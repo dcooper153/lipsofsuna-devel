@@ -1,3 +1,5 @@
+local Lobby = require("system/lobby")
+
 Ui:add_state{
 	state = "join",
 	root = "mainmenu",
@@ -59,7 +61,7 @@ Ui:add_state{
 	end,
 	init = function()
 		-- Download the server list.
-		Lobby.master = Client.options.master_server
+		Lobby:set_master(Client.options.master_server)
 		local servers = Lobby:download_server_list() or {}
 		-- Add the local server.
 		table.insert(servers, 1, {ip = "localhost", port = 10101,

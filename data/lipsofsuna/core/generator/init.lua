@@ -1,6 +1,6 @@
 if not Settings then return end
 
-require "system/noise"
+local File = require("system/file")
 require(Mod.path .. "generator")
 require(Mod.path .. "region")
 

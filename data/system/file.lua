@@ -1,11 +1,12 @@
-require "system/class"
+local Class = require("system/class")
 
 if not Los.program_load_extension("file") then
 	error("loading extension `file' failed")
 end
 
-File = Class()
-File.class_name = "File"
+------------------------------------------------------------------------------
+
+local File = Class("File")
 
 --- Reads the contents of a file.
 -- @param self File class.
@@ -50,3 +51,5 @@ end
 File.write = function(self, name, data)
 	return Los.file_write(name, data)
 end
+
+return File

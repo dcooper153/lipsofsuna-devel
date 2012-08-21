@@ -1,6 +1,9 @@
 local Class = require("system/class")
+local Model = require("system/model")
+local RenderObject = require("system/object-render")
+local RenderModel = require("system/render-model")
 
-local SpeedlineEffect = Class()
+local SpeedlineEffect = Class("SpeedlineEffect")
 
 --- Creates a new speed line effect for the object.
 -- @param clss SpeedlineEffect class.
@@ -45,8 +48,8 @@ SpeedlineEffect.add_slice = function(self)
 		p1 = self.object:get_position():copy():subtract_xyz(0,h,0)
 		p2 = self.object:get_position():copy():add_xyz(0,h,0)
 	else
-		p1 = self.object:get_position():copy():add(self.object:get_rotation() * p1)
-		p2 = self.object:get_position():copy():add(self.object:get_rotation() * p2)
+		p1 = self.object:transform_local_to_global(p1)
+		p2 = self.object:transform_local_to_global(p2)
 	end
 	p1:subtract(self.position)
 	p2:subtract(self.position)

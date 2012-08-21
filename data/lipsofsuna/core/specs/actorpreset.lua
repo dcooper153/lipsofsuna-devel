@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Actorpresetspec = Class(Spec)
+Actorpresetspec = Class("Actorpresetspec", Spec)
 Actorpresetspec.type = "actorpresetspec"
 Actorpresetspec.dict_id = {}
 Actorpresetspec.dict_cat = {}

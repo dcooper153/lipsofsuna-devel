@@ -1,4 +1,10 @@
-Voxel.tile_size = Program.sector_size / Voxel.tiles_per_line
+local Actor = require("core/objects/actor")
+local Item = require("core/objects/item")
+local Material = require("system/material")
+local Obstacle = require("core/objects/obstacle")
+local Staticobject = require("core/objects/static")
+
+Voxel.tile_size = Program:get_sector_size() / Voxel.tiles_per_line
 Voxel.tile_scale = 1 / Voxel.tile_size
 
 --- Checks what kind of tiles are within the range.
@@ -19,9 +25,9 @@ Voxel.check_range = function(clss, src, dst)
 					result.empty = result.empty + 1
 				else
 					local m = Material:find{id = t}
-					if m and m.type == "liquid" then
+					if m and m:get_type() == "liquid" then
 						result.liquid = result.liquid + 1
-						if m.magma then
+						if m:get_magma() then
 							result.magma = result.magma + 1
 						end
 					else
@@ -72,12 +78,12 @@ Voxel.place_actor = function(clss, args)
 	-- This needs to support both the client and the server so the class
 	-- used varies depending on what's available.
 	local clss_ = args.class or Actor or Object
-	clss_.new(clss_, {
-		spec = spec,
-		position = args.point * clss.tile_size,
-		random = true,
-		realized = true,
-		rotation = args.rotation and Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}})
+	local obj = clss_()
+	obj.random = true
+	obj:set_spec(spec)
+	obj:set_position(args.point * clss.tile_size)
+	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
+	obj:set_visible(true)
 end
 
 --- Places an item to the map.
@@ -92,12 +98,12 @@ Voxel.place_item = function(clss, args)
 	local spec = Itemspec:random(args)
 	if not spec then return end
 	local clss_ = args.class or Item or Object
-	clss_.new(clss_, {
-		spec = spec,
-		position = args.point * clss.tile_size,
-		random = true,
-		realized = true,
-		rotation = args.rotation and Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}})
+	local obj = clss_()
+	obj.random = true
+	obj:set_spec(spec)
+	obj:set_position(args.point * clss.tile_size)
+	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
+	obj:set_visible(true)
 end
 
 --- Places an obstacle to the map.
@@ -111,11 +117,11 @@ Voxel.place_obstacle = function(clss, args)
 	local spec = Obstaclespec:random(args)
 	if not spec then return end
 	local clss_ = args.class or Obstacle or Object
-	clss_.new(clss_, {
-		spec = spec,
-		position = args.point * clss.tile_size,
-		realized = true,
-		rotation = args.rotation and Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}})
+	local obj = clss_()
+	obj:set_spec(spec)
+	obj:set_position(args.point * clss.tile_size)
+	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
+	obj:set_visible(true)
 end
 
 --- Places a static object to the map.
@@ -129,11 +135,11 @@ Voxel.place_static = function(clss, args)
 	local spec = Staticspec:random(args)
 	if not spec then return end
 	local clss_ = args.class or Staticobject or Object
-	clss_.new(clss_, {
-		spec = spec,
-		position = args.point * clss.tile_size,
-		realized = true,
-		rotation = args.rotation and Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}})
+	local obj = clss_()
+	obj:set_spec(spec)
+	obj:set_position(args.point * clss.tile_size)
+	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
+	obj:set_visible(true)
 end
 
 --- Places a predefined map pattern to the map.
@@ -163,7 +169,7 @@ Voxel.place_pattern = function(clss, args)
 		local tile = 0
 		if v[4] then
 			local mat = Material:find{name = v[4]}
-			tile = mat and mat.id or 0
+			tile = mat and mat:get_id() or 0
 		end
 		if v[5] then
 			-- Fill volume of tiles.

@@ -1,15 +1,18 @@
-Unittest:add(1, "voxel", function()
-	require "system/tiles"
+Unittest:add(1, "system", "voxel", function()
+	local Vector = require("system/math/vector")
+	local Voxel = require("system/tiles")
 	-- Getting and setting tiles.
 	assert(Voxel:get_tile(Vector(100,101,102)) == 0)
 	Voxel:set_tile(Vector(100,101,102), 5)
 	assert(Voxel:get_tile(Vector(100,101,102)) == 5)
 end)
 
-Unittest:add(1, "voxel get block offsets", function()
-	require "system/tiles"
+Unittest:add(1, "system", "voxel get block offsets", function()
+	local Voxel = require("system/tiles")
 	local n = 0
 	local map = {}
+	Program:unload_world()
+	Voxel:set_block_size(1, 12)
 	for x,y,z in Voxel:get_blocks_by_sector_id(1) do
 		assert(x >= Voxel.blocks_per_line)
 		assert(x < 2 * Voxel.blocks_per_line)

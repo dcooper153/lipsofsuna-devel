@@ -1,4 +1,6 @@
-Operators.camera = Class()
+local Class = require("system/class")
+
+Operators.camera = Class("CameraOperator")
 Operators.camera.data = {}
 
 --- Initializes the camera operator.

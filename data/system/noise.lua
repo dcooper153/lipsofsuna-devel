@@ -1,9 +1,12 @@
+local Class = require("system/class")
+
 if not Los.program_load_extension("noise") then
 	error("loading extension `noise' failed")
 end
 
-Noise = Class()
-Noise.class_name = "Noise"
+------------------------------------------------------------------------------
+
+local Noise = Class("Noise")
 
 --- Generates Perlin noise.
 -- @param self Noise class.
@@ -71,3 +74,5 @@ Noise.perlin_threshold = function(self, ...)
 			a.frequency, a.octaves, a.persistent, a.seed)
 	end
 end
+
+return Noise

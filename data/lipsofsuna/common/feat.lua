@@ -1,6 +1,7 @@
+local Class = require("system/class")
 local Damage = require("core/server/damage")
 
-Feat = Class()
+Feat = Class("Feat")
 
 --- Creates a new feat.
 -- @param clss Feat class.
@@ -9,7 +10,8 @@ Feat = Class()
 --   <li>effects: List of effects and their magnitudes.</li></ul>
 -- @return New feat.
 Feat.new = function(clss, args)
-	local self = Class.new(clss, args)
+	local self = Class.new(clss)
+	for k,v in pairs(args) do self[k] = v end
 	self.effects = self.effects or {}
 	return self
 end
@@ -60,14 +62,14 @@ end
 
 Feat.apply_impulse = function(self, args)
 	if args.object and args.owner then
-		args.object:impulse{impulse = args.owner.rotation * Vector(0, 0, -100)}
+		args.object:impulse{impulse = args.owner:get_rotation() * Vector(0, 0, -100)}
 	end
 end
 
 Feat.apply_block_penalty = function(self, args)
 	-- Increase the melee cooldown if the target is blocking.
 	if args.owner and args.object and args.object.blocking then
-		if Program.time - args.object.blocking > args.object.spec.blocking_delay then
+		if Program:get_time() - args.object.blocking > args.object.spec.blocking_delay then
 			args.owner.cooldown = (args.owner.cooldown or 0) * 2
 			args.owner:animate("stagger")
 		end
@@ -261,7 +263,7 @@ Feat.perform = function(self, args)
 		if self.func then self:func(args) end
 	end
 	-- Emit a vision event.
-	Vision:event{type = "object-feat", object = args.user, anim = anim, move = move}
+	Server:object_event(args.user, "object-feat", {anim = anim, move = move})
 	return true
 end
 

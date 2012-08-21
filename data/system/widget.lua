@@ -1,24 +1,22 @@
-require "system/class"
+local Class = require("system/class")
+local Widgets = require("system/widgets")
 
--- FIXME
-Widgets = Class()
-Widgets.class_name = "Widgets"
+if not Los.program_load_extension("widgets") then
+	error("loading extension `widgets' failed")
+end
 
-Widget = Class()
-Widget.class_name = "Widget"
+------------------------------------------------------------------------------
+
+local Widget = Class("Widget")
 
 --- Creates a new widget.
 -- @param clss Widget class.
--- @param args Arguments.
 -- @return New widget.
-Widget.new = function(clss, args)
+Widget.new = function(clss)
 	local self = Class.new(clss)
 	self.handle = Los.widget_new()
 	self.__children = {}
 	__userdata_lookup[self.handle] = self
-	if args then
-		for k,v in pairs(args) do self[k] = v end
-	end
 	return self
 end
 
@@ -30,36 +28,17 @@ Widget.add_child = function(self, widget)
 	self.__children[widget] = widget
 end
 
---- Appends a column to the widget.
+--- Calculates and sets the size request of the widget.
 -- @param self Widget.
--- @param args List of widgets.
-Widget.append_col = function(self, ...)
-	-- Append a list of handles.
-	local h = {...}
-	for k,v in pairs(h) do h[k] = h[k] and h[k].handle end
-	Los.widget_append_col(self.handle, h)
-	-- Reference children.
-	local w = {...}
-	local x = self.cols
-	for y=1,self.rows do
-		self.__children[x + y * 1000] = w[y]
-	end
-end
-
---- Appends a row to the widget.
--- @param self Widget.
--- @param args List of widgets.
-Widget.append_row = function(self, ...)
-	-- Append a list of handles.
-	local h = {...}
-	for k,v in pairs(h) do h[k] = h[k] and h[k].handle end
-	Los.widget_append_row(self.handle, h)
-	-- Reference children.
-	local w = {...}
-	local y = self.rows
-	for x=1,self.cols do
-		self.__children[x + y * 1000] = w[x]
-	end
+-- @param args Arguments.<ul>
+--   <li>1,width: Width request.</li>
+--   <li>2,height: Height request.</li>
+--   <li>font: Font to use when calculating from text.</li>
+--   <li>internal: Set the internal request instead of the user request.</li>
+--   <li>paddings: Additional paddings to add or nil.</li>
+--   <li>text: Text to use when calculating from text.</li></ul>
+Widget.calculate_request = function(self, ...)
+	Los.widget_set_request(self.handle, ...)
 end
 
 --- Clears the canvas of the widget.
@@ -115,7 +94,7 @@ end
 -- @param self Widget.
 Widget.detach = function(self)
 	-- Remove from the script parent.
-	local p = self.parent
+	local p = self:get_parent()
 	if p then
 		for k,v in pairs(p.__children) do
 			if v == self then
@@ -128,56 +107,6 @@ Widget.detach = function(self)
 	Los.widget_detach(self.handle)
 end
 
---- Gets a child widget.
--- @param self Widget.
--- @param ... Arguments.<ul>
---   <li>1,row: Row number.</li>
---   <li>2,col: Column number.</li></ul>
--- @return Widget or nil.
-Widget.get_child = function(self, ...)
-	local a,b = ...
-	if type(a) == "table" then
-		local x = a[1] or a.col
-		local y = a[2] or a.row
-		return self.__children[x + y * 1000]
-	else
-		return self.__children[a + b * 1000]
-	end
-end
-
---- Gets the size request of the widget.
--- @param self Widget.
--- @return Request width, request height.
-Widget.get_request = function(self)
-	return Los.widget_get_request(self.handle)
-end
-
---- Inserts a column to the widget.
--- @param self Widget.
--- @param ... Arguments.<ul>
---   <li>1,col: Column index or nil.</li>
---   <li>2,widget: Widget or nil.</li></ul>
-Widget.insert_col = function(self, ...)
-	local a = {...}
-	for k,v in pairs(a) do
-		if v ~= nil then a[k] = v.handle end
-	end
-	Los.widget_insert_col(self.handle, a)
-end
-
---- Inserts a row to the widget.
--- @param self Widget.
--- @param ... Arguments.<ul>
---   <li>1,row: Row index or nil.</li>
---   <li>2,widget: Widget or nil.</li></ul>
-Widget.insert_row = function(self, ...)
-	local a = {...}
-	for k,v in pairs(a) do
-		if v ~= nil then a[k] = v.handle end
-	end
-	Los.widget_insert_row(self.handle, a)
-end
-
 --- Pops up the widget.
 -- @param self Widget.
 -- @param args Arguments.<ul>
@@ -188,225 +117,161 @@ end
 --   <li>dir: Popup direction. ("left"/"right"/"up"/"down")</li></ul>
 Widget.popup = function(self, args)
 	if Widgets.popup then
-		Widgets.popup.visible = false
+		Widgets.popup:set_visible(false)
 	end
 	Widgets.popup = self
 	return Los.widget_popup(self.handle, args)
 end
 
---- Removes a row or a column from the widget.
+--- Gets the focus status of the widget.
 -- @param self Widget.
--- @param args Arguments.<ul>
---   <li>col: Column index.</li>
---   <li>row: Row index.</li></ul>
-Widget.remove = function(self, args)
-	if args.col then
-		local w,h = self.cols,self.rows
-		for x = args.col,w do
-			for y = 1,h do
-				local c = self.__children[(x + 1) + y * 1000]
-				self.__children[x + y * 1000] = c
-			end
-		end
-		for y = 1,h do
-			self.__children[w + y * 1000] = nil
-		end
-	end
-	if args.row then
-		local w,h = self.cols,self.rows
-		for x = 1,w do
-			for y = args.row,h do
-				local c = self.__children[x + (y + 1) * 1000]
-				self.__children[x + y * 1000] = c
-			end
-		end
-		for x = 1,w do
-			self.__children[x + h * 1000] = nil
-		end
-	end
-	Los.widget_remove(self.handle, args)
+-- @param v Boolean.
+Widget.set_focused = function(self, v)
+	self.focused = v
 end
 
---- Sets a child widget.
+--- Gets the depth sorting priority of the widget.
 -- @param self Widget.
--- @param ... Arguments.<ul>
---   <li>1,col: Column number.</li>
---   <li>2,row: Row number.</li>
---   <li>3,widget: Widget.</li></ul>
-Widget.set_child = function(self, ...)
-	local a,b,c = ...
-	if type(a) == "table" then
-		local x = a[1] or a.col
-		local y = a[2] or a.row
-		local w = a[3] or a.widget
-		self.__children[x + y * 1000] = w
-		Los.widget_set_child(self.handle, x, y, w and w.handle)
-	else
-		self.__children[a + b * 1000] = c
-		Los.widget_set_child(self.handle, a, b, c and c.handle)
+-- @return Number.
+Widget.get_depth = function(self)
+	return Los.widget_get_depth(self.handle)
+end
+
+--- Sets the depth sorting priority of the widget.
+-- @param self Widget.
+-- @param v Number.
+Widget.set_depth = function(self, v)
+	Los.widget_set_depth(self.handle, v)
+end
+
+--- Gets the floating flag of the widget.
+-- @param self Widget.
+-- @return Boolean.
+Widget.get_floating = function(self)
+	return Los.widget_get_floating(self.handle)
+end
+
+--- Sets the floating flag of the widget.
+-- @param self Widget.
+-- @param v Boolean.
+Widget.set_floating = function(self, v)
+	Los.widget_set_floating(self.handle, v)
+	if not v and self == Widgets.popup then
+		Widgets.popup = nil
 	end
 end
 
---- Enables or disables row or column expansion.
+--- Gets the fullscreen enable flag of the widget.
 -- @param self Widget.
--- @param ... Arguments.<ul>
---   <li>1,row: Row number.</li>
---   <li>2,col: Column number.</li>
---   <li>3,expand: Boolean.</li></ul>
-Widget.set_expand = function(self, ...)
-	Los.widget_set_expand(self.handle, ...)
+-- @return Boolean.
+Widget.get_fullscreen = function(self)
+	return Los.widget_get_fullscreen(self.handle)
 end
 
---- Sets the size request of the widget.
+--- Sets the fullscreen enable flag of the widget.
 -- @param self Widget.
--- @param args Arguments.<ul>
---   <li>1,width: Width request.</li>
---   <li>2,height: Height request.</li>
---   <li>font: Font to use when calculating from text.</li>
---   <li>internal: Set the internal request instead of the user request.</li>
---   <li>paddings: Additional paddings to add or nil.</li>
---   <li>text: Text to use when calculating from text.</li></ul>
-Widget.set_request = function(self, ...)
-	Los.widget_set_request(self.handle, ...)
+-- @param v Boolean.
+Widget.set_fullscreen = function(self, v)
+	Los.widget_set_fullscreen(self.handle, v)
 end
 
---- Number of columns in the widget.
--- @name Widget.cols
--- @class table
+--- Gets the height of the widget.
+-- @param self Widget.
+-- @return Number.
+Widget.get_height = function(self)
+	return Los.widget_get_height(self.handle)
+end
 
---- Depth sorting priority.
--- @name Widget.depth
--- @class table
+--- Gets the pixel offset of the widget relative to its parent.
+-- @param self Widget.
+-- @return Vector.
+Widget.get_offset = function(self)
+	return Vector:new_from_handle(Los.widget_get_offset(self.handle))
+end
 
---- Floating flag.
--- @name Widget.floating
--- @class table
-
---- Fullscreen flag.
--- @name Widget.fullscreen
--- @class table
-
---- Height of the widget.
--- @name Widget.height
--- @class table
-
---- Margin widths.
--- @name Widget.margins
--- @class table
-
---- Pixel offset relative to the parent.
--- @name Widget.offset
--- @class table
+--- Sets the pixel offset of the widget relative to its parent.
+-- @param self Widget.
+-- @param v Vector.
+Widget.set_offset = function(self, v)
+	Los.widget_set_offset(self.handle, v.handle)
+end
 
 --- The parent of this widget.
 -- @name Widget.parent
 -- @class table
+Widget.get_parent = function(self)
+	local handle = Los.widget_get_parent(self.handle)
+	if not handle then return end
+	return __userdata_lookup[handle] -- TODO: eliminate by caching the parent in scripts
+end
 
---- Number of rows in the widget.
--- @name Widget.rows
--- @class table
+--- Gets the size request of the widget.
+-- @param self Widget.
+-- @return Width, height.
+Widget.get_request = function(self)
+	return Los.widget_get_request(self.handle)
+end
 
---- Child spacings.
--- @name Widget.margins
--- @class table
+--- Sets the size request of the widget.
+-- @param self Widget.
+-- @param width Width request, or nil.
+-- @param height Height request, or nil.
+-- @param internal True to set the internal request instead of the user request.
+Widget.set_request = function(self, width, height, internal)
+	Los.widget_set_request(self.handle, {width = width, height = height, internal = internal})
+end
 
---- Visibility flag.
--- @name Widget.visible
--- @class table
+--- Gets the visibility flag of the widget.
+-- @param self Widget.
+-- @return Boolean.
+Widget.get_visible = function(self)
+	return Los.widget_get_visible(self.handle)
+end
 
---- Width of the widget
--- @name Widget.width
--- @class table
+--- Sets the visibility flag of the widget.
+-- @param self Widget.
+-- @param v Boolean.
+Widget.set_visible = function(self, v)
+	Los.widget_set_visible(self.handle, v)
+	if not v and self == Widgets.popup then
+		Widgets.popup = nil
+	end
+end
 
---- Left edge position.
--- @name Widget.x
--- @class table
+--- Gets the width of the widget
+-- @param self Widget.
+-- @return Number.
+Widget.get_width = function(self)
+	return Los.widget_get_width(self.handle)
+end
 
---- Top edge position.
--- @name Widget.y
--- @class table
+--- Gets the left edge position.
+-- @param self Widget.
+-- @return Number.
+Widget.get_x = function(self)
+	return Los.widget_get_x(self.handle)
+end
 
-Widget:add_getters{
-	cols = function(s) return Los.widget_get_cols(s.handle) end,
-	depth = function(s) return Los.widget_get_depth(s.handle) end,
-	floating = function(s) return Los.widget_get_floating(s.handle) end,
-	fullscreen = function(s) return Los.widget_get_fullscreen(s.handle) end,
-	height = function(s) return Los.widget_get_height(s.handle) end,
-	height_request = function(s)
-		local a,b = Los.widget_get_request(s.handle)
-		return b
-	end,
-	margins = function(s) return Los.widget_get_margins(s.handle) end,
-	offset = function(s) return Class.new(Vector, {handle = Los.widget_get_offset(s.handle)}) end,
-	parent = function(s)
-		local handle = Los.widget_get_parent(s.handle)
-		if not handle then return end
-		return __userdata_lookup[handle]
-	end,
-	request = function(s)
-		local a,b = Los.widget_get_request(s.handle)
-		return {a, b}
-	end,
-	rows = function(s) return Los.widget_get_rows(s.handle) end,
-	spacings = function(s) return Los.widget_get_spacings(s.handle) end,
-	visible = function(s) return Los.widget_get_visible(s.handle) end,
-	width = function(s) return Los.widget_get_width(s.handle) end,
-	width_request = function(s)
-		local a,b = Los.widget_get_request(s.handle)
-		return a
-	end,
-	x = function(s) return Los.widget_get_x(s.handle) end,
-	y = function(s) return Los.widget_get_y(s.handle) end}
+--- Sets the left edge position.
+-- @param self Widget.
+-- @return Number.
+Widget.set_x = function(self, v)
+	Los.widget_set_x(self.handle, v)
+end
 
-Widget:add_setters{
-	cols = function(s, v)
-		local w,h = s.cols,s.rows
-		if v < w then
-			for x = v+1,w do
-				for y = 1,h do
-					s.__children[x + y * 1000] = nil
-				end
-			end
-		end
-		Los.widget_set_cols(s.handle, v)
-	end,
-	depth = function(s, v) Los.widget_set_depth(s.handle, v) end,
-	expand_col = function(s, v) Los.widget_set_expand(s.handle, v) end,
-	expand_row = function(s, v) Los.widget_set_expand(s.handle, nil, v) end,
-	floating = function(s, v)
-		Los.widget_set_floating(s.handle, v)
-		if not v and s == Widgets.popup then Widgets.popup = nil end
-	end,
-	fullscreen = function(s, v) Los.widget_set_fullscreen(s.handle, v) end,
-	height_request = function(s, v) Los.widget_set_request(s.handle, s.width_request, v) end,
-	margins = function(s, v) Los.widget_set_margins(s.handle, v) end,
-	offset = function(s, v) Los.widget_set_offset(s.handle, v.handle) end,
-	request = function(s, v)
-		if v and v.class_name == "Vector" then
-			Los.widget_set_request(s.handle, v.handle)
-		else
-			Los.widget_set_request(s.handle, v)
-		end
-	end,
-	rows = function(s, v)
-		local w,h = s.cols,s.rows
-		if v < h then
-			for x = 1,w do
-				for y = v+1,h do
-					s.__children[x + y * 1000] = nil
-				end
-			end
-		end
-		Los.widget_set_rows(s.handle, v)
-	end,
-	spacings = function(s, v) Los.widget_set_spacings(s.handle, v) end,
-	visible = function(s, v)
-		Los.widget_set_visible(s.handle, v)
-		if not v and s == Widgets.popup then Widgets.popup = nil end
-	end,
-	width_request = function(s, v) Los.widget_set_request(s.handle, v, s.height_request) end,
-	x = function(s, v) Los.widget_set_x(s.handle, v) end,
-	y = function(s, v) Los.widget_set_y(s.handle, v) end}
+--- Gets the top edge position of the widget.
+-- @param self Widget.
+-- @return Number.
+Widget.get_y = function(self)
+	return Los.widget_get_y(self.handle)
+end
+
+--- Sets the top edge position of the widget.
+-- @param self Widget.
+-- @param v Number.
+Widget.set_y = function(self, v)
+	Los.widget_set_y(self.handle, v)
+end
 
 -- Userdata don't have members but the engine needs to be able to call the
 -- reshape functions of widgets. This is done with a global variable.
@@ -414,3 +279,5 @@ __widget_reshape = function(handle)
 	local w = __userdata_lookup[handle]
 	if w and w.reshaped then w:reshaped() end
 end
+
+return Widget

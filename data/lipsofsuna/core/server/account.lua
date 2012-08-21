@@ -1,25 +1,27 @@
-require "system/class"
+local Class = require("system/class")
+local Password = require("system/password")
 
-Account = Class()
+local Account = Class("Account")
 
 --- Loads or creates an account.
 -- @param clss Account class.
 -- @param login Login name.
--- @param password Password.
--- @return Account, or nil if authentication failed.
-Account.new = function(clss, login, password)
-	local data = Server.account_database:load_account(login)
-	local hash = Password:hash(password, Server.account_database.password_salt)
-	if data and data[2] ~= hash then return end
-	local self = Class.new(clss, {
-		login = login,
-		password = hash,
-		permissions = data and data[3] or 0,
-		character = data and data[4]})
-	if data and data[5] then
-		local ok,vec = pcall(loadstring("return " .. data[5]))
+-- @param password Hashed password.
+-- @param permissions Permission mask, or nil.
+-- @param character Character string, or nil.
+-- @param spawnpoint Spawn point string, or nil.
+-- @return Account.
+Account.new = function(clss, login, password, permissions, character, spawnpoint)
+	local self = Class.new(clss)
+	self.login = login
+	self.password = password
+	self.permissions = permissions or 0
+	self.character = character
+	if spawnpoint then
+		local ok,vec = pcall(loadstring("return " .. spawnpoint))
 		if ok then self.spawn_point = vec end
 	end
-	Server.accounts_by_name[login] = self
 	return self
 end
+
+return Account

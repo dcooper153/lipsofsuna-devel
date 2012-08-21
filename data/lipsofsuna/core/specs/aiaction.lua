@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Aiactionspec = Class(Spec)
+Aiactionspec = Class("Aiactionspec", Spec)
 Aiactionspec.type = "aiaction"
 Aiactionspec.dict_id = {}
 Aiactionspec.dict_cat = {}

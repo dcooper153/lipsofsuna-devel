@@ -12,7 +12,7 @@ local radian_wrap = function(x)
 	return y
 end
 
-local PlayerState = Class()
+local PlayerState = Class("PlayerState")
 
 PlayerState.new = function(clss)
 	local self = Class.new(clss)

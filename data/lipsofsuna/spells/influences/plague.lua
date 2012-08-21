@@ -1,3 +1,5 @@
+local Actor = require("core/objects/actor")
+
 -- Summon plagued beasts.
 Feateffectspec:extend{
 	name = "black haze",
@@ -10,7 +12,7 @@ Feateffectspec:extend{
 		-- Damage the actor.
 		mod.object:damaged{amount = 5, type = "disease"}
 		-- Infect nearby actors.
-		local near = SimulationObject:find{point = mod.object.position, radius = 5}
+		local near = Game.objects:find_by_point(mod.object:get_position(), 5)
 		for k,v in pairs(near) do
 			if math.random() > 0.1 then
 				v:inflict_modifier("black haze", 10000)

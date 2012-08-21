@@ -1,5 +1,5 @@
-Unittest:add(1, "database", function()
-	require "system/database"
+Unittest:add(1, "system", "database", function()
+	local Database = require("system/database")
 	-- Database creation.
 	local d = Database("unittest.sqlite")
 	assert(d)

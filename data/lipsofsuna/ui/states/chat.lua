@@ -13,7 +13,7 @@ Ui:add_widget{
 			local cmd,match = ChatCommand:find(w.value, "client")
 			if cmd then cmd.func(Client.player_object, {match}) end
 			-- Close the chat unless the command did already.
-			if Ui.state == "chat" then Ui:pop_state() end
+			if Ui:get_state() == "chat" then Ui:pop_state() end
 		end
 		widget.canceled = function(w)
 			Ui:pop_state()

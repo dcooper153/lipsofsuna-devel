@@ -1,4 +1,6 @@
-Introspect = Class()
+local Class = require("system/class")
+
+Introspect = Class("Introspect")
 Introspect.types_dict = {}
 
 --- Creates a new introspection ruleset.

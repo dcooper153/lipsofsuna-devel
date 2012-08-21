@@ -1,5 +1,8 @@
-Selection = Class()
-Selection.class_name = "Selection"
+local Class = require("system/class")
+local Model = require("system/model")
+local RenderObject = require("system/object-render")
+
+local Selection = Class("Selection")
 Selection.face_dir = {
 	Vector(-1,0,0), Vector(1,0,0),
 	Vector(0,-1,0), Vector(0,1,0),
@@ -95,20 +98,21 @@ end
 Selection.refresh = function(self)
 	if not self.visual then return end
 	if not self.object then return end
-	self.visual:set_position(self.object.position)
-	self.visual:set_rotation(self.object.rotation)
+	self.visual:set_position(self.object:get_position())
+	self.visual:set_rotation(self.object:get_rotation())
 end
 
 Selection.rotate = function(self, drot)
 	if not self.visual then return end
 	if not self.object then return end
-	self.object.rotation = drot * self.object.rotation
+	self.object:set_rotation(drot * self.object:get_rotation())
 	self:refresh()
 end
 
 Selection.transform = function(self, center, dpos, drot)
 	if not self.object then return end
-	self.object.position = drot * (self.object.position + dpos - center) + center
+	local p = self.object:get_position():copy():add(dpos):subtract(center)
+	self.object:set_position(drot * p + center)
 	self:refresh()
 end
 
@@ -133,7 +137,7 @@ Selection.set_empty = function(self)
 end
 
 Selection.set_object = function(self, data, face)
-	local model = self:create_face_model(face, data.rotation, data.bounding_box_physics)
+	local model = self:create_face_model(face, data:get_rotation(), data:get_bounding_box_physics())
 	self.face = face
 	self.key = data
 	self.object = data
@@ -142,7 +146,7 @@ Selection.set_object = function(self, data, face)
 	self.visual = RenderObject()
 	self.visual.model = model:get_render()
 	self.visual:add_model(self.visual.model)
-	self.visual:set_position(data.position)
+	self.visual:set_position(data:get_position())
 end
 
 Selection.set_tile = function(self, data, face)
@@ -153,8 +157,10 @@ Selection.set_tile = function(self, data, face)
 	self.tile = data
 	self.visual_prev = self.visual
 	self.visual = RenderObject()
-	self.visual.model = Model:find_or_load("select1"):get_render()
+	self.visual.model = Main.models:find_by_name("select1"):get_render()
 	self.visual:add_model(self.visual.model)
 	self.visual:set_position(p)
 	self.visual:set_rotation(self.face_rot[face])
 end
+
+return Selection

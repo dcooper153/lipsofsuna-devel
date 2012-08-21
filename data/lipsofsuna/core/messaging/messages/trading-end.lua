@@ -13,7 +13,7 @@ Message{
 		if player.dead then return end
 		if not player.trading then return end
 		-- Cancel trading.
-		Trading:cancel(player)
+		Server.trading:cancel(player)
 	end,
 	server_to_client_encode = function(self)
 		return {}
@@ -23,7 +23,7 @@ Message{
 	end,
 	server_to_client_handle = function(self)
 		-- Update the user interface.
-		if Ui.state == "trading" then
+		if Ui:get_state() == "trading" then
 			Ui:pop_state()
 		end
 	end}

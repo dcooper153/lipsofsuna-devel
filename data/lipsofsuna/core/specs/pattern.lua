@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Patternspec = Class(Spec)
+Patternspec = Class("Paternspec", Spec)
 Patternspec.type = "pattern"
 Patternspec.dict_id = {}
 Patternspec.dict_cat = {}
@@ -55,8 +56,7 @@ Patternspec.write = function(self)
 	return self.introspect:write_str(self)
 end
 
-Patternspec:add_getters{
-	spawn_point_world = function(self)
-		if not self.spawn_point then return end
-		return (self.position + self.spawn_point) * Voxel.tile_size
-	end}
+Patternspec.get_spawn_point_world = function(self)
+	if not self.spawn_point then return end
+	return (self.position + self.spawn_point) * Voxel.tile_size
+end

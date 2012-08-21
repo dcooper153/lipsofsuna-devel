@@ -14,7 +14,7 @@ Message{
 		if not player then return end
 		if player.dead then return end
 		-- Get the modified inventory.
-		local target = SimulationObject:find{id = id}
+		local target = Game.objects:find_by_id(id)
 		if not target then return end
 		if not target.inventory:is_subscribed(player) then return end
 		if not player:can_reach_object(target) then return end

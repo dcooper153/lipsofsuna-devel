@@ -1,7 +1,6 @@
 local Class = require("system/class")
 
-local MovementPrediction = Class()
-MovementPrediction.class_name = "MovementPrediction"
+local MovementPrediction = Class("MovementPrediction")
 
 --- Creates a new movement predictor.
 -- @param clss Movement prediction class.

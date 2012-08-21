@@ -1,10 +1,11 @@
+local Class = require("system/class")
+local Input = require("system/input")
 require(Mod.path .. "widget")
 
-Widgets.Uiscrollfloat = Class(Widgets.Uiwidget)
-Widgets.Uiscrollfloat.class_name = "Widgets.Uiscrollfloat"
+Widgets.Uiscrollfloat = Class("Uiscrollfloat", Widgets.Uiwidget)
 
 Widgets.Uiscrollfloat.new = function(clss, label, min, max, value, changed)
-	local self = Widgets.Uiwidget.new(clss, nil, label)
+	local self = Widgets.Uiwidget.new(clss, label)
 	self.min = min
 	self.max = max
 	self.value = value
@@ -76,16 +77,16 @@ Widgets.Uiscrollfloat.handle_event = function(self, args)
 			self.input_mode = nil
 		end
 	end
-	if not Ui.pointer_grab then
+	if not Ui:get_pointer_grab() then
 		if args.type == "mousepress" then
-			local cx = Program.cursor_position.x
+			local cx = Input:get_pointer_position().x
 			if args.button == 1 then
-				if cx < self.x + Theme.width_label_1 + Theme.width_slider_button_1 then
+				if cx < self:get_x() + Theme.width_label_1 + Theme.width_slider_button_1 then
 					self.value = math.max(self.value - self.step, self.min)
 					self.need_repaint = true
 					self:update_text()
 					self:changed()
-				elseif cx >= self.x + self.size.x - Theme.width_slider_button_1 then
+				elseif cx >= self:get_x() + self.size.x - Theme.width_slider_button_1 then
 					self.value = math.min(self.value + self.step, self.max)
 					self.need_repaint = true
 					self:update_text()
@@ -96,7 +97,7 @@ Widgets.Uiscrollfloat.handle_event = function(self, args)
 			end
 			return
 		elseif args.type == "mousemotion" then
-			if Program.mouse_button_state % 2 == 1 then
+			if Input:get_mouse_button_state() % 2 == 1 then
 				self:set_value_at(args.x)
 			end
 			return
@@ -132,7 +133,7 @@ Widgets.Uiscrollfloat.update_text = function(self)
 end
 
 Widgets.Uiscrollfloat.get_value_at = function(self, x)
-	local pos = math.max(0, x - self.x - Theme.width_label_1 - Theme.width_slider_button_1)
+	local pos = math.max(0, x - self:get_x() - Theme.width_label_1 - Theme.width_slider_button_1)
 	local frac = math.min(1, pos / (self.size.x - Theme.width_label_1 - Theme.width_slider_button_1 * 2 - 5))
 	return frac * (self.max - self.min) + self.min
 end

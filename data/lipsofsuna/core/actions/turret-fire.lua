@@ -7,7 +7,7 @@ local perform_attack = function(attacker)
 	if not ammo then return end
 	-- Play the attack effect.
 	Server:object_effect(attacker, "musket1")
-	Vision:event{type = "object attack", object = attacker, move = "stand", variant = math.random(0, 255)}
+	Server:object_event(attacker, "object attack", {move = "stand", variant = math.random(0, 255)})
 	-- Fire the projectile.
 	local projectile = ammo:split()
 	local damage = Combat:calculate_ranged_damage(attacker, projectile)

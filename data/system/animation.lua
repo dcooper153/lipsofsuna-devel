@@ -1,4 +1,4 @@
-require "system/class"
+local Class = require("system/class")
 
 if not Los.program_load_extension("animation") then
 	error("loading extension `animation' failed")
@@ -6,8 +6,7 @@ end
 
 ------------------------------------------------------------------------------
 
-Animation = Class()
-Animation.class_name = "Animation"
+local Animation = Class("Animation")
 Animation.dict_name = setmetatable({}, {__mode = "v"})
 
 -- FIXME
@@ -49,7 +48,7 @@ Animation.load = function(clss, name)
 end
 
 --- Sets the transformation of a node in the given frame.
--- @param self Object.
+-- @param self Animation.
 -- @param args Arguments.<ul>
 --   <li>frame: Frame number.</li>
 --   <li>node: Node name.</li>
@@ -64,14 +63,24 @@ Animation.set_transform = function(self, args)
 end
 
 --- Gets the duration of the animation in seconds.
--- @name Animation.duration
--- @class table
+-- @param self Animation.
+-- @return Duration in seconds.
+Animation.get_duration = function(self)
+	return Los.animation_get_duration(self.handle)
+end
 
 --- Gets the number of frames in the animation
--- @name Animation.frames
--- @class table
+-- @param self Animation.
+-- @return Number of frames.
+Animation.get_frames = function(self)
+	return Los.animation_get_frames(self.handle)
+end
 
-Animation:add_getters{
-	duration = function(self) return Los.animation_get_duration(self.handle) end,
-	frames = function(self) return Los.animation_get_frames(self.handle) end,
-	name = function(self) return Los.animation_get_name(self.handle) end}
+--- Gets the name of the animation.
+-- @param self Animation.
+-- @return Name.
+Animation.get_name = function(self)
+	return Los.animation_get_name(self.handle)
+end
+
+return Animation

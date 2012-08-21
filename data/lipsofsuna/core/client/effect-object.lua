@@ -1,6 +1,6 @@
 local Class = require("system/class")
 
-local EffectObject = Class()
+local EffectObject = Class("EffectObject")
 
 --- Creates a new effect.
 -- @param clss EffectObject class.
@@ -27,6 +27,17 @@ end
 
 EffectObject.detach = function(self)
 	Game.scene_nodes_by_ref[self] = nil
+end
+
+--- Transforms a position vector from the local coordinate space to global.
+-- @param self EffectObject.
+-- @param point Point vector.
+-- @return Point vector.
+EffectObject.transform_local_to_global = function(self, point)
+	local pos = self:get_position()
+	if not point then return pos end
+	local rot = self:get_rotation()
+	return pos:copy():add(rot * point)
 end
 
 EffectObject.unparent = function(self)

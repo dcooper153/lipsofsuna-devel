@@ -29,5 +29,5 @@ Message{
 			Client.data.trading.shop[k] = item
 		end
 		-- Update the user interface.
-		Ui.state = "trading"
+		Ui:set_state("trading")
 	end}

@@ -25,7 +25,7 @@ Message{
 		-- Validate the input.
 		for k,v in pairs(enabled) do
 			local skill = Skillspec:find{name = k}
-			if not skill or not Unlocks:get("skill", k) then
+			if not skill or not Server.unlocks:get("skill", k) then
 				enabled[k] = nil
 			end
 		end
@@ -62,7 +62,7 @@ Message{
 			Client.data.skills:add(name)
 		end
 		-- Update the user interface.
-		if Ui.state == "skills" then
+		if Ui:get_state() == "skills" then
 			Ui:restart_state()
 		end
 	end}

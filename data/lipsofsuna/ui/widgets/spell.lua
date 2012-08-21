@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "widget")
 
-Widgets.Uispell = Class(Widgets.Uiwidget)
-Widgets.Uispell.class_name = "Widgets.Uispell"
+Widgets.Uispell = Class("Uispell", Widgets.Uiwidget)
 
 Widgets.Uispell.new = function(clss, mode, name, active)
 	local self = Widgets.Uiwidget.new(clss)

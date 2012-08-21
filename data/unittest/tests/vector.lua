@@ -1,5 +1,5 @@
-Unittest:add(1, "vector", function()
-	require "system/math"
+Unittest:add(1, "system", "vector", function()
+	local Vector = require("system/math/vector")
 	-- Addition.
 	local vec = Vector(1, 100) + Vector(5,5,5)
 	assert(vec.x == 6 and vec.y == 105 and vec.z == 5)
@@ -24,4 +24,16 @@ Unittest:add(1, "vector", function()
 	assert(d.x == 0 and d.y == 0 and d.z == 0)
 	d:normalize()
 	assert(d.x == 0 and d.y == 0 and d.z == 0)
+	-- Multiplication.
+	local e = Vector(100, -100, 50) * 0.5
+	assert(e.x == 50 and e.y == -50 and e.z == 25)
+	-- Subtraction.
+	local f = Vector(600, 500, 400) - Vector(100, -100, 50)
+	assert(f.x == 500 and f.y == 600 and f.z == 350)
+	-- Getters and setters.
+	local g = Vector()
+	g.x = 100
+	g.y = 200
+	g.z = -100
+	assert(g.x == 100 and g.y == 200 and g.z == -100)
 end)

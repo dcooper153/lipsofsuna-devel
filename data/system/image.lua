@@ -1,4 +1,4 @@
-require "system/class"
+local Class = require("system/class")
 
 if not Los.program_load_extension("image") then
 	error("loading extension `image' failed")
@@ -6,8 +6,7 @@ end
 
 ------------------------------------------------------------------------------
 
-Image = Class()
-Image.class_name = "Image"
+local Image = Class("Image")
 
 --- Loads an image from a file.
 -- @param clss Image class.
@@ -20,3 +19,5 @@ Image.new = function(clss, file)
 	self.handle = handle
 	return self
 end
+
+return Image

@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Actionspec = Class(Spec)
-Actionspec.class_name = "Actionspec"
+Actionspec = Class("Actionspec", Spec)
 Actionspec.type = "action"
 Actionspec.dict_id = {}
 Actionspec.dict_cat = {}

@@ -7,7 +7,7 @@ Message{
 		return {}
 	end,
 	server_to_client_handle = function(self)
-		Client.player_object = nil
+		Client:set_player_object(nil)
 		Operators.chargen:init()
-		Ui.state = "chargen"
+		Ui:set_state("chargen")
 	end}

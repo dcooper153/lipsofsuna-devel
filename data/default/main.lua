@@ -1,8 +1,8 @@
 require "system/core"
 
-if Program.args == "-U" or Program.args == "--unittest" then
-	Program:launch_mod{name = "unittest", args = Program.args}
+if Program:get_args() == "-U" or Program:get_args() == "--unittest" then
+	Program:launch_mod{name = "unittest", args = Program:get_args()}
 else
-	Program:launch_mod{name = "lipsofsuna", args = Program.args}
+	Program:launch_mod{name = "lipsofsuna", args = Program:get_args()}
 end
-Program.quit = true
+Program:set_quit(true)

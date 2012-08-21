@@ -9,4 +9,5 @@ docs/html
 .lock-wafbuild
 .waf*
 !data/lipsofsuna/
+!data/unittest/tests/lipsofsuna/
 !src/lipsofsuna/

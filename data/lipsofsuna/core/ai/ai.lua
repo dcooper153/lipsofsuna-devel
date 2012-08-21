@@ -1,4 +1,6 @@
-Ai = Class()
+local Class = require("system/class")
+
+Ai = Class("Ai")
 Ai.dict_name = {}
 
 --- Creates a new actor AI.<br/>
@@ -18,15 +20,22 @@ Ai.new = function(clss, object)
 	return self
 end
 
+--- Registers an AI subclass.
+-- @param clss AI class.
+-- @param ai Subclass.
+Ai.register = function(clss, ai)
+	clss.dict_name[ai.type] = ai
+end
+
 --- Adds an enemy to the list of enemies.
 -- @param self AI.
 -- @param object Enemy object.
 Ai.add_enemy = function(self, object)
 	local enemy = self.enemies[object]
 	if enemy then
-		enemy[2] = Program.time + 30
+		enemy[2] = Program:get_time() + 30
 	else
-		self.enemies[object] = {object, Program.time + 30}
+		self.enemies[object] = {object, Program:get_time() + 30}
 	end
 end
 
@@ -63,7 +72,7 @@ end
 Ai.calculate_enemy_rating = function(self, enemy)
 	-- TODO: Should take enemy weakness into account.
 	-- TODO: Should probably take terrain into account by solving paths.
-	return 1 / ((self.object.position - enemy.position).length + 1)
+	return 1 / ((self.object:get_position() - enemy:get_position()).length + 1)
 end
 
 --- Calculates the tilt value for melee attacks.
@@ -71,7 +80,7 @@ end
 -- @return Tilt quaternion.
 Ai.calculate_melee_tilt = function(self)
 	-- Calculate distance to the target.
-	local diff = self.target.position + self.target.center_offset_physics - self.object.position - self.object.spec.aim_ray_center
+	local diff = self.target:get_position() + self.target:get_center_offset_physics() - self.object:get_position() - self.object.spec.aim_ray_center
 	local dist = Vector(diff.x, 0, diff.z).length
 	-- Solve the tilt angle analytically.
 	local angle = math.atan2(diff.y, dist)
@@ -97,7 +106,7 @@ Ai.calculate_ranged_tilt = function(self)
 	local spec = Itemspec:find{name = weapon.spec.ammo_type}
 	if not spec then return Quaternion() end
 	-- Calculate distance to the target.
-	local diff = self.target.position + self.target.center_offset_physics - self.object.position - self.object.spec.aim_ray_center
+	local diff = self.target:get_position() + self.target:get_center_offset_physics() - self.object:get_position() - self.object.spec.aim_ray_center
 	local dist = Vector(diff.x, 0, diff.z).length
 	-- Solve the tilt angle with brute force.
 	local speed = 20
@@ -177,7 +186,7 @@ Ai.find_best_feat = function(self, args)
 		if not feat:usable{user = self.object} then return end
 		-- Make sure that the feat can reach the target.
 		local range = anim.range or self.object.spec.aim_ray_end * 0.7
-		local dist = (self.object.position - args.target.position).length
+		local dist = (self.object:get_position() - args.target:get_position()).length
 		if dist > range then return end
 		-- Add best feat effects.
 		feat:add_best_effects{category = effect, user = self.object}
@@ -206,10 +215,10 @@ end
 Ai.scan_enemies = function(self)
 	-- Clear old enemies.
 	local old = self.enemies
-	local time = Program.time
+	local time = Program:get_time()
 	self.enemies = {}
 	-- Find new enemies.
-	local objs = Object:find{point = self.object.position, radius = 15}
+	local objs = Game.objects:find_by_point(self.object:get_position(), 15)
 	for k,v in pairs(objs) do
 		if not v.dead then
 			local enemy = old[v]
@@ -235,3 +244,5 @@ end
 -- @param secs Seconds since the last update.
 Ai.update = function(self, secs)
 end
+
+return Ai

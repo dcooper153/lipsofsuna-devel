@@ -1,5 +1,9 @@
-Generator.sector_types.Labyrinth = Class()
-Generator.sector_types.Labyrinth.class_name = "Generator.Labyrinth"
+local Class = require("system/class")
+local Item = require("core/objects/item")
+local Material = require("system/material")
+local Noise = require("system/noise")
+
+Generator.sector_types.Labyrinth = Class("Generator.Labyrinth")
 
 Generator.sector_types.Labyrinth.init = function(self)
 	self.scale1 = Vector(1.0,1.0,1.0)
@@ -29,7 +33,7 @@ Generator.sector_types.Labyrinth.generate = function(self, pos, size)
 	local r3 = Noise:perlin_noise(pos + Vector(size.x/2,0,size.z), self.scale1, 1, 3, 0.5, Server.generator.seed1)
 	local r4 = Noise:perlin_noise(pos + Vector(0,0,size.z/2), self.scale1, 1, 3, 0.5, Server.generator.seed1)
 	local r5 = Noise:perlin_noise(pos + Vector(size.x/2,0,0), self.scale1, 1, 3, 0.5, Server.generator.seed1)
-	Voxel:fill_region{point = pos, size = size, tile = self.mats[2].id}
+	Voxel:fill_region{point = pos, size = size, tile = self.mats[2]:get_id()}
 	Voxel:fill_region{point = pos + Vector(a,c,a), size = Vector(b,d,b), tile = 0}
 	if r2 > t1 then
 		Voxel:fill_region{point = pos + Vector(a+b,c,a), size = Vector(a,d,b), tile = 0}

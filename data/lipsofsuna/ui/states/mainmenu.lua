@@ -35,11 +35,11 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "mainmenu",
 	widget = function()
-		local widget = Widgets.Uibutton("Editor", function() Ui.state = "editor" end)
+		local widget = Widgets.Uibutton("Editor", function() Ui:set_state("editor") end)
 		widget.hint = "$A: Enter\n$$B\n$$U\n$$D"
 		return widget
 	end}
 
 Ui:add_widget{
 	state = "mainmenu",
-	widget = function() return Widgets.Uibutton("Quit", function() Program.quit = true end) end}
+	widget = function() return Widgets.Uibutton("Quit", function() Program:set_quit(true) end) end}

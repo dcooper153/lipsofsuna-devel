@@ -34,10 +34,10 @@ Ui:add_hud{
 	init = function()
 		local self = Widgets.Uiicon(Iconspec:find{name = "crosshair1"})
 		self.update = function(self, secs)
-			local mode = Program.video_mode
+			local mode = Program:get_video_mode()
 			local padx = mode[1] - self.icon.size[1]
 			local pady = mode[2] - self.icon.size[2]
-			self.offset = Vector(padx / 2, pady / 2)
+			self:set_offset(Vector(padx / 2, pady / 2))
 		end
 		return self
 	end}
@@ -59,5 +59,5 @@ Ui:add_hud{
 
 Ui:add_hud{
 	id = "target",
-	active = function() return Ui.state == "play" end,
+	active = function() return Ui:get_state() == "play" end,
 	init = function() return Widgets.Hudtarget() end}

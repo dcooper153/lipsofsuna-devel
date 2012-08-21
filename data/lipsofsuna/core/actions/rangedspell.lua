@@ -1,3 +1,5 @@
+local Coroutine = require("system/coroutine")
+
 -- Ranged spell.
 -- A magical projectile is fired at the specific time into the attack
 -- animation. The collision callback of the projectile takes

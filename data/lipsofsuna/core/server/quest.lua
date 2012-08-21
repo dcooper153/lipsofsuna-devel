@@ -1,78 +1,35 @@
 require "common/marker"
+local Class = require("system/class")
 
---- Marks the quest as active.
+local Quest = Class("Quest")
+
+--- Creates a new quest.
 -- @param clss Quest class.
--- @param args Arguments.<ul>
---   <li>id: Quest id.</li>
---   <li>name: Quest name.</li>
---   <li>quest: Quest.</li></ul>
-Quest.activate = function(clss, args)
-	-- Find the quest.
-	local q = args.quest or clss:find(args)
-	if not q then return end
-	-- Set the status and inform clients.
-	if q.status == "unused" or q.status == "inactive" then
-		q.status = "active"
-		q:send{all = true}
-		Server.quest_database:save_quest(q)
-	end
+-- @param name Quest name.
+-- @param status Status string, or nil.
+-- @param text Description text, or nil.
+-- @param marker Marker name, or nil.
+Quest.new = function(clss, name, status, text, marker)
+	local self = Class.new(clss)
+	self.name = name
+	self.status = status or "inactive"
+	self.text = text
+	self.marker = marker
+	return self
 end
 
---- Marks the quest as completed.
--- @param clss Quest class.
--- @param args Arguments.<ul>
---   <li>id: Quest id.</li>
---   <li>name: Quest name.</li>
---   <li>quest: Quest.</li></ul>
-Quest.complete = function(clss, args)
-	-- Find the quest.
-	local q = args.quest or clss:find(args)
-	if not q then return end
-	-- Set the status and inform clients.
-	if q.status ~= "completed" then
-		q.status = "completed"
-		q:send{all = true}
-		Server.quest_database:save_quest(q)
-	end
-end
-
---- Sends the quest status to a client or clients.
+--- Sends the quest status to the given client.
 -- @param self Quest.
--- @param args Arguments.<ul>
---   <li>all: True to send to all clients.</li>
---   <li>client: Client.</li></ul>
-Quest.send = function(self, args)
-	-- Skip inactive quests.
+-- @param client Client.
+-- @param status True to send the status.
+-- @param marker True to send the marker.
+Quest.send_to_client = function(self, client, status, marker)
 	if self.status ~= "active" and self.status ~= "completed" then return end
-	-- Notify clients of the change.
-	if args.all then
-		for k,v in pairs(Server.players_by_client) do
-			Game.messaging:server_event("update quest status", k, self.id, self.status, self.text)
-		end
-	elseif args.client then
-		Game.messaging:server_event("update quest status", args.client, self.id, self.status, self.text)
+	if status then
+		Game.messaging:server_event("update quest status", client, self.name, self.status, self.text)
 	end
-	-- Send the mark if one is set.
-	self:send_marker(args)
-end
-
---- Sends the map marker of the quest to a client or clients.
--- @param self Quest.
--- @param args Arguments.<ul>
---   <li>all: True to send to all clients.</li>
---   <li>client: Client.</li></ul>
-Quest.send_marker = function(self, args)
-	-- Skip inactive quests.
-	if self.status ~= "active" and self.status ~= "completed" then return end
-	-- Create marker packet.
-	local m = self.marker and Marker:find{name = self.marker}
-	-- Send the packet to clients.
-	if args.all then
-		for k,v in pairs(Server.players_by_client) do
-			Game.messaging:server_event("update quest marker", k, self.id, self.marker)
-		end
-	elseif args.client then
-		Game.messaging:server_event("update quest marker", args.client, self.id, self.marker)
+	if marker then
+		Game.messaging:server_event("update quest marker", client, self.name, self.marker)
 	end
 end
 
@@ -111,15 +68,14 @@ Quest.update = function(self, args)
 		self.text = args.text
 		ch_t = true
 	end
-	-- Inform clients.
-	if ch_s or ch_t then
-		self:send{all = true}
-	end
-	if ch_m then
-		self:send_marker{all = true}
+	-- Inform all clients.
+	for client in pairs(Server.players_by_client) do
+		self:send_to_client(client, ch_s or ch_t, ch_m)
 	end
 	-- Save changes.
 	if ch_m or ch_p or ch_s or ch_t then
 		Server.quest_database:save_quest(self)
 	end
 end
+
+return Quest

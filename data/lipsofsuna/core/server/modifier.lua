@@ -1,4 +1,6 @@
-Modifier = Class()
+local Class = require("system/class")
+
+Modifier = Class("Modifier")
 
 --- Creates a new modifier.
 -- @param clss Modifier class.
@@ -8,7 +10,8 @@ Modifier = Class()
 --   <li>strength: Strength value.</li></ul>
 -- @return Modifier.
 Modifier.new = function(clss, args)
-	local self = Class.new(clss, args)
+	local self = Class.new(clss)
+	for k,v in pairs(args) do self[k] = v end
 	self.timer = 0
 	return self
 end

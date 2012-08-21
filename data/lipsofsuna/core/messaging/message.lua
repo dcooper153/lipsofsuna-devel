@@ -1,6 +1,6 @@
-require "system/class"
+local Class = require("system/class")
 
-Message = Class()
+Message = Class("Message")
 Message.next_id = 1
 Message.dict_id = {}
 Message.dict_name = {}
@@ -32,10 +32,15 @@ Message.new = function(clss, args)
 		assert(type(args.server_to_client_predict) == "nil")
 	end
 	-- Register the message type.
-	local self = Class.new(clss, args)
+	local self = Class.new(clss)
+	for k,v in pairs(args) do
+		self[k] = v
+	end
 	self.id = clss.next_id
 	clss.next_id = clss.next_id + 1
 	clss.dict_id[self.id] = self
 	clss.dict_name[self.name] = self
 	return self
 end
+
+return Message

@@ -1,4 +1,6 @@
-Names = Class()
+local Class = require("system/class")
+
+Names = Class("Names")
 Names.races = {}
 
 --- Returns a random character name.

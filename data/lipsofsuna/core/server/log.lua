@@ -1,10 +1,18 @@
-Log = Class()
-Log.class_name = "Log"
+local Class = require("system/class")
+local Time = require("system/time")
 
-Log.format = function(clss, format, ...)
-	print(Time.date_time .. ": " .. string.format(format, ...))
+local Log = Class("Log")
+
+Log.new = function(clss)
+	return Class.new(clss)
 end
 
-Log.text = function(clss, text)
-	print(Time.date_time .. ": " .. text)
+Log.format = function(self, format, ...)
+	print(Time:get_date_time() .. ": " .. string.format(format, ...))
 end
+
+Log.text = function(self, text)
+	print(Time:get_date_time() .. ": " .. text)
+end
+
+return Log

@@ -1,7 +1,7 @@
 local Class = require("system/class")
 local Sector = require("system/sector")
 
-local TerrainSync = Class()
+local TerrainSync = Class("TerrainSync")
 
 --- Creates a new terrain synchronizer.
 -- @param clss TerrainSync class.

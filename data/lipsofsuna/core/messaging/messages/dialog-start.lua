@@ -14,15 +14,11 @@ Message{
 		if not player then return end
 		if player.dead then return end
 		-- Find the object.
-		local object = SimulationObject:find{id = id}
+		local object = Game.objects:find_by_id(id)
 		if not object then return end
 		if not player:can_reach_object(object) then return end
 		-- Execute the dialog of the object.
-		if object.dialog then return end
-		local dialog = Dialog{object = object, user = player}
-		if not dialog then return end
-		object.dialog = dialog
-		if object.dialog:execute() then
+		if Server.dialogs:execute(object, player) then
 			Game.messaging:server_event("object dialog", player.client, id)
 		end
 	end}

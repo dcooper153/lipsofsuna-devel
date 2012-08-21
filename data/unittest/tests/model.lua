@@ -1,5 +1,5 @@
-Unittest:add(1, "model", function()
-	require "system/model"
+Unittest:add(1, "system", "model", function()
+	local Model = require("system/model")
 	-- Creating models.
 	local m = Model()
 	assert(m)

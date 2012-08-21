@@ -10,7 +10,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, id, value)
 		-- Get the object.
-		local obj = Object:find{id = id}
+		local obj = Game.objects:find_by_id(id)
 		if not obj then return end
 		-- Update death status.
 		if obj.dead == value then return end

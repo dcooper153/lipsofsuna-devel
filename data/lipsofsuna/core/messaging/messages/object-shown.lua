@@ -1,3 +1,6 @@
+local Bitwise = require("system/bitwise")
+local Item = require("core/objects/item")
+local Physics = require("system/physics")
 local Simulation = require("core/client/simulation")
 
 local make_flags = function(list)
@@ -54,24 +57,26 @@ Message{
 			flags = flags + FlagType.NAME
 		end
 		-- Count.
-		if o.count and o.count > 1 then
+		if o:get_count() > 1 then
 			flags = flags + FlagType.COUNT
-			add(data, "uint32", o.count)
+			add(data, "uint32", o:get_count())
 		end
 		-- Position.
-		if o.position.x > 1 and o.position.y > 1 and o.position.z > 1 then
+		local pos = o:get_position()
+		if pos.x > 1 or pos.y > 1 or pos.z > 1 then
 			flags = flags + FlagType.POSITION
-			add(data, "float", o.position.x)
-			add(data, "float", o.position.y)
-			add(data, "float", o.position.z)
+			add(data, "float", pos.x)
+			add(data, "float", pos.y)
+			add(data, "float", pos.z)
 		end
 		-- Rotation.
-		if math.abs(o.rotation.w) < 0.99 then
+		local rot = o:get_rotation()
+		if math.abs(rot.w) < 0.99 then
 			flags = flags + FlagType.ROTATION
-			add(data, "float", o.rotation.x)
-			add(data, "float", o.rotation.y)
-			add(data, "float", o.rotation.z)
-			add(data, "float", o.rotation.w)
+			add(data, "float", rot.x)
+			add(data, "float", rot.y)
+			add(data, "float", rot.z)
+			add(data, "float", rot.w)
 		end
 		-- Head style.
 		if o.head_style then
@@ -141,7 +146,7 @@ Message{
 			local tmp = {}
 			for k,v in pairs(o.animations) do
 				if v[1] then
-					table.insert(tmp, {v[1], Program.time - v[2]})
+					table.insert(tmp, {v[1], Program:get_time() - v[2]})
 				end
 			end
 			if #tmp > 0 then
@@ -159,7 +164,7 @@ Message{
 			for slot,index in pairs(o.inventory.equipped) do
 				local item = o.inventory:get_object_by_index(index)
 				if item then
-					table.insert(tmp, {index, slot, item.spec.name, item.count})
+					table.insert(tmp, {index, slot, item.spec.name, item:get_count()})
 				end
 			end
 			if #tmp > 0 then
@@ -370,15 +375,15 @@ Message{
 	end,
 	server_to_client_handle = function(self, mine, args)
 		local update_player_object = function(o)
-			o.collision_group = Physics.GROUP_PLAYERS
-			Client.player_object = o
-			Client.mouse_smoothing = Client.options.mouse_smoothing
-			Ui.state = "play"
+			o:set_collision_group(Physics.GROUP_PLAYERS)
+			Client:set_player_object(o)
+			Client:set_mouse_smoothing(Client.options.mouse_smoothing)
+			Ui:set_state("play")
 		end
 		-- Only set the render model in single player.
 		if args.class then
 			-- Find the object.
-			local o = Object:find{id = args.id}
+			local o = Game.objects:find_by_id(args:get_id())
 			if not o then return end
 			-- Self.
 			if o.client == -1 then
@@ -390,7 +395,7 @@ Message{
 			if o.animations then
 				for k,v in pairs(o.animations) do
 					if v[1] then
-						o.render:add_animation(v[1], Program.time - v[2])
+						o.render:add_animation(v[1], Program:get_time() - v[2])
 					end
 				end
 			end
@@ -401,7 +406,7 @@ Message{
 			return
 		end
 		-- Hide old objects.
-		local old = Object:find{id = args.id}
+		local old = Game.objects:find_by_id(args.id)
 		if old then old:detach() end
 		-- Spec.
 		local spec
@@ -437,7 +442,7 @@ Message{
 		end
 		-- Count.
 		if args.count then
-			o.count = args.count
+			o:set_count(args.count)
 		end
 		-- Position.
 		if args.position then

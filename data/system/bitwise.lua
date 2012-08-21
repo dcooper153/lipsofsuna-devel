@@ -1,7 +1,6 @@
-require "system/class"
+local Class = require("system/class")
 
-Bitwise = Class()
-Bitwise.class_name = "Bitwise"
+local Bitwise = Class("Bitwise")
 
 Bitwise.bchk = function(clss, x, y)
 	return x % (y + y) >= y
@@ -22,3 +21,5 @@ Bitwise.bor = function(clss, x, y)
 	end
 	return v
 end
+
+return Bitwise

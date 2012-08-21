@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "widget")
 
-Widgets.Uidialogtext = Class(Widgets.Uiwidget)
-Widgets.Uidialogtext.class_name = "Widgets.Uidialogtext"
+Widgets.Uidialogtext = Class("Uidialogtext", Widgets.Uiwidget)
 
 Widgets.Uidialogtext.new = function(clss, id, index, char, text)
 	local self = Widgets.Uiwidget.new(clss)

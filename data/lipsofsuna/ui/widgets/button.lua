@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "widget")
 
-Widgets.Uibutton = Class(Widgets.Uiwidget)
-Widgets.Uibutton.class_name = "Widgets.Uibutton"
+Widgets.Uibutton = Class("Uibutton", Widgets.Uiwidget)
 
 Widgets.Uibutton.new = function(clss, label, apply)
 	local self = Widgets.Uiwidget.new(clss)

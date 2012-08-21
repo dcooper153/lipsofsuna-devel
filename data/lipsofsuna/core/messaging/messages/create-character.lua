@@ -1,3 +1,5 @@
+local Player = require("core/objects/player")
+
 Message{
 	name = "create character",
 	client_to_server_encode = function(self, char)

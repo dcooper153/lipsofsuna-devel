@@ -1,3 +1,6 @@
+local Render = require("system/render")
+local Sound = require("system/sound")
+
 Ui:add_state{
 	state = "options",
 	label = "Options",
@@ -19,7 +22,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "options",
-	widget = function() return Widgets.Uiconfigoption("anisotropic_filter", function(k,v) Render.anisotrophy = v end) end}
+	widget = function() return Widgets.Uiconfigoption("anisotropic_filter", function(k,v) Render:set_anisotrophy(v) end) end}
 
 Ui:add_widget{
 	state = "options",
@@ -87,7 +90,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "options",
-	widget = function() return Widgets.Uiconfigoption("mouse_smoothing", function(k,v) Client.mouse_smoothing = v end) end}
+	widget = function() return Widgets.Uiconfigoption("mouse_smoothing", function(k,v) Client:set_mouse_smoothing(v) end) end}
 
 Ui:add_widget{
 	state = "options",
@@ -95,7 +98,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "options",
-	widget = function() return Widgets.Uiconfigoption("music_volume", function(k,v) Sound.music_volume = v end) end}
+	widget = function() return Widgets.Uiconfigoption("music_volume", function(k,v) Sound:set_music_volume(v) end) end}
 
 Ui:add_widget{
 	state = "options",
@@ -124,7 +127,7 @@ Ui:add_state{
 	init = function()
 		-- Get the sorted list of video modes.
 		modes = {}
-		for k,v in ipairs(Program.video_modes) do
+		for k,v in ipairs(Program:get_video_modes()) do
 			if v[2] >= 480 then
 				local name = string.format("%sx%s", v[1], v[2])
 				table.insert(modes, {name, v[1], v[2], true})
@@ -139,7 +142,7 @@ Ui:add_state{
 		-- Create the windowed mode button.
 		widgets = {
 			Widgets.Uiradio("Windowed", "mode", function(w)
-				local s = Program.video_mode
+				local s = Program:get_video_mode()
 				Program:set_video_mode(s[1], s[2], false, Client.options.vsync)
 			end)}
 		-- Create the fullscreen mode buttons.
@@ -151,7 +154,7 @@ Ui:add_state{
 			table.insert(widgets, widget)
 		end
 		-- Activate the button of the current mode.
-		local mode = Program.video_mode
+		local mode = Program:get_video_mode()
 		for k,v in pairs(widgets) do
 			if not v.mode then
 				-- Windowed.

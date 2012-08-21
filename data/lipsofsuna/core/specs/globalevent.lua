@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Globaleventspec = Class(Spec)
+Globaleventspec = Class("Globaleventspec", Spec)
 Globaleventspec.type = "quest"
 Globaleventspec.dict_id = {}
 Globaleventspec.dict_cat = {}

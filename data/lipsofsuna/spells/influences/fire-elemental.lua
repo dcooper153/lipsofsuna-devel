@@ -1,9 +1,11 @@
+local Actor = require("core/objects/actor")
+
 Feateffectspec:extend{
 	name = "fire elemental",
 	touch = function(self, args)
 		-- Find an empty ground spot.
 		if not args.object then return end
-		local ctr = Utils:find_summon_point(args.object.position)
+		local ctr = Utils:find_summon_point(args.object:get_position())
 		if not ctr then return end
 		-- Create the summon.
 		local spec = Actorspec:find{name = "fire elemental"}

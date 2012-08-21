@@ -1,4 +1,6 @@
-Operators.world = Class()
+local Class = require("system/class")
+
+Operators.world = Class("WorldOperator")
 Operators.world.data = {}
 
 --- Gets the currently manipulated object.</br>
@@ -85,14 +87,14 @@ end
 -- @param action Action spec.
 Operators.world.use_object = function(self, object, action)
 	-- Open subscribed inventories directly.
-	if action.name == "loot" and Operators.inventory:get_inventory_by_id(object.id) then
-		Client.data.inventory.id = object.id
-		Ui.state = "loot"
+	if action.name == "loot" and Operators.inventory:get_inventory_by_id(object:get_id()) then
+		Client.data.inventory.id = object:get_id()
+		Ui:set_state("loot")
 		return
 	end
 	-- Send a normal use command otherwise.
-	Game.messaging:client_event("use in world", object.id, action.name)
-	if Ui.state == "word/object" then
+	Game.messaging:client_event("use in world", object:get_id(), action.name)
+	if Ui:get_state() == "word/object" then
 		Ui:pop_state()
 	end
 end

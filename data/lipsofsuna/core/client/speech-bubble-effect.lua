@@ -1,6 +1,9 @@
 local Class = require("system/class")
+local Label = require("system/widgets/label")
+local Render = require("system/render")
+local Vector = require("system/math/vector")
 
-local SpeechBubbleEffect = Class()
+local SpeechBubbleEffect = Class("SpeechBubbleEffect")
 
 --- Creates a new text bubble.
 -- @param clss SpeechBubbleEffect class.
@@ -15,7 +18,8 @@ local SpeechBubbleEffect = Class()
 --   <li>velocity: Velocity vector.</li></ul>
 -- @return SpeechBubbleEffect
 SpeechBubbleEffect.new = function(clss, args)
-	local self = Class.new(clss, args)
+	local self = Class.new(clss)
+	for k,v in pairs(args) do self[k] = v end
 	self.offset = self.offset or Vector()
 	self.widgets = {}
 	self:add_line(args)
@@ -26,11 +30,16 @@ SpeechBubbleEffect.add_line = function(self, args)
 	-- Create the text widget.
 	local life = args.life or 10
 	local fade = args.fade or 0
-	local widget = Widgets.Label{
-		text = args.text, color = args.text_color,
-		font = args.text_font, width_request = 250, halign = 0.5,
-		life = life, fade = fade,
-		velocity = args.velocity, motion = Vector()}
+	local widget = Label()
+	widget:set_text(args.text)
+	widget:set_color(args.text_color)
+	widget:set_font(args.text_font)
+	widget:set_request(250, nil)
+	widget:set_halign(0.5)
+	widget.life = life
+	widget.fade = fade
+	widget.velocity = args.velocity
+	widget.motion = Vector()
 	-- Add it to the widget list.
 	table.insert(self.widgets, widget)
 	self:transform()
@@ -40,7 +49,7 @@ end
 SpeechBubbleEffect.disable = function(self)
 	-- Remove from the effect manager.
 	if self.object then
-		Client.effects.speech_bubble_dict_id[self.object.id] = nil
+		Client.effects.speech_bubble_dict_id[self.object:get_id()] = nil
 	end
 	Client.effects.speech_bubble_dict[self] = nil
 	-- Remove from the UI.
@@ -57,9 +66,9 @@ SpeechBubbleEffect.transform = function(self)
 		p = self.object.render:find_node{name = self.node}
 	end
 	if p then
-		self.position = self.offset + self.object.position + self.object.rotation * p
+		self.position = self.offset + self.object:get_position() + self.object:get_rotation() * p
 	else
-		self.position = self.offset + self.object.position
+		self.position = self.offset + self.object:get_position()
 	end
 end
 
@@ -100,15 +109,16 @@ SpeechBubbleEffect.update = function(self, secs)
 	for i = 1,n do
 		local v = self.widgets[n - i + 1]
 		if v.life < v.fade then
-			local c = v.color
-			v.color = {c[1], c[2], c[3], v.life / v.fade}
+			local c = v:get_color()
+			v:set_color{c[1], c[2], c[3], v.life / v.fade}
 		end
 		if p.z > 1 then
-			v.color[4] = 0
+			local c = v:get_color()
+			v:set_color{c[1], c[2], c[3], 0}
 		end
-		v.offset = p + v.motion
+		v:set_offset(p + v.motion)
 		if not v.velocity then
-			p = Vector(p.x, p.y - v.height - 5)
+			p = Vector(p.x, p.y - v:get_height() - 5)
 		end
 	end
 end

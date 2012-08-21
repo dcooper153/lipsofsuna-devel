@@ -1,10 +1,14 @@
-Globaleventmanager = Class()
-Globaleventmanager.class_name = "Globaleventmanager"
+local Actor = require("core/objects/actor")
+local Class = require("system/class")
+local Coroutine = require("system/coroutine")
+local Sector = require("system/sector")
+
+local GlobalEventManager = Class("GlobalEventManager")
 
 --- Creates a new global event manager.
--- @param clss Globaleventmanager class.
--- @return Globaleventmanager.
-Globaleventmanager.new = function(clss)
+-- @param clss GlobalEventManager class.
+-- @return GlobalEventManager.
+GlobalEventManager.new = function(clss)
 	local self = Class.new(clss)
 	self.player_states = setmetatable({}, {__mode = "k"})
 	self.timer = 0
@@ -22,7 +26,7 @@ end
 --- Finds a random spawn point near an active player.
 -- @param self Global event manager.
 -- @return Position vector in world space, or nil.
-Globaleventmanager.find_actor_spawn_point = function(self)
+GlobalEventManager.find_actor_spawn_point = function(self)
 	-- Select a random player.
 	local players = {}
 	for client,player in pairs(Server.players_by_client) do
@@ -31,8 +35,8 @@ Globaleventmanager.find_actor_spawn_point = function(self)
 	if #players == 0 then return end
 	local player = players[math.random(1, #players)]
 	-- Check that there are not too many actors nearby.
-	local radius = player.vision.radius
-	local objects = Object:find{point = player.position, radius = radius * 2}
+	local radius = player.vision:get_radius()
+	local objects = Game.objects:find_by_point(player:get_position(), radius * 2)
 	local monsters = 0
 	for id,object in pairs(objects) do
 		if object.class == Actor then
@@ -43,10 +47,10 @@ Globaleventmanager.find_actor_spawn_point = function(self)
 	-- Select a random point just outside of the vision radius.
 	local a = 2 * math.pi * math.random()
 	local r = radius * 1.2
-	local point = player.position:copy():add_xyz(r * math.cos(a), 0, r * math.sin(a))
+	local point = player:get_position():copy():add_xyz(r * math.cos(a), 0, r * math.sin(a))
 	-- Check that no player sees the spawn point.
 	for k,v in pairs(players) do
-		if (point - v.position).length < v.vision.radius then
+		if (point - v:get_position()).length < v.vision:get_radius() then
 			return
 		end
 	end
@@ -60,16 +64,16 @@ Globaleventmanager.find_actor_spawn_point = function(self)
 end
 
 --- Finds players near the given sector.
--- @param self Globaleventmanager.
+-- @param self GlobalEventManager.
 -- @param id Sector ID.
 -- @return Dictionary of players mapped to player states.
-Globaleventmanager.find_players_exploring_sector = function(self, id)
+GlobalEventManager.find_players_exploring_sector = function(self, id)
 	-- Find the closest player.
 	local c = Sector:get_center_by_id(id)
 	local nearest_dist
 	local nearest_player
 	for k,v in pairs(Server.players_by_client) do
-		local d = (v.position - c).length
+		local d = (v:get_position() - c).length
 		if not nearest_dist or d < nearest_dist then
 			nearest_dist = d
 			nearest_player = v
@@ -82,7 +86,7 @@ Globaleventmanager.find_players_exploring_sector = function(self, id)
 	nearest_dist = nearest_dist + 20
 	-- Use the closest player as the reference to find other players.
 	for k,v in pairs(Server.players_by_client) do
-		local d = (v.position - c).length
+		local d = (v:get_position() - c).length
 		if d < nearest_dist then
 			res[v] = self.player_states[v]
 		end
@@ -91,10 +95,10 @@ Globaleventmanager.find_players_exploring_sector = function(self, id)
 end
 
 --- Called when a player performs an action.
--- @param self Globaleventmanager.
+-- @param self GlobalEventManager.
 -- @param action String describing the action.
 -- @param player Player object, or nil.
-Globaleventmanager.notify_action = function(self, action, player)
+GlobalEventManager.notify_action = function(self, action, player)
 	-- We are only interested in player actions.
 	if not player then return end
 	if not player.client then return end
@@ -112,7 +116,7 @@ Globaleventmanager.notify_action = function(self, action, player)
 	-- Handle the action.
 	if action == "dialog" then
 		-- Keep 10 last dialog actions in memory.
-		local t = Program.time
+		local t = Program:get_time()
 		local n = #s.dialog
 		if n == 0 then
 			s.dialog[1] = t
@@ -122,7 +126,7 @@ Globaleventmanager.notify_action = function(self, action, player)
 		end
 	elseif action == "eat" or action == "drink" then
 		-- Keep 10 last eating actions in memory.
-		local t = Program.time
+		local t = Program:get_time()
 		local n = #s.eaten
 		if n == 0 then
 			s.eaten[1] = t
@@ -135,7 +139,7 @@ Globaleventmanager.notify_action = function(self, action, player)
 		--
 		-- Since this action is based on sector loading, and that tends
 		-- to occur in clusters, only one event per 5 seconds is recorded.
-		local t = Program.time
+		local t = Program:get_time()
 		local n = #s.explored
 		if n == 0 then
 			s.explored[1] = t
@@ -147,17 +151,17 @@ Globaleventmanager.notify_action = function(self, action, player)
 end
 
 --- Called when a sector is created or loaded.
--- @param self Globaleventmanager.
+-- @param self GlobalEventManager.
 -- @param id Sector ID.
 -- @param loaded True for loaded, false for newly created.
 -- @param objects List of objects in the sector.
-Globaleventmanager.sector_created = function(self, id, loaded, objects)
+GlobalEventManager.sector_created = function(self, id, loaded, objects)
 	-- Find the player who most likely triggered the creation.
 	local c = Sector:get_center_by_id(id)
 	local nearest_dist
 	local nearest_player
 	for k,v in pairs(Server.players_by_client) do
-		local d = (v.position - c).length
+		local d = (v:get_position() - c).length
 		if not nearest_dist or d < nearest_dist then
 			nearest_dist = d
 			nearest_player = v
@@ -167,7 +171,7 @@ Globaleventmanager.sector_created = function(self, id, loaded, objects)
 	if nearest_dist and nearest_dist < 100 then
 		nearest_dist = nearest_dist + 20
 		for k,v in pairs(Server.players_by_client) do
-			local d = (v.position - c).length
+			local d = (v:get_position() - c).length
 			if d < nearest_dist then
 				self:notify_action("player explore", v)
 			end
@@ -184,24 +188,24 @@ Globaleventmanager.sector_created = function(self, id, loaded, objects)
 end
 
 --- Starts an event.
--- @param self Globaleventmanager.
+-- @param self GlobalEventManager.
 -- @param name Event name
-Globaleventmanager.start_event = function(self, name)
+GlobalEventManager.start_event = function(self, name)
 	-- Stop the potential old instance.
 	self:stop_event(name)
 	-- Start the new event.
 	local event = self.events[name]
 	if not event then return end
-	event.start_time = Program.time
+	event.start_time = Program:get_time()
 	event.spec:started(event)
 	-- Log the event.
-	Log:format("Started global event %q", name)
+	Server.log:format("Started global event %q", name)
 end
 
 --- Stops an event.
--- @param self Globaleventmanager.
+-- @param self GlobalEventManager.
 -- @param name Event name
-Globaleventmanager.stop_event = function(self, name)
+GlobalEventManager.stop_event = function(self, name)
 	-- Find the running event.
 	local event = self.events[name]
 	if not event then return end
@@ -210,19 +214,19 @@ Globaleventmanager.stop_event = function(self, name)
 	event.start_time = nil
 	event.spec:stopped(event)
 	-- Log the event.
-	Log:format("Stopped global event %q", name)
+	Server.log:format("Stopped global event %q", name)
 end
 
 --- Updates global events.
--- @param self Globaleventmanager.
+-- @param self GlobalEventManager.
 -- @param secs Seconds since the last update.
-Globaleventmanager.update = function(self, secs)
+GlobalEventManager.update = function(self, secs)
 	-- Update peridically.
 	self.timer = self.timer + secs
 	if self.timer < 1 then return end
 	self.timer = self.timer - 1
 	-- Update running events.
-	local now = Program.time
+	local now = Program:get_time()
 	for k,v in pairs(self.events) do
 		if v.start_time and v.spec.duration and v.spec.duration < now - v.start_time then
 			self:stop_event(k)
@@ -230,3 +234,5 @@ Globaleventmanager.update = function(self, secs)
 		v.spec:update(v, 1)
 	end
 end
+
+return GlobalEventManager

@@ -1,8 +1,10 @@
-Widgets.Uilog = Class(Widget)
-Widgets.Uilog.class_name = "Widgets.Uilog"
+local Class = require("system/class")
+local Widget = require("system/widget")
 
-Widgets.Uilog.new = function(clss, args)
-	local self = Widget.new(clss, args)
+Widgets.Uilog = Class("Uilog", Widget)
+
+Widgets.Uilog.new = function(clss)
+	local self = Widget.new(clss)
 	self.lines = {}
 	return self
 end
@@ -14,8 +16,8 @@ end
 
 Widgets.Uilog.reshaped = function(self)
 	self:canvas_clear()
-	local w = self.width
-	local h = self.height
+	local w = self:get_width()
+	local h = self:get_height()
 	local y = 200
 	for k,v in ipairs(self.lines) do
 		local tw,th = Program:measure_text(Theme.text_font_1, v[1], w)
@@ -29,10 +31,10 @@ Widgets.Uilog.update = function(self, secs)
 	local changed = self.need_relayout
 	self.need_relayout = true
 	-- Update the screen offset.
-	local mode = Program.video_mode
-	if self.width ~= mode[1] or self.offset.y ~= mode[2] - 200 then
-		self.offset = Vector(5, mode[2] - Theme.text_height_1 * 3 - 200)
-		self:set_request{width = mode[1], height = 200}
+	local mode = Program:get_video_mode()
+	if self:get_width() ~= mode[1] or self:get_offset().y ~= mode[2] - 200 then
+		self:set_offset(Vector(5, mode[2] - Theme.text_height_1 * 3 - 200))
+		self:set_request(mode[1], 200)
 		changed = true
 	end
 	-- Fade out messages.

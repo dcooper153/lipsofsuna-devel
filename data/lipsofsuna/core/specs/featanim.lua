@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Feattypespec = Class(Spec)
+Feattypespec = Class("Feattypespec", Spec)
 Feattypespec.type = "feattype"
 Feattypespec.dict_id = {}
 Feattypespec.dict_cat = {}

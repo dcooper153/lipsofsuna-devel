@@ -1,9 +1,11 @@
 local Class = require("system/class")
+local DamageLabelEffect = require(Mod.path .. "damage-label-effect")
 local ParticleEffect = require(Mod.path .. "particle-effect")
+local Sound = require("system/sound")
 local SoundEffect = require(Mod.path .. "sound-effect")
 local SpeechBubbleEffect = require(Mod.path .. "speech-bubble-effect")
 
-local EffectManager = Class()
+local EffectManager = Class("EffectManager")
 
 EffectManager.new = function(clss)
 	local self = Class.new(clss)
@@ -19,24 +21,35 @@ end
 -- @param magnitude Quake magnitude.
 EffectManager.apply_quake = function(self, point, magnitude)
 	if point and magnitude and Client.player_object then
-		local dist = (Client.player_object.position - point).length
+		local dist = (Client.player_object:get_position() - point).length
 		local quake = math.min(math.max(magnitude / (0.05 * dist * dist + 0.5), 0), 1)
 		Client.camera1.quake = math.max(Client.camera1.quake or 0, quake)
 		Client.camera3.quake = math.max(Client.camera3.quake or 0, quake)
 	end
 end
 
+--- Creates a damage text effect.
+-- @param self EffectManager.
+-- @param object Damaged object, or nil.
+-- @param point Position in world space, or nil.
+-- @param damage Damage amount.
+EffectManager.create_damage_text = function(self, object, point, damage)
+	if math.abs(damage) <= 2 then return end
+	local effect = DamageLabelEffect(object, point, damage)
+	self.speech_bubble_dict[effect] = effect
+end
+
 EffectManager.create_speech_bubble = function(self, args)
 	-- Try to reuse an existing speech bubble.
 	if args.object then
-		local bubble = self.speech_bubble_dict_id[args.object.id]
+		local bubble = self.speech_bubble_dict_id[args.object:get_id()]
 		if bubble then return bubble:add_line(args) end
 	end
 	-- Create a new speech bubble.
 	local bubble = SpeechBubbleEffect(args)
 	self.speech_bubble_dict[bubble] = true
 	if args.object then
-		self.speech_bubble_dict_id[args.object.id] = bubble
+		self.speech_bubble_dict_id[args.object:get_id()] = bubble
 	end
 end
 
@@ -53,10 +66,9 @@ EffectManager.cycle_music_track = function(self)
 	if not self.music_mode then return end
 	local tracks = modes[self.music_mode];
 	if not tracks then return end
-	Sound.music_fading = 2.0
-	Sound.music_looping = (#tracks > 1)
-	Sound.music_volume = Client.options.music_volume
-	Sound.music = tracks[math.random(1, #tracks)]
+	Sound:set_music_fading(2.0)
+	Sound:set_music_volume(Client.options.music_volume)
+	Sound:set_music(tracks[math.random(1, #tracks)])
 end
 
 --- Switches the music track.
@@ -92,7 +104,7 @@ EffectManager.play_global = function(self, name)
 	end
 	-- Quake the camera.
 	if effect.quake and Client.player_object then
-		self:apply_quake(Client.player_object.position, effect.quake)
+		self:apply_quake(Client.player_object:get_position(), effect.quake)
 	end
 end
 
@@ -125,7 +137,7 @@ EffectManager.play_object = function(self, name, object, node)
 			sound_volume = effect.sound_volume}
 	end
 	-- Quake the camera.
-	self:apply_quake(object.position, effect.quake)
+	self:apply_quake(object:get_position(), effect.quake)
 end
 
 EffectManager.play_world = function(self, name, position)

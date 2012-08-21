@@ -1,10 +1,12 @@
 local Combat = require("core/server/combat")
+local Coroutine = require("system/coroutine")
+local Physics = require("system/physics")
 
 local choose_move = function(attacker)
-	if attacker.strafing < -0.2 then return "left"
-	elseif attacker.strafing > 0.2 then return "right"
-	elseif attacker.movement < -0.2 then return "back"
-	elseif attacker.movement > 0.2 then return "front"
+	if attacker:get_strafing() < -0.2 then return "left"
+	elseif attacker:get_strafing() > 0.2 then return "right"
+	elseif attacker:get_movement() < -0.2 then return "back"
+	elseif attacker:get_movement() > 0.2 then return "front"
 	else return "stand" end
 end
 
@@ -40,7 +42,7 @@ local perform_attack = function(attacker, move)
 		end
 		-- Play the attack effect.
 		Server:object_effect(attacker, "swing1")
-		Vision:event{type = "object attack", object = attacker, move = move, variant = math.random(0, 255)}
+		Server:object_event(attacker, "object attack", {move = move, variant = math.random(0, 255)})
 		-- Cast a curve against actors and items.
 		for i = 1,4 do
 			Coroutine:sleep(attacker.spec.timing_attack_melee * 0.02 / 4)
@@ -59,7 +61,7 @@ Actionspec{
 	charge_start = function(user)
 		local move = choose_move(user)
 		user:animate("charge " .. move, true)
-		user.attack_charge = Program.time
+		user.attack_charge = Program:get_time()
 		user.attack_charge_anim = "right melee"
 		user.attack_charge_move = move
 	end,

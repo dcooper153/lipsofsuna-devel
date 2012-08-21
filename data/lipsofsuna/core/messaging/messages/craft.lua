@@ -12,7 +12,7 @@ Message{
 		local player = Server:get_player_by_client(client)
 		if not player then return end
 		if player.dead then return end
-		if player.id ~= id then return end
+		if player:get_id() ~= id then return end
 		local o = Crafting:craft(player, name, player.crafting_mode)
 		if not o then return end
 		player.inventory:merge_or_drop_object(o)
@@ -27,7 +27,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, mode)
 		Operators.crafting:set_mode(mode)
-		if mode ~= "default" or Ui.state == "crafting" then
-			Ui.state = "crafting"
+		if mode ~= "default" or Ui:get_state() == "crafting" then
+			Ui:set_state("crafting")
 		end
 	end}

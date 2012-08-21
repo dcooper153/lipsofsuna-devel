@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "entry")
 
-Widgets.Uiintrospectfield = Class(Widgets.Uientry)
-Widgets.Uiintrospectfield.class_name = "Widgets.Uiintrospectfield"
+Widgets.Uiintrospectfield = Class("Uiintrospectfield", Widgets.Uientry)
 Widgets.Uiintrospectfield.brief_fields = {["boolean"] = true, ["color"] = true, ["number"] = true, ["quaternion"] = true, ["string"] = true, ["vector"] = true}
 
 Widgets.Uiintrospectfield.new = function(clss, spec, field)
@@ -26,7 +26,7 @@ Widgets.Uiintrospectfield.new = function(clss, spec, field)
 		end
 	end
 	-- Create the entry custom widget.
-	local self = Widgets.Uiwidget.new(clss, nil, label)
+	local self = Widgets.Uiwidget.new(clss, label)
 	self.help = field.description
 	self.spec = spec
 	self.field = field

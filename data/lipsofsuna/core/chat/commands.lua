@@ -1,4 +1,9 @@
-require "system/debug"
+local Actor = require("core/objects/actor")
+local Debug = require( "system/debug")
+local Item = require("core/objects/item")
+local Obstacle = require("core/objects/obstacle")
+local Physics = require("system/physics")
+local Staticobject = require("core/objects/static")
 
 ChatCommand{
 	name = "client_restart",
@@ -7,7 +12,7 @@ ChatCommand{
 	handler = "client",
 	func = function(player, matches)
 		Program:launch_mod{name = "lipsofsuna"}
-		Program.quit = true
+		Program:set_quit(true)
 	end}
 
 ChatCommand{
@@ -17,7 +22,7 @@ ChatCommand{
 	handler = "client",
 	func = function(player, matches)
 		Operators.stats:update_client_stats(true)
-		Ui.state = "admin/client-stats"
+		Ui:set_state("admin/client-stats")
 	end}
 
 ChatCommand{
@@ -112,18 +117,18 @@ ChatCommand{
 			player:send_message("/noclip mode off.")
 			player.noclip = nil
 			player.flying = player.spec.flying or false
-			player.collision_mask = 0xFFFF
-			player.collision_group = Physics.GROUP_PLAYER
-			player.gravity = player.spec.gravity
-			player.gravity_liquid = player.spec.water_gravity
+			player:set_collision_mask(0xFFFF)
+			player:set_collision_group(Physics.GROUP_PLAYER)
+			player:set_gravity(player.spec.gravity)
+			player:set_gravity_liquid(player.spec.water_gravity)
 		else
 			player:send_message("/noclip mode on.")
 			player.noclip = true
 			player.flying = true
-			player.collision_mask = 0
-			player.collision_group = 0
-			player.gravity = Vector()
-			player.gravity_liquid = Vector()
+			player:set_collision_mask(0)
+			player:set_collision_group(0)
+			player:set_gravity(Vector())
+			player:set_gravity_liquid(Vector())
 		end
 	end}
 
@@ -135,7 +140,7 @@ ChatCommand{
 	func = function(player, matches)
 		local object = Client.player_object
 		if not object then return end
-		local pos = object.position
+		local pos = object:get_position()
 		local str = string.format("Position: %.2f %.2f %.2f", pos.x, pos.y, pos.z)
 		Client:append_log(str)
 		print(str)
@@ -206,24 +211,24 @@ ChatCommand{
 		if spec1 then
 			Actor{
 				spec = spec1,
-				position = player.position,
+				position = player:get_position(),
 				random = true,
 				realized = true}
 		elseif spec2 then
 			Item{
 				spec = spec2,
-				position = player.position,
+				position = player:get_position(),
 				random = true,
 				realized = true}
 		elseif spec3 then
 			Obstacle{
 				spec = spec3,
-				position = player.position,
+				position = player:get_position(),
 				realized = true}
 		elseif spec4 then
 			Staticobject{
 				spec = spec4,
-				position = player.position,
+				position = player:get_position(),
 				realized = true}
 		end
 	end}
@@ -239,7 +244,7 @@ ChatCommand{
 		if not spec then return end
 		Actor{
 			spec = spec,
-			position = player.position,
+			position = player:get_position(),
 			random = true,
 			realized = true}
 	end}
@@ -255,7 +260,7 @@ ChatCommand{
 		if not spec then return end
 		Item{
 			spec = spec,
-			position = player.position,
+			position = player:get_position(),
 			random = true,
 			realized = true}
 	end}
@@ -271,7 +276,7 @@ ChatCommand{
 		if not spec then return end
 		Obstacle{
 			spec = spec,
-			position = player.position,
+			position = player:get_position(),
 			realized = true}
 	end}
 
@@ -336,7 +341,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		repeat until not Unlocks:unlock_random()
+		repeat until not Server.unlocks:unlock_random()
 	end}
 
 ChatCommand{
@@ -361,7 +366,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		Unlocks:unlock_random()
+		Server.unlocks:unlock_random()
 	end}
 
 ChatCommand{
@@ -373,7 +378,7 @@ ChatCommand{
 	func = function(player, matches)
 		local spec = Skillspec:find{name = matches[1]}
 		if spec then
-			Unlocks:unlock("skill", matches[1])
+			Server.unlocks:unlock("skill", matches[1])
 		else
 			player:send_message(string.format("No such skill %q.", matches[1]))
 		end
@@ -388,7 +393,7 @@ ChatCommand{
 	func = function(player, matches)
 		local spec = Feateffectspec:find{name = matches[1]}
 		if spec then
-			Unlocks:unlock("spell effect", matches[1])
+			Server.unlocks:unlock("spell effect", matches[1])
 		else
 			player:send_message(string.format("No such spell effect %q.", matches[1]))
 		end
@@ -403,7 +408,7 @@ ChatCommand{
 	func = function(player, matches)
 		local spec = Feattypespec:find{name = matches[1]}
 		if spec then
-			Unlocks:unlock("spell type", matches[1])
+			Server.unlocks:unlock("spell type", matches[1])
 		else
 			player:send_message(string.format("No such spell type %q.", matches[1]))
 		end

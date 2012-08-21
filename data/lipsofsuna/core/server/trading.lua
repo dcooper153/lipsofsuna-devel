@@ -1,12 +1,20 @@
-Trading = Class()
+local Class = require("system/class")
+local Item = require("core/objects/item")
+
+local Trading = Class("Trading")
+
+Trading.new = function(clss)
+	local self = Class.new(clss)
+	return clss
+end
 
 --- Applies the trade if it's acceptable.
--- @param clss Trading.
+-- @param self Trading.
 -- @param player Player.
-Trading.accept = function(clss, player)
+Trading.accept = function(self, player)
 	-- Check for an acceptable deal.
 	if not player.trading then return end
-	if not clss:deal(player) then return end
+	if not self:deal(player) then return end
 	-- Remove the sold items.
 	for k,v in pairs(player.trading.sell) do
 		player.inventory:subtract_objects_by_index(v[1], v[2])
@@ -24,9 +32,9 @@ Trading.accept = function(clss, player)
 end
 
 --- Cancels the trade.
--- @param clss Trading.
+-- @param self Trading.
 -- @param player Player.
-Trading.cancel = function(clss, player)
+Trading.cancel = function(self, player)
 	if not player.trading then return end
 	Game.messaging:server_event("trading end", player.client)
 	player.trading = nil
@@ -38,15 +46,15 @@ end
 -- the player inventory or other conditions have changed. Any invalid items
 -- are removed and invalid item counts clamped to the valid bounds.
 --
--- @param clss Trading.
+-- @param self Trading.
 -- @param player Player.
-Trading.deal = function(clss, player)
+Trading.deal = function(self, player)
 	-- Calculate the value of the items sold by the player.
 	local sell = 0
 	for k,v in pairs(player.trading.sell) do
 		local item = player.inventory:get_object_by_index(v[1])
 		if item then
-			v[2] = math.max(v[2], item.count)
+			v[2] = math.max(v[2], item:get_count())
 			sell = sell + v[2] * item.spec:get_trading_value()
 		else
 			player.trading.sell[k] = nil
@@ -70,12 +78,12 @@ Trading.deal = function(clss, player)
 end
 
 --- Starts a trade.
--- @param clss Trading.
+-- @param self Trading.
 -- @param player Player.
 -- @param merchant Actor.
-Trading.start = function(clss, player, merchant)
+Trading.start = function(self, player, merchant)
 	-- Initialize the trading data.
-	clss:cancel(player)
+	self:cancel(player)
 	player.trading = {sell = {}, buy = {}, shop = {}, merchant = merchant}
 	-- Create the shop list.
 	-- TODO: Should depend on the merchant.
@@ -89,8 +97,10 @@ Trading.start = function(clss, player, merchant)
 end
 
 --- Sends a deal status update to the player.
--- @param clss Trading.
+-- @param self Trading.
 -- @param player Player.
-Trading.update = function(clss, player)
-	Game.messaging:server_event("trading accept", player.client, clss:deal(player))
+Trading.update = function(self, player)
+	Game.messaging:server_event("trading accept", player.client, self:deal(player))
 end
+
+return Trading

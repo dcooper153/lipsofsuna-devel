@@ -1,5 +1,8 @@
-Generator.sector_types.Main = Class()
-Generator.sector_types.Main.class_name = "Generator.Main"
+local Class = require("system/class")
+local Noise = require("system/noise")
+local Sector = require("system/sector")
+
+Generator.sector_types.Main = Class("Generator.Main")
 
 Generator.sector_types.Main.init = function(self)
 	self.scale1 = Vector(1,1,1) * (0.01 * Voxel.tile_scale)

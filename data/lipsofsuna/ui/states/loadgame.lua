@@ -1,3 +1,5 @@
+local File = require("system/file")
+
 Ui:add_state{
 	state = "loadgame",
 	root = "mainmenu",

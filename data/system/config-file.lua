@@ -1,4 +1,4 @@
-require "system/class"
+local Class = require("system/class")
 
 if not Los.program_load_extension("config-file") then
 	error("loading extension `config-file' failed")
@@ -6,8 +6,7 @@ end
 
 ------------------------------------------------------------------------------
 
-ConfigFile = Class()
-ConfigFile.class_name = "ConfigFile"
+local ConfigFile = Class("ConfigFile")
 
 --- Opens a configuration file.
 -- @param clss ConfigFile class.
@@ -44,3 +43,5 @@ end
 ConfigFile.set = function(self, k, v)
 	Los.config_file_set(self.handle, k, v)
 end
+
+return ConfigFile

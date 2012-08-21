@@ -7,7 +7,7 @@ Aiactionspec{
 	perform = function(self, secs)
 		if not self.target then return end
 		-- Turn towards the target.
-		self.object:face_point{point = self.target.position, secs = secs}
+		self.object:face_point{point = self.target:get_position(), secs = secs}
 		-- Jump towards the target.
 		self.object:set_movement(1)
 		self.object:jump()

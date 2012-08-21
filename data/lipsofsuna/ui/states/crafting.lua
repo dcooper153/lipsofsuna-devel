@@ -9,7 +9,7 @@ Ui:add_state{
 		local recipes = Operators.crafting:get_craftable()
 		local widgets = {}
 		for k,v in ipairs(recipes) do
-			table.insert(widgets, Widgets.Uiinvcraft(object.id, v))
+			table.insert(widgets, Widgets.Uiinvcraft(object:get_id(), v))
 		end
 		-- Create the fallback widget if nothing to craft.
 		if #widgets == 0 then

@@ -12,7 +12,7 @@ Client.host_game = function(self)
 	self.data.connection.waiting = false
 	-- Enter the start game mode.
 	Client.data.load.next_state = "start-game"
-	Ui.state = "load"
+	Ui:set_state("load")
 end
 
 Client.start_single_player = function(self)
@@ -27,5 +27,5 @@ Client.start_single_player = function(self)
 	self.data.connection.waiting = false
 	-- Enter the start game mode.
 	Client.data.load.next_state = "start-game"
-	Ui.state = "load"
+	Ui:set_state("load")
 end

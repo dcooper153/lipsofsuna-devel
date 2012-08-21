@@ -13,7 +13,7 @@ Message{
 		if player.dead then return end
 		if not player.trading then return end
 		-- Accept trading.
-		Trading:accept(player)
+		Server.trading:accept(player)
 	end,
 	server_to_client_encode = function(self, deal)
 		return {"bool", deal}
@@ -27,7 +27,7 @@ Message{
 		-- Change the shopkeeper's approval.
 		Client.data.trading.accepted = deal
 		-- Update the user interface.
-		if Ui.state == "trading" then
+		if Ui:get_state() == "trading" then
 			Ui:restart_state()
 		end
 	end}

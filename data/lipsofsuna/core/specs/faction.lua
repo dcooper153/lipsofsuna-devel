@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Factionspec = Class(Spec)
+Factionspec = Class("Factionspec", Spec)
 Factionspec.type = "faction"
 Factionspec.dict_id = {}
 Factionspec.dict_cat = {}

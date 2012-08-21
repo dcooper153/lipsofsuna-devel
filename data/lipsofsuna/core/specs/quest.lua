@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Questspec = Class(Spec)
+Questspec = Class("Questspec", Spec)
 Questspec.type = "quest"
 Questspec.dict_id = {}
 Questspec.dict_cat = {}
@@ -13,8 +14,6 @@ Questspec.introspect = Introspect{
 		{name = "status", type = "string", default = "unused", description = "Quest status. (unused/inactive/active/completed)"},
 		{name = "text", type = "string", default = "", description = "Textual description of the quest status."}
 	}}
-
-Quest = Questspec --FIXME
 
 --- Creates a new quest specification.
 -- @param clss Quest class.

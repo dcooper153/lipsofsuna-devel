@@ -1,5 +1,6 @@
-require "system/class"
-require "system/math"
+local Program = require("system/core")
+local Quaternion = require("system/math/quaternion")
+local Vector = require("system/math/vector")
 
 if not Los.program_load_extension("graphics") then
 	error("loading extension `graphics' failed")
@@ -32,18 +33,12 @@ end
 
 --- Measures a string.
 -- @param clss Program class.
--- @param ... Arguments.<ul>
---   <li>1,font: Font name.</li>
---   <li>2,text: Text to measure.</li></ul>
---   <li>3,width: Width limit, or nil.</li></ul>
+-- @param font Font name.
+-- @param text Text to measure.
+-- @param width Width limit, or nil.
 -- @return Width, height.
-Program.measure_text = function(clss, ...)
-	local a,b,c = ...
-	if type(a) == "table" then
-		return Los.program_measure_text(a[1] or a.font, a[2] or a.text, a[3] or a.width)
-	else
-		return Los.program_measure_text(a, b, c)
-	end
+Program.measure_text = function(clss, font, text, width)
+	return Los.program_measure_text(font, text, width)
 end
 
 --- Renders the scene.
@@ -59,77 +54,103 @@ Program.update_scene = function(clss, secs)
 	return Los.program_render_update(secs)
 end
 
---- Sets the current video mode.
--- @param clss Program class.
--- @param ... Arguments.<ul>
---   <li>1,width: Window width in pixels.</li>
---   <li>2,height: Window height in pixels.</li>
---   <li>3,fullscreen: True for fullscreen.</li></ul>
--- @return True on success.
-Program.set_video_mode = function(clss, ...)
-	return Los.program_set_video_mode(...)
+--- Gets the far plane distance of the camera.
+-- @param self Program class.
+-- @return Far plane distance.
+Program.get_camera_far = function(self)
+	return self.__camera_far or 50
 end
 
---- The far plane distance of the camera.
--- @name Program.camera_far
--- @class table
+--- Sets the far plane distance of the camera.
+-- @param self Program class.
+-- @param v Far plane distance.
+Program.set_camera_far = function(self, v)
+	self.__camera_far = v
+	Los.render_set_camera_far(v)
+end
 
---- The near plane distance of the camera.
--- @name Program.camera_near
--- @class table
+--- Gets the near plane distance of the camera.
+-- @param self Program class.
+-- @return Near plane distance.
+Program.get_camera_near = function(self)
+	return self.__camera_near or 0.1
+end
 
---- The position of the camera.
--- @name Program.camera_position
--- @class table
+--- Sets the near plane distance of the camera.
+-- @param self Program class.
+-- @param v Near plane distance.
+Program.set_camera_near = function(self, v)
+	self.__camera_near = v
+	Los.render_set_camera_near(v)
+end
 
---- The rotation of the camera.
--- @name Program.camera_rotation
--- @class table
+--- Gets the position of the camera.
+-- @param self Program class.
+-- @return Vector.
+Program.get_camera_position = function(self)
+	return self.__camera_position or Vector()
+end
 
---- Gets the version of the OpenGL renderer used.
--- @name Program.opengl_version
--- @class table
+--- Sets the position of the camera.
+-- @param self Program class.
+-- @param v Vector.
+Program.set_camera_position = function(self, v)
+	local rot = self:get_camera_rotation()
+	self.__camera_position = v
+	Los.render_set_camera_transform(v.handle, rot.handle)
+end
 
---- Current video mode (read-only).
--- @name Program.video_mode
--- @class table
+--- Gets the rotation of the camera.
+-- @param self Program class.
+-- @return Quaternion.
+Program.get_camera_rotation = function(self)
+	return self.__camera_rotation or Quaternion()
+end
 
---- List of supported fullscreen modes (read-only).
--- @name Program.video_modes
--- @class table
+--- Sets the rotation of the camera.
+-- @param self Program class.
+-- @param v Quaternion.
+Program.set_camera_rotation = function(self, v)
+	local pos = self:get_camera_position()
+	self.__camera_rotation = v
+	Los.render_set_camera_transform(pos.handle, v.handle)
+end
 
---- Main window title.
--- @name Program.window_title
--- @class table
+--- Gets the current video mode.
+-- @param self Program class.
+-- @return Video mode table.
+Program.get_video_mode = function(self)
+	return Los.program_get_video_mode()
+end
 
-Program:add_class_getters{
-	camera_far = function(s) return rawget(s, "__camera_far") or 50 end,
-	camera_near = function(s) return rawget(s, "__camera_near") or 0.1 end,
-	camera_position = function(s) return rawget(s, "__camera_position") or Vector() end,
-	camera_rotation = function(s) return rawget(s, "__camera_rotation") or Quaternion() end,
-	opengl_version = function(s) return Los.program_get_opengl_version() end,
-	video_mode = function(s) return Los.program_get_video_mode() end,
-	video_modes = function(s) return Los.program_get_video_modes() end,
-	window_title = function(s) return rawget(s, "__window_title") or "" end}
+--- Sets the current video mode.
+-- @param self Program class.
+-- @param width Window width in pixels.
+-- @param height Window height in pixels.
+-- @param fullscreen True for fullscreen.
+-- @return True on success.
+Program.set_video_mode = function(self, width, height, fullscreen)
+	return Los.program_set_video_mode(width, height, fullscreen)
+end
 
-Program:add_class_setters{
-	camera_far = function(s, v)
-		rawset(s, "__camera_far", v)
-		Los.render_set_camera_far(v)
-	end,
-	camera_near = function(s, v)
-		rawset(s, "__camera_near", v)
-		Los.render_set_camera_near(v)
-	end,
-	camera_position = function(s, v)
-		rawset(s, "__camera_position", v)
-		Los.render_set_camera_transform(v.handle, s.camera_rotation.handle)
-	end,
-	camera_rotation = function(s, v)
-		rawset(s, "__camera_rotation", v)
-		Los.render_set_camera_transform(s.camera_position.handle, v.handle)
-	end,
-	window_title = function(s, v)
-		rawset(s, "__window_title", v)
-		Los.program_set_title(v)
-	end}
+--- Gets the list of supported fullscreen video modes.
+-- @param self Program class.
+-- @return List of video mode tables.
+Program.get_video_modes = function(self)
+	return Los.program_get_video_modes()
+end
+
+--- Gets the title of the main window.
+-- @param self Program class.
+-- @return String.
+Program.get_window_title = function(self)
+	return self.__window_title or ""
+end
+
+--- Sets the title of the main window.
+-- @param self Program class.
+-- @param v String.
+Program.set_window_title = function(self, v)
+	self.__window_title = v
+	Los.program_set_title(v)
+end

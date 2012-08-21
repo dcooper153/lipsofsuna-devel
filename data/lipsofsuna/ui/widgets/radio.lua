@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "toggle")
 
-Widgets.Uiradio = Class(Widgets.Uitoggle)
-Widgets.Uiradio.class_name = "Widgets.Uiradio"
+Widgets.Uiradio = Class("Uiradio", Widgets.Uitoggle)
 
 Widgets.Uiradio.new = function(clss, label, group, changed)
 	local self = Widgets.Uitoggle.new(clss, label, changed)

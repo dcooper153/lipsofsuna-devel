@@ -1,5 +1,6 @@
-Widgets.Quickpage = Class()
-Widgets.Quickpage.class_name = "Widgets.Quickpage"
+local Class = require("system/class")
+
+Widgets.Quickpage = Class("Quickpage")
 
 --- Creates a new quickslots page.
 -- @param clss Quickpage class.

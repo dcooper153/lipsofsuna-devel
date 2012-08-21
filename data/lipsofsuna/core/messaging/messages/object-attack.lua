@@ -10,7 +10,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, id, move, variant)
 		-- Find the object.
-		local obj = Object:find{id = id}
+		local obj = Game.objects:find_by_id(id)
 		if not obj then return end
 		if not obj.spec then return end
 		-- Add a speedline effect for the weapon.

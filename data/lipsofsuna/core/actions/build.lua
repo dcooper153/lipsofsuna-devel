@@ -1,3 +1,7 @@
+local Coroutine = require("system/coroutine")
+local Material = require("system/material")
+local Physics = require("system/physics")
+
 Actionspec{
 	name = "build",
 	func = function(feat, info, args)
@@ -10,7 +14,7 @@ Actionspec{
 			-- Check for sufficient materials.
 			local m = Material:find{name = args.weapon.spec.construct_tile}
 			local need = args.weapon.spec.construct_tile_count or 1
-			local have = args.weapon.count
+			local have = args.weapon:get_count()
 			if not m or need > have then return end
 			-- Perform the ray cast.
 			local src,dst = args.user:get_attack_ray()
@@ -21,7 +25,7 @@ Actionspec{
 			if not t then return end
 			-- Build the tile.
 			args.weapon:subtract(need)
-			Voxel:set_tile(p, m.id)
+			Voxel:set_tile(p, m:get_id())
 			Server:world_effect(p * Voxel.tile_size, m.effect_build)
 		end)
 	end}

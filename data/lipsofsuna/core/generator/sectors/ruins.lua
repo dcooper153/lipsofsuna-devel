@@ -1,5 +1,8 @@
-Generator.sector_types.Ruins = Class()
-Generator.sector_types.Ruins.class_name = "Generator.Ruins"
+local Class = require("system/class")
+local Material = require("system/material")
+local Noise = require("system/noise")
+
+Generator.sector_types.Ruins = Class("Generator.Ruins")
 
 Generator.sector_types.Ruins.init = function(self)
 	self.scale1 = Vector(0.3,0.3,0.3)
@@ -18,7 +21,7 @@ end
 Generator.sector_types.Ruins.generate = function(self, pos, size)
 	-- Create granite.
 	local m1 = Material:find{name = "granite1"}
-	Voxel:fill_region{point = pos, size = size, tile = m1.id}
+	Voxel:fill_region{point = pos, size = size, tile = m1:get_id()}
 	-- Create caverns.
 	Noise:perlin_terrain(pos, pos + size, 0, 0.2, self.scale2, 2, 2, 0.2, Server.generator.seed1)
 	-- Create ruins.

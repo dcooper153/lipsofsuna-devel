@@ -1,11 +1,12 @@
-require "system/object"
+local Class = require("system/class")
+local Quaternion = require("system/math/quaternion")
+local SimulationObject = require("core/objects/simulation")
+local Vector = require("system/math/vector")
 
-EditorObject = Class(SimulationObject)
-EditorObject.class_name = "EditorObject"
+local EditorObject = Class("EditorObject", SimulationObject)
 
-EditorObject.new = function(clss, args)
-	local self = SimulationObject.new(clss, args)
-	self.render:init(self)
+EditorObject.new = function(clss)
+	local self = SimulationObject.new(clss)
 	return self
 end
 
@@ -19,7 +20,7 @@ EditorObject.snap = function(self, pstep, rstep)
 	v.x = v.x - v.x % pstep
 	v.y = v.y - v.y % pstep
 	v.z = v.z - v.z % pstep
-	self.position = v
+	self:set_position(v)
 	-- Rotation.
 	local r = self:get_rotation().euler[1] + 0.5 * rstep
 	self:set_rotation(Quaternion{euler = {r - r % rstep, 0, 0}})
@@ -49,3 +50,16 @@ EditorObject.set_spec = function(self, v)
 		self.render:add_animation("idle")
 	end
 end
+
+EditorObject.set_visible = function(self, v)
+	SimulationObject.set_visible(self, v)
+	if v then
+		self.render:init(self)
+	end
+end
+
+EditorObject.get_beheaded = function(self)
+	return false
+end
+
+return EditorObject

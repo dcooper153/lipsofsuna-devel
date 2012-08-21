@@ -12,7 +12,7 @@ Ui:add_widget{
 				Client.editor:uninitialize()
 			end
 			Client:terminate_game()
-			Ui.state = "mainmenu"
+			Ui:set_state("mainmenu")
 		end)
 	end}
 
@@ -20,6 +20,6 @@ Ui:add_widget{
 	state = "quit",
 	widget = function() return Widgets.Uibutton("Quit to desktop", function()
 			Client:terminate_game()
-			Program.quit = true
+			Program:set_quit(true)
 		end)
 	end}

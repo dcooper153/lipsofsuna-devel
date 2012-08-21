@@ -1,6 +1,8 @@
-require "system/lobby"
+local Class = require("system/class")
+local ConfigFile = require("system/config-file")
+local Lobby = require("system/lobby")
 
-ServerConfig = Class()
+local ServerConfig = Class("ServerConfig")
 
 --- Creates a new server configuration instance.
 -- @param clss ServerConfig class.
@@ -19,12 +21,12 @@ ServerConfig.new = function(clss)
 	self:load()
 	self:save()
 	-- Setup the lobby.
-	Lobby.players = 0
+	Lobby:set_players(0)
 	if self.server_announce then
-		Lobby.desc = self.server_desc
-		Lobby.name = self.server_name
-		Lobby.master = self.server_master
-		Lobby.port = self.server_port
+		Lobby:set_desc(self.server_desc)
+		Lobby:set_name(self.server_name)
+		Lobby:set_master(self.server_master)
+		Lobby:set_port(self.server_port)
 	end
 	return self
 end
@@ -73,3 +75,5 @@ ServerConfig.save = function(self)
 	-- Flush the file.
 	self.config:save()
 end
+
+return ServerConfig

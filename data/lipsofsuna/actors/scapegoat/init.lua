@@ -10,7 +10,7 @@ Dialogspec{name = "scapegoat death", commands = {
 		-- player can claim the reward from the main actor of the quest.
 		local add = function(branch, var_name, quest_name)
 			-- Find the quest.
-			local quest = Quest:find{name = quest_name}
+			local quest = Questspec:find{name = quest_name}
 			if not quest then return end
 			-- Get information on the main quest actor.
 			local actor = self.object:get_dialog_variable(var_name .. "_mark_actor") or "the contact person"

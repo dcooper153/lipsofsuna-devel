@@ -1,7 +1,10 @@
+local Actor = require("core/objects/actor")
 local Class = require("system/class")
+local Color = require("common/color")
+local Obstacle = require("core/objects/obstacle")
+local Physics = require("system/physics")
 
-local Simulation = Class()
-Simulation.class_name = "Simulation"
+local Simulation = Class("Simulation")
 
 --- Creates an object by a spec.
 -- @param self Simulation.
@@ -96,7 +99,7 @@ Simulation.update = function(self, secs)
 	-- Hence, this needs not to be done in single player or when hosting
 	-- an embedded server.
 	if not Server.initialized then
-		for k,v in pairs(Object.objects) do
+		for k,v in pairs(Game.objects.objects_by_id) do
 			v:update(secs)
 		end
 	end

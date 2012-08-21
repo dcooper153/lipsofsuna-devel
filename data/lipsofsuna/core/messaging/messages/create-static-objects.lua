@@ -1,3 +1,5 @@
+local Staticobject = require("core/objects/static")
+
 Message{
 	name = "create static objects",
 	server_to_client_encode = function(self, objects)

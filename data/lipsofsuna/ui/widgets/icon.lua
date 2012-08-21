@@ -1,21 +1,21 @@
-Widgets.Uiicon = Class(Widget)
+local Class = require("system/class")
+local Widget = require("system/widget")
+
+Widgets.Uiicon = Class("Uiicon", Widget)
 Widgets.Uiicon.DEFAULT = {image="icons1", offset={0,0}, size={34,34}}
 
 Widgets.Uiicon.new = function(clss, icon, pos, rot, tooltip)
 	local self = Widget.new(clss)
 	self.icon = icon
-	if pos then self.offset = pos end
-	if rot then self.rotation = rot end
+	if pos then self:set_offset(pos) end
+	if rot then self:set_rotation(rot) end
 	self.tooltip = tooltip
 	return self
 end
 
 Widgets.Uiicon.reshaped = function(self)
 	local icon = self.icon or self.DEFAULT
-	self:set_request{
-		internal = true,
-		width = icon.size[1],
-		height = icon.size[2]}
+	self:set_request(icon.size[1], icon.size[2], true)
 	self:canvas_clear()
 	self:canvas_image{
 		dest_position = {0,0},

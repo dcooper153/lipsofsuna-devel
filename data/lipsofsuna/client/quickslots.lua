@@ -1,10 +1,11 @@
+local Class = require("system/class")
+local Widget = require("system/widget")
 require "client/widgets/quickpage"
 
-Quickslots = Class()
-Quickslots.class_name = "Quickslots"
+Quickslots = Class("Quickslots")
 
 Quickslots.init = function(clss)
-	clss.group = Widget{rows = 1, cols = 1, spacings = {0,0}}
+	clss.group = Widget()
 	clss.items = Widgets.Quickpage{type = "items"}
 	clss.feats = Widgets.Quickpage{type = "feats"}
 	clss.mode = "feats"
@@ -66,17 +67,3 @@ end
 Quickslots.save = function(clss)
 	clss.feats:save()
 end
-
-Quickslots.class_getters = {
-	mode = function(self) return rawget(self, "_mode") end}
-
-Quickslots.class_setters = {
-	mode = function(self, v)
-		if self.mode == v then return end
-		rawset(self, "_mode", v)
-		if v == "feats" then
-			self.group:set_child(1, 1, self.feats)
-		else
-			self.group:set_child(1, 1, self.items)
-		end
-	end}

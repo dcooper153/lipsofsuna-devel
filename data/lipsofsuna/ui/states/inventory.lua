@@ -10,9 +10,9 @@ Ui:add_state{
 			local slot = object.inventory:get_slot_by_index(index)
 			local data = item and {
 				text = item.spec.name,
-				count = item.count or 1,
+				count = item:get_count(),
 				icon = item.spec.icon}
-			table.insert(widgets, Widgets.Uiinvitem(object.id, data, index, slot))
+			table.insert(widgets, Widgets.Uiinvitem(object:get_id(), data, index, slot))
 		end
 		return widgets
 	end}
@@ -28,7 +28,7 @@ Ui:add_widget{
 	widget = function()
 		-- Get the active container.
 		if not Client.data.inventory.id then return end
-		local object = Object:find{id = Client.data.inventory.id}
+		local object = Game.objects:find_by_id(Client.data.inventory.id)
 		if not object then return end
 		-- Get the active item.
 		local index = Client.data.inventory.index
@@ -50,7 +50,7 @@ Ui:add_widget{
 	state = "inventory/item",
 	widget = function()
 		-- Get the active container.
-		local object = Object:find{id = Client.data.inventory.id}
+		local object = Game.objects:find_by_id(Client.data.inventory.id)
 		if not object then return end
 		-- Don't show the widget if the item isn't equipped.
 		local index = Client.data.inventory.index
@@ -67,7 +67,7 @@ Ui:add_widget{
 	widget = function()
 		-- Get the active container.
 		if not Client.data.inventory.id then return end
-		local object = Object:find{id = Client.data.inventory.id}
+		local object = Game.objects:find_by_id(Client.data.inventory.id)
 		if not object then return end
 		-- Get the active item.
 		local index = Client.data.inventory.index
@@ -80,7 +80,7 @@ Ui:add_widget{
 			local action = v.name
 			table.insert(widgets, Widgets.Uibutton(name, function()
 				Game.messaging:client_event("use in inventory", Client.data.inventory.id, Client.data.inventory.index, action)
-				if Ui.state == "inventory/item" then
+				if Ui:get_state() == "inventory/item" then
 					Ui:pop_state()
 				end
 			end))
@@ -192,7 +192,7 @@ Ui:add_state{
 				text = item.spec.name,
 				count = item.count or 1,
 				icon = item.spec.icon}
-			table.insert(widgets, Widgets.Uiinvmove(object.id, data, index, slot))
+			table.insert(widgets, Widgets.Uiinvmove(object:get_id(), data, index, slot))
 		end
 		return widgets
 	end}

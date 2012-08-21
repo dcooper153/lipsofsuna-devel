@@ -1,15 +1,17 @@
+local Class = require("system/class")
+
 --- Create and synchronize stats.
 -- @name Stats
 -- @class table
-Skills = Class()
-Skills.class_name = "Skills"
+local Skills = Class("Skills")
 
 --- Creates a new skills list.
 -- @param clss Skills class.
--- @param args Arguments.
+-- @param id Unique ID.
 -- @return New skills.
-Skills.new = function(clss, args)
-	local self = Class.new(clss, args)
+Skills.new = function(clss, id)
+	local self = Class.new(clss)
+	self.id = id
 	self.skills = {}
 	return self
 end
@@ -220,3 +222,5 @@ Skills.remove_invalid = function(self)
 		end
 	end
 end
+
+return Skills

@@ -1,6 +1,6 @@
 local Class = require("system/class")
 
-local Damage = Class()
+local Damage = Class("Damage")
 
 --- Creates a new damage instance.
 -- @param clss Damage class.
@@ -112,10 +112,10 @@ Damage.apply_defender_armor = function(self, object)
 	if not object then return end
 	local reduce = {["cold damage"] = true, ["fire damage"] = true, ["physical damage"] = true}
 	-- Calculate the blocking bonus.
-	local armor = object.armor_class or 0
+	local armor = object:get_armor_class()
 	if object.blocking then
 		local delay = object.spec.blocking_delay
-		local elapsed = Program.time - object.blocking
+		local elapsed = Program:get_time() - object.blocking
 		local frac = math.min(1, elapsed / delay)
 		armor = armor + frac * object.spec.blocking_armor
 	end

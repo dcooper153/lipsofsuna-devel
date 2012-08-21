@@ -1,7 +1,9 @@
+local Camera = require("system/camera")
+local Class = require("system/class")
+local Light = require("system/light")
 local Simulation = require("core/client/simulation")
 
-Benchmark = Class()
-Benchmark.class_name = "Benchmark"
+Benchmark = Class("Benchmark")
 
 Benchmark.new = function(clss)
 	local self = Class.new(clss)
@@ -19,7 +21,7 @@ Benchmark.new = function(clss)
 		o.render:init(o)
 		o.render:add_animation(anims[i % 3 + 1])
 		o:set_visible(true)
-		self.objects[o.id] = o
+		self.objects[o:get_id()] = o
 		self.object = o
 	end
 	-- Setup terrain benchmarking.
@@ -28,18 +30,24 @@ Benchmark.new = function(clss)
 	self.terrain_timer2 = 1
 	-- Create the camera.
 	self.translation = Vector(-5, 2, -15)
-	self.camera = Camera{far = 1000.0, near = 0.3, mode = "first-person"}
+	self.camera = Camera()
+	self.camera:set_far(1000)
+	self.camera:set_near(0.3)
+	self.camera:set_mode("first-person")
 	-- Create the light.
-	self.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.0,0.0,0.01}}
-	self.light.enabled = true
+	self.light = Light()
+	self.light:set_ambient{0.3,0.3,0.3,1.0}
+	self.light:set_diffuse{0.6,0.6,0.6,1.0}
+	self.light:set_equation{1.0,0.0,0.01}
+	self.light:set_enabled(true)
 	return self
 end
 
 Benchmark.close = function(self)
 	-- Restore the normal map state.
-	for k,v in pairs(Object.objects) do v:detach() end
+	for k,v in pairs(Game.objects.objects_by_id) do v:detach() end
 	Client.sectors:unload_world()
-	self.light.enabled = false
+	self.light:set_enabled(false)
 	Client.sectors.unload_time = 10
 end
 
@@ -48,8 +56,8 @@ end
 -- @param secs Seconds since the last update.
 Benchmark.update = function(self, secs)
 	-- Update the camera.
-	self.camera.target_position = self.object.position + self.translation
-	self.camera.target_rotation = Quaternion{axis = Vector(0, 1, 0), angle = math.pi}
+	self.camera:set_target_position(self.object:get_position() + self.translation)
+	self.camera:set_target_rotation(Quaternion{axis = Vector(0, 1, 0), angle = math.pi})
 	self.camera:update(secs)
 	self.camera:warp()
 	Client.camera = self.camera
@@ -58,7 +66,6 @@ Benchmark.update = function(self, secs)
 	Client.lighting:update(secs)
 	-- Modify objects.
 	for k,v in pairs(self.objects) do
-		v:activate(5)
 		if not v.model_rebuild_timer then
 			v.model_rebuild_timer = 2
 			v.body_style = {}

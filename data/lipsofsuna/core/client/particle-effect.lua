@@ -1,7 +1,8 @@
 local Class = require("system/class")
-local EffectObject = require(Mod.path .. "effect-object")
+local EffectObject = require("core/client/effect-object")
+local RenderObject = require("system/object-render")
 
-local ParticleEffect = Class(EffectObject)
+local ParticleEffect = Class("ParticleEffect", EffectObject)
 
 ParticleEffect.new = function(clss, args)
 	local self = EffectObject.new(clss, args)

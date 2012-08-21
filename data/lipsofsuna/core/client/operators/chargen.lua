@@ -1,4 +1,11 @@
+local Camera = require("system/camera")
+local Class = require("system/class")
+local Color = require("common/color")
+local Model = require("system/model")
 local ModelBuilder = require(Mod.path .. "model-builder")
+local ModelMerger = require("system/model-merger")
+local RenderObject = require("system/object-render")
+local RenderModel = require("system/render-model")
 local RenderUtils = require(Mod.path .. "render-utils")
 
 local scale255 = function(t)
@@ -7,7 +14,7 @@ local scale255 = function(t)
 	return res
 end
 
-Operators.chargen = Class()
+Operators.chargen = Class("ChargenOperator")
 Operators.chargen.char = {}
 Operators.chargen.data = {}
 
@@ -26,14 +33,17 @@ Operators.chargen.list_races = {
 -- @param self Operator.
 Operators.chargen.init = function(self)
 	-- Create the object.
-	self.data.merger = Merger()
+	self.data.merger = ModelMerger()
 	self.data.render = RenderObject()
 	self.data.render:set_position(Vector(1, 1, 1))
 	self.data.render:set_visible(true)
 	self:randomize()
 	-- Create the camera.
 	self.data.translation = Vector(0.3, 1.8, -2)
-	self.data.camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
+	self.data.camera = Camera()
+	self.data.camera:set_far(60)
+	self.data.camera:set_near(0.3)
+	self.data.camera:set_mode("first-person")
 	self.data.camera:warp()
 	self:update(0.0)
 	Client.camera = self.data.camera
@@ -97,7 +107,7 @@ end
 -- @param args Event arguments.
 -- @return True if the caller should handle the event.
 Operators.chargen.input = function(self, args)
-	if not Ui.pointer_grab then return true end
+	if not Ui:get_pointer_grab() then return true end
 	local ret = true
 	-- Rotate the character.
 	local action1 = Client.bindings:find_by_name("turn")
@@ -196,8 +206,8 @@ Operators.chargen.update = function(self, secs)
 		if args then self.data.render:animate(args) end
 	end
 	-- Update the camera.
-	self.data.camera.target_position = self.data.render:get_position() + self.data.translation
-	self.data.camera.target_rotation = Quaternion{axis = Vector(0, 1, 0), angle = math.pi}
+	self.data.camera:set_target_position(self.data.render:get_position() + self.data.translation)
+	self.data.camera:set_target_rotation(Quaternion{axis = Vector(0, 1, 0), angle = math.pi})
 	self.data.camera:update(secs)
 	Client:update_camera()
 	-- Update lighting.

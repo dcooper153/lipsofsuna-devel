@@ -1,12 +1,19 @@
+local Class = require("system/class")
+
 if not Los.program_load_extension("reload") then
 	error("loading extension `reload' failed")
 end
 
-Reload = Class()
-Reload.class_name = "Reload"
+------------------------------------------------------------------------------
 
-Reload.class_getters = {
-	enabled = function(s) return Los.reload_get_enabled() end}
+local Reload = Class("Reload")
 
-Reload.class_setters = {
-	enabled = function(s, v) Los.reload_set_enabled(v) end}
+Reload.get_enabled = function(self)
+	return Los.reload_get_enabled()
+end
+
+Reload.set_enabled = function(self, v)
+	Los.reload_set_enabled(v)
+end
+
+return Reload

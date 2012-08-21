@@ -1,4 +1,5 @@
-require "system/model"
+local Class = require("system/class")
+local Model = require("system/model")
 
 if not Los.program_load_extension("thread") then
 	error("loading extension `thread' failed")
@@ -6,7 +7,7 @@ end
 
 ------------------------------------------------------------------------------
 
-Thread = Class()
+local Thread = Class("Thread")
 
 --- Creates a new thread.
 -- @param clss Thread class.
@@ -16,9 +17,10 @@ Thread = Class()
 --   <li>3,code: Code string to execute./<li></ul>
 -- @return Thread.
 Thread.new = function(clss, ...)
-	local h = Los.thread_new(...)
-	assert(h, "thread creation failed")
-	return Class.new(Thread, {handle = h})
+	local self = Class.new(clss)
+	self.handle = Los.thread_new(...)
+	assert(self.handle, "thread creation failed")
+	return self
 end
 
 --- Pops a message sent by the child script of the thread.
@@ -28,7 +30,7 @@ Thread.pop_message = function(self)
 	local r = Los.thread_pop_message(self.handle)
 	if not r then return end
 	if r.type == "model" and r.model then
-		r.model = Class.new(Model, {handle = r.model})
+		r.model = Model:new_from_handle(r.model)
 	end
 	return r
 end
@@ -47,9 +49,12 @@ Thread.push_message = function(self, ...)
 	end
 end
 
-Thread:add_getters{
-	done = function(self) return Los.thread_get_done(self.handle) end}
+Thread.get_done = function(self)
+	return Los.thread_get_done(self.handle)
+end
 
-Thread:add_setters{
-	done = function(self, v) end,
-	quit = function(self, v) return Los.thread_set_quit(self.handle, v) end}
+Thread.set_quit = function(self, v)
+	return Los.thread_set_quit(self.handle, v)
+end
+
+return Thread

@@ -9,7 +9,7 @@ Message{
 		return {id, message}
 	end,
 	server_to_client_handle = function(self, id, message)
-		local o = Object:find{id = id}
+		local o = Game.objects:find_by_id(id)
 		if not o then return end
 		local n = o.name or o.spec.name
 		Client:add_speech_text{object = o, name = o.name or o.spec.name, text = message}

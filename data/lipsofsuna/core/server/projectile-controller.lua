@@ -1,7 +1,7 @@
 local Class = require("system/class")
 local Combat = require("core/server/combat")
 
-local ProjectileController = Class()
+local ProjectileController = Class("ProjectileController")
 
 ProjectileController.new = function(clss, attacker, projectile, damage, speed, speedline)
 	local self = Class.new(clss)
@@ -16,7 +16,7 @@ end
 ProjectileController.attach = function(self)
 	-- Set the projectile controls.
 	self.projectile.controller = self
-	self.projectile.gravity = self.projectile.spec.gravity_projectile
+	self.projectile:set_gravity(self.projectile.spec.gravity_projectile)
 	self.projectile.speedline = speedline
 	-- Add the projectile to the world.
 	local src,dst = self.attacker:get_attack_ray()
@@ -32,16 +32,16 @@ ProjectileController.attach = function(self)
 	-- Enable the destruction timer or contact events.
 	if self.projectile.spec.destroy_timer then
 		self.destruction_timer = self.projectile.spec.destroy_timer
-		self.projectile.contact_events = false
+		self.projectile:set_contact_events(false)
 	else
-		self.projectile.contact_events = true
+		self.projectile:set_contact_events(true)
 	end
 end
 
 ProjectileController.detach = function(self)
-	self.projectile.contact_events = false
+	self.projectile:set_contact_events(false)
 	self.projectile.controller = nil
-	self.projectile.gravity = self.projectile.spec.gravity
+	self.projectile:set_gravity(self.projectile.spec.gravity)
 	self.projectile:detach()
 end
 

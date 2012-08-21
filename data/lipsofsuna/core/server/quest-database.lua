@@ -1,6 +1,7 @@
-require "system/class"
+local Class = require("system/class")
+local Quest = require(Mod.path .. "quest")
 
-QuestDatabase = Class()
+local QuestDatabase = Class("QuestDatabase")
 
 --- Creates a new quest database.
 -- @param clss QuestDatabase class.
@@ -9,12 +10,14 @@ QuestDatabase = Class()
 QuestDatabase.new = function(clss, db)
 	local self = Class.new(clss)
 	self.db = db
+	self.quests_by_name = {}
 	return self
 end
 
 --- Resets the quest database.
 -- @param self QuestDatabase.
 QuestDatabase.reset = function(self)
+	self.quests_by_name = {}
 	self.db:query([[DROP TABLE IF EXISTS dialog_flags;]])
 	self.db:query([[DROP TABLE IF EXISTS dialog_variables;]])
 	self.db:query([[DROP TABLE IF EXISTS quests;]])
@@ -33,19 +36,21 @@ QuestDatabase.reset = function(self)
 		marker TEXT);]])
 end
 
---- Loads quests from the database.
+--- Finds a quest by name.
+-- @param self QuestDatabase.
+-- @param name Quest name.
+-- @return Quest, or nil.
+QuestDatabase.find_quest_by_name = function(self, name)
+	return self.quests_by_name[name]
+end
+
+--- Loads all quests from the database.
 -- @param self QuestDatabase.
 QuestDatabase.load_quests = function(self)
-	local r = self.db:query("SELECT name,status,desc,marker FROM quests;")
+	local r = self.db:query([[SELECT name,status,desc,marker FROM quests;]])
 	for k,v in ipairs(r) do
-		local quest = Quest:find{name = v[1]}
-		if quest then
-			quest:update{status = v[2], text = v[3], marker = v[4]}
-		end
-	end
-	local r = self.db:query("SELECT name,value FROM dialog_flags;")
-	for k,v in ipairs(r) do
-		Dialog.flags[v[1]] = v[2]
+		local quest = Quest(unpack(v))
+		self.quests_by_name[quest.name] = quest
 	end
 end
 
@@ -53,27 +58,32 @@ end
 -- @param self QuestDatabase.
 -- @param quest Quest.
 QuestDatabase.save_quest = function(self, quest)
-	self.db:query("BEGIN TRANSACTION;")
-	self.db:query("REPLACE INTO quests (name,status,desc,marker) VALUES (?,?,?,?);",
+	self.db:query([[REPLACE INTO quests (name,status,desc,marker) VALUES (?,?,?,?);]],
 		{quest.name, quest.status, quest.text, quest.marker})
-	self.db:query("END TRANSACTION;")
 end
 
---- Saves all quests.
+--- Gets a dialog flag by name.
 -- @param self QuestDatabase.
--- @param erase True to erase existing database entries first.
-QuestDatabase.save_quests = function(self, erase)
-	self.db:query("BEGIN TRANSACTION;")
-	self.db:query("DELETE FROM quests;")
-	self.db:query("DELETE FROM dialog_flags;")
-	for k,v in pairs(Quest.dict_name) do
-		self.db:query("REPLACE INTO quests (name,status,desc,marker) VALUES (?,?,?,?);",
-			{k, v.status, v.text, v.marker})
+-- @param name Flag name.
+-- @return Flag value, or nil.
+QuestDatabase.get_dialog_flag = function(self, name)
+	local rows = self.db:query([[SELECT value FROM dialog_flags WHERE name=?;]], {name})
+	if not rows then return end
+	for k,v in ipairs(rows) do
+		return v[1]
 	end
-	for k,v in pairs(Dialog.flags) do
-		self.db:query("REPLACE INTO dialog_flags (name,value) VALUES (?,?);", {k, v})
+end
+
+--- Sets a dialog flag.
+-- @param self QuestDatabase.
+-- @param name Flag name.
+-- @param value Flag value.
+QuestDatabase.set_dialog_flag = function(self, name, value)
+	if value then
+		self.db:query([[REPLACE INTO dialog_flags (name,value) VALUES (?,?);]], {name, value})
+	else
+		self.db:query([[DELETE FROM dialog_flags WHERE name=?;]], {name})
 	end
-	self.db:query("END TRANSACTION;")
 end
 
 --- Gets a dialog variable by the owner object and variable name.
@@ -82,7 +92,7 @@ end
 -- @param name Variable name.
 -- @return Variable value, or nil.
 QuestDatabase.get_dialog_variable = function(self, object, name)
-	local rows = self.db:query([[SELECT value FROM dialog_variables WHERE id=? AND key=?;]], {object.id, name})
+	local rows = self.db:query([[SELECT value FROM dialog_variables WHERE id=? AND key=?;]], {object:get_id(), name})
 	if not rows then return end
 	for k,v in ipairs(rows) do
 		return v[1]
@@ -96,9 +106,9 @@ end
 -- @param value Variable value.
 QuestDatabase.set_dialog_variable = function(self, object, name, value)
 	if value then
-		self.db:query([[REPLACE INTO dialog_variables (id,key,value) VALUES (?,?,?);]], {object.id, name, value})
+		self.db:query([[REPLACE INTO dialog_variables (id,key,value) VALUES (?,?,?);]], {object:get_id(), name, value})
 	else
-		self.db:query([[DELETE FROM dialog_variables WHERE id=? AND key=?;]], {object.id, name})
+		self.db:query([[DELETE FROM dialog_variables WHERE id=? AND key=?;]], {object:get_id(), name})
 	end
 end
 
@@ -108,7 +118,7 @@ end
 -- @return Dictionary of variables.
 QuestDatabase.get_dialog_variables = function(self, object)
 	local res = {}
-	local rows = self.db:query([[SELECT key,value FROM dialog_variables WHERE id=?;]], {object.id})
+	local rows = self.db:query([[SELECT key,value FROM dialog_variables WHERE id=?;]], {object:get_id()})
 	if rows then
 		for k,v in ipairs(rows) do
 			res[v[1]] = v[2]
@@ -116,3 +126,12 @@ QuestDatabase.get_dialog_variables = function(self, object)
 	end
 	return res
 end
+
+--- Returns the dictionary of all quests in the database.
+-- @param self QuestDatabase.
+-- @return Dictionary.
+QuestDatabase.get_all_quests = function(self)
+	return self.quests_by_name
+end
+
+return QuestDatabase

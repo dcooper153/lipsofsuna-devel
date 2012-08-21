@@ -1,5 +1,6 @@
-require "system/class"
-require "system/sector"
+local Class = require("system/class")
+local Packet = require("system/packet")
+local Sector = require("system/sector")
 
 if not Los.program_load_extension("tiles") then
 	error("loading extension `tiles' failed")
@@ -7,102 +8,7 @@ end
 
 ------------------------------------------------------------------------------
 
-Material = Class()
-Material.class_name = "Material"
-
---- Creates a new material.
--- @param clss Material class.
--- @param args Arguments.
--- @return New material.
-Material.new = function(clss, args)
-	local self = Class.new(clss)
-	self.handle = Los.material_new()
-	if args then
-		for k,v in pairs(args) do self[k] = v end
-	end
-	return self
-end
-
---- Face culling toggle.
--- @name Material.cullface
--- @class table
-
---- Diffuse color.
--- @name Material.diffuse
--- @class table
-
---- Material flags.
--- @name Material.flags
--- @class table
-
---- Material friction.
--- @name Material.friction
--- @class table
-
---- Material ID.
--- @name Material.id
--- @class table
-
---- Material name.
--- @name Material.name
--- @class table
-
---- Surface shader.
--- @name Material.shader
--- @class table
-
---- Shininess.
--- @name Material.shininess
--- @class table
-
---- Specular color.
--- @name Material.specular
--- @class table
-
---- Texture list.
--- @name Material.texture
--- @class table
-
---- Texture scale factor.
--- @name Material.texture_scale
--- @class table
-
---- Material type.
--- @name Material.type
--- @class table
-
-Material:add_getters{
-	cullface = function(s) return Los.material_get_cullface(s.handle) end,
-	diffuse = function(s) return Los.material_get_diffuse(s.handle) end,
-	flags = function(s) return Los.material_get_flags(s.handle) end,
-	friction = function(s) return Los.material_get_friction(s.handle) end,
-	id = function(s) return Los.material_get_id(s.handle) end,
-	material = function(s) return Los.material_get_material(s.handle) end,
-	name = function(s) return Los.material_get_name(s.handle) end,
-	shader = function(s) return Los.material_get_shader(s.handle) end,
-	shininess = function(s) return Los.material_get_shininess(s.handle) end,
-	specular = function(s) return Los.material_get_specular(s.handle) end,
-	texture = function(s) return Los.material_get_texture(s.handle) end,
-	texture_scale = function(s) return Los.material_get_texture_scale(s.handle) end,
-	type = function(s) return Los.material_get_type(s.handle) end}
-
-Material:add_setters{
-	cullface = function(s, v) Los.material_set_cullface(s.handle, v) end,
-	diffuse = function(s, v) Los.material_set_diffuse(s.handle, v) end,
-	flags = function(s, v) Los.material_set_flags(s.handle, v) end,
-	friction = function(s, v) Los.material_set_friction(s.handle, v) end,
-	material = function(s, v) Los.material_set_material(s.handle, v) end,
-	name = function(s, v) Los.material_set_name(s.handle, v) end,
-	shader = function(s, v) Los.material_set_shader(s.handle, v) end,
-	shininess = function(s, v) Los.material_set_shininess(s.handle, v) end,
-	specular = function(s, v) Los.material_set_specular(s.handle, v) end,
-	texture = function(s, v) Los.material_set_texture(s.handle, v) end,
-	texture_scale = function(s, v) Los.material_set_texture_scale(s.handle, v) end,
-	type = function(s, v) Los.material_set_type(s.handle, v) end}
-
-------------------------------------------------------------------------------
-
-Voxel = Class()
+Voxel = Class("Voxel")
 
 --- Copies a terrain region into a packet.
 -- @param self Voxel class.
@@ -113,7 +19,7 @@ Voxel = Class()
 -- @return Packet writer.
 Voxel.copy_region = function(self, args)
 	local handle = Los.voxel_copy_region{point = args.point and args.point.handle, sector = args.sector, size = args.size}
-	return Class.new(Packet, {handle = handle})
+	return Packet:new_from_handle(handle)
 end
 
 --- Fills a terrain region.
@@ -146,7 +52,33 @@ end
 Voxel.find_tile = function(self, args)
 	local t,p = Los.voxel_find_tile{match = args.match, point = args.point.handle, radius = args.radius}
 	if not t then return end
-	return t, Class.new(Vector, {handle = p})
+	return t, Vector:new_from_handle(p)
+end
+
+--- Intersects a ray with map tiles.
+-- @param self Object.
+-- @param s Ray start point, in world space.</li>
+-- @param e Ray end point, in world space.</li>
+-- @return Position vector in world space, tile index vector.
+Voxel.intersect_ray = function(self, s, e)
+	return Los.voxel_intersect_ray(s.handle, e.handle)
+end
+
+--- Pastes a terrain region from a packet to the map.
+-- @param self Voxel class.
+-- @param args Arguments.<ul>
+--   <li>packet: Data packet.</li>
+--   <li>point: Tile index vector.</li>
+--   <li>sector: Sector index.</li></ul>
+Voxel.paste_region = function(self, args)
+	Los.voxel_paste_region{packet = args.packet.handle, point = args.point and args.point.handle, sector = args.sector}
+end
+
+--- Update the voxel terrain state.
+-- @param self Voxel class.
+-- @param secs Seconds since the last update.
+Voxel.update = function(self, secs)
+	Los.voxel_update(secs)
 end
 
 --- Gets the data of a voxel block.
@@ -157,6 +89,17 @@ end
 -- @param packet Packet writer.
 Voxel.get_block = function(self, x, y, z, packet)
 	Los.voxel_get_block(x, y, z, packet.handle)
+end
+
+--- Sets the contents of a block of voxels.
+-- @param self Voxel class.
+-- @param x Block offset.
+-- @param y Block offset.
+-- @param z Block offset.
+-- @param packet Packet reader.
+-- @return True on success.
+Voxel.set_block = function(self, x, y, z, packet)
+	return Los.voxel_set_block(x, y, z, packet.handle)
 end
 
 --- Gets the offsets of the blocks in the given sector.
@@ -178,106 +121,71 @@ Voxel.get_blocks_by_sector_id = function(self, id)
 	end)
 end
 
+--- Sets the block size of voxel terrain.
+-- @param self Voxel class.
+-- @param blocks Number of blocks along a sector edge.
+-- @param tiles Number of tiles along a block edge.
+Voxel.set_block_size = function(self, blocks, tiles)
+	Los.voxel_set_blocks_per_line(blocks)
+	Los.voxel_set_tiles_per_line(tiles)
+	-- TODO: Get rid of these shortcuts?
+	self.blocks_per_line = blocks
+	self.tiles_per_line = tiles
+end
+
+--- Gets the fill tile number for empty sectors.
+-- @param self Voxel class.
+-- @return Number.
+Voxel.get_fill_tile = function(self)
+	return Los.voxel_get_fill()
+end
+
+--- Sets the fill tile number for empty sectors.
+-- @param self Voxel class.
+-- @param v Number.
+Voxel.set_fill_tile = function(self, v)
+	Los.voxel_set_fill(v)
+end
+
+--- Gets the approximate memory used by voxel terrain, in bytes.
+-- @param self Voxel class.
+-- @return Memory used, in bytes.
+Voxel.get_memory_used = function(self)
+	return Los.voxel_get_memory_used()
+end
+
 --- Gets the contents of a tile.
 -- @param self Voxel class.
--- @param args Arguments.<ul>
---   <li>1: Tile index vector.</li></ul>
+-- @param coord Tile offset vector.
 -- @return Tile.
-Voxel.get_tile = function(self, a)
-	return Los.voxel_get_tile(a.handle)
-end
-
---- Intersects a ray with map tiles.
--- @param self Object.
--- @param ... Arguments.<ul>
---   <li>1,start_point: Ray start point in world space.</li>
---   <li>2,end_point: Ray end point in world space.</li></ul>
--- @return Position vector in world space, tile index vector.
-Voxel.intersect_ray = function(self, ...)
-	local a,b = ...
-	if not a.class then
-		return Los.voxel_intersect_ray(a.handle, b.handle)
-	else
-		return Los.voxel_intersect_ray(a.start_point.handle, a.end_point.handle)
-	end
-end
-
---- Pastes a terrain region from a packet to the map.
--- @param self Voxel class.
--- @param args Arguments.<ul>
---   <li>packet: Data packet.</li>
---   <li>point: Tile index vector.</li>
---   <li>sector: Sector index.</li></ul>
-Voxel.paste_region = function(self, args)
-	Los.voxel_paste_region{packet = args.packet.handle, point = args.point and args.point.handle, sector = args.sector}
-end
-
---- Update the voxel terrain state.
--- @param self Voxel class.
--- @param secs Seconds since the last update.
-Voxel.update = function(self, secs)
-	Los.voxel_update(secs)
-end
-
---- Sets the contents of a block of voxels.
--- @param self Voxel class.
--- @param x Block offset.
--- @param y Block offset.
--- @param z Block offset.
--- @param packet Packet reader.
--- @return True on success.
-Voxel.set_block = function(self, x, y, z, packet)
-	return Los.voxel_set_block(x, y, z, packet.handle)
+Voxel.get_tile = function(self, coord)
+	return Los.voxel_get_tile(coord.handle)
 end
 
 --- Sets the contents of a tile.
 -- @param self Voxel class.
--- @param args Arguments.<ul>
---   <li>1: Tile index vector.</li>
---   <li>2: Tile number.</li></ul>
-Voxel.set_tile = function(self, a, b)
-	return Los.voxel_set_tile(a.handle, b)
+-- @param coord Vector.
+-- @param tile Tile number.
+Voxel.set_tile = function(self, coord, tile)
+	return Los.voxel_set_tile(coord.handle, tile)
 end
 
 --- Sets the contents of multiple tiles.
 -- @param self Voxel class.
--- @param args Arguments.<ul>
---   <li>1: Tile number.</li>
---   <li>2: List of tile index vectors.</li></ul>
-Voxel.set_tiles = function(self, a, b)
+-- @param tile Tile number.
+-- @param coords List of vectors.</li></ul>
+Voxel.set_tiles = function(self, tile, coords)
 	local h = {}
-	for k,v in pairs(b) do h[k] = b[k].handle end
-	return Los.voxel_set_tiles(a.handle, h)
+	for k,v in pairs(coords) do h[k] = coords[k].handle end
+	return Los.voxel_set_tiles(tile, h)
 end
 
---- Number of blocks per sector edge.
+--- Number of blocks along a sector edge.
 -- @name Voxel.blocks_per_line
 -- @class table
 
---- Fill type for empty sectors.
--- @name Voxel.fill
--- @class table
-
---- Approximate memory used by terrain, in bytes.
--- @name Voxel.memory_used
--- @class table
-
---- List of material IDs.
--- @name Voxel.materials
--- @class table
-
---- Number of tiles per sector edge.
+--- Number of tiles along a sector edge.
 -- @name Voxel.tiles_per_line
 -- @class table
 
-Voxel.class_getters = {
-	blocks_per_line = function(s) return Los.voxel_get_blocks_per_line() end,
-	fill = function(s) return Los.voxel_get_fill() end,
-	materials = function(s) return Los.voxel_get_materials() end,
-	memory_used = function(s) return Los.voxel_get_memory_used() end,
-	tiles_per_line = function(s) return Los.voxel_get_tiles_per_line() end}
-
-Voxel.class_setters = {
-	blocks_per_line = function(s, v) Los.voxel_set_blocks_per_line(v) end,
-	fill = function(s, v) Los.voxel_set_fill(v) end,
-	tiles_per_line = function(s, v) Los.voxel_set_tiles_per_line(v) end}
+return Voxel

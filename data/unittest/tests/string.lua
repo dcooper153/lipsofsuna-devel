@@ -1,5 +1,5 @@
-Unittest:add(1, "string", function()
-	require "system/string"
+Unittest:add(1, "system", "string", function()
+	local String = require("system/string")
 	-- Wide character conversion.
 	local pos = 1
 	local str = "STOP、ペロペロ"

@@ -1,5 +1,8 @@
-Generator.sector_types.Overworld = Class()
-Generator.sector_types.Overworld.class_name = "Generator.Overworld"
+local Class = require("system/class")
+local Material = require("system/material")
+local Noise = require("system/noise")
+
+Generator.sector_types.Overworld = Class("Generator.Overworld")
 
 Generator.sector_types.Overworld.init = function(self)
 	self.scale1 = Vector(0.2,0.2,0.2)
@@ -27,7 +30,7 @@ Generator.sector_types.Overworld.generate = function(self, pos, size)
 				p1.y = math.ceil(height * Voxel.tile_scale) - 1
 				local n1 = Noise:perlin_noise(p1, self.scale1, 1, 3, 0.5, Server.generator.seed1)
 				if n1 > 0.8 then
-					Voxel:fill_region{point = p1, size = Vector(1, 1+(n1-0.8)/0.3, 1), tile = m1.id}
+					Voxel:fill_region{point = p1, size = Vector(1, 1+(n1-0.8)/0.3, 1), tile = m1:get_id()}
 				end
 			end
 		end

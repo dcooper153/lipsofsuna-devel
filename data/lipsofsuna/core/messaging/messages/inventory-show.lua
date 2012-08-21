@@ -10,11 +10,11 @@ Message{
 	end,
 	server_to_client_handle = function(self, id)
 		-- Find the object.
-		local object = Object:find{id = id}
+		local object = Game.objects:find_by_id(id)
 		if not object then return end
 		-- Show the inventory.
-		if Ui.state == "play" or Ui.state == "world/object" then
+		if Ui:get_state() == "play" or Ui:get_state() == "world/object" then
 			Client.data.inventory.id = id
-			Ui.state = "loot"
+			Ui:set_state("loot")
 		end
 	end}

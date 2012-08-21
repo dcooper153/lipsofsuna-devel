@@ -1,7 +1,7 @@
 local Class = require("system/class")
 local Damage = require("core/server/damage")
 
-local Combat = Class()
+local Combat = Class("Combat")
 
 Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, tile)
 	-- Calculate the damage.
@@ -24,10 +24,10 @@ Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, ti
 	-- Apply object damage.
 	if defender then
 		-- Knockback the defender.
-		defender:impulse{impulse = attacker.rotation * Vector(0, 0, -100)}
+		defender:impulse{impulse = attacker:get_rotation() * Vector(0, 0, -100)}
 		-- Stagger the attacker.
 		if defender.blocking then
-			if Program.time - defender.blocking > defender.spec.blocking_delay then
+			if Program:get_time() - defender.blocking > defender.spec.blocking_delay then
 				attacker.cooldown = (attacker.cooldown or 0) + 1
 				attacker:animate("stagger")
 			end
@@ -70,7 +70,7 @@ Combat.apply_ranged_impact = function(self, attacker, projectile, damage, point,
 	-- Apply object damage.
 	if defender then
 		-- Knockback the defender.
-		defender:impulse{impulse = projectile.rotation * Vector(0, 0, -100)}
+		defender:impulse{impulse = projectile:get_rotation() * Vector(0, 0, -100)}
 		-- Damage the defender.
 		local args = {owner = attacker, object = defender}
 		for name,value in pairs(damage.influences) do

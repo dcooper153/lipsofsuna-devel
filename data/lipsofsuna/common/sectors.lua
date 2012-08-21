@@ -1,4 +1,7 @@
-Sectors = Class()
+local Class = require("system/class")
+local Timer = require("system/timer")
+
+Sectors = Class("Sectors")
 
 --- Creates a new sector manager.
 -- @param clss Sectors class.
@@ -91,7 +94,7 @@ Sectors.save_world = function(self, erase, progress)
 		self.database:query("DELETE FROM terrain;")
 	end
 	-- Write the new world data.
-	local sectors = Program.sectors
+	local sectors = Program:get_sectors()
 	if progress then
 		-- Write with progress updates.
 		local total = 0
@@ -123,7 +126,7 @@ end
 Sectors.update = function(self)
 	if not self.unload_time then return end
 	local written = 0
-	for k,d in pairs(Program.sectors) do
+	for k,d in pairs(Program:get_sectors()) do
 		if d > self.unload_time and written < 40 then
 			-- Save the sector.
 			if self.database then

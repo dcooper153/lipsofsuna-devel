@@ -10,7 +10,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, id, type, name, size, mine)
 		-- Find the object.
-		local object = Object:find{id = id}
+		local object = Game.objects:find_by_id(id)
 		if not object then return end
 		-- Add the subscription.
 		Operators.inventory:add_inventory(id)
@@ -22,10 +22,10 @@ Message{
 		-- Show the inventory.
 		if not mine then
 			Client.data.inventory.id = id
-			if Ui.state == "inventory" then
+			if Ui:get_state() == "inventory" then
 				Ui:push_state("loot")
 			else
-				Ui.state = "loot"
+				Ui:set_state("loot")
 			end
 		end
 	end}

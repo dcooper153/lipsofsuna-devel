@@ -9,5 +9,7 @@ Message{
 		return {text}
 	end,
 	server_to_client_handle = function(self, text)
-		Client.notification_text = text
+		local hud = Ui:get_hud("notification")
+		if not hud then return end
+		hud.widget:set_text(text)
 	end}

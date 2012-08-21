@@ -1,20 +1,37 @@
-Unlocks = Class()
-Unlocks.class_name = "Unlocks"
+local Class = require("system/class")
+
+local UnlockManager = Class("UnlockManager")
 
 --- Initializes unlocks.
--- @param self Unlocks class.
+-- @param self UnlockManager class.
 -- @param db Database, or nil.
-Unlocks.init = function(self, db)
+-- @return UnlockManager
+UnlockManager.new = function(clss, db)
+	local self = Class.new(clss)
 	self.db = db
 	self.unlocks = {}
+	return self
+end
+
+--- Clears all unlocks.
+-- @param self UnlockManager.
+UnlockManager.reset = function(self)
+	self.unlocks = {}
+	if self.db then
+		self.db:query([[DROP TABLE IF EXISTS unlocks;]])
+		self.db:query([[CREATE TABLE unlocks (
+			type TEXT,
+			name TEXT,
+			PRIMARY KEY(type,name));]])
+	end
 end
 
 --- Called when an unlock is added or removed.
--- @param self Unlocks class.
+-- @param self UnlockManager.
 -- @param type Unlock type.
 -- @param name Unlock name.
 -- @param added True if added, false if removed.
-Unlocks.changed = function(self, type, name, added)
+UnlockManager.changed = function(self, type, name, added)
 	if not Server.initialized then return end
 	if added then
 		Game.messaging:server_event_broadcast("unlocks add", type, name)
@@ -23,20 +40,20 @@ Unlocks.changed = function(self, type, name, added)
 	end
 end
 
---- Returne true if the item is unlocked.
--- @param self Unlocks class.
+--- Returns true if the item is unlocked.
+-- @param self UnlockManager.
 -- @param type Unlock type.
 -- @param name Unlock name.
-Unlocks.get = function(self, type, name)
+UnlockManager.get = function(self, type, name)
 	if not self.unlocks[type] then return end
 	if not self.unlocks[type][name] then return end
 	return true
 end
 
 --- Gets the unlocks in a list form.
--- @param self Unlocks class.
+-- @param self UnlockManager.
 -- @return List of unlocks.
-Unlocks.get_list = function(self, packet)
+UnlockManager.get_list = function(self)
 	local res = {}
 	for type,names in pairs(self.unlocks) do
 		for name in pairs(names) do
@@ -47,10 +64,10 @@ Unlocks.get_list = function(self, packet)
 end
 
 --- Locks an item.
--- @param self Unlocks class.
+-- @param self UnlockManager.
 -- @param type Unlock type.
 -- @param name Unlock name.
-Unlocks.lock = function(self, type, name)
+UnlockManager.lock = function(self, type, name)
 	-- Remove from the unlock table.
 	if not self.unlocks[type] then return end
 	if not self.unlocks[type][name] then return end
@@ -63,11 +80,11 @@ Unlocks.lock = function(self, type, name)
 	end
 end
 
---- Unlocks an item.
--- @param self Unlocks class.
+--- UnlockManager an item.
+-- @param self UnlockManager.
 -- @param type Unlock type.
 -- @param name Unlock name.
-Unlocks.unlock = function(self, type, name)
+UnlockManager.unlock = function(self, type, name)
 	-- Add to the unlock table.
 	if not self.unlocks[type] then
 		self.unlocks[type] = {[name] = true}
@@ -83,10 +100,10 @@ Unlocks.unlock = function(self, type, name)
 	end
 end
 
---- Unlocks a random skill, spell type or spell effect.
--- @param self Unlocks class.
+--- UnlockManager a random skill, spell type or spell effect.
+-- @param self UnlockManager.
 -- @return Unlock type and unlock name, or nil.
-Unlocks.unlock_random = function(self)
+UnlockManager.unlock_random = function(self)
 	local choices = {}
 	-- Find the unlockable skills.
 	-- All skill types that have a description are assumed to be used by
@@ -141,8 +158,8 @@ Unlocks.unlock_random = function(self)
 end
 
 --- Reads the unlocks from a database.
--- @param self Unlocks class.
-Unlocks.read_db = function(self)
+-- @param self UnlockManager.
+UnlockManager.load = function(self)
 	self.unlocks = {}
 	if not self.db then return end
 	local rows = self.db:query([[SELECT type,name FROM unlocks;]])
@@ -157,8 +174,8 @@ Unlocks.read_db = function(self)
 end
 
 --- Writes the unlocks to a database.
--- @param self Unlocks class.
-Unlocks.write_db = function(self)
+-- @param self UnlockManager.
+UnlockManager.save = function(self)
 	if not self.db then return end
 	self.db:query([[DELETE FROM unlocks;]])
 	for type,names in pairs(self.unlocks) do
@@ -167,3 +184,5 @@ Unlocks.write_db = function(self)
 		end
 	end
 end
+
+return UnlockManager

@@ -1,9 +1,90 @@
-require "common/stats"
-require(Mod.path .. "simulation")
+local Class = require("system/class")
+local Coroutine = require("system/coroutine")
+local Item = require("core/objects/item")
+local Physics = require("system/physics")
+local ObjectSerializer = require("core/server/object-serializer")
+local SimulationObject = require("core/objects/simulation")
+local Skills = require("core/server/skills")
+local Stats = require("core/server/stats")
+local Timer = require("system/timer")
 
-Actor = Class(SimulationObject)
-Actor.class_name = "Actor"
-Actor.dict_id = setmetatable({}, {__mode = "kv"})
+local Actor = Class("Actor", SimulationObject)
+Actor.serializer = ObjectSerializer{
+	{
+		name = "angular",
+		type = "vector",
+		get = function(self) return self:get_angular() end,
+		set = function(self, v) return self:set_angular(v) end
+	},
+	{
+		name = "animation_profile",
+		type = "string",
+		get = function(self) return self.animation_profile end,
+		set = function(self, v) self.animation_profile = v end
+	},
+	{
+		name = "beheaded",
+		type = "boolean",
+		get = function(self) return self:get_beheaded() end,
+		set = function(self, v) self:set_beheaded(v) end
+	},
+	{
+		name = "body_scale",
+		type = "number"
+	},
+	{
+		name = "body_style",
+		type = "number list"
+	},
+	{
+		name = "eye_color",
+		type = "number list"
+	},
+	{
+		name = "eye_style",
+		type = "string"
+	},
+	{
+		name = "face_style",
+		type = "number list"
+	},
+	{
+		name = "hair_color",
+		type = "number list"
+	},
+	{
+		name = "hair_style",
+		type = "string"
+	},
+	{
+		name = "head_style",
+		type = "string"
+	},
+	{
+		name = "home_point",
+		type = "vector"
+	},
+	{
+		name = "position",
+		type = "vector",
+		get = function(self) return self:get_position() end,
+		set = function(self, v) self:set_position(v) end
+	},
+	{
+		name = "rotation",
+		type = "quaternion",
+		get = function(self) return self:get_rotation() end,
+		set = function(self, v) self:set_rotation(v) end
+	},
+	{
+		name = "skin_color",
+		type = "number list"
+	},
+	{
+		name = "skin_style",
+		type = "string"
+	}
+}
 
 --- Creates a new actor.
 -- @param clss Actor class.
@@ -28,50 +109,58 @@ Actor.dict_id = setmetatable({}, {__mode = "kv"})
 --   <li>spec: Actorspec of the actor.</li>
 --   <li>realized: True to add the object to the simulation.</li></ul>
 Actor.new = function(clss, args)
-	local self = SimulationObject.new(clss, {id = args.id})
+	local self = SimulationObject.new(clss, args and args.id)
 	local copy = function(n, d)
 		if args[n] ~= nil or d then
 			self[n] = (args[n] ~= nil) and args[n] or d
 		end
 	end
-	self.attributes = {}
-	self.skills = Skills{id = self.id}
-	self.stats = Stats{id = self.id}
-	copy("angular")
-	copy("animation_profile")
-	copy("beheaded")
-	copy("body_scale")
-	copy("body_style")
-	copy("eye_color")
-	copy("eye_style")
-	copy("face_style")
-	copy("hair_color")
-	copy("hair_style")
-	copy("head_style")
-	copy("home_point")
-	copy("jumped", 0)
-	copy("name")
-	copy("physics", "kinematic")
-	copy("random")
-	copy("rotation")
-	copy("position")
-	copy("skin_color")
-	copy("skin_style")
-	copy("carried_weight", 0)
-	copy("spec")
-	clss.dict_id[self.id] = self
 	self.update_timer = 0.1 * math.random()
-	if args and args.dead then self:set_dead_state() end
-	copy("realized")
+	self.attributes = {}
+	self.skills = Skills(self:get_id())
+	self.stats = Stats(self:get_id())
+	if args then
+		if args.angular then self:set_angular(args.angular) end
+		copy("animation_profile")
+		if args.beheaded then self:set_beheaded(true) end
+		copy("body_scale")
+		copy("body_style")
+		copy("eye_color")
+		copy("eye_style")
+		copy("face_style")
+		copy("hair_color")
+		copy("hair_style")
+		copy("head_style")
+		copy("home_point")
+		copy("jumped", 0)
+		copy("name")
+		self:set_physics(args.physics or "kinematic")
+		copy("random")
+		if args.rotation then self:set_rotation(args.rotation) end
+		if args.position then self:set_position(args.position) end
+		copy("skin_color")
+		copy("skin_style")
+		copy("carried_weight", 0)
+		if args.spec then self:set_spec(args.spec) end
+		if args.dead then self:set_dead_state() end
+	else
+		self:set_physics("kinematic")
+		self.jumped = 0
+		self.carried_weight = 0
+	end
 	-- Initialize skills.
 	if self:has_server_data() then
-		if args.skills then
+		if args and args.skills then
 			self.skills:clear()
 			for k,v in pairs(args.skills) do
 				self.skills:add(k)
 			end
 		end
 		self:update_skills()
+	end
+	-- Set the visibility.
+	if args and args.realized then
+		self:set_visible(true)
 	end
 	-- Client data.
 	if self:has_client_data() then
@@ -86,16 +175,16 @@ end
 Actor.clone = function(self)
 	-- TODO: Copy dialog variables?
 	return Actor{
-		angular = self.angular,
-		beheaded = self.beheaded,
+		angular = self:get_angular(),
+		beheaded = self:get_beheaded(),
 		dead = self.dead,
 		eye_style = self.eye_style,
 		face_style = self.face_style,
 		hair_style = self.hair_style,
 		head_style = self.head_style,
-		physics = self.physics,
-		position = self.position,
-		rotation = self.rotation,
+		physics = self:get_physics(),
+		position = self:get_position(),
+		rotation = self:get_rotation(),
 		spec = self.spec}
 end
 
@@ -115,11 +204,13 @@ end
 -- @param self Object.
 Actor.calculate_animation = function(self)
 	if not self:has_server_data() then return end
+	local m = self:get_movement()
+	local s = self:get_strafing()
 	local anim
-	local back = self.movement < 0
-	local front = self.movement > 0
-	local left = self.strafing < 0
-	local right = self.strafing > 0
+	local back = m < 0
+	local front = m > 0
+	local left = s < 0
+	local right = s > 0
 	local run = self.running
 	-- Select the animation.
 	if back then self:animate("walk back")
@@ -136,6 +227,7 @@ end
 -- @param self Object.
 Actor.calculate_speed = function(self)
 	-- Base speed.
+	if not self:get_spec() then return end
 	local s = (self.running and not self.blocking) and self.spec.speed_run or self.spec.speed_walk
 	-- Skill bonuses.
 	s = s * self.attributes.speed
@@ -144,8 +236,8 @@ Actor.calculate_speed = function(self)
 		s = math.max(1, s * 0.3)
 	end
 	-- Update speed.
-	if s ~= self.speed then
-		self.speed = s
+	if s ~= self:get_speed() then
+		self:set_speed(s)
 		self:calculate_animation()
 	end
 end
@@ -154,9 +246,9 @@ end
 -- @param self Actor.
 -- @return True if could climb.
 Actor.can_climb_low = function(self)
-	if self.movement < 0 then return end
-	local ctr = self.position * Voxel.tile_scale + Vector(0,0.5,0)
-	local dir = self.rotation * Vector(0,0,-1)
+	if self:get_movement() < 0 then return end
+	local ctr = self:get_position():copy():multiply(Voxel.tile_scale):add_xyz(0,0.5,0)
+	local dir = self:get_rotation() * Vector(0,0,-1)
 	local dst = (ctr + dir):floor()
 	local f1 = Voxel:get_tile(dst)
 	local f2 = Voxel:get_tile(dst + Vector(0,1,0))
@@ -168,9 +260,9 @@ end
 -- @param self Actor.
 -- @return True if could climb.
 Actor.can_climb_high = function(self)
-	if self.movement < 0 then return end
-	local ctr = self.position * Voxel.tile_scale + Vector(0,0.5,0)
-	local dir = self.rotation * Vector(0,0,-1)
+	if self:get_movement() < 0 then return end
+	local ctr = self:get_position():copy():multiply(Voxel.tile_scale):add_xyz(0,0.5,0)
+	local dir = self:get_rotation() * Vector(0,0,-1)
 	local dst = (ctr + dir):floor()
 	local f1 = Voxel:get_tile(dst + Vector(0,1,0))
 	local f2 = Voxel:get_tile(dst + Vector(0,2,0))
@@ -191,15 +283,15 @@ Actor.check_line_of_sight = function(self, args)
 	-- Get the vision ray.
 	-- TODO: Take bounding box into account.
 	if args.point then
-		src = self.position + Vector(0,1,0)
+		src = self:get_position() + Vector(0,1,0)
 		dst = args.point
 	elseif args.object then
-		src = self.position + Vector(0,1,0)
-		dst = args.object.position + Vector(0,1,0)
+		src = self:get_position() + Vector(0,1,0)
+		dst = args.object:get_position() + Vector(0,1,0)
 	end
 	-- Check for view cone.
 	local ray = (src - dst):normalize()
-	local look = self.rotation * Vector(0,0,-1)
+	local look = self:get_rotation() * Vector(0,0,-1)
 	if math.acos(ray:dot(look)) > self.spec.view_cone then
 		return
 	end
@@ -231,6 +323,74 @@ Actor.check_enemy = function(self, object)
 	return self.spec:check_enemy(object)
 end
 
+Actor.climb = function(self)
+	if self.blocking then return end
+	if self.climbing then return end
+	local align_object = function()
+		local ctr = self:get_position() * Voxel.tile_scale
+		ctr:add_xyz(0,0.5,0):floor()
+		ctr:add_xyz(0.5,0.1,0.5):multiply(Voxel.tile_size)
+		self:set_position(ctr)
+	end
+	if self:can_climb_high() then
+		align_object(self)
+		self.jumping = nil
+		self.climbing = true
+		self:animate("climb high")
+		Coroutine(function()
+			-- Rise.
+			local t = 0
+			local p = self:get_position():copy()
+			local r = self:get_rotation():copy()
+			local z = Vector()
+			repeat
+				local d = coroutine.yield()
+				t = t + d
+				self:set_position(p + Vector(0,2*t,0))
+				self:set_velocity(z)
+			until t > 0.8 * Voxel.tile_size
+			-- Slide.
+			t = 0
+			p = self:get_position():copy()
+			repeat
+				local d = coroutine.yield()
+				t = t + d
+				self:set_position(p + r * Vector(0,0.3,-0.8) * t)
+				self:set_velocity(z)
+			until t > 1.5
+			self.climbing = nil
+		end)
+	elseif self:can_climb_low() then
+		align_object(self)
+		self.jumping = nil
+		self.climbing = true
+		self:animate("climb low")
+		Coroutine(function()
+			-- Rise.
+			local t = 0
+			local p = self:get_position():copy()
+			local r = self:get_rotation():copy()
+			local z = Vector()
+			repeat
+				local d = coroutine.yield()
+				t = t + d
+				self:set_position(p + Vector(0,4*t,0))
+				self:set_velocity(z)
+			until t > 0.2 * Voxel.tile_size
+			-- Slide.
+			t = 0
+			p = self:get_position():copy()
+			repeat
+				local d = coroutine.yield()
+				t = t + d
+				self:set_position(p + r * Vector(0,0.3,-1) * 2 * t)
+				self:set_velocity(z)
+			until t > 0.7
+			self.climbing = nil
+		end)
+	end
+end
+
 --- Causes the object to take damage.
 -- @param self Object.
 -- @param args Arguments.<ul>
@@ -252,16 +412,16 @@ Actor.damaged = function(self, args)
 	else
 		-- Behead if the blow was strong.
 		-- Players can't be beheaded with first hit.
-		if not self.beheaded then
+		if not self:get_beheaded() then
 			if self.dead then
-				if args.amount > 15 then self.beheaded = true end
+				if args.amount > 15 then self:set_beheaded(true) end
 			elseif not self.client then
-				if args.amount > 30 then self.beheaded = true end
+				if args.amount > 30 then self:set_beheaded(true) end
 			end
 		end
 		-- Say the death message.
 		-- This is omitted if the actor is beheaded or killed by a surprise.
-		if not self.dead and not self.beheaded and self.ai then
+		if not self.dead and not self:get_beheaded() and self.ai then
 			for k,v in pairs(self.ai.enemies) do
 				local p = self.spec:get_personality()
 				local s = p and p:get_phrase("death")
@@ -289,152 +449,23 @@ Actor.damaged = function(self, args)
 	end
 end
 
---- Gets the spell effects known by the object.
--- @param self Object.
--- @return Dictionary of booleans.
-Actor.get_known_spell_effects = function(self)
-	return self.spec.feat_effects
-end
-
---- Gets the spell types known by the object.
--- @param self Object.
--- @return Dictionary of booleans.
-Actor.get_known_spell_types = function(self)
-	return self.spec.feat_types
-end
-
-Actor.get_weapon = function(self)
-	return self.inventory:get_object_by_slot(self.spec.weapon_slot)
-end
-
-Actor.set_weapon = function(self, value)
-	return self.inventory:equip_object(value, self.spec.weapon_slot)
-end
-
-Actor.set_dead_state = function(self, drop)
-	-- Playback animation.
-	-- This needs to be done first because setting the 'dead' member will
-	-- prevent any future animation changes.
-	self:animate("death")
-	-- Disable controls.
-	self.dead = true
-	self:set_movement(0)
-	self:set_strafing(0)
-	self.auto_attack = nil
-	self.jumping = nil
-	self.climbing = nil
-	self.shape = "dead"
-	self.physics = "rigid"
-	-- Disable stats.
-	self.stats.enabled = false
-	self.stats:set_value("health", 0)
-	-- Drop held items.
-	if drop then
-		local o = self.inventory:get_object_by_slot("hand.L")
-		if o then
-			o:detach()
-			o:set_position(self:get_position())
-			o:set_visible(true)
-		end
-		o = self:get_weapon()
-		if o then
-			o:detach()
-			o:set_position(self:get_position())
-			o:set_visible(true)
-		end
-	end
-	-- Emit a vision event.
-	Vision:event{type = "object-dead", object = self, dead = true}
-end
-
-Actor.climb = function(self)
-	if self.blocking then return end
-	if self.climbing then return end
-	local align_object = function()
-		local ctr = self.position * Voxel.tile_scale
-		ctr:add_xyz(0,0.5,0):floor()
-		ctr:add_xyz(0.5,0.1,0.5):multiply(Voxel.tile_size)
-		self:set_position(ctr)
-	end
-	if self:can_climb_high() then
-		align_object(self)
-		self.jumping = nil
-		self.climbing = true
-		self:animate("climb high")
-		Coroutine(function()
-			-- Rise.
-			local t = 0
-			local p = self:get_position():copy()
-			local r = self:get_rotation():copy()
-			local z = Vector()
-			repeat
-				local d = coroutine.yield()
-				t = t + d
-				self:set_position(p + Vector(0,2*t,0))
-				self.velocity = z
-			until t > 0.8 * Voxel.tile_size
-			-- Slide.
-			t = 0
-			p = self.position:copy()
-			repeat
-				local d = coroutine.yield()
-				t = t + d
-				self:set_position(p + r * Vector(0,0.3,-0.8) * t)
-				self.velocity = z
-			until t > 1.5
-			self.climbing = nil
-		end)
-	elseif self:can_climb_low() then
-		align_object(self)
-		self.jumping = nil
-		self.climbing = true
-		self:animate("climb low")
-		Coroutine(function()
-			-- Rise.
-			local t = 0
-			local p = self:get_position():copy()
-			local r = self:get_rotation():copy()
-			local z = Vector()
-			repeat
-				local d = coroutine.yield()
-				t = t + d
-				self:set_position(p + Vector(0,4*t,0))
-				self.velocity = z
-			until t > 0.2 * Voxel.tile_size
-			-- Slide.
-			t = 0
-			p = self.position:copy()
-			repeat
-				local d = coroutine.yield()
-				t = t + d
-				self:set_position(p + r * Vector(0,0.3,-1) * 2 * t)
-				self.velocity = z
-			until t > 0.7
-			self.climbing = nil
-		end)
-	end
-end
-
 --- Causes the actor to die.
 -- @param self Object.
 -- @return True if killed, false if saved by Sanctuary.
 Actor.die = function(self)
 	if self.dead then return end
 	-- Sanctuary save.
-	if self.modifiers and self.modifiers.sanctuary and not self.beheaded then
+	if self.modifiers and self.modifiers.sanctuary and not self:get_beheaded() then
 		self:remove_modifier("sanctuary")
 		self:damaged{amount = -10, type = "physical"}
 		self:teleport{marker = "sanctuary"}
 		return
 	end
 	-- Death dialog.
+	Server.dialogs:cancel(self)
 	if self.spec.dialog then
-		local dialog = Dialog{object = self, name = self.spec.dialog .. " death"}
-		if dialog then
-			self.dialog = dialog
-			self.dialog:execute()
-			self.dialog = nil
-		end
+		Server.dialogs:execute(self, self, "death")
+		Server.dialogs:cancel(self)
 	end
 	-- Disable controls etc.
 	self:set_dead_state(true)
@@ -460,73 +491,19 @@ end
 --   <li>secs: Tick length or nil for instant rotation.</li></ul>
 -- @return The dot product of the current direction and the target direction.
 Actor.face_point = function(self, args)
-	local sdir = self.rotation * Vector(0, 0, -1)
-	local edir = (args.point - self.position):normalize()
+	local sdir = self:get_rotation() * Vector(0, 0, -1)
+	local edir = args.point:copy():subtract(self:get_position()):normalize()
 	local quat = Quaternion{dir = Vector(edir.x, 0, edir.z), up = Vector(0, 1, 0)}
 	if args.secs then
 		-- Interpolate rotation towards target point.
 		-- TODO: Should use args.secs here somehow.
-		self.rotation = self.rotation:nlerp(quat, 0.9)
+		self:set_rotation(self:get_rotation():copy():nlerp(quat, 0.9))
 		return sdir:dot(edir)
 	else
 		-- Instantly set the target rotation.
-		self.rotation = quat
+		self:set_rotation(quat)
 		return 1.0
 	end
-end
-
---- Gets the rotation quaternion towards the given point.
--- @param self Object.
--- @param point Position vector in world space.
--- @return Quaternion.
-Actor.get_rotation_to_point = function(self, point)
-	local dir = (point - self.position):normalize()
-	dir.y = 0
-	return Quaternion{dir = dir, up = Vector(0, 1, 0)}
-end
-
---- Gets the attack ray of the actor.
--- @param self Object.
--- @param rel Destination shift vector or nil.
--- @return Ray start point and ray end point relative to the object.
-Actor.get_attack_ray = function(self, rel)
-	local ctr = self.spec.aim_ray_center
-	local ray1 = Vector(0, 0, -self.spec.aim_ray_start)
-	local ray2 = Vector(0, 0, -self.spec.aim_ray_end)
-	if rel then ray2 = ray2 + rel * self.spec.aim_ray_end end
-	if self.tilt then
-		local rot = Quaternion{euler = self.tilt.euler}
-		local src = self.position + self.rotation * (ctr + rot * ray1)
-		local dst = self.position + self.rotation * (ctr + rot * ray2)
-		return src, dst
-	else
-		local src = self.position + self.rotation * (ctr + ray1)
-		local dst = self.position + self.rotation * (ctr + ray2)
-		return src, dst
-	end
-end
-
---- Returns the burdening limit of the actor.
--- @param self Actor.
--- @return Burdening limit in kilograms
-Actor.get_burden_limit = function(self)
-	-- TODO
-	return 500
-end
-
---- Returns true if the actor is burdened.
--- @param self Actor.
--- @return True if burdened.
-Actor.get_burdened = function(self)
-	return self.carried_weight > self:get_burden_limit()
-end
-
---- Gets a modifier by name.
--- @param self Object.
--- @param name Modifer name.
-Actor.get_modifier = function(self, name)
-	if not self.modifiers then return end
-	return self.modifiers[name]
 end
 
 --- Called when the inventory of the actor is updated.
@@ -534,6 +511,7 @@ end
 -- @param args Inventory event arguments.
 Actor.handle_inventory_event = function(self, args)
 	if not args then return end
+	if not self:get_spec() then return end
 	if not self:has_client_data() then return end
 	local node = self.spec:get_node_by_equipment_slot(args.slot)
 	-- Update achored equipment or the actor model.
@@ -574,21 +552,21 @@ Actor.jump = function(self)
 	-- Check for preconditions.
 	if self.blocking then return end
 	if self.climbing then return end
-	local t = Program.time
+	local t = Program:get_time()
 	if t - self.jumped < 0.5 then return end
 	-- Jump or swim.
 	if self.submerged and self.submerged > 0.4 then
 		-- Swimming upwards.
 		if self:get_burdened() then return end
-		local v = self.velocity
+		local v = self:get_velocity()
 		self.jumped = t - 0.3
 		self.jumping = true
-		if v.y < self.speed then
+		if v.y < self:get_speed() then
 			SimulationObject.jump(self, {impulse = Vector(v.x, self.spec.swim_force * self.spec.mass, v.z)})
 		end
 	else
 		-- Jumping.
-		if not self.ground or self:get_burdened() then return end
+		if not self:get_ground() or self:get_burdened() then return end
 		self.jumped = t
 		self.jumping = true
 		Server:object_effect(self, "jump1")
@@ -596,7 +574,7 @@ Actor.jump = function(self)
 		Coroutine(function(thread)
 			Coroutine:sleep(self.spec.timing_jump * 0.02)
 			if not self:get_visible() then return end
-			local v = self.velocity
+			local v = self:get_velocity()
 			local f = self.spec.mass * self.spec.jump_force * self.attributes.jump
 			SimulationObject.jump(self, {impulse = Vector(v.x, f, v.z)})
 		end)
@@ -609,10 +587,10 @@ Actor.jump_stop = function(self)
 	if not self.jumping then return end
 	if self.submerged then return end
 	local init_y = self.spec.jump_force * self.spec.mass
-	local vel = self.velocity
+	local vel = self:get_velocity()
 	if vel.y > 0 and vel.y < init_y then
 		vel.y = 0
-		self.velocity = vel
+		self:set_velocity(vel)
 	end
 end
 
@@ -636,6 +614,17 @@ Actor.pick_up = function(self, src_id, dst_id, dst_slot)
 	end}
 end
 
+--- Reads the object from a database.
+-- @param self Object.
+-- @param db Database.
+Actor.read_db = function(self, db)
+	SimulationObject.read_db(self, db)
+	Server.object_database:load_inventory(self)
+	Server.object_database:load_skills(self)
+	self:update_skills()
+	Server.object_database:load_stats(self)
+end
+
 --- Removes a modifier.
 -- @param self Object.
 -- @param name Modifier name.
@@ -653,43 +642,21 @@ Actor.removed_modifier = function(self, name)
 	self:update_skills()
 end
 
-Actor.get_attack_charge = function(self)
-	if not self.attack_charge then return 0 end
-	return math.min(1, (Program.time - self.attack_charge) / 2)
-end
-
---- Enables or disables the blocking stance.
--- @param self Actor.
--- @param value True to block.
-Actor.set_block = function(self, value)
-	if self.jumping then return end
-	if value and self.blocking then return end
-	if not value and not self.blocking then return end
-	if value then
-		self.blocking = Program.time
-		self:animate("block start")
-	else
-		self.blocking = nil
-		self:animate("block stop")
-	end
-	self:calculate_speed()
-	self:calculate_animation()
-end
-
---- Sets the forward/backward movement state of the actor.
+--- Causes the actor to rise from death.
 -- @param self Object.
--- @param value Movement rate.
-Actor.set_movement = function(self, value)
-	self.movement = math.min(1, math.max(-1, value))
-	self:calculate_animation()
-end
-
---- Sets the strafing state of the actor.
--- @param self Object.
--- @param value Strafing rate.
-Actor.set_strafing = function(self, value)
-	self.strafing = value
-	self:calculate_animation()
+Actor.resurrect = function(self)
+	if not self.dead then return end
+	-- Enable controls.
+	self.dead = nil
+	self:set_shape("default")
+	self:set_physics("kinematic")
+	-- Enable stats.
+	self.stats.enabled = true
+	self.stats:set_value("health", 1)
+	-- Restore the idle animation.
+	self:animate("idle")
+	-- Emit a vision event.
+	Server:object_event(self, "object-dead", {dead = false})
 end
 
 --- Teleports the object.
@@ -749,16 +716,16 @@ end
 Actor.update_actions = function(self, secs)
 	-- Update flying.
 	if self.flying and self.tilt then
-		local v = self.velocity
-		if math.abs(self.movement) > 0.5 then
+		local v = self:get_velocity()
+		if math.abs(self:get_movement()) > 0.5 then
 			local e = self.tilt.euler[3]
 			if e > 0 then
-				self.velocity = Vector(v.x, math.max(v.y, 5*math.sin(e)), v.z)
+				self:set_velocity(Vector(v.x, math.max(v.y, 5*math.sin(e)), v.z))
 			else
-				self.velocity = Vector(v.x, math.min(v.y, 5*math.sin(e)), v.z)
+				self:set_velocity(Vector(v.x, math.min(v.y, 5*math.sin(e)), v.z))
 			end
 		else
-			self.velocity = Vector()
+			self:set_velocity(Vector())
 		end
 	end
 	-- Update feat cooldown.
@@ -781,7 +748,7 @@ Actor.update_actions = function(self, secs)
 		if self.velocity_prev then
 			local limity = self.spec.falling_damage_speed
 			local prevy = self.velocity_prev.y
-			local diffy = self.velocity.y - prevy
+			local diffy = self:get_velocity().y - prevy
 			if prevy < -limity and diffy > limity then
 				local damage = (diffy - limity) * self.spec.falling_damage_rate * self.attributes.falling_damage
 				if damage > 2 then
@@ -790,7 +757,7 @@ Actor.update_actions = function(self, secs)
 				end
 			end
 		end
-		self.velocity_prev = self.velocity
+		self.velocity_prev = self:get_velocity()
 	end
 	-- Play the landing animation after jumping.
 	-- Initiate climbing when applicable.
@@ -802,7 +769,7 @@ Actor.update_actions = function(self, secs)
 		end
 		-- Landing.
 		self.jump_timer = (self.jump_timer or 0) + secs
-		if self.jump_timer > 0.2 and Program.time - self.jumped > 0.8 and self.ground then
+		if self.jump_timer > 0.2 and Program:get_time() - self.jumped > 0.8 and self:get_ground() then
 			if not self.submerged or self.submerged < 0.3 then
 				self:animate("land ground")
 				Server:object_effect(self, self.spec.effect_landing)
@@ -813,11 +780,14 @@ Actor.update_actions = function(self, secs)
 		end
 	end
 end
+
 --- Updates the AI state of the actor.<br/>
+--
 -- You can force the AI to recheck its state immediately by calling the function.
 -- This can be useful when, for example, the player has initiated a dialog and
 -- you want to set the NPC into the chat mode immediately instead of waiting for
 -- the next AI update cycle.
+--
 -- @param self Object.
 Actor.update_ai_state = function(self)
 	if self.ai then
@@ -917,38 +887,11 @@ Actor.update_skills = function(self)
 	self:calculate_speed()
 	-- Update the vision radius.
 	if self.vision then
-		if self.position.y > 1600 then
+		if self:get_position().y > 1600 then
 			attr.view_distance = attr.view_distance * 1.5
 		end
-		self.vision.radius = attr.view_distance
+		self.vision:set_radius(attr.view_distance)
 	end
-end
-
---- Reads the object from a database.
--- @param self Object.
--- @param db Database.
-Actor.read_db = function(self, db)
-	Server.object_database:load_inventory(self)
-	Server.object_database:load_skills(self)
-	self:update_skills()
-	Server.object_database:load_stats(self)
-end
-
---- Causes the actor to rise from death.
--- @param self Object.
-Actor.resurrect = function(self)
-	if not self.dead then return end
-	-- Enable controls.
-	self.dead = nil
-	self.shape = "default"
-	self.physics = "kinematic"
-	-- Enable stats.
-	self.stats.enabled = true
-	self.stats:set_value("health", 1)
-	-- Restore the idle animation.
-	self:animate("idle")
-	-- Emit a vision event.
-	Vision:event{type = "object-dead", object = self, dead = false}
 end
 
 --- Plays footstep sounds for actors.
@@ -1014,17 +957,17 @@ end
 -- @return Data string.
 Actor.write = function(self)
 	return string.format("local self=Actor%s\n%s", serialize{
-		angular = self.angular,
-		beheaded = self.beheaded or nil,
+		angular = self:get_angular(),
+		beheaded = self:get_beheaded(),
 		dead = self.dead,
 		eye_style = self.eye_style,
 		face_style = self.face_style,
 		hair_style = self.hair_style,
 		head_style = self.head_style,
-		id = self.id,
-		physics = self.physics,
-		position = self.position,
-		rotation = self.rotation,
+		id = self:get_id(),
+		physics = self:get_physics(),
+		position = self:get_position(),
+		rotation = self:get_rotation(),
 		spec = self.spec.name},
 		"return self")
 end
@@ -1035,51 +978,23 @@ end
 Actor.write_db = function(self, db)
 	-- Don't save summons.
 	if self.summon_timer then return end
-	-- Write the object.
-	local data = serialize{
-		angular = self.angular,
-		animation_profile = self.animation_profile,
-		beheaded = self.beheaded or nil,
-		body_scale = self.body_scale,
-		body_style = self.body_style,
-		eye_color = self.eye_color,
-		eye_style = self.eye_style,
-		face_style = self.face_style,
-		hair_color = self.hair_color,
-		hair_style = self.hair_style,
-		head_style = self.head_style,
-		home_point = self.home_point,
-		physics = self.physics,
-		position = self.position,
-		rotation = self.rotation,
-		skin_color = self.skin_color,
-		skin_style = self.skin_style}
-	db:query([[REPLACE INTO object_data (id,type,spec,dead,data) VALUES (?,?,?,?,?);]],
-		{self.id, "actor", self.spec.name, self.dead and 1 or 0, data})
-	-- Write the sector.
-	if self.sector then
-		if self.spec.important or not self.dead then
-			db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {self.id, self.sector, nil})
-		else
-			db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {self.id, self.sector, 0})
-		end
-	else
-		db:query([[DELETE FROM object_sectors where id=?;]], {self.id})
-	end
+	-- Write the object data.
+	local id = self:get_id()
+	SimulationObject.write_db(self, db)
 	-- Write the inventory contents.
-	db:query([[DELETE FROM object_inventory WHERE parent=?;]], {self.id})
+	db:query([[DELETE FROM object_inventory WHERE parent=?;]], {id})
 	for index,object in pairs(self.inventory.stored) do
-		object:write_db(db, index)
+		object:write_db(db)
 	end
 	-- Write skills.
-	db:query([[DELETE FROM object_skills WHERE id=?;]], {self.id})
+	db:query([[DELETE FROM object_skills WHERE id=?;]], {id})
 	for name,value in pairs(self.skills.skills) do
-		db:query([[REPLACE INTO object_skills (id,name) VALUES (?,?);]], {self.id, name})
+		db:query([[REPLACE INTO object_skills (id,name) VALUES (?,?);]], {id, name})
 	end
 	-- Write stats.
-	db:query([[DELETE FROM object_stats WHERE id=?;]], {self.id})
+	db:query([[DELETE FROM object_stats WHERE id=?;]], {id})
 	for name,args in pairs(self.stats.stats) do
-		db:query([[REPLACE INTO object_stats (id,name,value) VALUES (?,?,?);]], {self.id, name, args.value})
+		db:query([[REPLACE INTO object_stats (id,name,value) VALUES (?,?,?);]], {id, name, args.value})
 	end
 end
 
@@ -1101,30 +1016,188 @@ Actor.write_preset = function(self)
 		skin_style = self.skin_style}
 end
 
+Actor.get_armor_class = function(self)
+	local value = 0
+	for slot in pairs(self.spec.equipment_slots) do
+		local item = self.inventory:get_object_by_slot(slot)
+		value = value + (item and item.spec.armor_class or 0)
+	end
+	return value
+end
+
+Actor.get_attack_charge = function(self)
+	if not self.attack_charge then return 0 end
+	return math.min(1, (Program:get_time() - self.attack_charge) / 2)
+end
+
+--- Gets the attack ray of the actor.
+-- @param self Object.
+-- @param rel Destination shift vector or nil.
+-- @return Ray start point and ray end point relative to the object.
+Actor.get_attack_ray = function(self, rel)
+	local ctr = self.spec.aim_ray_center
+	local ray1 = Vector(0, 0, -self.spec.aim_ray_start)
+	local ray2 = Vector(0, 0, -self.spec.aim_ray_end)
+	if rel then ray2 = ray2 + rel * self.spec.aim_ray_end end
+	if self.tilt then
+		local rot = Quaternion{euler = self.tilt.euler}
+		local src = self:transform_local_to_global(ctr + rot * ray1)
+		local dst = self:transform_local_to_global(ctr + rot * ray2)
+		return src, dst
+	else
+		local src = self:transform_local_to_global(ctr + ray1)
+		local dst = self:transform_local_to_global(ctr + ray2)
+		return src, dst
+	end
+end
+
+Actor.get_beheaded = function(self)
+	return self.__beheaded
+end
+
+Actor.set_beheaded = function(self, value)
+	-- TODO: Unbeheading?
+	if not value then return end
+	self.__beheaded = value
+	Server:object_event(self, "object-beheaded")
+	local hat = self.inventory:get_object_by_slot("head")
+	if hat then
+		local p = self:get_position()
+		hat:detach()
+		hat:set_position(p + self:get_rotation() * (self.dead and Vector(0,0.5,2) or Vector(0,2,0)))
+		hat:set_velocity(Vector(math.random(), math.random(), math.random()))
+		hat:set_visible(true)
+	end
+end
+
+--- Enables or disables the blocking stance.
+-- @param self Actor.
+-- @param value True to block.
+Actor.set_block = function(self, value)
+	if self.jumping then return end
+	if value and self.blocking then return end
+	if not value and not self.blocking then return end
+	if value then
+		self.blocking = Program:get_time()
+		self:animate("block start")
+	else
+		self.blocking = nil
+		self:animate("block stop")
+	end
+	self:calculate_speed()
+	self:calculate_animation()
+end
+
+--- Returns the burdening limit of the actor.
+-- @param self Actor.
+-- @return Burdening limit in kilograms
+Actor.get_burden_limit = function(self)
+	-- TODO
+	return 500
+end
+
+--- Returns true if the actor is burdened.
+-- @param self Actor.
+-- @return True if burdened.
+Actor.get_burdened = function(self)
+	return self.carried_weight > self:get_burden_limit()
+end
+
+--- Gets the spell effects known by the object.
+-- @param self Object.
+-- @return Dictionary of booleans.
+Actor.get_known_spell_effects = function(self)
+	return self.spec.feat_effects
+end
+
+Actor.set_dead_state = function(self, drop)
+	-- Playback animation.
+	-- This needs to be done first because setting the 'dead' member will
+	-- prevent any future animation changes.
+	self:animate("death")
+	-- Disable controls.
+	self.dead = true
+	self:set_movement(0)
+	self:set_strafing(0)
+	self.auto_attack = nil
+	self.jumping = nil
+	self.climbing = nil
+	self:set_shape("dead")
+	self:set_physics("rigid")
+	-- Disable stats.
+	self.stats.enabled = false
+	self.stats:set_value("health", 0)
+	-- Drop held items.
+	if drop then
+		local o = self.inventory:get_object_by_slot("hand.L")
+		if o then
+			o:detach()
+			o:set_position(self:get_position())
+			o:set_visible(true)
+		end
+		o = self:get_weapon()
+		if o then
+			o:detach()
+			o:set_position(self:get_position())
+			o:set_visible(true)
+		end
+	end
+	-- Emit a vision event.
+	Server:object_event(self, "object-dead", {dead = true})
+end
+
+--- Gets the spell types known by the object.
+-- @param self Object.
+-- @return Dictionary of booleans.
+Actor.get_known_spell_types = function(self)
+	return self.spec.feat_types
+end
+
+--- Gets a modifier by name.
+-- @param self Object.
+-- @param name Modifer name.
+Actor.get_modifier = function(self, name)
+	if not self.modifiers then return end
+	return self.modifiers[name]
+end
+
+--- Sets the forward/backward movement state of the actor.
+-- @param self Object.
+-- @param value Movement rate.
+Actor.set_movement = function(self, value)
+	SimulationObject.set_movement(self, math.min(1, math.max(-1, value)))
+	self:calculate_animation()
+end
+
+--- Gets the rotation quaternion towards the given point.
+-- @param self Object.
+-- @param point Position vector in world space.
+-- @return Quaternion.
+Actor.get_rotation_to_point = function(self, point)
+	local dir = point:copy():subtract(self:get_position()):normalize()
+	dir.y = 0
+	return Quaternion{dir = dir, up = Vector(0, 1, 0)}
+end
+
 Actor.set_spec = function(self, v)
 	local spec = type(v) == "string" and Actorspec:find{name = v} or v
 	if self.spec == spec then return end
 	SimulationObject.set_spec(self, spec)
 	-- Configure physics.
-	self.collision_group = spec.collision_group
-	self.collision_mask = spec.collision_mask
-	self.friction_liquid = spec.water_friction
-	self.gravity = spec.gravity
-	self.gravity_liquid = spec.water_gravity
-	self.mass = spec.mass
+	self:set_collision_group(spec.collision_group)
+	self:set_collision_mask(spec.collision_mask)
+	self:set_friction_liquid(spec.water_friction)
+	self:set_gravity(spec.gravity)
+	self:set_gravity_liquid(spec.water_gravity)
+	self:set_mass(spec.mass)
 	-- Initialize stats and skills.
 	self.skills:clear()
 	for k in pairs(spec.skills) do
 		self.skills:add(k)
 	end
 	self:update_skills()
-	-- Create the inventory.
-	if not self.inventory then
-		self.inventory = Inventory{id = self.id, size = spec.inventory_size}
-	else
-		-- FIXME: May break for existing objects that have too many inventory items.
-		self.inventory.size = spec.inventory_size
-	end
+	-- Set the inventory size.
+	self.inventory:set_size(spec.inventory_size)
 	-- Create server data.
 	if self:has_server_data() then
 		-- Set the appearance.
@@ -1177,10 +1250,10 @@ Actor.set_spec = function(self, v)
 		if spec.marker then
 			self.marker = Marker:find{name = spec.marker}
 			if self.marker then
-				self.marker.position = self.position
-				self.marker.target = self.id
+				self.marker.position = self:get_position()
+				self.marker.target = self:get_id()
 			else
-				self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
+				self.marker = Marker{name = spec.marker, position = self:get_position(), target = self:get_id()}
 			end
 		end
 		-- Mark corpses as dead.
@@ -1205,31 +1278,38 @@ Actor.set_stat = function(self, s, v, m, diff)
 		self.stats:set(s, v, m, 0)
 	end
 	-- Show health notifications.
-	local player = Client.player_object
 	if diff and s == "health" then
 		-- Show a health change text.
-		if math.abs(diff) > 2 then
-			local code = (diff > 0 and 0x01 or 0x00) + (self == player and 0x10 or 0x00)
-			local colors = {
-				[0x00] = {1,1,0,1},
-				[0x01] = {0,1,1,1},
-				[0x10] = {1,0,0,1},
-				[0x11] = {0,1,0,1}}
-			Client:add_damage_text{object = self, color = colors[code], text = tostring(diff)}
-		end
+		Client.effects:create_damage_text(self, nil, diff)
 		-- Quake the camera if the player was hurt.
-		if self == player and diff < -5 then
-			Client.effects:apply_quake(self.position, 0.01 * (5 - diff))
+		if self == Client.player_object and diff < -5 then
+			Client.effects:apply_quake(self:get_position(), 0.01 * (5 - diff))
 		end
 		-- Set the correct collision shape.
 		-- Dead actors have a different collision shape. We switch between
 		-- the two when the health changes between zero and non-zero.
 		if v == 0 and self.animated then
-			self.shape = "dead"
+			self:set_shape("dead")
 		else
-			self.shape = "default"
+			self:set_shape("default")
 		end
 	end
+end
+
+Actor.get_storage_sector = function(self)
+	return self:get_sector()
+end
+
+Actor.get_storage_type = function(self)
+	return "actor"
+end
+
+--- Sets the strafing state of the actor.
+-- @param self Object.
+-- @param value Strafing rate.
+Actor.set_strafing = function(self, value)
+	SimulationObject.set_strafing(self, value)
+	self:calculate_animation()
 end
 
 --- Sets the tilt angle of the object.
@@ -1245,29 +1325,12 @@ Actor.set_tilt_angle = function(self, tilt, predict)
 	end
 end
 
-Actor:add_getters{
-	armor_class = function(s)
-		local value = 0
-		for k,v in pairs(s.spec.equipment_slots) do
-			local i = s.inventory:get_object_by_slot(k)
-			value = value + (i and i.spec.armor_class or 0)
-		end
-		return value
-	end,
-	beheaded = function(self)
-		return rawget(self, "__beheaded")
-	end}
+Actor.get_weapon = function(self)
+	return self.inventory:get_object_by_slot(self.spec.weapon_slot)
+end
 
-Actor:add_setters{
-	beheaded = function(s, v)
-		rawset(s, "__beheaded", v)
-		Vision:event{type = "object-beheaded", object = s}
-		local hat = s.inventory:get_object_by_slot("head")
-		if hat then
-			local p = s:get_position()
-			hat:detach()
-			hat:set_position(p + s:get_rotation() * (s.dead and Vector(0,0.5,2) or Vector(0,2,0)))
-			hat.velocity = Vector(math.random(), math.random(), math.random())
-			hat:set_visible(true)
-		end
-	end}
+Actor.set_weapon = function(self, value)
+	return self.inventory:equip_object(value, self.spec.weapon_slot)
+end
+
+return Actor

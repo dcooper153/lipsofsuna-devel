@@ -1,8 +1,42 @@
-require(Mod.path .. "simulation")
+local Class = require("system/class")
+local ObjectSerializer = require("core/server/object-serializer")
+local SimulationObject = require("core/objects/simulation")
 
-Item = Class(SimulationObject)
-Item.class_name = "Item"
-Item.pickable = true
+local Item = Class("Item", SimulationObject)
+Item.serializer = ObjectSerializer{
+	{
+		name = "angular",
+		type = "vector",
+		get = function(self) return self:get_angular() end,
+		set = function(self, v) return self:set_angular(v) end
+	},
+	{
+		name = "count",
+		type = "number",
+		get = function(self) return self:get_count() end,
+		set = function(self, v) self:set_count(v) end
+	},
+	{
+		name = "health",
+		type = "number"
+	},
+	{
+		name = "looted",
+		type = "boolean"
+	},
+	{
+		name = "position",
+		type = "vector",
+		get = function(self) return self:get_position() end,
+		set = function(self, v) self:set_position(v) end
+	},
+	{
+		name = "rotation",
+		type = "quaternion",
+		get = function(self) return self:get_rotation() end,
+		set = function(self, v) self:set_rotation(v) end
+	}
+}
 
 --- Creates an item.
 -- @param clss Item class.
@@ -15,10 +49,10 @@ Item.pickable = true
 --   <li>realized: True to add the object to the simulation.</li></ul>
 -- @return New item.
 Item.new = function(clss, args)
-	local self = SimulationObject.new(clss, {id = args.id})
+	local self = SimulationObject.new(clss, args and args.id)
 	if args then
-		if args.angular then self.angular = args.angular end
-		if args.count then self.count = args.count end
+		if args.angular then self:set_angular(args.angular) end
+		if args.count then self:set_count(args.count) end
 		if args.looted then self.looted = args.looted end
 		if args.position then self:set_position(args.position) end
 		if args.random then self.random = args.random end
@@ -37,9 +71,9 @@ end
 Item.clone = function(self)
 	return Item{
 		spec = self.spec,
-		angular = self.angular,
-		position = self.position,
-		rotation = self.rotation}
+		angular = self:get_angular(),
+		position = self:get_position(),
+		rotation = self:get_rotation()}
 end
 
 --- Handles physics contacts.
@@ -80,7 +114,7 @@ Item.die = function(self)
 	-- Execute destruction actions.
 	for k,v in ipairs(self.spec.destroy_actions) do
 		if v == "explode" then
-			Utils:explosion(self.position)
+			Utils:explosion(self:get_position())
 		end
 	end
 	-- Remove from the world.
@@ -100,10 +134,10 @@ end
 -- @return Object.
 Item.split = function(self, count)
 	local c = count or 1
-	if c < self.count then
+	if c < self:get_count() then
 		local o = self:clone()
 		self:subtract(c)
-		o.count = c
+		o:set_count(c)
 		return o
 	else
 		self:detach()
@@ -126,13 +160,13 @@ end
 -- @return Data string.
 Item.write = function(self)
 	return string.format("local self=Item%s\n%s", serialize{
-		angular = self.angular,
-		count = self.count,
-		id = self.id,
+		angular = self:get_angular(),
+		count = self:get_count(),
+		id = self:get_id(),
 		looted = self.looted,
 		spec = self.spec.name,
-		position = self.position,
-		rotation = self.rotation},
+		position = self:get_position(),
+		rotation = self:get_rotation()},
 		"return self")
 end
 
@@ -140,6 +174,7 @@ end
 -- @param self Object.
 -- @param db Database.
 Item.read_db = function(self, db)
+	SimulationObject.read_db(self, db)
 	Server.object_database:load_inventory(self)
 end
 
@@ -147,39 +182,23 @@ end
 -- @param self Object.
 -- @param db Database.
 Item.write_db = function(self, db)
-	-- Write the object.
-	local data = serialize{
-		angular = self.angular,
-		count = self.count,
-		looted = self.looted,
-		position = self.position,
-		rotation = self.rotation}
-	db:query([[REPLACE INTO object_data (id,type,spec,dead,data) VALUES (?,?,?,?,?);]],
-		{self.id, "item", self.spec.name, 0, data})
-	-- Write the sector.
-	if self.sector then
-		if self.spec.important then
-			db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {self.id, self.sector, nil})
-		else
-			db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {self.id, self.sector, 0})
-		end
-	else
-		db:query([[DELETE FROM object_sectors where id=?;]], {self.id})
-	end
+	-- Write the object data.
+	local id = self:get_id()
+	SimulationObject.write_db(self, db)
 	-- Write the inventory contents.
-	db:query([[DELETE FROM object_inventory WHERE parent=?;]], {self.id})
+	db:query([[DELETE FROM object_inventory WHERE parent=?;]], {id})
 	for index,object in pairs(self.inventory.stored) do
-		object:write_db(db, index)
+		object:write_db(db)
 	end
 	-- Write the own inventory index.
-	local parent = self.parent and SimulationObject:find{id = self.parent}
+	local parent = self.parent and Game.objects:find_by_id(self.parent)
 	if parent then
 		local index = parent.inventory:get_index_by_object(self)
 		local slot = parent.inventory:get_slot_by_index(index)
 		db:query([[REPLACE INTO object_inventory (id,parent,offset,slot) VALUES (?,?,?,?);]],
-			{self.id, self.parent, index, slot})
+			{id, self.parent, index, slot})
 	else
-		db:query([[DELETE FROM object_inventory WHERE id=?;]], {self.id})
+		db:query([[DELETE FROM object_inventory WHERE id=?;]], {id})
 	end
 end
 
@@ -189,6 +208,32 @@ end
 -- @return Armor rating.
 Item.get_armor_class = function(self, user)
 	return self.spec.armor_class
+end
+
+--- Gets the stack count of the item.
+-- @param self Object.
+-- @return Count.
+Item.get_count = function(self)
+	return rawget(self, "__count") or 1
+end
+
+--- Sets the stack count of the item.
+-- @param self Object.
+-- @param v Count.
+Item.set_count = function(self, v)
+	-- Store the new count.
+	local old = rawget(self, "__count")
+	if old == v then return end
+	rawset(self, "__count", v ~= 0 and v or nil)
+	-- Update the inventory containing the object.
+	if self.parent then
+		local parent = Game.objects:find_by_id(self.parent)
+		if parent then
+			parent.inventory:update_object(s)
+		else
+			self.parent = nil
+		end
+	end
 end
 
 --- Gets the weapon damage types of the item.
@@ -218,28 +263,26 @@ Item.set_spec = function(self, value)
 	if self:has_server_data() then
 		-- FIXME: Why does client side picking break if this is set by
 		-- the client when connected to a remote server?
-		self.physics = "rigid"
-		self.mass = spec.mass
+		self:set_physics("rigid")
+		self:set_mass(spec.mass)
 	end
-	self.collision_group = spec.collision_group
-	self.collision_mask = spec.collision_mask
-	self.friction_liquid = spec.water_friction
-	self.gravity = spec.gravity
-	self.gravity_liquid = spec.water_gravity
-	-- Create the inventory.
-	if spec.inventory_size and not self.inventory then
-		self.inventory = Inventory{id = self.id, size = spec.inventory_size}
-	end
+	self:set_collision_group(spec.collision_group)
+	self:set_collision_mask(spec.collision_mask)
+	self:set_friction_liquid(spec.water_friction)
+	self:set_gravity(spec.gravity)
+	self:set_gravity_liquid(spec.water_gravity)
+	-- Set the inventory size.
+	self.inventory:set_size(spec.inventory_size)
 	-- Create server data.
 	if self:has_server_data() then
 		-- Create static loot.
-		if self.inventory then
+		if self.random and self.inventory:get_size() > 0 then
 			for k,v in pairs(spec.inventory_items) do
 				self.inventory:merge_object(Item{spec = Itemspec:find{name = v}})
 			end
 		end
 		-- Create random loot.
-		if self.random and self.inventory and spec.loot_categories then
+		if self.random and self.inventory:get_size() > 0 and spec.loot_categories then
 			local num_cat = #spec.loot_categories
 			local num_item
 			if spec.loot_count_min or spec.loot_count_max then
@@ -247,7 +290,7 @@ Item.set_spec = function(self, value)
 				local max = spec.loot_count_max or min
 				num_item = math.random(min, max)
 			else
-				num_item = math.random(0, self.inventory.size)
+				num_item = math.random(0, self.inventory:get_size())
 			end
 			for i = 1,num_item do
 				local cat = spec.loot_categories[math.random(1, num_cat)]
@@ -258,3 +301,13 @@ Item.set_spec = function(self, value)
 	-- Set the model.
 	self:set_model_name(spec.model)
 end
+
+Item.get_storage_sector = function(self)
+	return self:get_sector()
+end
+
+Item.get_storage_type = function(self)
+	return "item"
+end
+
+return Item

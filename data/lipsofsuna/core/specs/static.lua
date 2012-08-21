@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Staticspec = Class(Spec)
-Staticspec.class_name = "Staticspec"
+Staticspec = Class("Staticspec", Spec)
 Staticspec.type = "static"
 Staticspec.dict_id = {}
 Staticspec.dict_cat = {}

@@ -1,10 +1,10 @@
+local Class = require("system/class")
 require(Mod.path .. "widget")
 
-Widgets.Uitoggle = Class(Widgets.Uiwidget)
-Widgets.Uitoggle.class_name = "Widgets.Uitoggle"
+Widgets.Uitoggle = Class("Uitoggle", Widgets.Uiwidget)
 
 Widgets.Uitoggle.new = function(clss, label, changed)
-	local self = Widgets.Uiwidget.new(clss, nil, label)
+	local self = Widgets.Uiwidget.new(clss, label)
 	self.value = false
 	self.changed = changed
 	self.hint = "$A: Toggle\n$$B\n$$U\n$$D"

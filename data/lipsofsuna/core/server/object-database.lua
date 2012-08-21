@@ -1,6 +1,11 @@
-require "system/class"
+local Actor = require("core/objects/actor")
+local Class = require("system/class")
+local Item = require("core/objects/item")
+local Obstacle = require("core/objects/obstacle")
+local Player = require("core/objects/player")
+local Staticobject = require("core/objects/static")
 
-ObjectDatabase = Class()
+local ObjectDatabase = Class("ObjectDatabase")
 
 --- Creates a new object database.
 -- @param clss ObjectDatabase class.
@@ -19,6 +24,7 @@ end
 -- @param self ObjectDatabase.
 ObjectDatabase.reset = function(self)
 	self.db:query([[DROP TABLE IF EXISTS object_data;]])
+	self.db:query([[DROP TABLE IF EXISTS object_fields;]])
 	self.db:query([[DROP TABLE IF EXISTS object_inventory;]])
 	self.db:query([[DROP TABLE IF EXISTS object_sectors;]])
 	self.db:query([[DROP TABLE IF EXISTS object_skills;]])
@@ -27,8 +33,12 @@ ObjectDatabase.reset = function(self)
 		id INTEGER PRIMARY KEY,
 		type TEXT,
 		spec TEXT,
-		dead INTEGER,
-		data TEXT);]])
+		dead INTEGER);]])
+	self.db:query([[CREATE TABLE object_fields (
+		id INTEGER,
+		name TEXT,
+		value TEXT,
+		PRIMARY KEY(id,name));]])
 	self.db:query([[CREATE TABLE object_inventory (
 		id INTEGER PRIMARY KEY,
 		parent INTEGER,
@@ -99,11 +109,12 @@ end
 -- @param self ObjectDatabase.
 -- @param object Object.
 ObjectDatabase.delete_object = function(self, object)
-	self.db:query([[DELETE FROM object_data WHERE id=?;]], {object.id})
-	self.db:query([[DELETE FROM object_inventory WHERE id=?;]], {object.id})
-	self.db:query([[DELETE FROM object_sectors WHERE id=?;]], {object.id})
-	self.db:query([[DELETE FROM object_skills WHERE id=?;]], {object.id})
-	self.db:query([[DELETE FROM object_stats WHERE id=?;]], {object.id})
+	self.db:query([[DELETE FROM object_data WHERE id=?;]], {object:get_id()})
+	self.db:query([[DELETE FROM object_fields WHERE id=?;]], {object:get_id()})
+	self.db:query([[DELETE FROM object_inventory WHERE id=?;]], {object:get_id()})
+	self.db:query([[DELETE FROM object_sectors WHERE id=?;]], {object:get_id()})
+	self.db:query([[DELETE FROM object_skills WHERE id=?;]], {object:get_id()})
+	self.db:query([[DELETE FROM object_stats WHERE id=?;]], {object:get_id()})
 end
 
 --- Returns true if the object with the given ID exists in the database.
@@ -114,6 +125,15 @@ ObjectDatabase.does_object_exist = function(self, id)
 	return rows and rows[1]
 end
 
+--- Reads the fields of the object from the database.
+-- @param self ObjectDatabase.
+-- @param parent Object.
+ObjectDatabase.load_fields = function(self, parent)
+	local rows = self.db:query(
+		[[SELECT name,value FROM object_fields WHERE id=?]], {parent:get_id()})
+	parent.serializer:read(parent, rows)
+end
+
 --- Reads all objects in a sector.
 -- @param self ObjectDatabase.
 -- @param parent Object.
@@ -121,16 +141,16 @@ end
 ObjectDatabase.load_inventory = function(self, parent)
 	local objects = {}
 	local rows = self.db:query(
-		[[SELECT b.id,b.type,b.spec,b.dead,b.data,a.offset,a.slot FROM
+		[[SELECT b.id,b.type,b.spec,b.dead,a.offset,a.slot FROM
 		object_inventory AS a INNER JOIN
 		object_data AS b WHERE
-		a.parent=? AND a.id=b.id]], {parent.id})
+		a.parent=? AND a.id=b.id]], {parent:get_id()})
 	for k,v in ipairs(rows) do
-		local obj = self:load_object(v[1], v[2], v[3], v[4], v[5])
+		local obj = self:load_object(v[1], v[2], v[3], v[4])
 		if obj then
-			parent.inventory:set_object(v[6], obj)
-			if v[7] then
-				parent.inventory:equip_index(v[6], v[7])
+			parent.inventory:set_object(v[5], obj)
+			if v[6] then
+				parent.inventory:equip_index(v[5], v[6])
 			end
 			table.insert(objects, obj)
 		end
@@ -144,20 +164,10 @@ end
 -- @param type Object type.
 -- @param spec Spec name.
 -- @param dead One for dead, zero for alive.
--- @param data Object data.
 -- @return Object.
-ObjectDatabase.load_object = function(self, id, type, spec, dead, data)
-	-- Load the data string.
-	if not data then return end
-	local func = loadstring("return " .. data)
-	if not func then return end
-	-- Convert the data string into a table.
-	local ok,args = pcall(func)
-	if not ok then
-		print("ERROR: " .. args)
-		return
-	end
-	-- Add arguements from the queried row.
+ObjectDatabase.load_object = function(self, id, type, spec, dead)
+	-- Create arguments out of the queried row.
+	local args = {}
 	args.id = id
 	args.dead = (dead == 1) and true or nil
 	args.spec = spec
@@ -189,11 +199,11 @@ end
 ObjectDatabase.load_player = function(self, account)
 	if not account.character then return end
 	local rows = self.db:query(
-		[[SELECT id,type,spec,dead,data FROM object_data
+		[[SELECT id,type,spec,dead FROM object_data
 		WHERE type=? AND id=?]],
 		{"player", account.character})
 	for k,v in ipairs(rows) do
-		return self:load_object(v[1], v[2], v[3], v[4], v[5])
+		return self:load_object(v[1], v[2], v[3], v[4])
 	end
 end
 
@@ -202,7 +212,7 @@ end
 -- @param parent Object.
 ObjectDatabase.load_skills = function(self, parent)
 	local rows = self.db:query(
-		[[SELECT name FROM object_skills WHERE id=?]], {parent.id})
+		[[SELECT name FROM object_skills WHERE id=?]], {parent:get_id()})
 	for k,v in ipairs(rows) do
 		parent.skills:add_without_requirements(v[1])
 	end
@@ -214,7 +224,7 @@ end
 -- @param parent Object.
 ObjectDatabase.load_stats = function(self, parent)
 	local rows = self.db:query(
-		[[SELECT name,value FROM object_stats WHERE id=?]], {parent.id})
+		[[SELECT name,value FROM object_stats WHERE id=?]], {parent:get_id()})
 	for k,v in ipairs(rows) do
 		parent.stats:set_value(v[1], v[2])
 	end
@@ -227,12 +237,12 @@ end
 ObjectDatabase.load_sector_objects = function(self, sector)
 	local objects = {}
 	local rows = self.db:query(
-		[[SELECT b.id,b.type,b.spec,b.dead,b.data FROM
+		[[SELECT b.id,b.type,b.spec,b.dead FROM
 		object_sectors AS a INNER JOIN
 		object_data AS b WHERE
 		a.sector=? AND a.id=b.id]], {sector})
 	for k,v in ipairs(rows) do
-		local obj = self:load_object(v[1], v[2], v[3], v[4], v[5])
+		local obj = self:load_object(v[1], v[2], v[3], v[4])
 		if obj then
 			obj:set_visible(true)
 			table.insert(objects, obj)
@@ -247,9 +257,9 @@ end
 ObjectDatabase.load_static_objects = function(self)
 	local objects = {}
 	local rows = self.db:query(
-		[[SELECT id,type,spec,dead,data FROM object_data WHERE type=?]], {"static"})
+		[[SELECT id,type,spec,dead FROM object_data WHERE type=?]], {"static"})
 	for k,v in ipairs(rows) do
-		local obj = self:load_object(v[1], v[2], v[3], v[4], v[5])
+		local obj = self:load_object(v[1], v[2], v[3], v[4])
 		if obj then
 			obj:set_visible(true)
 			table.insert(objects, obj)
@@ -270,7 +280,7 @@ end
 -- @param sector Sector number.
 ObjectDatabase.save_sector_objects = function(self, sector)
 	self.db:query([[DELETE FROM object_sectors WHERE sector=?;]], {sector})
-	local objs = SimulationObject:find{sector = sector}
+	local objs = Game.objects:find_by_sector(sector)
 	for k,v in pairs(objs) do
 		v:write_db(self.db)
 	end
@@ -303,3 +313,5 @@ ObjectDatabase.update_world_decay = function(self, secs)
 	-- Wait for the next cycle.
 	self.object_decay_timer = 0
 end
+
+return ObjectDatabase

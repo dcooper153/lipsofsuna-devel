@@ -1,9 +1,12 @@
+local Class = require("system/class")
+
 if not Los.program_load_extension("camera") then
 	error("loading extension `camera' failed")
 end
 
-Camera = Class()
-Camera.class_name = "Camera"
+------------------------------------------------------------------------------
+
+local Camera = Class("Camera")
 
 --- Creates a new camera.
 -- @param clss Camera class.
@@ -35,7 +38,7 @@ end
 -- @return Start point, end point.
 Camera.picking_ray = function(self, args)
 	local a,b = Los.camera_picking_ray(self.handle, {cursor = args.cursor.handle, far = args.far, near = args.near})
-	return Class.new(Vector, {handle = a}), Class.new(Vector, {handle = b})
+	return Vector:new_from_handle(a), Vector:new_from_handle(b)
 end
 
 --- Resets the look spring transformation of the camera.
@@ -86,101 +89,194 @@ Camera.zoom = function(self, args)
 	Los.camera_zoom(self.handle, args)
 end
 
---- The collision group of the camera.
--- @name Camera.collision_group
--- @class table
+--- Gets the collision group of the camera.
+-- @param self Camera.
+-- @return Collision group.
+Camera.get_collision_group = function(self)
+	return Los.camera_get_collision_group(self.handle)
+end
 
---- The collision mask of the camera.
--- @name Camera.collision_mask
--- @class table
+--- Sets the collision group of the camera.
+-- @param self Camera.
+-- @param v Collision group.
+Camera.set_collision_group = function(self, v)
+	Los.camera_set_collision_group(self.handle, v)
+end
 
---- Far plane of the camera.
--- @name Camera.far
--- @class table
+--- Gets the collision mask of the camera.
+-- @param self Camera.
+-- @return Collision mask.
+Camera.get_collision_mask = function(self)
+	return Los.camera_get_collision_mask(self.handle)
+end
 
---- The field of view of the camera.
--- @name Camera.fov
--- @class table
+--- Sets the collision mask of the camera.
+-- @param self Camera.
+-- @param v Collision mask.
+Camera.set_collision_mask = function(self, v)
+	Los.camera_set_collision_mask(self.handle, v)
+end
 
---- Camera mode.<br/>
--- Recognized values: "first-person"/"manual"/"third-person".
--- @name Camera.mode
--- @class table
+--- Gets the far plane distance of the camera.
+-- @param self Camera.
+-- @return Number.
+Camera.get_far = function(self)
+	return self.__far or 75
+end
 
---- Modelview matrix.
--- @name Camera.modelview
--- @class table
+--- Sets the far plane distance of the camera.
+-- @param self Camera.
+-- @param v Number.
+Camera.set_far = function(self, v)
+	rawset(self, "__far", v)
+	Los.camera_set_far(self.handle, v)
+end
 
---- Near plane of the camera.
--- @name Camera.far
--- @class table
+--- Gets the field of view of the camera.
+-- @param self Camera.
+-- @return Angle in radians.
+Camera.get_fov = function(self)
+	return Los.camera_get_fov(self.handle)
+end
 
---- Camera position.
--- @name Camera.position
--- @class table
+--- Sets the field of view of the camera.
+-- @param self Camera.
+-- @param v Angle in radians.
+Camera.set_fov = function(self, v)
+	Los.camera_set_fov(self.handle, v)
+end
 
---- The position smoothing factor of the camera.
--- @name Camera.position_smoothing
--- @class table
+--- Gets the current camera mode.<br/>
+--
+-- Recognized values are "first-person", "manual" and "third-person".
+--
+-- @param self Camera.
+-- @return String.
+Camera.get_mode = function(self)
+	return Los.camera_get_mode(self.handle)
+end
 
---- Projection matrix.
--- @name Camera.projection
--- @class table
+--- Sets the current camera mode.<br/>
+--
+-- Recognized values are "first-person", "manual" and "third-person".
+--
+-- @param self Camera.
+-- @return String.
+Camera.set_mode = function(self, v)
+	Los.camera_set_mode(self.handle, v)
+end
 
---- Camera rotation.
--- @name Camera.rotation
--- @class table
+--- Gets the modelview matrix of the camera.
+-- @param self Camera.
+-- @return List of 16 numbers.
+Camera.get_modelview = function(self)
+	return Los.camera_get_modelview(self.handle)
+end
 
---- The rotation smoothing factor of the camera.
--- @name Camera.rotation_smoothing
--- @class table
+--- Gets the current position of the camera.
+-- @param self Camera.
+-- @return Vector.
+Camera.get_position = function(self)
+	return Vector:new_from_handle(Los.camera_get_position(self.handle))
+end
 
---- The position of the target of third person camera.
--- @name Camera.center
--- @class table
+--- Gets the position smoothing factor of the camera.
+-- @param self Camera.
+-- @return Number.
+Camera.get_position_smoothing = function(self)
+	return Los.camera_get_position_smoothing(self.handle)
+end
 
---- The rotation of the target of third person camera.
--- @name Camera.center
--- @class table
+--- Sets the position smoothing factor of the camera.
+-- @param self Camera.
+-- @param v Number.
+Camera.set_position_smoothing = function(self, v)
+	Los.camera_set_position_smoothing(self.handle, v)
+end
+
+--- Gets the projection matrix of the camera.
+-- @param self Camera.
+-- @return List of 16 numbers.
+Camera.get_projection = function(self)
+	return Los.camera_get_projection(self.handle)
+end
+
+--- Gets the near plane distance of the camera.
+-- @param self Camera.
+-- @return Number.
+Camera.get_near = function(self)
+	return self.__near or 1
+end
+
+--- Sets the near plane distance of the camera.
+-- @param self Camera.
+-- @param v Number.
+Camera.set_near = function(self, v)
+	self.__near = v
+	Los.camera_set_near(self.handle, v)
+end
+
+--- Gets the current rotation of the camera.
+-- @param self Camera.
+-- @return Quaternion.
+Camera.get_rotation = function(self)
+	return Quaternion:new_from_handle(Los.camera_get_rotation(self.handle))
+end
+
+--- Gets the rotation smoothing factor of the camera.
+-- @param self Camera.
+-- @return Number.
+Camera.get_rotation_smoothing = function(self)
+	return Los.camera_get_rotation_smoothing(self.handle)
+end
+
+--- Sets the rotation smoothing factor of the camera.
+-- @param self Camera.
+-- @param v Number.
+Camera.set_rotation_smoothing = function(self, v)
+	Los.camera_set_rotation_smoothing(self.handle, v)
+end
+
+--- Gets the target position of the camera.
+-- @param self Camera.
+-- @return Vector.
+Camera.get_target_position = function(self)
+	return Vector:new_from_handle(Los.camera_get_target_position(self.handle))
+end
+
+--- Sets the target position of the camera.
+-- @param self Camera.
+-- @param v Vector.
+Camera.set_target_position = function(self, v)
+	Los.camera_set_target_position(self.handle, v.handle)
+end
+
+--- Gets the target rotation of the camera.
+-- @param self Camera.
+-- @return Quaternion.
+Camera.get_target_rotation = function(self)
+	return Quaternion:new_from_handle(Los.camera_get_target_rotation(self.handle))
+end
+
+--- Sets the rotation rotation of the camera.
+-- @param self Camera.
+-- @param v Quaternion.
+Camera.set_target_rotation = function(self, v)
+	Los.camera_set_target_rotation(self.handle, v.handle)
+end
 
 --- The viewport of the camera.
--- @name Camera.viewport
--- @class table
+-- @param self Camera.
+-- @return Table of four numbers.
+Camera.get_viewport = function(self)
+	return Los.camera_get_viewport(self.handle)
+end
 
-Camera:add_getters{
-	collision_group = function(s) return Los.camera_get_collision_group(s.handle) end,
-	collision_mask = function(s) return Los.camera_get_collision_mask(s.handle) end,
-	far = function(s) return rawget(s, "__far") or 75 end,
-	fov = function(s) return Los.camera_get_fov(s.handle) end,
-	mode = function(s) return Los.camera_get_mode(s.handle) end,
-	modelview = function(s) return Los.camera_get_modelview(s.handle) end,
-	near = function(s) return rawget(s, "__near") or 1 end,
-	position = function(s) return Class.new(Vector, {handle = Los.camera_get_position(s.handle)}) end,
-	position_smoothing = function(s) return Los.camera_get_position_smoothing(s.handle) end,
-	projection = function(s) return Los.camera_get_projection(s.handle) end,
-	rotation = function(s) return Class.new(Quaternion, {handle = Los.camera_get_rotation(s.handle)}) end,
-	rotation_smoothing = function(s) return Los.camera_get_rotation_smoothing(s.handle) end,
-	target_position = function(s) return Class.new(Vector, {handle = Los.camera_get_target_position(s.handle)}) end,
-	target_rotation = function(s) return Class.new(Quaternion, {handle = Los.camera_get_target_rotation(s.handle)}) end,
-	viewport = function(s) return Los.camera_get_viewport(s.handle) end}
-
-Camera:add_setters{
-	collision_group = function(s, v) Los.camera_set_collision_group(s.handle, v) end,
-	collision_mask = function(s, v) Los.camera_set_collision_mask(s.handle, v) end,
-	far = function(s, v)
-		rawset(s, "__far", v)
-		Los.camera_set_far(s.handle, v)
-	end,
-	fov = function(s, v) Los.camera_set_fov(s.handle, v) end,
-	mode = function(s, v) Los.camera_set_mode(s.handle, v) end,
-	near = function(s, v)
-		rawset(s, "__near", v)
-		Los.camera_set_near(s.handle, v)
-	end,
-	position_smoothing = function(s, v) Los.camera_set_position_smoothing(s.handle, v) end,
-	rotation_smoothing = function(s, v) Los.camera_set_rotation_smoothing(s.handle, v) end,
-	target_position = function(s, v) Los.camera_set_target_position(s.handle, v.handle) end,
-	target_rotation = function(s, v) Los.camera_set_target_rotation(s.handle, v.handle) end,
-	viewport = function(s, v) Los.camera_set_viewport(s.handle, v) end}
+--- Sets the viewport of the camera.
+-- @param self Camera.
+-- @param v Table of four numbers.
+Camera.set_viewport = function(self, v)
+	Los.camera_set_viewport(self.handle, v)
+end
 
 return Camera

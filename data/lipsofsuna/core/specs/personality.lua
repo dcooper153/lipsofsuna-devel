@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Personalityspec = Class(Spec)
+Personalityspec = Class("Personalityspec", Spec)
 Personalityspec.type = "personality"
 Personalityspec.dict_id = {}
 Personalityspec.dict_cat = {}

@@ -1,7 +1,9 @@
 local Class = require("system/class")
+local Color = require("common/color")
+local Model = require("system/model")
+local ModelMerger = require("system/model-merger")
 
-local ModelBuilder = Class()
-ModelBuilder.class_name = "ModelBuilder"
+local ModelBuilder = Class("ModelBuilder")
 
 --- Builds the mesh for the given actor.
 -- @param clss ModelBuilder class.
@@ -18,13 +20,13 @@ ModelBuilder.build_for_actor = function(clss, object)
 	-- Create or reuse the model merger.
 	local merger = object.model_merger
 	if not merger then
-		merger = Merger()
+		merger = ModelMerger()
 		object.model_merger = merger
 	end
 	-- Build the character model in a separate thread.
 	-- The result is handled in the tick handler in event.lua.
 	clss:build_with_merger(merger, {
-		beheaded = object.beheaded,
+		beheaded = object:get_beheaded(),
 		body_scale = object.body_scale,
 		body_style = object.body_style,
 		equipment = equipment,
@@ -37,7 +39,7 @@ ModelBuilder.build_for_actor = function(clss, object)
 		nudity = Client.options.nudity_enabled,
 		skin_color = Color:ubyte_to_float(object.skin_color),
 		skin_style = object.skin_style,
-		spec = object.spec})
+		spec = object:get_spec()})
 end
 
 --- Builds the mesh for the given object.
@@ -96,7 +98,7 @@ ModelBuilder.build_with_merger = function(clss, merger, args)
 		end
 	end
 	-- Morph and merge the submodels.
-	local model = Model:find_or_load(meshes["skeleton"])
+	local model = Main.models:find_by_name(meshes["skeleton"])
 	if model then merger:add_model(model) end
 	meshes["skeleton"] = nil
 	for k,v in pairs(meshes) do
@@ -125,7 +127,7 @@ end
 -- @param args Model building arguments.
 ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 	-- Load the model.
-	local ref = Model:find_or_load(file)
+	local ref = Main.models:find_by_name(file)
 	local morph = {}
 	local add = function(name, value)
 		if not value then return end

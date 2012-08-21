@@ -1,3 +1,5 @@
+local Material = require("system/material")
+
 Material{
 	name = "adamantium1",
 	material = "adamantium1",

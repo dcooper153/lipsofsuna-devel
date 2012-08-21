@@ -1,6 +1,7 @@
-Unittest:add(1, "ai", function()
-	require "system/ai"
-	require "system/math"
+Unittest:add(1, "system", "ai", function()
+	local Ai = require("system/ai")
+	local Vector = require("system/math/vector")
+	local Voxel = require("system/tiles")
 	-- Create the maze.
 	for x=98,102 do
 		for z=98,102 do

@@ -1,3 +1,5 @@
+local Database = require("system/database")
+
 Message{
 	name = "server stats",
 	client_to_server_encode = function(self)
@@ -10,7 +12,7 @@ Message{
 		-- Check for permissions.
 		local player = Server:get_player_by_client(client)
 		if not player then return end
-		if not player.admin then
+		if not player:get_admin() then
 			Game.messaging:server_event("message", "You have no permission to do that.")
 			return
 		end
@@ -29,7 +31,7 @@ Message{
 		local num_objects_real = 0
 		local num_vision_miss = 0
 		local num_vision_real = 0
-		for k,v in pairs(SimulationObject.objects) do
+		for k,v in pairs(Game.objects.objects_by_id) do
 			if v.class_name == "Player" then
 				if v:get_visible() then
 					num_players_real = num_players_real + 1
@@ -96,7 +98,7 @@ Obstacles: %d+%d
 Others: %d+%d
 Vision: %d+%d
 Sectors: %d]],
-			Program.fps, Database.memory_used / 1024, collectgarbage("count") / 1024, Voxel.memory_used / 1024,
+			Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024, Voxel:get_memory_used() / 1024,
 			1000 * Program.profiling.update, 1000 * Program.profiling.event,
 			num_players_real, num_players_miss,
 			num_actors_real, num_actors_idle, num_actors_miss,
@@ -118,5 +120,5 @@ Sectors: %d]],
 	end,
 	server_to_client = function(self, text)
 		Client.data.admin.server_stats = text
-		Ui.state = "admin/server-stats"
+		Ui:set_state("admin/server-stats")
 	end}

@@ -1,6 +1,6 @@
--- Spell on touch.
--- While the attack animation is played, an attack ray is cast.
--- The first object or tile that collides with the ray is damaged.
+local Coroutine = require("system/coroutine")
+local Physics = require("system/physics")
+
 Actionspec{name = "spell on touch", func = function(feat, info, args)
 	Coroutine(function(t)
 		feat:play_effects(args)

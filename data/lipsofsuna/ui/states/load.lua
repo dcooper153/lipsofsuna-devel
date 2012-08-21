@@ -15,7 +15,7 @@ Ui:add_state{
 	end,
 	update = function(secs)
 		if Client.data.load.finished then
-			Ui.state = Client.data.load.next_state
+			Ui:set_state(Client.data.load.next_state)
 			return
 		end
 		if Client.data.load.timer >= 0.1 then

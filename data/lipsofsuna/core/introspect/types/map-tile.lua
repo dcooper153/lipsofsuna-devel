@@ -6,9 +6,6 @@ Introspect.types_dict["map tile"] = {
 		       val1[4] == val2[4]
 	end,
 	write_str = function(val)
-		if not val[4] then
-			print("EEEEEEEEEEEEEE", val[1], val[2], val[3], val[4])
-		end
 		return string.format("{%d,%d,%d,%q}",
 			val[1], val[2], val[3], val[4])
 	end}

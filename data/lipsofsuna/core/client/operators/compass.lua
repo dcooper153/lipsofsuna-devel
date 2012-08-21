@@ -4,7 +4,7 @@
 Client.get_active_marker = function(self)
 	if not self.data.quest.shown then return end
 	if not self.player_object then return end
-	local quest = Quest:find{name = self.data.quest.shown}
+	local quest = Questspec:find{name = self.data.quest.shown}
 	if not quest or not quest.marker then return end
 	return Marker:find{name = quest.marker}
 end
@@ -22,7 +22,7 @@ Client.get_compass_direction = function(self)
 	local marker = self:get_active_marker()
 	if not marker then return end
 	-- Calculate the direction.
-	local diff = marker.position - self.player_object.position
+	local diff = marker.position - self.player_object:get_position()
 	return 0.5 * math.pi + math.atan2(diff.z, -diff.x)
 end
 
@@ -34,7 +34,7 @@ Client.get_compass_distance = function(self)
 	local marker = self:get_active_marker()
 	if not marker then return end
 	-- Calculate the distance.
-	local diff = marker.position - self.player_object.position
+	local diff = marker.position - self.player_object:get_position()
 	diff.y = 0
 	return diff.length
 end
@@ -47,6 +47,6 @@ Client.get_compass_height = function(self)
 	local marker = self:get_active_marker()
 	if not marker then return end
 	-- Calculate the height offset.
-	local diff = marker.position - self.player_object.position
+	local diff = marker.position - self.player_object:get_position()
 	return diff.y
 end

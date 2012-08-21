@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "label")
 
-Widgets.Uidialogchoice = Class(Widgets.Uilabel)
-Widgets.Uidialogchoice.class_name = "Widgets.Uidialogchoice"
+Widgets.Uidialogchoice = Class("Uidialogchoice", Widgets.Uilabel)
 
 Widgets.Uidialogchoice.new = function(clss, id, index, text)
 	local self = Widgets.Uilabel.new(clss, text)

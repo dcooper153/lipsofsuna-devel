@@ -1,5 +1,7 @@
-Widgets.Hudcompass = Class(Widget)
-Widgets.Hudcompass.class_name = "Widgets.Hudcompass"
+local Class = require("system/class")
+local Widget = require("system/widget")
+
+Widgets.Hudcompass = Class("Hudcompass", Widget)
 
 --- Creates a new compass widget.
 -- @param clss Compass class.
@@ -25,10 +27,10 @@ Widgets.Hudcompass.update = function(self, secs)
 end
 
 Widgets.Hudcompass.reshaped = function(self)
-	local w = self.width
-	local h = self.height
-	local mode = Program.video_mode
-	self.offset = Vector(0, mode[2] - 80)
+	local w = self:get_width()
+	local h = self:get_height()
+	local mode = Program:get_video_mode()
+	self:set_offset(Vector(0, mode[2] - 80))
 	self:canvas_clear()
 	-- Add the background.
 	self:canvas_image{

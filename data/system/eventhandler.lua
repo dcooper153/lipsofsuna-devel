@@ -1,7 +1,8 @@
-require "system/core"
+local Class = require("system/class")
+local Packet = require("system/packet")
+local Program = require("system/core")
 
-Eventhandler = Class()
-Eventhandler.class_name = "Eventhandler"
+local Eventhandler = Class("Eventhandler")
 Eventhandler.handlers = setmetatable({}, {__mode = "v"})
 
 --- Creates a new event handler and enables it.<br/>
@@ -13,7 +14,8 @@ Eventhandler.handlers = setmetatable({}, {__mode = "v"})
 --   <li>type: Event type. (required)</li></ul>
 -- @return New event handler.
 Eventhandler.new = function(clss, args)
-	local self = Class.new(clss, args)
+	local self = Class.new(clss)
+	for k,v in pairs(args) do self[k] = v end
 	self:enable()
 	return self
 end
@@ -38,7 +40,7 @@ end
 Eventhandler.event = function(clss, args)
 	-- Translate handles.
 	if args.type == "packet" then
-		args.packet = Class.new(Packet, {handle = args.packet})
+		args.packet = Packet:new_from_handle(args.packet)
 		args.packet:read()
 	end
 	for k,v in pairs(args) do
@@ -48,7 +50,7 @@ Eventhandler.event = function(clss, args)
 			if d then
 				args[k] = d
 			else
-				args[k] = Class.new(Vector, {handle = v})
+				args[k] = Vector:new_from_handle(v)
 			end
 		end
 	end
@@ -69,3 +71,5 @@ Eventhandler.update = function(clss)
 		event = Program:pop_event()
 	end
 end
+
+return Eventhandler

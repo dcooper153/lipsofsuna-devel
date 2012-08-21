@@ -1,5 +1,6 @@
-Mod = Class()
-Mod.class_name = "Mod"
+local Class = require("system/class")
+
+Mod = Class("Mod")
 
 Mod.load = function(self, name)
 	local prev_name = self.name

@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Actorskinspec = Class(Spec)
+Actorskinspec = Class("Actorskinspec", Spec)
 Actorskinspec.type = "actorskinspec"
 Actorskinspec.dict_id = {}
 Actorskinspec.dict_cat = {}

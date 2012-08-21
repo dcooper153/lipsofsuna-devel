@@ -1,8 +1,12 @@
+local Class = require("system/class")
+
 if not Los.program_load_extension("password") then
 	error("loading extension `password' failed")
 end
 
-Password = Class()
+------------------------------------------------------------------------------
+
+local Password = Class("Password")
 
 --- Creates a password hash.
 -- @param self Program class.
@@ -21,3 +25,5 @@ end
 Password.random_salt = function(self, length)
 	return Los.program_random_salt(length)
 end
+
+return Password

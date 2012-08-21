@@ -9,9 +9,7 @@ Message{
 		return {type, name}
 	end,
 	server_to_client_handle = function(self, type, name)
-		if not Server.initialized then
-			Client.data.unlocks:lock(type, name)
-		end
+		Client.data.unlocks:lock(type, name)
 		if not Operators.play:is_startup_period() then
 			Client:append_log("Locked " .. type .. ": " .. name)
 		end

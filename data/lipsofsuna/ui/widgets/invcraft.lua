@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "invitem")
 
-Widgets.Uiinvcraft = Class(Widgets.Uiinvitem)
-Widgets.Uiinvcraft.class_name = "Widgets.Uiinvcraft"
+Widgets.Uiinvcraft = Class("Uiinvcraft", Widgets.Uiinvitem)
 
 Widgets.Uiinvcraft.new = function(clss, id, name)
 	local spec = Itemspec:find{name = name}

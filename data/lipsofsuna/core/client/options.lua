@@ -1,6 +1,9 @@
 local Class = require("system/class")
+local ConfigFile = require("system/config-file")
+local Render = require("system/render")
+local Staticobject = require("core/objects/static")
 
-local Options = Class()
+local Options = Class("Options")
 
 Options.config_keys = {
 	anisotropic_filter = {"Anisotropic filtering", "int", 0, 32},
@@ -125,22 +128,22 @@ end
 
 Options.apply = function(self)
 	-- Set the anisotropic filter.
-	Render.anisotrophy = self.anisotropic_filter
+	Render:set_anisotrophy(self.anisotropic_filter)
 	-- Set the shader scheme.
 	if self.shader_quality == 3 then
 		if self.outlines_enabled then
-			Render.material_scheme = "Default"
+			Render:set_material_scheme("Default")
 		else
-			Render.material_scheme = "quality3"
+			Render:set_material_scheme("quality3")
 		end
 	elseif self.shader_quality == 2 then
 		if self.outlines_enabled then
-			Render.material_scheme = "quality2outline"
+			Render:set_material_scheme("quality2outline")
 		else
-			Render.material_scheme = "quality2"
+			Render:set_material_scheme("quality2")
 		end
 	else
-		Render.material_scheme = "quality1"
+		Render:set_material_scheme("quality1")
 	end
 	-- Set the bloom pass.
 	Render:remove_compositor("bloom1")
@@ -152,7 +155,7 @@ Options.apply = function(self)
 		Ui:restart_state()
 	end
 	-- Update the render properties of objects.
-	for k,v in pairs(Object.objects) do
+	for k,v in pairs(Game.objects.objects_by_id) do
 		self:apply_object(v)
 	end
 end

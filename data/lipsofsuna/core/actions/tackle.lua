@@ -1,3 +1,5 @@
+local Coroutine = require("system/coroutine")
+
 Actionspec{
 	name = "tackle",
 	func = function(feat, info, args)
@@ -10,7 +12,7 @@ Actionspec{
 				if ground_hits < 30 then return end
 			end
 			-- Stop the tackle motion.
-			args.user.contact_events = false
+			args.user:set_contact_events(false)
 			self.contact_cb = nil
 			-- Apply the feat effects.
 			local args = {
@@ -22,15 +24,15 @@ Actionspec{
 			feat:apply_touch(args)
 			-- Bounce the target strongly.
 			if result.object then
-				result.object:impulse{impulse = self.rotation * Vector(0, 400, -400)}
+				result.object:impulse{impulse = self:get_rotation() * Vector(0, 400, -400)}
 			end
 		end
 		args.user.contact_cb = callback
-		args.user.contact_events = true
+		args.user:set_contact_events(true)
 		-- Initialize the tackle motion
 		args.user:jump()
-		local vel = args.user.rotation * Vector(0,0.25,-1) * 10
-		args.user.velocity = vel
+		local vel = args.user:get_rotation() * Vector(0,0.25,-1) * 10
+		args.user:set_velocity(vel)
 		feat:play_effects(args)
 		-- Maintain the tackle motion.
 		Coroutine(function(t)
@@ -38,9 +40,9 @@ Actionspec{
 				Coroutine:sleep(0.1)
 				if not args.user:get_visible() then break end
 				if args.user.contact_cb ~= callback then break end
-				args.user.velocity = vel
+				args.user:set_velocity(vel)
 			end
-			args.user.contact_events = false
+			args.user:set_contact_events(false)
 			args.user.contact_cb = nil
 		end)
 	end}

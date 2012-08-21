@@ -1,7 +1,10 @@
+local Class = require("system/class")
+local Heightmap = require("system/heightmap")
+local Image = require("system/image")
+
 Program:add_path(Mod.path)
 
-Map = Class()
-Map.class_name = "Map"
+Map = Class("Map")
 
 Map.init = function(self)
 	-- Only initialize once.

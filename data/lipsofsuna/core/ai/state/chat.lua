@@ -13,7 +13,7 @@ Aistatespec{
 		if self.object.dialog then
 			self.object:set_movement(0)
 			if self.object.dialog.user then
-				self.object:face_point{point = self.object.dialog.user.position, secs = secs}
+				self.object:face_point{point = self.object.dialog.user:get_position(), secs = secs}
 			end
 		end
 	end}

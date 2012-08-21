@@ -11,5 +11,5 @@ Message{
 	server_to_client_handle = function(self, title, text)
 		Client.data.book.title = title
 		Client.data.book.text = text
-		Ui.state = "book"
+		Ui:set_state("book")
 	end}

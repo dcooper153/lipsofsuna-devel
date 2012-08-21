@@ -1,4 +1,6 @@
-require "system/class"
+local Aabb = require("system/math/aabb")
+local Class = require("system/class")
+local Vector = require("system/math/vector")
 
 if not Los.program_load_extension("model") then
 	error("loading extension `model' failed")
@@ -6,33 +8,26 @@ end
 
 ------------------------------------------------------------------------------
 
-Model = Class()
-Model.class_name = "Model"
-Model.models = setmetatable({}, {__mode = "v"})
+local Model = Class("Model")
 
 --- Creates a new model.
 -- @param clss Model class.
--- @param args Arguments.
+-- @param name Name for caching.
 -- @return New model.
-Model.new = function(clss, args)
+Model.new = function(clss, name)
 	local self = Class.new(clss)
 	self.handle = Los.model_new()
-	if args then
-		if args.name then clss.models[args.name] = self end
-		for k,v in pairs(args) do self[k] = v end
-	end
 	return self
 end
 
---- Finds a model by name.
+--- Creates a new model from an internal handle.
 -- @param clss Model class.
--- @param args Arguments.<ul>
---   <li>file: Model filename.</li></ul>
--- @return Model or nil.
-Model.find = function(clss, args)
-	if args.file then
-		return clss.models[args.file]
-	end
+-- @param handle Handle.
+-- @return New model.
+Model.new_from_handle = function(clss, handle)
+	local self = Class.new(clss)
+	self.handle = handle
+	return self
 end
 
 --- Creates a copy of the model.
@@ -58,6 +53,9 @@ end
 -- @param self Model.
 Model.changed = function(self)
 	Los.model_changed(self.handle)
+	if self.render then
+		self.render:set_model(self)
+	end
 end
 
 --- Loads the model from a file.
@@ -87,29 +85,40 @@ Model.merge = function(self, args)
 	end
 end
 
---- The local bounding box of the model.
--- @name Model.bounding_box
--- @class table
+--- Gets the local bounding box of the model.
+-- @param self Model.
+-- @return Aabb.
+Model.get_bounding_box = function(self)
+	local h1,h2 = Los.model_get_bounding_box(self.handle)
+	local min = Vector:new_from_handle(h1)
+	local max = Vector:new_from_handle(h2)
+	return Aabb{point = min, size = max - min}
+end
 
---- The local center offset of the bounding box of the model.
--- @name Model.center_offset
--- @class table
+--- Gets the local center offset of the bounding box of the model.
+-- @param self Model.
+-- @return Vector.
+Model.get_center_offset = function(self)
+	local h = Los.model_get_center_offset(self.handle)
+	return Vector:new_from_handle(h)
+end
 
---- The approximate memory used by the model, in bytes.
--- @name Model.memory_used
--- @class table
+--- Gets the approximate memory used by the model, in bytes.
+-- @param self Model.
+-- @return Memory used, in bytes
+Model.get_memory_used = function(self)
+	return Los.model_get_memory_used(self.handle)
+end
 
-Model:add_getters{
-	bounding_box = function(self)
-		local h1,h2 = Los.model_get_bounding_box(self.handle)
-		local min = Class.new(Vector, {handle = h1})
-		local max = Class.new(Vector, {handle = h2})
-		return Aabb{point = min, size = max - min}
-	end,
-	center_offset = function(self)
-		local h = Los.model_get_center_offset(self.handle)
-		return Class.new(Vector, {handle = h})
-	end,
-	memory_used = function(self)
-		return Los.model_get_memory_used(self.handle)
-	end}
+--- Gets the render model of the model.
+-- @param self Model.
+-- @return Render model.
+Model.get_render = function(self)
+	if not self.render then
+		local RenderModel = require("system/render-model")
+		self.render = RenderModel(self)
+	end
+	return self.render
+end
+
+return Model

@@ -1,7 +1,9 @@
-require "system/class"
-require(Mod.path .. "message")
+local Class = require("system/class")
+local Message = require(Mod.path .. "message")
+local Network = require("system/network")
+local Packet = require("system/packet")
 
-Messaging = Class()
+local Messaging = Class("Messaging")
 
 Messaging.new = function(clss, port)
 	local self = Class.new(clss)
@@ -76,7 +78,7 @@ Messaging.server_event_broadcast = function(self, type, ...)
 		self:server_event(type, -1, ...)
 	end
 	if self.multiplayer then
-		for k,v in pairs(Network.clients) do
+		for k,v in pairs(Network:get_clients()) do
 			self:server_event(type, v, ...)
 		end
 	end
@@ -84,7 +86,7 @@ end
 
 Messaging.handle_packet = function(self, client, packet)
 	-- Get the message handler.
-	local handler = Message.dict_id[packet.type]
+	local handler = Message.dict_id[packet:get_type()]
 	if not handler then return end
 	-- Handle the message.
 	if client then
@@ -106,12 +108,4 @@ Messaging.handle_packet = function(self, client, packet)
 	end
 end
 
-------------------------------------------------------------------------------
-
-Eventhandler{type = "packet", func = function(self, args)
-	if Client then
-		Game.messaging:handle_packet(args.client, args.packet)
-	else
-		Game.messaging:handle_packet(args.client, args.packet)
-	end
-end}
+return Messaging

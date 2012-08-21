@@ -1,4 +1,5 @@
-require "system/class"
+local Class = require("system/class")
+local Packet = require("system/packet")
 
 if not Los.program_load_extension("database") then
 	error("loading extension `database' failed")
@@ -6,20 +7,17 @@ end
 
 ------------------------------------------------------------------------------
 
-Database = Class()
-Database.class_name = "Database"
+local Database = Class("Database")
 
 --- Opens a database.
 -- @param clss Database class.
--- @param args Arguments.<ul>
---   <li>1,name: Unique database name.</li></ul>
+-- @param name Database name.
 -- @return New database.
-Database.new = function(clss, args)
+Database.new = function(clss, name)
 	local self = Class.new(clss)
-	self.handle = Los.database_new(args)
+	self.handle = Los.database_new(name)
 	if not self.handle then
-		local n = (type(args) == "string") and args or args.name
-		assert(self.handle, string.format("creating database %q failed", n))
+		assert(self.handle, string.format("creating database %q failed", name))
 	end
 	return self
 end
@@ -52,15 +50,17 @@ Database.query = function(self, a, b)
 	-- Translate handles to packets.
 	for k1,v1 in pairs(t) do
 		for k2,v2 in pairs(v1) do
-			if type(v2) == "userdata" then v1[k2] = Class.new(Packet, {handle = v2}) end
+			if type(v2) == "userdata" then v1[k2] = Packet:new_from_handle(v2) end
 		end
 	end
 	return t
 end
 
---- Approximate memory used by add databases, in bytes.
--- @name Database.memory_used
--- @class table
+--- Gets the approximate memory used by all databases.
+-- @param self Database class.
+-- @return Size in bytes.
+Database.get_memory_used = function(self)
+	return Los.database_get_memory_used()
+end
 
-Database:add_class_getters{
-	memory_used = function(self) return Los.database_get_memory_used(self) end}
+return Database

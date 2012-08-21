@@ -1,7 +1,7 @@
-require "system/eventhandler"
+local Class = require("system/class")
+local Eventhandler = require("system/eventhandler")
 
-Coroutine = Class()
-Coroutine.class_name = "Coroutine"
+local Coroutine = Class("Coroutine")
 Coroutine.routines = {}
 
 --- Creates a thread executing a function.
@@ -43,3 +43,5 @@ end
 Eventhandler{type = "tick", func = function(self, args)
 	Coroutine:update(args.secs)
 end}
+
+return Coroutine

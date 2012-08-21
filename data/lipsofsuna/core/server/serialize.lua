@@ -1,9 +1,8 @@
-require "system/password"
-require "common/unlocks"
+local Class = require("system/class")
 
-Serialize = Class()
-Serialize.game_version = "5"
-Serialize.object_version = "4"
+local Serialize = Class("Serialize")
+Serialize.game_version = "7"
+Serialize.object_version = "7"
 
 --- Creates a new serializer.
 -- @param clss Serialize class.
@@ -21,8 +20,6 @@ end
 Serialize.load = function(clss)
 	clss:load_generator()
 	clss:load_markers()
-	Server.quest_database:load_quests()
-	Server.object_database:load_static_objects()
 end
 
 --- Loads map generator data from the database.
@@ -67,9 +64,8 @@ Serialize.save = function(clss, erase)
 	end
 	clss:save_generator(erase)
 	clss:save_markers(erase)
-	Server.quest_database:save_quests(erase)
 	Server.account_database:save_accounts(erase)
-	Unlocks:write_db()
+	Server.unlocks:save()
 end
 
 --- Saves the map generator state.
@@ -132,19 +128,10 @@ Serialize.init_game_database = function(self, reset)
 	self.db:query([[DROP TABLE IF EXISTS generator_settings;]])
 	self.db:query([[DROP TABLE IF EXISTS markers;]])
 	self.db:query([[DROP TABLE IF EXISTS options;]])
-	self.db:query([[DROP TABLE IF EXISTS unlocks;]])
 	self.db:query(
 		[[CREATE TABLE options (
 		key TEXT PRIMARY KEY,
 		value TEXT);]])
-	self.db:query([[CREATE TABLE dialog_flags (
-		name TEXT PRIMARY KEY,
-		value TEXT);]])
-	self.db:query([[CREATE TABLE dialog_variables (
-		id INTEGER,
-		key TEXT,
-		value TEXT,
-		PRIMARY KEY(id,key));]])
 	self.db:query([[CREATE TABLE generator_sectors (
 		id INTEGER PRIMARY KEY,
 		value TEXT);]])
@@ -159,30 +146,6 @@ Serialize.init_game_database = function(self, reset)
 		z FLOAT,
 		unlocked INTENGER,
 		discoverable INTEGER);]])
-	self.db:query([[CREATE TABLE quests (
-		name TEXT PRIMARY KEY,
-		status TEXT,
-		desc TEXT,
-		marker TEXT);]])
-	self.db:query([[CREATE TABLE unlocks (
-		type TEXT,
-		name TEXT,
-		PRIMARY KEY(type,name));]])
-	-- Set the version number.
-	self:set_value("game_version", self.game_version)
-end
-
---- Saves an unlock to the database.
--- @param self Serialize class.
--- @param type Type of the unlocked item.
--- @param name Name of the unlocked item.
--- @param value True to unlock, false to lock.
-Serialize.save_unlock = function(self, type, name, value)
-	if value then
-		self.db:query([[REPLACE INTO unlocks (type,name) VALUES (?,?);]], {type, name})
-	else
-		self.db:query([[DELETE FROM unlocks WHERE type=? AND name=?;]], {type, name})
-	end
 end
 
 --- Gets a value from the key-value database.
@@ -210,3 +173,5 @@ end
 Serialize.set_value = function(self, key, value)
 	self.db:query([[REPLACE INTO options (key,value) VALUES (?,?);]], {key, value})
 end
+
+return Serialize

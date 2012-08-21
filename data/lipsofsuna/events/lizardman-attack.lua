@@ -34,11 +34,11 @@ Globaleventspec{
 		-- Start the event at a suitable moment.
 		local check = function(player, status)
 			-- FIXME: The condition is too arbitrary.
-			if not Server.generator:is_overworld_sector_by_point(player.position) then return end
+			if not Server.generator:is_overworld_sector_by_point(player:get_position()) then return end
 			if #status.explored < 5 then return end
 			if #status.eaten < 3 then return end
 			if status.eaten[3] < status.explored[1]  then return end
-			local t = Program.time
+			local t = Program:get_time()
 			if t - status.explored[2] < 30 then return end
 			if t - status.eaten[3] > 200 then return end
 			return true

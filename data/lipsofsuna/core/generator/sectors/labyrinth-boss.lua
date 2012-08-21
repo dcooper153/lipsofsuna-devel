@@ -1,5 +1,9 @@
-Generator.sector_types.LabyrinthBoss = Class()
-Generator.sector_types.LabyrinthBoss.class_name = "Generator.LabyrinthBoss"
+local Actor = require("core/objects/actor")
+local Class = require("system/class")
+local Item = require("core/objects/item")
+local Material = require("system/material")
+
+Generator.sector_types.LabyrinthBoss = Class("Generator.LabyrinthBoss")
 
 Generator.sector_types.LabyrinthBoss.init = function(self)
 	self.scale1 = Vector(0.3,0.3,0.3)
@@ -15,7 +19,7 @@ end
 -- @param size Size of the generated area.
 Generator.sector_types.LabyrinthBoss.generate = function(self, pos, size)
 	local a,c,d = size.x,3,6
-	Voxel:fill_region{point = pos, size = size, tile = self.mats[2].id}
+	Voxel:fill_region{point = pos, size = size, tile = self.mats[2]:get_id()}
 	Voxel:fill_region{point = pos + Vector(0,c,0), size = Vector(a,d,a), tile = 0}
 	Actor{
 		spec = "dragon",

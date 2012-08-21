@@ -1,130 +1,88 @@
-Widgets.Button = Class(Widget)
-Widgets.Button.class_name = "Widgets.Button"
+local Class = require("system/class")
+local Widget = require("system/widget")
 
-Widgets.Button.new = function(clss, args)
-	local self = Widget.new(clss, args)
-	if not self.font then self.font = "default" end
-	if not self.style then self.style = "default" end
-	if not self.text then self.text = "" end
-	if self.enabled == nil then self.enabled = true end
+local Button = Class("Button", Widget)
+
+Button.new = function(clss)
+	local self = Widget.new(clss)
+	self.font = "default"
+	self.text = ""
+	self.enabled = true
 	return self
 end
 
-Widgets.Button.handle_event = function(self, args)
+Button.handle_event = function(self, args)
 	if args.type ~= "mousepress" then return true end
 	self:pressed()
 end
 
-Widgets.Button.pressed = function(self)
+Button.pressed = function(self)
 end
 
-Widgets.Button.reshaped = function(self)
+Button.reshaped = function(self)
 	-- Calculate the size.
-	if self.style == "default" then
-		self:set_request{
-			font = self.font,
-			internal = true,
-			paddings = {3,6,6,3},
-			text = self.text}
-	else
-		self:set_request{
-			width = 16,
-			height = 16}
-	end
-	local w = self.width
-	local h = self.height
+	self:calculate_request{
+		font = self.font,
+		internal = true,
+		paddings = {3,6,6,3},
+		text = self.text}
+	local w = self:get_width()
+	local h = self:get_height()
 	-- Rebuild the canvas.
-	local e = self.enabled
-	local f = self.focused
 	self:canvas_clear()
-	if self.style == "default" then
-		self:canvas_image{
-			dest_position = {0,0},
-			dest_size = {w,h},
-			source_image = "widgets2",
-			source_position = self.focused and {100,100} or {100,0},
-			source_tiling = {7,86,7,7,86,7}}
-		self:canvas_text{
-			dest_position = {0,0},
-			dest_size = {w,h},
-			text = self.text,
-			text_alignment = {0.5,0.5},
-			text_color = {0,0,0,1},
-			text_font = self.font}
-	elseif self.style == "scroll-up" then
-		local sx = self.enabled and 700 or 720
-		local sy = self.focused and 100 or 130
-		self:canvas_image{
-			dest_position = {0,0},
-			dest_size = {21,21},
-			source_image = "widgets1",
-			source_position = {sx,sy},
-			source_tiling = {0,21,0,0,21,0}}
-	elseif self.style == "scroll-down" then
-		local sx = self.enabled and 700 or 720
-		local sy = self.focused and 160 or 190
-		self:canvas_image{
-			dest_position = {0,0},
-			dest_size = {21,21},
-			source_image = "widgets1",
-			source_position = {sx,sy},
-			source_tiling = {0,21,0,0,21,0}}
-	elseif self.style == "scroll-left" then
-		local sx = self.enabled and 700 or 720
-		local sy = self.focused and 100 or 130
-		self:canvas_image{
-			dest_position = {0,0},
-			dest_size = {21,21},
-			rotation = 0.5 * math.pi,
-			rotation_center = Vector(10,10),
-			source_image = "widgets1",
-			source_position = {sx,sy},
-			source_tiling = {0,21,0,0,21,0}}
-	elseif self.style == "scroll-right" then
-		local sx = self.enabled and 700 or 720
-		local sy = self.focused and 160 or 190
-		self:canvas_image{
-			dest_position = {0,0},
-			dest_size = {21,21},
-			rotation = 0.5 * math.pi,
-			rotation_center = Vector(10,10),
-			source_image = "widgets1",
-			source_position = {sx,sy},
-			source_tiling = {0,21,0,0,21,0}}
-	end
-	self:canvas_compile()
+	self:canvas_image{
+		dest_position = {0,0},
+		dest_size = {w,h},
+		source_image = "widgets2",
+		source_position = self.focused and {100,100} or {100,0},
+		source_tiling = {7,86,7,7,86,7}}
+	self:canvas_text{
+		dest_position = {0,0},
+		dest_size = {w,h},
+		text = self.text,
+		text_alignment = {0.5,0.5},
+		text_color = {0,0,0,1},
+		text_font = self.font}
 end
 
-Widgets.Button:add_getters{
-	enabled = function(s) return rawget(s, "__enabled") end,
-	focused = function(s) return rawget(s, "__focused") end,
-	font = function(s) return rawget(s, "__font") end,
-	style = function(s) return rawget(s, "__style") end,
-	text = function(s) return rawget(s, "__text") end}
+Button.get_enabled = function(self)
+	return self.enabled
+end
 
-Widgets.Button:add_setters{
-	enabled = function(s, v)
-		if s.enabled == v then return end
-		rawset(s, "__enabled", v)
-		s:reshaped()
-	end,
-	focused = function(s, v)
-		if s.focused == v then return end
-		rawset(s, "__focused", v)
-		s:reshaped()
-	end,
-	font = function(s, v)
-		if s.font == v then return end
-		rawset(s, "__font", v)
-		s:reshaped()
-	end,
-	style = function(s, v)
-		if s.style == v then return end
-		rawset(s, "__style", v)
-		s:reshaped()
-	end,
-	text = function(s, v)
-		if s.text == v then return end
-		rawset(s, "__text", v)
-		s:reshaped()
-	end}
+Button.set_enabled = function(self, v)
+	if self.enabled == v then return end
+	self.enabled = v
+	self:reshaped()
+end
+
+Button.get_focused = function(self)
+	return self.focused
+end
+
+Button.set_focused = function(self, v)
+	if self.focused == v then return end
+	self.focused = v
+	self:reshaped()
+end
+
+Button.get_font = function(self)
+	return self.font
+end
+
+Button.set_font = function(self, v)
+	if self.font == v then return end
+	self.font = v
+	self:reshaped()
+end
+
+Button.get_text = function(self)
+	return self.text
+end
+
+Button.set_text = function(self, v)
+	if self.text == v then return end
+	self.text = v
+	self:reshaped()
+end
+
+return Button

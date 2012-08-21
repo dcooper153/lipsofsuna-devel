@@ -1,26 +1,36 @@
-require "system/object"
-require "common/inventory"
+local Class = require("system/class")
+local Inventory = require("core/server/inventory")
+local Object = require("system/object")
+local Model = require("system/model")
+local Settings = require("common/settings")
+local Timer = require("system/timer")
 local ClientRenderObject = not Settings.server and require("core/client/client-render-object")
 local MovementPrediction = not Settings.server and require("core/client/movement-prediction")
 
-SimulationObject = Class(Object)
-SimulationObject.class_name = "SimulationObject"
+local SimulationObject = Class("SimulationObject", Object)
 
-local objspec = Spec{name = "object", type = "object"}
-
-SimulationObject.new = function(clss, args)
-	local self = Object.new(clss, {id = args and args.id})
-	self.inventory = Inventory{id = self.id}
+--- Creates a new simulation object.
+-- @param clss SimulationObject class.
+-- @param id Unique ID, or nil for automatically selected.
+-- @return SimulationObject.
+SimulationObject.new = function(clss, id)
+	local self = Object.new(clss)
+	-- Select a unique ID.
+	if id then
+		local old = Game.objects.objects_by_id[id]
+		if old then old:detach() end
+		self:set_id(id)
+	else
+		self:set_id(Game.objects:get_free_id())
+	end
+	Game.objects:add(self)
+	-- Initialize client and server data.
+	self.inventory = Inventory(self:get_id())
 	if Game.enable_graphics then
 		self.render = ClientRenderObject()
 	end
 	if Game.enable_prediction then
 		self.prediction = MovementPrediction()
-	end
-	if args then
-		for k,v in pairs(args) do
-			self[k] = v
-		end
 	end
 	return self
 end
@@ -32,7 +42,7 @@ end
 SimulationObject.contact_cb = function(self, result)
 	if not self.contact_args then
 		self.contact_args = nil
-		self.contact_events = false
+		self:set_contact_events(false)
 		return
 	end
 	if result.object == self.contact_args.owner then return end
@@ -47,7 +57,7 @@ SimulationObject.contact_cb = function(self, result)
 	self.contact_args.feat:apply_impulse(args)
 	self.contact_args.feat:apply(args)
 	self.contact_args = nil
-	self.contact_events = false
+	self:set_contact_events(false)
 	self:detach()
 	return true
 end
@@ -80,13 +90,13 @@ SimulationObject.animate = function(self, name, force_temporary)
 			if not self.animations then self.animations = {} end
 			local prev = self.animations[anim.channel]
 			if prev and prev[1] == name then return end
-			self.animations[anim.channel] = {name, Program.time}
+			self.animations[anim.channel] = {name, Program:get_time()}
 		else
 			self.animations[anim.channel] = nil
 		end
 	end
 	-- Emit a vision event.
-	Vision:event{type = "object-animated", animation = name, object = self, variant = math.random(0, 255)}
+	Server:object_event(self, "object-animated", {animation = name, variant = math.random(0, 255)})
 	return true
 end
 
@@ -97,7 +107,7 @@ end
 SimulationObject.can_reach_object = function(self, object)
 	-- Check for reachability of inventory items.
 	if object.parent then
-		local parent = SimulationObject:find{id = object.parent}
+		local parent = Game.objects:find_by_id(object.parent)
 		if not parent then return end
 		if not parent.inventory:is_subscribed(self) then return end
 		return self:can_reach_object(parent)
@@ -105,12 +115,9 @@ SimulationObject.can_reach_object = function(self, object)
 	-- Make sure that the target exists in the world.
 	if not object:get_visible() then return end
 	-- Check the distance from the aim ray center to the bounding box of the target.
-	local center = self.position
-	if self.spec.aim_ray_center then
-		center = center + self.rotation * self.spec.aim_ray_center
-	end
-	local bounds = object.bounding_box
-	local diff = object.rotation.conjugate * (center - object.position)
+	local center = self:transform_local_to_global(self.spec.aim_ray_center)
+	local bounds = object:get_bounding_box()
+	local diff = object:get_rotation().conjugate * (center - object:get_position())
 	local dist = bounds:get_distance_to_point(diff)
 	return dist <= 5
 end
@@ -138,7 +145,7 @@ SimulationObject.detach = function(self)
 	-- Detach from inventories.
 	if self:has_server_data() then
 		if self.parent then
-			local parent = Object:find{id = self.parent}
+			local parent = Game.objects:find_by_id(self.parent)
 			if parent then
 				parent.inventory:remove_object(self)
 			end
@@ -159,9 +166,8 @@ SimulationObject.die = function(self)
 end
 
 SimulationObject.effect = function(self, args)
-	if args.effect then
-		Vision:event{type = "object-effect", object = self, effect = args.effect}
-	end
+	if not args.effect then return end
+	Server:object_event(self, "object-effect", {effect = args.effect})
 end
 
 --- Finds an open inventory.
@@ -169,7 +175,7 @@ end
 -- @param id Inventory ID.
 -- @return Inventory or nil.
 SimulationObject.find_open_inventory = function(self, id)
-	local obj = SimulationObject:find{id = id}
+	local obj = Game.objects:find_by_id(id)
 	if not obj then return end
 	if not object.inv:is_subscribed(self) then return end
 	return object.inv
@@ -182,9 +188,9 @@ end
 -- @return Object or nil.
 SimulationObject.find_target = function(self, where, what)
 	if where == 0 then
-		return SimulationObject:find{id = what, point = self.position, radius = 5}
+		return Game.objects:find_by_id_and_point(what, self:get_position(), 5)
 	else
-		local obj = SimulationObject:find{id = where}
+		local obj = Game.objects:find_by_id(id)
 		if not obj then return end
 		if obj.inventory:is_subscribed(self) then
 			return obj.inventory:get_object_by_index(what)
@@ -210,7 +216,7 @@ SimulationObject.fire = function(self, args)
 	-- Enable collision callback.
 	if args.collision then
 		self.contact_args = args
-		self.contact_events = true
+		self:set_contact_events(true)
 	end
 	-- Enable destruction timer.
 	if args.timer then
@@ -231,11 +237,11 @@ SimulationObject.fire = function(self, args)
 	self.owner = args.owner
 	self:set_position(src)
 	if args.owner.tilt then
-		self.rotation = args.owner.rotation * args.owner.tilt
+		self:set_rotation(args.owner:get_rotation() * args.owner.tilt)
 	else
-		self.rotation = args.owner.rotation
+		self:set_rotation(args.owner:get_rotation())
 	end
-	self.velocity = (dst - src):normalize() * (args.speed or 20)
+	self:set_velocity(dst:copy():subtract(src):normalize():multiply(args.speed or 20))
 	self:set_visible(true)
 end
 
@@ -297,29 +303,6 @@ SimulationObject.get_equip_value = function(self, user)
 	end
 end
 
---- Gets a free object ID.
--- @param clss Object class.
--- @return Free object ID.
-SimulationObject.get_free_id = function(clss)
-	if Server.initialized then
-		while true do
-			local id = math.random(0x0000001, 0x0FFFFFF)
-			if not SimulationObject:find{id = id} then
-				if not Server.object_database:does_object_exist(id) then
-					return id
-				end
-			end
-		end
-	else
-		while true do
-			local id = math.random(0x1000000, 0x7FFFFFF)
-			if not SimulationObject:find{id = id} then
-				return id
-			end
-		end
-	end
-end
-
 --- Gets the spell effects known by the object.
 -- @param self Object.
 -- @return List of strings.
@@ -339,7 +322,7 @@ end
 -- @return String.
 SimulationObject.get_name_with_count = function(self)
 	local name = self.name or "unnamed object"
-	local count = self.count
+	local count = self:get_count()
 	if count > 1 then
 		name = "" .. count .. "x " .. name
 	end
@@ -352,7 +335,7 @@ end
 SimulationObject.get_tile_range = function(self)
 	-- TODO: Should depend on actor spec.
 	local size = Vector(1,self.spec.type == "actor" and 2 or 1,1)
-	local src = self.position * Voxel.tile_scale
+	local src = self:get_position() * Voxel.tile_scale
 	src.x = math.floor(src.x)
 	src.y = math.floor(src.y + 0.3)
 	src.z = math.floor(src.z)
@@ -402,7 +385,7 @@ SimulationObject.loot = function(self, user)
 		self.inventory:subscribe(user, function(args) user:handle_inventory_event(args) end)
 		self:animate("loot")
 		self.looted = true
-		Game.messaging:server_event("inventory show", user.client, self.id)
+		Game.messaging:server_event("inventory show", user.client, self:get_id())
 	end
 end
 
@@ -412,7 +395,7 @@ end
 -- @return True if merged successfully.
 SimulationObject.merge = function(self, object)
 	if self.spec == object.spec and self.spec.stacking then
-		self.count = self.count + object.count
+		self:set_count(self:get_count() + object:get_count())
 		object:detach()
 		return true
 	end
@@ -426,9 +409,8 @@ end
 -- @param self Speaking object.
 -- @param msg Message to send.
 SimulationObject.say = function(self, msg)
-	if msg then
-		Vision:event{type = "object-speech", object = self, message = msg}
-	end
+	if not msg then return end
+	Server:object_event(self, "object-speech", {message = msg})
 end
 
 --- Sends a message to the client controlling the object.
@@ -460,8 +442,9 @@ end
 -- @param count: Count to subtract.
 SimulationObject.subtract = function(self, count)
 	local c = count or 1
-	if self.count > c then
-		self.count = self.count - c
+	local old = self:get_count()
+	if old > c then
+		self:set_count(old - c)
 	else
 		self:detach()
 		self:purge()
@@ -484,11 +467,11 @@ SimulationObject.teleport = function(self, args)
 	elseif args.region then
 		local reg = Patternspec:find{name = args.region}
 		if not reg then return end
-		self:set_position(reg.spawn_point_world)
+		self:set_position(reg:get_spawn_point_world())
 	elseif args.position then
 		self:set_position(args.position)
 	else return end
-	self.velocity = Vector()
+	self:set_velocity(Vector())
 	self:set_visible(true)
 	return true
 end
@@ -516,13 +499,6 @@ SimulationObject.update = function(self, secs)
 		if self:has_server_data() then
 			self.render:set_position(self:get_position())
 			self.render:set_rotation(self:get_rotation())
-		end
-		-- Maintain activity.
-		local v = Object.dict_active[self]
-		if v and self.spec and self.spec.type ~= "actor" then
-			v = v - secs
-			if v <= 0 then v = nil end
-			self:activate(v)
 		end
 	end
 end
@@ -563,12 +539,33 @@ end
 -- @param self Object.
 -- @param db Database.
 SimulationObject.read_db = function(self, db)
+	Server.object_database:load_fields(self)
 end
 
 --- Writes the object to a database.
 -- @param self Object.
 -- @param db Database.
 SimulationObject.write_db = function(self, db)
+	-- Write the object data.
+	local id = self:get_id()
+	db:query([[REPLACE INTO object_data (id,type,spec,dead) VALUES (?,?,?,?);]],
+		{id, self:get_storage_type(), self.spec.name, self.dead and 1 or 0})
+	-- Write the serializer fields.
+	db:query([[DELETE FROM object_fields WHERE id=?;]], {id})
+	self.serializer:write(self, function(name, value)
+		db:query([[REPLACE INTO object_fields (id,name,value) VALUES (?,?,?);]], {id, name, value})
+	end)
+	-- Write the sector information.
+	local sector = self:get_storage_sector()
+	if sector then
+		if self.spec.important then
+			db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {id, sector, nil})
+		else
+			db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {id, sector, 0})
+		end
+	else
+		db:query([[DELETE FROM object_sectors where id=?;]], {id})
+	end
 end
 
 --- Sets the dialog state of the object.
@@ -603,6 +600,13 @@ SimulationObject.update_sound = function(self, secs)
 	assert(self:has_client_data())
 end
 
+--- Gets the stack count of the object.
+-- @param self Object.
+-- @return Count.
+SimulationObject.get_count = function(self)
+	return 1
+end
+
 --- Gets the bounding box of the object.
 -- @param self Object.
 -- @return Bounding box.
@@ -627,7 +631,7 @@ end
 SimulationObject.set_model_name = function(self, v)
 	self.model_name = v
 	if self:get_visible() then
-		local model = v and Model:find_or_load(v)
+		local model = v and Main.models:find_by_name(v)
 		self:set_model(model)
 	end
 end
@@ -660,7 +664,7 @@ SimulationObject.set_visible = function(self, v)
 	-- Ensure that visible objects have their models loaded.
 	if v and not self:get_model() then
 		local name = self:get_model_name()
-		if name then self:set_model(Model:find_or_load(name)) end
+		if name then self:set_model(Main.models:find_by_name(name)) end
 	end
 end
 
@@ -680,7 +684,7 @@ end
 -- @param self Object.
 -- @return Spec.
 SimulationObject.get_spec = function(self)
-	return rawget(self, "__spec") or objspec
+	return rawget(self, "__spec")
 end
 
 --- Sets the spec of the object.
@@ -688,39 +692,7 @@ end
 -- @param value Spec.
 SimulationObject.set_spec = function(self, value)
 	rawset(self, "__spec", value)
+	self.spec = value
 end
 
-SimulationObject:add_getters{
-	admin = function(s)
-		local a = rawget(s, "account")
-		return a and Server.config.admins[a.login]
-	end,
-	count = function(s)
-		return rawget(s, "__count") or 1
-	end,
-	spec = function(self)
-		return self:get_spec()
-	end}
-
-SimulationObject:add_setters{
-	admin = function(s, v)
-		Server.config.admins[s] = v and true or nil
-		Server.config:save()
-	end,
-	count = function(s, v)
-		-- Store the new count.
-		if s.count == v then return end
-		rawset(s, "__count", v ~= 0 and v or nil)
-		-- Update the inventory containing the object.
-		if s.parent then
-			local parent = SimulationObject:find{id = s.parent}
-			if parent then
-				parent.inventory:update_object(s)
-			else
-				s.parent = nil
-			end
-		end
-	end,
-	spec = function(self, v)
-		self:set_spec(v)
-	end}
+return SimulationObject

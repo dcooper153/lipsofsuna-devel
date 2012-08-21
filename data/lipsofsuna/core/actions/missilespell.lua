@@ -1,3 +1,6 @@
+local Coroutine = require("system/coroutine")
+local MissileSpell = require("core/objects/missilespell")
+
 Actionspec{name = "missile spell", func = function(feat, info, args)
 	Coroutine(function(t)
 		Coroutine:sleep(args.user.spec.timing_spell_ranged * 0.02)

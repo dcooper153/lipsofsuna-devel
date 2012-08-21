@@ -1,6 +1,8 @@
-require(Mod.path .. "spec")
+local Class = require("system/class")
+local Color = require("common/color")
+local Spec = require(Mod.path .. "spec")
 
-Actorspec = Class(Spec)
+Actorspec = Class("Actorspec", Spec)
 Actorspec.type = "actor"
 Actorspec.dict_id = {}
 Actorspec.dict_cat = {}

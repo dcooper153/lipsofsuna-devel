@@ -1,5 +1,7 @@
-Generator.sector_types.Border = Class()
-Generator.sector_types.Border.class_name = "Generator.Border"
+local Class = require("system/class")
+local Material = require("system/material")
+
+Generator.sector_types.Border = Class("Generator.Border")
 
 Generator.sector_types.Border.init = function(self)
 	self.mats = {
@@ -11,5 +13,5 @@ end
 -- @param pos Offset of the generated area.
 -- @param size Size of the generated area.
 Generator.sector_types.Border.generate = function(self, pos, size)
-	Voxel:fill_region{point = pos, size = size, tile = self.mats[1].id}
+	Voxel:fill_region{point = pos, size = size, tile = self.mats[1]:get_id()}
 end

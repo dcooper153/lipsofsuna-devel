@@ -1,7 +1,7 @@
-require(Mod.path .. "simulation")
+local Class = require("system/class")
+local SimulationObject = require("core/objects/simulation")
 
-Spell = Class(SimulationObject)
-Spell.class_name = "Spell"
+local Spell = Class("Spell", SimulationObject)
 Spell.dict_id = setmetatable({}, {__mode = "kv"})
 
 --- Creates a new spell.
@@ -17,15 +17,15 @@ Spell.dict_id = setmetatable({}, {__mode = "kv"})
 -- @return Spell.
 Spell.new = function(clss, args)
 	local self = SimulationObject.new(clss)
-	self.dict_id[self.id] = self
+	self.dict_id[self:get_id()] = self
 	self.effect = args.effect
 	self.feat = args.feat
 	self.owner = args.owner
 	self.power = args.power
-	self.spec = args.spec
-	self.gravity = Vector()
+	self:set_spec(args.spec)
+	self:set_gravity(Vector())
 	self:set_model_name(args.spec.model)
-	self.physics = "rigid"
+	self:set_physics("rigid")
 	return self
 end
 
@@ -74,8 +74,8 @@ Spell.fire = function(self, args)
 	a.feat = self.feat
 	a.owner = self.owner
 	local ret = SimulationObject.fire(self, a)
-	self.orig_rotation = self.rotation
-	self.orig_velocity = self.velocity
+	self.orig_rotation = self:get_rotation():copy()
+	self.orig_velocity = self:get_velocity():copy()
 	return ret
 end
 
@@ -83,9 +83,14 @@ Spell.update = function(self, secs)
 	if not self:get_visible() then return end
 	if self:has_server_data() then
 		-- Prevent impacts from altering movement.
-		self.rotation = self.orig_rotation
-		self.velocity = self.orig_velocity
+		self:set_rotation(self.orig_rotation)
+		self:set_velocity(self.orig_velocity)
 	end
 	-- Update the base class.
 	SimulationObject.update(self, secs)
 end
+
+Spell.write_db = function(self)
+end
+
+return Spell

@@ -1,7 +1,8 @@
-require(Mod.path .. "camper")
+local Class = require("system/class")
+local CamperAi = require(Mod.path .. "camper")
 
-AnchoredAi = Class(CamperAi)
-Ai.dict_name["anchored"] = AnchoredAi
+local AnchoredAi = Class("AnchoredAi", CamperAi)
+AnchoredAi.type = "anchored"
 
 --- Creates a new anchored AI.
 -- @param clss CamperAi class.
@@ -21,3 +22,5 @@ AnchoredAi.choose_wander_target = function(self)
 		self:avoid_wander_obstacles(home)
 	end
 end
+
+return AnchoredAi

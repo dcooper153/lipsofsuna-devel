@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Aistatespec = Class(Spec)
+Aistatespec = Class("Aistatespec", Spec)
 Aistatespec.type = "aistate"
 Aistatespec.dict_id = {}
 Aistatespec.dict_cat = {}

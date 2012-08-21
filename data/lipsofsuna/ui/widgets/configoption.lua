@@ -1,11 +1,11 @@
+local Class = require("system/class")
 require(Mod.path .. "entry")
 require(Mod.path .. "scrollfloat")
 require(Mod.path .. "scrollinteger")
 require(Mod.path .. "toggle")
 require(Mod.path .. "widget")
 
-Widgets.Uiconfigoption = Class(Widgets.Uiwidget)
-Widgets.Uiconfigoption.class_name = "Widgets.Uiconfigoption"
+Widgets.Uiconfigoption = Class("Uiconfigoption", Widgets.Uiwidget)
 
 Widgets.Uiconfigoption.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
@@ -25,8 +25,7 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionbool = Class(Widgets.Uitoggle)
-Widgets.Uiconfigoptionbool.class_name = "Widgets.Uiconfigoption"
+Widgets.Uiconfigoptionbool = Class("Uiconfigoptionbool", Widgets.Uitoggle)
 
 Widgets.Uiconfigoptionbool.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
@@ -49,8 +48,7 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionfloat = Class(Widgets.Uiscrollfloat)
-Widgets.Uiconfigoptionfloat.class_name = "Widgets.Uiconfigoption"
+Widgets.Uiconfigoptionfloat = Class("Uiconfigoptionfloat", Widgets.Uiscrollfloat)
 
 Widgets.Uiconfigoptionfloat.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
@@ -72,8 +70,7 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionint = Class(Widgets.Uiscrollinteger)
-Widgets.Uiconfigoptionint.class_name = "Widgets.Uiconfigoption"
+Widgets.Uiconfigoptionint = Class("Uiconfigoptionint", Widgets.Uiscrollinteger)
 
 Widgets.Uiconfigoptionint.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
@@ -95,8 +92,7 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionpow = Class(Widgets.Uiscrollinteger)
-Widgets.Uiconfigoptionpow.class_name = "Widgets.Uiconfigoption"
+Widgets.Uiconfigoptionpow = Class("Uiconfigoptionpow", Widgets.Uiscrollinteger)
 
 Widgets.Uiconfigoptionpow.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
@@ -123,8 +119,7 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionstring = Class(Widgets.Uientry)
-Widgets.Uiconfigoptionstring.class_name = "Widgets.Uiconfigoption"
+Widgets.Uiconfigoptionstring = Class("Uiconfigoptionstring", Widgets.Uientry)
 
 Widgets.Uiconfigoptionstring.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]

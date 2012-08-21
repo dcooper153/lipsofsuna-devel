@@ -1,7 +1,10 @@
-require(Mod.path .. "simulation")
+local Actor = require("core/objects/actor")
+local Class = require("system/class")
+local Packet = require("system/packet")
+local Sector = require("system/sector")
+local Vision = require("system/vision")
 
-Player = Class(Actor)
-Player.class_name = "Player"
+local Player = Class("Player", Actor)
 
 --- Creates a new player object.
 -- @param clss Player class.
@@ -82,7 +85,13 @@ end
 
 Player.set_client = function(self, client)
 	self.client = client
-	self.vision = Vision{cone_factor = 0.5, cone_angle = math.pi/2.5, enabled = true, id = self.id, object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
+	self.vision = Vision(self:get_id(), Game.objects)
+	self.vision:set_cone_factor(0.5)
+	self.vision:set_cone_angle(math.pi/2.5)
+	self.vision:set_enabled(true)
+	self.vision.object = self
+	self.vision:set_radius(10)
+	self.vision.callback = function(args) self:vision_cb(args) end
 	self.vision.terrain = {}
 	self:update_vision_radius()
 	self.vision:update()
@@ -101,7 +110,7 @@ end
 Player.disable = function(self, keep)
 	if not Server.initialized then return end
 	if self.vision then
-		self.vision.enabled = false
+		self.vision:set_enabled(false)
 	end
 	if not keep and self.client then
 		Game.messaging:server_event("start character creation", self.client)
@@ -120,7 +129,7 @@ end
 -- @param self Object.
 -- @return Dictionary of booleans.
 Player.get_known_spell_effects = function(self)
-	return Unlocks.unlocks["spell effect"] or {}
+	return Server.unlocks.unlocks["spell effect"] or {}
 end
 
 --- Gets the spell types known by the object.
@@ -129,7 +138,7 @@ end
 Player.get_known_spell_types = function(self)
 	local ret = {}
 	local base = Actor.get_known_spell_types(self)
-	local unlock = Unlocks.unlocks["spell type"]
+	local unlock = Server.unlocks.unlocks["spell type"]
 	for k in pairs(base) do ret[k] = true end
 	if unlock then
 		for k in pairs(unlock) do ret[k] = true end
@@ -167,7 +176,7 @@ Player.handle_inventory_event = function(self, args)
 			if args.object then
 				local name = args.object.spec.name
 				local slot = args.inventory:get_slot_by_index(args.index)
-				Game.messaging:server_event("add inventory item", self.client, id, args.index, name, args.object.count)
+				Game.messaging:server_event("add inventory item", self.client, id, args.index, name, args.object:get_count())
 				if slot then
 					Game.messaging:server_event("equip inventory item", self.client, id, args.index, slot)
 				end
@@ -182,11 +191,11 @@ Player.handle_inventory_event = function(self, args)
 			Game.messaging:server_event("unequip inventory item", self.client, id, args.index)
 		end,
 		["inventory-subscribed"] = function()
-			local owner = SimulationObject:find{id = id}
+			local owner = Game.objects:find_by_id(id)
 			local spec = owner.spec
 			if not self.inventory_subscriptions then self.inventory_subscriptions = {} end
 			self.inventory_subscriptions[id] = args.inventory
-			Game.messaging:server_event("create inventory", self.client, id, spec.type, spec.name, args.inventory.size, (id == self.id))
+			Game.messaging:server_event("create inventory", self.client, id, spec.type, spec.name, args.inventory.size, (id == self:get_id()))
 		end,
 		["inventory-unsubscribed"] = function()
 			if not self.inventory_subscriptions then return end
@@ -228,7 +237,7 @@ Player.set_spawn_point = function(self, name)
 	else
 		local r = Patternspec:find{name = spawnpoint}
 		if r and not r.spawn_point then r = nil end
-		if r then home = r.spawn_point_world end
+		if r then home = r:get_spawn_point_world() end
 	end
 	-- Use the default if not found.
 	if not home then
@@ -249,7 +258,7 @@ Player.update = function(self, secs)
 			-- Check for bugged characters just in case.
 			if not self:get_visible() or not self.vision then return self:detach() end
 			-- Prevent sectors from unloading if a player is present.
-			self:refresh{radius = self.vision.radius}
+			self:refresh{radius = self.vision:get_radius()}
 		end
 		-- Update vision.
 		if self.vision then
@@ -276,7 +285,7 @@ end
 Player.update_map = function(self)
 	-- Discover map markers.
 	for k,v in pairs(Marker.dict_discoverable) do
-		if (self.position - v.position).length < 3 * self.vision.radius then
+		if (self:get_position() - v.position).length < 3 * self.vision:get_radius() then
 			v:unlock()
 		end
 	end
@@ -290,7 +299,7 @@ Player.update_inventory_subscriptions = function(self)
 		self.inventory:subscribe(self, function(args) self:handle_inventory_event(args) end)
 	end
 	for id,inv in pairs(self.inventory_subscriptions) do
-		local object = SimulationObject:find{id = id}
+		local object = Game.objects:find_by_id(id)
 		if not object or not self:can_reach_object(object) then
 			inv:unsubscribe(self)
 		end
@@ -311,8 +320,8 @@ end
 -- update it here.
 -- @param self Object.
 Player.update_vision_radius = function(self)
-	self.vision.direction = self.rotation * Vector(0,0,-1)
-	self.vision.position = self.position
+	self.vision:set_direction(self:get_rotation() * Vector(0,0,-1))
+	self.vision:set_position(self:get_position())
 end
 
 Player.vision_cb = function(self, args)
@@ -321,58 +330,57 @@ Player.vision_cb = function(self, args)
 	{
 		["object-animated"] = function(args)
 			local o = args.object
-			if o.static then return end
-			Game.messaging:server_event("object animated", self.client, o.id, args.animation or "", args.time or 0.0, args.variant)
+			if o:get_static() then return end
+			Game.messaging:server_event("object animated", self.client, o:get_id(), args.animation or "", args.time or 0.0, args.variant)
 		end,
 		["object attack"] = function(args)
 			local o = args.object
-			Game.messaging:server_event("object attack", self.client, o.id, args.move, args.variant)
+			Game.messaging:server_event("object attack", self.client, o:get_id(), args.move, args.variant)
 		end,
 		["object-beheaded"] = function(args)
 			local o = args.object
-			if o.static then return end
-			Game.messaging:server_event("object beheaded", self.client, o.id)
+			if o:get_static() then return end
+			Game.messaging:server_event("object beheaded", self.client, o:get_id())
 		end,
 		["object-dead"] = function(args)
 			local o = args.object
-			if o.static then return end
-			Game.messaging:server_event("object dead", self.client, o.id, args.dead)
+			if o:get_static() then return end
+			Game.messaging:server_event("object dead", self.client, o:get_id(), args.dead)
 		end,
 		["object-dialog"] = function(args)
 			local o = args.object
 			local mine = (o.dialog and o.dialog.user == self or false)
 			if args.choices then
-				Game.messaging:server_event("object dialog choice", self.client, o.id, mine, args.choices)
+				Game.messaging:server_event("object dialog choice", self.client, o:get_id(), mine, args.choices)
 			elseif args.message then
-				Game.messaging:server_event("object dialog say", self.client, o.id, mine, args.character or "", args.message)
+				Game.messaging:server_event("object dialog say", self.client, o:get_id(), mine, args.character or "", args.message)
 			else
-				Game.messaging:server_event("object dialog none", self.client, o.id)
+				Game.messaging:server_event("object dialog none", self.client, o:get_id())
 			end
 		end,
 		["object-effect"] = function(args)
 			local o = args.object
-			Game.messaging:server_event("object effect", self.client, o.id, args.effect)
+			Game.messaging:server_event("object effect", self.client, o:get_id(), args.effect)
 		end,
 		["object-feat"] = function(args)
 			local o = args.object
-			if o.static then return end
-			Game.messaging:server_event("object feat", self.client, o.id, args.anim.name, args.move or 0)
+			if o:get_static() then return end
+			Game.messaging:server_event("object feat", self.client, o:get_id(), args.anim.name, args.move or 0)
 		end,
 		["object-hidden"] = function(args)
 			local o = args.object
-			if o.static then return end
-			Game.messaging:server_event("object hidden", self.client, o.id)
+			if o:get_static() then return end
+			Game.messaging:server_event("object hidden", self.client, o:get_id())
 		end,
 		["object-moved"] = function(args)
 			local o = args.object
-			if o.static then return end
-			Game.messaging:server_event("object moved", self.client, o.id, o:get_position(), o:get_rotation(), o:get_tilt_angle(), o.velocity)
+			if o:get_static() then return end
+			Game.messaging:server_event("object moved", self.client, o:get_id(), o:get_position(), o:get_rotation(), o:get_tilt_angle(), o:get_velocity())
 		end,
 		["object-shown"] = function(args)
 			-- Don't send static objects.
 			local o = args.object
-			if o.static then return end
-			if o.spec.name == "static" then return end
+			if o:get_static() then return end
 			-- Notify the client.
 			Game.messaging:server_event("object shown", self.client, o == self, o)
 			-- Wake up the AI.
@@ -383,7 +391,7 @@ Player.vision_cb = function(self, args)
 		end,
 		["object-speech"] = function(args)
 			local o = args.object
-			Game.messaging:server_event("object speech", self.client, o.id, args.message)
+			Game.messaging:server_event("object speech", self.client, o:get_id(), args.message)
 		end,
 		["stat changed"] = function(args)
 			local o = args.object
@@ -392,24 +400,24 @@ Player.vision_cb = function(self, args)
 			local v = s:get_skill(args.name)
 			if not v then return end
 			if v.prot == "public" or self == o then
-				Game.messaging:server_event("object stat", self.client, o.id, args.name, args.value, args.maximum, math.ceil(args.value - args.value_prev + 0.5))
+				Game.messaging:server_event("object stat", self.client, o:get_id(), args.name, args.value, args.maximum, math.ceil(args.value - args.value_prev + 0.5))
 			end
 		end,
 		["object-equip"] = function(args)
 			-- If the player is subscribed to the inventory of the object, the
 			-- equip message is already sent by the inventory listener.
-			local id = args.object.id
+			local id = args.object:get_id()
 			if args.object.inventory:is_subscribed(self) then return end
 			-- The contents of the inventory slot must be revealed to the client
 			-- since it would otherwise have no information on the equipped item.
-			Game.messaging:server_event("add inventory item", self.client, id, args.index, args.item.spec.name, args.item.count)
+			Game.messaging:server_event("add inventory item", self.client, id, args.index, args.item.spec.name, args.item:get_count())
 			-- Send the equip message.
 			Game.messaging:server_event("equip inventory item", self.client, id, args.index, args.slot)
 		end,
 		["object-unequip"] = function(args)
 			-- If the player is subscribed to the inventory of the object, the
 			-- unequip message is already sent by the inventory listener.
-			local id = args.object.id
+			local id = args.object:get_id()
 			if args.object.inventory:is_subscribed(self) then return end
 			-- Send the unequip message.
 			Game.messaging:server_event("unequip inventory item", self.client, id, args.index)
@@ -434,57 +442,37 @@ Player.vision_cb = function(self, args)
 end
 
 --- Writes the object to a database.
---
--- Player objects are not added to sectors unless they are corpses. Apart from
--- that and the account information being written, they behave similar to
--- ordinary actors.
---
 -- @param self Object.
 -- @param db Database.
 Player.write_db = function(self, db)
-	-- Write the object.
-	local data = serialize{
-		angular = self.angular,
-		animation_profile = self.animation_profile,
-		body_scale = self.body_scale,
-		body_style = self.body_style,
-		eye_color = self.eye_color,
-		eye_style = self.eye_style,
-		face_style = self.face_style,
-		hair_color = self.hair_color,
-		hair_style = self.hair_style,
-		head_style = self.head_style,
-		name = self.name,
-		physics = self.dead and "rigid" or "kinematic",
-		position = self.position,
-		rotation = self.rotation,
-		skin_color = self.skin_color,
-		skin_style = self.skin_style}
-	db:query([[REPLACE INTO object_data (id,type,spec,dead,data) VALUES (?,?,?,?,?);]],
-		{self.id, "player", self.spec.name, self.dead and 1 or 0, data})
-	-- Write the sector.
-	if self.sector and not self.client then
-		db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {self.id, self.sector, 0})
-	else
-		db:query([[DELETE FROM object_sectors where id=?;]], {self.id})
-	end
-	-- Write the inventory contents.
-	db:query([[DELETE FROM object_inventory WHERE parent=?;]], {self.id})
-	for index,object in pairs(self.inventory.stored) do
-		object:write_db(db, index)
-	end
-	-- Write skills.
-	db:query([[DELETE FROM object_skills WHERE id=?;]], {self.id})
-	for name,value in pairs(self.skills.skills) do
-		db:query([[REPLACE INTO object_skills (id,name) VALUES (?,?);]], {self.id, name})
-	end
-	-- Write stats.
-	db:query([[DELETE FROM object_stats WHERE id=?;]], {self.id})
-	for name,args in pairs(self.stats.stats) do
-		db:query([[REPLACE INTO object_stats (id,name,value) VALUES (?,?,?);]], {self.id, name, args.value})
-	end
+	-- Write the object data.
+	Actor.write_db(self, db)
 	-- Write account information.
 	if self.client and self.account then
 		Server.account_database:save_account(self.account, self)
 	end
 end
+
+Player.get_admin = function(self)
+	local account = rawget(self, "account")
+	if not account then return end
+	return Server.config.admins[account.login]
+end
+
+Player.set_admin = function(self, v)
+	local account = rawget(self, "account")
+	if not account then return end
+	Server.config.admins[account.login] = v and true or nil
+	Server.config:save()
+end
+
+Player.get_storage_sector = function(self)
+	if self.client then return end
+	return self:get_sector()
+end
+
+Player.get_storage_type = function(self)
+	return "player"
+end
+
+return Player

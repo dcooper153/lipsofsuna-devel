@@ -10,7 +10,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, id)
 		-- Get the object.
-		local object = Object:find{id = id}
+		local object = Game.objects:find_by_id(id)
 		if not object then return end
 		-- Remove the head.
 		object.render:set_beheaded(true)

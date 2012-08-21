@@ -1,6 +1,7 @@
-require "system/class"
+local Class = require("system/class")
+local Vector = require("system/math/vector")
 
-Sector = Class()
+local Sector = Class("Sector")
 
 Sector.get_block_offset_by_block_id = function(self, id)
 	local bpl = Voxel.blocks_per_line * 128

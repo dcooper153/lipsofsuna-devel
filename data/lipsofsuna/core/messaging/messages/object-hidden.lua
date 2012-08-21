@@ -10,10 +10,10 @@ Message{
 	end,
 	server_to_client_handle = function(self, id)
 		-- Get the object.
-		local obj = Object:find{id = id}
+		local obj = Game.objects:find_by_id(id)
 		if not obj then return end
 		-- Hide the object.
-		if obj.static then return end
+		if obj:get_static() then return end
 		if obj.render then
 			obj.render:clear()
 		end

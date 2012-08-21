@@ -1,4 +1,7 @@
-Crafting = Class()
+local Class = require("system/class")
+local Item = require("core/objects/item")
+
+Crafting = Class("Crafting")
 
 --- Checks if a specific item can be crafted by the user.
 -- @param clss Crafting class.

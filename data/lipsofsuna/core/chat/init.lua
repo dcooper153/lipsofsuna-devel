@@ -1,5 +1,6 @@
-ChatCommand = Class()
-ChatCommand.class_name = "ChatCommand"
+local Class = require("system/class")
+
+ChatCommand = Class("ChatCommand")
 ChatCommand.dict_id = {}
 
 --- Registers a new chat command.
@@ -10,7 +11,8 @@ ChatCommand.dict_id = {}
 --   <li>permission: Permission level.</ul>
 -- @return New chat command.
 ChatCommand.new = function(clss, args)
-	local self = Class.new(clss, args)
+	local self = Class.new(clss)
+	for k,v in pairs(args) do self[k] = v end
 	self.id = #clss.dict_id + 1
 	clss.dict_id[self.id] = self
 	return self

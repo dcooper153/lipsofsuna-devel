@@ -1,4 +1,5 @@
-require "system/class"
+local Class = require("system/class")
+local Vector = require("system/math/vector")
 
 if not Los.program_load_extension("input") then
 	error("loading extension `input' failed")
@@ -6,22 +7,34 @@ end
 
 ------------------------------------------------------------------------------
 
---- Toggles pointer grabbing.
--- @name Program.cursor_grabbed
--- @class table
+local Input = Class("Input")
 
---- The current cursor position.
--- @name Program.cursor_position
--- @class table
+--- Gets the mouse button state mask.
+-- @param self Input class.
+-- @return Number.
+Input.get_mouse_button_state = function(self)
+	return Los.input_get_mouse_button_state()
+end
 
---- The mouse button mask.
--- @name Program.mouse_button_state
--- @class table
+--- Gets the pointer grabbing state.
+-- @param self Input class.
+-- @return True if grabbed, false if not.
+Input.get_pointer_grab = function(self)
+	return Los.input_get_pointer_grab()
+end
 
-Program:add_class_getters{
-	cursor_grabbed = function(s) return Los.input_get_pointer_grab() end,
-	cursor_position = function(s) return Class.new(Vector, {handle = Los.input_get_cursor_pos()}) end,
-	mouse_button_state = function(s) return Los.input_get_mouse_button_state() end}
+--- Enables or disables pointer grabbing.
+-- @param self Input class.
+-- @param v True to grab, false to ungrab.
+Input.set_pointer_grab = function(self, v)
+	Los.input_set_pointer_grab(v)
+end
 
-Program:add_class_setters{
-	cursor_grabbed = function(s, v) Los.input_set_pointer_grab(v) end}
+--- Gets the current cursor position.
+-- @param self Input class.
+-- @return Vector.
+Input.get_pointer_position = function(self)
+	return Vector:new_from_handle(Los.input_get_cursor_pos())
+end
+
+return Input

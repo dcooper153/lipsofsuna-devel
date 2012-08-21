@@ -1,4 +1,4 @@
-Messaging{
+Message{
 	name = "create marker",
 	server_to_client_encode = function(self, name, point)
 		return {"string", name, "float", point.x, "float", point.y, "float", point.z}

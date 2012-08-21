@@ -1,7 +1,8 @@
 local Class = require("system/class")
 local EffectObject = require(Mod.path .. "effect-object")
+local SoundSource = require("system/sound-source")
 
-local SoundEffect = Class(EffectObject)
+local SoundEffect = Class("SoundEffect", EffectObject)
 
 --- Creates a new effect.
 -- @param clss EffectObject class.

@@ -1,8 +1,7 @@
 if not Settings then return end
 if Settings.server then return end
 
-require "common/skills"
-require "common/unlocks"
+local File = require("system/file")
 
 require "editor/editor"
 File:require_directory("client/widgets")

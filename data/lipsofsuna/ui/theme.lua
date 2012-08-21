@@ -1,4 +1,6 @@
-Theme = Class()
+local Class = require("system/class")
+
+Theme = Class("Theme")
 Theme.themes = {
 	{
 		help_text_width = 175,
@@ -213,3 +215,5 @@ Theme.set_theme = function(self, index)
 	end
 	return true
 end
+
+return Theme

@@ -1,23 +1,37 @@
-require(Mod.path .. "simulation")
+local Class = require("system/class")
+local ObjectSerializer = require("core/server/object-serializer")
+local SimulationObject = require("core/objects/simulation")
 
-Staticobject = Class(SimulationObject)
-Staticobject.class_name = "Staticobject"
+local Staticobject = Class("Staticobject", SimulationObject)
+Staticobject.serializer = ObjectSerializer{
+	{
+		name = "position",
+		type = "vector",
+		get = function(self) return self:get_position() end,
+		set = function(self, v) self:set_position(v) end
+	},
+	{
+		name = "rotation",
+		type = "quaternion",
+		get = function(self) return self:get_rotation() end,
+		set = function(self, v) self:set_rotation(v) end
+	}
+}
 
 --- Creates an static object.
 -- @param clss Staticobject class.
 -- @param args Arguments.
 -- @return New static object.
 Staticobject.new = function(clss, args)
-	local self = SimulationObject.new(clss, {id = args.id})
-	self.disable_saving = true
-	self.static = true
+	local self = SimulationObject.new(clss, args and args.id)
+	self:set_static(true)
 	if args then
 		if args.position then self:set_position(args.position) end
 		if args.rotation then self:set_rotation(args.rotation) end
 		if args.spec then self:set_spec(args.spec) end
 		if args.realized then self:set_visible(args.realized) end
 	end
-	Game.static_objects_by_id[self.id] = self
+	Game.static_objects_by_id[self:get_id()] = self
 	return self
 end
 
@@ -26,8 +40,8 @@ end
 -- @return New object.
 Staticobject.clone = function(self)
 	return Staticobject{
-		position = self.position,
-		rotation = self.rotation,
+		position = self:get_position(),
+		rotation = self:get_rotation(),
 		spec = self.spec}
 end
 
@@ -45,32 +59,27 @@ end
 Staticobject.die = function(self)
 end
 
---- Writes the obstacle to a database.
--- @param self Object.
--- @param db Database.
-Staticobject.write_db = function(self, db)
-	-- Write the object.
-	local data = serialize{
-		id = self.id,
-		position = self.position,
-		rotation = self.rotation,
-		spec = self.spec.name}
-	db:query([[REPLACE INTO object_data (id,type,spec,dead,data) VALUES (?,?,?,?,?);]],
-		{self.id, "static", self.spec.name, 0, data})
-end
-
 Staticobject.set_spec = function(self, value)
 	local spec = type(value) == "string" and Staticspec:find{name = value} or value
 	if not spec then return end
 	SimulationObject.set_spec(self, spec)
-	self.collision_group = spec.collision_group
-	self.collision_mask = spec.collision_mask
-	self.gravity = spec.gravity
-	self.physics = "static"
+	self:set_collision_group(spec.collision_group)
+	self:set_collision_mask(spec.collision_mask)
+	self:set_gravity(spec.gravity)
+	self:set_physics("static")
 	-- Create the marker.
 	if spec.marker then
-		self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
+		self.marker = Marker{name = spec.marker, position = self:get_position(), target = self:get_id()}
 	end
 	-- Set the model.
 	self:set_model_name(spec.model)
 end
+
+Staticobject.get_storage_type = function(self)
+	return "static"
+end
+
+Staticobject.get_storage_sector = function(self)
+end
+
+return Staticobject

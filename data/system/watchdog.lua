@@ -1,4 +1,4 @@
-require "system/core"
+local Program = require("system/core")
 
 if not Los.program_load_extension("watchdog") then
 	error("loading extension `watchdog' failed")
@@ -16,3 +16,5 @@ end
 Program.watchdog_stop = function(clss)
 	return Los.watchdog_stop()
 end
+
+return Program

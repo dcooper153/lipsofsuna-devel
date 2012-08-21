@@ -1,3 +1,5 @@
+local Network = require("system/network")
+
 Message{
 	name = "login",
 	client_to_server_encode = function(self, login, pass)

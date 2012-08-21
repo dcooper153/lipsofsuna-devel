@@ -1,7 +1,10 @@
-Region = Class()
+local Class = require("system/class")
+
+local Region = Class("Region")
 
 Region.new = function(clss, args)
-	local self = Class.new(clss, args)
+	local self = Class.new(clss)
+	for k,v in pairs(args) do self[k] = v end
 	self.links = {}
 	self.linked_regions = {}
 	return self
@@ -38,3 +41,5 @@ Region.get_link_point = function(self, dst)
 	local pt = ctr + Vector(dir.x * self.size.x, dir.y * self.size.y, dir.z * self.size.z) * 0.5 + Vector(0,3)
 	return pt:floor()
 end
+
+return Region

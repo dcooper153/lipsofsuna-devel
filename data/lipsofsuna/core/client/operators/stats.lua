@@ -1,4 +1,8 @@
-Operators.stats = Class()
+local Class = require("system/class")
+local Database = require("system/database")
+local Render = require("system/render")
+
+Operators.stats = Class("StatsOperator")
 Operators.stats.data = {}
 
 Operators.stats.get_client_stats_text = function(self)
@@ -10,10 +14,10 @@ Operators.stats.update_client_stats = function(self, show_objects)
 	local models = 0
 	for k,v in pairs(__userdata_lookup) do
 		if v.class_name == "Model" then
-			models = models + v.memory_used
+			models = models + v:get_memory_used()
 		end
 	end
-	local stats = Render.stats
+	local stats = Render:get_stats()
 	-- Store the stats into a string.
 	self.data.client_stats = string.format([[
 FPS: %.2f
@@ -32,7 +36,7 @@ Allocated meshes: %d : %dkB
 Allocated skeletons: %d
 Allocated textures: %d/%d : %dkB
 Allocated materials: %d/%d
-]], Program.fps, Database.memory_used / 1024, collectgarbage("count") / 1024, Voxel.memory_used / 1024, models / 1024,
+]], Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024, Voxel:get_memory_used() / 1024, models / 1024,
 1000 * (Program.profiling.update or 0), 1000 * (Program.profiling.event or 0), 1000 * (Program.profiling.render or 0),
 stats.batch_count, stats.face_count, stats.attachment_count, stats.entity_count, stats.mesh_count,
 stats.mesh_memory / 1000, stats.skeleton_count, stats.texture_count_loaded, stats.texture_count,
@@ -52,7 +56,7 @@ stats.texture_memory / 1000, stats.material_count_loaded, stats.material_count)
 		end
 		table.sort(listtype)
 		local numactive = 0
-		for k in pairs(Object.dict_active) do
+		for k in pairs(Game.objects.objects_by_id) do
 			numactive = numactive + 1
 		end
 		local objects = ""

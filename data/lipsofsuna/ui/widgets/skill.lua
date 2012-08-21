@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "widget")
 
-Widgets.Uiskill = Class(Widgets.Uiwidget)
-Widgets.Uiskill.class_name = "Widgets.Uiskill"
+Widgets.Uiskill = Class("Uiskill", Widgets.Uiwidget)
 
 Widgets.Uiskill.new = function(clss, skill, active, value)
 	local self = Widgets.Uiwidget.new(clss)

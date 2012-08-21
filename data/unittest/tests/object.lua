@@ -1,17 +1,24 @@
-Unittest:add(1, "object", function()
-	require "system/object"
+Unittest:add(1, "system", "object", function()
+	local Object = require("system/object")
+	local Physics = require("system/physics")
+	local Model = require("system/model")
+	local Program = require("system/core")
+	local Quaternion = require("system/math/quaternion")
+	local Vector = require("system/math/vector")
 	require "system/object-physics"
-	Physics.enable_simulation = true
+	Physics:set_enable_simulation(true)
 	-- Getters and setters.
 	do
-		local obj = Object{position = Vector(1,2,3), realized = true}
+		local obj = Object()
+		obj:set_position(Vector(1,2,3))
+		obj:set_visible(true)
 		assert(obj:get_position().class == Vector)
 		assert(obj:get_position().x == 1 and obj:get_position().y == 2 and obj:get_position().z == 3)
 		assert(obj:get_rotation().class == Quaternion)
 		assert(obj:get_visible())
-		assert(obj.sector == 0)
+		assert(obj:get_sector() == 0)
 		obj:set_visible(false)
-		assert(obj.sector == nil)
+		assert(obj:get_sector() == nil)
 		collectgarbage()
 	end
 	-- Name field.
@@ -26,7 +33,12 @@ Unittest:add(1, "object", function()
 		collectgarbage()
 	end
 	-- Keeping realized objects.
-	for i = 1,100 do Object{model = Model(), position = Vector(10*i,50,50), realized = true} end
+	for i = 1,100 do
+		local o = Object()
+		o:set_model(Model())
+		o:set_position(Vector(10*i,50,50))
+		o:set_visible(true)
+	end
 	collectgarbage()
 	local num = 0
 	for k,v in pairs(__objects_realized) do num = num + 1 end

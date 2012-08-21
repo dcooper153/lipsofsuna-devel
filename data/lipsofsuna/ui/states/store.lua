@@ -14,7 +14,7 @@ Ui:add_widget{
 			local slot = object.inventory:get_slot_by_index(index)
 			local data = item and {
 				text = item.spec.name,
-				count = item.count or 1,
+				count = item:get_count(),
 				icon = item.spec.icon}
 			table.insert(widgets, Widgets.Uiinvstore(Client.data.inventory.id, data, index, slot))
 		end

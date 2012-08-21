@@ -1,8 +1,12 @@
+local Actor = require("core/objects/actor")
+local Class = require("system/class")
+local Item = require("core/objects/item")
+local Material = require("system/material")
+local Sector = require("system/sector")
+
 -- FIXME: These need to be cleaned up.
 
-Actions = Class()
-
-Utils = Class()
+Utils = Class("Utils")
 
 --- Checks if there's room for the model in the given point in space.
 -- @param clss Utils class.
@@ -11,8 +15,8 @@ Utils = Class()
 -- @return True if there's room for the model.
 Utils.check_room = function(clss, point, model)
 	-- FIXME: Should rather do physics based testings.
-	for k,v in pairs(SimulationObject.objects) do
-		local d = (v.position - point).length
+	for k,v in pairs(Game.objects.objects_by_id) do
+		local d = (v:get_position() - point).length
 		if d < 1.5 then return end
 	end
 	return true
@@ -30,7 +34,7 @@ Utils.find_build_point = function(clss, point, user)
 	-- Return it if the character doesn't intersect with it.
 	-- TODO: Should check for other objects as well.
 	local tile = Aabb{point = p * Voxel.tile_size, size = Vector(1, 1, 1) * Voxel.tile_size}
-	local char = Aabb{point = user.position - Vector(0.5, 0, 0.5), size = Vector(1.5, 2, 1.5)}
+	local char = Aabb{point = user:get_position() - Vector(0.5, 0, 0.5), size = Vector(1.5, 2, 1.5)}
 	if not tile:intersects(char) then return t,p end
 	-- Try to resolve a better position.
 	-- If the player is standing on the tile, look for an empty tile in the
@@ -44,7 +48,7 @@ Utils.find_build_point = function(clss, point, user)
 	else
 		return
 	end
-	local dir = user.rotation * Vector(0,0,-1)
+	local dir = user:get_rotation() * Vector(0,0,-1)
 	if math.abs(dir.x) > math.abs(dir.z) then
 		if dir.x < 0 then
 			p.x = p.x - 1
@@ -239,7 +243,7 @@ Utils.get_player_spawn_point = function(self)
 	local r = Patternspec:find{name = "supplycamp1"}
 	if r and not r.spawn_point then return end
 	if not r then r = Patternspec:find_spawn_points()[1] end
-	if r then return r.spawn_point_world end
+	if r then return r:get_spawn_point_world() end
 end
 
 --- Gets the difficulty of the spawn point.
@@ -304,10 +308,10 @@ Utils.explosion = function(clss, point, radius)
 		end
 	end
 	-- Damage nearby objects.
-	for k1,v1 in pairs(SimulationObject:find{point = point, radius = r2}) do
-		local diff = v1.position - point
+	for k1,v1 in pairs(Game.objects:find_by_point(point, r2)) do
+		local diff = v1:get_position() - point
 		local frac = diff.length / r2
-		local mult = 10 * math.min(100, v1.mass)
+		local mult = 10 * math.min(100, v1:get_mass())
 		local impulse = diff:normalize() * (mult * (1 - 0.3 * frac))
 		v1:impulse{impulse = impulse, point = Vector()}
 		v1:damaged{amount = 40 * (1 - frac), type = "explosion"}
@@ -325,7 +329,7 @@ Voxel.player_contact = function(self, player, point)
 		if not c or (c - point).length > 3 then break end
 		local m = Material:find{id = t.terrain}
 		if not m then break end
-		if m.name == "trapdoor-000" then
+		if m:get_name() == "trapdoor-000" then
 			Voxel:erase{point = c}
 		else
 			if m.name == "spikes-000" then
@@ -349,7 +353,7 @@ Voxel.damage = function(self, user, point)
 	end
 	-- Change tile type.
 	local n = Material:find{name = m.mining_transform}
-	Voxel:set_tile(point, n and n.id or 0)
+	Voxel:set_tile(point, n and n:get_id() or 0)
 	-- Create materials.
 	if m.mining_materials and user then
 		for k,v in pairs(m.mining_materials) do

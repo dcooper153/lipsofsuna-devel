@@ -1,69 +1,79 @@
-require "system/timer"
+local Class = require("system/class")
 
 if not Los.program_load_extension("lobby") then
 	error("loading extension `lobby' failed")
 end
 
-Lobby = Class()
-Lobby.class_name = "Lobby"
+------------------------------------------------------------------------------
+
+local Lobby = Class("Lobby")
 
 --- Downloads the server list from the master server.
 -- @param self Lobby class.
 -- @return List of servers or nil if failed.
 Lobby.download_server_list = function(self)
-	if self.master then
-		return Los.lobby_download_server_list{master = self.master}
+	if self.__master then
+		return Los.lobby_download_server_list{master = self.__master}
 	end
 end
 
 --- Sends server info to the master server.
 -- @param self Lobby class.
 Lobby.upload_server_info = function(self)
-	if self.desc and self.master and self.name and self.players and self.port then
-		Los.lobby_upload_server_info{desc = self.desc, master = self.master,
-			name = self.name, players = self.players, port = self.port}
+	if self.__desc and self.__master and self.__name and self.__players and self.__port then
+		Los.lobby_upload_server_info{desc = self.__desc, master = self.__master,
+			name = self.__name, players = self.__players, port = self.__port}
 	end
 end
 
-Lobby.class_getters = {
-	desc = function(s) return rawget(s, "__desc") end,
-	master = function(s) return rawget(s, "__master") end,
-	name = function(s) return rawget(s, "__name") end,
-	players = function(s) return rawget(s, "__players") end,
-	port = function(s) return rawget(s, "__port") end}
+Lobby.get_desc = function(self)
+	return self.__desc
+end
 
-Lobby.class_setters = {
-	desc = function(s, v)
-		if s.desc ~= v then
-			rawset(s, "__desc", v)
-			s:upload_server_info()
-		end
-	end,
-	master = function(s, v)
-		if s.master ~= v then
-			rawset(s, "__master", v)
-			s:upload_server_info()
-		end
-	end,
-	name = function(s, v)
-		if s.name ~= v then
-			rawset(s, "__name", v)
-			s:upload_server_info()
-		end
-	end,
-	players = function(s, v)
-		if s.players ~= v then
-			rawset(s, "__players", v)
-			s:upload_server_info()
-		end
-	end,
-	port = function(s, v)
-		if s.port ~= v then
-			rawset(s, "__port", v)
-			s:upload_server_info()
-		end
-	end}
+Lobby.set_desc = function(self, v)
+	if self.desc == v then return end
+	self.__desc = v
+	self:upload_server_info()
+end
 
-Timer{delay = 3000, func = function()
-	Lobby:upload_server_info()
-end}
+Lobby.get_master = function(self)
+	return self.__master
+end
+
+Lobby.set_master = function(self, v)
+	if self.master == v then return end
+	self.__master = v
+	self:upload_server_info()
+end
+
+Lobby.get_name = function(self)
+	return self.__name
+end
+
+Lobby.set_name = function(self, v)
+	if self.name == v then return end
+	self.__name = v
+	self:upload_server_info()
+end
+
+Lobby.get_players = function(self)
+	return self.__players
+end
+
+Lobby.set_players = function(self, v)
+	if self.players == v then return end
+	self.__players = v
+	self:upload_server_info()
+end
+
+Lobby.get_port = function(self)
+	return self.__port
+end
+
+Lobby.set_port = function(self, v)
+	if self.port == v then return end
+	self.__port = v
+	self:upload_server_info()
+end
+
+return Lobby

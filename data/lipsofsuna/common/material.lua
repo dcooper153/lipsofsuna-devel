@@ -1,5 +1,5 @@
+local Material = require("system/material")
 require "system/tiles"
-require "common/model"
 
 Material.dict_id = {}
 Material.dict_name = {}
@@ -25,11 +25,8 @@ end
 -- @param args Arguments.
 -- @return New models.
 Material.new = function(clss, args)
-	if type(args.model) == "string" then
-		args.model = Model:find_or_load(args.model)
-	end
 	local self = instfunc(clss, args)
-	clss.dict_id[self.id] = self
-	clss.dict_name[self.name] = self
+	clss.dict_id[self:get_id()] = self
+	clss.dict_name[self:get_name()] = self
 	return self
 end

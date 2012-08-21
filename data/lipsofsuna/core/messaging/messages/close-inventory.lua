@@ -14,8 +14,8 @@ Message{
 		if not player then return end
 		if player.dead then return end
 		-- Find the inventory.
-		if id == player.id then return end
-		local obj = SimulationObject:find{id = id}
+		if id == player:get_id() then return end
+		local obj = Game.objects:find_by_id(id)
 		if not obj then return end
 		-- Unsubscribe.
 		obj.inventory:unsubscribe(player)
@@ -32,7 +32,7 @@ Message{
 		-- Remove the subscription.
 		Operators.inventory:remove_inventory(id)
 		-- Find the object.
-		local object = Object:find{id = id}
+		local object = Game.objects:find_by_id(id)
 		if not object then return end
 		-- Clear the inventory.
 		if not object:has_server_data() then

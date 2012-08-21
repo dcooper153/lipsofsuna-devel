@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "widget")
 
-Widgets.Uibinding = Class(Widgets.Uiwidget)
-Widgets.Uibinding.class_name = "Widgets.Uibinding"
+Widgets.Uibinding = Class("Uibinding", Widgets.Uiwidget)
 
 Widgets.Uibinding.new = function(clss, action)
 	local self = Widgets.Uiwidget.new(clss)

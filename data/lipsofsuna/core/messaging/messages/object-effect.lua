@@ -9,7 +9,7 @@ Message{
 		return {id, name}
 	end,
 	server_to_client_handle = function(self, id, name)
-		local object = Object:find{id = id}
+		local object = Game.objects:find_by_id(id)
 		if not object then return end
 		Client.effects:play_object(name, object)
 	end}

@@ -1,3 +1,5 @@
+local Coroutine = require("system/coroutine")
+
 -- Spell on self.
 -- At the specific time into the attack animation, the effects of the
 -- feat are applied to the attacker herself.
@@ -9,7 +11,7 @@ Actionspec{name = "spell on self", func = function(feat, info, args)
 			charge = args.charge,
 			object = args.user,
 			owner = args.user,
-			point = args.user.position,
+			point = args.user:get_position(),
 			weapon = args.weapon}
 	end)
 end}

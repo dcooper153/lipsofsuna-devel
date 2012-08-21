@@ -1,3 +1,6 @@
+local AreaSpell = require("core/objects/areaspell")
+local Coroutine = require("system/coroutine")
+
 Actionspec{
 	name = "area spell",
 	func = function(feat, info, args)
@@ -14,7 +17,7 @@ Actionspec{
 					local sub = Feat{animation = "area spell", effects = {{v[1], v[2]}}}
 					local spell = AreaSpell{
 						duration = effect.duration, radius = effect.radius,
-						feat = sub, owner = args.user, position = args.user.position,
+						feat = sub, owner = args.user, position = args.user:get_position(),
 						realized = true, spec = spec}
 				end
 			end

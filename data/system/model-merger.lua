@@ -1,4 +1,5 @@
-require "system/model"
+local Class = require("system/class")
+local Model = require("system/model")
 
 if not Los.program_load_extension("model-merge") then
 	error("loading extension `model-merge' failed")
@@ -6,14 +7,13 @@ end
 
 ------------------------------------------------------------------------------
 
-Merger = Class()
-Merger.class_name = "Merger"
+local ModelMerger = Class("ModelMerger")
 
 --- Creates a new model merger.
--- @param clss Merger class.
+-- @param clss ModelMerger class.
 -- @return New model merger.
-Merger.new = function(clss)
-	local self = Class.new(Merger)
+ModelMerger.new = function(clss)
+	local self = Class.new(ModelMerger)
 	self.handle = Los.merger_new()
 	return self
 end
@@ -21,7 +21,7 @@ end
 --- Adds a model.
 -- @param self Model merger.
 -- @param model Model to add.
-Merger.add_model = function(self, model)
+ModelMerger.add_model = function(self, model)
 	Los.merger_add_model(self.handle, model.handle)
 end
 
@@ -29,23 +29,23 @@ end
 -- @param self Model merger.
 -- @param model Model to add.
 -- @param targets List of alternating morph target names and influence.
-Merger.add_model_morph = function(self, model, targets)
+ModelMerger.add_model_morph = function(self, model, targets)
 	Los.merger_add_model_morph(self.handle, model.handle, unpack(targets))
 end
 
 --- Queues finishing the build.
 -- @param self Model merger.
-Merger.finish = function(self)
+ModelMerger.finish = function(self)
 	Los.merger_finish(self.handle)
 end
 
 --- Pops a finished model.
 -- @param self Model merger.
 -- @return Model or nil.
-Merger.pop_model = function(self, model, targets)
+ModelMerger.pop_model = function(self, model, targets)
 	local handle = Los.merger_pop_model(self.handle)
 	if not handle then return end
-	return Class.new(Model, {handle = handle})
+	return Model:new_from_handle(handle)
 end
 
 --- Replaces fields of matching materials.
@@ -56,6 +56,8 @@ end
 --   <li>material: Material reference name to set, or nil.</li>
 --   <li>specular: Specular color to set, or nil.</li>
 --   <li>textures: Array of texture to set, or nil.</li></ul>
-Merger.replace_material = function(self, args)
+ModelMerger.replace_material = function(self, args)
 	Los.merger_replace_material(self.handle, args)
 end
+
+return ModelMerger

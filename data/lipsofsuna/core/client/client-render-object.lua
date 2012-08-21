@@ -1,4 +1,6 @@
+local Animation = require("system/animation")
 local Class = require("system/class")
+local Model = require("system/model")
 local ModelBuilder = require("core/client/model-builder")
 local ModelEffect = require("core/client/model-effect")
 local ParticleEffect = require("core/client/particle-effect")
@@ -6,7 +8,7 @@ local RenderObject = require("system/object-render")
 local RenderUtils = require("core/client/render-utils")
 local SpeedlineEffect = require("core/client/speedline-effect")
 
-local ClientRenderObject = Class(RenderObject)
+local ClientRenderObject = Class("ClientRenderObject", RenderObject)
 
 --- Initializes the render object.
 -- @param self Render object.
@@ -22,8 +24,8 @@ ClientRenderObject.init = function(self, object)
 	-- Set the render model.
 	if object.spec.models then
 		self:request_model_rebuild()
-	elseif object.model then
-		self:set_model(object.model:get_render())
+	elseif object:get_model() then
+		self:set_model(object:get_model():get_render())
 	else
 		self:set_model()
 	end
@@ -130,7 +132,7 @@ ClientRenderObject.add_equipment_anchor = function(self, object, slot, node)
 	-- Get the anchored model.
 	local model_name = object:get_model_name()
 	if not model_name then return end
-	local model = Model:find_or_load(model_name)
+	local model = Main.models:find_by_name(model_name)
 	if not model then return end
 	-- Add the anchor effect.
 	local effect = ModelEffect{
@@ -295,7 +297,7 @@ ClientRenderObject.update = function(self, secs)
 		local m = self.object.model_merger:pop_model()
 		if m then
 			self:set_model(m:get_render())
-			self.model.bounding_box = m.bounding_box
+			self.model.bounding_box = m:get_bounding_box()
 		end
 	end
 end

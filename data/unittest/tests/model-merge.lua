@@ -1,7 +1,7 @@
-Unittest:add(1, "model merger", function()
-	require "system/model-merge"
+Unittest:add(1, "system", "model merger", function()
+	local ModelMerger = require("system/model-merger")
 	-- Creating the merger.
-	local m = Merger()
+	local m = ModelMerger()
 	assert(m)
 	assert(m.handle)
 	-- Finishing.

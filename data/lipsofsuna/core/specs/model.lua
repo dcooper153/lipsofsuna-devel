@@ -1,7 +1,7 @@
-require(Mod.path .. "spec")
+local Class = require("system/class")
+local Spec = require("core/specs/spec")
 
-Modelspec = Class(Spec)
-Modelspec.class_name = "Modelspec"
+Modelspec = Class("Modelspec", Spec)
 Modelspec.type = "model"
 Modelspec.dict_id = {}
 Modelspec.dict_cat = {}
@@ -18,3 +18,5 @@ Modelspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	return self
 end
+
+return ModelSpec

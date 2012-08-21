@@ -1,8 +1,9 @@
 local Class = require("system/class")
 local EffectObject = require("core/client/effect-object")
+local RenderObject = require("system/object-render")
 local SpeedlineEffect = require("core/client/speedline-effect")
 
-local ModelEffect = Class(EffectObject)
+local ModelEffect = Class("ModelEffect", EffectObject)
 
 --- Creates a new model effect.
 -- @param clss Model effect class.

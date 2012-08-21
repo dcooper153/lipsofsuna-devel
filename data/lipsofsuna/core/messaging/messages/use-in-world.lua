@@ -14,7 +14,7 @@ Message{
 		if not player then return end
 		if player.dead then return end
 		-- Find the object.
-		local object = SimulationObject:find{id = id}
+		local object = Game.objects:find_by_id(id)
 		if not object then return end
 		if not player:can_reach_object(object) then return end
 		-- Validate the action.

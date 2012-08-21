@@ -1,5 +1,12 @@
-Ui = Class()
-Ui.class_name = "Ui"
+local Button = require("system/widgets/button")
+local Class = require("system/class")
+local Cursor = require("system/widgets/cursor")
+local Input = require("system/input")
+local Label = require("system/widgets/label")
+local Scrollbar = require("system/widgets/scrollbar")
+local Widget = require("system/widget")
+
+Ui = Class("Ui")
 Ui.bubbles = {}
 Ui.huds = {}
 Ui.states = {}
@@ -12,24 +19,26 @@ Ui.init = function(self)
 	self.size = Vector()
 	self.stack = {}
 	self.widgets = {}
-	self.window = Widget{floating = true, fullscreen = true}
+	self.window = Widget()
+	self.window:set_floating(true)
+	self.window:set_fullscreen(true)
 	self.repeat_timer = 0
 	-- Create the back button.
-	self.back = Widgets.Button{
-		text = "<",
-		pressed = function() self:pop_state() end}
+	self.back = Button()
+	self.back:set_text("<")
+	self.back.pressed = function() self:pop_state() end
 	-- Create the help labels.
-	self.hint = Widgets.Label()
-	self.label = Widgets.Label()
+	self.hint = Label()
+	self.label = Label()
 	-- Create the scrollbar.
-	self.scrollbar = Widgets.Scrollbar{
-		offset = Vector(32, 0),
-		changed = function(w, p) self.scroll_offset = p end,
-		grabbed = function(w, v) self.scroll_active = v end}
+	self.scrollbar = Scrollbar()
+	self.scrollbar:set_offset(Vector(32, 0))
+	self.scrollbar.changed = function(w, p) self:set_scroll_offset(p) end
+	self.scrollbar.grabbed = function(w, v) self.scroll_active = v end
 	self.scrollbar.step = 50
 	-- Initialize the cursor.
-	self.cursor = Widgets.Cursor(Iconspec:find{name = "cursor1"})
-	self.pointer_grab = Client.options.grab_cursor
+	self.cursor = Cursor(Iconspec:find{name = "cursor1"})
+	self:set_pointer_grab(Client.options.grab_cursor)
 end
 
 --- Adds a heads over display widget to the user interface.
@@ -207,21 +216,21 @@ end
 -- @param self Ui class.
 Ui.autoscroll = function(self)
 	-- Get the focused widget.
-	local w = self.focused_widget
+	local w = self:get_focused_widget()
 	if not w then return end
 	-- Get the relative screen position.
-	local start = self.widgets[1].y
+	local start = self.widgets[1]:get_y()
 	local height = self.size.y
 	-- Scroll up until the top of the widget is visible.
-	local top = w.offset.y
+	local top = w:get_offset().y
 	if top < 0 then
-		self.scroll_offset = top - start
+		self:set_scroll_offset(top - start)
 		return
 	end
 	-- Scroll down until the bottom of the widget is visible.
 	local bottom = top + w.size.y
 	if bottom > height then
-		self.scroll_offset = bottom - start - height
+		self:set_scroll_offset(bottom - start - height)
 	end
 end
 
@@ -236,11 +245,11 @@ Ui.command = function(self, cmd, press)
 		return
 	end
 	if cmd == "back" then
-		local state = self.state
+		local state = self:get_state()
 		local widget = self.widgets[self.focused_item]
 		if not widget or not widget.apply_back then return self:pop_state() end
 		if widget:apply_back() then self:pop_state() end
-		if state ~= self.state then
+		if state ~= self:get_state() then
 			Client.effects:play_global("uitransition1")
 		end
 	elseif cmd == "apply" then
@@ -253,19 +262,19 @@ Ui.command = function(self, cmd, press)
 		self.repeat_up = true
 		if self.focused_item then
 			if self.focused_item > 1 then
-				self.widgets[self.focused_item].focused = false
+				self.widgets[self.focused_item]:set_focused(false)
 				self.focused_item = self.focused_item - 1
-				self.widgets[self.focused_item].focused = true
+				self.widgets[self.focused_item]:set_focused(true)
 				self:update_help()
 				self:autoscroll()
 			elseif #self.widgets > 1 then
-				self.widgets[self.focused_item].focused = false
+				self.widgets[self.focused_item]:set_focused(false)
 				self.focused_item = #self.widgets
-				self.widgets[self.focused_item].focused = true
+				self.widgets[self.focused_item]:set_focused(true)
 				self:update_help()
 				self:autoscroll()
 			end
-			self.history[self.history_state] = self.focused_item
+			self.history[self:get_history_state()] = self.focused_item
 			Client.effects:play_global("uimove1")
 		end
 	elseif cmd == "down" then
@@ -273,19 +282,19 @@ Ui.command = function(self, cmd, press)
 		self.repeat_down = true
 		if self.focused_item then
 			if self.focused_item < #self.widgets then
-				self.widgets[self.focused_item].focused = false
+				self.widgets[self.focused_item]:set_focused(false)
 				self.focused_item = self.focused_item + 1
-				self.widgets[self.focused_item].focused = true
+				self.widgets[self.focused_item]:set_focused(true)
 				self:update_help()
 				self:autoscroll()
 			elseif #self.widgets > 1 then
-				self.widgets[self.focused_item].focused = false
+				self.widgets[self.focused_item]:set_focused(false)
 				self.focused_item = 1
-				self.widgets[self.focused_item].focused = true
+				self.widgets[self.focused_item]:set_focused(true)
 				self:update_help()
 				self:autoscroll()
 			end
-			self.history[self.history_state] = self.focused_item
+			self.history[self:get_history_state()] = self.focused_item
 			Client.effects:play_global("uimove1")
 		end
 	end
@@ -356,10 +365,10 @@ end
 -- @return True if the caller should handle the event.
 Ui.handle_event = function(self, args)
 	-- Find the state.
-	local state_ = self.states[self.state]
+	local state_ = self.states[self:get_state()]
 	if not state_ then return true end
 	-- Check the mouse event handling mode.
-	local mouse_mode = not self.pointer_grab
+	local mouse_mode = not self:get_pointer_grab()
 	local mouse_event = false
 	if args.type == "mousepress" or args.type == "mouserelease" or
 	   args.type == "mousescroll" or args.type == "mousemotion" then
@@ -400,19 +409,19 @@ end
 -- @param state State name.
 -- @param focus Focused widget index, nil for first.
 Ui.push_state = function(self, state, focus)
-	local src,src_root = self.state,self.root
+	local src,src_root = self:get_state(),self.root
 	table.insert(self.stack, state)
 	self:show_state(state, focus)
-	self:state_changed(src, src_root, self.state, self.root)
+	self:state_changed(src, src_root, self:get_state(), self.root)
 end
 
 --- Pops the topmost state in the stack and shows the state below it.
 -- @param self Ui class.
 Ui.pop_state = function(self)
-	local src,src_root = self.state,self.root
+	local src,src_root = self:get_state(),self.root
 	table.remove(self.stack, #self.stack)
-	self:show_state(self.state)
-	self:state_changed(src, src_root, self.state, self.root)
+	self:show_state(self:get_state())
+	self:state_changed(src, src_root, self:get_state(), self.root)
 end
 
 --- Queues a relayout for all widgets.
@@ -432,7 +441,7 @@ end
 --- Recreates and shows the current state.
 -- @param self Ui class.
 Ui.restart_state = function(self)
-	local s = self.state
+	local s = self:get_state()
 	local f = self.focused_item
 	-- Remove and recreate the state.
 	self:pop_state()
@@ -442,13 +451,13 @@ end
 --- Scrolls the screen.
 -- @param self Ui class.
 Ui.scroll = function(self, dir)
-	if not self.scrollbar.visible then return end
+	if not self.scrollbar:get_visible() then return end
 	local range = self.__scroll_range
 	if not range then return end
 	if dir == "up" then
-		self.scroll_offset = math.max(range[2] - 50, 0)
+		self:set_scroll_offset(math.max(range[2] - 50, 0))
 	elseif dir == "down" then
-		self.scroll_offset = math.min(range[2] + 50, range[1] - range[3])
+		self:set_scroll_offset(math.min(range[2] + 50, range[1] - range[3]))
 	end
 end
 
@@ -485,7 +494,7 @@ Ui.show_state = function(self, state, focus)
 			print(debug.traceback("ERROR: " .. err))
 		end)
 		if widget then
-			widget:set_request{width = self.window.width, height = self.window.height}
+			widget:set_request(self.window:get_width(), self.window:get_height())
 			self.window:add_child(widget)
 			self.background = widget
 			root = widget
@@ -507,8 +516,8 @@ Ui.show_state = function(self, state, focus)
 		end)
 		if ret and widget then
 			if widget.class_name then
-				if spec.help then widget.help = spec.help end
-				if spec.hint then widget.hint = spec.hint end
+				if spec.help then widget:set_help(spec.help) end
+				if spec.hint then widget:set_hint(spec.hint) end
 				if spec.input then widget.handle_input = spec.input end
 				if spec.update then widget.update = spec.update end
 				if not widget.id then widget.id = spec.id or id end
@@ -519,7 +528,7 @@ Ui.show_state = function(self, state, focus)
 		end
 	end
 	-- Set the state name text.
-	local mode = Program.video_mode
+	local mode = Program:get_video_mode()
 	self:update_help()
 	-- Toggle HUD widgets.
 	for index,hud in pairs(self.huds) do
@@ -538,21 +547,21 @@ Ui.show_state = function(self, state, focus)
 	-- Attach the widgets.
 	self:show_state_attach()
 	-- Focus the first or previously focused widget.
-	local f = math.min(focus or self.history[self.history_state] or 1, #self.widgets)
+	local f = math.min(focus or self.history[self:get_history_state()] or 1, #self.widgets)
 	if self.widgets[f] then
 		self.focused_item = f
-		self.widgets[f].focused = true
+		self.widgets[f]:set_focused(true)
 	else
 		self.focused_item = nil
 	end
-	self.history[self.history_state] = self.focused_item
+	self.history[self:get_history_state()] = self.focused_item
 	-- Position the widgets.
-	self.scroll_offset = 0
+	self:set_scroll_offset(0)
 	self.need_autoscroll = true
 	-- Rebuild the help text.
 	self:update_help()
 	-- Update the grab state.
-	self.pointer_grab = self.pointer_grab
+	self:set_pointer_grab(self:get_pointer_grab())
 end
 
 --- Internal function that adds all widgets to the window in the right order.
@@ -615,24 +624,24 @@ end
 -- @param secs Seconds since the last update.
 Ui.update = function(self, secs)
 	-- Update the window size.
-	local mode = Program.video_mode
+	local mode = Program:get_video_mode()
 	self.was_resized = (mode[1] ~= self.size.x or mode[2] ~= self.size.y)
 	if self.was_resized then
 		self.size.x = mode[1]
 		self.size.y = mode[2]
-		self.window:set_request{width = mode[1], height = mode[2]}
+		self.window:set_request(mode[1], mode[2])
 		if self.background then
-			self.background:set_request{width = mode[1], height = mode[2]}
+			self.background:set_request(mode[1], mode[2])
 		end
 		self:update_help()
 		self.need_relayout = true
 	end
 	-- Update the cursor.
-	if not self.pointer_grab then
+	if not self:get_pointer_grab() then
 		self.cursor:update()
 	end
 	-- Call the update functions of the state.
-	local s = self.states[self.state]
+	local s = self.states[self:get_state()]
 	if s then
 		for k,v in pairs(s.update) do
 			v(secs)
@@ -649,7 +658,7 @@ Ui.update = function(self, secs)
 	-- Update the layout.
 	if self.need_relayout then
 		self.need_relayout = nil
-		self.scroll_offset = self.scroll_offset or 0
+		self:set_scroll_offset(self:get_scroll_offset() or 0)
 	end
 	-- Autoscroll after state changes.
 	if self.need_autoscroll then
@@ -675,22 +684,22 @@ Ui.update = function(self, secs)
 		end
 	end
 	-- Update mouse focus.
-	if not self.pointer_grab then
-		local focus = Widgets.widget_under_cursor
+	if not self:get_pointer_grab() then
+		local focus = Widgets:get_widget_under_cursor()
 		if focus then
 			-- Focus a UI widget.
 			local found = false
 			for k,v in pairs(self.widgets) do
 				if v == focus then
 					if self.focused_item ~= k then
-						self.widgets[self.focused_item].focused = false
+						self.widgets[self.focused_item]:set_focused(false)
 						self.focused_item = k
-						self.widgets[self.focused_item].focused = true
+						self.widgets[self.focused_item]:set_focused(true)
 						self:update_help()
 						self:autoscroll()
 					end
 					if self.prev_custom_focus then
-						self.prev_custom_focus.focused = false
+						self.prev_custom_focus:set_focused(false)
 						self.prev_custom_focus = nil
 					end
 					found = true
@@ -700,10 +709,10 @@ Ui.update = function(self, secs)
 			-- Focus a custom widget.
 			if not found then
 				if self.prev_custom_focus then
-					self.prev_custom_focus.focused = false
+					self.prev_custom_focus:set_focused(false)
 				end
 				self.prev_custom_focus = focus
-				focus.focused = true
+				focus:set_focused(true)
 			end
 		end
 	end
@@ -740,10 +749,10 @@ end
 --- Updates the help text of the state.
 -- @param self Ui class.
 Ui.update_help = function(self)
-	local state = self.states[self.state]
+	local state = self.states[self:get_state()]
 	-- Get the hint format.
 	local hint
-	local widget = self.focused_widget
+	local widget = self:get_focused_widget()
 	if not widget then
 		if state and state.hint then
 			hint = state.hint
@@ -751,7 +760,7 @@ Ui.update_help = function(self)
 			hint = "$$B"
 		end
 	else
-		hint = widget.hint or "$$A\n$$B\n$$U\n$$D"
+		hint = widget:get_hint()
 	end
 	-- Replace special format sequences.
 	hint = string.gsub(hint, "$$A", "$A: Activate")
@@ -765,96 +774,100 @@ Ui.update_help = function(self)
 	hint = string.gsub(hint, "$M", Client.bindings:get_control_name("menu") or "[---]")
 	-- Get the detailed help string.
 	if widget then
-		help = widget.help
+		help = widget:get_help()
 	end
 	if help then
 		hint = hint .. "\n\n" .. help
 	end
 	-- Update the help text.
-	local mode = Program.video_mode
-	self.label:set_request{width = Theme.help_text_width}
-	self.label.font = Theme.text_font_2
-	self.label.text = state and state.label or ""
-	self.label.offset = Vector(mode[1] - Theme.help_text_width, 0)
-	self.hint:set_request{width = Theme.help_text_width}
-	self.hint.font = Theme.text_font_1
-	self.hint.text = hint
-	if self.label.text ~= "" then
-		self.hint.offset = Vector(mode[1] - Theme.help_text_width, Theme.help_title_height)
+	local mode = Program:get_video_mode()
+	self.label:set_request(Theme.help_text_width, nil)
+	self.label:set_font(Theme.text_font_2)
+	self.label:set_text(state and state.label or "")
+	self.label:set_offset(Vector(mode[1] - Theme.help_text_width, 0))
+	self.hint:set_request(Theme.help_text_width, nil)
+	self.hint:set_font(Theme.text_font_1)
+	self.hint:set_text(hint)
+	if self.label:get_text() ~= "" then
+		self.hint:set_offset(Vector(mode[1] - Theme.help_text_width, Theme.help_title_height))
 	else
-		self.hint.offset = Vector(mode[1] - Theme.help_text_width, 0)
+		self.hint:set_offset(Vector(mode[1] - Theme.help_text_width, 0))
 	end
 end
 
-Ui:add_class_getters{
-	focused_widget = function(self)
-		if not self.focused_item then return end
-		return self.widgets[self.focused_item]
-	end,
-	history_state = function(self)
-		local name = self.state
-		local state = self.states[name]
-		return state and state.history or name
-	end,
-	pointer_grab = function(self)
-		return rawget(self, "__pointer_grab")
-	end,
-	scroll_offset = function(self)
-		return rawget(self, "__scroll_offset")
-	end,
-	state = function(self)
-		local s = self.stack[#self.stack]
-		return s or self.root or "play"
-	end}
+Ui.get_focused_widget = function(self)
+	if not self.focused_item then return end
+	return self.widgets[self.focused_item]
+end
 
-Ui:add_class_setters{
-	pointer_grab = function(self, v)
-		-- The pointer is always shown in pure UI states.
-		local state_ = self.states[self.state]
-		if v and state_ and state_.grab() then
-			rawset(self, "__pointer_grab", true)
-			self.cursor.floating = false
-			Program.cursor_grabbed = true
-		else
-			rawset(self, "__pointer_grab", false)
-			self.cursor.floating = true
-			Program.cursor_grabbed = false
-		end
-	end,
-	state = function(self, v)
-		local src,src_root = self.state,self.root
-		self.stack = {v}
-		self:show_state(v)
-		self:state_changed(src, src_root, self.state, self.root)
-	end,
-	scroll_offset = function(self, v)
-		-- Decide if a scrollbar is needed.
-		local h = 0
-		for k,widget in ipairs(self.widgets) do
-			h = h + widget.size.y
-		end
-		local x = (h < self.size.y) and 32 or 53
-		-- Update system widget positions.
-		if h < self.size.y then
-			self.scrollbar.visible = false
-			self.back:set_request{width = 32, height = h}
-		else
-			self.scrollbar:set_range(h, v, self.size.y)
-			self.scrollbar:set_request{height = self.size.y}
-			self.scrollbar.visible = true
-			self.back:set_request{width = 32, height = self.size.y}
-		end
-		-- Update state widget positions.
-		local y = 0
-		local sh = self.size.y
-		for k,widget in ipairs(self.widgets) do
-			local wy = y - v
-			local wh = widget.size.y
-			widget.offset = Vector(x, wy)
-			widget.visible = (wy > -wh and wy < sh)
-			y = y + wh
-		end
-		-- Store the scrolling state.
-		rawset(self, "__scroll_offset", v)
-		rawset(self, "__scroll_range", {h, v, self.size.y})
-	end}
+Ui.get_history_state = function(self)
+	local name = self:get_state()
+	local state = self.states[name]
+	return state and state.history or name
+end
+
+Ui.get_pointer_grab = function(self)
+	return self.__pointer_grab
+end
+
+Ui.get_scroll_offset = function(self)
+	return self.__scroll_offset
+end
+
+Ui.get_state = function(self)
+	local s = self.stack[#self.stack]
+	return s or self.root or "play"
+end
+
+Ui.set_pointer_grab = function(self, v)
+	-- The pointer is always shown in pure UI states.
+	local state_ = self.states[self:get_state()]
+	if v and state_ and state_.grab() then
+		self.__pointer_grab = true
+		self.cursor:set_floating(false)
+		Input:set_pointer_grab(true)
+	else
+		self.__pointer_grab = false
+		self.cursor:set_floating(true)
+		Input:set_pointer_grab(false)
+	end
+end
+
+Ui.set_state = function(self, v)
+	local src,src_root = self:get_state(),self.root
+	self.stack = {v}
+	self:show_state(v)
+	self:state_changed(src, src_root, self:get_state(), self.root)
+end
+
+Ui.set_scroll_offset = function(self, v)
+	-- Decide if a scrollbar is needed.
+	local h = 0
+	for k,widget in ipairs(self.widgets) do
+		h = h + widget.size.y
+	end
+	local x = (h < self.size.y) and 32 or 53
+	-- Update system widget positions.
+	if h < self.size.y then
+		self.scrollbar:set_visible(false)
+		self.back:set_request(32, h)
+	else
+		self.scrollbar:set_range(h, v, self.size.y)
+		self.scrollbar:set_request(nil, self.size.y)
+		self.scrollbar:set_visible(true)
+		self.back:set_request(32, self.size.y)
+	end
+	-- Update state widget positions.
+	local y = 0
+	local sh = self.size.y
+	for k,widget in ipairs(self.widgets) do
+		local wy = y - v
+		local wh = widget.size.y
+		widget:set_offset(Vector(x, wy))
+		widget:set_visible(wy > -wh and wy < sh)
+		y = y + wh
+	end
+	-- Store the scrolling state.
+	self.__scroll_offset = v
+	self.__scroll_range = {h, v, self.size.y}
+end

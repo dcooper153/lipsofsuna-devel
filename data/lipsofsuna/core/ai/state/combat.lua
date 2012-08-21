@@ -25,7 +25,7 @@ Aistatespec{
 			self:choose_combat_action()
 		end
 		-- Turn towards the target.
-		local face = self.object:face_point{point = self.target.position, secs = secs}
+		local face = self.object:face_point{point = self.target:get_position(), secs = secs}
 		if face < 0.5 then
 			self.object:set_movement(0)
 			return

@@ -2,26 +2,28 @@ Message{
 	name = "unlocks init",
 	server_to_client_encode = function(self, unlocks)
 		local data = {}
-		for k,v in ipairs(unlocks) do
-			table.insert(data, "string")
-			table.insert(data, v[1])
-			table.insert(data, "string")
-			table.insert(data, v[2])
+		for type,names in pairs(unlocks) do
+			for name in pairs(names) do
+				table.insert(data, "string")
+				table.insert(data, type)
+				table.insert(data, "string")
+				table.insert(data, name)
+			end
 		end
 		return data
 	end,
 	server_to_client_decode = function(self, packet)
-		local unlock = {}
+		local unlocks = {}
 		while true do
 			local ok,t,n = packet:resume("string", "string")
 			if not ok then break end
-			if unlock[t] then
-				unlock[t][n] = true
+			if unlocks[t] then
+				unlocks[t][n] = true
 			else
-				unlock[t] = {[n] = true}
+				unlocks[t] = {[n] = true}
 			end
 		end
-		return {unlock}
+		return {unlocks}
 	end,
 	server_to_client_handle = function(self, unlocks)
 		-- Determine locked items.
@@ -40,9 +42,7 @@ Message{
 		-- Lock items.
 		for type,names in pairs(lock) do
 			for name in pairs(names) do
-				if not Server.initialized then
-					Client.data.unlocks:lock(type, name)
-				end
+				Client.data.unlocks:lock(type, name)
 				if not Operators.play:is_startup_period() then
 					Client:append_log("Locked " .. type .. ": " .. name)
 				end
@@ -52,9 +52,7 @@ Message{
 		for type,names in pairs(unlocks) do
 			for name in pairs(names) do
 				if not Client.data.unlocks:get(type, name) then
-					if not Server.initialized then
-						Client.data.unlocks:unlock(type, name)
-					end
+					Client.data.unlocks:unlock(type, name)
 					if not Operators.play:is_startup_period() then
 						Client:append_log("Unlocked " .. type .. ": " .. name)
 					end

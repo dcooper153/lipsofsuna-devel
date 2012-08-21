@@ -7,7 +7,7 @@ Message{
 		return {}
 	end,
 	server_to_client_handle = function(self)
-		Ui.state = "play"
+		Ui:set_state("play")
 		Operators.play:reset()
 		Quickslots:reset()
 	end}

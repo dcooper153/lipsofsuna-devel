@@ -1,5 +1,6 @@
-Unittest:add(1, "thread", function()
-	require "system/thread"
+Unittest:add(1, "system", "thread", function()
+	local Model = require("system/model")
+	local Thread = require("system/thread")
 	-- Creation.
 	print("Testing thread creation...")
 	local t = Thread(nil, "Hello World!", [[
@@ -8,7 +9,7 @@ Unittest:add(1, "thread", function()
 	-- Message passing.
 	print("Testing thread message passing...")
 	local t1 = Thread(nil, "", [[
-		require "system/core"
+		local Program = require("system/core")
 		local m
 		repeat m = Program:pop_message() until m
 		assert(m.type == "string")
@@ -24,8 +25,8 @@ Unittest:add(1, "thread", function()
 	-- Model passing.
 	print("Testing thread message model passing...")
 	local t2 = Thread(nil, "", [[
-		require "system/core"
-		require "system/model"
+		local Program = require("system/core")
+		local Model = require("system/model")
 		assert(Program:push_message{model = Model()})]])
 	repeat m = t2:pop_message() until m
 	assert(m.type == "model")
@@ -34,9 +35,9 @@ Unittest:add(1, "thread", function()
 	-- Thread termination.
 	print("Testing thread termination...")
 	local t3 = Thread(nil, "", [[
-		require "system/core"
-		while not Program.quit do Program:update() end]])
-	assert(not t3.done)
-	t3.quit = true
-	repeat until t3.done
+		local Program = require("system/core")
+		while not Program:get_quit() do Program:update() end]])
+	assert(not t3:get_done())
+	t3:set_quit(true)
+	repeat until t3:get_done()
 end)

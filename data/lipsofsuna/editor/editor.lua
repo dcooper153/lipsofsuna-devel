@@ -1,10 +1,16 @@
+local Class = require("system/class")
+local EditorBounds = require("editor/editor-bounds")
+local EditorCamera = require("editor/editorcamera")
+local EditorObject = require("editor/editorobject")
+local Light = require("system/light")
+local Material = require("system/material")
+local Model = require("system/model")
+local Physics = require("system/physics")
+local Selection = require("editor/selection")
 local Simulation = require("core/client/simulation")
 require "editor/controls"
-require "editor/editorcamera"
-require "editor/editorobject"
-require "editor/selection"
 
-Editor = Class()
+Editor = Class("Editor")
 
 Editor.new = function(clss)
 	-- Initialize self.
@@ -16,7 +22,13 @@ Editor.new = function(clss)
 	self.copybuffer = {}
 	-- Camera and lighting.
 	self.camera = EditorCamera()
-	self.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.0,0.0,0.01}, priority = 2}
+	self.light = Light()
+	self.light:set_ambient{0.3,0.3,0.3,1.0}
+	self.light:set_diffuse{0.6,0.6,0.6,1.0}
+	self.light:set_equation{1.0,0.0,0.01}
+	self.light:set_priority(2)
+	-- Boundary object.
+	self.bounds = EditorBounds()
 	return self
 end
 
@@ -24,9 +36,8 @@ Editor.reset = function(self)
 	self.prev_tiles = {}
 	self.selection = {}
 	self.copybuffer = {}
-	if self.corners then
-		self.corners:detach()
-		self.corners = nil
+	if self.bounds then
+		self.bounds:detach()
 	end
 end
 
@@ -39,7 +50,7 @@ Editor.initialize = function(self)
 		self:load(Settings.pattern)
 		Settings.pattern = nil
 	end
-	self.light.enabled = true
+	self.light:set_enabled(true)
 	if Map then Map:init() end
 end
 
@@ -48,7 +59,7 @@ end
 Editor.uninitialize = function(self)
 	Game:deinit()
 	self.initialized = nil
-	self.light.enabled = false
+	self.light:set_enabled(false)
 end
 
 --- Extrudes the selected tiles.
@@ -95,21 +106,21 @@ end
 
 Editor.grab = function(self, delta)
 	-- Get the view direction of the ray.
-	local look = self.camera.rotation * Vector(0,0,-1)
+	local look = self.camera:get_rotation() * Vector(0,0,-1)
 	-- Transform each selected object.
 	for k,v in pairs(self.selection) do
 		if v.object then
 			-- Project camera axes to the selection plane.
 			local normal = v.face_dir[v.face]
-			local camerax = self.camera.rotation * Vector(1, 0, 0)
-			local cameray = self.camera.rotation * Vector(0, 1, 0)
+			local camerax = self.camera:get_rotation() * Vector(1, 0, 0)
+			local cameray = self.camera:get_rotation() * Vector(0, 1, 0)
 			local movex = camerax - normal * camerax:dot(normal)
 			local movey = cameray - normal * cameray:dot(normal)
 			-- Multiply the projected axes by mouse movement factors.
 			movex = movex * (0.5 * -delta.x)
 			movey = movey * (0.5 * -delta.y)
 			-- Scale the axes by the distance between the object and the camera.
-			local scale = (self.camera.position - v.object.position).length
+			local scale = (self.camera:get_position() - v.object:get_position()).length
 			movex = movex * scale
 			movey = movey * scale
 			-- Move the selection.
@@ -124,7 +135,7 @@ Editor.fill = function(self, p1, p2, erase)
 	local mat = 0
 	if not erase then
 		local m = Material:find{name = self.combo_tiles.text}
-		if m then mat = m.id end
+		if m then mat = m:get_id() end
 	end
 	-- Fix the order of the range.
 	local x1,x2 = p1.x,p2.x
@@ -146,7 +157,7 @@ end
 Editor.load = function(self, name)
 	-- Make sure the old map is erased.
 	self:reset()
-	for k,v in pairs(Object.objects) do v:detach() end
+	for k,v in pairs(Game.objects.objects_by_id) do v:detach() end
 	Game.sectors:unload_world()
 	-- Find or create the pattern.
 	local pattern = Patternspec:find{name = name}
@@ -168,16 +179,9 @@ Editor.load = function(self, name)
 	Voxel:place_pattern{class = EditorObject, point = self.origin, name = name}
 	-- Setup the camera.
 	self.camera:warp((self.origin + self.size * 0.5) * Voxel.tile_size, Quaternion(0, 1, 0, 0))
-	-- Corner markers.
-	if not self.corners then
-		self.corners = EditorObject()
-		self.corners:set_position(self.origin * Voxel.tile_size)
-		self.corners.render:init(self.corners)
-		self.corners:set_visible(true)
-	end
-	self.corners.model = Model()
-	self.corners.model:add_material{material = "bounds1"}
-	self:update_corners()
+	-- Corner the bounds model.
+	self.bounds:set_position(self.origin * Voxel.tile_size)
+	self.bounds:rebuild(self.size)
 	-- Update the map name entry.
 	self.map_name = name
 end
@@ -197,10 +201,10 @@ Editor.paste = function(self, args)
 	--Calculate offset of pastebuffer objects
 	for k,v in pairs(self.copybuffer) do
 		
-		if v.object and v.object.position then
-			if not prevpoint then prevpoint = v.object.position v.offset = Vector(0,0,0)
+		if v.object and v.object:get_position() then
+			if not prevpoint then prevpoint = v.object:get_position() v.offset = Vector(0,0,0)
 			else
-				v.offset = prevpoint - v.object.position
+				v.offset = prevpoint - v.object:get_position()
 			end
 		end
 		if v.tile then
@@ -214,7 +218,7 @@ Editor.paste = function(self, args)
 	--insert pastebuffer objects into world
 	for k,v in pairs(self.copybuffer) do
 		if v.object and point then
-			--if self.selection[1].object and then print "bas" point=self.selection[1].object.position end
+			--if self.selection[1].object and then print "bas" point=self.selection[1].object:get_position() end
 			EditorObject{position = point+v.offset, realized = true, spec = v.object.spec}
 		elseif v.tile and point then
 		--local mat = v.tile.material
@@ -324,7 +328,7 @@ Editor.save = function(self)
 	local actors = {}
 	local statics = {}
 	-- Collect objects.
-	for k,v in pairs(Object.objects) do
+	for k,v in pairs(Game.objects.objects_by_id) do
 		if v:get_visible() and v.spec then
 			if v.spec.type == "item" then
 				table.insert(items, v)
@@ -363,8 +367,8 @@ Editor.save = function(self)
 	table.sort(statics, sortobj)
 	-- Update the pattern.
 	local makeobj = function(v)
-		local p = roundvec(v.position)
-		local r = v.rotation.euler
+		local p = roundvec(v:get_position())
+		local r = v:get_rotation().euler
 		local e
 		if r[1] ~= 0 then
 			e = math.floor(100 * r[1] / (2 * math.pi) + 0.5) / 100
@@ -397,7 +401,7 @@ Editor.save = function(self)
 				if v ~= 0 then
 					local mat = Material:find{id = v}
 					if mat then
-						self.pattern.tiles[i] = {x, y, z, mat.name}
+						self.pattern.tiles[i] = {x, y, z, mat:get_name()}
 						i = i + 1
 					end
 				end
@@ -413,7 +417,7 @@ Editor.save = function(self)
 end
 
 Editor.pick_scene = function(self)
-	local mode = Program.video_mode
+	local mode = Program:get_video_mode()
 	local cursor = Vector(mode[1]/2, mode[2]/2)
 	local r1,r2 = self.camera:picking_ray{cursor = cursor, far = 20, near = 0.1}
 	local ret = Physics:cast_ray{src = r1, dst = r2}
@@ -429,13 +433,12 @@ Editor.pick = function(self)
 	-- Find or create a selection.
 	if object then
 		--determine the object face
-		local osize = object.bounding_box_physics.size
-		local c = self.camera.position
-		local objs = c - object.position --Vector(osize.x/2,osize.y/2,osize.z/2))
+		local osize = object:get_bounding_box_physics().size
+		local c = self.camera:get_position()
+		local objs = c - object:get_position() --Vector(osize.x/2,osize.y/2,osize.z/2))
 		local objsx = math.abs(objs.x)
 		local objsy = math.abs(objs.y)
 		local objsz = math.abs(objs.z)
-		--print(self.camera.position,objsz,objsy,objsx)
 		local face
 		if objsx > objsy and objsx > objsz then
 			face = objs.x < 0 and 1 or 2
@@ -444,14 +447,6 @@ Editor.pick = function(self)
 		else
 			face = objs.z < 0 and 5 or 6
 		end
-		--print(face)
-
--- 		local c = self.camera.position
--- 		local op = object.position
--- 		local face
--- 		if c.x - op.x > c.x - op.x
--- 		if c.x > op.x then face = 2 else face = 1 end 
-		
 		if object.selection then return object.selection end
 		local i = object
 		local se = self.selection[i]
@@ -535,26 +530,25 @@ end
 -- @param force True to force update.
 Editor.update = function(self, secs, force)
 	-- Update the camera.
-	local mode = Program.video_mode
-	local cp0 = self.camera.target_position
-	local cr0 = self.camera.rotation
+	local mode = Program:get_video_mode()
+	local cp0 = self.camera:get_target_position()
+	local cr0 = self.camera:get_rotation()
 	self.camera:update(secs)
 
 	-- FIXME: Is some of this redundant?
-	Program.hdr = Client.options.bloom_enabled
-	Program.multisamples = Client.options.multisamples
-	Program.camera_far = self.camera.far
-	Program.camera_near = self.camera.near
-	Program.camera_position = self.camera.position
-	Program.camera_rotation = self.camera.rotation
-	local mode = Program.video_mode
+	--Program:set_multisamples(Client.options.multisamples)
+	Program:set_camera_far(self.camera:get_far())
+	Program:set_camera_near(self.camera:get_near())
+	Program:set_camera_position(self.camera:get_position())
+	Program:set_camera_rotation(self.camera:get_rotation())
+	local mode = Program:get_video_mode()
 	local viewport = {0, 0, mode[1], mode[2]}
-	self.camera.viewport = viewport
+	self.camera:set_viewport(viewport)
 
-	local cp1 = self.camera.target_position
-	local cr1 = self.camera.rotation
+	local cp1 = self.camera:get_target_position()
+	local cr1 = self.camera:get_rotation()
 	-- Update the light source.
-	self.light.position = cp1 + cr1 * Vector(0,0,-5)
+	self.light:set_position(cp1 + cr1 * Vector(0,0,-5))
 	-- Update the highlight.
 	self.highlight:update(secs)
 	if self.highlight:get_loaded() then
@@ -569,39 +563,6 @@ Editor.update = function(self, secs, force)
 	end
 	-- Update the rectangle selection.
 	self:update_rect_select()
-end
-
-Editor.update_corners = function(self)
-	local i = 1
-	local v = {}
-	local face = function(a,b,c,d,n)
-		v[i] = {a[1],a[2],a[3],n[1],n[2],n[3]}
-		v[i+1] = {b[1],b[2],b[3],n[1],n[2],n[3]}
-		v[i+2] = {d[1],d[2],d[3],n[1],n[2],n[3]}
-		v[i+3] = v[i]
-		v[i+4] = v[i+2]
-		v[i+5] = {c[1],c[2],c[3],n[1],n[2],n[3]}
-		i = i + 6
-	end
-	local o = -0.2
-	local s = self.size * Voxel.tile_size - Vector(o,o,o)*2
-	local p = {
-		{o,o,o,1}, {s.x,o,o,1}, {o,s.y,o,1}, {s.x,s.y,o,1},
-		{o,o,s.z,1}, {s.x,o,s.z,1}, {o,s.y,s.z,1}, {s.x,s.y,s.z,1}}
-	-- Front and back.
-	face(p[1], p[2], p[3], p[4], {0,0,-1})
-	face(p[5], p[6], p[7], p[8], {0,0,1})
-	-- Bottom and top.
-	face(p[1], p[2], p[5], p[6], {0,-1,0})
-	face(p[3], p[4], p[7], p[8], {0,1,0})
-	-- Left and right.
-	face(p[1], p[3], p[5], p[7], {-1,0,0})
-	face(p[2], p[4], p[6], p[8], {1,0,0})
-	-- Create the cube.
-	self.corners.model:remove_vertices()
-	self.corners.model:add_triangles{material = 1, vertices = v}
-	self.corners.model:changed()
-	self.corners.render:set_model(RenderModel(self.corners.model))
 end
 
 Editor.update_rect_select = function(self)

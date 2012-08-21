@@ -1,4 +1,4 @@
-require "system/class"
+local Class = require("system/class")
 
 if not Los.program_load_extension("heightmap") then
 	error("loading extension `heightmap' failed")
@@ -6,8 +6,7 @@ end
 
 ------------------------------------------------------------------------------
 
-Heightmap = Class()
-Heightmap.class_name = "Heightmap"
+local Heightmap = Class("Heightmap")
 
 --- Creates a new heightmap.
 -- @param clss Heightmap class.
@@ -43,3 +42,5 @@ end
 Heightmap.get_height = function(self, point, clamp)
 	return Los.heightmap_get_height(self.handle, point.handle, clamp)
 end
+
+return Heightmap

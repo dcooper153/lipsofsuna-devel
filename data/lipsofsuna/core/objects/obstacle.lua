@@ -1,21 +1,47 @@
-require(Mod.path .. "simulation")
+local Class = require("system/class")
+local Item = require("core/objects/item")
+local ObjectSerializer = require("core/server/object-serializer")
+local SimulationObject = require("core/objects/simulation")
 
-Obstacle = Class(SimulationObject)
-Obstacle.class_name = "Obstacle"
+local Obstacle = Class("Obstacle", SimulationObject)
+Obstacle.serializer = ObjectSerializer{
+	{
+		name = "angular",
+		type = "vector",
+		get = function(self) return self:get_angular() end,
+		set = function(self, v) return self:set_angular(v) end
+	},
+	{
+		name = "health",
+		type = "number"
+	},
+	{
+		name = "position",
+		type = "vector",
+		get = function(self) return self:get_position() end,
+		set = function(self, v) self:set_position(v) end
+	},
+	{
+		name = "rotation",
+		type = "quaternion",
+		get = function(self) return self:get_rotation() end,
+		set = function(self, v) self:set_rotation(v) end
+	}
+}
 
 --- Creates an obstacle.
 -- @param clss Mover class.
 -- @param args Arguments.
 -- @return New obstacle.
 Obstacle.new = function(clss, args)
-	local self = SimulationObject.new(clss, {id = args.id})
+	local self = SimulationObject.new(clss, args and args.id)
 	local copy = function(n, d)
 		if args[n] ~= nil or d then
 			self[n] = (args[n] ~= nil) and args[n] or d
 		end
 	end
 	if args then
-		if args.angular then self.angular = args.angular end
+		if args.angular then self:set_angular(args.angular) end
 		if args.health then self.health = args.health end
 		if args.position then self:set_position(args.position) end
 		if args.rotation then self:set_rotation(args.rotation) end
@@ -31,10 +57,10 @@ end
 Obstacle.clone = function(self)
 	-- TODO: Clone dialog variables?
 	return Obstacle{
-		angular = self.angular,
+		angular = self:get_angular(),
 		health = self.health,
-		position = self.position,
-		rotation = self.rotation,
+		position = self:get_position(),
+		rotation = self:get_rotation(),
 		spec = self.spec}
 end
 
@@ -62,32 +88,12 @@ Obstacle.die = function(self)
 	for k,v in ipairs(self.spec.destroy_items) do
 		local spec = Itemspec:find{name = v[1]}
 		if spec then
-			local p = self.position + self.rotation * (v[2] or Vector())
-			local r = self.rotation * (v[3] or Quaternion())
+			local p = self:transform_local_to_global(v[2])
+			local r = self:get_rotation() * (v[3] or Quaternion())
 			local o = Item{random = true, spec = spec, position = p, rotation = r, realized = true}
 		end
 	end
 	SimulationObject.die(self)
-end
-
---- Writes the object to a database.
--- @param self Object.
--- @param db Database.
-Obstacle.write_db = function(self, db)
-	-- Write the object.
-	local data = serialize{
-		angular = self.angular,
-		health = self.health,
-		position = self.position,
-		rotation = self.rotation}
-	db:query([[REPLACE INTO object_data (id,type,spec,dead,data) VALUES (?,?,?,?,?);]],
-		{self.id, "obstacle", self.spec.name, 0, data})
-	-- Write the sector.
-	if self.sector then
-		db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {self.id, self.sector, nil})
-	else
-		db:query([[DELETE FROM object_sectors where id=?;]], {self.id})
-	end
 end
 
 Obstacle.set_visible = function(self, value)
@@ -110,15 +116,25 @@ Obstacle.set_spec = function(self, value)
 	if not spec then return end
 	SimulationObject.set_spec(self, spec)
 	-- Configure physics.
-	self.collision_group = spec.collision_group
-	self.collision_mask = spec.collision_mask
-	self.gravity = spec.gravity
-	self.mass = spec.mass
-	self.physics = spec.physics
+	self:set_collision_group(spec.collision_group)
+	self:set_collision_mask(spec.collision_mask)
+	self:set_gravity(spec.gravity)
+	self:set_mass(spec.mass)
+	self:set_physics(spec.physics)
 	-- Create the marker.
 	if self:has_server_data() and spec.marker then
-		self.marker = Marker{name = spec.marker, position = self:get_position(), target = self.id}
+		self.marker = Marker{name = spec.marker, position = self:get_position(), target = self:get_id()}
 	end
 	-- Set the model.
 	self:set_model_name(spec.model)
 end
+
+Obstacle.get_storage_sector = function(self)
+	return self:get_sector()
+end
+
+Obstacle.get_storage_type = function(self)
+	return "obstacle"
+end
+
+return Obstacle

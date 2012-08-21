@@ -1,5 +1,7 @@
-Timer = Class()
-Timer.class_name = "Timer"
+local Class = require("system/class")
+local Eventhandler = require("system/eventhandler")
+
+local Timer = Class("Timer")
 Timer.dict_timer = {}
 Timer.dict_delete = {}
 setmetatable(Timer.dict_timer, {__mode = "v"})
@@ -15,7 +17,8 @@ setmetatable(Timer.dict_timer, {__mode = "v"})
 --   <li>owner: Owner object or nil.</li></ul>
 -- @return New timer.
 Timer.new = function(clss, args)
-	local self = Class.new(clss, args)
+	local self = Class.new(clss)
+	for k,v in pairs(args) do self[k] = v end
 	if args.enabled == nil then
 		self:enable()
 	end
@@ -36,21 +39,20 @@ end
 -- @param self Timer.
 Timer.enable = function(self)
 	Timer.dict_timer[self] = self.owner or true
-	self.updated = Program.time
+	self.updated = Program:get_time()
 end
 
-Timer:add_setters{
-	enabled = function(s, v)
-		if v then
-			s:enable()
-		else
-			s:disable()
-		end
-	end}
+Timer.get_enabled = function(self, v)
+	if v then
+		self:enable()
+	else
+		self:disable()
+	end
+end
 
 -- Register event handler.
 Eventhandler{type = "tick", func = function(self, args)
-	local t = Program.time
+	local t = Program:get_time()
 	-- Remove timers.
 	for k in pairs(Timer.dict_delete) do
 		Timer.dict_timer[k] = nil
@@ -74,3 +76,5 @@ Eventhandler{type = "tick", func = function(self, args)
 		end
 	end
 end}
+
+return Timer

@@ -1,7 +1,8 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 require "common/string"
 
-Itemspec = Class(Spec)
+Itemspec = Class("Itemspec", Spec)
 Itemspec.type = "item"
 Itemspec.dict_id = {}
 Itemspec.dict_cat = {}

@@ -1,4 +1,9 @@
-require "system/class"
+local Class = require("system/class")
+local Database = require("system/database")
+local Messaging = require("core/messaging/messaging")
+local Network = require("system/network")
+local ObjectManager = require("core/server/object-manager")
+local Physics = require("system/physics")
 
 Physics.GROUP_ACTORS = 0x0001
 Physics.GROUP_ITEMS = 0x0002
@@ -10,7 +15,8 @@ Physics.GROUP_VOXELS = 0x8000
 Physics.MASK_CAMERA = 0xF003
 Physics.MASK_PICK = 0xF003
 
-Game = Class()
+Game = Class("Game")
+Game.objects = ObjectManager() --FIXME
 Game.scene_nodes_by_ref = {}
 
 --- Initializes the game.
@@ -24,7 +30,7 @@ Game.init = function(self, mode, save, port)
 	self.mode = mode
 	-- Initialize sectors.
 	if save then
-		self.database = Database{name = "save" .. save .. ".sqlite"}
+		self.database = Database("save" .. save .. ".sqlite")
 		self.database:query("PRAGMA synchronous=OFF;")
 		self.database:query("PRAGMA count_changes=OFF;")
 	end
@@ -53,7 +59,7 @@ Game.init = function(self, mode, save, port)
 	-- Initialize terrain updates.
 	if Server.initialized then
 		Voxel.block_changed_cb = function(index, stamp)
-			Vision:event{type = "voxel-block-changed", index = index, stamp = stamp}
+			Server:global_event("voxel-block-changed", {index = index, stamp = stamp})
 		end
 	end
 end
@@ -73,10 +79,7 @@ Game.deinit = function(self)
 	end
 	-- Detach all objects.
 	self.sectors.database = nil
-	for k,v in pairs(Object.objects) do
-		v:detach()
-		Object.objects[k] = nil
-	end
+	self.objects:detach_all()
 	self.sectors:unload_world()
 	self.static_objects_by_id = nil
 	-- Detach scene nodes.

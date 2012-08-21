@@ -1,3 +1,6 @@
+local Material = require("system/material")
+local Obstacle = require("core/objects/obstacle")
+
 -- Spawn trees and plants.
 Feateffectspec:extend{
 	name = "wilderness",
@@ -24,10 +27,10 @@ Feateffectspec:extend{
 					pos.y = y
 					local tile = Voxel:get_tile(pos)
 					if not blocked then
-						if tile == soil.id then
-							Voxel:set_tile(pos, grass.id)
+						if tile == soil:get_id() then
+							Voxel:set_tile(pos, grass:get_id())
 						end
-						if tile == soil.id or tile == grass.id then
+						if tile == soil:get_id() or tile == grass:get_id() then
 							local vec = Vector(x,y,z)
 							table.insert(hits, vec)
 						end

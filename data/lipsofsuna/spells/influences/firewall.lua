@@ -1,3 +1,5 @@
+local AreaSpell = require("core/objects/areaspell")
+
 Feateffectspec:extend{
 	name = "firewall",
 	ranged = function(self, args)
@@ -5,7 +7,7 @@ Feateffectspec:extend{
 		local ctr = Utils:find_empty_ground(args.point)
 		if not ctr then return end
 		-- Select the creation direction.
-		local d = ctr:copy():subtract(args.object.position):abs()
+		local d = ctr:copy():subtract(args.object:get_position()):abs()
 		local dir = (d.x < d.z) and Vector(1) or Vector(0,0,1)
 		-- Create the flames.
 		for i=-2,2 do

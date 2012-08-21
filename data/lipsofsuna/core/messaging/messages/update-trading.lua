@@ -38,7 +38,7 @@ Message{
 			if ok then
 				local item = player.inventory:get_object_by_index(index)
 				if item then
-					count = math.max(item.count, count)
+					count = math.max(item:get_count(), count)
 					table.insert(player.trading.sell, {index, count})
 				end
 			end
@@ -54,5 +54,5 @@ Message{
 		-- Update the deal status.
 		player.trading.buy = buy
 		player.trading.sell = sell
-		Trading:update(player)
+		Server.trading:update(player)
 	end}

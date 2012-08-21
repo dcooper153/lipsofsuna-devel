@@ -18,12 +18,12 @@ Message{
 		local object = player.inventory:get_object_by_index(index)
 		if not object then return end
 		-- Split the dropped stack.
-		count = math.min(object.count, count)
+		count = math.min(object:get_count(), count)
 		local split = object:split(count)
 		-- Drop the item.
 		-- TODO: Better positioning.
 		split:set_position(player:get_position() + player:get_rotation() * Vector(0,0,-1) + Vector(0,1))
-		split.velocity = Vector()
+		split:set_velocity(Vector())
 		split:set_rotation(Quaternion())
 		split:set_visible(true)
 	end}

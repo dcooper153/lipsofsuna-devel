@@ -1,19 +1,21 @@
+local Class = require("system/class")
+
 --- Combined inventory and equipment item storage.<br/>
 -- A generic inventory class that allows one to easily store and retrieve
 -- items. Both objects and strings are supported as items so the class is
 -- usable to both the client and the server.
 -- @name Inventory
 -- @class table
-Inventory = Class()
-Inventory.class_name = "Inventory"
+local Inventory = Class("Inventory")
 
 --- Creates a new inventory.
 -- @param clss Inventory class.
--- @param args Arguments.
+-- @param id Unique ID.
 -- @return New inventory.
-Inventory.new = function(clss, args)
-	local self = Class.new(clss, args)
-	self.size = args and args.size or 10
+Inventory.new = function(clss, id)
+	local self = Class.new(clss)
+	self.id = id
+	self.size = 0
 	self.stored = {}
 	self.equipped = {}
 	self.listeners = setmetatable({}, {__mode = "k"})
@@ -26,7 +28,7 @@ end
 Inventory.calculate_weight = function(self)
 	local w = 0
 	for k,v in pairs(self.stored) do
-		w = w + v.spec.mass_inventory * v.count + v.inventory:calculate_weight()
+		w = w + v.spec.mass_inventory * v:get_count() + v.inventory:calculate_weight()
 	end
 	return w
 end
@@ -49,7 +51,7 @@ Inventory.count_objects_by_name = function(self, name)
 	local count = 0
 	for k,v in pairs(self.stored) do
 		if v.spec.name == name then
-			count = count + v.count
+			count = count + v:get_count()
 		end
 	end
 	return count
@@ -63,7 +65,7 @@ Inventory.count_objects_by_type = function(self, type)
 	local count = 0
 	for k,v in pairs(self.stored) do
 		if v.spec.categories[type] then
-			count = count + v.count
+			count = count + v:get_count()
 		end
 	end
 	return count
@@ -74,7 +76,7 @@ end
 -- @param args Arguments.
 Inventory.equip_best_objects = function(self)
 	-- Get the owner object.
-	local owner = Object:find{id = self.id}
+	local owner = Game.objects:find_by_id(self.id)
 	if not owner then return end
 	-- Loop through all available equipment slots.
 	for name in pairs(owner.spec.equipment_slots) do
@@ -119,8 +121,7 @@ Inventory.equip_index = function(self, index, slot)
 	end
 	-- Notify vision.
 	if Server.initialized then
-		local parent = Object:find{id = self.id}
-		Vision:event{type = "object-equip", id = self.id, index = index, item = o, object = parent, slot = slot}
+		Server:object_event_id(self.id, "object-equip", {index = index, item = o, slot = slot})
 	end
 end
 
@@ -300,7 +301,7 @@ Inventory.merge_or_drop_object = function(self, object)
 	if self:merge_object(object) then return true end
 	-- Find the owner.
 	if not Utils then return end
-	local o = Object:find{id = self.id}
+	local o = Game.objects:find_by_id(self.id)
 	if not o then return end
 	-- Drop near the owner.
 	local p = Utils:find_drop_point{point = o:get_position()}
@@ -398,8 +399,8 @@ end
 Inventory.subtract_objects_by_index = function(self, index, count)
 	local item = self:get_object_by_index(index)
 	if not item then return end
-	if item.count < count then
-		local left = count - item.count
+	if item:get_count() < count then
+		local left = count - item:get_count()
 		self:set_object(index)
 		return left
 	elseif item.count == left then
@@ -420,10 +421,10 @@ Inventory.subtract_objects_by_name = function(self, name, count)
 	local left = count
 	for k,v in pairs(self.stored) do
 		if v.spec.name == name then
-			if v.count < left then
-				left = left - v.count
+			if v:get_count() < left then
+				left = left - v:get_count()
 				self:set_object(k)
-			elseif v.count == left then
+			elseif v:get_count() == left then
 				self:set_object(k)
 				left = 0
 				break
@@ -446,10 +447,10 @@ Inventory.subtract_objects_by_type = function(self, type, count)
 	local left = count
 	for k,v in pairs(self.stored) do
 		if v.categories[type] then
-			if v.count < left then
-				left = left - v.count
+			if v:get_count() < left then
+				left = left - v:get_count()
 				self:set_object(k)
-			elseif v.count == left then
+			elseif v:get_count() == left then
 				self:set_object(k)
 				left = 0
 				break
@@ -478,8 +479,7 @@ Inventory.unequip_index = function(self, index)
 	end
 	-- Notify vision.
 	if Server.initialized then
-		local parent = Object:find{id = self.id}
-		Vision:event{type = "object-unequip", id = self.id, index = index, item = o, object = parent, slot = slot}
+		Server:object_event_id(self.id, "object-unequip", {index = index, item = o, slot = slot})
 	end
 end
 
@@ -498,8 +498,8 @@ Inventory.unequip_slot = function(self, slot)
 	end
 	-- Notify vision.
 	if Server.initialized then
-		local parent = Object:find{id = self.id}
-		Vision:event{type = "object-unequip", id = self.id, index = index, item = o, object = parent, slot = slot}
+		local parent = Game.objects:find_by_id(self.id)
+		Server:object_event_id(self.id, "object-unequip", {index = index, item = o, slot = slot})
 	end
 end
 
@@ -534,3 +534,19 @@ Inventory.update_index = function(self, index)
 		v{type = "inventory-changed", index = index, inventory = self, object = o}
 	end
 end
+
+--- Gets the size of the inventory.
+-- @param self Inventory.
+-- @return Number.
+Inventory.get_size = function(self)
+	return self.size
+end
+
+--- Sets the size of the inventory.
+-- @param self Inventory.
+-- @param value Number.
+Inventory.set_size = function(self, value)
+	self.size = value or 0
+end
+
+return Inventory

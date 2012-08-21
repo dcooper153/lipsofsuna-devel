@@ -1,4 +1,5 @@
 local Combat = require("core/server/combat")
+local Coroutine = require("system/coroutine")
 local ProjectileController = require("core/server/projectile-controller")
 
 local perform_attack = function(attacker, weapon)
@@ -15,7 +16,7 @@ local perform_attack = function(attacker, weapon)
 		if weapon.effect_attack then
 			Server:object_effect(attacker, weapon.effect_attack)
 		end
-		Vision:event{type = "object attack", object = attacker, move = "stand", variant = math.random(0, 255)}
+		Server:object_event(attacker, "object attack", {move = "stand", variant = math.random(0, 255)})
 		-- Fire the projectile.
 		local projectile = ammo:split()
 		local damage = Combat:calculate_ranged_damage(attacker, projectile)
@@ -28,7 +29,7 @@ Actionspec{
 	name = "ranged",
 	charge_start = function(user)
 		user:animate("charge stand", true)
-		user.attack_charge = Program.time
+		user.attack_charge = Program:get_time()
 		user.attack_charge_anim = "ranged"
 	end,
 	charge_end = function(user)

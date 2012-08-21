@@ -1,4 +1,4 @@
-require "system/class"
+local Class = require("system/class")
 
 if not Los.program_load_extension("network") then
 	error("loading extension `network' failed")
@@ -6,8 +6,7 @@ end
 
 ------------------------------------------------------------------------------
 
-Network = Class()
-Network.class_name = "Network"
+local Network = Class("Network")
 
 --- Disconnects a client.
 -- @param clss Network class.
@@ -67,100 +66,32 @@ Network.update = function(clss)
 	Los.network_update()
 end
 
---- Gets the list of connected clients (read-only).
--- @name Network.clients
--- @class table
-
---- Controls whether clients can connect to the server.
--- @name Network.closed
--- @class table
-
---- Gets whether the game connected to network (read-only).
--- @name Network.connected
--- @class table
-
-Network.class_getters = {
-	clients = function(s) return Los.network_get_clients() end,
-	closed = function(s) return Los.network_get_closed() end,
-	connected = function(s) return Los.network_get_connected() end}
-
-Network.class_setters = {
-	closed = function(s, v) Los.network_set_closed(v) end}
-
-------------------------------------------------------------------------------
-
-Packet = Class()
-Packet.class_name = "Packet"
-
---- Creates a new packet.
--- @param self Packet class.
--- @param type Packet type.
--- @param ... Packet contents.
--- @return New packet.
-Packet.new = function(clss, ...)
-	local self = Class.new(clss)
-	self.handle = Los.packet_new(...)
-	return self
+--- Gets the list of connected clients.
+-- @param clss Network class
+-- @return List of client IDs.
+Network.get_clients = function(self)
+	return Los.network_get_clients()
 end
 
---- Reads data starting from the beginning of the packet.
--- @param self Packet.
--- @param ... Types to read.
--- @return Boolean and a list of read values.
-Packet.read = function(self, ...)
-	return Los.packet_read(self.handle, ...)
+--- Returns true if all future connections will be blocked.
+-- @param clss Network class
+-- @return Boolean.
+Network.get_closed = function(self)
+	return Los.network_get_closed()
 end
 
---- Reads data starting from the beginning of the packet.
--- @param self Packet.
--- @param ... Types to read.
--- @return Boolean and a table of read values.
-Packet.read_table = function(self, ...)
-	local pack = function(...) return {...} end
-	local res = pack(self:read(...))
-	local ok = res[1]
-	table.remove(res, 1)
-	return ok,res
+--- Toggles connections blocking.
+-- @param clss Network class
+-- @param v True to block connections, false to accept connections.
+Network.set_closed = function(self, v)
+	Los.network_set_closed(v)
 end
 
---- Reads data starting from the last read positiong of the packet.
--- @param self Packet.
--- @param ... Types to read.
--- @return Boolean and a list of read values.
-Packet.resume = function(self, ...)
-	return Los.packet_resume(self.handle, ...)
+--- Returns true if a connection has been established.
+-- @param clss Network class
+-- @return Boolean.
+Network.get_connected = function(self)
+	return Los.network_get_connected()
 end
 
---- Reads data starting from the beginning of the packet.
--- @param self Packet.
--- @param ... Types to read.
--- @return Boolean and a table of read values.
-Packet.resume_table = function(self, ...)
-	local pack = function(...) return {...} end
-	local res = pack(self:resume(...))
-	local ok = res[1]
-	table.remove(res, 1)
-	return ok,res
-end
-
---- Appends data to the packet.
--- @param self Packet.
--- @param ... Types to write.
-Packet.write = function(self, ...)
-	return Los.packet_write(self.handle, ...)
-end
-
---- Size in bytes.
--- @name Packet.size
--- @class table
-
---- Type number.
--- @name Packet.type
--- @class table
-
-Packet:add_getters{
-	size = function(s) return Los.packet_get_size(s.handle) end,
-	type = function(s) return Los.packet_get_type(s.handle) end}
-
-Packet:add_setters{
-	type = function(s, v) Los.packet_set_type(s.handle, v) end}
+return Network

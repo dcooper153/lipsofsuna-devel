@@ -10,7 +10,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, id, name, value, max, diff)
 		-- Get the object.
-		local o = Object:find{id = id}
+		local o = Game.objects:find_by_id(id)
 		if not o then return end
 		-- Update the stats.
 		o:set_stat(name, value, max, diff)

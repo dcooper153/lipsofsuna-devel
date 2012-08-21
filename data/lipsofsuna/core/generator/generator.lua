@@ -1,7 +1,11 @@
-require(Mod.path .. "region")
+local Class = require("system/class")
+local Material = require("system/material")
+local Network = require("system/network")
+local Region = require(Mod.path .. "region")
+local Sector = require("system/sector")
+local Staticobject = require("core/objects/static")
 
-Generator = Class()
-Generator.class_name = "Generator"
+Generator = Class("Generator")
 Generator.map_size = Vector(1000, 1000, 1000)
 Generator.map_start = Vector(600, 600, 600) - Generator.map_size * 0.5
 Generator.map_end = Vector(600, 600, 600) + Generator.map_size * 0.5
@@ -147,7 +151,7 @@ Generator.generate = function(self, args)
 	-- Find used sectors.
 	self:update_status(0, "Counting sectors")
 	local sectorn = 0
-	local sectors = Program.sectors
+	local sectors = Program:get_sectors()
 	for k in pairs(sectors) do
 		if not self.sectors[k] then
 			self.sectors[k] = "Town"
@@ -186,7 +190,7 @@ Generator.generate = function(self, args)
 	self:update_status(0, "Saving quests")
 	Server.serialize:save_generator(true)
 	Server.serialize:save_markers(true)
-	Server.quest_database:save_quests(true)
+	Server.quest_database:reset()
 	Server.account_database:save_accounts(true)
 	Server.object_database:clear_world_decay()
 	-- Discard events emitted during map generation so that they
@@ -198,7 +202,7 @@ Generator.generate = function(self, args)
 	repeat until not Program:pop_event()
 	-- Inform players of the generation being complete.
 	-- All accounts were erased so clients need to re-authenticate.
-	for k,v in pairs(Network.clients) do
+	for k,v in pairs(Network:get_clients()) do
 		Game.messaging:server_event("login", v)
 	end
 end
@@ -352,7 +356,7 @@ Generator.generate_resources = function(self, pos, size, amount)
 		local t = Voxel:get_tile(p)
 		if t ~= 0 then
 			local m = mats[math.random(1,#mats)]
-			if m then create_vein(p, m.id, 1) end
+			if m then create_vein(p, m:get_id(), 1) end
 		else
 			create_plant_or_item(p)
 		end
@@ -373,7 +377,7 @@ Generator.inform_clients = function(self, client)
 	if client then
 		Game.messaging:server_event("generator status", client, msg, prg)
 	else
-		for k,v in pairs(Network.clients) do
+		for k,v in pairs(Network:get_clients()) do
 			Game.messaging:server_event("generator status", v, msg, prg)
 		end
 	end

@@ -1,7 +1,8 @@
-require(Mod.path .. "ai")
+local Class = require("system/class")
+local Ai = require(Mod.path .. "ai")
 
-NpcAi = Class(Ai)
-Ai.dict_name["npc"] = NpcAi
+local NpcAi = Class("NpcAi", Ai)
+NpcAi.type = "npc"
 
 --- Creates a new actor AI.<br/>
 -- The AI is inactive when created. It's only activated when the controlled
@@ -41,16 +42,16 @@ NpcAi.choose_combat_action = function(self)
 	local allow_strafe_right_jump
 	-- Calculate the distance to the target.
 	local spec = self.object.spec
-	local diff = self.target.position - self.object.position
-	local size1 = self.object.bounding_box_physics.size
-	local size2 = self.target.bounding_box_physics.size
+	local diff = self.target:get_position() - self.object:get_position()
+	local size1 = self.object:get_bounding_box_physics().size
+	local size2 = self.target:get_bounding_box_physics().size
 	size1.y = 0
 	size2.y = 0
 	local dist = diff.length - 0.5 * (size1 + size2).length
 	local hint = 0.7 * spec.aim_ray_end
 	-- Calculate the tile offset.
-	local ctr = self.object.position * Voxel.tile_scale + Vector(0,0.5,0)
-	local dir = self.target.position - self.object.position
+	local ctr = self.object:get_position():copy():multiply(Voxel.tile_scale):add_xyz(0,0.5,0)
+	local dir = self.target:get_position() - self.object:get_position()
 	dir = Vector(dir.x,0,dir.z):normalize()
 	-- Check if we could walk forward.
 	if spec.ai_enable_walk then
@@ -111,7 +112,7 @@ NpcAi.choose_combat_action = function(self)
 		end
 	end
 	-- Initialize the action arguments.
-	local look = self.object.rotation * Vector(0,0,-1)
+	local look = self.object:get_rotation() * Vector(0,0,-1)
 	local args = {
 		aim = dir:dot(Vector(look.x, 0, look.z):normalize()),
 		allow_forward = allow_forward,
@@ -171,7 +172,7 @@ end
 -- @param self AI.
 NpcAi.choose_wander_target = function(self)
 	-- Randomize the search order.
-	local src = (self.object.position * Voxel.tile_scale):add_xyz(0,0.5,0):floor()
+	local src = self.object:get_position():copy():multiply(Voxel.tile_scale):add_xyz(0,0.5,0):floor()
 	local dirs = {Vector(1,0,0), Vector(-1,0,0), Vector(0,0,1), Vector(0,0,-1)}
 	for a=1,4 do
 		local b = math.random(1,4)
@@ -187,7 +188,7 @@ NpcAi.choose_wander_target = function(self)
 	end
 	-- Fallback to a random direction.
 	local rot = Quaternion{axis = Vector(0,1,0), angle = math.random() * 6.28}
-	self.target = self.object.position + rot * Vector(0, 0, 10)
+	self.target = self.object:get_position() + rot * Vector(0, 0, 10)
 end
 
 --- Tries to avoid obstacles on the path to the given wander target.
@@ -195,7 +196,7 @@ end
 -- @param target Point vector in world space.
 -- @return True if avoided successfully.
 NpcAi.avoid_wander_obstacles = function(self, target)
-	local src = (self.object.position * Voxel.tile_scale):add_xyz(0,0.5,0):floor()
+	local src = self.object:get_position():multiply(Voxel.tile_scale):add_xyz(0,0.5,0):floor()
 	local dst = (target * Voxel.tile_scale):add_xyz(0,0.5,0):floor()
 	local p = Vector(
 		math.min(math.max(dst.x, src.x - 1), src.x + 1), src.y,
@@ -319,3 +320,5 @@ NpcAi.update_state = function(self)
 		self:set_state{state = best_state}
 	end
 end
+
+return NpcAi

@@ -1,5 +1,5 @@
-Unittest:add(1, "password", function()
-	require "system/password"
+Unittest:add(1, "system", "password", function()
+	local Password = require("system/password")
 	local rfc3962_test_vectors = {
 		{{"password", "ATHENA.MIT.EDUraeburn", 1},
 			"cdedb5281bb2f801565a1122b25635150ad1f7a04bb9f3a333ecc0e2e1f70837"},

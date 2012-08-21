@@ -1,4 +1,4 @@
-require "system/file"
+local File = require("system/file")
 
 Unittest = {}
 Unittest.tests = {}
@@ -6,11 +6,12 @@ Unittest.tests = {}
 --- Adds a unittest.
 -- @param self Unittest class.
 -- @param stage Stage number.
+-- @param program Program name.
 -- @param name Test name.
 -- @param func Test function.
-Unittest.add = function(self, stage, name, func)
+Unittest.add = function(self, stage, program, name, func)
 	assert(not self.tests[name])
-	self.tests[name] = {stage, name, func}
+	self.tests[name] = {stage, name, func, program}
 end
 
 --- Adds all unittests in the tests directory.
@@ -37,9 +38,22 @@ Unittest.run_all = function(self)
 	end)
 	-- Run the tests.
 	for k,v in ipairs(sorted) do
+		-- Override require.
+		local require_real = require
+		if v[4] ~= "system" then
+			require = function(f)
+				if string.match(f, "^system/") then
+					return require_real(f)
+				else
+					return require_real(v[4] .. "/" .. f)
+				end
+			end
+		end
+		-- Run the test function.
 		print("Testing " .. v[2] .. "...")
-		local s,e = pcall(v[3])
-		if not s then print(e) end
+		xpcall(v[3], function(err) print(debug.traceback(err)) end)
+		-- Restore require.
+		require = require_real
 	end
 end
 

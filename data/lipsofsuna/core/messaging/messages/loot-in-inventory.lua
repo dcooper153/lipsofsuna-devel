@@ -14,7 +14,7 @@ Message{
 		if not player then return end
 		if player.dead then return end
 		-- Get the object.
-		local parent = SimulationObject:find{id = id}
+		local parent = Game.objects:find_by_id(id)
 		if not parent.inventory:is_subscribed(player) then return end
 		if not player:can_reach_object(parent) then return end
 		local object = parent.inventory:get_object_by_index(index)

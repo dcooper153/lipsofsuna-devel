@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "label")
 
-Widgets.Uihelptext = Class(Widgets.Uilabel)
-Widgets.Uihelptext.class_name = "Widgets.Uihelptext"
+Widgets.Uihelptext = Class("Uihelptext", Widgets.Uilabel)
 
 Widgets.Uihelptext.new = function(clss, text)
 	local self = Widgets.Uilabel.new(clss, text)

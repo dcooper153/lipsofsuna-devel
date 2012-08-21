@@ -1,8 +1,10 @@
-require(Mod.path .. "trading")
+local Actor = require("core/objects/actor")
+local Class = require("system/class")
+local Item = require("core/objects/item")
+local Obstacle = require("core/objects/obstacle")
+local Trading = require(Mod.path .. "trading")
 
-Dialog = Class()
-Dialog.dict_id = {}
-Dialog.flags = {}
+local Dialog = Class("Dialog")
 
 --- Creates a new dialog.
 -- @param clss Quest class.
@@ -12,25 +14,13 @@ Dialog.flags = {}
 --   <li>spec: Dialog spec.</li>
 --   <li>user: Object that started the dialog.</li></ul>
 -- @return New dialog.
-Dialog.new = function(clss, args)
-	-- Find the dialog spec.
-	local name = args.name or (args.spec and args.spec.name) or args.object.spec.dialog
-	local spec = args.spec or Dialogspec:find{name = name}
-	if not spec then return end
+Dialog.new = function(clss, object, user, spec)
 	-- Allocate self.
-	local self = Class.new(clss, args)
-	self.id = args.object.id
-	self.name = name
-	self.object = args.object
+	local self = Class.new(clss)
+	self.id = object:get_id()
+	self.object = object
 	self.spec = spec
-	self.user = args.user
-	-- Add to dictionaries.
-	clss.dict_id[self.id] = self
-	-- Attach to the object.
-	self.object.dialog = self
-	if self.object.spec.type == "actor" then
-		self.object:update_ai_state()
-	end
+	self.user = user
 	-- Initialize the virtual machine.
 	self.vm = {{exe = self.spec.commands, off = 0, pos = 1, len = #self.spec.commands}}
 	return self
@@ -139,7 +129,7 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			-- Create the target actor.
 			local actor
 			for k,spec in ipairs(actors) do
-				if not Dialog.flags["scapegoat_alive_" .. spec.name] then
+				if not Server.quest_database:get_dialog_flag("scapegoat_alive_" .. spec.name) then
 					var_actor = spec.name
 					actor = Actor{
 						spec = spec,
@@ -162,7 +152,7 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			var_excuse = excuses[math.random(1, #excuses)]
 			-- Reserve the actor for this quest.
 			npc_marker = actor.spec.marker
-			Dialog.flags["scapegoat_alive_" .. actor.spec.name] = "true"
+			Server.quest_database:set_dialog_flag("scapegoat_alive_" .. actor.spec.name, "true")
 			-- Set the dialog variables.
 			self.object:set_dialog_variable(var_name .. "_init", nil)
 			self.object:set_dialog_variable(var_name .. "_type", var_type)
@@ -175,7 +165,6 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 	if not var_type then
 		local func = random_quests[math.random(1, #random_quests)]
 		func()
-		Server.quest_database:save_quests()
 	end
 	-- Dialog creation functions.
 	-- These build the dialog trees for each random quest type.
@@ -248,11 +237,13 @@ end
 --
 -- @param self Dialog.
 -- @param event Dialog event.
-Dialog.emit_event = function(self, event)
-	self.event = event
+Dialog.emit_event = function(self, object, event)
 	if self.object.spec.type ~= "static" then
-		Vision:event(event)
+		Server:object_event(object, "object-dialog", event)
 	else
+		event.type = "object-dialog"
+		event.id = object:get_id()
+		event.object = object
 		for k,v in pairs(Server.players_by_client) do
 			v:vision_cb(event)
 		end
@@ -268,9 +259,9 @@ Dialog.execute = function(self)
 	-- Utility functions.
 	local check_cond = function(c)
 		-- Backward compatibility.
-		if c.cond and not Dialog.flags[c.cond] then return end
+		if c.cond and not Server.quest_database:get_dialog_flag(c.cond) then return end
 		if c.cond_dead and not self.object.dead then return end
-		if c.cond_not and Dialog.flags[c.cond_not] then return end
+		if c.cond_not and Server.quest_database:get_dialog_flag(c.cond_not) then return end
 		-- New condition string.
 		if not c.check then return true end
 		for _,cond in ipairs(c.check) do
@@ -280,23 +271,23 @@ Dialog.execute = function(self)
 			elseif type == "!dead" then
 				if self.object.dead then return end
 			elseif type == "flag" then
-				if not Dialog.flags[name] then return end
+				if not Server.quest_database:get_dialog_flag(name) then return end
 			elseif type == "!flag" then
-				if Dialog.flags[name] then return end
+				if Server.quest_database:get_dialog_flag(name) then return end
 			elseif type == "quest active" then
-				local quest = Quest:find{name = name}
+				local quest = Server.quest_database:find_quest_by_name(name)
 				if not quest then return end
 				if quest.status ~= "active" then return end
 			elseif type == "quest not active" then
-				local quest = Quest:find{name = name}
+				local quest = Server.quest_database:find_quest_by_name(name)
 				if not quest then return end
 				if quest.status == "active" then return end
 			elseif type == "quest completed" then
-				local quest = Quest:find{name = name}
+				local quest = Server.quest_database:find_quest_by_name(name)
 				if not quest then return end
 				if quest.status ~= "completed" then return end
 			elseif type == "quest not completed" then
-				local quest = Quest:find{name = name}
+				local quest = Server.quest_database:find_quest_by_name(name)
 				if not quest then return end
 				if quest.status == "completed" then return end
 			elseif type == "var" then
@@ -309,7 +300,7 @@ Dialog.execute = function(self)
 	end
 	local select_spawn_position = function(c)
 		if c.position_absolute then return c.position_absolute end
-		local pos = self.object.position
+		local pos = self.object:get_position()
 		if c.position_marker then
 			local m = Marker:find{name = c.position_marker}
 			if m then pos = m.position end
@@ -367,7 +358,7 @@ Dialog.execute = function(self)
 			until not cmd or cmd[1] ~= "choice"
 			-- Break until answered.
 			self.choices = cmds
-			self:emit_event{type = "object-dialog", object = self.object, choices = choices}
+			self:emit_event(self.object, {choices = choices})
 			self.user = nil
 			return true
 		end,
@@ -391,13 +382,11 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["flag"] = function(vm, c)
-			Dialog.flags[c[2]] = "true"
-			Server.quest_database:save_quests()
+			Server.quest_database:set_dialog_flag(c[2], "true")
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["flag clear"] = function(vm, c)
-			Dialog.flags[c[2]] = nil
-			Server.quest_database:save_quests()
+			Server.quest_database:set_dialog_flag(c[2], nil)
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["func"] = function(vm, c)
@@ -422,7 +411,7 @@ Dialog.execute = function(self)
 		info = function(vm, c)
 			-- Break until answered.
 			self.choices = "info"
-			self:emit_event{type = "object-dialog", object = self.object, message = string.format("(%s)", c[2])}
+			self:emit_event(self.object, {message = string.format("(%s)", c[2])})
 			self.user = nil
 			return true
 		end,
@@ -438,7 +427,7 @@ Dialog.execute = function(self)
 			Game.messaging:server_event("notification", self.user.client, c[2])
 		end,
 		quest = function(vm, c)
-			local q = Quest:find{name = c[2]}
+			local q = Server.quest_database:find_quest_by_name(c[2])
 			if q then q:update(c) end
 			vm[1].pos = vm[1].pos + 1
 		end,
@@ -477,7 +466,7 @@ Dialog.execute = function(self)
 		say = function(vm, c)
 			-- Publish the line.
 			self.choices = "line"
-			self:emit_event{type = "object-dialog", object = self.object, character = c[2], message = c[3]}
+			self:emit_event(self.object, {character = c[2], message = c[3]})
 			self.object:animate("talk")
 			self.user = nil
 			return true
@@ -499,9 +488,9 @@ Dialog.execute = function(self)
 			if object then
 				object:set_position(select_spawn_position(c))
 				if type(c.rotation) == "number" then
-					object.rotation = Quaternion{axis = Vector(0,1), angle = c.rotation / math.pi * 180}
+					object:set_rotation(Quaternion{axis = Vector(0,1), angle = c.rotation / math.pi * 180})
 				elseif type(c.rotation) == "table" then
-					object.rotation = c.rotation
+					object:set_rotation(c.rotation)
 				end
 				object:set_visible(true)
 			end
@@ -514,7 +503,7 @@ Dialog.execute = function(self)
 					name = string.format("%s(%d)", c.assign_marker, index)
 					index = index + 1
 				end
-				object.marker = Marker{name = name, position = object.position, target = object.id}
+				object.marker = Marker{name = name, position = object:get_position(), target = object:get_id()}
 				object.marker:unlock()
 			end
 			vm[1].pos = vm[1].pos + 1
@@ -535,7 +524,7 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 		end,
 		trade = function(vm, c)
-			Trading:start(self.user, self.object)
+			Server.trading:start(self.user, self.object)
 			for i = #vm,1,-1 do vm[i] = nil end
 		end,
 		["unlock marker"] = function(vm, c)
@@ -546,7 +535,7 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["unlock reward"] = function(vm, c)
-			Unlocks:unlock_random()
+			Server.unlocks:unlock_random()
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["var"] = function(vm, c)
@@ -570,9 +559,7 @@ Dialog.execute = function(self)
 		end
 	end
 	-- Reset at end.
-	self:emit_event{type = "object-dialog", object = self.object}
-	Dialog.dict_id[self.id] = nil
-	self.object.dialog = nil
-	self.object = nil
-	self.user = nil
+	Server.dialogs:cancel(self.object)
 end
+
+return Dialog

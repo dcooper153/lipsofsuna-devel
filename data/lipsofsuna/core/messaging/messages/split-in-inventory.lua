@@ -14,7 +14,7 @@ Message{
 		if not player then return end
 		if player.dead then return end
 		-- Get the object.
-		local parent = SimulationObject:find{id = id}
+		local parent = Game.objects:find_by_id(id)
 		if not parent.inventory:is_subscribed(player) then return end
 		if not player:can_reach_object(parent) then return end
 		local object = parent.inventory:get_object_by_index(index)
@@ -22,9 +22,9 @@ Message{
 		-- Validate the split.
 		if count == 0 then return end
 		if not object.spec.stacking then return end
-		if not object.count or object.count < 2 then return end
+		if object:get_count() < 2 then return end
 		count = math.max(1, count)
-		count = math.min(count, object.count - 1)
+		count = math.min(count, object:get_count() - 1)
 		-- Split the stack.
 		local dst = parent.inventory:get_empty_index()
 		if not dst then

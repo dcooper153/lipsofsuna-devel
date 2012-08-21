@@ -1,5 +1,5 @@
-Unittest:add(1, "file", function()
-	require "system/file"
+Unittest:add(1, "system", "file", function()
+	local File = require("system/file")
 	-- Directory scanning.
 	local r1 = File:scan_directory("/")
 	assert(#r1 == 3)

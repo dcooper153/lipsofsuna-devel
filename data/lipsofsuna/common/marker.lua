@@ -1,4 +1,6 @@
-Marker = Class()
+local Class = require("system/class")
+
+Marker = Class("Marker")
 Marker.dict_name = {}
 Marker.dict_discoverable = {}
 
@@ -19,7 +21,8 @@ end
 --   <li>target: ID of the target object.</li></ul>
 -- @return Marker.
 Marker.new = function(clss, args)
-	local self = Class.new(clss, args)
+	local self = Class.new(clss)
+	for k,v in pairs(args) do self[k] = v end
 	clss.dict_name[args.name] = self
 	if self.discoverable then
 		clss.dict_discoverable[args.name] = self

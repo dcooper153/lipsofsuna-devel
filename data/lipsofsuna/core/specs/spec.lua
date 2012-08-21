@@ -1,4 +1,7 @@
-Spec = Class()
+local Class = require("system/class")
+local File = require("system/file")
+
+Spec = Class("Spec")
 Spec.dict_id = {}
 Spec.dict_cat = {}
 Spec.dict_name = {}
@@ -43,8 +46,9 @@ end
 --   <li>name: Spec name.</li></ul>
 -- @return New item spec.
 Spec.new = function(clss, args)
-	local self = Class.new(clss, args)
+	local self = Class.new(clss)
 	self.id = #clss.dict_id + 1
+	for k,v in pairs(args) do self[k] = v end
 	-- Setup categories.
 	self.categories = args.categories or {}
 	-- Register.
@@ -247,3 +251,5 @@ Spec.write_str = function(self)
 		return self.introspect:write_str(self)
 	end
 end
+
+return Spec

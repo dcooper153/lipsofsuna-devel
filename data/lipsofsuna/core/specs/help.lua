@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Helpspec = Class(Spec)
+Helpspec = Class("Helpspec", Spec)
 Helpspec.type = "helpspec"
 Helpspec.dict_id = {}
 Helpspec.dict_cat = {}

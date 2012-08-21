@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "invitem")
 
-Widgets.Uitradeslot = Class(Widgets.Uiinvitem)
-Widgets.Uitradeslot.class_name = "Widgets.Uitradeslot"
+Widgets.Uitradeslot = Class("Uitradeslot", Widgets.Uiinvitem)
 
 Widgets.Uitradeslot.new = function(clss, item, index, buy)
 	local self = Widgets.Uiinvitem.new(clss, nil, item, index, item and item.slot)

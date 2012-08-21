@@ -1,4 +1,6 @@
-Operators.quests = Class()
+local Class = require("system/class")
+
+Operators.quests = Class("QuestsOperator")
 Operators.quests.data = {}
 
 --- Resets the quest manager.</br>
@@ -7,7 +9,7 @@ Operators.quests.data = {}
 --
 -- @param self Operator.
 Operators.quests.reset = function(self)
-	self.data = {sound_timer = Program.time, quests = {}}
+	self.data = {sound_timer = Program:get_time(), quests = {}}
 end
 
 --- Adds a new quest.<br/>
@@ -18,7 +20,7 @@ end
 -- @param quest Quest information.
 Operators.quests.add_quest = function(self, quest)
 	-- Add to the dictionary.
-	self.data.quests[quest.id] = quest
+	self.data.quests[quest.name] = quest
 	-- Set as active if nothing else is active.
 	if not self.data.shown and quest.status ~= "completed" then
 		self.data.shown = quest
@@ -76,7 +78,7 @@ Operators.quests.get_compass_direction = function(self)
 	if not marker then return end
 	-- Calculate the direction.
 	if not Client.player_object then return end
-	local diff = marker.position - Client.player_object.position
+	local diff = marker.position - Client.player_object:get_position()
 	return 0.5 * math.pi + math.atan2(diff.z, -diff.x)
 end
 
@@ -92,7 +94,7 @@ Operators.quests.get_compass_distance = function(self)
 	if not marker then return end
 	-- Calculate the distance.
 	if not Client.player_object then return end
-	local diff = marker.position - Client.player_object.position
+	local diff = marker.position - Client.player_object:get_position()
 	diff.y = 0
 	return diff.length
 end
@@ -109,7 +111,7 @@ Operators.quests.get_compass_height = function(self)
 	if not marker then return end
 	-- Calculate the height offset.
 	if not Client.player_object then return end
-	local diff = marker.position - Client.player_object.position
+	local diff = marker.position - Client.player_object:get_position()
 	return diff.y
 end
 
@@ -119,8 +121,8 @@ end
 --
 -- @param self Client.
 -- @return Quest status, or nil.
-Operators.quests.get_quest_by_id = function(self, id)
-	return self.data.quests[id]
+Operators.quests.get_quest_by_name = function(self, name)
+	return self.data.quests[name]
 end
 
 --- Set the status of the quest.<br/>
@@ -132,7 +134,7 @@ end
 -- @param status New status.
 -- @param text Quest text.
 Operators.quests.set_quest_status = function(self, quest, status, text)
-	local t = Program.time
+	local t = Program:get_time()
 	local joining = Operators.play:is_startup_period()
 	local silent = joining or (t - self.data.sound_timer < 2)
 	-- Update the status.
@@ -161,7 +163,7 @@ Operators.quests.set_quest_status = function(self, quest, status, text)
 	end
 	-- Set as active if nothing else is active.
 	if not self.data.shown and status ~= "completed" then
-		self.data.shown = quest.id
+		self.data.shown = quest.name
 	end
 end
 
@@ -173,8 +175,8 @@ end
 -- @return List of quests.
 Operators.quests.get_quests = function(self)
 	local quests = {}
-	for id,quest in pairs(self.data.quests) do
-		local spec = Quest:find{id = id}
+	for name,quest in pairs(self.data.quests) do
+		local spec = Questspec:find{name = name}
 		table.insert(quests, {spec, quest})
 	end
 	table.sort(quests, function(a, b) return a[1].name < b[1].name end)

@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "radio")
 
-Widgets.Uiquest = Class(Widgets.Uiradio)
-Widgets.Uiquest.class_name = "Widgets.Uiquest"
+Widgets.Uiquest = Class("Uiquest", Widgets.Uiradio)
 
 Widgets.Uiquest.new = function(clss, quest)
 	local self = Widgets.Uiradio.new(clss, nil, "quest")

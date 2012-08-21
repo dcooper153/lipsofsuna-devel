@@ -1,5 +1,6 @@
 local BoomerangController = require("core/server/boomerang-controller")
 local Combat = require("core/server/combat")
+local Coroutine = require("system/coroutine")
 local ProjectileController = require("core/server/projectile-controller")
 
 local perform_attack = function(attacker, weapon)
@@ -8,7 +9,7 @@ local perform_attack = function(attacker, weapon)
 		Coroutine:sleep(attacker.spec.timing_attack_throw * 0.02)
 		-- Play the attack effect.
 		Server:object_effect(attacker, "swing1")
-		Vision:event{type = "object attack", object = attacker, move = "stand", variant = math.random(0, 255)}
+		Server:object_event(attacker, "object attack", {move = "stand", variant = math.random(0, 255)})
 		-- Fire the projectile.
 		local projectile = weapon:split()
 		local damage = Combat:calculate_ranged_damage(attacker, projectile)
@@ -26,7 +27,7 @@ Actionspec{
 	name = "throw",
 	charge_start = function(user)
 		user:animate("charge stand", true)
-		user.attack_charge = Program.time
+		user.attack_charge = Program:get_time()
 		user.attack_charge_anim = "throw"
 	end,
 	charge_end = function(user)

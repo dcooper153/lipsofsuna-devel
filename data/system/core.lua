@@ -1,7 +1,7 @@
-require "system/class"
+local Class = require("system/class")
+local Model = require("system/model")
 
-Program = Class()
-Program.class_name = "Program"
+Program = Class("Program")
 
 --- Adds a data lookup path.
 -- @param clss Program class.
@@ -40,35 +40,12 @@ end
 -- @param clss Program class.
 -- @return Event table, or nil.
 Program.pop_event = function(clss)
-	local pop = function()
-		clss:pump_events()
-		if not __events then return end
-		local t = __events[1]
-		if not t then return end
-		table.remove(__events, 1)
-		return t
-	end
-	local conv = function(t)
-		if t.type == "object-contact" then
-			if t.self then
-				t.self = Object:find{id = t.self}
-				if not t.self then return end
-			end
-			if t.object then
-				t.object = Object:find{id = t.object}
-				if not t.object then return end
-			end
-		elseif t.type == "object-motion" then
-			t.object = Object:find{id = t.object}
-			if not t.object then return end
-		end
-		return true
-	end
-	while true do
-		local t = pop()
-		if not t then return end
-		if conv(t) then return t end
-	end
+	clss:pump_events()
+	if not __events then return end
+	local t = __events[1]
+	if not t then return end
+	table.remove(__events, 1)
+	return t
 end
 
 --- Pops a message sent by the parent script.
@@ -78,7 +55,7 @@ Program.pop_message = function(self)
 	local r = Los.program_pop_message()
 	if not r then return end
 	if r.type == "model" and r.model then
-		r.model = Class.new(Model, {handle = r.model})
+		r.model = Model:new_from_handle(r.model)
 	end
 	return r
 end
@@ -113,9 +90,11 @@ Program.push_message = function(self, ...)
 end
 
 --- Unloads a sector.<br/>
+--
 -- Unrealizes all normal objects in the sector and clears the terrain in the sector.
 -- Objects that have the disable_unloading member set are kept despite calling this.
 -- The sector is removed from the sector list if no realized objects remain.
+--
 -- @param clss Program class.
 -- @param args Arguments.<ul>
 --   <li>sector: Sector index.</li></ul>
@@ -123,11 +102,11 @@ Program.unload_sector = function(clss, args)
 	-- Don't unload if the sector contains non-unloadable objects.
 	-- Sectors can't be partially unloaded so we can't unload sectors
 	-- that have distant objects if we want to keep them around.
-	for k,v in pairs(Object:find{sector = args.sector}) do
+	for k,v in pairs(Game.objects:find_by_sector(args.sector)) do
 		if v.disable_unloading then return end
 	end
 	-- Unrealize all objects.
-	for k,v in pairs(Object:find{sector = args.sector}) do
+	for k,v in pairs(Game.objects:find_by_sector(args.sector)) do
 		v:detach()
 	end
 	-- Remove the sector.
@@ -172,53 +151,81 @@ Program.wait = function(clss, secs)
 	Los.program_wait(secs)
 end
 
---- The argument string passed to the program at startup time.
--- @name Program.args
--- @class table
+--- Gets the argument string passed to the program at startup time.
+-- @param self Program class.
+-- @return String.
+Program.get_args = function(self)
+	return Los.program_get_args()
+end
 
---- Short term average frames per second.
--- @name Program.fps
--- @class table
+--- Gets the short term average frames per second.
+-- @param self Program class.
+-- @return Number.
+Program.get_fps = function(self)
+	return Los.program_get_fps()
+end
 
---- Boolean indicating whether the game needs to exit.
--- @name Program.quit
--- @class table
+--- Gets the quit flag of the program.
+-- @param self Program class.
+-- @return Boolean.
+Program.get_quit = function(self)
+	return Los.program_get_quit()
+end
 
---- Dictionary of indices of active sectors.
--- @name Program.sectors
--- @class table
+--- Sets the quit flag of the program.
+-- @param self Program class.
+-- @param v True.
+Program.set_quit = function(self, v)
+	Los.program_set_quit(v)
+end
 
---- Sector size in world units.
--- @name Program.sector_size
--- @class table
+--- Gets the dictionary of active sector IDs.
+-- @param self Program class.
+-- @return Dictionary of number keys and boolean values.
+Program.get_sectors = function(self)
+	return Los.program_get_sectors()
+end
 
---- Sleep time between ticks, in seconds.
--- @name Program.quit
--- @class table
+--- Gets the sector size in world units.
+-- @param self Program class.
+-- @return Number.
+Program.get_sector_size = function(self)
+	return Los.program_get_sector_size()
+end
 
---- Short term average tick length in seconds.
--- @name Program.tick
--- @class table
+--- Gets the sleep time between ticks.
+-- @param self Program class.
+-- @return Timer in seconds.
+Program.get_sleep = function(self)
+	return Los.program_get_sleep()
+end
 
---- Number of seconds the program has been running.
--- @name Program.time
--- @class table
+--- Sets the sleep time between ticks.
+-- @param self Program class.
+-- @param v Timer in seconds.
+Program.set_sleep = function(self, v)
+	Los.program_set_sleep(v)
+end
 
---- Version string of the engine.
--- @name Program.version
--- @class table
+--- Gets the short term average tick length in seconds.
+-- @param self Program class.
+-- @return Number.
+Program.get_tick = function(self)
+	return Los.program_get_tick()
+end
 
-Program.class_getters = {
-	args = function(s) return Los.program_get_args() end,
-	fps = function(s) return Los.program_get_fps() end,
-	quit = function(s) return Los.program_get_quit() end,
-	sectors = function(s) return Los.program_get_sectors() end,
-	sector_size = function(s) return Los.program_get_sector_size() end,
-	sleep = function(s) return Los.program_get_sleep() end,
-	tick = function(s) return Los.program_get_tick() end,
-	time = function(s) return Los.program_get_time() end,
-	version = function(s) return Los.program_get_version() end}
+--- Gets the number of seconds the program has been running.
+-- @param self Program class.
+-- @return Number.
+Program.get_time = function(self)
+	return Los.program_get_time()
+end
 
-Program.class_setters = {
-	quit = function(s, v) Los.program_set_quit(v) end,
-	sleep = function(s, v) Los.program_set_sleep(v) end}
+--- Gets the version string of the engine.
+-- @param self Program class.
+-- @return String.
+Program.get_version = function(self)
+	return Los.program_get_version()
+end
+
+return Program

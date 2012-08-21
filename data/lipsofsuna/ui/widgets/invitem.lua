@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "widget")
 
-Widgets.Uiinvitem = Class(Widgets.Uiwidget)
-Widgets.Uiinvitem.class_name = "Widgets.Uiinvitem"
+Widgets.Uiinvitem = Class("Uiinvitem", Widgets.Uiwidget)
 
 Widgets.Uiinvitem.new = function(clss, id, item, index, slot)
 	local self = Widgets.Uiwidget.new(clss)
@@ -27,7 +27,7 @@ Widgets.Uiinvitem.rebuild_size = function(self)
 	-- Get the base size.
 	local size = Widgets.Uiwidget.rebuild_size(self)
 	-- Resize to fit the description.
-	local name = self.pretty_name
+	local name = self:get_pretty_name()
 	if name then
 		local w,h = Program:measure_text(Theme.text_font_1, name, size.x - 40)
 		if h then size.y = math.max(size.y, h + 10) end
@@ -53,7 +53,7 @@ Widgets.Uiinvitem.rebuild_canvas = function(self)
 			source_tiling = {0,icon.size[1],0,0,icon.size[2],0}}
 	end
 	-- Add the name.
-	local name = self.pretty_name
+	local name = self:get_pretty_name()
 	if name then
 		self:canvas_text{
 			dest_position = {40,5},
@@ -74,7 +74,7 @@ Widgets.Uiinvitem.rebuild_canvas = function(self)
 			text_font = Theme.text_font_2}
 	end
 	-- Add the count.
-	local count = self.pretty_count
+	local count = self:get_pretty_count()
 	if count then
 		self:canvas_text{
 			dest_position = {5,5},
@@ -86,15 +86,15 @@ Widgets.Uiinvitem.rebuild_canvas = function(self)
 	end
 end
 
-Widgets.Uiinvitem:add_getters{
-	pretty_count = function(self)
-		if not self.item then return end
-		if not self.item.count or self.item.count <= 1 then return end
-		return tostring(self.item.count)
-	end,
-	pretty_name = function(self)
-		if not self.item then return end
-		if not self.item.text then return end
-		local subs = function(a,b) return string.upper(a) .. b end
-		return string.gsub(self.item.text, "(.)(.*)", subs)
-	end}
+Widgets.Uiinvitem.get_pretty_count = function(self)
+	if not self.item then return end
+	if not self.item.count or self.item.count <= 1 then return end
+	return tostring(self.item.count)
+end
+
+Widgets.Uiinvitem.get_pretty_name = function(self)
+	if not self.item then return end
+	if not self.item.text then return end
+	local subs = function(a,b) return string.upper(a) .. b end
+	return string.gsub(self.item.text, "(.)(.*)", subs)
+end

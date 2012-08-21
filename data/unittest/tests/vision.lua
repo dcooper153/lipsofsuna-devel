@@ -1,5 +1,9 @@
-Unittest:add(1, "vision", function()
-	require "system/vision"
+Unittest:add(1, "system", "vision", function()
+	local Class = require("system/class")
+	local Eventhandler = require("system/eventhandler")
+	local Object = require("system/object")
+	local Vector = require("system/math/vector")
+	local Vision = require("system/vision")
 	local evt
 	local update = function(vis)
 		local evt = vis:update()
@@ -7,13 +11,24 @@ Unittest:add(1, "vision", function()
 		Eventhandler:update()
 		return vis:update()
 	end
+	local objects = Class("ObjectManager")
+	objects.dict = setmetatable({}, {__mode = "kv"})
+	objects.add = function(self, obj) self.dict[obj:get_id()] = obj end
+	objects.find_by_id = function(self, id) return self.dict[id] end
 	-- Initialization.
 	Eventhandler:update()
-	local vis = Vision{enabled = true, position = Vector(100,200,300), radius = 2, threshold = 1}
-	assert(vis.radius == 2)
-	assert(vis.threshold == 1)
+	local vis = Vision(0, objects)
+	vis:set_enabled(true)
+	vis:set_position(Vector(100,200,300))
+	vis:set_radius(2)
+	vis:set_threshold(1)
+	assert(vis:get_radius() == 2)
+	assert(vis:get_threshold() == 1)
 	-- Creating unrealized objects.
-	local obj = Object{position = Vector(100,200,300)}
+	local obj = Object()
+	obj:set_id(1)
+	obj:set_position(Vector(100,200,300))
+	objects:add(obj)
 	evt = update(vis)
 	assert(#evt == 0)
 	-- Realizing within the sphere.
@@ -24,26 +39,26 @@ Unittest:add(1, "vision", function()
 	assert(evt[1].object == obj)
 	assert(vis.objects[obj])
 	-- Moving within the sphere.
-	obj.position = obj.position + Vector(1.8)
+	obj:set_position(obj:get_position() + Vector(1.8))
 	evt = update(vis)
 	assert(#evt == 0)
 	-- Moving within the keep threshold.
-	obj.position = obj.position + Vector(1)
+	obj:set_position(obj:get_position() + Vector(1))
 	evt = update(vis)
 	assert(#evt == 0)
 	-- Leaving the sphere.
-	obj.position = obj.position + Vector(1.2)
+	obj:set_position(obj:get_position() + Vector(1.2))
 	evt = update(vis)
 	assert(#evt == 1)
 	assert(evt[1].type == "object-hidden")
 	assert(evt[1].object == obj)
 	assert(not vis.objects[obj])
 	-- Moving outside the sphere.
-	obj.position = obj.position - Vector(1.5)
+	obj:set_position(obj:get_position() - Vector(1.5))
 	evt = update(vis)
 	assert(#evt == 0)
 	-- Moving into the sphere.
-	obj.position = obj.position - Vector(1)
+	obj:set_position(obj:get_position() - Vector(1))
 	evt = update(vis)
 	assert(#evt == 1)
 	assert(evt[1].type == "object-shown")
@@ -57,7 +72,11 @@ Unittest:add(1, "vision", function()
 	-- Multiple events.
 	obj:set_visible(true)
 	evt = update(vis)
-	local obj1 = Object{position = Vector(100,200,300), realized = true}
+	local obj1 = Object()
+	obj1:set_id(2)
+	obj1:set_position(Vector(100,200,300))
+	obj1:set_visible(true)
+	objects:add(obj1)
 	obj:set_visible(false)
 	evt = update(vis)
 	assert(#evt == 2)

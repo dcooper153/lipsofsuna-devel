@@ -1,4 +1,9 @@
-require "system/class"
+local Animation = require("system/animation")
+local Class = require("system/class")
+
+if not Los.program_load_extension("graphics") then
+	error("loading extension `graphics' failed")
+end
 
 if not Los.program_load_extension("object-render") then
 	error("loading extension `object-render' failed")
@@ -6,8 +11,7 @@ end
 
 ------------------------------------------------------------------------------
 
-RenderObject = Class()
-RenderObject.class_name = "RenderObject"
+local RenderObject = Class("RenderObject")
 
 --- Creates a new render object.
 -- @param self Render object class.
@@ -75,7 +79,7 @@ end
 RenderObject.find_node = function(self, args)
 	local p,r = Los.render_object_find_node(self.handle, args)
 	if not p then return end
-	return Class.new(Vector, {handle = p}), Class.new(Quaternion, {handle = r})
+	return Vector:new_from_handle(p), Quaternion:new_from_handle(r)
 end
 
 --- Gets animation information for the given animation channel.<br/>

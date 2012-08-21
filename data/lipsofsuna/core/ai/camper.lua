@@ -1,7 +1,8 @@
-require(Mod.path .. "npc")
+local Class = require("system/class")
+local NpcAi = require(Mod.path .. "npc")
 
-CamperAi = Class(NpcAi)
-Ai.dict_name["camper"] = CamperAi
+local CamperAi = Class("CamperAi", NpcAi)
+CamperAi.type = "camper"
 
 --- Creates a new camper AI.
 -- @param clss CamperAi class.
@@ -17,7 +18,7 @@ end
 CamperAi.choose_wander_target = function(self)
 	local home = self.object.home_point
 	if home then
-		local dist = (self.object.position - self.object.home_point).length
+		local dist = (self.object:get_position() - self.object.home_point).length
 		if dist > 15 * math.random() then
 			self.target = home
 			if self:avoid_wander_obstacles(home) then return end
@@ -32,8 +33,10 @@ end
 CamperAi.update = function(self, secs)
 	-- Store the home point.
 	if not self.object.home_point then
-		self.object.home_point = self.object.position
+		self.object.home_point = self.object:get_position()
 	end
 	-- Update the base AI.
 	NpcAi.update(self, secs)
 end
+
+return CamperAi

@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "widget")
 
-Widgets.Uimap = Class(Widgets.Uiwidget)
-Widgets.Uimap.class_name = "Widgets.Uimap"
+Widgets.Uimap = Class("Uimap", Widgets.Uiwidget)
 
 --- Creates a new map widget.
 -- @return Map widget.
@@ -21,7 +21,7 @@ end
 -- @param rot World space rotation of the marker.
 Widgets.Uimap.add_marker = function(self, icon, name, pos, rot)
 	-- Calculate the relative position.
-	local center = Client.player_object.position
+	local center = Client.player_object:get_position()
 	local loc = Vector(pos.x, pos.z) - Vector(center.x, center.z)
 	-- Calculate the pixel position.
 	local size = self.size
@@ -64,7 +64,7 @@ Widgets.Uimap.handle_event = function(self, args)
 		end
 	end
 	-- Zoom with mouse.
-	if not Ui.pointer_grab and args.type == "mousescroll" then
+	if not Ui:get_pointer_grab() and args.type == "mousescroll" then
 		if args.rel > 0 then
 			self:zoom("in")
 		else
@@ -86,7 +86,7 @@ Widgets.Uimap.rebuild_canvas = function(self)
 	-- Rebuild the markers.
 	local player = Client.player_object
 	self:clear_markers()
-	self:add_marker("mapmarker2", "player", player.position, player.rotation.euler[1])
+	self:add_marker("mapmarker2", "player", player:get_position(), player:get_rotation().euler[1])
 	for k,v in pairs(Marker.dict_name) do
 		if v.unlocked then
 			self:add_marker("mapmarker1", k, v.position, 0)

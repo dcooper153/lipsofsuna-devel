@@ -1,17 +1,18 @@
 require "system/vision"
+local Class = require("system/class")
 
 --- Create and synchronize stats.
 -- @name Stats
 -- @class table
-Stats = Class()
-Stats.class_name = "Stats"
+local Stats = Class("Stats")
 
 --- Creates a new stats list.
 -- @param clss Stats class.
--- @param args Arguments.
+-- @param id Unique ID.
 -- @return New stats.
-Stats.new = function(clss, args)
-	local self = Class.new(clss, args)
+Stats.new = function(clss, id)
+	local self = Class.new(clss)
+	self.id = id
 	self.stats = {}
 	self.enabled = not args or args.enabled ~= false
 	self:register{
@@ -125,8 +126,8 @@ Stats.notify_change = function(self, stat)
 	if not Server.initialized then return end
 	if not stat.value_prev then return end
 	if math.floor(stat.value) == math.floor(stat.value_prev) then return end
-	Vision:event{type = "stat changed", id = self.id, name = stat.name,
-		maximum = stat.maximum, value = stat.value, value_prev = stat.value_prev}
+	Server:object_event_id(self.id, "stat changed", {name = stat.name,
+		maximum = stat.maximum, value = stat.value, value_prev = stat.value_prev})
 end
 
 --- Registers a skill.
@@ -221,3 +222,5 @@ Stats.set_value = function(self, name, value)
 	v.value = math.max(0, math.min(value or 0, v.maximum))
 	self:notify_change(v)
 end
+
+return Stats

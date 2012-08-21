@@ -15,5 +15,5 @@ Message{
 		Client.data.connection.text = "Map generator: " .. message .. " (" .. math.ceil(progress * 100) .. "%)"
 		Client.data.connection.active = true
 		Client.data.connection.waiting = true
-		Ui.state = "start-game"
+		Ui:set_state("start-game")
 	end}

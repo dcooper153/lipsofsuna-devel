@@ -1,7 +1,8 @@
-require "system/class"
-require "system/password"
+local Account = require(Mod.path .. "account")
+local Class = require("system/class") 
+local Password = require("system/password")
 
-AccountDatabase = Class()
+local AccountDatabase = Class("AccountDatabase")
 AccountDatabase.account_version = "1"
 
 --- Creates a new account database.
@@ -45,16 +46,40 @@ AccountDatabase.reset = function(self)
 	self:set_account_option("account_version", self.account_version)
 end
 
+--- Creates an empty account.
+-- @param self AccountDatabase.
+-- @param login Login name.
+-- @param password Password.
+-- @return Account.
+AccountDatabase.create_account = function(self, login, password)
+	local hash = self:hash_password(login, password)
+	local account = Account(login, hash)
+	self:save_account(account)
+	return account
+end
+
+--- Creates a hashed version of the password.
+-- @param self AccountDatabase.
+-- @param login Login name.
+-- @param password Password string.
+-- @return Hashed password string.
+AccountDatabase.hash_password = function(self, login, password)
+	return Password:hash(password, self.password_salt)
+end
+
 --- Loads an account from the account database.
 -- @param self AccountDatabase.
 -- @param login Login name.
--- @return Account database row, or nil.
-AccountDatabase.load_account = function(self, login)
+-- @param password Password.
+-- @return Account or nil, status message or nil.
+AccountDatabase.load_account = function(self, login, password)
 	local r = self.db:query(
 		[[SELECT login,password,permissions,character,spawn_point
 		FROM accounts WHERE login=?;]], {login})
 	for k,v in ipairs(r) do
-		return v
+		local hash = self:hash_password(login, password)
+		if v[2] ~= hash then return nil, "authentication failed" end
+		return Account(login, hash, v[3], v[4], v[5]), "login successful"
 	end
 end
 
@@ -67,7 +92,7 @@ AccountDatabase.save_account = function(self, account, object)
 		[[REPLACE INTO accounts
 		(login,password,permissions,character,spawn_point)
 		VALUES (?,?,?,?,?);]],
-		{account.login, account.password, account.permissions, object and object.id, account.spawn_point and tostring(account.spawn_point)})
+		{account.login, account.password, account.permissions, object and object:get_id(), account.spawn_point and tostring(account.spawn_point)})
 end
 
 --- Saves all active player accounts.
@@ -113,3 +138,5 @@ AccountDatabase.set_account_option = function(self, key, value)
 	self.db:query(
 		[[REPLACE INTO options (key,value) VALUES (?,?);]], {key, value})
 end
+
+return AccountDatabase

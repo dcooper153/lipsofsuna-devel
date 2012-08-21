@@ -1,4 +1,6 @@
-Operators.introspect = Class()
+local Class = require("system/class")
+
+Operators.introspect = Class("IntrospectOperator")
 Operators.introspect.data = {}
 
 --- Initializes the introspection tool.

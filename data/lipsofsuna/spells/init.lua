@@ -1,3 +1,6 @@
+local File = require("system/file")
+local Program = require("system/core")
+
 Program:add_path(Mod.path .. "effects")
 File:require_directory(Mod.path .. "influences")
 

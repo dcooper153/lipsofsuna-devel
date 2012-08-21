@@ -1,7 +1,8 @@
+local Class = require("system/class")
 require "common/string"
 
-Settings = Class()
-Settings.arguments = string.split(Program.args)
+Settings = Class("Settings")
+Settings.arguments = string.split(Program:get_args())
 Settings.address = "localhost"
 Settings.port = 10101
 Settings.account = "guest"
@@ -121,7 +122,7 @@ end
 -- @return Usage string.
 Settings.usage = function(clss)
 	if clss.version then
-		return Program.version
+		return Program:get_version()
 	else
 		return [[Usage: lipsofsuna [options]
 
@@ -143,3 +144,5 @@ Options:
   -w --watchdog               Disable the watchdog timer.]]
 	end
 end
+
+return Settings

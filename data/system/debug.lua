@@ -1,6 +1,6 @@
-require "system/class"
+local Class = require("system/class")
 
-Debug = Class()
+local Debug = Class("Debug")
 
 --- Prints the paths to class instances of the given type.
 -- @param clss Debug class.
@@ -59,3 +59,5 @@ Debug.dump_paths_by_class_instance = function(clss, find)
 	end
 	traverse_var("_G", _G, {}, 1)
 end
+
+return Debug

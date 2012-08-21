@@ -1,8 +1,9 @@
+local Animation = require("system/animation")
 local Class = require("system/class")
-local LightEffect = require(Mod.path .. "light-effect")
-local ParticleEffect = require(Mod.path .. "particle-effect")
+local LightEffect = require("core/client/light-effect")
+local ParticleEffect = require("core/client/particle-effect")
 
-local RenderUtils = Class()
+local RenderUtils = Class("RenderUtils")
 
 --- Creates a scale animation for an actor.
 -- @param self Render utils.

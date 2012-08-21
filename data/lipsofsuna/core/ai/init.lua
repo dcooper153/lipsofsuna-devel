@@ -1,6 +1,6 @@
 if not Settings then return end
 
-require(Mod.path .. "ai")
-require(Mod.path .. "anchored")
-require(Mod.path .. "npc")
-require(Mod.path .. "camper")
+local Ai = require(Mod.path .. "ai")
+Ai:register(require(Mod.path .. "anchored"))
+Ai:register(require(Mod.path .. "npc"))
+Ai:register(require(Mod.path .. "camper"))

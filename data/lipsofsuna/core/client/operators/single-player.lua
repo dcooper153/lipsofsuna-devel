@@ -1,4 +1,7 @@
-Operators.single_player = Class()
+local Class = require("system/class")
+local File = require("system/file")
+
+Operators.single_player = Class("SinglePlayerOperator")
 Operators.single_player.data = {}
 
 --- Checks if the given save name exists.

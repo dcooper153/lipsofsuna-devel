@@ -1,7 +1,11 @@
-Unittest:add(2, "object render", function()
+Unittest:add(2, "system", "object render", function()
+	local Aabb = require("system/math/aabb")
 	require "system/graphics"
 	require "system/model-editing"
+	local Model = require("system/model")
+	local Object = require("system/object")
 	require "system/object-render"
+	local Vector = require("system/math/vector")
 	-- Checks for valgrind.
 	local create_cube_model = function(aabb)
 		-- Calculate the vertices of the bounding box.

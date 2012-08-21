@@ -1,3 +1,5 @@
+local Network = require("system/network")
+
 Ui:add_state{
 	state = "start-game",
 	root = "start-game",
@@ -10,7 +12,7 @@ Ui:add_state{
 		if not Client.data.connection.active then return end
 		-- If connecting, wait for the connection to establish.
 		if Client.data.connection.connecting then
-			if not Network.connected then return end
+			if not Network:get_connected() then return end
 			Client.data.connection.text = "Waiting for reply from " .. Settings.address .. ":" .. Settings.port .. "..."
 			Client.data.connection.connecting = false
 			Client.data.connection.waiting = true
@@ -53,7 +55,7 @@ Ui:add_widget{
 	state = "start-game",
 	widget = function() return Widgets.Uibutton("Cancel", function()
 			Client:terminate_game()
-			Ui.state = "mainmenu"
+			Ui:set_state("mainmenu")
 		end)
 	end}
 

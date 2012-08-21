@@ -1,4 +1,6 @@
-Color = Class()
+local Class = require("system/class")
+
+local Color = Class("Color")
 
 --- Converts an HSV color to RGB.
 -- @param clss Color class.
@@ -54,3 +56,5 @@ Color.ubyte_to_float = function(clss, color)
 	if not color then return end
 	return {color[1] / 255, color[2] / 255, color[3] / 255}
 end
+
+return Color

@@ -1,9 +1,13 @@
-require "system/object"
-require "system/physics"
+local Aabb = require("system/math/aabb")
+local Object = require("system/object")
+local Quaternion = require("system/math/quaternion")
+local Vector = require("system/math/vector")
 
 if not Los.program_load_extension("object-physics") then
 	error("loading extension `object-physics' failed")
 end
+
+------------------------------------------------------------------------------
 
 --- Makes the object approach a point.
 -- @param self Object.
@@ -50,150 +54,297 @@ Object.jump = function(self, args)
 	end
 end
 
---- Gets the velocity of the object.
+--- Gets the activation state of the object.
 -- @param self Object.
--- @return Velocity vector.
-Object.get_velocity = function(self)
-	return Class.new(Vector, {handle = Los.object_get_velocity(self.handle)})
+-- @return Boolean.
+Object.get_activated = function(self)
+	return Los.object_get_activated(self.handle)
 end
 
-Object.set_velocity = function(self, value)
-	Los.object_set_velocity(self.handle, value.handle)
+--- Sets the activation state of the object.
+-- @param self Object.
+-- @param v Boolean.
+Object.set_activated = function(self, v)
+	return Los.object_set_activated(self.handle, v)
 end
 
---- Activation state of the object.
--- @name Object.activated
--- @class table
-
---- Angular velocity.<br/>
+--- Gets the angular velocity of the object.<br/>
+--
 -- Angular velocity specifies how the object rotates. The direction of the
 -- vector points towards the axis of rotation and the length of the vector
 -- specifies how fast the object rotates around its center point.<br/>
+--
 -- Only supported by rigid bodies. Other kind of objects always return
 -- a zero vector.
--- @name Object.angular
--- @class table
+--
+-- @param self Object.
+-- @return Vector.
+Object.get_angular = function(self)
+	return Vector:new_from_handle(Los.object_get_angular(self.handle))
+end
 
---- Collision group bitmask.
--- @name Object.collision_group
--- @class table
+--- Sets the angular velocity of the object.<br/>
+--
+-- Only supported by rigid bodies.
+--
+-- @param self Object.
+-- @param v Vector.
+Object.set_angular = function(self, v)
+	Los.object_set_angular(self.handle, v.handle)
+end
 
---- Collision bitmask.
--- @name Object.collision_mask
--- @class table
+--- Gets the local bounding box of the collision shape of the object.
+-- @oaram self Object.
+-- @return Aabb.
+Object.get_bounding_box_physics = function(self)
+	local h1,h2 = Los.object_get_bounding_box_physics(self.handle)
+	local min = Vector:new_from_handle(h1)
+	local max = Vector:new_from_handle(h2)
+	return Aabb{point = min, size = max - min}
+end
 
---- Contact event generation toggle.
--- @name Object.contact_events
--- @class table
+--- Gets the local center offset of the collision shape of the object.
+-- @param self Object.
+-- @return Vector
+Object.get_center_offset_physics = function(self)
+	local h = Los.object_get_center_offset_physics(self.handle)
+	return Vector:new_from_handle(h)
+end
 
---- Gravity vector.
--- @name Object.gravity
--- @class table
+--- Gets the collision group number of the object.
+-- @param self Object.
+-- @return Number.
+Object.get_collision_group = function(self)
+	return Los.object_get_collision_group(self.handle)
+end
 
---- Ground contact flag.<br/>
--- Only supported by kinematic objects. Other kind of objects always return false.
--- @name Object.ground
--- @class table
+--- Sets the collision group number of the object.
+-- @param self Object.
+-- @param v Number.
+Object.set_collision_group = function(self, v)
+	Los.object_set_collision_group(self.handle, v)
+end
 
---- Liquid friction coefficient.
--- @name Object.friction_liquid
--- @class table
+--- Gets the collision bitmask of the object.
+-- @param self Object.
+-- @return Number.
+Object.get_collision_mask = function(self)
+	return Los.object_get_collision_mask(self.handle)
+end
 
---- Liquid gravity vector.
--- @name Object.gravity_liquid
--- @class table
+--- Sets the collision bitmask of the object.
+-- @param self Object.
+-- @return Number.
+Object.set_collision_mask = function(self, v)
+	Los.object_set_collision_mask(self.handle, v)
+end
 
---- Mass.
--- @name Object.mass
--- @class table
+--- Gets the contact event generation enable status.
+-- @oaram self Object.
+-- @return Boolean.
+Object.get_contact_events = function(self)
+	return Los.object_get_contact_events(self.handle)
+end
 
---- Movement direction.<br/>
+--- Sets the contact event generation enable status.
+-- @oaram self Object.
+-- @param v Boolean.
+Object.set_contact_events = function(self, v)
+	Los.object_set_contact_events(self.handle, v)
+end
+
+--- Gets the liquid friction coefficient of the object.
+-- @param self Object.
+-- @return Number.
+Object.get_friction_liquid = function(self)
+	Los.object_get_friction_liquid(self.handle)
+end
+
+--- Sets the liquid friction coefficient of the object.
+-- @param self Object.
+-- @param v Number.
+Object.set_friction_liquid = function(self, v)
+	Los.object_set_friction_liquid(self.handle, v)
+end
+
+--- Gets the gravity vector of the object.
+-- @param self Object.
+-- @return Vector.
+Object.get_gravity = function(self)
+	return Vector:new_from_handle(Los.object_get_gravity(self.handle))
+end
+
+--- Sets the gravity vector of the object.
+-- @param self Object.
+-- @param v Vector.
+Object.set_gravity = function(self, v)
+	if not v then return end -- FIXME: Shouldn't be called with nil
+	Los.object_set_gravity(self.handle, v.handle)
+end
+
+--- Gets the liquid gravity vector of the object.
+-- @param self Object.
+-- @return Vector.
+Object.get_gravity_liquid = function(self)
+	return Vector:new_from_handle(Los.object_get_gravity_liquid(self.handle))
+end
+
+--- Sets the liquid gravity vector of the object.
+-- @param self Object.
+-- @param v Vector.
+Object.set_gravity_liquid = function(self, v)
+	if not v then return end -- FIXME: Shouldn't be called with nil
+	Los.object_set_gravity_liquid(self.handle, v.handle)
+end
+
+--- Gets the ground contact status of the object.<br/>
+--
+-- Only supported by kinematic objects. Other kind of objects always
+-- return false.
+--
+-- @param self Object.
+-- @return Boolean.
+Object.get_ground = function(self)
+	return Los.object_get_ground(self.handle)
+end
+
+--- Gets the ground contact status of the object.<br/>
+--
+-- Only supported by kinematic objects.
+--
+-- @param self Object.
+-- @param v Boolean.
+Object.set_ground = function(self, v)
+	Los.object_set_ground(self.handle, v)
+end
+
+--- Gets the mass of the object.
+-- @param self Object.
+-- @return Number.
+Object.get_mass = function(self)
+	return Los.object_get_mass(self.handle)
+end
+
+--- Sets the mass of the object.
+-- @param self Object.
+-- @param v Number.
+Object.set_mass = function(self, v)
+	Los.object_set_mass(self.handle, v)
+end
+
+--- Gets the movement direction of the object.
+-- @param self Object.
+-- @return Number.
+Object.get_movement = function(self)
+	return Los.object_get_movement(self.handle)
+end
+
+--- Sets the movement direction of the object.<br/>
+--
 -- Only used by kinematic objects. The value of -1 means that the actor is
 -- moving forward at walking speed. The value of 1 means backward, and the
 -- value of 0 means no strafing.
--- @name Object.movement
--- @class table
+--
+-- @param self Object.
+-- @param v Number.
+Object.set_movement = function(self, v)
+	Los.object_set_movement(self.handle, v)
+end
 
---- Physics simulation mode.<br/>
--- Specifies the physics simulation mode of the object. The recognized values are:<ul>
+--- Gets the physics simulation mode of the object.
+-- @param self Object.
+-- @return String.
+Object.get_physics = function(self)
+	return Los.object_get_physics(self.handle)
+end
+
+--- Sets the physics simulation mode of the object.<br/>
+--
+-- Specifies the physics simulation mode of the object.
+-- The recognized values are:
+--
+-- <ul>
 -- <li>"kinematic": Kinematic character.</li>
 -- <li>"none": Not included to the simulation.</li>
 -- <li>"rigid": Rigid body simulation.</li>
 -- <li>"static": Static obstacle.</li>
--- <li>"vehicle": Vehicle physics.</li></ul>
+-- <li>"vehicle": Vehicle physics.</li>
+-- </ul>
+--
+-- @param self Object.
+-- @param v String.
+Object.set_physics = function(self, v)
+	Los.object_set_physics(self.handle, v)
+end
 
---- Physics shape.<br/>
+--- Gets the physics shape name of the object.
+-- @param self Object.
+-- @return String.
+Object.get_shape = function(self)
+	return Los.object_get_shape(self.handle)
+end
+
+--- Sets the physics shape name of the object.<br/>
+--
 -- A model can contain multiple physics shapes. By setting the field,
 -- you can switch to one of the alternative shapes. This can be used
 -- to, for example, set a smaller collision shape when the actor
 -- is crouching.
--- @name Object.shape
--- @class table
+--
+-- @param self Object.
+-- @param v String.
+Object.set_shape = function(self, v)
+	Los.object_set_shape(self.handle, v)
+end
 
---- Movement speed.<br/>
+--- Gets the movement speed of the object.
+-- @param self Object.
+-- @return Number.
+Object.get_speed = function(self)
+	return Los.object_get_speed(self.handle)
+end
+
+--- Sets the movement speed of the object.<br/>
+--
 -- Only used by kinematic objects.
--- @name Object.speed
--- @class table
+--
+-- @param self Object.
+-- @param v Number.
+Object.set_speed = function(self, v)
+	Los.object_set_speed(self.handle, v)
+end
 
---- Strafing direction.<br/>
+--- Gets the strafing direction of the object.
+-- @param self Object.
+-- @return Number.
+Object.get_strafing = function(self)
+	return Los.object_get_strafing(self.handle)
+end
+
+--- Sets the strafing direction of the object.<br/>
+--
 -- Only used by kinematic objects. The value of -1 means that the actor is
 -- strafing to the left at walking speed. The value of 1 means right, and the
 -- value of 0 means no strafing.
--- @name Object.strafing
--- @class table
+--
+-- @param self Object.
+-- @param v Number.
+Object.set_strafing = function(self, v)
+	Los.object_set_strafing(self.handle, v)
+end
 
---- Linear velocity.
--- @name Object.velocity
--- @class table
+--- Gets the linear velocity of the object.
+-- @param self Object.
+-- @return Vector.
+Object.get_velocity = function(self)
+	return Vector:new_from_handle(Los.object_get_velocity(self.handle))
+end
 
-Object:add_getters{
-	activated = function(self) return Los.object_get_activated(self.handle) end,
-	angular = function(s) return Class.new(Vector, {handle = Los.object_get_angular(s.handle)}) end,
-	bounding_box_physics = function(self)
-		local h1,h2 = Los.object_get_bounding_box_physics(self.handle)
-		local min = Class.new(Vector, {handle = h1})
-		local max = Class.new(Vector, {handle = h2})
-		return Aabb{point = min, size = max - min}
-	end,
-	center_offset_physics = function(self)
-		local h = Los.object_get_center_offset_physics(self.handle)
-		return Class.new(Vector, {handle = h})
-	end,
-	collision_group = function(s) return Los.object_get_collision_group(s.handle) end,
-	collision_mask = function(s) return Los.object_get_collision_mask(s.handle) end,
-	contact_events = function(s) return Los.object_get_contact_events(s.handle) end,
-	friction_liquid = function(s) Los.object_get_friction_liquid(s.handle) end,
-	gravity = function(s) return Class.new(Vector, {handle = Los.object_get_gravity(s.handle)}) end,
-	gravity_liquid = function(s) return Class.new(Vector, {handle = Los.object_get_gravity_liquid(s.handle)}) end,
-	ground = function(s) return Los.object_get_ground(s.handle) end,
-	mass = function(s) return Los.object_get_mass(s.handle) end,
-	movement = function(s) return Los.object_get_movement(s.handle) end,
-	physics = function(s) return Los.object_get_physics(s.handle) end,
-	shape = function(s) return Los.object_get_shape(s.handle) end,
-	speed = function(s) return Los.object_get_speed(s.handle) end,
-	strafing = function(s) return Los.object_get_strafing(s.handle) end,
-	velocity = function(s) return Class.new(Vector, {handle = Los.object_get_velocity(s.handle)}) end}
+--- Sets the linear velocity of the object.
+-- @param self Object.
+-- @param v Vector.
+Object.set_velocity = function(self, v)
+	Los.object_set_velocity(self.handle, v.handle)
+end
 
-Object:add_setters{
-	activated = function(self, v) return Los.object_set_activated(self.handle, v) end,
-	angular = function(s, v) Los.object_set_angular(s.handle, v.handle) end,
-	collision_group = function(s, v) Los.object_set_collision_group(s.handle, v) end,
-	collision_mask = function(s, v) Los.object_set_collision_mask(s.handle, v) end,
-	contact_events = function(s, v) Los.object_set_contact_events(s.handle, v) end,
-	friction_liquid = function(s, v) Los.object_set_friction_liquid(s.handle, v) end,
-	gravity = function(s, v)
-		if not v then return end -- FIXME: Shouldn't be called with nil
-		Los.object_set_gravity(s.handle, v.handle)
-	end,
-	gravity_liquid = function(s, v)
-		if not v then return end -- FIXME: Shouldn't be called with nil
-		Los.object_set_gravity_liquid(s.handle, v.handle)
-	end,
-	ground = function(s, v) Los.object_set_ground(s.handle, v) end,
-	mass = function(s, v) Los.object_set_mass(s.handle, v) end,
-	movement = function(s, v) Los.object_set_movement(s.handle, v) end,
-	physics = function(s, v) Los.object_set_physics(s.handle, v) end,
-	shape = function(s, v) Los.object_set_shape(s.handle, v) end,
-	speed = function(s, v) Los.object_set_speed(s.handle, v) end,
-	strafing = function(s, v) Los.object_set_strafing(s.handle, v) end,
-	velocity = function(self, v) self:set_velocity(v) end}
+return Object

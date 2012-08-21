@@ -1,8 +1,11 @@
-Widgets.Scrollbar = Class(Widget)
-Widgets.Scrollbar.class_name = "Widgets.Scrollbar"
+local Class = require("system/class")
+local Input = require("system/input")
+local Widget = require("system/widget")
 
-Widgets.Scrollbar.new = function(clss, args)
-	local self = Widget.new(clss, args)
+local Scrollbar = Class("Scrollbar", Widget)
+
+Scrollbar.new = function(clss)
+	local self = Widget.new(clss)
 	self.max = 0
 	self.page = 1
 	self.step = 1
@@ -10,26 +13,26 @@ Widgets.Scrollbar.new = function(clss, args)
 	return self
 end
 
-Widgets.Scrollbar.changed = function(self, value)
+Scrollbar.changed = function(self, value)
 end
 
-Widgets.Scrollbar.grabbed = function(self, value)
+Scrollbar.grabbed = function(self, value)
 end
 
-Widgets.Scrollbar.get_value_at = function(self, point)
+Scrollbar.get_value_at = function(self, point)
 	if self.max == 0 then return end
-	local p = point - Vector(self.x, self.y)
-	local v = p.y / self.height * self.max
+	local p = point - Vector(self:get_x(), self:get_y())
+	local v = p.y / self:get_height() * self.max
 	return math.floor(v + 0.5)
 end
 
-Widgets.Scrollbar.set_value_at = function(self, point)
+Scrollbar.set_value_at = function(self, point)
 	-- Ignore if the scroll range is empty.
 	if self.max <= self.page then return end
 	-- Clamp clicks on the buttons.
-	local c = point - Vector(self.x, self.y)
+	local c = point - Vector(self:get_x(), self:get_y())
 	c.y = math.max(c.y, 21)
-	c.y = math.min(c.y, self.height - 21 - 1)
+	c.y = math.min(c.y, self:get_height() - 21 - 1)
 	-- Scroll to the cursor.
 	local v = self:get_value_at(point)
 	if not v then return end
@@ -39,20 +42,20 @@ Widgets.Scrollbar.set_value_at = function(self, point)
 	return true
 end
 
-Widgets.Scrollbar.handle_event = function(self, args)
+Scrollbar.handle_event = function(self, args)
 	if args.type == "mousemotion" then
-		if Program.mouse_button_state % 2 == 1 then
+		if Input:get_mouse_button_state() % 2 == 1 then
 			self:set_value_at(Vector(args.x, args.y))
 			return
 		end
 	elseif args.type == "mousepress" then
 		if args.button ~= 1 then return end
 		if self.max <= self.page then return end
-		local cursor = Program.cursor_position
-		local c = cursor - Vector(self.x, self.y)
+		local cursor = Input:get_pointer_position()
+		local c = cursor - Vector(self:get_x(), self:get_y())
 		if c.y < 21 then
 			self:scroll("up")
-		elseif c.y >= self.height - 21 then
+		elseif c.y >= self:get_height() - 21 then
 			self:scroll("down")
 		else
 			self:set_value_at(cursor)
@@ -74,13 +77,10 @@ Widgets.Scrollbar.handle_event = function(self, args)
 	return true
 end
 
-Widgets.Scrollbar.reshaped = function(self)
-	self:set_request{
-		internal = true,
-		width = 21,
-		height = 64}
-	local w = self.width
-	local h = self.height
+Scrollbar.reshaped = function(self)
+	self:set_request(21, 64, true)
+	local w = self:get_width()
+	local h = self:get_height()
 	-- Draw the background.
 	self:canvas_clear()
 	self:canvas_image{
@@ -121,7 +121,7 @@ Widgets.Scrollbar.reshaped = function(self)
 	self:canvas_compile()
 end
 
-Widgets.Scrollbar.scroll = function(self, dir)
+Scrollbar.scroll = function(self, dir)
 	if dir == "up" then
 		self.scroll_offset = math.max(0, self.scroll_offset - self.step)
 		self:reshaped()
@@ -134,10 +134,12 @@ Widgets.Scrollbar.scroll = function(self, dir)
 	end
 end
 
-Widgets.Scrollbar.set_range = function(self, max, scroll_offset, page)
+Scrollbar.set_range = function(self, max, scroll_offset, page)
 	if scroll_offset then self.scroll_offset = scroll_offset end
 	if page then self.page = page end
 	self.max = max
 	self.scroll_offset = math.max(0, math.min(self.scroll_offset, self.max - self.page))
 	self:reshaped()
 end
+
+return Scrollbar

@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "scrollfloat")
 
-Widgets.Uiscrollinteger = Class(Widgets.Uiscrollfloat)
-Widgets.Uiscrollinteger.class_name = "Widgets.Uiscrollinteger"
+Widgets.Uiscrollinteger = Class("Uiscrollinteger", Widgets.Uiscrollfloat)
 
 Widgets.Uiscrollinteger.new = function(clss, label, min, max, value, changed)
 	local self = Widgets.Uiscrollfloat.new(clss, label, min, max, value, changed)

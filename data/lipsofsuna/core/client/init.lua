@@ -14,7 +14,7 @@ require "system/heightmap-render"
 require "system/input"
 require "system/keysym"
 require "system/model-editing"
-require "system/model-merge"
+require "system/model-merger"
 require "system/object-render"
 require "system/reload"
 require "system/render"
@@ -25,7 +25,7 @@ require "system/tiles-render"
 require "system/watchdog"
 require "system/widgets"
 
-Program.window_title = "Lips of Suna"
+Program:set_window_title("Lips of Suna")
 
 require(Mod.path .. "bindings")
 require(Mod.path .. "client")

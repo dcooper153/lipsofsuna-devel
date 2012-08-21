@@ -1,19 +1,18 @@
-Widgets.Quickslot = Class(Widget)
+local Class = require("system/class")
+local Widget = require("system/widget")
+
+Widgets.Quickslot = Class("Quickslot", Widget)
 
 Widgets.Quickslot.new = function(clss, args)
 	local self = Widget.new(clss, args)
-	self.margins = {3,2,5,4}
 	return self
 end
 
 Widgets.Quickslot.reshaped = function(self)
 	local icon = self.icon or self.DEFAULT
-	self:set_request{
-		internal = true,
-		width = 34+5,
-		height = 34}
-	local w = self.width
-	local h = self.height + 9
+	self:set_request(39, 34, true)
+	local w = self:get_width()
+	local h = self:get_height() + 9
 	-- Background.
 	self:canvas_clear()
 	self:canvas_image{
@@ -65,25 +64,3 @@ end
 
 Widgets.Quickslot.pressed = function(self, args)
 end
-
-Widgets.Quickslot:add_getters{
-	focused = function(self) return rawget(self, "__focused") end,
-	icon = function(self) return rawget(self, "__icon") end,
-	text = function(self) return rawget(self, "__text") end}
-
-Widgets.Quickslot:add_setters{
-	focused = function(self, value)
-		if self.focused == value then return end
-		rawset(self, "__focused", value)
-		self:reshaped()
-	end,
-	icon = function(self, value)
-		if self.icon == value then return end
-		rawset(self, "__icon", value)
-		self:reshaped()
-	end,
-	text = function(self, value)
-		if self.text == value then return end
-		rawset(self, "__text", value)
-		self:reshaped()
-	end}

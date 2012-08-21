@@ -10,11 +10,11 @@ Message{
 	end,
 	server_to_client_handle = function(self, id)
 		-- Find the object.
-		local obj = Object:find{id = id}
+		local obj = Game.objects:find_by_id(id)
 		if not obj then return end
 		-- Update the dialog.
 		obj:set_dialog("none")
-		if obj == Client.active_dialog_object and Ui.state == "dialog" then
+		if obj == Client.active_dialog_object and Ui:get_state() == "dialog" then
 			Ui:pop_state()
 		end
 	end}

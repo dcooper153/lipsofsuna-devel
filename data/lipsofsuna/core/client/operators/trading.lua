@@ -25,7 +25,7 @@ Operators.trading.get_buy_items = function(self)
 		if item then
 			table.insert(items, {
 				text = item.spec.name,
-				count = item.count or 1,
+				count = item:get_count(),
 				icon = item.spec.icon})
 		else
 			table.insert(items, false)
@@ -51,7 +51,7 @@ Operators.trading.get_sell_items = function(self)
 		if item then
 			table.insert(items, {
 				text = item.spec.name,
-				count = item.count or 1,
+				count = item:get_count(),
 				icon = item.spec.icon,
 				slot = slot})
 		else
@@ -72,7 +72,7 @@ Operators.trading.get_shop_items = function(self)
 	for index,item in ipairs(self.data.trading.shop) do
 		table.insert(items, {
 			text = item.spec.name,
-			count = item.count or 1,
+			count = item:get_count(),
 			icon = item.spec.icon})
 	end
 	return items

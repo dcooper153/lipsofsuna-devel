@@ -1,17 +1,15 @@
-require "system/widget"
+local Class = require("system/class")
+local Widget = require("system/widget")
 
-Widgets.Uiwidget = Class(Widget)
-Widgets.Uiwidget.class_name = "Widgets.Uiwidget"
+Widgets.Uiwidget = Class("Uiwidget", Widget)
 
-Widgets.Uiwidget.new = function(clss, child, label)
+Widgets.Uiwidget.new = function(clss, label)
 	-- Create the widget.
 	local self = Widget.new(clss)
 	self.size = Vector()
 	self.label = label
 	self.need_reshape = true
 	self.need_repaint = true
-	-- Add the child widget.
-	self.child = child
 	return self
 end
 
@@ -26,7 +24,7 @@ Widgets.Uiwidget.apply_back = function(self)
 end
 
 Widgets.Uiwidget.handle_event = function(self, args)
-	if Ui.pointer_grab then return true end
+	if Ui:get_pointer_grab() then return true end
 	if args.type ~= "mousepress" then return true end
 	self:apply()
 end
@@ -37,7 +35,7 @@ Widgets.Uiwidget.update = function(self, secs)
 		self.need_reshape = nil
 		local size = self:rebuild_size()
 		if self.size.x ~= size.x or self.size.y ~= size.y then
-			self:set_request{width = size.x, height = size.y}
+			self:set_request(size.x, size.y)
 			self.size = size
 			Ui.need_relayout = true
 		end
@@ -60,7 +58,8 @@ Widgets.Uiwidget.rebuild_size = function(self)
 	end
 	-- Resize to fit the child.
 	if self.child then
-		size.y = math.max(size.y, self.child.height_request or 0)
+		local w,h = self.child:get_request()
+		size.y = math.max(size.y, h or 0)
 	end
 	return size
 end
@@ -85,39 +84,28 @@ Widgets.Uiwidget.rebuild_canvas = function(self)
 	end
 end
 
-Widgets.Uiwidget:add_getters{
-	child = function(self) return rawget(self, "__child") end,
-	focused = function(self) return rawget(self, "__focused") end,
-	help = function(self) return rawget(self, "__help") end,
-	hint = function(self) return rawget(self, "__hint") end}
+Widgets.Uiwidget.set_focused = function(self, v)
+	if self.focused == v then return end
+	self.focused = v
+	self.need_repaint = true
+end
 
-Widgets.Uiwidget:add_setters{
-	child = function(self, v)
-		rawset(self, "__child", v)
-		if v then
-			if self.label then
-				v.offset = Vector(150, 5)
-				v:set_request{width = 150, height = 20}
-			else
-				v.offset = Vector(10, 5)
-				v:set_request{width = 300, height = 20}
-			end
-			self:add_child(v)
-			self.need_reshape = true
-		end
-	end,
-	focused = function(self, v)
-		if self.focused == v then return end
-		rawset(self, "__focused", v)
-		self.need_repaint = true
-	end,
-	help = function(self, v)
-		if self.help == v then return end
-		rawset(self, "__help", v)
-		if self.focused then Ui:update_help() end
-	end,
-	hint = function(self, v)
-		if self.hint == v then return end
-		rawset(self, "__hint", v)
-		if self.focused then Ui:update_help() end
-	end}
+Widgets.Uiwidget.get_help = function(self)
+	return self.help
+end
+
+Widgets.Uiwidget.set_help = function(self, v)
+	if self.help == v then return end
+	self.help = v
+	if self.focused then Ui:update_help() end
+end
+
+Widgets.Uiwidget.get_hint = function(self)
+	return self.hint or "$$A\n$$B\n$$U\n$$D"
+end
+
+Widgets.Uiwidget.set_hint = function(self, v)
+	if self.hint == v then return end
+	self.hint = v
+	if self.focused then Ui:update_help() end
+end

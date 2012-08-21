@@ -1,5 +1,6 @@
-Unittest:add(1, "quaternion", function()
-	require "system/math"
+Unittest:add(1, "system", "quaternion", function()
+	local Quaternion = require("system/math/quaternion")
+	local Vector = require("system/math/vector")
 	-- XYZW presentation.
 	local q1 = Quaternion(1,0,0,0)
 	assert(q1.x == 1)

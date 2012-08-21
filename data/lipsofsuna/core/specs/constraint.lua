@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Constraintspec = Class(Spec)
+Constraintspec = Class("Constraintspec", Spec)
 Constraintspec.type = "effect"
 Constraintspec.dict_id = {}
 Constraintspec.dict_cat = {}

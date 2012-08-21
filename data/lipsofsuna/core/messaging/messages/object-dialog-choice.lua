@@ -21,12 +21,12 @@ Message{
 	end,
 	server_to_client_handle = function(self, id, mine, choices)
 		-- Get the object.
-		local obj = Object:find{id = id}
+		local obj = Game.objects:find_by_id(id)
 		if not obj then return end
 		-- Update the dialog.
 		obj:set_dialog("choice", choices)
-		if init and (Ui.state == "play" or Ui.state == "world/object") then
+		if init and (Ui:get_state() == "play" or Ui:get_state() == "world/object") then
 			Client.active_dialog_object = obj
-			Ui.state = "dialog"
+			Ui:set_state("dialog")
 		end
 	end}

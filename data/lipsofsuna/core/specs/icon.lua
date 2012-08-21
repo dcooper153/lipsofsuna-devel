@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Iconspec = Class(Spec)
+Iconspec = Class("Iconspec", Spec)
 Iconspec.type = "icon"
 Iconspec.dict_id = {}
 Iconspec.dict_cat = {}

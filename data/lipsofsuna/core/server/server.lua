@@ -1,9 +1,25 @@
-require "system/class"
+local Class = require("system/class")
+local AccountDatabase = require(Mod.path .. "account-database")
+local Database = require("system/database")
+local DialogManager = require(Mod.path .. "dialog-manager")
+local GlobalEventManager = require(Mod.path .. "global-event-manager")
+local Log = require(Mod.path .. "log")
+local Network = require("system/network")
+local ObjectDatabase = require(Mod.path .. "object-database")
+local Physics = require("system/physics")
+local QuestDatabase = require(Mod.path .. "quest-database")
+local Serialize = require(Mod.path .. "serialize")
+local ServerConfig = require(Mod.path .. "server-config")
+local Trading = require(Mod.path .. "trading")
+local UnlockManager = require(Mod.path .. "unlock-manager")
+local Vision = require("system/vision")
 
-Server = Class()
+Server = Class("Server")
 
 Server.init = function(self, multiplayer, client)
+	self.log = Log()
 	self.config = ServerConfig()
+	self.dialogs = DialogManager()
 	self.marker_timer = 0
 	self.initialized = true
 	self.multiplayer = multiplayer
@@ -11,14 +27,20 @@ Server.init = function(self, multiplayer, client)
 	self.accounts_by_client = {}
 	self.accounts_by_name = setmetatable({}, {__mode = "v"})
 	self.players_by_client = {}
+	self.trading = Trading()
 	-- Initialize the databases.
+	local account_database = Database("accounts" .. Settings.file .. ".sqlite")
+	account_database:query("PRAGMA synchronous=OFF;")
+	account_database:query("PRAGMA count_changes=OFF;")
 	self.serialize = Serialize(Game.database)
-	self.account_database = AccountDatabase(Database{name = "accounts" .. Settings.file .. ".sqlite"})
+	self.unlocks = UnlockManager(Game.database)
+	self.account_database = AccountDatabase(account_database)
 	self.object_database = ObjectDatabase(Game.database)
 	self.quest_database = QuestDatabase(Game.database)
 	if self.serialize:get_value("game_version") ~= self.serialize.game_version then
+		self.unlocks:reset()
 		self.quest_database:reset()
-		Server.serialize:set_value("game_version", self.serialize.game_version)
+		self.serialize:set_value("game_version", self.serialize.game_version)
 	end
 	if self.serialize:get_value("object_version") ~= self.serialize.object_version then
 		self.object_database:reset()
@@ -27,9 +49,9 @@ Server.init = function(self, multiplayer, client)
 	-- Initialize the map generator.
 	self.generator = Generator()
 	-- Initialize the event manager.
-	self.events = Globaleventmanager()
+	self.events = GlobalEventManager()
 	-- Enable physics simulation.
-	Physics.enable_simulation = true
+	Physics:set_enable_simulation(true)
 end
 
 Server.deinit = function(self)
@@ -39,17 +61,25 @@ Server.deinit = function(self)
 	-- This needs to be done right now so that the databases are freed
 	-- for sure. Otherwise, they might remain locked in memory when the
 	-- client starts a new server.
+	self.log = nil
+	self.config = nil
+	self.dialogs = nil
 	self.accounts_by_client = nil
 	self.accounts_by_name = nil
 	self.players_by_client = nil
+	self.trading = nil
 	self.config = nil
 	self.serialize = nil
+	self.unlocks = nil
+	self.account_database = nil
+	self.object_database = nil
+	self.quest_database = nil
 	self.generator = nil
 	self.events = nil
 	collectgarbage()
 	-- Mark as uninitialized.
 	self.initialized = false
-	Physics.enable_simulation = false
+	Physics:set_enable_simulation(false)
 end
 
 Server.load = function(self)
@@ -58,23 +88,23 @@ Server.load = function(self)
 	-- Generate the map.
 	if Settings.generate or self.serialize:get_value("map_version") ~= self.generator.map_version then
 		self.generator:generate()
+		self.unlocks:save()
 		self.serialize:set_value("data_version", self.serialize.data_version)
-		Unlocks:init(self.serialize.db)
-		Unlocks:write_db()
 	else
 		self.serialize:load()
-		Unlocks:init(self.serialize.db)
-		Unlocks:read_db()
+		self.unlocks:load()
+		self.quest_database:load_quests()
+		self.object_database:load_static_objects()
 	end
 	-- Initialize default unlocks.
-	Unlocks:unlock("skill", "Health lv1")
-	Unlocks:unlock("skill", "Willpower lv1")
-	Unlocks:unlock("spell type", "ranged spell")
-	Unlocks:unlock("spell type", "spell on self")
-	Unlocks:unlock("spell effect", "fire damage")
-	Unlocks:unlock("spell effect", "light")
-	Unlocks:unlock("spell effect", "physical damage")
-	Unlocks:unlock("spell effect", "restore health")
+	self.unlocks:unlock("skill", "Health lv1")
+	self.unlocks:unlock("skill", "Willpower lv1")
+	self.unlocks:unlock("spell type", "ranged spell")
+	self.unlocks:unlock("spell type", "spell on self")
+	self.unlocks:unlock("spell effect", "fire damage")
+	self.unlocks:unlock("spell effect", "light")
+	self.unlocks:unlock("spell effect", "physical damage")
+	self.unlocks:unlock("spell effect", "restore health")
 end
 
 Server.authenticate_client = function(self, client, login, pass)
@@ -84,22 +114,26 @@ Server.authenticate_client = function(self, client, login, pass)
 	-- Make sure not logging in twice.
 	account = self.accounts_by_name[login]
 	if account then
+		self.log:format("Client login from %q failed: account already in use.", self:get_client_address(client))
 		Game.messaging:server_event("login failed", client, "The account is already in use.")
 		return
 	end
-	-- Load or create the account.
-	-- The password is also checked in case of an existing account. If the
-	-- check fails, Account() returns nil and we disconnect the client.
-	account = Account(login, pass)
+	-- Load or create an account.
+	local account,message = self.account_database:load_account(login, pass)
 	if not account then
-		Game.messaging:server_event("login failed", client, "Invalid account name or password.")
-		Network:disconnect(client)
-		return
+		if message then
+			self.log:format("Client login from %q failed: %s.", self:get_client_address(client), message)
+			Game.messaging:server_event("login failed", client, "Invalid account name or password.")
+			return
+		end
+		account = self.account_database:create_account(login, pass)
 	end
+	-- Associate the account to the client.
 	account.client = client
+	self.accounts_by_name[login] = account
 	self.accounts_by_client[client] = account
 	-- Log the successful login.
-	Log:format("Client login from %q using account %q.", self:get_client_address(client), login)
+	self.log:format("Client login from %q using account %q.", self:get_client_address(client), login)
 	-- Create existing characters.
 	local object = self.object_database:load_player(account)
 	if object then
@@ -123,21 +157,31 @@ Server.authenticate_client = function(self, client, login, pass)
 	end
 end
 
-Server.get_client_address = function(self, client)
-	if client == -1 then
-		return "localhost"
-	else
-		return Network:get_client_address(client) or "???"
-	end
-end
-
-Server.get_player_by_client = function(self, client)
-	return self.players_by_client[client]
+Server.global_event = function(self, type, args)
+	local a = args or {}
+	a.type = type
+	Vision:event(a)
 end
 
 Server.object_effect = function(self, object, name)
 	if not name then return end
-	Vision:event{type = "object-effect", object = object, effect = name}
+	self:object_event(object, "object-effect", {effect = name})
+end
+
+Server.object_event = function(self, object, type, args)
+	local a = args or {}
+	a.id = object:get_id()
+	a.object = object
+	a.type = type
+	Vision:event(a)
+end
+
+Server.object_event_id = function(self, id, type, args)
+	local a = args or {}
+	a.id = id
+	a.object = Game.objects:find_by_id(id)
+	a.type = type
+	Vision:event(a)
 end
 
 Server.spawn_player = function(self, player, client, spawnpoint)
@@ -161,22 +205,21 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 		end
 	end
 	-- Transmit other unlocks.
-	Game.messaging:server_event("unlocks init", client, Unlocks:get_list())
+	Game.messaging:server_event("unlocks init", client, self.unlocks.unlocks)
 	-- Transmit skills.
 	player:update_skills()
 	-- Transmit active and completed quests.
-	for k,q in pairs(Quest.dict_name) do
-		q:send{client = client}
-		q:send_marker{client = client}
+	for k,q in pairs(self.quest_database:get_all_quests()) do
+		q:send_to_client(client, true, true)
 	end
 	-- Transmit static objects.
 	local objects = {}
 	for k,v in pairs(Game.static_objects_by_id) do
-		table.insert(objects, {v.id, v.spec.name, v.position, v.rotation})
+		table.insert(objects, {v:get_id(), v.spec.name, v:get_position(), v:get_rotation()})
 	end
 	Game.messaging:server_event("create static objects", client, objects)
 	-- Transmit dialog states of static objects.
-	for k,v in pairs(Dialog.dict_id) do
+	for k,v in pairs(self.dialogs.dialogs_by_object) do
 		if v.object and v.object.static and v.event then
 			player:vision_cb(v.event)
 		end
@@ -188,7 +231,7 @@ end
 Server.update = function(self, secs)
 	if not self.initialized then return end
 	-- Update objects.
-	for k,v in pairs(Object.objects) do
+	for k,v in pairs(Game.objects.objects_by_id) do
 		v:update(secs)
 	end
 	-- Update markers.
@@ -197,9 +240,9 @@ Server.update = function(self, secs)
 		self.marker_timer = 0
 		for k,m in pairs(Marker.dict_name) do
 			if m.unlocked and m.target then
-				local o = SimulationObject:find{id = m.target}
-				if o and (m.position - o.position).length > 1 then
-					m.position = o.position
+				local o = Game.objects:find_by_id(m.target)
+				if o and (m.position - o:get_position()).length > 1 then
+					m.position = o:get_position()
 					for k,v in pairs(self.players_by_client) do
 						Game.messaging:server_event("create marker", v, m.name, m.position)
 					end
@@ -216,4 +259,16 @@ end
 Server.world_effect = function(self, point, name)
 	if not name then return end
 	Vision:event{type = "world-effect", point = point, effect = name}
+end
+
+Server.get_client_address = function(self, client)
+	if client == -1 then
+		return "localhost"
+	else
+		return Network:get_client_address(client) or "???"
+	end
+end
+
+Server.get_player_by_client = function(self, client)
+	return self.players_by_client[client]
 end

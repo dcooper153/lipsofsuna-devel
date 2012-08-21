@@ -1,10 +1,11 @@
+local Class = require("system/class")
+local String = require("system/string")
 require(Mod.path .. "widget")
 
-Widgets.Uientry = Class(Widgets.Uiwidget)
-Widgets.Uientry.class_name = "Widgets.Uientry"
+Widgets.Uientry = Class("Uientry", Widgets.Uiwidget)
 
 Widgets.Uientry.new = function(clss, label, changed)
-	local self = Widgets.Uiwidget.new(clss, nil, label)
+	local self = Widgets.Uiwidget.new(clss, label)
 	self.value = ""
 	self.cursor_pos = 1
 	self.changed = changed

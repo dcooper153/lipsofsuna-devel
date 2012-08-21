@@ -1,5 +1,4 @@
-require "system/class"
-require "system/widget"
+local Class = require("system/class")
 
 if not Los.program_load_extension("widgets") then
 	error("loading extension `widgets' failed")
@@ -7,14 +6,26 @@ end
 
 ------------------------------------------------------------------------------
 
+Widgets = Class("Widgets")
+
 --- Adds a font style.
 -- @param clss Widgets class.
--- @param ... Arguments.<ul>
---   <li>1,name: Font name.</li>
---   <li>2,file: Font file.</li>
---   <li>3,size: Font size.</li></ul>
-Widgets.add_font_style = function(clss, ...)
-	Los.widgets_add_font_style(...)
+-- @param name Font name.
+-- @param file Font file.
+-- @param size Font size.
+Widgets.add_font_style = function(clss, name, file, size)
+	Los.widgets_add_font_style(name, file, size)
+end
+
+--- Finds a widget under the cursor that has the given member.
+-- @param clss Widgets class.
+-- @return Widget, or nil.
+Widgets.find_handler_widget = function(clss, handler)
+	local w = clss:find_widget()
+	while w do
+		if w[handler] then return w end
+		w = w:get_parent()
+	end
 end
 
 --- Finds a widget by screen position.
@@ -27,22 +38,13 @@ Widgets.find_widget = function(clss, args)
 	return __userdata_lookup[handle]
 end
 
---- Currently focused widget.
--- @name Widgets.focused_widget
--- @class table
-Widgets.class_getters = {
-	widget_under_cursor = function(s, k)
-		local handle = Los.widgets_get_focused_widget()
-		if not handle then return end
-		return __userdata_lookup[handle]
-	end}
+--- Gets the currently focused widget.
+-- @param self Widgets class.
+-- @return Widget, or nil.
+Widgets.get_widget_under_cursor = function(self)
+	local handle = Los.widgets_get_focused_widget()
+	if not handle then return end
+	return __userdata_lookup[handle]
+end
 
-------------------------------------------------------------------------------
-
-require "system/widgets/button"
-require "system/widgets/cursor"
-require "system/widgets/frame"
-require "system/widgets/label"
-require "system/widgets/list"
-require "system/widgets/scrollbar"
-require "system/widgets/widgets"
+return Widgets

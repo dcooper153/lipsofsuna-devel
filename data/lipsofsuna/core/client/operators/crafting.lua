@@ -1,4 +1,6 @@
-Operators.crafting = Class()
+local Class = require("system/class")
+
+Operators.crafting = Class("CraftingOperator")
 Operators.crafting.data = {}
 
 --- Resets the crafting operator.

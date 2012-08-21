@@ -1,5 +1,7 @@
-Widgets.Hudmodifiers = Class(Widget)
-Widgets.Hudmodifiers.class_name = "Widgets.Hudmodifiers"
+local Class = require("system/class")
+local Widget = require("system/widget")
+
+Widgets.Hudmodifiers = Class("Hudmodifiers", Widget)
 
 --- Creates a new modifiers widget.
 -- @param clss Modifiers class.
@@ -71,12 +73,12 @@ end
 Widgets.Hudmodifiers.update = function(self, secs)
 	local len = #self.dict_id
 	if len == 0 then
-		self.visible = false
+		self:set_visible(false)
 	else
-		local mode = Program.video_mode
+		local mode = Program:get_video_mode()
 		local width = mode[1] - len * Theme.width_icon_1
-		self.offset = Vector(width / 2, 5)
-		self.visible = true
+		self:set_offset(Vector(width / 2, 5))
+		self:set_visible(true)
 		for k,v in pairs(self.dict_id) do
 			if v.time < 10000 then
 				v.time = math.max(0, v.time - secs)

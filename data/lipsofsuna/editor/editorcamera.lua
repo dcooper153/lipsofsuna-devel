@@ -1,10 +1,16 @@
+local Camera = require("system/camera")
+local Class = require("system/class")
+local Physics = require("system/physics")
+local Quaternion = require("system/math/quaternion")
+local Vector = require("system/math/vector")
+
 local radian_wrap = function(x)
 	if x < -math.pi then return x + 2 * math.pi
 	elseif x > math.pi then return x - 2 * math.pi
 	else return x end
 end
 
-EditorCamera = Class(Camera)
+local EditorCamera = Class("EditorCamera", Camera)
 
 --- Creates a new first person camera.
 -- @param clss First person camera class.
@@ -12,15 +18,15 @@ EditorCamera = Class(Camera)
 -- @return First person camera.
 EditorCamera.new = function(clss, args)
 	local self = Camera.new(clss, args)
-	self.collision_mask = Physics.MASK_CAMERA
-	self.far = Client.options.view_distance
-	self.fov = 1.1
-	self.mode = "first-person"
-	self.near = 0.01
+	self:set_collision_mask(Physics.MASK_CAMERA)
+	self:set_far(Client.options.view_distance)
+	self:set_fov(1.1)
+	self:set_mode("first-person")
+	self:set_near(0.01)
 	self.node_pos = Vector()
 	self.node_rot = Quaternion()
-	self.position_smoothing = 0.15
-	self.rotation_smoothing = 0.15
+	self:set_position_smoothing(0.15)
+	self:set_rotation_smoothing(0.15)
 	self.own_pos = Vector()
 	self.own_ray = Vector()
 	self.own_rot = Quaternion()
@@ -96,8 +102,8 @@ EditorCamera.update = function(self, secs)
 		end
 	end
 	-- Update the transformation.
-	self.target_position = pos
-	self.target_rotation = rot
+	self:set_target_position(pos)
+	self:set_target_rotation(rot)
 	Camera.update(self, secs)
 end
 
@@ -106,3 +112,5 @@ EditorCamera.warp = function(self, pos, rot)
 	self.own_rot = rot
 	Camera.warp(self)
 end
+
+return EditorCamera

@@ -1,6 +1,6 @@
 local Class = require("system/class")
 
-local Binding = Class()
+local Binding = Class("Binding")
 Binding.dict_index = {}
 Binding.dict_name = {}
 
@@ -113,22 +113,5 @@ Binding.is_pressed = function(self)
 	if self.key1 and Client.input:is_pressed(self.key1) then return true end
 	if self.key2 and Client.input:is_pressed(self.key2) then return true end
 end
-
-Binding:add_getters{
-	key1 = function(s) return rawget(s, "__key1") end,
-	key2 = function(s) return rawget(s, "__key2") end,
-	keys = function(s) return {s.key1, s.key2} end}
-
-Binding:add_setters{
-	key1 = function(s, v)
-		rawset(s, "__key1", v)
-	end,
-	key2 = function(s, v)
-		rawset(s, "__key2", v)
-	end,
-	keys = function(s, v)
-		s.key1 = keys[1]
-		s.key2 = keys[2]
-	end}
 
 return Binding

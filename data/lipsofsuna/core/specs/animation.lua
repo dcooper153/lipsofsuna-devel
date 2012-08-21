@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Animationspec = Class(Spec)
+Animationspec = Class("Animationspec", Spec)
 Animationspec.type = "animation"
 Animationspec.dict_id = {}
 Animationspec.dict_cat = {}

@@ -1,4 +1,6 @@
-Operators.spells = Class()
+local Class = require("system/class")
+
+Operators.spells = Class("SpellsOperator")
 Operators.spells.data = {slot = 1}
 
 --- Resets the spell editor.

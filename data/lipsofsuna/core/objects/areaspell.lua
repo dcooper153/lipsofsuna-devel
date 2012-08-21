@@ -1,7 +1,7 @@
-require(Mod.path .. "spell")
+local Class = require("system/class")
+local Spell = require("core/objects/spell")
 
-AreaSpell = Class(Spell)
-AreaSpell.class_name = "AreaSpell"
+local AreaSpell = Class("AreaSpell", Spell)
 
 --- Creates a new area spell.
 -- @param clss Area spell class.
@@ -14,9 +14,9 @@ AreaSpell.class_name = "AreaSpell"
 -- @return Spell.
 AreaSpell.new = function(clss, args)
 	local self = Spell.new(clss, {feat = args.feat, owner = args.owner, spec = args.spec})
-	self.collision_mask = 0
+	self:set_collision_mask(0)
 	self.timer = 1
-	self.physics = "static"
+	self:set_physics("static")
 	self.radius = args.radius
 	self.duration = args.duration
 	self:set_position(args.position)
@@ -34,7 +34,7 @@ AreaSpell.update = function(self, secs)
 		if self.timer < 1 then return end
 		self.timer = self.timer - 1
 		-- Apply the feat to each nearby object.
-		local objs = SimulationObject:find{point = self.position + Vector(0,1), radius = self.radius}
+		local objs = Game.objects:find_by_point(self:get_position():copy():add_xyz(0,1,0), self.radius)
 		for k,v in pairs(objs) do
 			if v:get_visible() and v.class_name ~= "AreaSpell" then
 				self.feat:apply{
@@ -53,3 +53,5 @@ AreaSpell.update = function(self, secs)
 	-- Update the base class.
 	Spell.update(self, secs)
 end
+
+return AreaSpell

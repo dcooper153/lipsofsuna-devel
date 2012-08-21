@@ -1,3 +1,5 @@
+local Material = require("system/material")
+
 Ui:add_state{
 	state = "editor",
 	root = "editor",
@@ -13,7 +15,7 @@ Ui:add_state{
 	end,
 	update = function(secs)
 		if not Client.editor.pattern then
-			Ui.state = "editor/menu"
+			Ui:set_state("editor/menu")
 		else
 			Client.editor:update(secs)
 		end

@@ -1,6 +1,8 @@
-require "system/class"
-require "system/core"
-require "system/model"
+local Aabb = require("system/math/aabb")
+local Class = require("system/class")
+local Program = require("system/core")
+local Quaternion = require("system/math/quaternion")
+local Vector = require("system/math/vector")
 
 if not Los.program_load_extension("object") then
 	error("loading extension `object' failed")
@@ -8,90 +10,17 @@ end
 
 ------------------------------------------------------------------------------
 
-Object = Class()
-Object.class_name = "Object"
-Object.objects = setmetatable({}, {__mode = "v"})
-Object.dict_active = setmetatable({}, {__mode = "k"})
+local Object = Class("Object")
 
 --- Creates a new object.
 -- @param clss Object class.
--- @param args Arguments.<ul>
---   <li>id: Unique object ID.</li></ul>
 -- @return New object.
-Object.new = function(clss, args)
+Object.new = function(clss)
 	-- Create the object.
 	local self = Class.new(clss)
 	self.handle = Los.object_new()
 	__userdata_lookup[self.handle] = self
-	-- Select the unique ID.
-	-- If there was an existing object with the same ID, hide it. This can
-	-- happen when object was hidden and displayed again before being GC'd.
-	self.id = args and args.id or clss:get_free_id()
-	local old = clss.objects[self.id]
-	if old then old:detach() end
-	clss.objects[self.id] = self
-	-- Copy arguments.
-	if args then
-		for k,v in pairs(args) do
-			if k ~= "realized" then self[k] = v end
-		end
-		if args.realized then self:set_visible(true) end
-	end
 	return self
-end
-
---- Finds objects.
--- @param clss Object class.
--- @param args Arguments.<ul>
---   <li>id: Object ID for ID search.</li>
---   <li>point: Center point for radius search.</li>
---   <li>radius: Search radius for radius search.</li>
---   <li>sector: Return all object in this sector.</li></ul>
--- @return Table of matching objects.
-Object.find = function(self, args)
-	if args.id then
-		-- Search by ID.
-		local obj = Object.objects[args.id]
-		if not obj then return end
-		-- Optional distance check.
-		if args.point and args.radius then
-			if not obj:get_visible() then return end
-			if (obj.position - args.point).length > args.radius then return end
-		end
-		return obj
-	else
-		-- Search by position or sector.
-		local list = Los.object_find{
-			point = args.point and args.point.handle,
-			radius = args.radius,
-			sector = args.sector}
-		for k,v in pairs(list) do list[k] = __userdata_lookup[v] end
-		-- Create an easily searchable dictionary.
-		local dict = {}
-		for k,v in pairs(list) do
-			dict[v.id] = v
-		end
-		return dict
-	end
-end
-
---- Gets a free object ID.
--- @param clss Object class.
--- @return Free object ID.
-Object.get_free_id = function(clss)
-	while true do
-		local id = math.random(0x1000000, 0x7FFFFFF)
-		if not clss:find{id = id} then
-			return id
-		end
-	end
-end
-
---- Adds the object to the list of active objects.
--- @param self Objects.
--- @param secs Number of seconds to remain active.
-Object.activate = function(self, secs)
-	Object.dict_active[self] = secs
 end
 
 --- Recalculates the bounding box of the model of the object.
@@ -104,7 +33,6 @@ end
 -- @param self Object.
 Object.detach = function(self)
 	self:set_visible(false)
-	Object.dict_active[self] = nil
 end
 
 --- Prevents map sectors around the object from being unloaded.
@@ -115,13 +43,67 @@ Object.refresh = function(self, args)
 	Los.object_refresh(self.handle, args)
 end
 
+--- Transforms a position vector from the local coordinate space to global.
+-- @param self Object.
+-- @param point Point vector.
+-- @return Point vector.
+Object.transform_local_to_global = function(self, point)
+	local pos = self:get_position()
+	if not point then return pos end
+	local rot = self:get_rotation()
+	return pos:copy():add(rot * point)
+end
+
 --- Gets the local bounding box of the object.
 -- @oaram self Object.
--- @return Bounding box.
+-- @return Aabb.
 Object.get_bounding_box = function(self)
 	local m = rawget(self, "__model")
 	if not m then return Aabb{point = Vector(-0.1,-0.1,-0.1), size = Vector(0.2,0.2,0.2)} end
-	return m.bounding_box
+	return m:get_bounding_box()
+end
+
+--- Gets the local center offset of the bounding box of the object.
+-- @param self Object.
+-- @return Vector
+Object.get_center_offset = function(self)
+	local m = rawget(self, "__model")
+	if not m then return Vector() end
+	return m:get_center_offset()
+end
+
+--- Gets the ID of the object.
+-- @param self Object.
+-- @return Number, or nil
+Object.get_id = function(self)
+	return Los.object_get_id(self.handle)
+end
+
+--- Sets the ID of the object.
+-- @param self Object.
+-- @param value Number
+Object.set_id = function(self, value)
+	Los.object_set_id(self.handle, value)
+end
+
+--- Gets the model of the object.
+-- @param self Object.
+-- @return Model.
+Object.get_model = function(self, v)
+	return rawget(self, "__model")
+end
+
+--- Sets the model of the object.
+-- @param self Object.
+-- @param v Model.
+Object.set_model = function(self, v)
+	if type(v) == "string" then
+		self:set_model_name(v)
+	else
+		rawset(self, "__model", v)
+		rawset(self, "__particle", nil)
+		Los.object_set_model(self.handle, v and v.handle)
+	end
 end
 
 --- Gets the position of the object.
@@ -166,31 +148,44 @@ Object.set_rotation = function(self, v)
 	Los.object_set_rotation(self.handle, v.handle)
 end
 
---- Gets the model of the object.
+--- Gets the sector ID of the object.
 -- @param self Object.
--- @return Model.
-Object.get_model = function(self, v)
-	return rawget(self, "__model")
+-- @return Number, or nil
+Object.get_sector = function(self)
+	return Los.object_get_sector(self.handle)
 end
 
---- Sets the model of the object.
+--- Returns true if the object is static.
 -- @param self Object.
--- @param v Model.
-Object.set_model = function(self, v)
-	if type(v) == "string" then
-		self:set_model_name(v)
-	else
-		rawset(self, "__model", v)
-		rawset(self, "__particle", nil)
-		Los.object_set_model(self.handle, v and v.handle)
-	end
+-- @return True if static, false if not.
+Object.get_static = function(self)
+	return Los.object_get_static(self.handle)
 end
 
+--- Make object static or non-static.<br/>
+--
+-- Static objects are not affected by the regular sector loading and unloading
+-- scheme. They will persist and retain their rendering and physics status even
+-- after the sector has been unloaded. On the contrary, non-static objects
+-- cannot remain visible if the sector in which they are is hidden.
+--
+-- @param self Object.
+-- @param value True for static, false for non-static.
+Object.set_static = function(self, value)
+	Los.object_set_static(self.handle, value)
+end
+
+--- Gets the visiblity of the object.
+-- @param self Object.
+-- @return True if visible, false if not.
 Object.get_visible = function(self)
 	return __objects_realized[self]
 	--return Los.object_get_visible(self.handle)
 end
 
+--- Sets the visiblity of the object.
+-- @param self Object.
+-- @param v True for visible, false for not.
 Object.set_visible = function(self, v)
 	if v then
 		if __objects_realized[self] then return end
@@ -205,65 +200,6 @@ Object.set_visible = function(self, v)
 	end
 end
 
---- The local center offset of the bounding box of the object.
--- @name Object.center_offset
--- @class table
-
---- The unique ID of the object.
--- @name Object.id
--- @class table
-
---- The model of the object.
--- @name Object.model
--- @class table
-
---- The position of the object.
--- @name Object.position
--- @class table
-
---- The realization status of the object.
--- @name Object.realized
--- @class table
-
---- The rotation of the object.
--- @name Object.rotation
--- @class table
-
---- The map sector of the object (read-only).
--- @name Object.sector
--- @class table
-
---- The static object status of the object.
---
--- Static objects are not affected by the regular sector loading and unloading
--- scheme. They will persist and retain their rendering and physics status even
--- after the sector has been unloaded. On the contrary, non-static objects
--- cannot remain visible if the sector in which they are is hidden.
---
--- @name Object.static
--- @class table
-
-Object:add_getters{
-	bounding_box = function(self) return self:get_bounding_box() end,
-	center_offset = function(self)
-		local m = rawget(self, "__model")
-		if not m then return Vector() end
-		return m.center_offset
-	end,
-	id = function(self) return Los.object_get_id(self.handle) end,
-	model = function(self) return self:get_model() end,
-	position = function(self) return self:get_position() end,
-	rotation = function(self) return self:get_rotation() end,
-	realized = function(self) return self:get_visible() end,
-	sector = function(self) return Los.object_get_sector(self.handle) end,
-	static = function(self, v) return Los.object_get_static(self.handle, v) end}
-
-Object:add_setters{
-	id = function(self, v) return Los.object_set_id(self.handle, v) end,
-	model = function(self, v) self:set_model(v) end,
-	position = function(self, v) self:set_position(v) end,
-	rotation = function(self, v) self:set_rotation(v) end,
-	realized = function(self, v) self:set_visible(v) end,
-	static = function(self, v) Los.object_set_static(self.handle, v) end}
-
 __objects_realized = {}
+
+return Object

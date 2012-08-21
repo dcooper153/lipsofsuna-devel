@@ -1,7 +1,8 @@
-local Class = require("system/class")
 local Camera = require("system/camera")
+local Class = require("system/class")
+local Physics = require("system/physics")
 
-local ThirdPersonCamera = Class(Camera)
+local ThirdPersonCamera = Class("ThirdPersonCamera", Camera)
 
 local radian_wrap = function(x)
 	if x < -math.pi then return x + 2 * math.pi
@@ -15,7 +16,7 @@ end
 -- @return Third person camera.
 ThirdPersonCamera.new = function(clss, args)
 	local self = Camera.new(clss, args)
-	self.collision_mask = Physics.MASK_CAMERA
+	self:set_collision_mask(Physics.MASK_CAMERA)
 	self.mode = "third-person"
 	self.displacement_smoothing_rate = 0.1
 	self.tilt_speed = 0
@@ -45,7 +46,7 @@ ThirdPersonCamera.get_position_displacement = function(self, pos, rot, turn)
 	local stepl = 0.12
 	local stepn = 6
 	local steps = stepn
-	local ctr = Physics:cast_ray{collision_mask = self.collision_mask, src = pos, dst = pos + turn * Vector(stepl * stepn)}
+	local ctr = Physics:cast_ray{collision_mask = self:get_collision_mask(), src = pos, dst = pos + turn * Vector(stepl * stepn)}
 	if ctr then
 		steps = math.floor((ctr.point - pos).length / stepl)
 		steps = math.max(0, steps - 1)
@@ -57,7 +58,7 @@ ThirdPersonCamera.get_position_displacement = function(self, pos, rot, turn)
 		-- Favor positions that have the best displacement to the side and
 		-- the most distance to the target before hitting a wall.
 		local center = pos + turn * Vector(i * stepl)
-		local back = Physics:cast_ray{collision_mask = self.collision_mask, src = center, dst = center + rot * Vector(0,0,5)}
+		local back = Physics:cast_ray{collision_mask = self:get_collision_mask(), src = center, dst = center + rot * Vector(0,0,5)}
 		local dist = back and (back.point - center).length or 5
 		local score = 3 * dist + (i + 1)
 		-- Prevent the crosshair corrected rotation from diverging too much
@@ -100,11 +101,11 @@ ThirdPersonCamera.get_transform = function(self)
 	-- Calculate the initial center position.
 	local spec = self.object.spec
 	local rel = spec and spec.camera_center or Vector(0, 2, 0)
-	local pos = self.object.position + rel + rot * Vector(0,0,0.5)
+	local pos = self.object:get_position() + rel + rot * Vector(0,0,0.5)
 	-- Calculate the sideward displacement.
 	local displ_pos = Vector()
 	local displ_rot = Quaternion()
-	if self.rotation_smoothing < 1 then
+	if self:get_rotation_smoothing() < 1 then
 		local r,p = self:get_position_displacement(pos, rot, turn1)
 		displ_pos = p
 		displ_rot = self:get_rotation_displacement(pos + turn1 * p, rot, r)
@@ -133,7 +134,7 @@ ThirdPersonCamera.update = function(self, secs)
 		end
 		-- Calculate the target transformation.
 		local pos,rot,turn,dpos,drot = self:get_transform()
-		if self.rotation_smoothing < 1 and self.prev_target_pos then
+		if self:get_rotation_smoothing() < 1 and self.prev_target_pos then
 			dpos:lerp(self.prev_target_pos, 1 - self.displacement_smoothing_rate)
 			drot = drot:nlerp(self.prev_target_rot, self.displacement_smoothing_rate)
 		end
@@ -152,8 +153,8 @@ ThirdPersonCamera.update = function(self, secs)
 			end
 		end
 		-- Set the target transformation.
-		self.target_position = pos + turn * dpos
-		self.target_rotation = drot * rot
+		self:set_target_position(pos + turn * dpos)
+		self:set_target_rotation(drot * rot)
 		-- Interpolate.
 		Camera.update(self, self.tick)
 	end

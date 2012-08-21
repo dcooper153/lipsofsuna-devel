@@ -1,4 +1,7 @@
-Operators.controls = Class()
+local Class = require("system/class")
+local ConfigFile = require("system/config-file")
+
+Operators.controls = Class("ControlsOperator")
 Operators.controls.data = {}
 
 --- Initializes the controls operator.

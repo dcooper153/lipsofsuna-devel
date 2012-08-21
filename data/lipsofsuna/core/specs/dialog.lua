@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Dialogspec = Class(Spec)
+Dialogspec = Class("Dialogspec", Spec)
 Dialogspec.type = "dialog"
 Dialogspec.dict_id = {}
 Dialogspec.dict_cat = {}

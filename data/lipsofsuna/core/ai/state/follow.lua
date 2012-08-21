@@ -14,7 +14,7 @@ Aistatespec{
 			return
 		end
 		-- Move towards the target.
-		local dist = (target - self.object.position).length
+		local dist = (target - self.object:get_position()).length
 		if dist < 3 then
 			self.object:set_movement(0)
 		else

@@ -1,38 +1,30 @@
-Widgets.Label = Class(Widget)
-Widgets.Label.class_name = "Widgets.Label"
+local Class = require("system/class")
+local Widget = require("system/widget")
 
-Widgets.Label.new = function(clss, args)
+local Label = Class("Label", Widget)
+
+Label.new = function(clss)
 	local self = Widget.new(clss)
-	local copy = function(f, d) self[f] = (args and args[f] ~= nil) and args[f] or d end
-	copy("request")
-	copy("width_request")
-	copy("color")
-	copy("font", "default")
-	copy("halign", 0)
-	copy("valign", 0.5)
-	copy("text", "")
-	if args then
-		for k,v in pairs(args) do self[k] = v end
-	end
+	self.text = ""
+	self.halign = 0
+	self.valign = 0.5
 	return self
 end
 
-Widgets.Label.reshaped = function(self)
-	local wrap = self.width_request
-	self:set_request{
+Label.reshaped = function(self)
+	local wrap,_ = self:get_request()
+	self:calculate_request{
 		font = self.font,
 		internal = true,
 		paddings = {2,2,2,2},
 		text = self.text,
 		width = wrap and (wrap - 4)}
-	local w = self.width
-	local h = self.height
 	local f = self.focused
 	local p = self.pressed
 	self:canvas_clear()
 	self:canvas_text{
 		dest_position = {0,0},
-		dest_size = {w,h},
+		dest_size = {self:get_width(),self:get_height()},
 		text = self.text,
 		text_alignment = {self.halign,self.valign},
 		text_color = self.color or (f and p and {0.6,0.6,0,1} or p and {0.6,0.6,0.6,0.6} or {1,1,1,1}),
@@ -40,30 +32,60 @@ Widgets.Label.reshaped = function(self)
 	self:canvas_compile()
 end
 
-Widgets.Label:add_getters{
-	color = function(s) return rawget(s, "__color") end,
-	focused = function(s) return rawget(s, "__focused") end,
-	font = function(s) return rawget(s, "__font") end,
-	text = function(s) return rawget(s, "__text") end}
+Label.get_color = function(self)
+	return self.color
+end
 
-Widgets.Label:add_setters{
-	color = function(s, v)
-		if s.color == v then return end
-		rawset(s, "__color", v)
-		s:reshaped()
-	end,
-	focused = function(s, v)
-		if s.focused == v then return end
-		rawset(s, "__focused", v)
-		s:reshaped()
-	end,
-	font = function(s, v)
-		if s.font == v then return end
-		rawset(s, "__font", v)
-		s:reshaped()
-	end,
-	text = function(s, v)
-		if s.text == v then return end
-		rawset(s, "__text", v)
-		s:reshaped()
-	end}
+Label.get_focused = function(self)
+	return self.focused
+end
+
+Label.get_font = function(self)
+	return self.font
+end
+
+Label.get_text = function(self)
+	return self.text
+end
+
+Label.set_color = function(self, v)
+	if not v then return end
+	self.color = v
+	self:reshaped()
+end
+
+Label.set_focused = function(self, v)
+	if self.focused == v then return end
+	self.focused = v
+	self:reshaped()
+end
+
+Label.set_halign = function(self, v)
+	if not v then return end
+	if self.halign == v then return end
+	self.halign = v
+	self:reshaped()
+end
+
+Label.set_font = function(self, v)
+	if not v then return end
+	if self.font == v then return end
+	self.font = v
+	self:reshaped()
+end
+
+Label.set_text = function(self, v)
+	if not v then return end
+	if self.text == v then return end
+	self.text = v
+	self:reshaped()
+end
+
+Label.set_valign = function(self, v)
+	if not v then return end
+	if self.valign == v then return end
+	self.halign = v
+	self:reshaped()
+end
+
+return Label

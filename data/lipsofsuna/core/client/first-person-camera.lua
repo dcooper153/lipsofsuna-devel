@@ -1,7 +1,8 @@
-local Class = require("system/class")
 local Camera = require("system/camera")
+local Class = require("system/class")
+local Physics = require("system/physics")
 
-local FirstPersonCamera = Class(Camera)
+local FirstPersonCamera = Class("FirstPersonCamera", Camera)
 
 local radian_wrap = function(x)
 	if x < -math.pi then return x + 2 * math.pi
@@ -15,8 +16,8 @@ end
 -- @return First person camera.
 FirstPersonCamera.new = function(clss, args)
 	local self = Camera.new(clss, args)
-	self.collision_mask = Physics.MASK_CAMERA
-	self.mode = "first-person"
+	self:set_collision_mask(Physics.MASK_CAMERA)
+	self:set_mode("first-person")
 	self.tilt_speed = 0
 	self.tilt_state = 0
 	self.turn_speed = 0
@@ -28,11 +29,11 @@ FirstPersonCamera.get_picking_ray = function(self)
 	if not self.object then return end
 	local spec = self.object.spec
 	-- Calculate the rotation.
-	local euler = self.object.rotation.euler
+	local euler = self.object:get_rotation().euler
 	euler[3] = self.object:get_tilt_angle() - self.tilt_state
 	local rot = Quaternion{euler = euler}
 	-- Project the ray.
-	local ctr = self.object.position + self.object.rotation * spec.aim_ray_center
+	local ctr = self.object:transform_local_to_global(spec.aim_ray_center)
 	return ctr,ctr + rot * Vector(0, 0, -5)
 end
 
@@ -44,14 +45,14 @@ FirstPersonCamera.get_transform = function(self)
 	-- Find the camera offset.
 	local spec = self.object.spec
 	local rel = spec.camera_center or Vector(0, 2, 0)
-	local pos = self.object.position + self.object.rotation * rel
+	local pos = self.object:transform_local_to_global(rel)
 	local npos,nrot = self.object:find_node{name = "#camera"}
 	if npos then
 		-- The position of the camera node is always used but the rotation is
 		-- ignored most of the time since the rotation component of the node
 		-- is highly annoying in many animations. However, the rotation is used
 		-- when the player dies to avoid the camera facing inside the corpse.
-		pos = self.object.position + self.object.rotation * npos
+		pos = self.object:transform_local_to_global(npos)
 		if self.object.dead then
 			rot = rot * nrot
 		end
@@ -84,8 +85,8 @@ FirstPersonCamera.update = function(self, secs)
 			self.quake = 0
 		end
 	end
-	self.target_position = pos
-	self.target_rotation = rot
+	self:set_target_position(pos)
+	self:set_target_rotation(rot)
 	-- Interpolate.
 	Camera.update(self, secs)
 end

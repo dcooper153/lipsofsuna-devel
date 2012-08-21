@@ -1,4 +1,4 @@
-require "system/model"
+local Model = require("system/model")
 
 if not Los.program_load_extension("model-editing") then
 	error("loading extension `model-editing' failed")
@@ -89,3 +89,5 @@ end
 Model.remove_vertices = function(self)
 	Los.model_remove_vertices(self.handle)
 end
+
+return Model

@@ -1,4 +1,4 @@
-require "system/class"
+local Class = require("system/class")
 
 if not Los.program_load_extension("render-model") then
 	error("loading extension `render-model' failed")
@@ -6,8 +6,7 @@ end
 
 ------------------------------------------------------------------------------
 
-RenderModel = Class()
-RenderModel.class_name = "RenderModel"
+local RenderModel = Class("RenderModel")
 
 --- Creates a new render model.
 -- @param clss Render model class.
@@ -32,3 +31,5 @@ end
 RenderModel.set_model = function(self, model)
 	Los.render_model_set_model(self.handle, model.handle)
 end
+
+return RenderModel

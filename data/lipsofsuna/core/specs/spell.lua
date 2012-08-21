@@ -1,6 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "spec")
 
-Spellspec = Class(Spec)
+Spellspec = Class("Spellspec", Spec)
 Spellspec.type = "spell"
 Spellspec.dict_id = {}
 Spellspec.dict_cat = {}

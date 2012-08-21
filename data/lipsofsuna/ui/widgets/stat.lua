@@ -1,7 +1,7 @@
+local Class = require("system/class")
 require(Mod.path .. "widget")
 
-Widgets.Uistat = Class(Widgets.Uiwidget)
-Widgets.Uistat.class_name = "Widgets.Uistat"
+Widgets.Uistat = Class("Uistat", Widgets.Uiwidget)
 
 Widgets.Uistat.new = function(clss, skill, index)
 	local self = Widgets.Uiwidget.new(clss)
@@ -73,12 +73,12 @@ Widgets.Uistat.update = function(self, secs)
 	self.timer = self.timer - secs
 	-- Update the offset and visibility.
 	if stat and self.timer > 0 then
-		local mode = Program.video_mode
+		local mode = Program:get_video_mode()
 		local pad = mode[1] - self.size.x
-		self.offset = Vector(pad / 2, mode[2] - self.index * Theme.text_height_1 * 1.2)
-		self.visible = true
+		self:set_offset(Vector(pad / 2, mode[2] - self.index * Theme.text_height_1 * 1.2))
+		self:set_visible(true)
 	else
 		self.timer = 0
-		self.visible = false
+		self:set_visible(false)
 	end
 end

@@ -1,6 +1,6 @@
 local Class = require("system/class")
 
-local Input = Class()
+local Input = Class("Input")
 
 --- Registers a new action.
 -- @param clss Input class.
@@ -20,7 +20,7 @@ end
 Input.event = function(self, args)
 	-- Maintain key states.
 	if args.type == "keypress" then
-		args.time = Program.time + 0.25
+		args.time = Program:get_time() + 0.25
 		self.mods = args.mods
 		self.pressed[args.code] = args
 	elseif args.type == "keyrelease" then
