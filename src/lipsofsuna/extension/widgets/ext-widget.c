@@ -134,7 +134,13 @@ static void Widget_canvas_image (LIScrArgs* args)
 	if (!liscr_args_gets_string (args, "source_image", &source_image))
 		return;
 	if (liscr_args_gets_floatv (args, "color", 4, color) == 4)
+	{
 		color_ptr = color;
+		color[0] = LIMAT_CLAMP (color[0], 0.0f, 1.0f);
+		color[1] = LIMAT_CLAMP (color[1], 0.0f, 1.0f);
+		color[2] = LIMAT_CLAMP (color[2], 0.0f, 1.0f);
+		color[3] = LIMAT_CLAMP (color[3], 0.0f, 1.0f);
+	}
 	if (liscr_args_gets_intv (args, "dest_clip", 4, dest_clip) == 4)
 		dest_clip_ptr = dest_clip;
 	if (liscr_args_gets_intv (args, "dest_position", 2, dest_position) == 2)
@@ -187,7 +193,13 @@ static void Widget_canvas_text (LIScrArgs* args)
 	if (liscr_args_gets_floatv (args, "text_alignment", 2, text_align) == 2)
 		text_align_ptr = text_align;
 	if (liscr_args_gets_floatv (args, "text_color", 4, text_color) == 4)
+	{
 		text_color_ptr = text_color;
+		text_color[0] = LIMAT_CLAMP (text_color[0], 0.0f, 1.0f);
+		text_color[1] = LIMAT_CLAMP (text_color[1], 0.0f, 1.0f);
+		text_color[2] = LIMAT_CLAMP (text_color[2], 0.0f, 1.0f);
+		text_color[3] = LIMAT_CLAMP (text_color[3], 0.0f, 1.0f);
+	}
 	liscr_args_gets_float (args, "rotation", &rotation);
 	if (liscr_args_gets_data (args, "rotation_center", LISCR_SCRIPT_VECTOR, &vector))
 		rotation_center_ptr = liscr_data_get_data (vector);
