@@ -1,10 +1,14 @@
 local Class = require("system/class")
+local Interpolation = require("system/math/interpolation")
 local Label = require("system/widgets/label")
 local Render = require("system/render")
 local Vector = require("system/math/vector")
+local Theme = require("ui/theme")
 
 local enemy_colors = {[false] = {1,1,0,1}, [true] = {0,1,1,1}}
 local player_colors = {[false] = {1,0,0,1}, [true] = {0,1,0,1}}
+local text_path_a = {1,1,0.5,0,0}
+local text_path_y = {0,0.5,0,-0.5,-1.5}
 
 local DamageLabelEffect = Class("DamageLabelEffect")
 
@@ -17,13 +21,11 @@ local DamageLabelEffect = Class("DamageLabelEffect")
 DamageLabelEffect.new = function(clss, object, point, damage)
 	local self = Class.new(clss)
 	self.timer = 0
-	self.life = 3
-	self.fade = 1
 	self.position = point or object:get_position() + Vector(0,2,0)
 	-- Create the text widget.
 	self.widget = Label()
 	self.widget:set_text(string.format("%d", damage))
-	self.widget:set_font("medium")
+	self.widget:set_font(Theme.text_font_2)
 	self.widget:set_request(250, nil)
 	self.widget:set_halign(0.5)
 	-- Determine the text color.
@@ -46,10 +48,9 @@ end
 
 DamageLabelEffect.update = function(self, secs)
 	-- Remove if the text faded out completely.
-	self.life = self.life - secs
-	if self.life < 0 then
-		self:disable()
-		return
+	self.timer = self.timer + 1.8 * secs
+	if self.timer >= 4 then
+		return self:disable()
 	end
 	-- Update the text position.
 	local proj = self:get_screen_position()
@@ -58,18 +59,16 @@ DamageLabelEffect.update = function(self, secs)
 	local color = self.widget:get_color()
 	if proj.z > 1 then
 		color[4] = 0
-	elseif self.life < self.fade then
-		color[4] = self.life / self.fade
 	else
-		color[4] = 1
+		local a = Interpolation:interpolate_samples_cubic_1d(self.timer, text_path_a)
+		color[4] = a
 	end
 	self.widget:set_color(color)
 end
 
 DamageLabelEffect.get_screen_position = function(self)
-	-- TODO: Better movement.
-	local offset = Vector(0, 3 - self.life, 0)
-	local proj = Render:project(self.position + offset)
+	local anim = Interpolation:interpolate_samples_cubic_1d(self.timer, text_path_y)
+	local proj = Render:project(self.position + Vector(0, anim, 0))
 	proj.x = proj.x - 125
 	return proj
 end
