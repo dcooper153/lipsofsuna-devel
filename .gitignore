@@ -5,8 +5,7 @@ data/lipsofsuna/import
 tool/goatexperiments
 docs/html
 .build
-.lock-wscript
-.lock-wafbuild
+.lock-*
 .waf*
 !data/lipsofsuna/
 !data/unittest/tests/lipsofsuna/
