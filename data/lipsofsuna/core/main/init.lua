@@ -54,6 +54,9 @@ Main.new = function(clss)
 			Program:update()
 			local t2 = Program:get_time()
 			Eventhandler:update()
+			if Game.initialized then
+				Game.sectors:update(t1 - frame)
+			end
 			Server:update(t1 - frame)
 			clss.models:update(t1 - frame)
 			local t3 = Program:get_time()
@@ -78,6 +81,9 @@ Main.new = function(clss)
 			Program:update_scene(t1 - frame)
 			local t2 = Program:get_time()
 			Eventhandler:update()
+			if Game.initialized then
+				Game.sectors:update(t1 - frame)
+			end
 			Server:update(t1 - frame)
 			Client:update(t1 - frame)
 			clss.models:update(t1 - frame)

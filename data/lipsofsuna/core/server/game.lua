@@ -14,6 +14,7 @@ local Messaging = require("core/messaging/messaging")
 local Network = require("system/network")
 local ObjectManager = require("core/server/object-manager")
 local Physics = require("system/physics")
+local SectorManager = require("core/server/sector-manager")
 
 Physics.GROUP_ACTORS = 0x0001
 Physics.GROUP_ITEMS = 0x0002
@@ -46,7 +47,7 @@ Game.init = function(self, mode, save, port)
 		self.database:query("PRAGMA synchronous=OFF;")
 		self.database:query("PRAGMA count_changes=OFF;")
 	end
-	self.sectors = Sectors(self.database)
+	self.sectors = SectorManager(self.database)
 	-- Initialize settings.
 	self.enable_graphics = (mode ~= "server")
 	self.enable_prediction = (mode == "join")
