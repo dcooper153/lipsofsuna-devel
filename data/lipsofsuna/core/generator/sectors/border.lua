@@ -12,6 +12,7 @@ end
 -- @param self Border generator.
 -- @param pos Offset of the generated area.
 -- @param size Size of the generated area.
-Generator.sector_types.Border.generate = function(self, pos, size)
+-- @param yield Yield function.
+Generator.sector_types.Border.generate = function(self, pos, size, yield)
 	Voxel:fill_region{point = pos, size = size, tile = self.mats[1]:get_id()}
 end

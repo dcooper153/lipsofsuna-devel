@@ -17,12 +17,14 @@ end
 -- @param self Forest generator.
 -- @param pos Offset of the generated area.
 -- @param size Size of the generated area.
-Generator.sector_types.Forest.generate = function(self, pos, size)
+-- @param yield Yield function.
+Generator.sector_types.Forest.generate = function(self, pos, size, yield)
 	-- Create terrain.
 	Voxel:fill_region{point = pos, size = size, tile = 0}
 	Noise:perlin_terrain(pos, pos + size, self.mats[1]:get_id(), 0.15, self.scale1, 4, 4, 0.1, Server.generator.seed1)
 	Noise:perlin_terrain(pos, pos + size, self.mats[2]:get_id(), 0.35, self.scale1, 4, 4, 0.15, Server.generator.seed1)
 	Noise:perlin_terrain(pos, pos + size, self.mats[3]:get_id(), 0.45, self.scale1, 4, 4, 0.2, Server.generator.seed1)
+	yield()
 	-- Spawn plants.
 	local ord = {1,3,5,7,9}
 	for x = pos.x+1,pos.x+size.x-2,2 do
@@ -30,6 +32,7 @@ Generator.sector_types.Forest.generate = function(self, pos, size)
 			for j=1,5 do
 				local i = math.random(1,5)
 				ord[j],ord[i] = ord[i],ord[j]
+				yield()
 			end
 			for k,v in ipairs(ord) do
 				if math.random(1,4)==1 then
@@ -37,6 +40,7 @@ Generator.sector_types.Forest.generate = function(self, pos, size)
 						break
 					end
 				end
+				yield()
 			end
 		end
 	end

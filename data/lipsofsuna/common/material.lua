@@ -21,12 +21,20 @@ Material.find = function(clss, args)
 end
 
 --- Creates a new material.
--- @param clss Model class.
+-- @param clss Material class.
 -- @param args Arguments.
 -- @return New models.
 Material.new = function(clss, args)
 	local self = instfunc(clss, args)
+	self.magma = args.magma
 	clss.dict_id[self:get_id()] = self
 	clss.dict_name[self:get_name()] = self
 	return self
+end
+
+--- Returns true if the material is magma.
+-- @param self Material.
+-- @return Boolean.
+Material.get_magma = function(self)
+	return self.magma
 end

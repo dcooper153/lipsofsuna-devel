@@ -130,11 +130,12 @@ SectorManager.update = function(self, secs)
 	-- Reduce the unload frequency.
 	if not self.unload_time then return end
 	self.update_timer = self.update_timer + secs
-	if self.update_timer < 2 then return end
+	if self.update_timer < 0.2 then return end
+	self.update_timer = 0
 	-- Unload unused sectors.
 	local written = 0
 	for k,d in pairs(Program:get_sectors()) do
-		if d > self.unload_time and written < 40 then
+		if d > self.unload_time and written < 10 then
 			-- Save the sector.
 			if self.database then
 				self:wait_sector_load(k)

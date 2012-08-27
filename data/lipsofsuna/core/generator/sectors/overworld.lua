@@ -12,7 +12,8 @@ end
 -- @param self Overworld generator.
 -- @param pos Offset of the generated area.
 -- @param size Size of the generated area.
-Generator.sector_types.Overworld.generate = function(self, pos, size)
+-- @param yield Yield function.
+Generator.sector_types.Overworld.generate = function(self, pos, size, yield)
 	-- Generate random rocks.
 	local m1 = Material:find{name = "granite1"}
 	local p1 = Vector()
@@ -33,6 +34,7 @@ Generator.sector_types.Overworld.generate = function(self, pos, size)
 					Voxel:fill_region{point = p1, size = Vector(1, 1+(n1-0.8)/0.3, 1), tile = m1:get_id()}
 				end
 			end
+			yield()
 		end
 	end
 	-- Generate objects.
@@ -45,5 +47,6 @@ Generator.sector_types.Overworld.generate = function(self, pos, size)
 		if p then
 			Voxel:place_obstacle{point = p * Voxel.tile_scale, category = "small-plant"}
 		end
+		yield()
 	end
 end

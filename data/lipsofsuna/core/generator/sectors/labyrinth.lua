@@ -17,7 +17,8 @@ end
 -- @param self Labyrinth generator.
 -- @param pos Offset of the generated area.
 -- @param size Size of the generated area.
-Generator.sector_types.Labyrinth.generate = function(self, pos, size)
+-- @param yield Yield function.
+Generator.sector_types.Labyrinth.generate = function(self, pos, size, yield)
 	-- A/////|  |/////  +-------------
 	-- A/////|R3|/////  |C //////////|
 	--  -----+  +-----  +------------+
@@ -35,6 +36,7 @@ Generator.sector_types.Labyrinth.generate = function(self, pos, size)
 	local r5 = Noise:perlin_noise(pos + Vector(size.x/2,0,0), self.scale1, 1, 3, 0.5, Server.generator.seed1)
 	Voxel:fill_region{point = pos, size = size, tile = self.mats[2]:get_id()}
 	Voxel:fill_region{point = pos + Vector(a,c,a), size = Vector(b,d,b), tile = 0}
+	yield()
 	if r2 > t1 then
 		Voxel:fill_region{point = pos + Vector(a+b,c,a), size = Vector(a,d,b), tile = 0}
 	elseif r2 > t2 then
@@ -45,6 +47,7 @@ Generator.sector_types.Labyrinth.generate = function(self, pos, size)
 	elseif r3 > t2 then
 		Voxel:fill_region{point = pos + Vector(a2,c,a+b), size = Vector(b2,d2,a), tile = 0}
 	end
+	yield()
 	if r4 > t1 then
 		Voxel:fill_region{point = pos + Vector(0,c,a), size = Vector(a,d,b), tile = 0}
 	elseif r4 > t2 then
@@ -55,6 +58,7 @@ Generator.sector_types.Labyrinth.generate = function(self, pos, size)
 	elseif r5 > t2 then
 		Voxel:fill_region{point = pos + Vector(a2,c,0), size = Vector(b2,d2,a), tile = 0}
 	end
+	yield()
 	local rnd = math.random()
 	if rnd > 0.8 then
 		Item{

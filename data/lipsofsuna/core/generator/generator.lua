@@ -11,8 +11,9 @@
 local Class = require("system/class")
 local Material = require("system/material")
 local Network = require("system/network")
-local Region = require(Mod.path .. "region")
+local Region = require("core/generator/region")
 local Sector = require("system/sector")
+local SectorGenerator = require("core/generator/sector-generator")
 local Staticobject = require("core/objects/static")
 
 --- TODO:doc
@@ -174,7 +175,7 @@ Generator.generate = function(self, args)
 	self:update_status(0, "Randomizing terrain")
 	local index = 0
 	for k in pairs(sectors) do
-		self:generate_sector(k)
+		SectorGenerator:execute(self, k, function() end)
 		self:update_status(index / sectorn)
 		index = index + 1
 	end
@@ -297,11 +298,12 @@ Generator.generate_dungeon = function(self, pattern)
 end
 
 --- Creates ore deposits and places plants.
--- @param self Sectors.
+-- @param self Generator.
 -- @param pos Position in tiles.
 -- @param size Size in tiles.
 -- @param amount How many resources to create at most.
-Generator.generate_resources = function(self, pos, size, amount)
+-- @param yield Yield function.
+Generator.generate_resources = function(self, pos, size, amount, yield)
 	-- /FIXME
 	local mats = {
 		Material:find{name = "adamantium1"},
@@ -332,6 +334,7 @@ Generator.generate_resources = function(self, pos, size, amount)
 	local create_plant_or_item = function(ctr)
 		local i = 0
 		repeat
+			yield()
 			i = i + 1
 			ctr.y = ctr.y - 1
 			if i > 10 then return end
@@ -340,6 +343,7 @@ Generator.generate_resources = function(self, pos, size, amount)
 		local src = ctr + Vector(-1,1,-1)
 		local dst = ctr + Vector(1,3,1)
 		ctr = ctr + Vector (0.5, 0, 0.5)
+		yield()
 		if math.random() < 0.1 then
 			Voxel:place_item{point = ctr, category = "generate"}
 		elseif math.random() < 0.4 and Voxel:check_range(src, dst).solid == 0 then
@@ -350,6 +354,7 @@ Generator.generate_resources = function(self, pos, size, amount)
 	end
 	local create_vein = function(ctr, mat)
 		for k,v in pairs(points) do
+			yield()
 			if math.random() < 0.3 then
 				local t = Voxel:get_tile(ctr + v)
 				if t ~= 0 then
@@ -372,11 +377,8 @@ Generator.generate_resources = function(self, pos, size, amount)
 		else
 			create_plant_or_item(p)
 		end
+		yield()
 	end
-end
-
-Generator.generate_sector = function(self, id)
-	self.sector_types.Main:generate(id)
 end
 
 --- Informs clients of the generator status.

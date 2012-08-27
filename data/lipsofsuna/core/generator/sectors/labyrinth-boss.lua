@@ -17,10 +17,12 @@ end
 -- @param self Labyrinth boss generator.
 -- @param pos Offset of the generated area.
 -- @param size Size of the generated area.
-Generator.sector_types.LabyrinthBoss.generate = function(self, pos, size)
+-- @param yield Yield function.
+Generator.sector_types.LabyrinthBoss.generate = function(self, pos, size, yield)
 	local a,c,d = size.x,3,6
 	Voxel:fill_region{point = pos, size = size, tile = self.mats[2]:get_id()}
 	Voxel:fill_region{point = pos + Vector(0,c,0), size = Vector(a,d,a), tile = 0}
+	yield()
 	Actor{
 		spec = "dragon",
 		position = (pos + Vector(a/2,c,a/2)) * Voxel.tile_size,

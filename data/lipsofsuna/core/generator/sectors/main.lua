@@ -11,16 +11,19 @@ end
 --- Generates a sector of a suitable type.
 -- @param self Main generator.
 -- @param sector Sector index.
-Generator.sector_types.Main.generate = function(self, sector)
+-- @param yield Yield function.
+Generator.sector_types.Main.generate = function(self, sector, yield)
 	local w = Voxel.tiles_per_line
 	local size = Vector(w,w,w)
 	local pos = Sector:get_tile_by_id(sector)
+	yield()
 	local t = self:get_sector(pos, size)
 	local g = Generator.sector_types[t]
+	yield()
 	if not g then
 		Voxel:fill_region{point = pos, size = size, tile = 0}
 	else
-		g:generate(pos, size)
+		g:generate(pos, size, yield)
 	end
 end
 
