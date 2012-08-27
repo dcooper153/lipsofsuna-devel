@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.specs.constraint
+-- @alias Constraintspec
+
 local Class = require("system/class")
 require(Mod.path .. "spec")
 
+--- TODO:doc
+-- @type Constraintspec
 Constraintspec = Class("Constraintspec", Spec)
 Constraintspec.type = "effect"
 Constraintspec.dict_id = {}
@@ -25,3 +37,5 @@ Constraintspec.new = function(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
+
+

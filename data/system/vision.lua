@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.vision
+-- @alias Vision
+
 local Class = require("system/class")
 local Eventhandler = require("system/eventhandler")
 
@@ -7,6 +17,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Vision
 local Vision = Class("Vision")
 Vision.dict = {}
 
@@ -154,3 +166,5 @@ Eventhandler{type = "vision-voxel-block-changed", func = function(self, event)
 end}
 
 return Vision
+
+

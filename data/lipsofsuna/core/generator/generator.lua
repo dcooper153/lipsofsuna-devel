@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.generator.generator
+-- @alias Generator
+
 local Class = require("system/class")
 local Material = require("system/material")
 local Network = require("system/network")
@@ -5,6 +15,8 @@ local Region = require(Mod.path .. "region")
 local Sector = require("system/sector")
 local Staticobject = require("core/objects/static")
 
+--- TODO:doc
+-- @type Generator
 Generator = Class("Generator")
 Generator.map_size = Vector(1000, 1000, 1000)
 Generator.map_start = Vector(600, 600, 600) - Generator.map_size * 0.5
@@ -623,3 +635,5 @@ Generator.is_overworld_sector_by_point = function(self, point)
 	local tile_y = point.y * Voxel.tile_scale
 	return tile_y > 1000
 end
+
+

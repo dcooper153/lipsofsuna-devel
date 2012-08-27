@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.reload
+-- @alias Reload
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("reload") then
@@ -6,6 +16,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Reload
 local Reload = Class("Reload")
 
 Reload.get_enabled = function(self)
@@ -17,3 +29,5 @@ Reload.set_enabled = function(self, v)
 end
 
 return Reload
+
+

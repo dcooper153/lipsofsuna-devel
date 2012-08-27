@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.sector
+-- @alias Sector
+
 local Class = require("system/class")
 local Vector = require("system/math/vector")
 
+--- TODO:doc
+-- @type Sector
 local Sector = Class("Sector")
 
 Sector.get_block_offset_by_block_id = function(self, id)
@@ -73,3 +85,5 @@ Sector.get_tile_by_point = function(self, point)
 end
 
 return Sector
+
+

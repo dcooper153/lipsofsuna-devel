@@ -1,3 +1,13 @@
+--- Provides networking capabilities.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.network
+-- @alias Network
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("network") then
@@ -6,6 +16,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- Host or connect to a UDP server.
+-- @type Network
 local Network = Class("Network")
 
 --- Disconnects a client.
@@ -56,7 +68,7 @@ end
 
 --- Disconnects all client and closes the network connection.
 -- @param clss Network class.
-Network.shutdown = function(self)
+Network.shutdown = function(clss)
 	Los.network_shutdown()
 end
 
@@ -69,21 +81,21 @@ end
 --- Gets the list of connected clients.
 -- @param clss Network class
 -- @return List of client IDs.
-Network.get_clients = function(self)
+Network.get_clients = function(clss)
 	return Los.network_get_clients()
 end
 
 --- Returns true if all future connections will be blocked.
 -- @param clss Network class
 -- @return Boolean.
-Network.get_closed = function(self)
+Network.get_closed = function(clss)
 	return Los.network_get_closed()
 end
 
 --- Toggles connections blocking.
 -- @param clss Network class
 -- @param v True to block connections, false to accept connections.
-Network.set_closed = function(self, v)
+Network.set_closed = function(clss, v)
 	Los.network_set_closed(v)
 end
 
@@ -95,3 +107,5 @@ Network.get_connected = function(self)
 end
 
 return Network
+
+

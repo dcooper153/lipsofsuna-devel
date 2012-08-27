@@ -1,11 +1,23 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.coroutine
+-- @alias Coroutine
+
 local Class = require("system/class")
 local Eventhandler = require("system/eventhandler")
 
+--- TODO:doc
+-- @type Coroutine
 local Coroutine = Class("Coroutine")
 Coroutine.routines = {}
 
 --- Creates a thread executing a function.
--- @param self Coroutine class.
+-- @param clss Coroutine class.
 -- @param func Function to execute.
 -- @return Coroutine.
 Coroutine.new = function(clss, func)
@@ -45,3 +57,5 @@ Eventhandler{type = "tick", func = function(self, args)
 end}
 
 return Coroutine
+
+

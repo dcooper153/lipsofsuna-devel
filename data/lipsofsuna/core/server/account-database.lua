@@ -1,14 +1,26 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.account_database
+-- @alias AccountDatabase
+
 local Account = require(Mod.path .. "account")
 local Class = require("system/class") 
 local Password = require("system/password")
 
+--- TODO:doc
+-- @type AccountDatabase
 local AccountDatabase = Class("AccountDatabase")
 AccountDatabase.account_version = "1"
 
 --- Creates a new account database.
 -- @param clss AccountDatabase class.
 -- @param db Database.
--- @returns AccountDatabase.
+-- @return AccountDatabase.
 AccountDatabase.new = function(clss, db)
 	local self = Class.new(clss)
 	self.db = db
@@ -140,3 +152,5 @@ AccountDatabase.set_account_option = function(self, key, value)
 end
 
 return AccountDatabase
+
+

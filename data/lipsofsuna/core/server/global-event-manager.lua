@@ -1,8 +1,20 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.global_event_manager
+-- @alias GlobalEventManager
+
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Coroutine = require("system/coroutine")
 local Sector = require("system/sector")
 
+--- TODO:doc
+-- @type GlobalEventManager
 local GlobalEventManager = Class("GlobalEventManager")
 
 --- Creates a new global event manager.
@@ -236,3 +248,5 @@ GlobalEventManager.update = function(self, secs)
 end
 
 return GlobalEventManager
+
+

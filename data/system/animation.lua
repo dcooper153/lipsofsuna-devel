@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.animation
+-- @alias Animation
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("animation") then
@@ -6,6 +16,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Animation
 local Animation = Class("Animation")
 Animation.dict_name = setmetatable({}, {__mode = "v"})
 
@@ -84,3 +96,5 @@ Animation.get_name = function(self)
 end
 
 return Animation
+
+

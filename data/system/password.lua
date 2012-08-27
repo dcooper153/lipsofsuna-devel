@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.password
+-- @alias Password
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("password") then
@@ -6,6 +16,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Password
 local Password = Class("Password")
 
 --- Creates a password hash.
@@ -27,3 +39,5 @@ Password.random_salt = function(self, length)
 end
 
 return Password
+
+

@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module ui.ui
+-- @alias Ui
+
 local Button = require("system/widgets/button")
 local Class = require("system/class")
 local Cursor = require("system/widgets/cursor")
@@ -6,6 +16,8 @@ local Label = require("system/widgets/label")
 local Scrollbar = require("system/widgets/scrollbar")
 local Widget = require("system/widget")
 
+--- TODO:doc
+-- @type Ui
 Ui = Class("Ui")
 Ui.bubbles = {}
 Ui.huds = {}
@@ -303,9 +315,9 @@ end
 --- Disables a heads over display widget.
 -- @param self Ui class.
 -- @param id Widget ID.
-Ui.disable_hud = function(self, args)
+Ui.disable_hud = function(self, id)
 	-- Find the HUD.
-	local hud = self:get_hud(args.id)
+	local hud = self:get_hud(id)
 	if not hud then return end
 	-- Deinitialize if not done already.
 	if not hud.widget then return end
@@ -450,6 +462,7 @@ end
 
 --- Scrolls the screen.
 -- @param self Ui class.
+-- @param dir Scrolling direction, either "up" or "down".
 Ui.scroll = function(self, dir)
 	if not self.scrollbar:get_visible() then return end
 	local range = self.__scroll_range
@@ -871,3 +884,5 @@ Ui.set_scroll_offset = function(self, v)
 	self.__scroll_offset = v
 	self.__scroll_range = {h, v, self.size.y}
 end
+
+

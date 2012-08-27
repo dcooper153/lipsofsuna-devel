@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.object_render
+-- @alias RenderObject
+
 local Animation = require("system/animation")
 local Class = require("system/class")
 
@@ -11,6 +21,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type RenderObject
 local RenderObject = Class("RenderObject")
 
 --- Creates a new render object.
@@ -255,3 +267,5 @@ RenderObject.set_visible = function(self, v)
 end
 
 return RenderObject
+
+

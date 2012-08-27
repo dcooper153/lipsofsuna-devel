@@ -1,9 +1,21 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.unlock_manager
+-- @alias UnlockManager
+
 local Class = require("system/class")
 
+--- TODO:doc
+-- @type UnlockManager
 local UnlockManager = Class("UnlockManager")
 
 --- Initializes unlocks.
--- @param self UnlockManager class.
+-- @param clss UnlockManager class.
 -- @param db Database, or nil.
 -- @return UnlockManager
 UnlockManager.new = function(clss, db)
@@ -186,3 +198,5 @@ UnlockManager.save = function(self)
 end
 
 return UnlockManager
+
+

@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.object
+-- @alias Object
+
 local Aabb = require("system/math/aabb")
 local Class = require("system/class")
 local Program = require("system/core")
@@ -10,6 +20,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Object
 local Object = Class("Object")
 
 --- Creates a new object.
@@ -55,7 +67,7 @@ Object.transform_local_to_global = function(self, point)
 end
 
 --- Gets the local bounding box of the object.
--- @oaram self Object.
+-- @param self Object.
 -- @return Aabb.
 Object.get_bounding_box = function(self)
 	local m = rawget(self, "__model")
@@ -89,7 +101,7 @@ end
 --- Gets the model of the object.
 -- @param self Object.
 -- @return Model.
-Object.get_model = function(self, v)
+Object.get_model = function(self)
 	return rawget(self, "__model")
 end
 
@@ -203,3 +215,5 @@ end
 __objects_realized = {}
 
 return Object
+
+

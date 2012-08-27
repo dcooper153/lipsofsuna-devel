@@ -1,5 +1,17 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.introspect.introspect
+-- @alias Introspect
+
 local Class = require("system/class")
 
+--- TODO:doc
+-- @type Introspect
 Introspect = Class("Introspect")
 Introspect.types_dict = {}
 
@@ -156,3 +168,5 @@ Introspect.write_str = function(self, data)
 	end
 	return str .. "}"
 end
+
+

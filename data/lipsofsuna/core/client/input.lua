@@ -1,5 +1,17 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.input
+-- @alias Input
+
 local Class = require("system/class")
 
+--- TODO:doc
+-- @type Input
 local Input = Class("Input")
 
 --- Registers a new action.
@@ -47,9 +59,11 @@ end
 --- Checks if a control is pressed.
 -- @param self Input.
 -- @param control Control.
--- @param True if pressed, false if not.
+-- @return True if pressed, false if not.
 Input.is_pressed = function(self, control)
 	return self.pressed[control]
 end
 
 return Input
+
+

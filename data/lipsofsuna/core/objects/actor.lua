@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.objects.actor
+-- @alias Actor
+
 local Class = require("system/class")
 local Coroutine = require("system/coroutine")
 local Item = require("core/objects/item")
@@ -8,6 +18,8 @@ local Skills = require("core/server/skills")
 local Stats = require("core/server/stats")
 local Timer = require("system/timer")
 
+--- TODO:doc
+-- @type Actor
 local Actor = Class("Actor", SimulationObject)
 Actor.serializer = ObjectSerializer{
 	{
@@ -1314,7 +1326,7 @@ end
 
 --- Sets the tilt angle of the object.
 -- @param self Object.
--- @param value Angle in radians.
+-- @param tilt Angle in radians.
 -- @param predict True to use prediction.
 Actor.set_tilt_angle = function(self, tilt, predict)
 	-- Set the angle.
@@ -1334,3 +1346,5 @@ Actor.set_weapon = function(self, value)
 end
 
 return Actor
+
+

@@ -1,7 +1,19 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.widgets.cursor
+-- @alias Cursor
+
 local Class = require("system/class")
 local Input = require("system/input")
 local Widget = require("system/widget")
 
+--- TODO:doc
+-- @type Cursor
 local Cursor = Class("Cursor", Widget)
 
 Cursor.new = function(clss, cursor)
@@ -49,3 +61,5 @@ Cursor.reshaped = function(self)
 end
 
 return Cursor
+
+

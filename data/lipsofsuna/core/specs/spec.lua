@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.specs.spec
+-- @alias Spec
+
 local Class = require("system/class")
 local File = require("system/file")
 
+--- TODO:doc
+-- @type Spec
 Spec = Class("Spec")
 Spec.dict_id = {}
 Spec.dict_cat = {}
@@ -253,3 +265,5 @@ Spec.write_str = function(self)
 end
 
 return Spec
+
+

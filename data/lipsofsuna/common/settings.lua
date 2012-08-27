@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module common.settings
+-- @alias Settings
+
 local Class = require("system/class")
 require "common/string"
 
+--- TODO:doc
+-- @type Settings
 Settings = Class("Settings")
 Settings.arguments = string.split(Program:get_args())
 Settings.address = "localhost"
@@ -146,3 +158,5 @@ Options:
 end
 
 return Settings
+
+

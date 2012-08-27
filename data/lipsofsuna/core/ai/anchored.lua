@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.ai.anchored
+-- @alias AnchoredAi
+
 local Class = require("system/class")
 local CamperAi = require(Mod.path .. "camper")
 
+--- TODO:doc
+-- @type AnchoredAi
 local AnchoredAi = Class("AnchoredAi", CamperAi)
 AnchoredAi.type = "anchored"
 
@@ -24,3 +36,5 @@ AnchoredAi.choose_wander_target = function(self)
 end
 
 return AnchoredAi
+
+

@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.input
+-- @alias Input
+
 local Class = require("system/class")
 local Vector = require("system/math/vector")
 
@@ -7,6 +17,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Input
 local Input = Class("Input")
 
 --- Gets the mouse button state mask.
@@ -38,3 +50,5 @@ Input.get_pointer_position = function(self)
 end
 
 return Input
+
+

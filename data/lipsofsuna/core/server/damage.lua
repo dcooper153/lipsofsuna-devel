@@ -1,5 +1,17 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.damage
+-- @alias Damage
+
 local Class = require("system/class")
 
+--- TODO:doc
+-- @type Damage
 local Damage = Class("Damage")
 
 --- Creates a new damage instance.
@@ -178,3 +190,5 @@ Damage.get_total_health_influence = function(self)
 end
 
 return Damage
+
+

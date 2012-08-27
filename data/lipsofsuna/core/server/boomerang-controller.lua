@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.boomerang_controller
+-- @alias BoomerangController
+
 local Class = require("system/class")
 local Combat = require("core/server/combat")
 
+--- TODO:doc
+-- @type BoomerangController
 local BoomerangController = Class("BoomerangController")
 
 BoomerangController.new = function(clss, attacker, projectile, damage)
@@ -71,3 +83,5 @@ BoomerangController.update = function(self, secs)
 end
 
 return BoomerangController
+
+

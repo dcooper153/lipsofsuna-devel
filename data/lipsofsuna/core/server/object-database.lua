@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.object_database
+-- @alias ObjectDatabase
+
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Item = require("core/objects/item")
@@ -5,12 +15,14 @@ local Obstacle = require("core/objects/obstacle")
 local Player = require("core/objects/player")
 local Staticobject = require("core/objects/static")
 
+--- TODO:doc
+-- @type ObjectDatabase
 local ObjectDatabase = Class("ObjectDatabase")
 
 --- Creates a new object database.
 -- @param clss ObjectDatabase class.
 -- @param db Database.
--- @returns ObjectDatabase.
+-- @return ObjectDatabase.
 ObjectDatabase.new = function(clss, db)
 	local self = Class.new(clss)
 	self.db = db
@@ -315,3 +327,5 @@ ObjectDatabase.update_world_decay = function(self, secs)
 end
 
 return ObjectDatabase
+
+

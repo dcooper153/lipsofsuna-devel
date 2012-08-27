@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.objects.missilespell
+-- @alias MissileSpell
+
 local Class = require("system/class")
 local Spell = require("core/objects/spell")
 
+--- TODO:doc
+-- @type MissileSpell
 local MissileSpell = Class("MissileSpell", Spell)
 
 --- Creates a new missile spell.
@@ -32,3 +44,5 @@ MissileSpell.update = function(self, secs)
 end
 
 return MissileSpell
+
+

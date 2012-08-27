@@ -1,9 +1,21 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.objects.player
+-- @alias Player
+
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Packet = require("system/packet")
 local Sector = require("system/sector")
 local Vision = require("system/vision")
 
+--- TODO:doc
+-- @type Player
 local Player = Class("Player", Actor)
 
 --- Creates a new player object.
@@ -219,14 +231,14 @@ Player.set_crafting_device = function(self, object, mode)
 end
 
 --- Gets the spawn point of the player.
--- @params self Object.
+-- @param self Object.
 -- @return Spawn point vector in world space, or nil.
 Player.get_spawn_point = function(self)
 	return self.account.spawn_point
 end
 
 --- Sets the spawn point of the player.
--- @params self Object.
+-- @param self Object.
 -- @param name Spawn point name.
 -- @return Spawn point vector in world space, or nil.
 Player.set_spawn_point = function(self, name)
@@ -476,3 +488,5 @@ Player.get_storage_type = function(self)
 end
 
 return Player
+
+

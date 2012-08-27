@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.specs.dialog
+-- @alias Dialogspec
+
 local Class = require("system/class")
 require(Mod.path .. "spec")
 
+--- TODO:doc
+-- @type Dialogspec
 Dialogspec = Class("Dialogspec", Spec)
 Dialogspec.type = "dialog"
 Dialogspec.dict_id = {}
@@ -255,3 +267,5 @@ Dialogspec.validate_all = function(self)
 		v:validate()
 	end
 end
+
+

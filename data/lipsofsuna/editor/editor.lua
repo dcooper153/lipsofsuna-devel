@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module editor.editor
+-- @alias Editor
+
 local Class = require("system/class")
 local EditorBounds = require("editor/editor-bounds")
 local EditorCamera = require("editor/editorcamera")
@@ -10,6 +20,8 @@ local Selection = require("editor/selection")
 local Simulation = require("core/client/simulation")
 require "editor/controls"
 
+--- TODO:doc
+-- @type Editor
 Editor = Class("Editor")
 
 Editor.new = function(clss)
@@ -64,7 +76,7 @@ end
 
 --- Extrudes the selected tiles.
 -- @param self Editor.
--- @param rev True to extrude in reverse.
+-- @param reverse True to extrude in reverse.
 Editor.extrude = function(self, reverse)
 	local del = {}
 	local add = {}
@@ -663,3 +675,5 @@ function deepcopy(object)
     end
     return _copy(object)
 end
+
+

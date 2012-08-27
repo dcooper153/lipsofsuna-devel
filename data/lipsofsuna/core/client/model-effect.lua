@@ -1,8 +1,20 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.model_effect
+-- @alias ModelEffect
+
 local Class = require("system/class")
 local EffectObject = require("core/client/effect-object")
 local RenderObject = require("system/object-render")
 local SpeedlineEffect = require("core/client/speedline-effect")
 
+--- TODO:doc
+-- @type ModelEffect
 local ModelEffect = Class("ModelEffect", EffectObject)
 
 --- Creates a new model effect.
@@ -70,3 +82,5 @@ ModelEffect.set_rotation = function(self, v)
 end
 
 return ModelEffect
+
+

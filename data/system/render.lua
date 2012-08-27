@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.render
+-- @alias Render
+
 local Class = require("system/class")
 local Vector = require("system/math/vector")
 
@@ -11,6 +21,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Render
 local Render = Class("Render")
 
 --- Enables a compositor script.
@@ -82,3 +94,5 @@ Render.get_stats = function(self)
 end
 
 return Render
+
+

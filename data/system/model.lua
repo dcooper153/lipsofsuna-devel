@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.model
+-- @alias Model
+
 local Aabb = require("system/math/aabb")
 local Class = require("system/class")
 local Vector = require("system/math/vector")
@@ -8,6 +18,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Model
 local Model = Class("Model")
 
 --- Creates a new model.
@@ -122,3 +134,5 @@ Model.get_render = function(self)
 end
 
 return Model
+
+

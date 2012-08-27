@@ -1,8 +1,20 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.objects.obstacle
+-- @alias Obstacle
+
 local Class = require("system/class")
 local Item = require("core/objects/item")
 local ObjectSerializer = require("core/server/object-serializer")
 local SimulationObject = require("core/objects/simulation")
 
+--- TODO:doc
+-- @type Obstacle
 local Obstacle = Class("Obstacle", SimulationObject)
 Obstacle.serializer = ObjectSerializer{
 	{
@@ -138,3 +150,5 @@ Obstacle.get_storage_type = function(self)
 end
 
 return Obstacle
+
+

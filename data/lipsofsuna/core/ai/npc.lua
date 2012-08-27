@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.ai.npc
+-- @alias NpcAi
+
 local Class = require("system/class")
 local Ai = require(Mod.path .. "ai")
 
+--- TODO:doc
+-- @type NpcAi
 local NpcAi = Class("NpcAi", Ai)
 NpcAi.type = "npc"
 
@@ -322,3 +334,5 @@ NpcAi.update_state = function(self)
 end
 
 return NpcAi
+
+

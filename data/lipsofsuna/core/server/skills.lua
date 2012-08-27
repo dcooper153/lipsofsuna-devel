@@ -1,8 +1,17 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.skills
+-- @alias Skills
+
 local Class = require("system/class")
 
---- Create and synchronize stats.
--- @name Stats
--- @class table
+--- Create and synchronize skills.
+-- @type Skills
 local Skills = Class("Skills")
 
 --- Creates a new skills list.
@@ -85,7 +94,7 @@ end
 -- that affect the damage of the weapon are listed in the spec of the item.
 --
 -- @param self Skills.
--- @param item Item object.
+-- @param spec Itemspec.
 -- @return Number.
 Skills.calculate_damage_multiplier_for_itemspec = function(self, spec)
 	if not spec.influences_bonus then return 1 end
@@ -224,3 +233,5 @@ Skills.remove_invalid = function(self)
 end
 
 return Skills
+
+

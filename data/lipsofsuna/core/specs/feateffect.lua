@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.specs.feateffect
+-- @alias Feateffectspec
+
 local Class = require("system/class")
 require(Mod.path .. "spec")
 
+--- TODO:doc
+-- @type Feateffectspec
 Feateffectspec = Class("Feateffectspec", Spec)
 Feateffectspec.type = "feateffect"
 Feateffectspec.dict_id = {}
@@ -83,3 +95,5 @@ Feateffectspec.get_required_reagents = function(self, result)
 	end
 	return result
 end
+
+

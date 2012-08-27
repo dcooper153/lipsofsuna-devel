@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.packet
+-- @alias Packet
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("network") then
@@ -6,10 +16,12 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Packet
 local Packet = Class("Packet")
 
 --- Creates a new packet.
--- @param self Packet class.
+-- @param clss Packet class.
 -- @param ... Packet type and contents.
 -- @return New packet.
 Packet.new = function(clss, ...)
@@ -19,7 +31,7 @@ Packet.new = function(clss, ...)
 end
 
 --- Creates a new packet from an internal handle.
--- @param self Packet class.
+-- @param clss Packet class.
 -- @param handle Handle.
 -- @return New packet.
 Packet.new_from_handle = function(clss, handle)
@@ -97,3 +109,5 @@ Packet.set_type = function(self, v)
 end
 
 return Packet
+
+

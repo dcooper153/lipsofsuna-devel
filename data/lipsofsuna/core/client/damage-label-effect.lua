@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.damage_label_effect
+-- @alias DamageLabelEffect
+
 local Class = require("system/class")
 local Interpolation = require("system/math/interpolation")
 local Label = require("system/widgets/label")
@@ -10,6 +20,8 @@ local player_colors = {[false] = {1,0,0,1}, [true] = {0,1,0,1}}
 local text_path_a = {1,1,0.5,0,0}
 local text_path_y = {0,0.5,0,-0.5,-1.5}
 
+--- TODO:doc
+-- @type DamageLabelEffect
 local DamageLabelEffect = Class("DamageLabelEffect")
 
 --- Creates a new damage text label.
@@ -74,3 +86,5 @@ DamageLabelEffect.get_screen_position = function(self)
 end
 
 return DamageLabelEffect
+
+

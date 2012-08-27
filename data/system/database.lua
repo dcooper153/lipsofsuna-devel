@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.database
+-- @alias Database
+
 local Class = require("system/class")
 local Packet = require("system/packet")
 
@@ -7,6 +17,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Database
 local Database = Class("Database")
 
 --- Opens a database.
@@ -31,9 +43,8 @@ end
 -- array. The binding array is a simple table that contains the arguments in the
 -- same order as the query.
 -- @param self Database.
--- @param args Arguments.<ul>
---   <li>1: Query string.</li>
---   <li>2: Array of values to bind to the statement.</ul>
+-- @param a Query string.
+-- @param b Array of values to bind to the statement.
 -- @return Table of rows.
 Database.query = function(self, a, b)
 	-- Translate packets to handles.
@@ -64,3 +75,5 @@ Database.get_memory_used = function(self)
 end
 
 return Database
+
+

@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.math.interpolation
+-- @alias Interpolation
+
 local Class = require("system/class")
 local Vector = require("system/math/vector")
 
@@ -7,8 +17,7 @@ local Vector = require("system/math/vector")
 -- samples on the time axis is always one. If this is not the case, the
 -- caller should calculate a time offset that fulfills the requirement.
 --
--- @name Interpolation
--- @class table
+-- @type Interpolation
 local Interpolation = Class("Interpolation")
 
 ------------------------------------------------------------------------------
@@ -162,8 +171,8 @@ end
 --- Performs linear interpolation between points p1 and p2.
 -- @param self Interpolation class.
 -- @param t Time offset between [0,1].
--- @param p0 Point.
 -- @param p1 Point.
+-- @param p2 Point.
 -- @return Point.
 Interpolation.interpolate_segment_linear = function(self, t, p1, p2)
 	return p1 * (1 - t) + p2 * t
@@ -216,3 +225,5 @@ Interpolation.select_segment_4 = function(self, t, p)
 end
 
 return Interpolation
+
+

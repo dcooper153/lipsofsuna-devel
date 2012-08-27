@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module editor.editorcamera
+-- @alias EditorCamera
+
 local Camera = require("system/camera")
 local Class = require("system/class")
 local Physics = require("system/physics")
@@ -10,6 +20,8 @@ local radian_wrap = function(x)
 	else return x end
 end
 
+--- TODO:doc
+-- @type EditorCamera
 local EditorCamera = Class("EditorCamera", Camera)
 
 --- Creates a new first person camera.
@@ -114,3 +126,5 @@ EditorCamera.warp = function(self, pos, rot)
 end
 
 return EditorCamera
+
+

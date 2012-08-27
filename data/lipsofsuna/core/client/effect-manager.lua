@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.effect_manager
+-- @alias EffectManager
+
 local Class = require("system/class")
 local DamageLabelEffect = require(Mod.path .. "damage-label-effect")
 local ParticleEffect = require(Mod.path .. "particle-effect")
@@ -5,6 +15,8 @@ local Sound = require("system/sound")
 local SoundEffect = require(Mod.path .. "sound-effect")
 local SpeechBubbleEffect = require(Mod.path .. "speech-bubble-effect")
 
+--- TODO:doc
+-- @type EffectManager
 local EffectManager = Class("EffectManager")
 
 EffectManager.new = function(clss)
@@ -172,3 +184,5 @@ EffectManager.update = function(self, secs)
 end
 
 return EffectManager
+
+

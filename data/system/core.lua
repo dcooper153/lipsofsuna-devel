@@ -1,12 +1,24 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.core
+-- @alias Program
+
 local Class = require("system/class")
 local Model = require("system/model")
 
+--- TODO:doc
+-- @type Program
 Program = Class("Program")
 
 --- Adds a data lookup path.
 -- @param clss Program class.
 -- @param path Path name.
-Program.add_path = function(self, path)
+Program.add_path = function(clss, path)
 	return Los.program_add_path(path)
 end
 
@@ -32,7 +44,7 @@ end
 -- @param args Arguments.<ul>
 --  <li>1,name: Module name.</li></ul>
 --  <li>2,args: Argument string to pass to the module.</li></ul>
-Program.launch_mod = function(self, args)
+Program.launch_mod = function(clss, args)
 	return Los.program_launch_mod(args)
 end
 
@@ -62,13 +74,13 @@ end
 
 --- Pumps engine events to the event queue.
 -- @param clss Program class.
-Program.pump_events = function(clss, args)
-	Los.program_pump_events(args)
+Program.pump_events = function(clss)
+	Los.program_pump_events()
 end
 
 --- Pushes an event to the back of the event queue.
 -- @param clss Program class.
--- @return event Event table.
+-- @param event Event table.
 Program.push_event = function(clss, event)
 	if not __events then __events = {} end
 	clss:pump_events()
@@ -134,14 +146,14 @@ end
 
 --- Request program shutdown.
 -- @param clss Program class.
-Program.shutdown = function(clss, args)
-	Los.program_shutdown(args)
+Program.shutdown = function(clss)
+	Los.program_shutdown()
 end
 
 --- Updates the program state.
 -- @param clss Program class.
-Program.update = function(clss, args)
-	Los.program_update(args)
+Program.update = function(clss)
+	Los.program_update()
 end
 
 --- Waits for the given number seconds.
@@ -229,3 +241,5 @@ Program.get_version = function(self)
 end
 
 return Program
+
+

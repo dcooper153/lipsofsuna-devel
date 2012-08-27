@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.client_render_object
+-- @alias ClientRenderObject
+
 local Animation = require("system/animation")
 local Class = require("system/class")
 local Model = require("system/model")
@@ -8,6 +18,8 @@ local RenderObject = require("system/object-render")
 local RenderUtils = require("core/client/render-utils")
 local SpeedlineEffect = require("core/client/speedline-effect")
 
+--- TODO:doc
+-- @type ClientRenderObject
 local ClientRenderObject = Class("ClientRenderObject", RenderObject)
 
 --- Initializes the render object.
@@ -80,6 +92,7 @@ end
 -- @param name Animation name.
 -- @param time Optional start time, or nil.
 -- @param variant Animation variant number, or nil.
+-- @param weapon Weapon being wielded, or nil.
 -- @return Animation arguments.
 ClientRenderObject.add_animation = function(self, name, time, variant, weapon)
 	-- Check for initialization.
@@ -355,3 +368,5 @@ ClientRenderObject.set_tilt = function(self, nodes, value)
 end
 
 return ClientRenderObject
+
+

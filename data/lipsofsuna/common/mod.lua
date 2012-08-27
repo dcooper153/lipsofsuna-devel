@@ -1,5 +1,17 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module common.mod
+-- @alias Mod
+
 local Class = require("system/class")
 
+--- TODO:doc
+-- @type Mod
 Mod = Class("Mod")
 
 Mod.load = function(self, name)
@@ -21,3 +33,5 @@ Mod.load_optional = function(self, name)
 	self.name = prev_name
 	self.path = prev_path
 end
+
+

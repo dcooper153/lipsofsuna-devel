@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.dialog_manager
+-- @alias DialogManager
+
 local Class = require("system/class")
 local Dialog = require(Mod.path .. "dialog")
 
+--- TODO:doc
+-- @type DialogManager
 local DialogManager = Class("DialogManager")
 
 DialogManager.new = function(clss)
@@ -52,3 +64,5 @@ DialogManager.find_by_object = function(self, object)
 end
 
 return DialogManager
+
+

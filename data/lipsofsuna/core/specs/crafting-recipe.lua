@@ -1,7 +1,19 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.specs.crafting_recipe
+-- @alias CraftingRecipeSpec
+
 local Class = require("system/class")
 require(Mod.path .. "spec")
 require "common/string"
 
+--- TODO:doc
+-- @type CraftingRecipeSpec
 CraftingRecipeSpec = Class("CraftingRecipeSpec", Spec)
 CraftingRecipeSpec.type = "crafting recipe"
 CraftingRecipeSpec.dict_id = {}
@@ -26,3 +38,5 @@ CraftingRecipeSpec.new = function(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
+
+

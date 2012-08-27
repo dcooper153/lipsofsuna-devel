@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.tiles
+-- @alias Voxel
+
 local Class = require("system/class")
 local Packet = require("system/packet")
 local Sector = require("system/sector")
@@ -8,6 +18,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Voxel
 Voxel = Class("Voxel")
 
 --- Copies a terrain region into a packet.
@@ -189,3 +201,5 @@ end
 -- @class table
 
 return Voxel
+
+

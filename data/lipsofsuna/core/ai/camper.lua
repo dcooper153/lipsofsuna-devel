@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.ai.camper
+-- @alias CamperAi
+
 local Class = require("system/class")
 local NpcAi = require(Mod.path .. "npc")
 
+--- TODO:doc
+-- @type CamperAi
 local CamperAi = Class("CamperAi", NpcAi)
 CamperAi.type = "camper"
 
@@ -40,3 +52,5 @@ CamperAi.update = function(self, secs)
 end
 
 return CamperAi
+
+

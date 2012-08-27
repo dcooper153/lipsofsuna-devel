@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.projectile_controller
+-- @alias ProjectileController
+
 local Class = require("system/class")
 local Combat = require("core/server/combat")
 
+--- TODO:doc
+-- @type ProjectileController
 local ProjectileController = Class("ProjectileController")
 
 ProjectileController.new = function(clss, attacker, projectile, damage, speed, speedline)
@@ -65,3 +77,5 @@ ProjectileController.update = function(self, secs)
 end
 
 return ProjectileController
+
+

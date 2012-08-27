@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.math.quaternion
+-- @alias Quaternion
+
 local Class = require("system/class")
 local Vector = require("system/math/vector")
 
@@ -7,6 +17,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Quaternion
 local Quaternion = Class("Quaternion")
 
 --- The conjugate of the quaternion.
@@ -120,18 +132,24 @@ local quaternion_tostring = function(self)
 	return Los.quaternion_tostring(self.handle)
 end
 
---- Creates a new quaternion.
--- @param clss Quaternion class.
--- @param args Arguments.<ul>
---   <li>1,x: Optional X value, default is 0.</li>
---   <li>2,y: Optional Y value, default is 0.</li>
---   <li>3,z: Optional Z value, default is 0.</li>
---   <li>4,w: Optional W value, default is 1.</li>
+--- Creates a new quaternion.<br>
+--
+-- If a table is passed as the first argument, the following additional
+-- constuction arguments can be used:<br/>
+--
+-- <ul>
 --   <li>angle: Angle of rotation in radians.</li>
 --   <li>axis: Axis of rotation.</li>
 --   <li>dir: Look direction vector.</li>
 --   <li>euler: Euler angles.</li>
---   <li>up: Up direction vector.</li></ul>
+--   <li>up: Up direction vector.</li>
+-- </ul>
+--
+-- @param clss Quaternion class.
+-- @param x Optional X value, default is 0.
+-- @param y Optional Y value, default is 0.
+-- @param z Optional Z value, default is 0.
+-- @param w Optional W value, default is 1.
 -- @return New quaternion.
 Quaternion.new = function(clss, x, y, z, w)
 	local h
@@ -202,3 +220,5 @@ Quaternion.normalize = function(self)
 end
 
 return Quaternion
+
+

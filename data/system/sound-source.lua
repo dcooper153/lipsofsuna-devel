@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.sound_source
+-- @alias SoundSource
+
 local Class = require("system/class")
 local Vector = require("system/math/vector")
 
@@ -7,6 +17,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type SoundSource
 local SoundSource = Class("SoundSource")
 
 --- Creates a new sound source.
@@ -132,3 +144,5 @@ SoundSource.set_volume = function(self, value)
 end
 
 return SoundSource
+
+

@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.player_state
+-- @alias PlayerState
+
 local Class = require("system/class")
 local Simulation = require("core/client/simulation")
 
@@ -12,6 +22,8 @@ local radian_wrap = function(x)
 	return y
 end
 
+--- TODO:doc
+-- @type PlayerState
 local PlayerState = Class("PlayerState")
 
 PlayerState.new = function(clss)
@@ -102,3 +114,5 @@ PlayerState.set_targeted_object = function(self, object)
 end
 
 return PlayerState
+
+

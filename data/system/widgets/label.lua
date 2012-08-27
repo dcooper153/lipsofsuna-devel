@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.widgets.label
+-- @alias Label
+
 local Class = require("system/class")
 local Widget = require("system/widget")
 
+--- TODO:doc
+-- @type Label
 local Label = Class("Label", Widget)
 
 Label.new = function(clss)
@@ -89,3 +101,5 @@ Label.set_valign = function(self, v)
 end
 
 return Label
+
+

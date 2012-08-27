@@ -1,5 +1,17 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.messaging.message
+-- @alias Message
+
 local Class = require("system/class")
 
+--- TODO:doc
+-- @type Message
 Message = Class("Message")
 Message.next_id = 1
 Message.dict_id = {}
@@ -44,3 +56,5 @@ Message.new = function(clss, args)
 end
 
 return Message
+
+

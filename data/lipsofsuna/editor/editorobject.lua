@@ -1,8 +1,20 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module editor.editorobject
+-- @alias EditorObject
+
 local Class = require("system/class")
 local Quaternion = require("system/math/quaternion")
 local SimulationObject = require("core/objects/simulation")
 local Vector = require("system/math/vector")
 
+--- TODO:doc
+-- @type EditorObject
 local EditorObject = Class("EditorObject", SimulationObject)
 
 EditorObject.new = function(clss)
@@ -63,3 +75,5 @@ EditorObject.get_beheaded = function(self)
 end
 
 return EditorObject
+
+

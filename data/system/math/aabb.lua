@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.math.aabb
+-- @alias Aabb
+
 local Class = require("system/class")
 local Vector = require("system/math/vector")
 
+--- TODO:doc
+-- @type Aabb
 local Aabb = Class("Aabb")
 
 --- Creates a new axis-aligned bounding box.
@@ -64,3 +76,5 @@ Aabb.intersects_point = function(self, point)
 end
 
 return Aabb
+
+

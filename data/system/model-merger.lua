@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.model_merger
+-- @alias ModelMerger
+
 local Class = require("system/class")
 local Model = require("system/model")
 
@@ -7,6 +17,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type ModelMerger
 local ModelMerger = Class("ModelMerger")
 
 --- Creates a new model merger.
@@ -42,7 +54,7 @@ end
 --- Pops a finished model.
 -- @param self Model merger.
 -- @return Model or nil.
-ModelMerger.pop_model = function(self, model, targets)
+ModelMerger.pop_model = function(self)
 	local handle = Los.merger_pop_model(self.handle)
 	if not handle then return end
 	return Model:new_from_handle(handle)
@@ -61,3 +73,5 @@ ModelMerger.replace_material = function(self, args)
 end
 
 return ModelMerger
+
+

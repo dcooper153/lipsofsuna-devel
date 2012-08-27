@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.noise
+-- @alias Noise
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("noise") then
@@ -6,6 +16,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Noise
 local Noise = Class("Noise")
 
 --- Generates Perlin noise.
@@ -76,3 +88,5 @@ Noise.perlin_threshold = function(self, ...)
 end
 
 return Noise
+
+

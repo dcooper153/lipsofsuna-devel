@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module common.crafting
+-- @alias Crafting
+
 local Class = require("system/class")
 local Item = require("core/objects/item")
 
+--- TODO:doc
+-- @type Crafting
 Crafting = Class("Crafting")
 
 --- Checks if a specific item can be crafted by the user.
@@ -87,3 +99,5 @@ Crafting.get_requiring_items = function(clss, spec)
 	end
 	return items
 end
+
+

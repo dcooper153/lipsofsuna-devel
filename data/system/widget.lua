@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.widget
+-- @alias Widget
+
 local Class = require("system/class")
 local Widgets = require("system/widgets")
 
@@ -7,6 +17,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Widget
 local Widget = Class("Widget")
 
 --- Creates a new widget.
@@ -254,7 +266,7 @@ end
 
 --- Sets the left edge position.
 -- @param self Widget.
--- @return Number.
+-- @param v Number.
 Widget.set_x = function(self, v)
 	Los.widget_set_x(self.handle, v)
 end
@@ -281,3 +293,5 @@ __widget_reshape = function(handle)
 end
 
 return Widget
+
+

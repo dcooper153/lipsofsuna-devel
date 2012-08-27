@@ -1,7 +1,19 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.third_person_camera
+-- @alias ThirdPersonCamera
+
 local Camera = require("system/camera")
 local Class = require("system/class")
 local Physics = require("system/physics")
 
+--- TODO:doc
+-- @type ThirdPersonCamera
 local ThirdPersonCamera = Class("ThirdPersonCamera", Camera)
 
 local radian_wrap = function(x)
@@ -40,6 +52,9 @@ end
 -- the character doesn't obstruct the crosshair so badly.
 --
 -- @param self Third person camera.
+-- @param pos Non-displaced position.
+-- @param rot Non-displaced rotation.
+-- @param turn Non-displaced turning rotation.
 -- @return Displacement in object space.
 ThirdPersonCamera.get_position_displacement = function(self, pos, rot, turn)
 	-- Determine the number of iterations.
@@ -161,3 +176,5 @@ ThirdPersonCamera.update = function(self, secs)
 end
 
 return ThirdPersonCamera
+
+

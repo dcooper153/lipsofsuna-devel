@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.util
+-- @alias Utils
+
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Item = require("core/objects/item")
@@ -6,6 +16,8 @@ local Sector = require("system/sector")
 
 -- FIXME: These need to be cleaned up.
 
+--- TODO:doc
+-- @type Utils
 Utils = Class("Utils")
 
 --- Checks if there's room for the model in the given point in space.
@@ -374,3 +386,5 @@ Voxel.damage = function(self, user, point)
 	end
 	return true
 end
+
+

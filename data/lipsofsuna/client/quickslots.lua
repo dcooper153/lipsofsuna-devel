@@ -1,7 +1,19 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module client.quickslots
+-- @alias Quickslots
+
 local Class = require("system/class")
 local Widget = require("system/widget")
 require "client/widgets/quickpage"
 
+--- TODO:doc
+-- @type Quickslots
 Quickslots = Class("Quickslots")
 
 Quickslots.init = function(clss)
@@ -12,7 +24,7 @@ Quickslots.init = function(clss)
 end
 
 --- Assigns a feat to a quickslot.
--- @param self Quickslots class.
+-- @param clss Quickslots class.
 -- @param index Quickslot index number.
 -- @param feat Feat to assign or nil.
 Quickslots.assign_feat = function(clss, index, feat)
@@ -67,3 +79,5 @@ end
 Quickslots.save = function(clss)
 	clss.feats:save()
 end
+
+

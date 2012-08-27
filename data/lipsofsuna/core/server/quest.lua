@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.quest
+-- @alias Quest
+
 require "common/marker"
 local Class = require("system/class")
 
+--- TODO:doc
+-- @type Quest
 local Quest = Class("Quest")
 
 --- Creates a new quest.
@@ -79,3 +91,5 @@ Quest.update = function(self, args)
 end
 
 return Quest
+
+

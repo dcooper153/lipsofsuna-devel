@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.objects.spell
+-- @alias Spell
+
 local Class = require("system/class")
 local SimulationObject = require("core/objects/simulation")
 
+--- TODO:doc
+-- @type Spell
 local Spell = Class("Spell", SimulationObject)
 Spell.dict_id = setmetatable({}, {__mode = "kv"})
 
@@ -94,3 +106,5 @@ Spell.write_db = function(self)
 end
 
 return Spell
+
+

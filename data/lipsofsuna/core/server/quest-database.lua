@@ -1,12 +1,24 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.quest_database
+-- @alias QuestDatabase
+
 local Class = require("system/class")
 local Quest = require(Mod.path .. "quest")
 
+--- TODO:doc
+-- @type QuestDatabase
 local QuestDatabase = Class("QuestDatabase")
 
 --- Creates a new quest database.
 -- @param clss QuestDatabase class.
 -- @param db Database.
--- @returns QuestDatabase.
+-- @return QuestDatabase.
 QuestDatabase.new = function(clss, db)
 	local self = Class.new(clss)
 	self.db = db
@@ -135,3 +147,5 @@ QuestDatabase.get_all_quests = function(self)
 end
 
 return QuestDatabase
+
+

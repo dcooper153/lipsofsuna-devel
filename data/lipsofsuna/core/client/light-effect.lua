@@ -1,7 +1,19 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.light_effect
+-- @alias LightEffect
+
 local Class = require("system/class")
 local EffectObject = require("core/client/effect-object")
 local Light = require("system/light")
 
+--- TODO:doc
+-- @type LightEffect
 local LightEffect = Class("LightEffect", EffectObject)
 
 LightEffect.new = function(clss, args)
@@ -30,3 +42,5 @@ LightEffect.set_rotation = function(self, v)
 end
 
 return LightEffect
+
+

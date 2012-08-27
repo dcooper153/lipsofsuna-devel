@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.specs.actorpreset
+-- @alias Actorpresetspec
+
 local Class = require("system/class")
 require(Mod.path .. "spec")
 
+--- TODO:doc
+-- @type Actorpresetspec
 Actorpresetspec = Class("Actorpresetspec", Spec)
 Actorpresetspec.type = "actorpresetspec"
 Actorpresetspec.dict_id = {}
@@ -33,3 +45,5 @@ Actorpresetspec.new = function(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
+
+

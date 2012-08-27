@@ -1,5 +1,17 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.movement_prediction
+-- @alias MovementPrediction
+
 local Class = require("system/class")
 
+--- TODO:doc
+-- @type MovementPrediction
 local MovementPrediction = Class("MovementPrediction")
 
 --- Creates a new movement predictor.
@@ -64,7 +76,6 @@ end
 --- Sets the target rotation.
 -- @param self Movement prediction.
 -- @param rot Rotation quaternion.
--- @param tilt Tilt angle.
 MovementPrediction.set_target_rotation = function(self, rot)
 	self.target_rotation = rot or self.pred_rotation:copy()
 	if not self.enabled then self:warp() end
@@ -138,3 +149,5 @@ MovementPrediction.warp = function(self)
 end
 
 return MovementPrediction
+
+

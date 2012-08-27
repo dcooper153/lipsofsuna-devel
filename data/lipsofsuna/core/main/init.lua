@@ -1,8 +1,20 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.main.init
+-- @alias Main
+
 require(Mod.path .. "event")
 local Class = require("system/class")
 local Eventhandler = require("system/eventhandler")
 local ModelManager = require(Mod.path .. "model-manager")
 
+--- TODO:doc
+-- @type Main
 Main = Class("Main")
 
 Main.new = function(clss)
@@ -82,3 +94,5 @@ Main.new = function(clss)
 		Client:deinit()
 	end
 end
+
+

@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.math.vector
+-- @alias Vector
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("math") then
@@ -6,6 +16,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Vector
 local Vector = Class("Vector")
 
 --- Length.
@@ -69,7 +81,7 @@ end
 
 --- Multiplies the vector by a scalar or quaternion.
 -- @param self Vector.
--- @param scalar Scalar.
+-- @param value Scalar or quaternion.
 -- @return New vector.
 local vector_mul = function(self, value)
 	if type(value) == "number" then
@@ -85,7 +97,7 @@ end
 
 --- Subtracts a vector from another.
 -- @param self Vector.
--- @param vector Vector.
+-- @param v Vector.
 -- @return New vector.
 local vector_sub = function(self, v)
 	local copy = self:copy()
@@ -142,7 +154,7 @@ end
 
 --- Add a vector to another in-place.
 -- @param self Vector.
--- @param vector Vector.
+-- @param v Vector.
 -- @return Self.
 Vector.add = function(self, v)
 	Los.vector_add(self.handle, v.handle)
@@ -181,7 +193,7 @@ end
 
 --- Divides the vector by a scalar in-place.
 -- @param self Vector.
--- @param scalar Scalar.
+-- @param value Scalar.
 -- @return Self.
 Vector.divide = function(self, value)
 	if value ~= 0 then
@@ -229,7 +241,7 @@ end
 
 --- Multiplies the vector by a scalar in-place.
 -- @param self Vector.
--- @param scalar Scalar.
+-- @param value Scalar.
 -- @return Self.
 Vector.multiply = function(self, value)
 	Los.vector_mul(self.handle, value)
@@ -269,7 +281,7 @@ end
 
 --- Subtracts a vector from another in-place.
 -- @param self Vector.
--- @param vector Vector.
+-- @param v Vector.
 -- @return Self.
 Vector.subtract = function(self, v)
 	Los.vector_sub(self.handle, v.handle)
@@ -299,3 +311,5 @@ Vector.transform = function(self, q)
 end
 
 return Vector
+
+

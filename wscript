@@ -239,14 +239,21 @@ def html(ctx):
 	import re
 	import shutil
 	# Initialize directories.
-	luadir = os.path.join(ctx.path.abspath(), 'docs', 'html', 'lua')
+	luadir = os.path.join(ctx.path.abspath(), 'docs', 'html')
 	shutil.rmtree(luadir, True)
 	os.makedirs(luadir)
 	# Compile the Doxygen documentation.
 	ctx.exec_command('doxygen docs/Doxyfile')
 	Logs.pprint('GREEN', "Built Doxygen documentation")
 	# Compile the script documentation.
-	ctx.exec_command('luadoc -d docs/html/lua data/system data/lipsofsuna')
+	orig_dir = os.getcwd()
+	os.chdir(os.path.join(ctx.path.abspath(), 'data', 'system'))
+	ctx.exec_command('ldoc.lua .')
+	os.chdir(os.path.join(ctx.path.abspath(), 'data', 'unittest'))
+	ctx.exec_command('ldoc.lua .')
+	os.chdir(os.path.join(ctx.path.abspath(), 'data', 'lipsofsuna'))
+	ctx.exec_command('ldoc.lua .')
+	os.chdir(orig_dir)
 	Logs.pprint('GREEN', "Built Lua documentation")
 
 ##############################################################################

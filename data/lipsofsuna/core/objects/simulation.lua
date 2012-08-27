@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.objects.simulation
+-- @alias SimulationObject
+
 local Class = require("system/class")
 local Inventory = require("core/server/inventory")
 local Object = require("system/object")
@@ -7,6 +17,8 @@ local Timer = require("system/timer")
 local ClientRenderObject = not Settings.server and require("core/client/client-render-object")
 local MovementPrediction = not Settings.server and require("core/client/movement-prediction")
 
+--- TODO:doc
+-- @type SimulationObject
 local SimulationObject = Class("SimulationObject", Object)
 
 --- Creates a new simulation object.
@@ -290,7 +302,7 @@ end
 --- Gets all dialog variable for the object.
 -- @param self Object.
 -- @return List of variables.
-SimulationObject.get_dialog_variables = function(self, name)
+SimulationObject.get_dialog_variables = function(self)
 	return Server.quest_database:get_dialog_variables(self)
 end
 
@@ -439,7 +451,7 @@ end
 
 --- Subtracts stacked objects.
 -- @param self Object.
--- @param count: Count to subtract.
+-- @param count Count to subtract.
 SimulationObject.subtract = function(self, count)
 	local c = count or 1
 	local old = self:get_count()
@@ -621,7 +633,7 @@ end
 --- Gets the model name of the object.
 -- @param self Object.
 -- @return Model name, or empty string.
-SimulationObject.get_model_name = function(self, v)
+SimulationObject.get_model_name = function(self)
 	return self.model_name or ""
 end
 
@@ -696,3 +708,5 @@ SimulationObject.set_spec = function(self, value)
 end
 
 return SimulationObject
+
+

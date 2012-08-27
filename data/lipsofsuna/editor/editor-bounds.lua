@@ -1,8 +1,20 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module editor.editor_bounds
+-- @alias EditorBounds
+
 local Class = require("system/class")
 local Model = require("system/model")
 local RenderModel = require("system/render-model")
 local RenderObject = require("system/object-render")
 
+--- TODO:doc
+-- @type EditorBounds
 local EditorBounds = Class("EditorBounds")
 
 EditorBounds.new = function(clss)
@@ -63,3 +75,5 @@ EditorBounds.set_position = function(self, v)
 end
 
 return EditorBounds
+
+

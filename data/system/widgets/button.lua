@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.widgets.button
+-- @alias Button
+
 local Class = require("system/class")
 local Widget = require("system/widget")
 
+--- TODO:doc
+-- @type Button
 local Button = Class("Button", Widget)
 
 Button.new = function(clss)
@@ -86,3 +98,5 @@ Button.set_text = function(self, v)
 end
 
 return Button
+
+

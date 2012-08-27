@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.specs.globalevent
+-- @alias Globaleventspec
+
 local Class = require("system/class")
 require(Mod.path .. "spec")
 
+--- TODO:doc
+-- @type Globaleventspec
 Globaleventspec = Class("Globaleventspec", Spec)
 Globaleventspec.type = "quest"
 Globaleventspec.dict_id = {}
@@ -57,3 +69,5 @@ end
 -- @param secs Seconds since the last update.
 Globaleventspec.update = function(clss, event, secs)
 end
+
+

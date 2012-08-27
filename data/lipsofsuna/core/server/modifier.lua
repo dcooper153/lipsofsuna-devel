@@ -1,5 +1,17 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.modifier
+-- @alias Modifier
+
 local Class = require("system/class")
 
+--- TODO:doc
+-- @type Modifier
 Modifier = Class("Modifier")
 
 --- Creates a new modifier.
@@ -20,7 +32,6 @@ end
 -- @param clss Modifier class.
 -- @param object Object whose modifiers to update.
 -- @param secs Seconds since the last update.
--- @param args Arguments sent to the modifier
 Modifier.update = function(clss, object, secs)
 	local num = 0
 	-- Update each modifier.
@@ -52,3 +63,5 @@ Modifier.update = function(clss, object, secs)
 		object.modifiers = nil
 	end
 end
+
+

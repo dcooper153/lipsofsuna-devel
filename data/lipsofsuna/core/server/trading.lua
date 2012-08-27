@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.trading
+-- @alias Trading
+
 local Class = require("system/class")
 local Item = require("core/objects/item")
 
+--- TODO:doc
+-- @type Trading
 local Trading = Class("Trading")
 
 Trading.new = function(clss)
@@ -104,3 +116,5 @@ Trading.update = function(self, player)
 end
 
 return Trading
+
+

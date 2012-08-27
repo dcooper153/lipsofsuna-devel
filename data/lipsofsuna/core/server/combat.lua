@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.combat
+-- @alias Combat
+
 local Class = require("system/class")
 local Damage = require("core/server/damage")
 
+--- TODO:doc
+-- @type Combat
 local Combat = Class("Combat")
 
 Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, tile)
@@ -96,3 +108,5 @@ Combat.calculate_ranged_damage = function(self, attacker, weapon, projectile)
 end
 
 return Combat
+
+

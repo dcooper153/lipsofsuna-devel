@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.widgets
+-- @alias Widgets
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("widgets") then
@@ -6,6 +16,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Widgets
 Widgets = Class("Widgets")
 
 --- Adds a font style.
@@ -19,6 +31,7 @@ end
 
 --- Finds a widget under the cursor that has the given member.
 -- @param clss Widgets class.
+-- @param handler Member name.
 -- @return Widget, or nil.
 Widgets.find_handler_widget = function(clss, handler)
 	local w = clss:find_widget()
@@ -48,3 +61,5 @@ Widgets.get_widget_under_cursor = function(self)
 end
 
 return Widgets
+
+

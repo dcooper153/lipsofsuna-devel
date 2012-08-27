@@ -1,7 +1,19 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module editor.selection
+-- @alias Selection
+
 local Class = require("system/class")
 local Model = require("system/model")
 local RenderObject = require("system/object-render")
 
+--- TODO:doc
+-- @type Selection
 local Selection = Class("Selection")
 Selection.face_dir = {
 	Vector(-1,0,0), Vector(1,0,0),
@@ -164,3 +176,5 @@ Selection.set_tile = function(self, data, face)
 end
 
 return Selection
+
+

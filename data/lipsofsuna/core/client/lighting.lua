@@ -1,7 +1,19 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.lighting
+-- @alias Lighting
+
 local Class = require("system/class")
 local Light = require("system/light")
 local Render = require("system/render")
 
+--- TODO:doc
+-- @type Lighting
 local Lighting = Class("Lighting")
 
 Lighting.new = function(clss)
@@ -65,3 +77,5 @@ Lighting.set_light_spell = function(self, value)
 end
 
 return Lighting
+
+

@@ -1,7 +1,19 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.particle_effect
+-- @alias ParticleEffect
+
 local Class = require("system/class")
 local EffectObject = require("core/client/effect-object")
 local RenderObject = require("system/object-render")
 
+--- TODO:doc
+-- @type ParticleEffect
 local ParticleEffect = Class("ParticleEffect", EffectObject)
 
 ParticleEffect.new = function(clss, args)
@@ -45,3 +57,5 @@ ParticleEffect.set_rotation = function(self, v)
 end
 
 return ParticleEffect
+
+

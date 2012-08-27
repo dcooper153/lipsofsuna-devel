@@ -1,5 +1,17 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.serialize
+-- @alias Serialize
+
 local Class = require("system/class")
 
+--- TODO:doc
+-- @type Serialize
 local Serialize = Class("Serialize")
 Serialize.game_version = "7"
 Serialize.object_version = "7"
@@ -175,3 +187,5 @@ Serialize.set_value = function(self, key, value)
 end
 
 return Serialize
+
+

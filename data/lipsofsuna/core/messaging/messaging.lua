@@ -1,8 +1,20 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.messaging.messaging
+-- @alias Messaging
+
 local Class = require("system/class")
 local Message = require(Mod.path .. "message")
 local Network = require("system/network")
 local Packet = require("system/packet")
 
+--- TODO:doc
+-- @type Messaging
 local Messaging = Class("Messaging")
 
 Messaging.new = function(clss, port)
@@ -109,3 +121,5 @@ Messaging.handle_packet = function(self, client, packet)
 end
 
 return Messaging
+
+

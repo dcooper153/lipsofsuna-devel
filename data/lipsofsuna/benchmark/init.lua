@@ -1,8 +1,20 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module benchmark.init
+-- @alias Benchmark
+
 local Camera = require("system/camera")
 local Class = require("system/class")
 local Light = require("system/light")
 local Simulation = require("core/client/simulation")
 
+--- TODO:doc
+-- @type Benchmark
 Benchmark = Class("Benchmark")
 
 Benchmark.new = function(clss)
@@ -90,3 +102,5 @@ Benchmark.update = function(self, secs)
 		end
 	end
 end
+
+

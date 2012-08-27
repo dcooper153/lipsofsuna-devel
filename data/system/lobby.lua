@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.lobby
+-- @alias Lobby
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("lobby") then
@@ -6,6 +16,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Lobby
 local Lobby = Class("Lobby")
 
 --- Downloads the server list from the master server.
@@ -77,3 +89,5 @@ Lobby.set_port = function(self, v)
 end
 
 return Lobby
+
+

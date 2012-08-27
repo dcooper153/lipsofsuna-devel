@@ -1,5 +1,17 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.debug
+-- @alias Debug
+
 local Class = require("system/class")
 
+--- TODO:doc
+-- @type Debug
 local Debug = Class("Debug")
 
 --- Prints the paths to class instances of the given type.
@@ -61,3 +73,5 @@ Debug.dump_paths_by_class_instance = function(clss, find)
 end
 
 return Debug
+
+

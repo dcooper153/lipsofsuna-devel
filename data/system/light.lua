@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.light
+-- @alias Light
+
 local Class = require("system/class")
 local Quaternion = require("system/math/quaternion")
 local Vector = require("system/math/vector")
@@ -12,6 +22,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Light
 local Light = Class("Light")
 
 --- Creates a new light source.
@@ -186,7 +198,7 @@ end
 
 --- Sets the far plane distance of the shadow projection.
 -- @param self Light.
--- @param v.
+-- @param v Number.
 Light.set_shadow_far = function(self, v)
 	self.__shadow_far = v
 	Los.light_set_shadow_far(self.handle, v)
@@ -253,3 +265,5 @@ Light.set_spot_exponent = function(self, v)
 end
 
 return Light
+
+

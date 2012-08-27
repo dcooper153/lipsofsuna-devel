@@ -1,8 +1,20 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.model_builder
+-- @alias ModelBuilder
+
 local Class = require("system/class")
 local Color = require("common/color")
 local Model = require("system/model")
 local ModelMerger = require("system/model-merger")
 
+--- TODO:doc
+-- @type ModelBuilder
 local ModelBuilder = Class("ModelBuilder")
 
 --- Builds the mesh for the given actor.
@@ -177,3 +189,5 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 end
 
 return ModelBuilder
+
+

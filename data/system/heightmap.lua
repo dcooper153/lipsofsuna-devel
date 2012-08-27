@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.heightmap
+-- @alias Heightmap
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("heightmap") then
@@ -6,6 +16,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Heightmap
 local Heightmap = Class("Heightmap")
 
 --- Creates a new heightmap.
@@ -44,3 +56,5 @@ Heightmap.get_height = function(self, point, clamp)
 end
 
 return Heightmap
+
+

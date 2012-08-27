@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.game
+-- @alias Game
+
 local Class = require("system/class")
 local Database = require("system/database")
 local Messaging = require("core/messaging/messaging")
@@ -15,6 +25,8 @@ Physics.GROUP_VOXELS = 0x8000
 Physics.MASK_CAMERA = 0xF003
 Physics.MASK_PICK = 0xF003
 
+--- TODO:doc
+-- @type Game
 Game = Class("Game")
 Game.objects = ObjectManager() --FIXME
 Game.scene_nodes_by_ref = {}
@@ -95,3 +107,5 @@ Game.deinit = function(self)
 	self.messaging = nil
 	collectgarbage()
 end
+
+

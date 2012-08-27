@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.sound
+-- @alias Sound
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("sound") then
@@ -6,6 +16,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Sound
 local Sound = Class("Sound")
 
 --- Gets the position of the listener.
@@ -86,3 +98,5 @@ Sound.set_music_volume = function(self, v)
 end
 
 return Sound
+
+

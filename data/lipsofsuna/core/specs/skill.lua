@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.specs.skill
+-- @alias Skillspec
+
 local Class = require("system/class")
 require(Mod.path .. "spec")
 
+--- TODO:doc
+-- @type Skillspec
 Skillspec = Class("Skillspec", Spec)
 Skillspec.type = "skillspec"
 Skillspec.dict_id = {}
@@ -106,3 +118,5 @@ Skillspec.find_indirect_requirements = function(self)
 	recurse(self)
 	return reqs
 end
+
+

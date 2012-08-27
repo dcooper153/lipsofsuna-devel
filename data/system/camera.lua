@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.camera
+-- @alias Camera
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("camera") then
@@ -6,6 +16,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Camera
 local Camera = Class("Camera")
 
 --- Creates a new camera.
@@ -161,7 +173,7 @@ end
 -- Recognized values are "first-person", "manual" and "third-person".
 --
 -- @param self Camera.
--- @return String.
+-- @param v String.
 Camera.set_mode = function(self, v)
 	Los.camera_set_mode(self.handle, v)
 end
@@ -280,3 +292,5 @@ Camera.set_viewport = function(self, v)
 end
 
 return Camera
+
+

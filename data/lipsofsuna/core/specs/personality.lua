@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.specs.personality
+-- @alias Personalityspec
+
 local Class = require("system/class")
 require(Mod.path .. "spec")
 
+--- TODO:doc
+-- @type Personalityspec
 Personalityspec = Class("Personalityspec", Spec)
 Personalityspec.type = "personality"
 Personalityspec.dict_id = {}
@@ -38,3 +50,5 @@ Personalityspec.get_phrase = function(self, type)
 	end
 	return rnd(self["phrases_" .. type])
 end
+
+

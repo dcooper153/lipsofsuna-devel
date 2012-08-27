@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.server
+-- @alias Server
+
 local Class = require("system/class")
 local AccountDatabase = require(Mod.path .. "account-database")
 local Database = require("system/database")
@@ -14,6 +24,8 @@ local Trading = require(Mod.path .. "trading")
 local UnlockManager = require(Mod.path .. "unlock-manager")
 local Vision = require("system/vision")
 
+--- TODO:doc
+-- @type Server
 Server = Class("Server")
 
 Server.init = function(self, multiplayer, client)
@@ -272,3 +284,5 @@ end
 Server.get_player_by_client = function(self, client)
 	return self.players_by_client[client]
 end
+
+

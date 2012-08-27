@@ -1,18 +1,28 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.dialog
+-- @alias Dialog
+
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Item = require("core/objects/item")
 local Obstacle = require("core/objects/obstacle")
 local Trading = require(Mod.path .. "trading")
 
+--- TODO:doc
+-- @type Dialog
 local Dialog = Class("Dialog")
 
 --- Creates a new dialog.
 -- @param clss Quest class.
--- @param args Arguments.<ul>
---   <li>name: Dialog name.</li>
---   <li>object: Object controlled by the dialog.</li>
---   <li>spec: Dialog spec.</li>
---   <li>user: Object that started the dialog.</li></ul>
+-- @param object Object controlled by the dialog.
+-- @param user Object that started the dialog.
+-- @param spec Dialog spec.
 -- @return New dialog.
 Dialog.new = function(clss, object, user, spec)
 	-- Allocate self.
@@ -52,6 +62,7 @@ Dialog.answer = function(self, user, answer)
 end
 
 --- Creates a dialog for a random quest.
+-- @param self Dialog.
 -- @param name Quest name.
 -- @param difficulty Difficulty level. ("easy"/"hard")
 -- @return Dialog branch.
@@ -236,6 +247,7 @@ end
 -- global vision event is emitted to players only.
 --
 -- @param self Dialog.
+-- @param object Object.
 -- @param event Dialog event.
 Dialog.emit_event = function(self, object, event)
 	if self.object.spec.type ~= "static" then
@@ -563,3 +575,5 @@ Dialog.execute = function(self)
 end
 
 return Dialog
+
+

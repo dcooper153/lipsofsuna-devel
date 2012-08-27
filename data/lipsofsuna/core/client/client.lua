@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.client
+-- @alias Client
+
 local Class = require("system/class")
 local Binding = require(Mod.path .. "binding")
 local Database = require("system/database")
@@ -18,6 +28,8 @@ local TerrainSync = require(Mod.path .. "terrain-sync")
 local ThirdPersonCamera = require(Mod.path .. "third-person-camera")
 local UnlockManager = require("core/server/unlock-manager")
 
+--- TODO:doc
+-- @type Client
 Client = Class("Client")
 
 Operators = {}
@@ -104,6 +116,7 @@ end
 
 --- Appends a message to the log.
 -- @param self Client class.
+-- @param text Text.
 Client.append_log = function(self, text)
 	local hud = Ui:get_hud("chat")
 	if not hud then return end
@@ -256,7 +269,7 @@ Client.update_rendering_style = function(self)
 end
 
 --- Sets or unsets the active target.
--- @param clss Client class.
+-- @param self Client class.
 -- @param text String or nil.
 Client.set_target_text = function(self, text)
 	self.action_text = text
@@ -313,3 +326,5 @@ Client.set_player_object = function(self, v)
 	self.player_object = v
 	self.camera = self.camera3
 end
+
+

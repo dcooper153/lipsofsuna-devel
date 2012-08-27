@@ -1,11 +1,23 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.binding
+-- @alias Binding
+
 local Class = require("system/class")
 
+--- TODO:doc
+-- @type Binding
 local Binding = Class("Binding")
 Binding.dict_index = {}
 Binding.dict_name = {}
 
---- Registers a new action.
--- @param clss Action class.
+--- Registers a new binding.
+-- @param clss Binding class.
 -- @param args Arguments.
 -- @return Binding.
 Binding.new = function(clss, args)
@@ -23,12 +35,12 @@ Binding.new = function(clss, args)
 	return self
 end
 
---- Activates all actions that correspond to the event.
--- @param self Action class.
+--- Activates all bindings that correspond to the event.
+-- @param clss Binding class.
 -- @param args Event.
 Binding.event = function(clss, args)
-	for name,action in pairs(clss.dict_name) do
-		action:handle_event(args)
+	for name,binding in pairs(clss.dict_name) do
+		binding:handle_event(args)
 	end
 end
 
@@ -36,15 +48,15 @@ Binding.find_by_name = function(clss, name)
 	return clss.dict_name[name]
 end
 
---- Returns the name of the control that triggers the action with the requested name.
--- @param self Action class.
--- @param name Action name.
+--- Returns the name of the control that triggers the binding with the requested name.
+-- @param self Binding class.
+-- @param name Binding name.
 -- @return Key name or nil.
 Binding.get_control_name = function(self, name)
-	local action = self.dict_name[name]
-	if not action then return nil end
-	if not action.key1 then return nil end
-	return "[" .. Client.input:get_key_name(action.key1) .. "]"
+	local binding = self.dict_name[name]
+	if not binding then return nil end
+	if not binding.key1 then return nil end
+	return "[" .. Client.input:get_key_name(binding.key1) .. "]"
 end
 
 --- Gets the control response to the event.
@@ -97,7 +109,7 @@ Binding.get_event_response = function(self, args)
 	end
 end
 
---- Executes the action if it matches the input event.
+--- Executes the binding if it matches the input event.
 -- @param self Binding.
 -- @param args Event arguments.
 -- @return True if handled.
@@ -115,3 +127,5 @@ Binding.is_pressed = function(self)
 end
 
 return Binding
+
+

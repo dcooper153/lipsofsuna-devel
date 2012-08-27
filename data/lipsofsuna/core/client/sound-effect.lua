@@ -1,7 +1,19 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.sound_effect
+-- @alias SoundEffect
+
 local Class = require("system/class")
 local EffectObject = require(Mod.path .. "effect-object")
 local SoundSource = require("system/sound-source")
 
+--- TODO:doc
+-- @type SoundEffect
 local SoundEffect = Class("SoundEffect", EffectObject)
 
 --- Creates a new effect.
@@ -67,3 +79,5 @@ SoundEffect.set_position = function(self, v)
 end
 
 return SoundEffect
+
+

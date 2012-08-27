@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module common.feat
+-- @alias Feat
+
 local Class = require("system/class")
 local Damage = require("core/server/damage")
 
+--- TODO:doc
+-- @type Feat
 Feat = Class("Feat")
 
 --- Creates a new feat.
@@ -386,3 +398,5 @@ Feat.write = function(self)
 		animation = self.animation,
 		effects = self.effects})
 end
+
+

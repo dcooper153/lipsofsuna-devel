@@ -1,8 +1,20 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.speech_bubble_effect
+-- @alias SpeechBubbleEffect
+
 local Class = require("system/class")
 local Label = require("system/widgets/label")
 local Render = require("system/render")
 local Vector = require("system/math/vector")
 
+--- TODO:doc
+-- @type SpeechBubbleEffect
 local SpeechBubbleEffect = Class("SpeechBubbleEffect")
 
 --- Creates a new text bubble.
@@ -124,3 +136,5 @@ SpeechBubbleEffect.update = function(self, secs)
 end
 
 return SpeechBubbleEffect
+
+

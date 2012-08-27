@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.object_serializer
+-- @alias ObjectSerializer
+
 local Class = require("system/class")
 local Quaternion = require("system/math/quaternion")
 local String = require("system/string")
@@ -63,6 +73,8 @@ local encoders = {
 		return string.format("%g,%g,%g", v.x, v.y, v.z)
 	end}
 
+--- TODO:doc
+-- @type ObjectSerializer
 local ObjectSerializer = Class("ObjectSerializer")
 
 --- Creates a new object manager.
@@ -126,6 +138,7 @@ ObjectSerializer.read = function(self, object, rows)
 end
 
 --- Serializes an object.
+-- @param self ObjectSerializer.
 -- @param object Object to serialize.
 -- @param query Database query function.
 ObjectSerializer.write = function(self, object, query)
@@ -147,3 +160,5 @@ ObjectSerializer.write = function(self, object, query)
 end
 
 return ObjectSerializer
+
+

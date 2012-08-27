@@ -1,6 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module common.sectors
+-- @alias Sectors
+
 local Class = require("system/class")
 local Timer = require("system/timer")
 
+--- TODO:doc
+-- @type Sectors
 Sectors = Class("Sectors")
 
 --- Creates a new sector manager.
@@ -142,3 +154,5 @@ Sectors.update = function(self)
 	-- Finish the transaction.
 	if written > 0 then self.database:query("END TRANSACTION;") end
 end
+
+

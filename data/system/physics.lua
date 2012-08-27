@@ -1,3 +1,13 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.physics
+-- @alias Physics
+
 local Class = require("system/class")
 
 if not Los.program_load_extension("physics") then
@@ -6,6 +16,8 @@ end
 
 ------------------------------------------------------------------------------
 
+--- TODO:doc
+-- @type Physics
 local Physics = Class("Physics")
 
 --- Performs a ray cast test.
@@ -66,3 +78,5 @@ Physics.set_enable_simulation = function(self, v)
 end
 
 return Physics
+
+

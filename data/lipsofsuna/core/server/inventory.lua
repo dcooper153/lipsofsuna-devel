@@ -1,11 +1,22 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.inventory
+-- @alias Inventory
+
 local Class = require("system/class")
 
 --- Combined inventory and equipment item storage.<br/>
+--
 -- A generic inventory class that allows one to easily store and retrieve
 -- items. Both objects and strings are supported as items so the class is
 -- usable to both the client and the server.
--- @name Inventory
--- @class table
+--
+-- @type Inventory
 local Inventory = Class("Inventory")
 
 --- Creates a new inventory.
@@ -227,7 +238,7 @@ end
 
 --- Gets the equipment slot of the given object.
 -- @param self Inventory.
--- @param index Inventory index.
+-- @param object Object.
 -- @return Equipment slot name, or nil.
 Inventory.get_slot_by_object = function(self, object)
 	for k,v in pairs(self.equipped) do
@@ -323,7 +334,7 @@ end
 
 --- Sets the object in the given inventory index.
 -- @param self Inventory.
--- @param slot Slot name or number.
+-- @param index Slot number.
 -- @param object Object, or nil.
 Inventory.set_object = function(self, index, object)
 	-- Check for changes.
@@ -550,3 +561,5 @@ Inventory.set_size = function(self, value)
 end
 
 return Inventory
+
+

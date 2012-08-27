@@ -1,9 +1,18 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.server.stats
+-- @alias Stats
+
 require "system/vision"
 local Class = require("system/class")
 
 --- Create and synchronize stats.
--- @name Stats
--- @class table
+-- @type Stats
 local Stats = Class("Stats")
 
 --- Creates a new stats list.
@@ -224,3 +233,5 @@ Stats.set_value = function(self, name, value)
 end
 
 return Stats
+
+

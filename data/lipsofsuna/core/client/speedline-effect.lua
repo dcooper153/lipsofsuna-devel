@@ -1,8 +1,20 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.speedline_effect
+-- @alias SpeedlineEffect
+
 local Class = require("system/class")
 local Model = require("system/model")
 local RenderObject = require("system/object-render")
 local RenderModel = require("system/render-model")
 
+--- TODO:doc
+-- @type SpeedlineEffect
 local SpeedlineEffect = Class("SpeedlineEffect")
 
 --- Creates a new speed line effect for the object.
@@ -195,3 +207,5 @@ SpeedlineEffect.update = function(self, secs)
 end
 
 return SpeedlineEffect
+
+

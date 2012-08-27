@@ -1,7 +1,19 @@
+--- TODO:doc
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.eventhandler
+-- @alias Eventhandler
+
 local Class = require("system/class")
 local Packet = require("system/packet")
 local Program = require("system/core")
 
+--- TODO:doc
+-- @type Eventhandler
 local Eventhandler = Class("Eventhandler")
 Eventhandler.handlers = setmetatable({}, {__mode = "v"})
 
@@ -73,3 +85,5 @@ Eventhandler.update = function(clss)
 end
 
 return Eventhandler
+
+
