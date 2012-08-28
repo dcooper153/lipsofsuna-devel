@@ -129,7 +129,7 @@ SimulationObject.can_reach_object = function(self, object)
 	-- Check the distance from the aim ray center to the bounding box of the target.
 	local center = self:transform_local_to_global(self.spec.aim_ray_center)
 	local bounds = object:get_bounding_box()
-	local diff = object:get_rotation().conjugate * (center - object:get_position())
+	local diff = center:subtract(object:get_position()):transform(object:get_rotation().conjugate)
 	local dist = bounds:get_distance_to_point(diff)
 	return dist <= 5
 end

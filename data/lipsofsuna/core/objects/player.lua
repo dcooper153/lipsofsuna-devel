@@ -332,7 +332,7 @@ end
 -- update it here.
 -- @param self Object.
 Player.update_vision_radius = function(self)
-	self.vision:set_direction(self:get_rotation() * Vector(0,0,-1))
+	self.vision:set_direction(Vector(0,0,-1):transform(self:get_rotation()))
 	self.vision:set_position(self:get_position())
 end
 

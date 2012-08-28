@@ -24,7 +24,7 @@ ModelBuilder.build_for_actor = function(clss, object)
 	if not object.spec then return end
 	if not object.spec.models then return end
 	-- Create the equipment list.
-	equipment = {}
+	local equipment = {}
 	for k in pairs(object.spec.equipment_slots) do
 		local item = object.inventory:get_object_by_slot(k)
 		if item then equipment[k] = item.spec.name end

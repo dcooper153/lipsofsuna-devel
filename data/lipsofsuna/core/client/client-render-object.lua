@@ -289,12 +289,6 @@ ClientRenderObject.update = function(self, secs)
 		if self.model_rebuild_timer <= 0 then
 			self.model_rebuild_timer = nil
 			if self.object.spec.models then
-				-- Create the equipment list.
-				local equipment = {}
-				for k in pairs(self.object.inventory.equipped) do
-					local object = self.object.inventory:get_object_by_slot(k)
-					if object then equipment[k] = object.spec.name end
-				end
 				-- Build the character model in a separate thread.
 				-- The result is handled in the tick handler below.
 				ModelBuilder:build_for_actor(self.object)

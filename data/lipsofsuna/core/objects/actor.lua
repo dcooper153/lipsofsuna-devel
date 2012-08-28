@@ -303,7 +303,7 @@ Actor.check_line_of_sight = function(self, args)
 	end
 	-- Check for view cone.
 	local ray = (src - dst):normalize()
-	local look = self:get_rotation() * Vector(0,0,-1)
+	local look = Vector(0,0,-1):transform(self:get_rotation())
 	if math.acos(ray:dot(look)) > self.spec.view_cone then
 		return
 	end
@@ -503,7 +503,7 @@ end
 --   <li>secs: Tick length or nil for instant rotation.</li></ul>
 -- @return The dot product of the current direction and the target direction.
 Actor.face_point = function(self, args)
-	local sdir = self:get_rotation() * Vector(0, 0, -1)
+	local sdir = Vector(0, 0, -1):transform(self:get_rotation())
 	local edir = args.point:copy():subtract(self:get_position()):normalize()
 	local quat = Quaternion{dir = Vector(edir.x, 0, edir.z), up = Vector(0, 1, 0)}
 	if args.secs then

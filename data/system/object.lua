@@ -63,7 +63,7 @@ Object.transform_local_to_global = function(self, point)
 	local pos = self:get_position()
 	if not point then return pos end
 	local rot = self:get_rotation()
-	return pos:copy():add(rot * point)
+	return point:copy():transform(rot, pos)
 end
 
 --- Gets the local bounding box of the object.

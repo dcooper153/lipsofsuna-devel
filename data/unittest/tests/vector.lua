@@ -36,4 +36,9 @@ Unittest:add(1, "system", "vector", function()
 	g.y = 200
 	g.z = -100
 	assert(g.x == 100 and g.y == 200 and g.z == -100)
+	-- Transformation.
+	local Quaternion = require("system/math/quaternion")
+	local h = Vector(1, 2, 3)
+	h:transform(Quaternion{axis = Vector(0,1,0), angle = math.pi})
+	assert(math.abs(h.x + 1) < 0.0001 and math.abs(h.y - 2)  < 0.0001 and math.abs(h.z + 3) < 0.0001)
 end)

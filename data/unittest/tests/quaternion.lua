@@ -18,9 +18,12 @@ Unittest:add(1, "system", "quaternion", function()
 	assert(q4.euler[1] == 0)
 	assert(q4.euler[2] == 0)
 	assert(q4.euler[3] == 1.5)
-	-- Multiplication vectors.
+	-- Multiplication.
 	local q5 = q4 * q3
 	assert(q5.class == Quaternion)
-	local v1 = q4 * Vector(1,0,0)
+	-- Transforming a vector.
+	local q6 = Quaternion{axis = Vector(0,1,0), angle = math.pi}
+	local v1 = q6 * Vector(1,0,0)
 	assert(v1.class == Vector)
+	assert(math.abs(v1.x + 1) < 0.0001 and math.abs(v1.y) < 0.0001 and math.abs(v1.z) < 0.0001)
 end)

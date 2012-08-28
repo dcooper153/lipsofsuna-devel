@@ -61,7 +61,7 @@ ThirdPersonCamera.get_position_displacement = function(self, pos, rot, turn)
 	local stepl = 0.12
 	local stepn = 6
 	local steps = stepn
-	local ctr = Physics:cast_ray{collision_mask = self:get_collision_mask(), src = pos, dst = pos + turn * Vector(stepl * stepn)}
+	local ctr = Physics:cast_ray{collision_mask = self:get_collision_mask(), src = pos, dst = Vector(stepl * stepn):transform(turn, pos)}
 	if ctr then
 		steps = math.floor((ctr.point - pos).length / stepl)
 		steps = math.max(0, steps - 1)
@@ -72,8 +72,8 @@ ThirdPersonCamera.get_position_displacement = function(self, pos, rot, turn)
 	for i=0,steps do
 		-- Favor positions that have the best displacement to the side and
 		-- the most distance to the target before hitting a wall.
-		local center = pos + turn * Vector(i * stepl)
-		local back = Physics:cast_ray{collision_mask = self:get_collision_mask(), src = center, dst = center + rot * Vector(0,0,5)}
+		local center = Vector(i * stepl):transform(turn, pos)
+		local back = Physics:cast_ray{collision_mask = self:get_collision_mask(), src = center, dst = Vector(0,0,5):transform(rot, center)}
 		local dist = back and (back.point - center).length or 5
 		local score = 3 * dist + (i + 1)
 		-- Prevent the crosshair corrected rotation from diverging too much
@@ -82,8 +82,8 @@ ThirdPersonCamera.get_position_displacement = function(self, pos, rot, turn)
 		if crosshair then
 			local dir = (crosshair - center):normalize()
 			local rot1 = Quaternion{dir = dir, up = Vector(0,1,0)}
-			local dir1 = rot * Vector(0,0,-1)
-			local dir2 = rot1 * Vector(0,0,-1)
+			local dir1 = Vector(0,0,-1):transform(rot)
+			local dir2 = Vector(0,0,-1):transform(rot1)
 			if i > 0 and dir1:dot(dir2) < 0.95 then score = -2 end
 		end
 		-- Choose the best camera center.
@@ -98,13 +98,13 @@ end
 
 ThirdPersonCamera.get_rotation_displacement = function(self, pos, rot, ratio)
 	-- Rotate the 3D cursor to the screen center.
-	local cur = Client.player_state:get_crosshair_position() or pos + rot * Vector(0,0,-5)
-	local dir = (cur - pos):normalize()
+	local cur = Client.player_state:get_crosshair_position() or Vector(0,0,-5):transform(rot, pos)
+	local dir = cur:copy():subtract(pos):normalize()
 	local drot = Quaternion{dir = dir, up = Vector(0,1,0)}
 	-- Damp cases when the 3D cursor is too close.
-	drot = drot:nlerp(rot, ratio)
+	drot:nlerp(rot, ratio)
 	-- Convert the rotation to the object space.
-	return drot * rot.conjugate
+	return drot:concat(rot.conjugate)
 end
 
 ThirdPersonCamera.get_transform = function(self)
@@ -116,14 +116,14 @@ ThirdPersonCamera.get_transform = function(self)
 	-- Calculate the initial center position.
 	local spec = self.object.spec
 	local rel = spec and spec.camera_center or Vector(0, 2, 0)
-	local pos = self.object:get_position() + rel + rot * Vector(0,0,0.5)
+	local pos = Vector(0,0,0.5):transform(rot, rel):add(self.object:get_position())
 	-- Calculate the sideward displacement.
 	local displ_pos = Vector()
 	local displ_rot = Quaternion()
 	if self:get_rotation_smoothing() < 1 then
 		local r,p = self:get_position_displacement(pos, rot, turn1)
 		displ_pos = p
-		displ_rot = self:get_rotation_displacement(pos + turn1 * p, rot, r)
+		displ_rot = self:get_rotation_displacement(p:copy():transform(turn1, pos), rot, r)
 	end
 	-- Return the final transformation.
 	return pos,rot,turn1,displ_pos,displ_rot
@@ -151,13 +151,13 @@ ThirdPersonCamera.update = function(self, secs)
 		local pos,rot,turn,dpos,drot = self:get_transform()
 		if self:get_rotation_smoothing() < 1 and self.prev_target_pos then
 			dpos:lerp(self.prev_target_pos, 1 - self.displacement_smoothing_rate)
-			drot = drot:nlerp(self.prev_target_rot, self.displacement_smoothing_rate)
+			drot:nlerp(self.prev_target_rot, self.displacement_smoothing_rate)
 		end
-		self.prev_target_pos = dpos
-		self.prev_target_rot = drot
+		self.prev_target_pos = dpos:copy()
+		self.prev_target_rot = drot:copy()
 		-- Mix in the free rotation mode.
 		local mix = math.max(math.abs(self.turn_state),math.abs(self.tilt_state))
-		drot = drot:nlerp(Quaternion(), 1 - math.min(1, 30 * mix))
+		drot:nlerp(Quaternion(), 1 - math.min(1, 30 * mix))
 		-- Min in the camera quake.
 		if self.quake then
 			local rnd = Vector(2*math.random()-1, 2*math.random()-1, 2*math.random()-1)
@@ -168,13 +168,11 @@ ThirdPersonCamera.update = function(self, secs)
 			end
 		end
 		-- Set the target transformation.
-		self:set_target_position(pos + turn * dpos)
-		self:set_target_rotation(drot * rot)
+		self:set_target_position(dpos:transform(turn, pos))
+		self:set_target_rotation(drot:concat(rot))
 		-- Interpolate.
 		Camera.update(self, self.tick)
 	end
 end
 
 return ThirdPersonCamera
-
-

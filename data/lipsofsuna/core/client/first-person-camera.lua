@@ -46,7 +46,7 @@ FirstPersonCamera.get_picking_ray = function(self)
 	local rot = Quaternion{euler = euler}
 	-- Project the ray.
 	local ctr = self.object:transform_local_to_global(spec.aim_ray_center)
-	return ctr,ctr + rot * Vector(0, 0, -5)
+	return ctr,Vector(0, 0, -5):transform(rot, ctr)
 end
 
 FirstPersonCamera.get_transform = function(self)

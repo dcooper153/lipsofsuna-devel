@@ -98,39 +98,6 @@ static void Quaternion_add (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &tmp);
 }
 
-static void Quaternion_mul (LIScrArgs* args)
-{
-	float s;
-	LIMatQuaternion q;
-	LIMatVector v;
-	LIScrData* b;
-
-	if (liscr_args_geti_float (args, 0, &s))
-	{
-		/* Multiply by scalar. */
-		q = limat_quaternion_init (
-			((LIMatQuaternion*) args->self)->x * s,
-			((LIMatQuaternion*) args->self)->y * s,
-			((LIMatQuaternion*) args->self)->z * s,
-			((LIMatQuaternion*) args->self)->w * s);
-		liscr_args_seti_quaternion (args, &q);
-	}
-	else if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &b))
-	{
-		/* Transform vector. */
-		v = limat_quaternion_transform (*((LIMatQuaternion*) args->self), *((LIMatVector*) liscr_data_get_data (b)));
-		v = limat_vector_validate (v);
-		liscr_args_seti_vector (args, &v);
-	}
-	else if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &b))
-	{
-		/* Concatenate rotations. */
-		q = limat_quaternion_multiply (*((LIMatQuaternion*) args->self), *((LIMatQuaternion*) liscr_data_get_data (b)));
-		q = limat_quaternion_validate (q);
-		liscr_args_seti_quaternion (args, &q);
-	}
-}
-
 static void Quaternion_sub (LIScrArgs* args)
 {
 	LIMatQuaternion tmp;
@@ -153,19 +120,41 @@ static void Quaternion_tostring (LIScrArgs* args)
 	liscr_args_seti_string (args, buffer);
 }
 
+static void Quaternion_concat (LIScrArgs* args)
+{
+	LIMatQuaternion* self;
+	LIMatQuaternion quat;
+
+	if (!liscr_args_geti_quaternion (args, 0, &quat))
+		return;
+	self = args->self;
+	*self = limat_quaternion_multiply (*self, quat);
+	*self = limat_quaternion_validate (*self);
+}
+
+static void Quaternion_multiply (LIScrArgs* args)
+{
+	float s;
+	LIMatQuaternion* self;
+
+	if (!liscr_args_geti_float (args, 0, &s))
+		return;
+	self = args->self;
+	*self = limat_quaternion_init (self->x * s, self->y * s, self->z * s, self->w * s);
+}
+
 static void Quaternion_nlerp (LIScrArgs* args)
 {
 	float val;
-	LIMatQuaternion q1;
+	LIMatQuaternion* self;
 	LIMatQuaternion q2;
 
 	if (liscr_args_geti_quaternion(args, 0, &q2) &&
 	    liscr_args_geti_float (args, 1, &val))
 	{
-		q1 = *((LIMatQuaternion*) args->self);
-		q2 = limat_quaternion_get_nearest (q2, q1);
-		q2 = limat_quaternion_nlerp (q1, q2, val);
-		liscr_args_seti_quaternion (args, &q2);
+		self = args->self;
+		q2 = limat_quaternion_get_nearest (q2, *self);
+		*self = limat_quaternion_nlerp (*self, q2, val);
 	}
 }
 
@@ -250,7 +239,8 @@ void liext_script_quaternion (
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new_euler", Quaternion_new_euler);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new_vectors", Quaternion_new_vectors);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_add", Quaternion_add);
-	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_mul", Quaternion_mul);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_concat", Quaternion_concat);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_multiply", Quaternion_multiply);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_sub", Quaternion_sub);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_tostring", Quaternion_tostring);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_nlerp", Quaternion_nlerp);

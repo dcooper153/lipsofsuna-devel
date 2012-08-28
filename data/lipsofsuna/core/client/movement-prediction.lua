@@ -130,7 +130,7 @@ MovementPrediction.update = function(self, secs)
 		self.ipol_timer = self.ipol_timer + self.tick
 		self.ipol_velocity:multiply(self.prediction_velocity_decay)
 		-- Apply rotation smoothing over time.
-		self.pred_rotation = self.pred_rotation:nlerp(self.target_rotation, self.rotation_corr_rate)
+		self.pred_rotation:nlerp(self.target_rotation, self.rotation_corr_rate)
 		self.pred_tilt = self.pred_tilt * (1 - self.rotation_corr_rate) + self.target_tilt * self.rotation_corr_rate
 		-- Apply position change predicted by the velocity.
 		self.pred_position:add(self.ipol_velocity * self.tick)

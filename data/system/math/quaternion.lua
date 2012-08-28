@@ -1,4 +1,4 @@
---- TODO:doc
+--- Quaternion maths class.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -17,7 +17,7 @@ end
 
 ------------------------------------------------------------------------------
 
---- TODO:doc
+--- Quaternion maths class.
 -- @type Quaternion
 local Quaternion = Class("Quaternion")
 
@@ -96,23 +96,28 @@ local quaternion_add = function(self, quat)
 end
 
 --- Multiplies the quaternion with another value.<br/>
+--
 -- The second value can be a scalar, a vector, or another quaternion.
 -- If it is a scalar, all the components of the quaternion are multiplied by it.
 -- If it is a vector, the vector is rotated by the quaternion, and
 -- if it is another quaternion, the rotations of the quaternions are concatenated.
+--
 -- @param self Quaternion.
 -- @param value Quaternion, vector, or number.
 -- @return New quaternion or vector.
 local quaternion_mul = function(self, value)
 	if type(value) == "number" then
-		local handle = Los.quaternion_mul(self.handle, value)
-		return Quaternion:new_from_handle(handle)
+		local quat = Quaternion:copy(self)
+		Los.quaternion_multiply(quat.handle, value)
+		return quat
 	elseif value.class == Quaternion then
-		local handle = Los.quaternion_mul(self.handle, value.handle)
-		return Quaternion:new_from_handle(handle)
+		local quat = Quaternion:copy(self)
+		Los.quaternion_concat(quat.handle, value.handle)
+		return quat
 	else
-		local handle = Los.quaternion_mul(self.handle, value.handle)
-		return Vector:new_from_handle(handle)
+		local vec = value:copy()
+		Los.vector_transform(vec.handle, self.handle)
+		return vec
 	end
 end
 
@@ -201,14 +206,32 @@ Quaternion.copy = function(self)
 	return Quaternion(self.x, self.y, self.z, self.w)
 end
 
---- Normalized linear interpolation.
+--- Concatenates a quaternion to another in-place.
+-- @param self Quaternion.
+-- @param quat Quaternion.
+-- @return Self.
+Quaternion.concat = function(self, quat)
+	Los.quaternion_concat(self.handle, quat.handle)
+	return self
+end
+
+--- Multiplies a quaternion by a scalar in-place.
+-- @param self Quaternion.
+-- @param s Scalar.
+-- @return Self.
+Quaternion.multiply = function(self, s)
+	Los.quaternion_multiply(self.handle, s)
+	return self
+end
+
+--- Normalized linear interpolation in-place.
 -- @param self Quaternion.
 -- @param quat Quaternion.
 -- @param blend Interpolation factor.
--- @return New quaternion.
+-- @return Self.
 Quaternion.nlerp = function(self, quat, blend)
-	local handle = Los.quaternion_nlerp(self.handle, quat.handle, blend)
-	return Quaternion:new_from_handle(handle)
+	Los.quaternion_nlerp(self.handle, quat.handle, blend)
+	return self
 end
 
 --- Calculates the normalized form of the quaternion.
@@ -220,5 +243,3 @@ Quaternion.normalize = function(self)
 end
 
 return Quaternion
-
-

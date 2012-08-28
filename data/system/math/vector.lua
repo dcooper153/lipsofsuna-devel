@@ -1,4 +1,4 @@
---- TODO:doc
+--- Vector maths class.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -16,7 +16,7 @@ end
 
 ------------------------------------------------------------------------------
 
---- TODO:doc
+--- Vector maths class.
 -- @type Vector
 local Vector = Class("Vector")
 
@@ -301,15 +301,18 @@ Vector.subtract_xyz = function(self, x, y, z)
 	return self
 end
 
---- Multiplies the vector by a quaternion in-place.
+--- Multiplies the vector by a quaternion in-place.<br/>
+--
+-- If the second argument is given, the vector is transformed around
+-- that point.
+--
 -- @param self Vector.
--- @param q Quaternion.
+-- @param quat Quaternion.
+-- @param vec Vector, or nil.
 -- @return Self.
-Vector.transform = function(self, q)
-	Los.quaternion_mul(q.handle, self.handle)
+Vector.transform = function(self, quat, vec)
+	Los.vector_transform(self.handle, quat.handle, vec and vec.handle)
 	return self
 end
 
 return Vector
-
-

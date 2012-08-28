@@ -120,6 +120,21 @@ static void Vector_normalize (LIScrArgs* args)
 	*v1 = limat_vector_normalize (*v1);
 }
 
+static void Vector_transform (LIScrArgs* args)
+{
+	LIMatQuaternion q;
+	LIMatVector v;
+	LIMatVector* self;
+
+	if (!liscr_args_geti_quaternion (args, 0, &q))
+		return;
+	self = args->self;
+	*self = limat_quaternion_transform (q, *self);
+	if (liscr_args_geti_vector (args, 1, &v))
+		*self = limat_vector_add (*self, v);
+	*self = limat_vector_validate (*self);
+}
+
 static void Vector_get_length (LIScrArgs* args)
 {
 	LIMatVector* v1;
@@ -189,6 +204,7 @@ void liext_script_vector (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_VECTOR, "vector_cross", Vector_cross);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_VECTOR, "vector_dot", Vector_dot);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_VECTOR, "vector_normalize", Vector_normalize);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_VECTOR, "vector_transform", Vector_transform);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_VECTOR, "vector_get_length", Vector_get_length);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_VECTOR, "vector_get_x", Vector_get_x);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_VECTOR, "vector_set_x", Vector_set_x);
