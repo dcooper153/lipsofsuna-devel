@@ -1,4 +1,4 @@
---- TODO:doc
+--- Manages the local player state.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -22,10 +22,13 @@ local radian_wrap = function(x)
 	return y
 end
 
---- TODO:doc
+--- Manages the local player state.
 -- @type PlayerState
 local PlayerState = Class("PlayerState")
 
+--- Creates a new player state.
+-- @param clss PlayerState class.
+-- @return PlayerState.
 PlayerState.new = function(clss)
 	local self = Class.new(clss)
 	self.tilt_speed = 0
@@ -38,14 +41,23 @@ PlayerState.new = function(clss)
 	return self
 end
 
+--- Tilts the player object on the client side.
+-- @param self PlayerState.
+-- @param value Tilting speed as radians per second.
 PlayerState.tilt = function(self, value)
 	self.tilt_speed = self.tilt_speed + value
 end
 
+--- Turns the player object on the client side.
+-- @param self PlayerState.
+-- @param value Turning speed as radians per second.
 PlayerState.turn = function(self, value)
 	self.turn_speed = self.turn_speed + value
 end
 
+--- Updates the local player state.
+-- @param self PlayerState.
+-- @param secs Seconds since the last update.
 PlayerState.update = function(self, secs)
 	-- Update targeting.
 	if Client.player_object then
@@ -80,18 +92,30 @@ PlayerState.update = function(self, secs)
 	end
 end
 
+--- Gets the world space crosshair position.
+-- @param self PlayerState.
+-- @return Vector, or nil.
 PlayerState.get_crosshair_position = function(self)
 	return self.crosshair
 end
 
+--- Gets the client side turning angle of the player object.
+-- @param self PlayerState.
+-- @return Number.
 PlayerState.get_turn_angle = function(self)
 	return self.rotation_curr.euler[1]
 end
 
+--- Gets the object currently under the crosshair.
+-- @param self PlayerState.
+-- @return Object, or nil.
 PlayerState.get_targeted_object = function(self)
 	return self.target_object
 end
 
+--- Sets the object currently under the crosshair.
+-- @param self PlayerState.
+-- @param object Object, or nil.
 PlayerState.set_targeted_object = function(self, object)
 	-- Check for changes.
 	if self.target_object == object then return end
@@ -114,5 +138,3 @@ PlayerState.set_targeted_object = function(self, object)
 end
 
 return PlayerState
-
-

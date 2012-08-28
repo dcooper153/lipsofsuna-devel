@@ -964,26 +964,6 @@ Actor.update_summon = function(self, secs)
 	end
 end
 
---- Writes the object to a string.
--- @param self Actor.
--- @return Data string.
-Actor.write = function(self)
-	return string.format("local self=Actor%s\n%s", serialize{
-		angular = self:get_angular(),
-		beheaded = self:get_beheaded(),
-		dead = self.dead,
-		eye_style = self.eye_style,
-		face_style = self.face_style,
-		hair_style = self.hair_style,
-		head_style = self.head_style,
-		id = self:get_id(),
-		physics = self:get_physics(),
-		position = self:get_position(),
-		rotation = self:get_rotation(),
-		spec = self.spec.name},
-		"return self")
-end
-
 --- Writes the object to a database.
 -- @param self Actor.
 -- @param db Database.

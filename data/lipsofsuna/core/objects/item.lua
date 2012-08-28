@@ -1,4 +1,4 @@
---- TODO:doc
+--- Item object.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -12,7 +12,7 @@ local Class = require("system/class")
 local ObjectSerializer = require("core/server/object-serializer")
 local SimulationObject = require("core/objects/simulation")
 
---- TODO:doc
+--- Item object.
 -- @type Item
 local Item = Class("Item", SimulationObject)
 Item.serializer = ObjectSerializer{
@@ -78,7 +78,7 @@ Item.new = function(clss, args)
 end
 
 --- Creates a copy of the item.
--- @param self Object.
+-- @param self Item.
 -- @return Object.
 Item.clone = function(self)
 	return Item{
@@ -89,7 +89,7 @@ Item.clone = function(self)
 end
 
 --- Handles physics contacts.
--- @param self Object.
+-- @param self Item.
 -- @param result Contact result.
 Item.contact_cb = function(self, result)
 	if not self.controller then return end
@@ -97,7 +97,7 @@ Item.contact_cb = function(self, result)
 end
 
 --- Causes the object to take damage.
--- @param self Object.
+-- @param self Item.
 -- @param args Arguments.<ul>
 --   <li>amount: Amount of damage.</li>
 --   <li>point: Damage point.</li>
@@ -118,7 +118,7 @@ Item.damaged = function(self, args)
 end
 
 --- Destroys the item.
--- @param self Object.
+-- @param self Item.
 Item.die = function(self)
 	-- Mark as dead.
 	if self.dead then return end
@@ -134,14 +134,22 @@ Item.die = function(self)
 end
 
 --- Called when the object is examined.
--- @param self Object.
+-- @param self Item.
 -- @param user User.
 Item.examine_cb = function(self, user)
 	user:send_message(self.spec.name)
 end
 
+--- Reads the object from a database.
+-- @param self Item.
+-- @param db Database.
+Item.read_db = function(self, db)
+	SimulationObject.read_db(self, db)
+	Server.object_database:load_inventory(self)
+end
+
 --- Splits items from the stack.
--- @param self Object.
+-- @param self Item.
 -- @param count Number of items to split.
 -- @return Object.
 Item.split = function(self, count)
@@ -158,7 +166,7 @@ Item.split = function(self, count)
 end
 
 --- Updates the state of the item.
--- @param self Object.
+-- @param self Item.
 -- @param secs Seconds since the last update.
 Item.update = function(self, secs)
 	if self.controller then
@@ -167,31 +175,8 @@ Item.update = function(self, secs)
 	SimulationObject.update(self, secs)
 end
 
---- Writes the object to a string.
--- @param self Object.
--- @return Data string.
-Item.write = function(self)
-	return string.format("local self=Item%s\n%s", serialize{
-		angular = self:get_angular(),
-		count = self:get_count(),
-		id = self:get_id(),
-		looted = self.looted,
-		spec = self.spec.name,
-		position = self:get_position(),
-		rotation = self:get_rotation()},
-		"return self")
-end
-
---- Reads the object from a database.
--- @param self Object.
--- @param db Database.
-Item.read_db = function(self, db)
-	SimulationObject.read_db(self, db)
-	Server.object_database:load_inventory(self)
-end
-
 --- Writes the object to a database.
--- @param self Object.
+-- @param self Item.
 -- @param db Database.
 Item.write_db = function(self, db)
 	-- Write the object data.
@@ -215,7 +200,7 @@ Item.write_db = function(self, db)
 end
 
 --- Gets the armor class of the item.
--- @param self Object.
+-- @param self Item.
 -- @param user Actor.
 -- @return Armor rating.
 Item.get_armor_class = function(self, user)
@@ -223,20 +208,19 @@ Item.get_armor_class = function(self, user)
 end
 
 --- Gets the stack count of the item.
--- @param self Object.
+-- @param self Item.
 -- @return Count.
 Item.get_count = function(self)
-	return rawget(self, "__count") or 1
+	return self.__count or 1
 end
 
 --- Sets the stack count of the item.
--- @param self Object.
+-- @param self Item.
 -- @param v Count.
 Item.set_count = function(self, v)
 	-- Store the new count.
-	local old = rawget(self, "__count")
-	if old == v then return end
-	rawset(self, "__count", v ~= 0 and v or nil)
+	if self.__count == v then return end
+	self.__count = v ~= 0 and v or nil
 	-- Update the inventory containing the object.
 	if self.parent then
 		local parent = Game.objects:find_by_id(self.parent)
@@ -249,7 +233,7 @@ Item.set_count = function(self, v)
 end
 
 --- Gets the weapon damage types of the item.
--- @param self Object.
+-- @param self Item.
 -- @param user Actor.
 -- @return Array of influences.
 Item.get_weapon_influences = function(self, user)
@@ -267,6 +251,9 @@ Item.get_weapon_influences = function(self, user)
 	return influences
 end
 
+--- Sets the itemspec of the object.
+-- @param self Item.
+-- @param value Itemspec.
 Item.set_spec = function(self, value)
 	local spec = type(value) == "string" and Itemspec:find{name = value} or value
 	if not spec then return end
@@ -323,5 +310,3 @@ Item.get_storage_type = function(self)
 end
 
 return Item
-
-
