@@ -89,8 +89,9 @@ Message{
 Database memory: %d kB
 Script memory: %d kB
 Terrain memory: %d kB
-Update tick: %d ms
-Event tick: %d ms
+
+%s
+
 Players: %d+%d
 Actors: %d+%d+%d
 Items: %d+%d+%d
@@ -99,26 +100,25 @@ Others: %d+%d
 Vision: %d+%d
 Sectors: %d]],
 			Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024, Voxel:get_memory_used() / 1024,
-			1000 * Program.profiling.update, 1000 * Program.profiling.event,
+			Main.timing:get_profiling_string(),
 			num_players_real, num_players_miss,
 			num_actors_real, num_actors_idle, num_actors_miss,
 			num_items_real, num_items_inv, num_items_miss,
 			num_obstacles_real, num_obstacles_miss,
 			num_objects_real, num_objects_miss,
 			num_vision_real, num_vision_miss,
-			num_sectors,
-			Program.profiling.update * 1000, Program.profiling.event * 1000)
-		Game.messaging:server_event("server stats", response)
+			num_sectors)
+		Game.messaging:server_event("server stats", client, response)
 	end,
-	server_to_client = function(self, text)
+	server_to_client_encode = function(self, text)
 		return {"string", text}
 	end,
-	server_to_client = function(self, packet)
+	server_to_client_decode = function(self, packet)
 		local ok,text = packet:read("string")
 		if not ok then return end
 		return {text}
 	end,
-	server_to_client = function(self, text)
+	server_to_client_handle = function(self, text)
 		Client.data.admin.server_stats = text
 		Ui:set_state("admin/server-stats")
 	end}

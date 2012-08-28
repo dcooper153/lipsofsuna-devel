@@ -1,4 +1,4 @@
---- TODO:doc
+--- Implements loading and caching of models.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -12,7 +12,7 @@ local Class = require("system/class")
 local Model = require("system/model")
 local ModelSpec = require("core/specs/model")
 
---- TODO:doc
+--- Implements loading and caching of models.
 -- @type ModelManager
 local ModelManager = Class("ModelManager")
 
@@ -82,5 +82,3 @@ ModelManager.update = function(self, secs)
 end
 
 return ModelManager
-
-

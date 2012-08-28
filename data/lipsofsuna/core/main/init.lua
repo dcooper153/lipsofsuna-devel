@@ -1,4 +1,4 @@
---- TODO:doc
+--- The main loop of the game.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -8,15 +8,18 @@
 -- @module core.main.init
 -- @alias Main
 
-require(Mod.path .. "event")
+require("core/main/event")
 local Class = require("system/class")
 local Eventhandler = require("system/eventhandler")
-local ModelManager = require(Mod.path .. "model-manager")
+local ModelManager = require("core/main/model-manager")
+local Timing = require("core/main/timing")
 
---- TODO:doc
+--- The main loop of the game.
 -- @type Main
 Main = Class("Main")
 
+--- Creates and enters the main loop.
+-- @param clss Main class.
 Main.new = function(clss)
 	-- Validate specs.
 	Actorspec:validate_all()
@@ -38,6 +41,7 @@ Main.new = function(clss)
 	Staticspec:validate_all()
 	-- Initialize.
 	clss.models = ModelManager()
+	clss.timing = Timing()
 	-- Enter the main loop.
 	if Settings.quit then
 		Program:set_quit(true)
@@ -46,59 +50,57 @@ Main.new = function(clss)
 		Game:init("server", Settings.file, Settings.port)
 		Server:load()
 		Program:set_sleep(1/60)
-		Program.profiling = {}
-		local frame = Program:get_time()
 		while not Program:get_quit() do
-			-- Update program state.
-			local t1 = Program:get_time()
+			-- Update the program state.
+			local tick = clss.timing:get_frame_duration()
+			clss.timing:start_frame()
+			clss.timing:start_action("program")
 			Program:update()
-			local t2 = Program:get_time()
+			-- Process events.
+			clss.timing:start_action("event")
 			Eventhandler:update()
+			-- Update the logic.
+			clss.timing:start_action("sectors")
 			if Game.initialized then
-				Game.sectors:update(t1 - frame)
+				Game.sectors:update(tick)
 			end
-			Server:update(t1 - frame)
-			clss.models:update(t1 - frame)
-			local t3 = Program:get_time()
-			-- Store timings.
-			Program.profiling.update = t2 - t1
-			Program.profiling.event = t3 - t2
-			frame = t1
+			clss.timing:start_action("server")
+			Server:update(tick)
+			clss.timing:start_action("models")
+			clss.models:update(tick)
 		end
 		Game:deinit()
 	else
 		-- Client main.
 		Client:init()
-		Program.profiling = {}
-		local frame = Program:get_time()
 		while not Program:get_quit() do
-			-- Update program state.
+			-- Update the program state.
+			local tick = clss.timing:get_frame_duration()
+			clss.timing:start_frame()
+			clss.timing:start_action("program")
 			if Settings.watchdog then
 				Program:watchdog_start(30)
 			end
-			local t1 = Program:get_time()
 			Program:update()
-			Program:update_scene(t1 - frame)
-			local t2 = Program:get_time()
+			Program:update_scene(tick)
+			-- Process events.
+			clss.timing:start_action("event")
 			Eventhandler:update()
+			-- Update the logic.
+			clss.timing:start_action("sectors")
 			if Game.initialized then
-				Game.sectors:update(t1 - frame)
+				Game.sectors:update(tick)
 			end
-			Server:update(t1 - frame)
-			Client:update(t1 - frame)
-			clss.models:update(t1 - frame)
-			local t3 = Program:get_time()
+			clss.timing:start_action("server")
+			Server:update(tick)
+			clss.timing:start_action("client")
+			Client:update(tick)
+			clss.timing:start_action("models")
+			clss.models:update(tick)
 			-- Render the scene.
+			clss.timing:start_action("render")
 			Program:render_scene()
-			local t4 = Program:get_time()
-			-- Update profiling stats.
-			Program.profiling.update = t2 - t1
-			Program.profiling.event = t3 - t2
-			Program.profiling.render = t4 - t3
-			frame = t1
 		end
 		Client:deinit()
 	end
 end
-
-

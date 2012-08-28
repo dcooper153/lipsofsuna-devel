@@ -25,9 +25,9 @@ Database memory: %d kB
 Script memory: %d kB
 Terrain memory: %d kB
 Model memory: %d kB
-Update tick: %d ms
-Event tick: %d ms
-Render tick: %d ms
+
+%s
+
 Rendered batches: %d
 Rendered faces: %d
 Allocated attachments: %d
@@ -37,7 +37,7 @@ Allocated skeletons: %d
 Allocated textures: %d/%d : %dkB
 Allocated materials: %d/%d
 ]], Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024, Voxel:get_memory_used() / 1024, models / 1024,
-1000 * (Program.profiling.update or 0), 1000 * (Program.profiling.event or 0), 1000 * (Program.profiling.render or 0),
+Main.timing:get_profiling_string(),
 stats.batch_count, stats.face_count, stats.attachment_count, stats.entity_count, stats.mesh_count,
 stats.mesh_memory / 1000, stats.skeleton_count, stats.texture_count_loaded, stats.texture_count,
 stats.texture_memory / 1000, stats.material_count_loaded, stats.material_count)

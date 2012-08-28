@@ -301,6 +301,16 @@ ChatCommand{
 	end}
 
 ChatCommand{
+	name = "reset_profiling",
+	description = "Resets profiling data.",
+	pattern = "^/reset_profiling$",
+	handler = "client",
+	func = function(player, matches)
+		Main.timing:reset_profiling()
+		Client:append_log("Profiling reset")
+	end}
+
+ChatCommand{
 	name = "resurrect",
 	description = "Resurrect yourself.",
 	pattern = "^/resurrect$",

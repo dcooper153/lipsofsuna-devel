@@ -122,6 +122,7 @@ end
 -- @param object Defender object.
 Damage.apply_defender_armor = function(self, object)
 	if not object then return end
+	if object:get_spec().type ~= "actor" then return end
 	local reduce = {["cold damage"] = true, ["fire damage"] = true, ["physical damage"] = true}
 	-- Calculate the blocking bonus.
 	local armor = object:get_armor_class()
