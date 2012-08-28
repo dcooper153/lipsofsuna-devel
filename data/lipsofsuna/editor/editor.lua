@@ -432,7 +432,7 @@ Editor.pick_scene = function(self)
 	local mode = Program:get_video_mode()
 	local cursor = Vector(mode[1]/2, mode[2]/2)
 	local r1,r2 = self.camera:picking_ray{cursor = cursor, far = 20, near = 0.1}
-	local ret = Physics:cast_ray{src = r1, dst = r2}
+	local ret = Physics:cast_ray(r1, r2)
 	if not ret then return end
 	return ret.point, ret.object, ret.tile
 end

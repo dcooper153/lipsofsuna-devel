@@ -310,10 +310,10 @@ Actor.check_line_of_sight = function(self, args)
 	-- Check for ray cast success.
 	-- TODO: Shoot multiple rays?
 	if args.point then
-		local ret = Physics:cast_ray{src = src, dst = dst, ignore = self}
+		local ret = Physics:cast_ray(src, dst, self)
 		return not ret or (ret.point - dst).length < 0.5
 	elseif args.object then
-		local ret = Physics:cast_ray{src = src, dst = dst, ignore = self}
+		local ret = Physics:cast_ray(src, dst, self)
 		if not ret or ret.object == args.object then return true end
 	end
 end
@@ -928,8 +928,8 @@ Actor.update_sound = function(self, secs)
 	if not rnode then return end
 	-- Ground check.
 	-- We don't want to play footsteps if the character is flying.
-	if not Physics:cast_ray{src = lnode, dst = lnode - Vector(0,spec.footstep_height)} and
-	   not Physics:cast_ray{src = rnode, dst = rnode - Vector(0,spec.footstep_height)} then
+	if not Physics:cast_ray(lnode, Vector(0,-spec.footstep_height):add(lnode)) and
+	   not Physics:cast_ray(rnode, Vector(0,-spec.footstep_height):add(rnode)) then
 		self.lfoot_prev = nil
 		self.rfoot_prev = nil
 		return

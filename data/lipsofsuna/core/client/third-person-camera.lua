@@ -61,7 +61,7 @@ ThirdPersonCamera.get_position_displacement = function(self, pos, rot, turn)
 	local stepl = 0.12
 	local stepn = 6
 	local steps = stepn
-	local ctr = Physics:cast_ray{collision_mask = self:get_collision_mask(), src = pos, dst = Vector(stepl * stepn):transform(turn, pos)}
+	local ctr = Physics:cast_ray(pos, Vector(stepl * stepn):transform(turn, pos), self:get_collision_mask())
 	if ctr then
 		steps = math.floor((ctr.point - pos).length / stepl)
 		steps = math.max(0, steps - 1)
@@ -73,7 +73,7 @@ ThirdPersonCamera.get_position_displacement = function(self, pos, rot, turn)
 		-- Favor positions that have the best displacement to the side and
 		-- the most distance to the target before hitting a wall.
 		local center = Vector(i * stepl):transform(turn, pos)
-		local back = Physics:cast_ray{collision_mask = self:get_collision_mask(), src = center, dst = Vector(0,0,5):transform(rot, center)}
+		local back = Physics:cast_ray(center, Vector(0,0,5):transform(rot, center), self:get_collision_mask())
 		local dist = back and (back.point - center).length or 5
 		local score = 3 * dist + (i + 1)
 		-- Prevent the crosshair corrected rotation from diverging too much

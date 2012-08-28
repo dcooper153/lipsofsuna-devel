@@ -1,4 +1,4 @@
---- TODO:doc
+--- Provides access to the physics simulation.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -16,23 +16,19 @@ end
 
 ------------------------------------------------------------------------------
 
---- TODO:doc
+--- Provides access to the physics simulation.
 -- @type Physics
 local Physics = Class("Physics")
 
 --- Performs a ray cast test.
 -- @param self Physics class.
--- @param args Arguments.<ul>
---   <li>collision_group: Collision group.</li>
---   <li>collision_mask: Collision mask.</li>
---   <li>ignore: Object or table of objects to ignore.</li>
---   <li>src: Start point vector in world space.</li>
---   <li>dst: End point vector in world space.</li></ul>
+-- @param src Start point vector in world space.
+-- @param dst End point vector in world space.
+-- @param mask Collision mask.
+-- @param ignore Object or table of objects to ignore.
 -- @return Table with point, normal, object and tile. Nil if no collision occurred.
-Physics.cast_ray = function(self, args)
-	local r = Los.physics_cast_ray{collision_group = args.collision_group,
-		collision_mask = args.collision_mask, ignore = ignore,
-		src = args.src.handle, dst = args.dst.handle}
+Physics.cast_ray = function(self, src, dst, mask, ignore)
+	local r = Los.physics_cast_ray(src.handle, dst.handle, mask, ignore)
 	if not r then return end
 	r.point = Vector:new_from_handle(r.point)
 	r.normal = Vector:new_from_handle(r.normal)
@@ -43,18 +39,14 @@ end
 
 --- Performs a sphere cast test.
 -- @param self Physics class.
--- @param args Arguments.<ul>
---   <li>collision_group: Collision group.</li>
---   <li>collision_mask: Collision mask.</li>
---   <li>ignore: Object or table of objects to ignore.</li>
---   <li>radius: Radius in world units.</li>
---   <li>src: Start point vector in world space.</li>
---   <li>dst: End point vector in world space.</li></ul>
+-- @param src Start point vector in world space.
+-- @param dst End point vector in world space.
+-- @param radius Radius in world units.
+-- @param mask Collision mask.
+-- @param ignore Object or table of objects to ignore.
 -- @return Table with point, normal, object and tile. Nil if no collision occurred.
 Physics.cast_sphere = function(self, args)
-	local r = Los.physics_cast_sphere{collision_group = args.collision_group,
-		collision_mask = args.collision_mask, ignore = ignore, radius = args.radius,
-		src = args.src.handle, dst = args.dst.handle}
+	local r = Los.physics_cast_sphere(src.handle, dst.handle, radius, mask, ignore)
 	if not r then return end
 	r.point = Vector:new_from_handle(r.point)
 	r.normal = Vector:new_from_handle(r.normal)

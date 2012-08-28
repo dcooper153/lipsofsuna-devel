@@ -36,7 +36,7 @@ local perform_attack = function(attacker, move)
 			-- Get the attack ray.
 			local src,dst = attacker:get_attack_ray(rel)
 			-- Cast from the previous point.
-			local r = prev and Physics:cast_ray{src = prev, dst = dst, collision_mask = mask}
+			local r = prev and Physics:cast_ray(prev, dst, mask)
 			if r then return apply(r) end
 			prev = dst
 		end
@@ -50,7 +50,7 @@ local perform_attack = function(attacker, move)
 		end
 		-- Cast a straight ray against everything.
 		local src,dst = attacker:get_attack_ray()
-		local r = Physics:cast_ray{src = src, dst = dst}
+		local r = Physics:cast_ray(src, dst)
 		if r then return apply(r) end
 	end)
 	return move

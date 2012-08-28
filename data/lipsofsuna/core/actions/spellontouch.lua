@@ -6,7 +6,7 @@ Actionspec{name = "spell on touch", func = function(feat, info, args)
 		feat:play_effects(args)
 		Coroutine:sleep(args.user.spec.timing_spell_touch * 0.02)
 		local src,dst = args.user:get_attack_ray()
-		local r = Physics:cast_ray{src = src, dst = dst}
+		local r = Physics:cast_ray(src, dst)
 		if not r then return end
 		feat:apply{
 			charge = args.charge,

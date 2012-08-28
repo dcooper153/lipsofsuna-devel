@@ -28,6 +28,7 @@
 static int private_build_ignore_list (
 	LIExtModule*  module,
 	LIScrArgs*    args,
+	int           index,
 	LIPhyObject** result,
 	int           limit)
 {
@@ -37,7 +38,7 @@ static int private_build_ignore_list (
 	LIObjObject* object;
 
 	/* Add an individual object to the ignore list. */
-	if (liscr_args_gets_data (args, "ignore", LISCR_SCRIPT_OBJECT, &data))
+	if (liscr_args_geti_data (args, index, LISCR_SCRIPT_OBJECT, &data))
 	{
 		object = liscr_data_get_data (data);
 		result[0] = liphy_physics_find_object (module->physics, object->id);
@@ -47,7 +48,7 @@ static int private_build_ignore_list (
 	}
 
 	/* Add multiple objects to the ignore list. */
-	if (liscr_args_gets_table (args, "ignore"))
+	if (liscr_args_geti_table (args, index))
 	{
 		for (i = 1 ; i <= limit ; i++)
 		{
@@ -88,12 +89,11 @@ static void Physics_cast_ray (LIScrArgs* args)
 
 	/* Handle arguments. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS);
-	if (!liscr_args_gets_vector (args, "src", &start) ||
-	    !liscr_args_gets_vector (args, "dst", &end))
+	if (!liscr_args_geti_vector (args, 0, &start) ||
+	    !liscr_args_geti_vector (args, 1, &end))
 		return;
-	liscr_args_gets_int (args, "collision_group", &group);
-	liscr_args_gets_int (args, "collision_mask", &mask);
-	ignore = private_build_ignore_list (module, args, ignores, sizeof (ignores) / sizeof (*ignores));
+	liscr_args_geti_int (args, 2, &mask);
+	ignore = private_build_ignore_list (module, args, 3, ignores, sizeof (ignores) / sizeof (*ignores));
 
 	if (liphy_physics_cast_ray (module->physics, &start, &end, group, mask, ignores, ignore, &result))
 	{
@@ -132,14 +132,13 @@ static void Physics_cast_sphere (LIScrArgs* args)
 
 	/* Handle arguments. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS);
-	if (!liscr_args_gets_vector (args, "src", &start) ||
-	    !liscr_args_gets_vector (args, "dst", &end))
+	if (!liscr_args_geti_vector (args, 0, &start) ||
+	    !liscr_args_geti_vector (args, 1, &end))
 		return;
-	liscr_args_gets_int (args, "collision_group", &group);
-	liscr_args_gets_int (args, "collision_mask", &mask);
-	if (liscr_args_gets_float (args, "radius", &radius))
+	if (liscr_args_geti_float (args, 2, &radius))
 		radius = LIMAT_MAX (0.02f, radius);
-	ignore = private_build_ignore_list (module, args, ignores, sizeof (ignores) / sizeof (*ignores));
+	liscr_args_geti_int (args, 3, &mask);
+	ignore = private_build_ignore_list (module, args, 4, ignores, sizeof (ignores) / sizeof (*ignores));
 
 	if (liphy_physics_cast_ray (module->physics, &start, &end, group, mask, ignores, ignore, &result))
 	{
