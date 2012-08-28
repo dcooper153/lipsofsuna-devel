@@ -50,6 +50,7 @@ Main.new = function(clss)
 		Game:init("server", Settings.file, Settings.port)
 		Server:load()
 		Program:set_sleep(1/60)
+		clss:enable_manual_gc()
 		while not Program:get_quit() do
 			-- Update the program state.
 			local tick = clss.timing:get_frame_duration()
@@ -68,11 +69,15 @@ Main.new = function(clss)
 			Server:update(tick)
 			clss.timing:start_action("models")
 			clss.models:update(tick)
+			-- Collect garbage.
+			clss.timing:start_action("garbage")
+			clss:perform_manual_gc()
 		end
 		Game:deinit()
 	else
 		-- Client main.
 		Client:init()
+		clss:enable_manual_gc()
 		while not Program:get_quit() do
 			-- Update the program state.
 			local tick = clss.timing:get_frame_duration()
@@ -100,7 +105,55 @@ Main.new = function(clss)
 			-- Render the scene.
 			clss.timing:start_action("render")
 			Program:render_scene()
+			-- Collect garbage.
+			clss.timing:start_action("garbage")
+			clss:perform_manual_gc(tick)
 		end
 		Client:deinit()
 	end
+end
+
+--- Enables manual garbage collection.
+-- @param clss Main class.
+Main.enable_manual_gc = function(clss)
+	-- Stop automatic collection from now on.
+	collectgarbage("stop")
+	collectgarbage("setpause", 1000)
+	collectgarbage("setstepmul", 10)
+	-- Perform full garbage collection.
+	local memory0 = collectgarbage("count")
+	local time0 = Program:get_time()
+	collectgarbage()
+	local time1 = Program:get_time()
+	local memory1 = collectgarbage("count")
+	-- Estimate the garbage collection rate.
+	clss.__need_memory = memory1
+	clss.__collect_time = 0.001
+	clss.__collect_rate = (memory0 - memory1) / (time1 - time0)
+	clss.__collect_thresh = memory1 * 1.5
+	manualgcenable=true
+end
+
+--- Collects garbage manually.
+-- @param clss Main class.
+-- @param secs Seconds since the last collection.
+Main.perform_manual_gc = function(clss, secs)
+	-- Estimate the needed collection time.
+	local rate = clss.__collect_rate
+	local thresh = clss.__collect_thresh
+	local memory = collectgarbage("count")
+	local time = math.max(0, memory - thresh) / (rate * secs)
+	time = math.min(time, clss.__collect_time + 0.0001)
+	clss.__collect_time = time
+	-- Collect garbage.
+	Program:collect_garbage(time)
+	collectgarbage("stop")
+	-- Estimate the collection rate.
+	local collected = memory - collectgarbage("count")
+	if collected > 0 and time > 0 then
+		clss.__collect_rate = collected / time
+	end
+	-- TODO: Estimate the real memory consumption.
+	-- clss.__need_memory = ???
+	-- clss.__collect_thresh = clss.__need_memory * ???
 end

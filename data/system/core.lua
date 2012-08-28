@@ -1,4 +1,4 @@
---- TODO:doc
+--- Operations for controlling the core features of the engine.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -11,7 +11,7 @@
 local Class = require("system/class")
 local Model = require("system/model")
 
---- TODO:doc
+--- Operations for controlling the core features of the engine.
 -- @type Program
 Program = Class("Program")
 
@@ -20,6 +20,14 @@ Program = Class("Program")
 -- @param path Path name.
 Program.add_path = function(clss, path)
 	return Los.program_add_path(path)
+end
+
+--- Collects garbage for the given number of seconds.
+-- @param clss Program class.
+-- @param secs Seconds.
+-- @return True if garbage collection finished before the end.
+Program.collect_garbage = function(clss, secs)
+	return Los.program_collect_garbage(secs)
 end
 
 --- Dumps debug information to the console.
@@ -241,5 +249,3 @@ Program.get_version = function(self)
 end
 
 return Program
-
-

@@ -279,21 +279,6 @@ void liscr_script_update (
 {
 }
 
-/**
- * \brief Enables or disables garbage collection.
- * \param self Script.
- * \param value Nonzero to enable.
- */
-void liscr_script_set_gc (
-	LIScrScript* self,
-	int          value)
-{
-	if (value)
-		lua_gc (self->lua, LUA_GCRESTART, 0);
-	else
-		lua_gc (self->lua, LUA_GCSTOP, 0);
-}
-
 lua_State* liscr_script_get_lua (
 	LIScrScript* self)
 {
