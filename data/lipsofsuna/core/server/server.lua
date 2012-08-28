@@ -243,9 +243,7 @@ end
 Server.update = function(self, secs)
 	if not self.initialized then return end
 	-- Update objects.
-	for k,v in pairs(Game.objects.objects_by_id) do
-		v:update(secs)
-	end
+	Game.objects:update(secs)
 	-- Update markers.
 	self.marker_timer = self.marker_timer + secs
 	if self.marker_timer > 2 then

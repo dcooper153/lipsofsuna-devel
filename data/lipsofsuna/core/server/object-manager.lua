@@ -1,4 +1,4 @@
---- TODO:doc
+--- Manages the objects of the game.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -10,7 +10,7 @@
 
 local Class = require("system/class")
 
---- TODO:doc
+--- Manages the objects of the game.
 -- @type ObjectManager
 local ObjectManager = Class("ObjectManager")
 
@@ -19,8 +19,27 @@ local ObjectManager = Class("ObjectManager")
 -- @return ObjectManager.
 ObjectManager.new = function(clss)
 	local self = Class.new(clss)
+	self.active_by_id = setmetatable({}, {__mode = "v"})
 	self.objects_by_id = setmetatable({}, {__mode = "v"})
 	return self
+end
+
+--- Marks an object as active or inactive.<br/>
+--
+-- Inactive objects do not consume any time during the update cycle so
+-- properly activating and deactivating objects can improve performance
+-- significantly when there are lots of inventory items or other objects
+-- that do not require processing.
+--
+-- @param self ObjectManager.
+-- @param object Object.
+-- @param value True for active, false for inactive.
+ObjectManager.activate_object = function(self, object, value)
+	if value then
+		self.active_by_id[object:get_id()] = object
+	else
+		self.active_by_id[object:get_id()] = nil
+	end
 end
 
 --- Adds an object to the manager.
@@ -37,6 +56,7 @@ ObjectManager.detach_all = function(self)
 		v:detach()
 		self.objects_by_id[k] = nil
 	end
+	self.active_by_id = {}
 end
 
 --- Finds an object by its ID.
@@ -93,6 +113,22 @@ ObjectManager.find_by_sector = function(self, sector)
 	return dict
 end
 
+--- Updates active objects.
+-- @param self ObjectManager.
+-- @param secs Seconds since the last update.
+ObjectManager.update = function(self, secs)
+	for k,v in pairs(self.active_by_id) do
+		v:update(secs)
+	end
+end
+
+--- Gets the dictionary of active objects.
+-- @param self ObjectManager.
+-- @return Dictionary.
+ObjectManager.get_active_objects = function(self)
+	return self.active_by_id
+end
+
 --- Gets a free object ID.
 -- @param self ObjectManager.
 -- @return Free object ID.
@@ -117,5 +153,3 @@ ObjectManager.get_free_id = function(self)
 end
 
 return ObjectManager
-
-

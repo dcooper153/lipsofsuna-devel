@@ -111,9 +111,7 @@ Simulation.update = function(self, secs)
 	-- Hence, this needs not to be done in single player or when hosting
 	-- an embedded server.
 	if not Server.initialized then
-		for k,v in pairs(Game.objects.objects_by_id) do
-			v:update(secs)
-		end
+		Game.objects:update(secs)
 	end
 end
 

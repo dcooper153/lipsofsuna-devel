@@ -1,4 +1,4 @@
---- TODO:doc
+--- The base class for game objects.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -17,7 +17,7 @@ local Timer = require("system/timer")
 local ClientRenderObject = not Settings.server and require("core/client/client-render-object")
 local MovementPrediction = not Settings.server and require("core/client/movement-prediction")
 
---- TODO:doc
+--- The base class for game objects.
 -- @type SimulationObject
 local SimulationObject = Class("SimulationObject", Object)
 
@@ -171,12 +171,15 @@ SimulationObject.detach = function(self)
 end
 
 --- Hides the object and purges it from the database.
--- @param self Object to kill.
+-- @param self Object.
 SimulationObject.die = function(self)
 	self:detach()
 	self:purge()
 end
 
+--- Plays an effect for the object.
+-- @param self Object.
+-- @param args Effect arguments.
 SimulationObject.effect = function(self, args)
 	if not args.effect then return end
 	Server:object_event(self, "object-effect", {effect = args.effect})
@@ -600,6 +603,13 @@ SimulationObject.set_dialog = function(self, type, args)
 	end
 end
 
+--- Finds a node from the graphical skeleton of the object.<br/>
+--
+-- This only works when running in the graphical mode and the skeleton
+-- has been loaded. If these are not the case, nil is returned.
+--
+-- @param self Object.
+-- @param ... Arguments.
 SimulationObject.find_node = function(self, ...)
 	if not self.render then return end
 	return self.render:find_node(...)
@@ -648,6 +658,10 @@ SimulationObject.set_model_name = function(self, v)
 	end
 end
 
+--- Sets the position of the object.
+-- @param self Object.
+-- @param value Vector.
+-- @param predict True to set the predicted value, false for the actual value.
 SimulationObject.set_position = function(self, value, predict)
 	if self.prediction and predict then
 		self.prediction:set_target_position(value)
@@ -659,6 +673,10 @@ SimulationObject.set_position = function(self, value, predict)
 	end
 end
 
+--- Sets the rotation of the object.
+-- @param self Object.
+-- @param value Vector.
+-- @param predict True to set the predicted value, false for the actual value.
 SimulationObject.set_rotation = function(self, value, predict)
 	if self.prediction and predict then
 		self.prediction:set_target_rotation(value)
@@ -670,9 +688,14 @@ SimulationObject.set_rotation = function(self, value, predict)
 	end
 end
 
+--- Sets the visibility of the object.<br/>
+-- @param self Object.
+-- @param v True for visible, false for hidden.
 SimulationObject.set_visible = function(self, v)
 	-- Call the base class.
 	Object.set_visible(self, v)
+	-- Set the activation status.
+	Game.objects:activate_object(self, v)
 	-- Ensure that visible objects have their models loaded.
 	if v and not self:get_model() then
 		local name = self:get_model_name()
@@ -708,5 +731,3 @@ SimulationObject.set_spec = function(self, value)
 end
 
 return SimulationObject
-
-

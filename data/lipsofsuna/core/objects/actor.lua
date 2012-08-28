@@ -182,7 +182,7 @@ Actor.new = function(clss, args)
 end
 
 --- Clones the object.
--- @param self Object.
+-- @param self Actor.
 -- @return New object.
 Actor.clone = function(self)
 	-- TODO: Copy dialog variables?
@@ -204,7 +204,7 @@ end
 -- This function skips faction checks and adds the object directly to the
 -- list. Hence, calling this temporarily makes the actor angry at the
 -- passed object.
--- @param self Object.
+-- @param self Actor.
 -- @param object Object to add to the list of enemies.
 Actor.add_enemy = function(self, object)
 	if not self.ai then return end
@@ -213,7 +213,7 @@ Actor.add_enemy = function(self, object)
 end
 
 --- Calculates the animation state based on the active controls.
--- @param self Object.
+-- @param self Actor.
 Actor.calculate_animation = function(self)
 	if not self:has_server_data() then return end
 	local m = self:get_movement()
@@ -236,7 +236,7 @@ Actor.calculate_animation = function(self)
 end
 
 --- Calculates the movement speed of the actor.
--- @param self Object.
+-- @param self Actor.
 Actor.calculate_speed = function(self)
 	-- Base speed.
 	if not self:get_spec() then return end
@@ -283,7 +283,7 @@ Actor.can_climb_high = function(self)
 end
 
 --- Checks line of sight to the target point or object.
--- @param self Object.
+-- @param self Actor.
 -- @param args Arguments.<ul>
 --   <li>object: Object being looked for.</li>
 --   <li>point: Point being looked for.</li></ul>
@@ -319,7 +319,7 @@ Actor.check_line_of_sight = function(self, args)
 end
 
 --- Checks if the given object is an enemy of the actor.
--- @param self Object.
+-- @param self Actor.
 -- @param object Object.
 -- @return True if the object is an enemy.
 Actor.check_enemy = function(self, object)
@@ -404,7 +404,7 @@ Actor.climb = function(self)
 end
 
 --- Causes the object to take damage.
--- @param self Object.
+-- @param self Actor.
 -- @param args Arguments.<ul>
 --   <li>amount: Amount of damage.</li>
 --   <li>point: Damage point.</li>
@@ -462,7 +462,7 @@ Actor.damaged = function(self, args)
 end
 
 --- Causes the actor to die.
--- @param self Object.
+-- @param self Actor.
 -- @return True if killed, false if saved by Sanctuary.
 Actor.die = function(self)
 	if self.dead then return end
@@ -497,7 +497,7 @@ Actor.die = function(self)
 end
 
 --- Makes the actor face a point.
--- @param self Object.
+-- @param self Actor.
 -- @param args Arguments.<ul>
 --   <li>point: Position vector.</li>
 --   <li>secs: Tick length or nil for instant rotation.</li></ul>
@@ -545,7 +545,7 @@ Actor.handle_inventory_event = function(self, args)
 end
 
 --- Inflicts a modifier on the object.
--- @param self Object.
+-- @param self Actor.
 -- @param name Modifier name.
 -- @param strength Modifier strength.
 -- @param args Arguments passed to the modifier
@@ -559,7 +559,7 @@ Actor.inflict_modifier = function(self, name, strength, args)
 end
 
 --- Causes the actor to jump.
--- @param self Object.
+-- @param self Actor.
 Actor.jump = function(self)
 	-- Check for preconditions.
 	if self.blocking then return end
@@ -594,7 +594,7 @@ Actor.jump = function(self)
 end
 
 --- Causes the actor to stop jumping, resulting to a lower jump.
--- @param self Object.
+-- @param self Actor.
 Actor.jump_stop = function(self)
 	if not self.jumping then return end
 	if self.submerged then return end
@@ -607,14 +607,14 @@ Actor.jump_stop = function(self)
 end
 
 --- Loots the object.
--- @param self Object.
+-- @param self Actor.
 -- @param user Object doing the looting.
 Actor.loot = function(self, user)
 	return SimulationObject.loot(self, user)
 end
 
 --- Picks up an object.
--- @param self Object.
+-- @param self Actor.
 -- @param src_id ID of the picked up object.
 -- @param dst_id ID of the inventory where to place the object.
 -- @param dst_slot Name of the inventory slot where to place the object.
@@ -627,7 +627,7 @@ Actor.pick_up = function(self, src_id, dst_id, dst_slot)
 end
 
 --- Reads the object from a database.
--- @param self Object.
+-- @param self Actor.
 -- @param db Database.
 Actor.read_db = function(self, db)
 	SimulationObject.read_db(self, db)
@@ -638,7 +638,7 @@ Actor.read_db = function(self, db)
 end
 
 --- Removes a modifier.
--- @param self Object.
+-- @param self Actor.
 -- @param name Modifier name.
 Actor.remove_modifier = function(self, name)
 	if self.modifiers and self.modifiers[name] then
@@ -648,14 +648,14 @@ Actor.remove_modifier = function(self, name)
 end
 
 --- Called when a modifier is removed.
--- @param self Object.
+-- @param self Actor.
 -- @param name Modifier name.
 Actor.removed_modifier = function(self, name)
 	self:update_skills()
 end
 
 --- Causes the actor to rise from death.
--- @param self Object.
+-- @param self Actor.
 Actor.resurrect = function(self)
 	if not self.dead then return end
 	-- Enable controls.
@@ -672,7 +672,7 @@ Actor.resurrect = function(self)
 end
 
 --- Teleports the object.
--- @param self Object.
+-- @param self Actor.
 -- @param args Arguments.<ul>
 --   <li>marker: Map marker name.</li>
 --   <li>position: World position.</li>
@@ -689,14 +689,14 @@ Actor.teleport = function(self, args)
 end
 
 --- Causes the summoned actor to be unsummoned.
--- @param self Object.
+-- @param self Actor.
 Actor.unsummon = function(self)
 	-- TODO: Some visual feedback would be nice.
 	self:detach()
 end
 
 --- Updates the state of the actor.
--- @param self Object.
+-- @param self Actor.
 -- @param secs Seconds since the last update.
 Actor.update = function(self, secs)
 	if not self:get_visible() then return end
@@ -800,7 +800,7 @@ end
 -- you want to set the NPC into the chat mode immediately instead of waiting for
 -- the next AI update cycle.
 --
--- @param self Object.
+-- @param self Actor.
 Actor.update_ai_state = function(self)
 	if self.ai then
 		self.ai:update_state()
@@ -840,7 +840,7 @@ Actor.update_burdening = function(self, secs)
 end
 
 --- Updates the environment of the object and tries to fix it if necessary.
--- @param self Object.
+-- @param self Actor.
 -- @param secs Seconds since the last update.
 -- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
 Actor.update_environment = function(self, secs)
@@ -878,7 +878,7 @@ Actor.update_environment = function(self, secs)
 end
 
 --- Updates the skills and related attributes of the actor.
--- @param self Object.
+-- @param self Actor.
 Actor.update_skills = function(self)
 	-- Calculate the attributes.
 	local attr = self.skills:calculate_attributes()
@@ -907,7 +907,7 @@ Actor.update_skills = function(self)
 end
 
 --- Plays footstep sounds for actors.
--- @param self Object.
+-- @param self Actor.
 -- @param secs Seconds since the last update.
 Actor.update_sound = function(self, secs)
 	assert(self:has_client_data())
@@ -954,7 +954,7 @@ Actor.update_sound = function(self, secs)
 end
 
 --- Updates the summon status of the object.
--- @param self Object.
+-- @param self Actor.
 -- @param secs Seconds since the last update.
 Actor.update_summon = function(self, secs)
 	if not self.summon_timer then return end
@@ -965,7 +965,7 @@ Actor.update_summon = function(self, secs)
 end
 
 --- Writes the object to a string.
--- @param self Object.
+-- @param self Actor.
 -- @return Data string.
 Actor.write = function(self)
 	return string.format("local self=Actor%s\n%s", serialize{
@@ -985,7 +985,7 @@ Actor.write = function(self)
 end
 
 --- Writes the object to a database.
--- @param self Object.
+-- @param self Actor.
 -- @param db Database.
 Actor.write_db = function(self, db)
 	-- Don't save summons.
@@ -1011,7 +1011,7 @@ Actor.write_db = function(self, db)
 end
 
 --- Writes the appearance preset of the object to a string.
--- @param self Object.
+-- @param self Actor.
 -- @return String.
 Actor.write_preset = function(self)
 	assert(self:has_client_data())
@@ -1043,7 +1043,7 @@ Actor.get_attack_charge = function(self)
 end
 
 --- Gets the attack ray of the actor.
--- @param self Object.
+-- @param self Actor.
 -- @param rel Destination shift vector or nil.
 -- @return Ray start point and ray end point relative to the object.
 Actor.get_attack_ray = function(self, rel)
@@ -1063,6 +1063,9 @@ Actor.get_attack_ray = function(self, rel)
 	end
 end
 
+--- Returns true if the actor is behaded.
+-- @param self Actor.
+-- @return Boolean.
 Actor.get_beheaded = function(self)
 	return self.__beheaded
 end
@@ -1116,7 +1119,7 @@ Actor.get_burdened = function(self)
 end
 
 --- Gets the spell effects known by the object.
--- @param self Object.
+-- @param self Actor.
 -- @return Dictionary of booleans.
 Actor.get_known_spell_effects = function(self)
 	return self.spec.feat_effects
@@ -1159,14 +1162,14 @@ Actor.set_dead_state = function(self, drop)
 end
 
 --- Gets the spell types known by the object.
--- @param self Object.
+-- @param self Actor.
 -- @return Dictionary of booleans.
 Actor.get_known_spell_types = function(self)
 	return self.spec.feat_types
 end
 
 --- Gets a modifier by name.
--- @param self Object.
+-- @param self Actor.
 -- @param name Modifer name.
 Actor.get_modifier = function(self, name)
 	if not self.modifiers then return end
@@ -1174,7 +1177,7 @@ Actor.get_modifier = function(self, name)
 end
 
 --- Sets the forward/backward movement state of the actor.
--- @param self Object.
+-- @param self Actor.
 -- @param value Movement rate.
 Actor.set_movement = function(self, value)
 	SimulationObject.set_movement(self, math.min(1, math.max(-1, value)))
@@ -1182,7 +1185,7 @@ Actor.set_movement = function(self, value)
 end
 
 --- Gets the rotation quaternion towards the given point.
--- @param self Object.
+-- @param self Actor.
 -- @param point Position vector in world space.
 -- @return Quaternion.
 Actor.get_rotation_to_point = function(self, point)
@@ -1191,6 +1194,9 @@ Actor.get_rotation_to_point = function(self, point)
 	return Quaternion{dir = dir, up = Vector(0, 1, 0)}
 end
 
+--- Sets the actor spec of the object.
+-- @param self Actor.
+-- @param v Actorspec.
 Actor.set_spec = function(self, v)
 	local spec = type(v) == "string" and Actorspec:find{name = v} or v
 	if self.spec == spec then return end
@@ -1317,7 +1323,7 @@ Actor.get_storage_type = function(self)
 end
 
 --- Sets the strafing state of the actor.
--- @param self Object.
+-- @param self Actor.
 -- @param value Strafing rate.
 Actor.set_strafing = function(self, value)
 	SimulationObject.set_strafing(self, value)
@@ -1325,7 +1331,7 @@ Actor.set_strafing = function(self, value)
 end
 
 --- Sets the tilt angle of the object.
--- @param self Object.
+-- @param self Actor.
 -- @param tilt Angle in radians.
 -- @param predict True to use prediction.
 Actor.set_tilt_angle = function(self, tilt, predict)
@@ -1337,14 +1343,19 @@ Actor.set_tilt_angle = function(self, tilt, predict)
 	end
 end
 
+--- Gets the currently wielded weapon.
+-- @param self Actor.
+-- @return Item, or nil.
 Actor.get_weapon = function(self)
 	return self.inventory:get_object_by_slot(self.spec.weapon_slot)
 end
 
+--- Sets the currently wielded weapon.
+-- @param self Actor.
+-- @param v Item, or nil.
+-- @return True on success.
 Actor.set_weapon = function(self, value)
 	return self.inventory:equip_object(value, self.spec.weapon_slot)
 end
 
 return Actor
-
-

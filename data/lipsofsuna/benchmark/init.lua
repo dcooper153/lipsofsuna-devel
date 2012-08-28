@@ -57,7 +57,7 @@ end
 
 Benchmark.close = function(self)
 	-- Restore the normal map state.
-	for k,v in pairs(Game.objects.objects_by_id) do v:detach() end
+	Game.objects:detach_all()
 	Client.sectors:unload_world()
 	self.light:set_enabled(false)
 	Client.sectors.unload_time = 10

@@ -169,7 +169,7 @@ end
 Editor.load = function(self, name)
 	-- Make sure the old map is erased.
 	self:reset()
-	for k,v in pairs(Game.objects.objects_by_id) do v:detach() end
+	Game.objects:detach_all()
 	Game.sectors:unload_world()
 	-- Find or create the pattern.
 	local pattern = Patternspec:find{name = name}
