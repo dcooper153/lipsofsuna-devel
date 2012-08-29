@@ -34,8 +34,8 @@ Generator.sector_types.Overworld.generate = function(self, pos, size, yield)
 					Voxel:fill_region{point = p1, size = Vector(1, 1+(n1-0.8)/0.3, 1), tile = m1:get_id()}
 				end
 			end
-			yield()
 		end
+		yield()
 	end
 	-- Generate objects.
 	local c = Vector()

@@ -161,12 +161,17 @@ SectorManager.update = function(self, secs)
 	-- necessary that the terrain exists when players enter. Otherwise,
 	-- they could fall to emptiness when there are a lot of sectors
 	-- being loaded simulataneously.
+	local skip
 	if Server.initialized then
 		for k,v in pairs(Server.players_by_client) do
 			local key = v:get_sector()
 			local loader = key and self.loaders[key]
 			if loader then
-				loader:update(secs)
+				skip = true
+				if not loader:update(secs) then
+					self.loaders[key] = nil
+					self.loaders_iterator = nil
+				end
 			end
 		end
 	end
@@ -175,11 +180,16 @@ SectorManager.update = function(self, secs)
 	-- This updates only one loader per frame. Iteration works like with
 	-- pairs() but is restarted if new loaders are added. This allows
 	-- incremental updated while accounting for the limitations of next().
-	for i = 1,10 do
-		local key,loader = next(self.loaders, self.loaders_iterator)
-		self.loaders_iterator = key
-		if loader and not loader:update(secs) then
-			self.loaders[key] = nil
+	--
+	-- TODO: This and the above updater should be merged, and loading
+	-- should be done starting from sectors closest to players.
+	if not skip then
+		for i = 1,3 do
+			local key,loader = next(self.loaders, self.loaders_iterator)
+			self.loaders_iterator = key
+			if loader and not loader:update(secs) then
+				self.loaders[key] = nil
+			end
 		end
 	end
 	-- Unload unused sectors.
