@@ -315,8 +315,9 @@ Inventory.merge_or_drop_object = function(self, object)
 	local o = Game.objects:find_by_id(self.id)
 	if not o then return end
 	-- Drop near the owner.
-	local p = Utils:find_drop_point{point = o:get_position()}
-	object:set_position(p or o.position)
+	local pos0 = o:get_position()
+	local pos1 = Utils:find_drop_point{point = pos0}
+	object:set_position(pos1 or pos0)
 	object:set_visible(true)
 end
 
