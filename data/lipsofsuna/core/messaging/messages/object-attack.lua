@@ -4,7 +4,7 @@ Message{
 		return {"uint32", id, "string", move, "uint8", variant}
 	end,
 	server_to_client_decode = function(self, packet)
-		local ok,id,slot,move,variant = packet:read("uint32", "string", "uint8")
+		local ok,id,move,variant = packet:read("uint32", "string", "uint8")
 		if not ok then return end
 		return {id, move, variant}
 	end,
