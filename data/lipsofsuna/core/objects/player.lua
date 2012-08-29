@@ -384,7 +384,7 @@ Player.vision_cb = function(self, args)
 			if o:get_static() then return end
 			Game.messaging:server_event("object hidden", self.client, o:get_id())
 		end,
-		["object-moved"] = function(args)
+		["object-motion"] = function(args)
 			local o = args.object
 			if o:get_static() then return end
 			Game.messaging:server_event("object moved", self.client, o:get_id(), o:get_position(), o:get_rotation(), o:get_tilt_angle(), o:get_velocity())

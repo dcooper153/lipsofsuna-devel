@@ -30,10 +30,6 @@ static void private_model_free (
 	LIObjManager* self,
 	LIMdlModel*   model);
 
-static void private_object_motion (
-	LIObjManager* self,
-	LIObjObject*  object);
-
 /*****************************************************************************/
 
 LIMaiExtensionInfo liext_object_info =
@@ -84,7 +80,6 @@ LIObjManager* liobj_manager_new (
 
 	/* Register callback handlers. */
 	lical_callbacks_insert (program->callbacks, "model-free", 0, private_model_free, self, self->calls + 0);
-	lical_callbacks_insert (program->callbacks, "object-motion", 63353, private_object_motion, self, self->calls + 1);
 
 	return self;
 }
@@ -133,28 +128,12 @@ LIObjObject* liobj_manager_find_object (
 	return lialg_u32dic_find (self->objects, id);
 }
 
-/*****************************************************************************/
-
-static void private_model_free (
-	LIObjManager* self,
-	LIMdlModel*   model)
-{
-	LIAlgU32dicIter iter;
-	LIObjObject* object;
-
-	/* Remove from objects. */
-	/* Models can become subject to garbage collection even when used by an
-	   object if scripts don't reference them. To handle the removal
-	   gracefully, we remove the deleted model from objects. */
-	LIALG_U32DIC_FOREACH (iter, self->objects)
-	{
-		object = iter.value;
-		if (object->model == model)
-			object->model = NULL;
-	}
-}
-
-static void private_object_motion (
+/**
+ * \brief Notifies scripts of an object being moved.
+ * \param self Object manager.
+ * \param object Object.
+ */
+void liobj_manager_notify_object_motion (
 	LIObjManager* self,
 	LIObjObject*  object)
 {
@@ -178,7 +157,28 @@ static void private_object_motion (
 		object->transform_event = object->transform;
 
 		/* Emit an object-motion event. */
-		limai_program_event (self->program, "object-motion", "object", LIMAI_FIELD_INT, liobj_object_get_external_id (object), NULL);
+		limai_program_event (self->program, "object-motion", "id", LIMAI_FIELD_INT, liobj_object_get_external_id (object), NULL);
+	}
+}
+
+/*****************************************************************************/
+
+static void private_model_free (
+	LIObjManager* self,
+	LIMdlModel*   model)
+{
+	LIAlgU32dicIter iter;
+	LIObjObject* object;
+
+	/* Remove from objects. */
+	/* Models can become subject to garbage collection even when used by an
+	   object if scripts don't reference them. To handle the removal
+	   gracefully, we remove the deleted model from objects. */
+	LIALG_U32DIC_FOREACH (iter, self->objects)
+	{
+		object = iter.value;
+		if (object->model == model)
+			object->model = NULL;
 	}
 }
 

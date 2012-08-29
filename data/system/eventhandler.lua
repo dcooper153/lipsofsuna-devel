@@ -85,5 +85,3 @@ Eventhandler.update = function(clss)
 end
 
 return Eventhandler
-
-

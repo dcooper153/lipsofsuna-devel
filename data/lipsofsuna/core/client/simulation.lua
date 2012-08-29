@@ -11,8 +11,10 @@
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Color = require("common/color")
+local Item = require("core/objects/item")
 local Obstacle = require("core/objects/obstacle")
 local Physics = require("system/physics")
+local Spell = require("core/objects/spell")
 
 --- TODO:doc
 -- @type Simulation
@@ -116,5 +118,3 @@ Simulation.update = function(self, secs)
 end
 
 return Simulation
-
-

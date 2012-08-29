@@ -7,7 +7,7 @@ Message{
 			"string", char.name,
 			"string", char.race,
 			-- Animation profile.
-			"string", chat.animation_profile,
+			"string", char.animation_profile,
 			-- Body style.
 			"uint8", char.body_scale,
 			"uint8", char.body_style[1],

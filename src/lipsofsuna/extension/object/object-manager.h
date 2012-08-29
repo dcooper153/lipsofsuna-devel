@@ -29,7 +29,7 @@ struct _LIObjManager
 {
 	LIMaiProgram* program;
 	LIAlgU32dic* objects;
-	LICalHandle calls[2];
+	LICalHandle calls[1];
 };
 
 LIAPICALL (LIObjManager*, liobj_manager_new, (
@@ -41,6 +41,10 @@ LIAPICALL (void, liobj_manager_free, (
 LIAPICALL (LIObjObject*, liobj_manager_find_object, (
 	LIObjManager* self,
 	uint32_t      id));
+
+LIAPICALL (void, liobj_manager_notify_object_motion, (
+	LIObjManager* self,
+	LIObjObject*  object));
 
 /*****************************************************************************/
 

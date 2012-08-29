@@ -8,6 +8,8 @@
 -- @module benchmark.init
 -- @alias Benchmark
 
+if Settings.server then return end
+
 local Camera = require("system/camera")
 local Class = require("system/class")
 local Light = require("system/light")

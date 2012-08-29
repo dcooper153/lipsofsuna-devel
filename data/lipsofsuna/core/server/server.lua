@@ -172,7 +172,7 @@ end
 Server.global_event = function(self, type, args)
 	local a = args or {}
 	a.type = type
-	Vision:event(a)
+	Vision:dispatch_event(a, Game.objects)
 end
 
 Server.object_effect = function(self, object, name)
@@ -185,7 +185,7 @@ Server.object_event = function(self, object, type, args)
 	a.id = object:get_id()
 	a.object = object
 	a.type = type
-	Vision:event(a)
+	Vision:dispatch_event(a, Game.objects)
 end
 
 Server.object_event_id = function(self, id, type, args)
@@ -193,7 +193,7 @@ Server.object_event_id = function(self, id, type, args)
 	a.id = id
 	a.object = Game.objects:find_by_id(id)
 	a.type = type
-	Vision:event(a)
+	Vision:dispatch_event(a, Game.objects)
 end
 
 Server.spawn_player = function(self, player, client, spawnpoint)
@@ -268,7 +268,8 @@ end
 
 Server.world_effect = function(self, point, name)
 	if not name then return end
-	Vision:event{type = "world-effect", point = point, effect = name}
+	local args = {type = "world-effect", point = point, effect = name}
+	Vision:dispatch_event(args, Game.objects)
 end
 
 Server.get_client_address = function(self, client)

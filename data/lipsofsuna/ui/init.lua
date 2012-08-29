@@ -1,3 +1,5 @@
+if Settings.server then return end
+
 require(Mod.path .. "theme")
 require(Mod.path .. "ui")
 

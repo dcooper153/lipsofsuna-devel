@@ -195,12 +195,10 @@ Object.set_visible = function(self, v)
 		if __objects_realized[self] then return end
 		__objects_realized[self] = true
 		Los.object_set_realized(self.handle, true)
-		Program:push_event{type = "object-visibility", object = self, visible = true}
 	else
 		if not __objects_realized[self] then return end
 		__objects_realized[self] = nil
 		Los.object_set_realized(self.handle, false)
-		Program:push_event{type = "object-visibility", object = self, visible = false}
 	end
 end
 

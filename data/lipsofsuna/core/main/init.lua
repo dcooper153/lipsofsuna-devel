@@ -71,7 +71,7 @@ Main.new = function(clss)
 			clss.models:update(tick)
 			-- Collect garbage.
 			clss.timing:start_action("garbage")
-			clss:perform_manual_gc()
+			clss:perform_manual_gc(tick)
 		end
 		Game:deinit()
 	else

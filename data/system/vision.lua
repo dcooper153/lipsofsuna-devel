@@ -9,7 +9,6 @@
 -- @alias Vision
 
 local Class = require("system/class")
-local Eventhandler = require("system/eventhandler")
 
 if not Los.program_load_extension("vision") then
 	error("loading extension `vision' failed")
@@ -37,27 +36,43 @@ Vision.new = function(clss, id, objects)
 	return self
 end
 
---- Emits a custom vision event.
+--- Dispatches an event to appropriate visions.
 -- @param clss Vision class.
--- @param args Event arguments.
-Vision.event = function(clss, args)
-	if args.vision then
-		-- Vision events.
-		local vision = clss.dict[args.vision]
+-- @param event Event table.
+-- @param object Object manager.
+Vision.dispatch_event = function(clss, event, objects)
+	if event.type == "vision-object-shown" then
+		-- Object entered vision.
+		local vision = Vision.dict[event.vision]
 		if not vision then return end
-		vision:push_event(args)
-	elseif args.object then
+		vision:push_event(event)
+	elseif event.type == "vision-object-hidden" then
+		-- Object left vision.
+		local vision = Vision.dict[event.vision]
+		if not vision then return end
+		vision:push_event(event)
+	elseif event.type == "vision-voxel-block-changed" then
+		-- Terrain changes.
+		local vision = Vision.dict[event.vision]
+		if not vision then return end
+		vision:push_event(event)
+	elseif event.object or event.id then
 		-- Object events.
+		if not event.object then
+			local object = objects:find_by_id(event.id)
+			if not object then return end
+			event.object = object
+		end
 		for k,v in pairs(clss.dict) do
-			if v.objects[args.object] then
-				v:push_event(args)
+			if v.objects[event.object] then
+				v:push_event(event)
 			end
 		end
-	elseif args.point then
+	elseif event.point then
 		-- Point events.
 		for k,v in pairs(clss.dict) do
-			if (v:get_position() - args.point).length <= v:get_radius() then
-				v:push_event(args)
+			if (v:get_position() - event.point).length <= v:get_radius() then
+				v:push_event(event)
 			end
 		end
 	end
@@ -140,31 +155,4 @@ Vision.set_position = function(self, v) Los.vision_set_position(self.handle, v.h
 Vision.set_radius = function(self, v) Los.vision_set_radius(self.handle, v) end
 Vision.set_threshold = function(self, v) Los.vision_set_threshold(self.handle, v) end
 
-------------------------------------------------------------------------------
--- Event handler hooks.
-
-Eventhandler{type = "object-motion", func = function(self, event)
-	Vision:event{type = "object-moved", id = event.object}
-end}
-
-Eventhandler{type = "vision-object-shown", func = function(self, event)
-	local vision = Vision.dict[event.vision]
-	if not vision then return end
-	vision:push_event(event)
-end}
-
-Eventhandler{type = "vision-object-hidden", func = function(self, event)
-	local vision = Vision.dict[event.vision]
-	if not vision then return end
-	vision:push_event(event)
-end}
-
-Eventhandler{type = "vision-voxel-block-changed", func = function(self, event)
-	local vision = Vision.dict[event.vision]
-	if not vision then return end
-	vision:push_event(event)
-end}
-
 return Vision
-
-

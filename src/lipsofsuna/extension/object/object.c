@@ -109,8 +109,8 @@ int liobj_object_moved (
 	if (!private_warp (self, &transform.position))
 		return 0;
 
-	/* Invoke program->callbacks. */
-	lical_callbacks_call (self->manager->program->callbacks, "object-motion", lical_marshal_DATA_PTR, self);
+	/* Notify scripts. */
+	liobj_manager_notify_object_motion (self->manager, self);
 
 	return 1;
 }
