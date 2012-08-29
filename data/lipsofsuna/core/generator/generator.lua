@@ -122,7 +122,7 @@ Generator.generate = function(self, args)
 	-- Reset the world.
 	self:update_status(0, "Resetting world")
 	Marker:reset()
-	Game.sectors:unload_world()
+	Game.sectors:unload_all()
 	-- Place special areas.
 	-- Regions have dependencies so we need to place them in several passes.
 	-- The region tables are filled but the map is all empty after this.
@@ -164,7 +164,7 @@ Generator.generate = function(self, args)
 	-- Find used sectors.
 	self:update_status(0, "Counting sectors")
 	local sectorn = 0
-	local sectors = Program:get_sectors()
+	local sectors = Game.sectors:get_sectors()
 	for k in pairs(sectors) do
 		if not self.sectors[k] then
 			self.sectors[k] = "Town"
@@ -195,7 +195,7 @@ Generator.generate = function(self, args)
 	self:update_status(0, "Saving the map")
 	Server.object_database:clear_objects()
 	Game.sectors:save_world(true, function(p) self:update_status(p) end)
-	Game.sectors:unload_world()
+	Game.sectors:unload_all()
 	for k,v in pairs(statics) do v:set_visible(true) end
 	Server.object_database:save_static_objects()
 	Server.serialize:set_value("map_version", Generator.map_version)

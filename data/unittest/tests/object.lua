@@ -4,6 +4,7 @@ Unittest:add(1, "system", "object", function()
 	local Model = require("system/model")
 	local Program = require("system/core")
 	local Quaternion = require("system/math/quaternion")
+	local Sectors = require("system/sectors")
 	local Vector = require("system/math/vector")
 	require "system/object-physics"
 	Physics:set_enable_simulation(true)
@@ -49,8 +50,4 @@ Unittest:add(1, "system", "object", function()
 		Program:update()
 		o:set_visible(false)
 	end
-	-- Unloading objects.
-	Program:unload_world()
-	for k,v in pairs(__objects_realized) do assert(false) end
-	collectgarbage()
 end)

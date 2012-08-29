@@ -1,11 +1,10 @@
 Unittest:add(1, "system", "program", function()
-	require "system/core"
+	local Program = require("system/core")
 	-- Built-in tests.
 	Los.program_unittest()
 	-- Getters and setters.
 	assert(type(Program:get_args()) == "string")
 	assert(type(Program:get_quit()) == "boolean")
-	assert(type(Program:get_sectors()) == "table")
 	assert(type(Program:get_sleep()) == "number")
 	assert(type(Program:get_tick()) == "number")
 	assert(type(Program:get_time()) == "number")

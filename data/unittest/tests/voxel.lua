@@ -8,10 +8,11 @@ Unittest:add(1, "system", "voxel", function()
 end)
 
 Unittest:add(1, "system", "voxel get block offsets", function()
+	local Sectors = require("system/sectors")
 	local Voxel = require("system/tiles")
 	local n = 0
 	local map = {}
-	Program:unload_world()
+	Sectors:unload_all()
 	Voxel:set_block_size(1, 12)
 	for x,y,z in Voxel:get_blocks_by_sector_id(1) do
 		assert(x >= Voxel.blocks_per_line)

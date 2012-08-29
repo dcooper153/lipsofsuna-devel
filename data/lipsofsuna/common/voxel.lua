@@ -2,9 +2,10 @@ local Actor = require("core/objects/actor")
 local Item = require("core/objects/item")
 local Material = require("system/material")
 local Obstacle = require("core/objects/obstacle")
+local Sectors = require("system/sectors")
 local Staticobject = require("core/objects/static")
 
-Voxel.tile_size = Program:get_sector_size() / Voxel.tiles_per_line
+Voxel.tile_size = Sectors:get_sector_size() / Voxel.tiles_per_line
 Voxel.tile_scale = 1 / Voxel.tile_size
 
 --- Checks what kind of tiles are within the range.

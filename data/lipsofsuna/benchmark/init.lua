@@ -58,7 +58,7 @@ end
 Benchmark.close = function(self)
 	-- Restore the normal map state.
 	Game.objects:detach_all()
-	Client.sectors:unload_world()
+	Game.sectors:unload_all()
 	self.light:set_enabled(false)
 	Client.sectors.unload_time = 10
 end

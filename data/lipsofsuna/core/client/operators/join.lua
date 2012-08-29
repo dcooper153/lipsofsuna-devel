@@ -1,8 +1,10 @@
+local Sectors = require("system/sectors")
+
 --- Switches the game to the joining start state.
 -- @param self Client class.
 Client.join_game = function(self)
 	-- Clear the world.
-	Program:unload_world()
+	Sectors:unload_all()
 	Game:init("join")
 	-- Set information for the UI.
 	self.data.connection.mode = "join"

@@ -96,14 +96,6 @@ static void Object_new (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
-static void Object_refresh (LIScrArgs* args)
-{
-	float radius = 32.0f;
-
-	liscr_args_gets_float (args, "radius", &radius);
-	liobj_object_refresh (args->self, radius);
-}
-
 static void Object_get_id (LIScrArgs* args)
 {
 	LIObjObject* self = args->self;
@@ -229,7 +221,6 @@ void liext_script_object (
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_OBJECT, "object_find", Object_find);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_OBJECT, "object_new", Object_new);
-	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_refresh", Object_refresh);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_id", Object_get_id);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_id", Object_set_id);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_model", Object_set_model);

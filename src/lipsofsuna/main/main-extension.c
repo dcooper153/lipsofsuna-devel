@@ -52,6 +52,7 @@ extern LIMaiExtensionInfo liext_physics_info;
 extern LIMaiExtensionInfo liext_reload_info;
 extern LIMaiExtensionInfo liext_render_info;
 extern LIMaiExtensionInfo liext_render_model_info;
+extern LIMaiExtensionInfo liext_sectors_info;
 extern LIMaiExtensionInfo liext_skeleton_info;
 extern LIMaiExtensionInfo liext_sound_info;
 extern LIMaiExtensionInfo liext_string_info;
@@ -100,6 +101,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "password", &liext_password_info },
 		{ "physics", &liext_physics_info },
 		{ "reload", &liext_reload_info },
+		{ "sectors", &liext_sectors_info },
 		{ "skeleton", &liext_skeleton_info },
 		{ "sound", &liext_sound_info },
 		{ "string", &liext_string_info },

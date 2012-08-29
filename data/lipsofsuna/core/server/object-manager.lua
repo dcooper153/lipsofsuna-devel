@@ -106,9 +106,11 @@ end
 ObjectManager.find_by_sector = function(self, sector)
 	local dict = {}
 	local list = Los.object_find{sector = sector}
-	for k,v in pairs(list) do
-		local o = __userdata_lookup[v]
-		dict[o:get_id()] = o
+	if list then
+		for k,v in pairs(list) do
+			local o = __userdata_lookup[v]
+			dict[o:get_id()] = o
+		end
 	end
 	return dict
 end

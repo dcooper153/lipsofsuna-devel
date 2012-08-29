@@ -205,24 +205,6 @@ static void Program_unittest (LIScrArgs* args)
 	limai_program_unittest (program);
 }
 
-static void Program_unload_sector (LIScrArgs* args)
-{
-	int sector;
-	LIMaiProgram* program;
-
-	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
-	if (liscr_args_gets_int (args, "sector", &sector))
-		lialg_sectors_remove (program->sectors, sector);
-}
-
-static void Program_unload_world (LIScrArgs* args)
-{
-	LIMaiProgram* program;
-
-	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
-	lialg_sectors_clear (program->sectors);
-}
-
 static void Program_shutdown (LIScrArgs* args)
 {
 	LIMaiProgram* program;
@@ -281,44 +263,6 @@ static void Program_set_quit (LIScrArgs* args)
 		program->quit = value;
 }
 
-static void Program_get_sectors (LIScrArgs* args)
-{
-	int idle;
-	LIAlgSector* sector;
-	LIAlgU32dicIter iter;
-	LIMaiProgram* program;
-
-	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
-	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-	LIALG_U32DIC_FOREACH (iter, program->sectors->sectors)
-	{
-		sector = iter.value;
-		idle = lisys_time (NULL) - (time_t) sector->stamp;
-		liscr_args_setf_float (args, iter.key, idle);
-	}
-}
-
-static void Program_get_sector_idle (LIScrArgs* args)
-{
-	int id;
-	LIAlgSector* sector;
-	LIMaiProgram* program;
-
-	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
-	if (!liscr_args_geti_int (args, 0, &id))
-		return;
-	sector = lialg_u32dic_find (program->sectors->sectors, id);
-	liscr_args_seti_int (args, lisys_time (NULL) - (time_t) sector->stamp);
-}
-
-static void Program_get_sector_size (LIScrArgs* args)
-{
-	LIMaiProgram* program;
-
-	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
-	liscr_args_seti_float (args, program->sectors->width);
-}
-
 static void Program_get_sleep (LIScrArgs* args)
 {
 	LIMaiProgram* program;
@@ -371,8 +315,6 @@ void liscr_script_program (
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_pump_events", Program_pump_events);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_push_message", Program_push_message);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_unittest", Program_unittest);
-	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_unload_sector", Program_unload_sector);
-	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_unload_world", Program_unload_world);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_shutdown", Program_shutdown);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_update", Program_update);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_wait", Program_wait);
@@ -380,9 +322,6 @@ void liscr_script_program (
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_fps", Program_get_fps);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_quit", Program_get_quit);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_quit", Program_set_quit);
-	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_sectors", Program_get_sectors);
-	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_sector_idle", Program_get_sector_idle);
-	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_sector_size", Program_get_sector_size);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_sleep", Program_get_sleep);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_sleep", Program_set_sleep);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_tick", Program_get_tick);

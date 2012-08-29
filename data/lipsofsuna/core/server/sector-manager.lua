@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local SectorLoader = require("core/server/sector-loader")
+local Sectors = require("system/sectors")
 local Timer = require("system/timer")
 
 --- Manages map sectors.
@@ -53,6 +54,13 @@ SectorManager.load_sector = function(self, sector)
 	end
 end
 
+--- Increases the timestamp of the sectors inside the given sphere.
+-- @param point Position vector, in world units.
+-- @param radius Refresh radius, in world units.
+SectorManager.refresh = function(self, point, radius)
+	Sectors:refresh(point, radius or 10)
+end
+
 --- Saves a sector to the database.
 -- @param self SectorManager.
 -- @param sector Sector ID.
@@ -81,7 +89,7 @@ SectorManager.save_world = function(self, erase, progress)
 		self.database:query("DELETE FROM terrain;")
 	end
 	-- Write the new world data.
-	local sectors = Program:get_sectors()
+	local sectors = Sectors:get_sectors()
 	if progress then
 		-- Write with progress updates.
 		local total = 0
@@ -101,24 +109,46 @@ SectorManager.save_world = function(self, erase, progress)
 	self.database:query("END TRANSACTION;")
 end
 
---- Unloads a sector without saving.
+--- Unloads the world without saving.<br/>
+--
+-- Unrealizes all objects and destroys all sectors of the world.
+-- You usually want to do this when you're about to quit a game and
+-- start a new one soon after.
+--
 -- @param self SectorManager.
--- @param sector Sector ID.
-SectorManager.unload_sector = function(self, sector)
-	self.sectors[sector] = nil
-	self.loaders[sector] = nil
-	self.loaders_iterator = nil
-	Program:unload_sector{sector = sector}
-end
-
---- Unloads the world without saving.
--- @param self SectorManager.
-SectorManager.unload_world = function(self)
-	Program:unload_world()
+SectorManager.unload_all = function(self)
+	-- Clear the dictionaries.
 	self.loaders = {}
 	self.loaders_iterator = nil
 	self.sectors = {}
 	self.sectors_iterator = nil
+	-- Unrealize all objects.
+	for k,v in pairs(__objects_realized) do
+		k:detach()
+	end
+	-- Unload the engine sectors.
+	Sectors:unload_all()
+end
+
+--- Unloads a sector without saving.<br/>
+--
+-- Unrealizes all normal objects in the sector and clears the terrain in the sector.
+-- The sector is completely removed from the sector list of the engine.
+--
+-- @param self SectorManager.
+-- @param sector Sector ID.
+SectorManager.unload_sector = function(self, sector)
+	-- Remove from the dictionaries.
+	self.sectors[sector] = nil
+	self.sectors_iterator = nil
+	self.loaders[sector] = nil
+	self.loaders_iterator = nil
+	-- Unrealize all objects.
+	for k,v in pairs(Game.objects:find_by_sector(sector)) do
+		v:detach()
+	end
+	-- Unload the engine sector.
+	Sectors:unload_sector(sector)
 end
 
 --- Unloads sectors that have been inactive long enough.
@@ -160,7 +190,7 @@ SectorManager.update = function(self, secs)
 	if self.unload_time then
 		local key = next(self.sectors, self.sectors_iterator)
 		self.sectors_iterator = key
-		local age = key and Program:get_sector_idle(key)
+		local age = key and Sectors:get_sector_idle(key)
 		if age and age > self.unload_time then
 			if self.database and not self.loaders[key] then
 				self:save_sector(key)
@@ -179,6 +209,13 @@ SectorManager.wait_sector_load = function(self, sector)
 	loader:finish()
 	self.loaders[sector] = nil
 	self.loaders_iterator = nil
+end
+
+--- Waits for a sector to finish loading.
+-- @param self SectorManager.
+-- @param sector Sector ID.
+SectorManager.get_sectors = function(self)
+	return Sectors:get_sectors()
 end
 
 return SectorManager

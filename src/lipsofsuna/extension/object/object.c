@@ -116,29 +116,6 @@ int liobj_object_moved (
 }
 
 /**
- * \brief Refreshes map around the object.
- *
- * Calling this function prevents the map sectors near the object from
- * unloading. One important use case for this is preventing clients from
- * being swapped out when they stand still.
- *
- * \param self Object.
- * \param radius Refresh radius.
- */
-void liobj_object_refresh (
-	LIObjObject* self,
-	float        radius)
-{
-	LIMatTransform transform;
-
-	if (liobj_object_get_realized (self))
-	{
-		liobj_object_get_transform (self, &transform);
-		lialg_sectors_refresh_point (self->manager->program->sectors, &transform.position, radius);
-	}
-}
-
-/**
  * \brief Gets the bounding box size of the object.
  * \param self Object.
  * \param bounds Return location for the bounding box.

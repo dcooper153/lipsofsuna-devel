@@ -47,14 +47,6 @@ Object.detach = function(self)
 	self:set_visible(false)
 end
 
---- Prevents map sectors around the object from being unloaded.
--- @param self Object.
--- @param args Arguments.<ul>
---   <li>radius: Refresh radius.</li></ul>
-Object.refresh = function(self, args)
-	Los.object_refresh(self.handle, args)
-end
-
 --- Transforms a position vector from the local coordinate space to global.
 -- @param self Object.
 -- @param point Point vector.

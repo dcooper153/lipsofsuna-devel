@@ -1,8 +1,10 @@
+local Sectors = require("system/sectors")
+
 --- Switches the game to the hosting start state.
 -- @param self Client class.
 Client.host_game = function(self)
 	-- Start the server.
-	Program:unload_world()
+	Sectors:unload_all()
 	Game:init("host", Settings.file, Settings.port)
 	-- Set information for the UI.
 	self.data.connection.mode = "host"
@@ -17,7 +19,7 @@ end
 
 Client.start_single_player = function(self)
 	-- Start the server.
-	Program:unload_world()
+	Sectors:unload_all()
 	Game:init("single", Settings.file)
 	-- Set information for the UI.
 	self.data.connection.mode = "single"

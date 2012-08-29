@@ -420,6 +420,13 @@ SimulationObject.purge = function(self)
 	Server.object_database:delete_object(self)
 end
 
+--- Refreshes the map around the object.
+-- @param self Object.
+-- @param radius Refresh radius, or 0 for default.
+SimulationObject.refresh = function(self, radius)
+	Game.sectors:refresh(self:get_position(), radius)
+end
+
 --- Sends a chat message to all players near the object.
 -- @param self Speaking object.
 -- @param msg Message to send.

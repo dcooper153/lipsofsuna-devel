@@ -93,7 +93,7 @@ Game.deinit = function(self)
 	-- Detach all objects.
 	self.sectors.database = nil
 	self.objects:detach_all()
-	self.sectors:unload_world()
+	self.sectors:unload_all()
 	self.static_objects_by_id = nil
 	-- Detach scene nodes.
 	for k in pairs(self.scene_nodes_by_ref) do

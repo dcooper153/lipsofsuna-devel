@@ -130,7 +130,7 @@ end
 Client.create_world = function(self)
 	if not Server.initialized then
 		Game.objects:detach_all()
-		Game.sectors:unload_world()
+		Game.sectors:unload_all()
 	end
 end
 

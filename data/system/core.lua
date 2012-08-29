@@ -109,42 +109,6 @@ Program.push_message = function(self, ...)
 	end
 end
 
---- Unloads a sector.<br/>
---
--- Unrealizes all normal objects in the sector and clears the terrain in the sector.
--- Objects that have the disable_unloading member set are kept despite calling this.
--- The sector is removed from the sector list if no realized objects remain.
---
--- @param clss Program class.
--- @param args Arguments.<ul>
---   <li>sector: Sector index.</li></ul>
-Program.unload_sector = function(clss, args)
-	-- Don't unload if the sector contains non-unloadable objects.
-	-- Sectors can't be partially unloaded so we can't unload sectors
-	-- that have distant objects if we want to keep them around.
-	for k,v in pairs(Game.objects:find_by_sector(args.sector)) do
-		if v.disable_unloading then return end
-	end
-	-- Unrealize all objects.
-	for k,v in pairs(Game.objects:find_by_sector(args.sector)) do
-		v:detach()
-	end
-	-- Remove the sector.
-	Los.program_unload_sector(args)
-end
-
---- Unloads the world map.<br/>
--- Unrealizes all objects and destroys all sectors of the world map.
--- You usually want to do this when you're about to create a new map with
--- the map generator to avoid parts of the old map being left in the game.
--- @param clss Program class.
-Program.unload_world = function(clss)
-	for k,v in pairs(__objects_realized) do
-		k:detach()
-	end
-	Los.program_unload_world()
-end
-
 --- Calls the function and catches and handles errors.
 -- @param clss Program class.
 -- @param func Function to call.
@@ -197,28 +161,6 @@ end
 -- @param v True.
 Program.set_quit = function(self, v)
 	Los.program_set_quit(v)
-end
-
---- Gets the idle time of a sector.
--- @param self Program class.
--- @param id Sector ID.
--- @return Age in seconds, or nil.
-Program.get_sector_idle = function(self, id)
-	return Los.program_get_sector_idle(id)
-end
-
---- Gets the dictionary of active sector IDs.
--- @param self Program class.
--- @return Dictionary of number keys and boolean values.
-Program.get_sectors = function(self)
-	return Los.program_get_sectors()
-end
-
---- Gets the sector size in world units.
--- @param self Program class.
--- @return Number.
-Program.get_sector_size = function(self)
-	return Los.program_get_sector_size()
 end
 
 --- Gets the sleep time between ticks.
