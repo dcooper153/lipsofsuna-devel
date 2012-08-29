@@ -65,7 +65,7 @@ Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, ti
 	if tile and weapon then
 		-- Break the tile.
 		if weapon.spec.categories["mattock"] then
-			Voxel:damage(args.owner, args.tile)
+			Voxel:damage(attacker, tile)
 		end
 		-- Damage the weapon.
 		if weapon.spec.damage_mining then
