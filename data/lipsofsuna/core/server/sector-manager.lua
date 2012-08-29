@@ -25,7 +25,6 @@ SectorManager.new = function(clss, database)
 	self.database = database
 	self.loaders = {}
 	self.sectors = {}
-	self.update_timer = 0
 	self.unload_time = 10
 	-- Initialize the database tables needed by us.
 	if self.database then
@@ -42,9 +41,11 @@ SectorManager.load_sector = function(self, sector)
 	-- Only load once.
 	if self.sectors[sector] then return end
 	self.sectors[sector] = true
+	self.sectors_iterator = nil
 	-- Create a sector loader.
 	if Server.initialized then
 		self.loaders[sector] = SectorLoader(self, sector)
+		self.loaders_iterator = nil
 	end
 	-- Handle client side terrain swapping.
 	if Game.mode == "join" then
@@ -106,6 +107,7 @@ end
 SectorManager.unload_sector = function(self, sector)
 	self.sectors[sector] = nil
 	self.loaders[sector] = nil
+	self.loaders_iterator = nil
 	Program:unload_sector{sector = sector}
 end
 
@@ -114,41 +116,58 @@ end
 SectorManager.unload_world = function(self)
 	Program:unload_world()
 	self.loaders = {}
+	self.loaders_iterator = nil
 	self.sectors = {}
+	self.sectors_iterator = nil
 end
 
 --- Unloads sectors that have been inactive long enough.
 -- @param self SectorManager.
 -- @param secs Seconds since the last update.
 SectorManager.update = function(self, secs)
-	-- Update sector loaders.
-	for k,v in pairs(self.loaders) do
-		if not v:update(secs) then
-			self.loaders[k] = nil
-		end
-	end
-	-- Reduce the unload frequency.
-	if not self.unload_time then return end
-	self.update_timer = self.update_timer + secs
-	if self.update_timer < 0.2 then return end
-	self.update_timer = 0
-	-- Unload unused sectors.
-	local written = 0
-	for k,d in pairs(Program:get_sectors()) do
-		if d > self.unload_time and written < 10 then
-			-- Save the sector.
-			if self.database then
-				self:wait_sector_load(k)
-				if written == 0 then self.database:query("BEGIN TRANSACTION;") end
-				written = written + 1
-				self:save_sector(k)
+	-- Load sectors for players.
+	--
+	-- Sectors populared by players need extra priority because it's
+	-- necessary that the terrain exists when players enter. Otherwise,
+	-- they could fall to emptiness when there are a lot of sectors
+	-- being loaded simulataneously.
+	if Server.initialized then
+		for k,v in pairs(Server.players_by_client) do
+			local key = v:get_sector()
+			local loader = key and self.loaders[key]
+			if loader then
+				loader:update(secs)
 			end
-			-- Unload the sector.
-			self:unload_sector(k)
 		end
 	end
-	-- Finish the transaction.
-	if written > 0 then self.database:query("END TRANSACTION;") end
+	-- Update sector loaders.
+	--
+	-- This updates only one loader per frame. Iteration works like with
+	-- pairs() but is restarted if new loaders are added. This allows
+	-- incremental updated while accounting for the limitations of next().
+	for i = 1,10 do
+		local key,loader = next(self.loaders, self.loaders_iterator)
+		self.loaders_iterator = key
+		if loader and not loader:update(secs) then
+			self.loaders[key] = nil
+		end
+	end
+	-- Unload unused sectors.
+	--
+	-- Like above, this processes one sector per frame. If the sector
+	-- has been unused for a while, it will be unloaded. When running a
+	-- server, the sector will also be saved if it was fully loaded.
+	if self.unload_time then
+		local key = next(self.sectors, self.sectors_iterator)
+		self.sectors_iterator = key
+		local age = key and Program:get_sector_idle(key)
+		if age and age > self.unload_time then
+			if self.database and not self.loaders[key] then
+				self:save_sector(key)
+			end
+			self:unload_sector(key)
+		end
+	end
 end
 
 --- Waits for a sector to finish loading.
@@ -159,6 +178,7 @@ SectorManager.wait_sector_load = function(self, sector)
 	if not loader then return end
 	loader:finish()
 	self.loaders[sector] = nil
+	self.loaders_iterator = nil
 end
 
 return SectorManager

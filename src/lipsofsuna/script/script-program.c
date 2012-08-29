@@ -293,9 +293,22 @@ static void Program_get_sectors (LIScrArgs* args)
 	LIALG_U32DIC_FOREACH (iter, program->sectors->sectors)
 	{
 		sector = iter.value;
-		idle = (int) time (NULL) - sector->stamp;
+		idle = lisys_time (NULL) - (time_t) sector->stamp;
 		liscr_args_setf_float (args, iter.key, idle);
 	}
+}
+
+static void Program_get_sector_idle (LIScrArgs* args)
+{
+	int id;
+	LIAlgSector* sector;
+	LIMaiProgram* program;
+
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	if (!liscr_args_geti_int (args, 0, &id))
+		return;
+	sector = lialg_u32dic_find (program->sectors->sectors, id);
+	liscr_args_seti_int (args, lisys_time (NULL) - (time_t) sector->stamp);
 }
 
 static void Program_get_sector_size (LIScrArgs* args)
@@ -368,6 +381,7 @@ void liscr_script_program (
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_quit", Program_get_quit);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_quit", Program_set_quit);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_sectors", Program_get_sectors);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_sector_idle", Program_get_sector_idle);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_sector_size", Program_get_sector_size);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_sleep", Program_get_sleep);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_sleep", Program_set_sleep);

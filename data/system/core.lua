@@ -199,6 +199,14 @@ Program.set_quit = function(self, v)
 	Los.program_set_quit(v)
 end
 
+--- Gets the idle time of a sector.
+-- @param self Program class.
+-- @param id Sector ID.
+-- @return Age in seconds, or nil.
+Program.get_sector_idle = function(self, id)
+	return Los.program_get_sector_idle(id)
+end
+
 --- Gets the dictionary of active sector IDs.
 -- @param self Program class.
 -- @return Dictionary of number keys and boolean values.
