@@ -26,7 +26,11 @@ end
 -- @return New models.
 Material.new = function(clss, args)
 	local self = instfunc(clss, args)
+	self.effect_build = args.effect_build
+	self.effect_collapse = args.effect_collapse
 	self.magma = args.magma
+	self.mining_materials = args.mining_materials
+	self.mining_transform = args.mining_transform
 	clss.dict_id[self:get_id()] = self
 	clss.dict_name[self:get_name()] = self
 	return self
