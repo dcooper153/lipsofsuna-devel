@@ -1,4 +1,4 @@
---- TODO:doc
+--- Damage calculation and applying helpers.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -11,10 +11,17 @@
 local Class = require("system/class")
 local Damage = require("core/server/damage")
 
---- TODO:doc
+--- Damage calculation and applying helpers.
 -- @type Combat
 local Combat = Class("Combat")
 
+--- Calculates and applies the damage of a melee impact.
+-- @param self Combat class.
+-- @param attacker Actor who cast the spell.
+-- @param weapon Item used for the attack, or nil.
+-- @param point Impact point in world space.
+-- @param defender Hit object, or nil.
+-- @param tile Hit tile, or nil.
 Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, tile)
 	-- Calculate the damage.
 	local damage = Damage()
@@ -36,7 +43,7 @@ Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, ti
 	-- Apply object damage.
 	if defender then
 		-- Knockback the defender.
-		defender:impulse{impulse = attacker:get_rotation() * Vector(0, 0, -100)}
+		defender:impulse{impulse = Vector(0,0,-100):transform(attacker:get_rotation())}
 		-- Stagger the attacker.
 		if defender.blocking then
 			if Program:get_time() - defender.blocking > defender.spec.blocking_delay then
@@ -69,6 +76,14 @@ Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, ti
 	end
 end
 
+--- Applies the damage of a ranged impact.
+-- @param self Combat class.
+-- @param attacker Actor who cast the spell.
+-- @param projectile Item used as the projectile.
+-- @param damage Damage information.
+-- @param point Impact point in world space.
+-- @param defender Hit object, or nil.
+-- @param tile Hit tile, or nil.
 Combat.apply_ranged_impact = function(self, attacker, projectile, damage, point, defender, tile)
 	-- Apply defender's status.
 	if defender then
@@ -82,7 +97,7 @@ Combat.apply_ranged_impact = function(self, attacker, projectile, damage, point,
 	-- Apply object damage.
 	if defender then
 		-- Knockback the defender.
-		defender:impulse{impulse = projectile:get_rotation() * Vector(0, 0, -100)}
+		defender:impulse{impulse = Vector(0,0,-100):transform(projectile:get_rotation())}
 		-- Damage the defender.
 		local args = {owner = attacker, object = defender}
 		for name,value in pairs(damage.influences) do
@@ -95,6 +110,12 @@ Combat.apply_ranged_impact = function(self, attacker, projectile, damage, point,
 	end
 end
 
+--- Calculates the damage of a ranged impact.
+-- @param self Combat class.
+-- @param attacker Actor who cast the spell.
+-- @param weapon Item used for the attack, or nil.
+-- @param projectile Item used as the projectile.
+-- @return Damage information.
 Combat.calculate_ranged_damage = function(self, attacker, weapon, projectile)
 	local damage = Damage()
 	if weapon then
@@ -107,6 +128,45 @@ Combat.calculate_ranged_damage = function(self, attacker, weapon, projectile)
 	return damage
 end
 
+--- Applies the effect of a ranged spell on impact.
+-- @param self Combat class.
+-- @param attacker Actor who cast the spell.
+-- @param projectile Spell object used as the projectile.
+-- @param effect Effectspec name.
+-- @param point Impact point in world space.
+-- @param defender Hit object, or nil.
+-- @param tile Hit tile, or nil.
+-- @return True if the effect is still alive.
+Combat.apply_ranged_spell_impact = function(self, attacker, projectile, effect, point, defender, tile)
+	-- Find the effect spec.
+	local espec = Feateffectspec:find{name = effect}
+	if not espec then return end
+	-- Calculate the damage.
+	local damage = Damage(espec.influences)
+	damage:apply_defender_vulnerabilities(defender)
+	-- Play impact effects.
+	for name in pairs(damage:get_impact_effects()) do
+		Server:world_effect(point, name)
+	end
+	-- Knockback the defender.
+	if defender then
+		defender:impulse{impulse = Vector(0,0,-100):transform(projectile:get_rotation())}
+	end
+	-- Apply the damage.
+	local absorb
+	local args = {owner = attacker, object = defender, tile = tile}
+	for name,value in pairs(damage.influences) do
+		local effect = Feateffectspec:find{name = name}
+		if effect and effect.ranged then
+			args.value = value
+			if not effect:ranged(args) then
+				absorb = true
+			elseif absorb == nil then
+				absorb = false
+			end
+		end
+	end
+	return not absorb
+end
+
 return Combat
-
-

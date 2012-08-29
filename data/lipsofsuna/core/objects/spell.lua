@@ -1,4 +1,4 @@
---- TODO:doc
+--- Base class for spell objects.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -9,9 +9,10 @@
 -- @alias Spell
 
 local Class = require("system/class")
+local Combat = require("core/server/combat")
 local SimulationObject = require("core/objects/simulation")
 
---- TODO:doc
+--- Base class for spell objects.
 -- @type Spell
 local Spell = Class("Spell", SimulationObject)
 Spell.dict_id = setmetatable({}, {__mode = "kv"})
@@ -48,30 +49,15 @@ Spell.contact_cb = function(self, result)
 	-- Make sure that applicable.
 	if not self:get_visible() then return end
 	if result.object == self.owner then return end
-	-- Create the arguments for collision callbacks.
-	local args = {
-		object = result.object,
-		owner = self.owner,
-		point = result.point,
-		projectile = self,
-		tile = result.tile}
-	-- Apply an impulse to the target.
-	self.feat:apply_impulse(args)
-	self.feat:play_effects_impact(args)
 	-- Call the collision callback of each effect.
 	-- Effects can remove themselves from the feat by returning false.
 	local left = 0
 	for k,v in pairs(self.feat.effects) do
 		local effect = Feateffectspec:find{name = v[1]}
-		if effect and effect.ranged then
-			local feat = Feat{animation = self.feat.animation, effects = {v}}
-			if not feat:apply_ranged(args) then
-				self.feat.effects[k] = nil
-			else
-				left = left + 1
-			end
-		else
+		if not Combat:apply_ranged_spell_impact(self.owner, self, v[1], result.point, result.object, result.tile) then
 			self.feat.effects[k] = nil
+		else
+			left = left + 1
 		end
 	end
 	-- Detach if no effects were left.
@@ -80,6 +66,9 @@ Spell.contact_cb = function(self, result)
 	end
 end
 
+--- Fires the spell.
+-- @param self Spell.
+-- @param args Arguments.
 Spell.fire = function(self, args)
 	local a = args or {}
 	a.collision = true
@@ -91,6 +80,9 @@ Spell.fire = function(self, args)
 	return ret
 end
 
+--- Updates the spell.
+-- @param self Spell.
+-- @param secs Seconds since the last update.
 Spell.update = function(self, secs)
 	if not self:get_visible() then return end
 	if self:has_server_data() then
@@ -102,9 +94,9 @@ Spell.update = function(self, secs)
 	SimulationObject.update(self, secs)
 end
 
+--- Prevents spell from being saved.
+-- @param self Spell.
 Spell.write_db = function(self)
 end
 
 return Spell
-
-

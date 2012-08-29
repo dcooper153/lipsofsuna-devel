@@ -1,4 +1,4 @@
---- TODO:doc
+--- Provides projectile movement to objects.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -11,10 +11,18 @@
 local Class = require("system/class")
 local Combat = require("core/server/combat")
 
---- TODO:doc
+--- Provides projectile movement to objects.
 -- @type ProjectileController
 local ProjectileController = Class("ProjectileController")
 
+--- Creates a new projectile controller.
+-- @param clss ProjectileController class.
+-- @param attacker Actor who fired the projectile.
+-- @param projectile Contrelled item.
+-- @param damage Damage information.
+-- @param speed Flight speed.
+-- @param speedline True to instructs clients to render a speedline effect.
+-- @return ProjectileController.
 ProjectileController.new = function(clss, attacker, projectile, damage, speed, speedline)
 	local self = Class.new(clss)
 	self.attacker = attacker
@@ -25,6 +33,8 @@ ProjectileController.new = function(clss, attacker, projectile, damage, speed, s
 	return self
 end
 
+--- Activates the controller and attaches it to the object.
+-- @param self ProjectileController.
 ProjectileController.attach = function(self)
 	-- Set the projectile controls.
 	self.projectile.controller = self
@@ -50,6 +60,8 @@ ProjectileController.attach = function(self)
 	end
 end
 
+--- Deactivates the controller and removes it from the object.
+-- @param self ProjectileController.
 ProjectileController.detach = function(self)
 	self.projectile:set_contact_events(false)
 	self.projectile.controller = nil
@@ -57,6 +69,9 @@ ProjectileController.detach = function(self)
 	self.projectile:detach()
 end
 
+--- Handles physics contacts.
+-- @param self ProjectileController.
+-- @param result Contact result.
 ProjectileController.handle_contact = function(self, result)
 	-- Apply the damage.
 	if result.object == self.attacker then return end
@@ -65,6 +80,9 @@ ProjectileController.handle_contact = function(self, result)
 	self:detach()
 end
 
+--- Updates the controller.
+-- @param self ProjectileController.
+-- @param secs Seconds since the last update.
 ProjectileController.update = function(self, secs)
 	-- Update the destruction timer.
 	if self.destruction_timer then
@@ -77,5 +95,3 @@ ProjectileController.update = function(self, secs)
 end
 
 return ProjectileController
-
-
