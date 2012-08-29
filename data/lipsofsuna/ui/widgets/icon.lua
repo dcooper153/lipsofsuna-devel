@@ -26,3 +26,7 @@ Widgets.Uiicon.reshaped = function(self)
 		source_position = icon.offset,
 		source_tiling = {0,icon.size[1],0,0,icon.size[2],0}}
 end
+
+Widgets.Uiicon.set_rotation = function(self, v)
+	self.rotation = v
+end

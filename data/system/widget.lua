@@ -289,9 +289,9 @@ end
 -- reshape functions of widgets. This is done with a global variable.
 __widget_reshape = function(handle)
 	local w = __userdata_lookup[handle]
-	if w and w.reshaped then w:reshaped() end
+	if w and w.reshaped then
+		w:reshaped()
+	end
 end
 
 return Widget
-
-

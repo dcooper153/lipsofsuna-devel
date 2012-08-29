@@ -15,6 +15,7 @@ local Class = require("system/class")
 Theme = Class("Theme")
 Theme.themes = {
 	{
+		scale = 1,
 		help_text_width = 175,
 		help_title_height = 20,
 		text_color_1 = {0,0,0,1},
@@ -32,6 +33,7 @@ Theme.themes = {
 		width_widget_1 = 300
 	},
 	{
+		scale = 1.5,
 		help_text_width = 235,
 		help_title_height = 26,
 		text_color_1 = {0,0,0,1},
@@ -49,6 +51,7 @@ Theme.themes = {
 		width_widget_1 = 450
 	},
 	{
+		scale = 2,
 		help_text_width = 295,
 		help_title_height = 32,
 		text_color_1 = {0,0,0,1},
