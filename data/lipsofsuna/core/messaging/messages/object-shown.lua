@@ -27,7 +27,7 @@ Message{
 		end
 		-- Header.
 		local flags = 0
-		local data = {"uint32", o.id, "uint32", flags}
+		local data = {"uint32", o:get_id(), "uint32", flags}
 		-- Spec.
 		if o.spec.type ~= "object" then
 			flags = flags + FlagType.SPEC
