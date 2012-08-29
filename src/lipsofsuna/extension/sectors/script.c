@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -82,7 +82,8 @@ static void Sectors_get_sector_idle (LIScrArgs* args)
 	if (!liscr_args_geti_int (args, 0, &id))
 		return;
 	sector = lialg_u32dic_find (module->program->sectors->sectors, id);
-	liscr_args_seti_int (args, lisys_time (NULL) - (time_t) sector->stamp);
+	if (sector != NULL)
+		liscr_args_seti_int (args, lisys_time (NULL) - (time_t) sector->stamp);
 }
 
 static void Sectors_get_sector_size (LIScrArgs* args)
