@@ -116,5 +116,3 @@ Trading.update = function(self, player)
 end
 
 return Trading
-
-

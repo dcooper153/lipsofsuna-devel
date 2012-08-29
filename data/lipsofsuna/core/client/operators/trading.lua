@@ -25,7 +25,7 @@ Operators.trading.get_buy_items = function(self)
 		if item then
 			table.insert(items, {
 				text = item.spec.name,
-				count = item:get_count(),
+				count = item.count,
 				icon = item.spec.icon})
 		else
 			table.insert(items, false)
@@ -72,7 +72,7 @@ Operators.trading.get_shop_items = function(self)
 	for index,item in ipairs(self.data.trading.shop) do
 		table.insert(items, {
 			text = item.spec.name,
-			count = item:get_count(),
+			count = item.count,
 			icon = item.spec.icon})
 	end
 	return items
@@ -202,7 +202,7 @@ Operators.trading.notify_server = function(self)
 	for k,index in pairs(self.data.trading.sell) do
 		local item = object.inventory:get_object_by_index(index)
 		if item then
-			table.insert(sell, {index, item.count})
+			table.insert(sell, {index, item:get_count()})
 		else
 			self.data.trading.buy[k] = nil
 		end

@@ -99,5 +99,3 @@ Crafting.get_requiring_items = function(clss, spec)
 	end
 	return items
 end
-
-

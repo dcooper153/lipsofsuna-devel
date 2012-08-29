@@ -200,16 +200,18 @@ Itemspec.get_trading_value = function(self)
 		end
 	end
 	local craft = CraftingRecipeSpec:find{name = self.name}
-	local req = Crafting:get_requiring_items(craft)
-	if #req > 0 then
-		self.value = value
-		local awg = 0
-		for k,v in pairs(req) do
-			local spec = Itemspec:find{name = v}
-			if spec then awg = awg + spec:get_trading_value() end
+	if craft then
+		local req = Crafting:get_requiring_items(craft)
+		if #req > 0 then
+			self.value = value
+			local awg = 0
+			for k,v in pairs(req) do
+				local spec = Itemspec:find{name = v}
+				if spec then awg = awg + spec:get_trading_value() end
+			end
+			awg = awg / #req
+			value = value + 0.05 * awg
 		end
-		awg = awg / #req
-		value = value + 0.05 * awg
 	end
 	-- Cache the value.
 	self.value = value
@@ -227,5 +229,3 @@ Itemspec.get_use_actions = function(self)
 	end
 	return res
 end
-
-
