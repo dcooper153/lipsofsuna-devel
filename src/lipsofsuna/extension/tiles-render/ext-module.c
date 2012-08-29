@@ -41,6 +41,10 @@ static int private_process_result (
 static void private_remove_redundant_tasks (
 	LIExtBuildTask** tasks);
 
+static LIExtBuildTask* private_select_task (
+	LIExtModule*     self,
+	LIExtBuildTask** tasks);
+
 static int private_tick (
 	LIExtModule* self,
 	float        secs);
@@ -68,6 +72,9 @@ LIExtModule* liext_tiles_render_new (
 	if (self == NULL)
 		return NULL;
 	self->program = program;
+	self->viewer = limat_transform_identity ();
+
+	/* Allocate the task mutex. */
 	self->tasks.mutex = lisys_mutex_new ();
 	if (self->tasks.mutex == NULL)
 	{
@@ -115,6 +122,10 @@ LIExtModule* liext_tiles_render_new (
 		liext_tiles_render_free (self);
 		return NULL;
 	}
+
+	/* Register classes. */
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_VOXEL_RENDER, self);
+	liext_script_voxel_render (program->script);
 
 	return self;
 }
@@ -175,6 +186,24 @@ void liext_tiles_render_clear_all (
 		block = iter.value;
 		liext_tiles_render_block_clear (block);
 	}
+}
+
+void liext_tiles_render_set_viewer_position (
+	LIExtModule*       self,
+	const LIMatVector* value)
+{
+	lisys_mutex_lock (self->tasks.mutex);
+	self->viewer.position = *value;
+	lisys_mutex_unlock (self->tasks.mutex);
+}
+
+void liext_tiles_render_set_viewer_rotation (
+	LIExtModule*           self,
+	const LIMatQuaternion* value)
+{
+	lisys_mutex_lock (self->tasks.mutex);
+	self->viewer.rotation = *value;
+	lisys_mutex_unlock (self->tasks.mutex);
 }
 
 /*****************************************************************************/
@@ -321,6 +350,43 @@ static void private_remove_redundant_tasks (
 	}
 }
 
+static LIExtBuildTask* private_select_task (
+	LIExtModule*     self,
+	LIExtBuildTask** tasks)
+{
+	float score;
+	float best_score = 0.0f;
+	LIExtBuildTask* best = NULL;
+	LIExtBuildTask* best_prev = NULL;
+	LIExtBuildTask* task;
+	LIExtBuildTask* task_prev;
+
+	/* Find the task with the highest score. */
+	task_prev = NULL;
+	for (task = *tasks ; task != NULL ; task = task->next)
+	{
+		score = liext_tiles_build_task_calculate_score (task, &self->viewer);
+		if (best == NULL || score < best_score)
+		{
+			best_score = score;
+			best = task;
+			best_prev = task_prev;
+		}
+		task_prev = task;
+	}
+	if (best == NULL)
+		return NULL;
+
+	/* Remove from the list. */
+	if (best_prev == NULL)
+		*tasks = best->next;
+	else
+		best_prev->next = best->next;
+	best->next = NULL;
+
+	return best;
+}
+
 static int private_tick (
 	LIExtModule* self,
 	float        secs)
@@ -391,11 +457,9 @@ static void private_worker_thread (
 	{
 		/* Get the next task. */
 		private_remove_redundant_tasks (&self->tasks.pending);
-		task = self->tasks.pending;
+		task = private_select_task (self, &self->tasks.pending);
 		if (task == NULL)
 			break;
-		self->tasks.pending = task->next;
-		task->next = NULL;
 		lisys_mutex_unlock (self->tasks.mutex);
 
 		/* Process the task. */

@@ -27,6 +27,7 @@ local Sound = require("system/sound")
 local TerrainSync = require(Mod.path .. "terrain-sync")
 local ThirdPersonCamera = require(Mod.path .. "third-person-camera")
 local UnlockManager = require("core/server/unlock-manager")
+local VoxelRender = require("system/tiles-render")
 
 --- TODO:doc
 -- @type Client
@@ -249,6 +250,8 @@ Client.update_camera = function(self)
 	Program:set_camera_near(self.camera:get_near())
 	Program:set_camera_position(self.camera:get_position())
 	Program:set_camera_rotation(self.camera:get_rotation())
+	VoxelRender:set_viewer_position(self.camera:get_position())
+	VoxelRender:set_viewer_rotation(self.camera:get_rotation())
 	local mode = Program:get_video_mode()
 	local viewport = {0, 0, mode[1], mode[2]}
 	self.camera:set_viewport(viewport)

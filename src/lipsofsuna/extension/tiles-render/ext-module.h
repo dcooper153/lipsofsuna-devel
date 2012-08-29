@@ -26,13 +26,14 @@ typedef struct _LIExtBlock LIExtBlock;
 typedef struct _LIExtBuildTask LIExtBuildTask;
 typedef struct _LIExtModule LIExtModule;
 
-#define LIEXT_SCRIPT_TILES_RENDER "TilesRender"
+#define LIEXT_SCRIPT_VOXEL_RENDER "VoxelRender"
 
 struct _LIExtModule
 {
 	LIAlgMemdic* blocks;
 	LICalHandle calls[3];
 	LIMaiProgram* program;
+	LIMatTransform viewer;
 	LIRenRender* render;
 	LIVoxManager* voxels;
 	struct
@@ -59,5 +60,18 @@ int liext_tiles_render_build_block (
 
 void liext_tiles_render_clear_all (
 	LIExtModule* self);
+
+void liext_tiles_render_set_viewer_position (
+	LIExtModule*       self,
+	const LIMatVector* value);
+
+void liext_tiles_render_set_viewer_rotation (
+	LIExtModule*           self,
+	const LIMatQuaternion* value);
+
+/*****************************************************************************/
+
+void liext_script_voxel_render (
+	LIScrScript* self);
 
 #endif

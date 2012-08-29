@@ -31,6 +31,7 @@ LIExtBuildTask* liext_tiles_build_task_new (
 {
 	int blockw;
 	LIExtBuildTask* self;
+	LIMatVector center;
 	LIVoxManager* manager;
 
 	/* Allocate self. */
@@ -47,8 +48,14 @@ LIExtBuildTask* liext_tiles_build_task_new (
 	self->addr.block[1] = event->block[1];
 	self->addr.block[2] = event->block[2];
 
-	/* Create a new terrain builder. */
+	/* Calculate the center position. */
 	blockw = manager->tiles_per_line / manager->blocks_per_line;
+	center.x = event->sector[0] * manager->tiles_per_line + event->block[0] * blockw * 0.5f;
+	center.y = event->sector[1] * manager->tiles_per_line + event->block[1] * blockw * 0.5f;
+	center.z = event->sector[2] * manager->tiles_per_line + event->block[2] * blockw * 0.5f;
+	self->center = limat_vector_multiply (center, manager->tile_width);
+
+	/* Create a new terrain builder. */
 	self->builder = livox_builder_new (manager,
 		manager->tiles_per_line * event->sector[0] + blockw * event->block[0],
 		manager->tiles_per_line * event->sector[1] + blockw * event->block[1],
@@ -71,6 +78,30 @@ void liext_tiles_build_task_free (
 	if (self->model != NULL)
 		limdl_model_free (self->model);
 	lisys_free (self);
+}
+
+float liext_tiles_build_task_calculate_score (
+	LIExtBuildTask*       self,
+	const LIMatTransform* viewer)
+{
+	float dot;
+	float dist;
+	LIMatVector dir;
+	LIMatVector diff;
+
+	/* Calculate the distance. */
+	diff = limat_vector_subtract (self->center, viewer->position);
+	diff.y = diff.y * 2.0f;
+	dist = limat_vector_get_length (diff);
+
+	/* Calculate the view cone factor. */
+	dir = limat_vector_init (0.0f, 0.0f, 1.0f);
+	dir = limat_quaternion_transform (viewer->rotation, dir);
+	diff = limat_vector_normalize (diff);
+	dot = limat_vector_dot (diff, dir);
+
+	/* FIXME: Is the sign correct? */
+	return dist * (1.5f + 0.5f * dot);
 }
 
 int liext_tiles_build_task_compare (

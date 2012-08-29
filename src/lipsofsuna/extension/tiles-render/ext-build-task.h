@@ -24,6 +24,7 @@ struct _LIExtBuildTask
 {
 	LIVoxBlockAddr addr;
 	LIVoxBuilder* builder;
+	LIMatVector center;
 	LIMatVector offset;
 	LIMdlModel* model;
 	LIExtBuildTask* next;
@@ -35,6 +36,10 @@ LIAPICALL (LIExtBuildTask*, liext_tiles_build_task_new, (
 
 LIAPICALL (void, liext_tiles_build_task_free, (
 	LIExtBuildTask* self));
+
+LIAPICALL (float, liext_tiles_build_task_calculate_score, (
+	LIExtBuildTask*       self,
+	const LIMatTransform* viewer));
 
 LIAPICALL (int, liext_tiles_build_task_compare, (
 	LIExtBuildTask* self,
