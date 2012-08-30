@@ -36,6 +36,15 @@ SectorManager.new = function(clss, database, unloading)
 	return self
 end
 
+--- Returns true if the sector has finished loading.
+-- @param self SectorManager.
+-- @param sector Sector ID.
+SectorManager.is_sector_loaded = function(self, sector)
+	if not self.sectors[sector] then return end
+	if self.loaders[sector] then return end
+	return true
+end
+
 --- Reads a sector from the database.
 -- @param self SectorManager.
 -- @param sector Sector ID.
