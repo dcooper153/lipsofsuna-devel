@@ -419,7 +419,7 @@ Message{
 		elseif args.type == "spell" then
 			spec = Spellspec:find{name = args.spec}
 		end
-		local o = Simulation:create_object_by_spec(spec, {id = args.id, model = args.model})
+		local o = Simulation:create_object_by_spec(spec, args.id)
 		-- Self.
 		if args.self then
 			update_player_object(o)
@@ -446,11 +446,11 @@ Message{
 		end
 		-- Position.
 		if args.position then
-			o:set_position(args.position, true)
+			o:set_position(args.position)
 		end
 		-- Rotation.
 		if args.rotation then
-			o:set_rotation(args.rotation, true)
+			o:set_rotation(args.rotation)
 		end
 		-- Head style.
 		if args.head_style then
@@ -481,9 +481,6 @@ Message{
 			o.face_style = args.face_style
 		end
 		-- Show the object.
-		if o.prediction then
-			o.prediction:warp()
-		end
 		o:set_visible(true)
 		o.render:init(o)
 		-- Animations.

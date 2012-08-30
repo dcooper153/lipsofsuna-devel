@@ -1,4 +1,4 @@
---- TODO:doc
+--- Provides a simple graphical benchmark.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -15,10 +15,13 @@ local Class = require("system/class")
 local Light = require("system/light")
 local Simulation = require("core/client/simulation")
 
---- TODO:doc
+--- Provides a simple graphical benchmark.
 -- @type Benchmark
 Benchmark = Class("Benchmark")
 
+--- Creates the benchmark.
+-- @param clss Benchmark class.
+-- @return Benchmark.
 Benchmark.new = function(clss)
 	local self = Class.new(clss)
 	-- Initialize the game.
@@ -32,12 +35,18 @@ Benchmark.new = function(clss)
 		local o = Simulation:create_object_by_spec(spec)
 		local a = i/20*2*math.pi
 		o:set_position(Vector(500,500,500) + Vector(math.cos(a), 0, math.sin(a)):multiply(i/4), true)
+		o:set_visible(true)
 		o.render:init(o)
 		o.render:add_animation(anims[i % 3 + 1])
-		o:set_visible(true)
 		self.objects[o:get_id()] = o
 		self.object = o
 	end
+	-- Create a static object.
+	local spec = Staticspec:find{name = "statictree1"}
+	local o = Simulation:create_object_by_spec(spec)
+	o:set_position(Vector(500,500,497))
+	o:set_visible(true)
+	o.render:init(o)
 	-- Setup terrain benchmarking.
 	self.terrain_offset = Vector(500,500,500):multiply(Voxel.tile_scale):floor():subtract_xyz(10,1,7)
 	self.terrain_timer1 = 0
@@ -57,6 +66,8 @@ Benchmark.new = function(clss)
 	return self
 end
 
+--- Removes benchmark objects from the scene.
+-- @param self Benchmark.
 Benchmark.close = function(self)
 	-- Restore the normal map state.
 	Game.objects:detach_all()
@@ -105,4 +116,4 @@ Benchmark.update = function(self, secs)
 	end
 end
 
-
+return Benchmark

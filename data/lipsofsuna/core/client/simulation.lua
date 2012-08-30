@@ -15,6 +15,7 @@ local Item = require("core/objects/item")
 local Obstacle = require("core/objects/obstacle")
 local Physics = require("system/physics")
 local Spell = require("core/objects/spell")
+local Staticobject = require("core/objects/static")
 
 --- TODO:doc
 -- @type Simulation
@@ -23,15 +24,11 @@ local Simulation = Class("Simulation")
 --- Creates an object by a spec.
 -- @param self Simulation.
 -- @param spec Object spec.
--- @param args Table of argument, or nil.
+-- @param id Unique ID, or nil.
 -- @return Object.
-Simulation.create_object_by_spec = function(self, spec, args)
+Simulation.create_object_by_spec = function(self, spec, id)
 	-- Prepare the arguments.
-	local a = {spec = spec, type = spec.type}
-	if args then
-		a.id = args.id
-		a.model = args.model
-	end
+	local a = {id = id, spec = spec}
 	-- Create the object.
 	local o
 	if spec.type == "actor" then
@@ -42,6 +39,8 @@ Simulation.create_object_by_spec = function(self, spec, args)
 		o = Spell(a)
 	elseif spec.type == "obstacle" then
 		o = Obstacle(a)
+	elseif spec.type == "static" then
+		o = Staticobject(a)
 	else
 		return
 	end

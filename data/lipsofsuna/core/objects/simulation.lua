@@ -708,6 +708,12 @@ SimulationObject.set_visible = function(self, v)
 		local name = self:get_model_name()
 		if name then self:set_model(Main.models:find_by_name(name)) end
 	end
+	-- Initialize prediction when shown.
+	if v and self.prediction then
+		self:set_position(self:get_position(), true)
+		self:set_rotation(self:get_rotation(), true)
+		self.prediction:warp()
+	end
 end
 
 --- Sets the velocity of the object.

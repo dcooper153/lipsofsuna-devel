@@ -1,4 +1,4 @@
-local Staticobject = require("core/objects/static")
+local Simulation = not Settings.server and require("core/client/simulation")
 
 Message{
 	name = "create static objects",
@@ -40,18 +40,22 @@ Message{
 		return {objects}
 	end,
 	server_to_client_handle = function(self, objects)
-		-- Create the physics objects.
 		if not Server.initialized then
+			-- Create the static objects.
 			for k,v in pairs(objects) do
 				local spec = Staticspec:find{name = v[2]}
 				if spec then
-					Staticobject{id = v[1], spec = spec,
-						position = v[3], rotation = v[4], realized = true}
+					local o = Simulation:create_object_by_spec(spec, v[1])
+					o:set_position(v[3])
+					o:set_rotation(v[4])
+					o:set_visible(true)
+					o.render:init(o)
 				end
 			end
-		end
-		-- Initialize the render objects.
-		for k,v in pairs(Game.static_objects_by_id) do
-			v.render:init(v)
+		else
+			-- Initialize render objects.
+			for k,v in pairs(Game.static_objects_by_id) do
+				v.render:init(v)
+			end
 		end
 	end}
