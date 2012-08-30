@@ -323,9 +323,9 @@ Utils.explosion = function(clss, point, radius)
 	for k1,v1 in pairs(Game.objects:find_by_point(point, r2)) do
 		local diff = v1:get_position() - point
 		local frac = diff.length / r2
-		local mult = 10 * math.min(100, v1:get_mass())
+		local mult = 10 * math.min(100, v1.physics:get_mass())
 		local impulse = diff:normalize() * (mult * (1 - 0.3 * frac))
-		v1:impulse{impulse = impulse, point = Vector()}
+		v1.physics:impulse(impulse)
 		v1:damaged{amount = 40 * (1 - frac), type = "explosion"}
 	end
 end

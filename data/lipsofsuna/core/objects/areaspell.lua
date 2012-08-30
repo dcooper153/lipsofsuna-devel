@@ -26,9 +26,9 @@ local AreaSpell = Class("AreaSpell", Spell)
 -- @return Spell.
 AreaSpell.new = function(clss, args)
 	local self = Spell.new(clss, {feat = args.feat, owner = args.owner, spec = args.spec})
-	self:set_collision_mask(0)
+	self.physics:set_collision_mask(0)
 	self.timer = 1
-	self:set_physics("static")
+	self.physics:set_physics("static")
 	self.radius = args.radius
 	self.duration = args.duration
 	self:set_position(args.position)

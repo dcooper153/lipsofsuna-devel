@@ -38,18 +38,11 @@ static void private_update_state (
 
 /**
  * \brief Creates a new physics object.
- *
  * \param physics Physics system.
- * \param id Object ID.
- * \param model Physics model or NULL.
- * \param control_mode Simulation mode.
- * \return New object or NULL.
+ * \return New object, or NULL.
  */
 LIPhyObject* liphy_object_new (
-	LIPhyPhysics*    physics,
-	uint32_t         id,
-	LIPhyModel*      model,
-	LIPhyControlMode control_mode)
+	LIPhyPhysics* physics)
 {
 	LIPhyObject* self;
 	btVector3 position (0.0f, 0.0f, 0.0f);
@@ -59,11 +52,9 @@ LIPhyObject* liphy_object_new (
 	if (self == NULL)
 		return NULL;
 	self->physics = physics;
-	self->id = id;
-	self->model = model;
 	self->pointer.object = 1;
 	self->pointer.pointer = self;
-	self->control_mode = control_mode;
+	self->control_mode = LIPHY_CONTROL_MODE_STATIC;
 	self->config.friction_liquid = 0.5f;
 	self->config.gravity = limat_vector_init (0.0f, -10.0f, 0.0f);
 	self->config.gravity_liquid = limat_vector_init (0.0f, -2.0f, 0.0f);
@@ -89,14 +80,10 @@ LIPhyObject* liphy_object_new (
 	}
 
 	/* Add to dictionary. */
-	if (self->id)
+	if (!lialg_ptrdic_insert (physics->objects, self, self))
 	{
-		lisys_assert (!lialg_u32dic_find (physics->objects, id));
-		if (!lialg_u32dic_insert (physics->objects, id, self))
-		{
-			liphy_object_free (self);
-			return NULL;
-		}
+		liphy_object_free (self);
+		return NULL;
 	}
 
 	return self;
@@ -111,8 +98,7 @@ void liphy_object_free (
 	LIPhyObject* self)
 {
 	/* Remove from dictionary. */
-	if (self->id)
-		lialg_u32dic_remove (self->physics->objects, self->id);
+	lialg_ptrdic_remove (self->physics->objects, self);
 
 	/* Unrealize. */
 	self->flags &= ~PRIVATE_REALIZED;
@@ -529,7 +515,6 @@ void liphy_object_set_control_mode (
 
 /**
  * \brief Gets the physics engine for which this object was created.
- * 
  * \param self Object.
  * \return Physics engine.
  */
@@ -537,6 +522,29 @@ LIPhyPhysics* liphy_object_get_engine (
 	LIPhyObject* self)
 {
 	return self->physics;
+}
+
+/**
+ * \brief Sets the user-specified ID of the object.
+ * \param self Object.
+ * \param id Any integer.
+ */
+int liphy_object_get_external_id (
+	const LIPhyObject* self)
+{
+	return self->external_id;
+}
+
+/**
+ * \brief Gets the user-specified ID of the object.
+ * \param self Object.
+ * \return Previously set ID.
+ */
+void liphy_object_set_external_id (
+	LIPhyObject* self,
+	int          value)
+{
+	self->external_id = value;
 }
 
 /**

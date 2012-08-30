@@ -12,7 +12,7 @@ Actionspec{
 				if ground_hits < 30 then return end
 			end
 			-- Stop the tackle motion.
-			args.user:set_contact_events(false)
+			args.user.physics:set_contact_events(false)
 			self.contact_cb = nil
 			-- Apply the feat effects.
 			local args = {
@@ -24,11 +24,11 @@ Actionspec{
 			feat:apply_touch(args)
 			-- Bounce the target strongly.
 			if result.object then
-				result.object:impulse{impulse = self:get_rotation() * Vector(0, 400, -400)}
+				result.object.physics:impulse(Vector(0,400,-400):transform(self:get_rotation()))
 			end
 		end
 		args.user.contact_cb = callback
-		args.user:set_contact_events(true)
+		args.user.physics:set_contact_events(true)
 		-- Initialize the tackle motion
 		args.user:jump()
 		local vel = args.user:get_rotation() * Vector(0,0.25,-1) * 10
@@ -42,7 +42,7 @@ Actionspec{
 				if args.user.contact_cb ~= callback then break end
 				args.user:set_velocity(vel)
 			end
-			args.user:set_contact_events(false)
+			args.user.physics:set_contact_events(false)
 			args.user.contact_cb = nil
 		end)
 	end}

@@ -12,6 +12,7 @@ local Class = require("system/class")
 local Inventory = require("core/server/inventory")
 local Object = require("system/object")
 local Model = require("system/model")
+local PhysicsObject = require("system/physics-object")
 local Settings = require("common/settings")
 local Timer = require("system/timer")
 local ClientRenderObject = not Settings.server and require("core/client/client-render-object")
@@ -36,6 +37,9 @@ SimulationObject.new = function(clss, id)
 		self:set_id(Game.objects:get_free_id())
 	end
 	Game.objects:add(self)
+	-- Initialize the physics object.
+	self.physics = PhysicsObject()
+	self.physics:set_id(self:get_id())
 	-- Initialize client and server data.
 	self.inventory = Inventory(self:get_id())
 	if Game.enable_graphics then
@@ -54,7 +58,7 @@ end
 SimulationObject.contact_cb = function(self, result)
 	if not self.contact_args then
 		self.contact_args = nil
-		self:set_contact_events(false)
+		self.physics:set_contact_events(false)
 		return
 	end
 	if result.object == self.contact_args.owner then return end
@@ -69,7 +73,7 @@ SimulationObject.contact_cb = function(self, result)
 	self.contact_args.feat:apply_impulse(args)
 	self.contact_args.feat:apply(args)
 	self.contact_args = nil
-	self:set_contact_events(false)
+	self.physics:set_contact_events(false)
 	self:detach()
 	return true
 end
@@ -231,7 +235,7 @@ SimulationObject.fire = function(self, args)
 	-- Enable collision callback.
 	if args.collision then
 		self.contact_args = args
-		self:set_contact_events(true)
+		self.physics:set_contact_events(true)
 	end
 	-- Enable destruction timer.
 	if args.timer then
@@ -564,6 +568,18 @@ SimulationObject.read_db = function(self, db)
 	Server.object_database:load_fields(self)
 end
 
+--- Synchronizes the logical position and rotation with the physics state.
+-- @param self Object.
+SimulationObject.sync_transform = function(self)
+	local p,r = self.physics:get_position(),self.physics:get_rotation()
+	Object.set_position(self, p)
+	Object.set_rotation(self, r)
+	if self.render then
+		self.render:set_position(p)
+		self.render:set_rotation(r)
+	end
+end
+
 --- Writes the object to a database.
 -- @param self Object.
 -- @param db Database.
@@ -647,6 +663,14 @@ SimulationObject.get_bounding_box = function(self)
 	return Object.get_bounding_box(self)
 end
 
+--- Sets the model of the object.
+-- @param self Object.
+-- @param v Model, or nil.
+SimulationObject.set_model = function(self, v)
+	Object.set_model(self, v)
+	self.physics:set_model(v)
+end
+
 --- Gets the model name of the object.
 -- @param self Object.
 -- @return Model name, or empty string.
@@ -665,6 +689,20 @@ SimulationObject.set_model_name = function(self, v)
 	end
 end
 
+--- Gets the forwards movement rate of the object.
+-- @param self Object.
+-- @return Movement rate.
+SimulationObject.get_movement = function(self, value)
+	return self.physics:get_movement(value) or 0
+end
+
+--- Sets the forwards movement rate of the object.
+-- @param self Object.
+-- @param value Movement rate.
+SimulationObject.set_movement = function(self, value)
+	self.physics:set_movement(value)
+end
+
 --- Sets the position of the object.
 -- @param self Object.
 -- @param value Vector.
@@ -674,6 +712,7 @@ SimulationObject.set_position = function(self, value, predict)
 		self.prediction:set_target_position(value)
 	else
 		Object.set_position(self, value)
+		self.physics:set_position(value)
 		if self.render then
 			self.render:set_position(value)
 		end
@@ -689,10 +728,25 @@ SimulationObject.set_rotation = function(self, value, predict)
 		self.prediction:set_target_rotation(value)
 	else
 		Object.set_rotation(self, value)
+		self.physics:set_rotation(value)
 		if self.render then
 			self.render:set_rotation(value)
 		end
 	end
+end
+
+--- Gets the strafing rate of the object.
+-- @param self Object.
+-- @return Strafing rate.
+SimulationObject.get_strafing = function(self, value)
+	return self.physics:get_strafing(value) or 0
+end
+
+--- Sets the strafing rate of the object.
+-- @param self Object.
+-- @param value Strafing rate.
+SimulationObject.set_strafing = function(self, value)
+	self.physics:set_strafing(value)
 end
 
 --- Sets the visibility of the object.<br/>
@@ -701,6 +755,8 @@ end
 SimulationObject.set_visible = function(self, v)
 	-- Call the base class.
 	Object.set_visible(self, v)
+	-- Set the visibilty of the physics object.
+	self.physics:set_visible(v)
 	-- Set the activation status.
 	Game.objects:activate_object(self, v)
 	-- Ensure that visible objects have their models loaded.
@@ -716,6 +772,13 @@ SimulationObject.set_visible = function(self, v)
 	end
 end
 
+--- Gets the velocity of the object.
+-- @param self Object.
+-- @return Velocity vector.
+SimulationObject.get_velocity = function(self)
+	return self.physics:get_velocity()
+end
+
 --- Sets the velocity of the object.
 -- @param self Object.
 -- @param value Velocity vector.
@@ -724,7 +787,7 @@ SimulationObject.set_velocity = function(self, value, predict)
 	if self.prediction and predict then
 		self.prediction:set_target_velocity(value)
 	else
-		Object.set_velocity(self, value)
+		self.physics:set_velocity(value)
 	end
 end
 

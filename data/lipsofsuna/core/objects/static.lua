@@ -75,10 +75,11 @@ Staticobject.set_spec = function(self, value)
 	local spec = type(value) == "string" and Staticspec:find{name = value} or value
 	if not spec then return end
 	SimulationObject.set_spec(self, spec)
-	self:set_collision_group(spec.collision_group)
-	self:set_collision_mask(spec.collision_mask)
-	self:set_gravity(spec.gravity)
-	self:set_physics("static")
+	-- Configure physics.
+	self.physics:set_collision_group(spec.collision_group)
+	self.physics:set_collision_mask(spec.collision_mask)
+	self.physics:set_gravity(spec.gravity)
+	self.physics:set_physics("static")
 	-- Create the marker.
 	if spec.marker then
 		self.marker = Marker{name = spec.marker, position = self:get_position(), target = self:get_id()}

@@ -51,9 +51,6 @@ LIAPICALL (LIObjObject*, liobj_object_new, (
 LIAPICALL (void, liobj_object_free, (
 	LIObjObject* self));
 
-LIAPICALL (int, liobj_object_moved, (
-	LIObjObject* self));
-
 LIAPICALL (void, liobj_object_get_bounds, (
 	const LIObjObject* self,
 	LIMatAabb*         bounds));

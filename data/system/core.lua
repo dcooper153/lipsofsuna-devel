@@ -36,6 +36,12 @@ Program.debug_dump = function(self)
 	return Los.program_debug_dump()
 end
 
+--- Discards all events from the event queue.
+-- @param clss Program class.
+Program.discard_events = function(clss)
+	repeat until not Program:pop_event()
+end		
+
 --- Gets the filename of the calling script file.
 -- @param clss Program class.
 -- @param index Caller index in the hierarchy.

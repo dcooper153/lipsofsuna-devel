@@ -27,10 +27,10 @@
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
 #include <BulletCollision/NarrowPhaseCollision/btRaycastCallback.h>
 #include <BulletDynamics/Character/btKinematicCharacterController.h>
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/callback.h>
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/model.h>
+#include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/callback.h"
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/model.h"
 #include "physics-dynamics-world.hpp"
 #include "physics-types.h"
 
@@ -60,7 +60,7 @@ struct _LIPhyPhysics
 	LIAlgList* constraints;
 	LIAlgList* controllers;
 	LIAlgU32dic* models;
-	LIAlgU32dic* objects;
+	LIAlgPtrdic* objects;
 	LICalCallbacks* callbacks;
 };
 
@@ -111,8 +111,8 @@ struct _LIPhyPointer
 
 struct _LIPhyObject
 {
+	int external_id;
 	int flags;
-	uint32_t id;
 	char* shape_name;
 	float submerged;
 	LIMatVector center_of_mass;

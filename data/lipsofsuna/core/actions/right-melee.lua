@@ -29,6 +29,7 @@ local perform_attack = function(attacker, move)
 	Coroutine(function(t)
 		local apply = function(r)
 			-- Calculate the damage.
+			r.object = r.object and Game.objects:find_by_id(r.object)
 			Combat:apply_melee_impact(attacker, weapon, r.point, r.object, r.tile)
 			return true
 		end

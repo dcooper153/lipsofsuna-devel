@@ -74,7 +74,7 @@ end
 
 Feat.apply_impulse = function(self, args)
 	if args.object and args.owner then
-		args.object:impulse{impulse = args.owner:get_rotation() * Vector(0, 0, -100)}
+		args.object.physics:impulse(Vector(0,0,-100):transform(args.owner:get_rotation()))
 	end
 end
 

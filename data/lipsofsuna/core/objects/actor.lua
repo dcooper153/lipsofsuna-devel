@@ -25,8 +25,8 @@ Actor.serializer = ObjectSerializer{
 	{
 		name = "angular",
 		type = "vector",
-		get = function(self) return self:get_angular() end,
-		set = function(self, v) return self:set_angular(v) end
+		get = function(self) return self.physics:get_angular() end,
+		set = function(self, v) return self.physics:set_angular(v) end
 	},
 	{
 		name = "animation_profile",
@@ -132,7 +132,7 @@ Actor.new = function(clss, args)
 	self.skills = Skills(self:get_id())
 	self.stats = Stats(self:get_id())
 	if args then
-		if args.angular then self:set_angular(args.angular) end
+		if args.angular then self.physics:set_angular(args.angular) end
 		copy("animation_profile")
 		if args.beheaded then self:set_beheaded(true) end
 		copy("body_scale")
@@ -146,7 +146,7 @@ Actor.new = function(clss, args)
 		copy("home_point")
 		copy("jumped", 0)
 		copy("name")
-		self:set_physics(args.physics or "kinematic")
+		self.physics:set_physics(args.physics or "kinematic")
 		copy("random")
 		if args.rotation then self:set_rotation(args.rotation) end
 		if args.position then self:set_position(args.position) end
@@ -156,7 +156,7 @@ Actor.new = function(clss, args)
 		if args.spec then self:set_spec(args.spec) end
 		if args.dead then self:set_dead_state() end
 	else
-		self:set_physics("kinematic")
+		self.physics:set_physics("kinematic")
 		self.jumped = 0
 		self.carried_weight = 0
 	end
@@ -187,14 +187,14 @@ end
 Actor.clone = function(self)
 	-- TODO: Copy dialog variables?
 	return Actor{
-		angular = self:get_angular(),
+		angular = self.physics:get_angular(),
 		beheaded = self:get_beheaded(),
 		dead = self.dead,
 		eye_style = self.eye_style,
 		face_style = self.face_style,
 		hair_style = self.hair_style,
 		head_style = self.head_style,
-		physics = self:get_physics(),
+		physics = self.physics:get_physics(),
 		position = self:get_position(),
 		rotation = self:get_rotation(),
 		spec = self.spec}
@@ -248,8 +248,8 @@ Actor.calculate_speed = function(self)
 		s = math.max(1, s * 0.3)
 	end
 	-- Update speed.
-	if s ~= self:get_speed() then
-		self:set_speed(s)
+	if s ~= self.physics:get_speed() then
+		self.physics:set_speed(s)
 		self:calculate_animation()
 	end
 end
@@ -314,7 +314,7 @@ Actor.check_line_of_sight = function(self, args)
 		return not ret or (ret.point - dst).length < 0.5
 	elseif args.object then
 		local ret = Physics:cast_ray(src, dst, self)
-		if not ret or ret.object == args.object then return true end
+		if not ret or ret.object == args.object:get_id() then return true end
 	end
 end
 
@@ -573,23 +573,19 @@ Actor.jump = function(self)
 		local v = self:get_velocity()
 		self.jumped = t - 0.3
 		self.jumping = true
-		if v.y < self:get_speed() then
-			SimulationObject.jump(self, {impulse = Vector(v.x, self.spec.swim_force * self.spec.mass, v.z)})
+		if v.y < self.physics:get_speed() then
+			self.physics:jump(Vector(v.x, self.spec.swim_force * self.spec.mass, v.z))
 		end
 	else
 		-- Jumping.
-		if not self:get_ground() or self:get_burdened() then return end
+		if not self.physics:get_ground() or self:get_burdened() then return end
 		self.jumped = t
 		self.jumping = true
 		Server:object_effect(self, "jump1")
 		self:animate("jump")
-		Coroutine(function(thread)
-			Coroutine:sleep(self.spec.timing_jump * 0.02)
-			if not self:get_visible() then return end
-			local v = self:get_velocity()
-			local f = self.spec.mass * self.spec.jump_force * self.attributes.jump
-			SimulationObject.jump(self, {impulse = Vector(v.x, f, v.z)})
-		end)
+		local v = self:get_velocity()
+		local f = self.spec.mass * self.spec.jump_force * self.attributes.jump
+		self.physics:jump(Vector(v.x, f, v.z))
 	end
 end
 
@@ -660,8 +656,8 @@ Actor.resurrect = function(self)
 	if not self.dead then return end
 	-- Enable controls.
 	self.dead = nil
-	self:set_shape("default")
-	self:set_physics("kinematic")
+	self.physics:set_shape("default")
+	self.physics:set_physics("kinematic")
 	-- Enable stats.
 	self.stats.enabled = true
 	self.stats:set_value("health", 1)
@@ -781,7 +777,7 @@ Actor.update_actions = function(self, secs)
 		end
 		-- Landing.
 		self.jump_timer = (self.jump_timer or 0) + secs
-		if self.jump_timer > 0.2 and Program:get_time() - self.jumped > 0.8 and self:get_ground() then
+		if self.jump_timer > 0.2 and Program:get_time() - self.jumped > 0.8 and self.physics:get_ground() then
 			if not self.submerged or self.submerged < 0.3 then
 				self:animate("land ground")
 				Server:object_effect(self, self.spec.effect_landing)
@@ -1117,8 +1113,8 @@ Actor.set_dead_state = function(self, drop)
 	self.auto_attack = nil
 	self.jumping = nil
 	self.climbing = nil
-	self:set_shape("dead")
-	self:set_physics("rigid")
+	self.physics:set_shape("dead")
+	self.physics:set_physics("rigid")
 	-- Disable stats.
 	self.stats.enabled = false
 	self.stats:set_value("health", 0)
@@ -1182,12 +1178,12 @@ Actor.set_spec = function(self, v)
 	if self.spec == spec then return end
 	SimulationObject.set_spec(self, spec)
 	-- Configure physics.
-	self:set_collision_group(spec.collision_group)
-	self:set_collision_mask(spec.collision_mask)
-	self:set_friction_liquid(spec.water_friction)
-	self:set_gravity(spec.gravity)
-	self:set_gravity_liquid(spec.water_gravity)
-	self:set_mass(spec.mass)
+	self.physics:set_collision_group(spec.collision_group)
+	self.physics:set_collision_mask(spec.collision_mask)
+	self.physics:set_friction_liquid(spec.water_friction)
+	self.physics:set_gravity(spec.gravity)
+	self.physics:set_gravity_liquid(spec.water_gravity)
+	self.physics:set_mass(spec.mass)
 	-- Initialize stats and skills.
 	self.skills:clear()
 	for k in pairs(spec.skills) do
@@ -1287,9 +1283,9 @@ Actor.set_stat = function(self, s, v, m, diff)
 		-- Dead actors have a different collision shape. We switch between
 		-- the two when the health changes between zero and non-zero.
 		if v == 0 and self.animated then
-			self:set_shape("dead")
+			self.physics:set_shape("dead")
 		else
-			self:set_shape("default")
+			self.physics:set_shape("default")
 		end
 	end
 end

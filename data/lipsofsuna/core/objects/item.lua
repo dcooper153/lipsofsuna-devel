@@ -19,8 +19,8 @@ Item.serializer = ObjectSerializer{
 	{
 		name = "angular",
 		type = "vector",
-		get = function(self) return self:get_angular() end,
-		set = function(self, v) return self:set_angular(v) end
+		get = function(self) return self.physics:get_angular() end,
+		set = function(self, v) return self.physics:set_angular(v) end
 	},
 	{
 		name = "count",
@@ -63,7 +63,7 @@ Item.serializer = ObjectSerializer{
 Item.new = function(clss, args)
 	local self = SimulationObject.new(clss, args and args.id)
 	if args then
-		if args.angular then self:set_angular(args.angular) end
+		if args.angular then self.physics:set_angular(args.angular) end
 		if args.count then self:set_count(args.count) end
 		if args.looted then self.looted = args.looted end
 		if args.position then self:set_position(args.position) end
@@ -83,7 +83,7 @@ end
 Item.clone = function(self)
 	return Item{
 		spec = self.spec,
-		angular = self:get_angular(),
+		angular = self.physics:get_angular(),
 		position = self:get_position(),
 		rotation = self:get_rotation()}
 end
@@ -262,14 +262,14 @@ Item.set_spec = function(self, value)
 	if self:has_server_data() then
 		-- FIXME: Why does client side picking break if this is set by
 		-- the client when connected to a remote server?
-		self:set_physics("rigid")
-		self:set_mass(spec.mass)
+		self.physics:set_physics("rigid")
+		self.physics:set_mass(spec.mass)
 	end
-	self:set_collision_group(spec.collision_group)
-	self:set_collision_mask(spec.collision_mask)
-	self:set_friction_liquid(spec.water_friction)
-	self:set_gravity(spec.gravity)
-	self:set_gravity_liquid(spec.water_gravity)
+	self.physics:set_collision_group(spec.collision_group)
+	self.physics:set_collision_mask(spec.collision_mask)
+	self.physics:set_friction_liquid(spec.water_friction)
+	self.physics:set_gravity(spec.gravity)
+	self.physics:set_gravity_liquid(spec.water_gravity)
 	-- Set the inventory size.
 	self.inventory:set_size(spec.inventory_size)
 	-- Create server data.

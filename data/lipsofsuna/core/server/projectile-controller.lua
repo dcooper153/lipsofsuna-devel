@@ -38,7 +38,7 @@ end
 ProjectileController.attach = function(self)
 	-- Set the projectile controls.
 	self.projectile.controller = self
-	self.projectile:set_gravity(self.projectile.spec.gravity_projectile)
+	self.projectile.physics:set_gravity(self.projectile.spec.gravity_projectile)
 	self.projectile.speedline = speedline
 	-- Add the projectile to the world.
 	local src,dst = self.attacker:get_attack_ray()
@@ -54,18 +54,18 @@ ProjectileController.attach = function(self)
 	-- Enable the destruction timer or contact events.
 	if self.projectile.spec.destroy_timer then
 		self.destruction_timer = self.projectile.spec.destroy_timer
-		self.projectile:set_contact_events(false)
+		self.projectile.physics:set_contact_events(false)
 	else
-		self.projectile:set_contact_events(true)
+		self.projectile.physics:set_contact_events(true)
 	end
 end
 
 --- Deactivates the controller and removes it from the object.
 -- @param self ProjectileController.
 ProjectileController.detach = function(self)
-	self.projectile:set_contact_events(false)
+	self.projectile.physics:set_contact_events(false)
 	self.projectile.controller = nil
-	self.projectile:set_gravity(self.projectile.spec.gravity)
+	self.projectile.physics:set_gravity(self.projectile.spec.gravity)
 	self.projectile:detach()
 end
 

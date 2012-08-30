@@ -15,27 +15,26 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __EXT_PHYSICS_OBJECT_MODULE_H__
+#define __EXT_PHYSICS_OBJECT_MODULE_H__
 
-#include <lipsofsuna/extension.h>
+#include "lipsofsuna/extension.h"
 
 #define LIEXT_SCRIPT_PHYSICS_OBJECT "PhysicsObject"
 
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+typedef struct _LIExtPhysicsObjectModule LIExtPhysicsObjectModule;
+struct _LIExtPhysicsObjectModule
 {
-	int silence;
-	LICalHandle calls[7];
+	LICalHandle calls[2];
 	LIMaiProgram* program;
 	LIPhyPhysics* physics;
 };
 
-LIExtModule* liext_object_physics_new (
+LIExtPhysicsObjectModule* liext_object_physics_new (
 	LIMaiProgram* program);
 
 void liext_object_physics_free (
-	LIExtModule* self);
+	LIExtPhysicsObjectModule* self);
 
 /*****************************************************************************/
 

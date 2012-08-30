@@ -32,7 +32,6 @@ Physics.cast_ray = function(self, src, dst, mask, ignore)
 	if not r then return end
 	r.point = Vector:new_from_handle(r.point)
 	r.normal = Vector:new_from_handle(r.normal)
-	if r.object then r.object = __userdata_lookup[r.object] end
 	if r.tile then r.tile = Vector:new_from_handle(r.tile) end
 	return r
 end
@@ -50,7 +49,6 @@ Physics.cast_sphere = function(self, args)
 	if not r then return end
 	r.point = Vector:new_from_handle(r.point)
 	r.normal = Vector:new_from_handle(r.normal)
-	if r.object then r.object = __userdata_lookup[r.object] end
 	if r.tile then r.tile = Vector:new_from_handle(r.tile) end
 	return r
 end
@@ -70,5 +68,3 @@ Physics.set_enable_simulation = function(self, v)
 end
 
 return Physics
-
-

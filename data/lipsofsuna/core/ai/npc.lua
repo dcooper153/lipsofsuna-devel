@@ -55,8 +55,8 @@ NpcAi.choose_combat_action = function(self)
 	-- Calculate the distance to the target.
 	local spec = self.object.spec
 	local diff = self.target:get_position() - self.object:get_position()
-	local size1 = self.object:get_bounding_box_physics().size
-	local size2 = self.target:get_bounding_box_physics().size
+	local size1 = self.object.physics:get_bounding_box().size
+	local size2 = self.target.physics:get_bounding_box().size
 	size1.y = 0
 	size2.y = 0
 	local dist = diff.length - 0.5 * (size1 + size2).length

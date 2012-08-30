@@ -149,7 +149,7 @@ Selection.set_empty = function(self)
 end
 
 Selection.set_object = function(self, data, face)
-	local model = self:create_face_model(face, data:get_rotation(), data:get_bounding_box_physics())
+	local model = self:create_face_model(face, data:get_rotation(), data.physics:get_bounding_box())
 	self.face = face
 	self.key = data
 	self.object = data

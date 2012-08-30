@@ -27,7 +27,7 @@ BoomerangController.attach = function(self)
 	-- Set the boomerang controls.
 	self.state = 0
 	self.timer = 0
-	self.projectile:set_gravity(self.projectile.spec.gravity_projectile)
+	self.projectile.physics:set_gravity(self.projectile.spec.gravity_projectile)
 	self.projectile.controller = self
 	-- Add the projectile to the world.
 	local src,dst = self.attacker:get_attack_ray()
@@ -37,15 +37,15 @@ BoomerangController.attach = function(self)
 	self.projectile:set_velocity(dst:subtract(src):normalize():multiply(10))
 	self.projectile:set_visible(true)
 	-- Enable contact events.
-	self.projectile:set_contact_events(true)
+	self.projectile.physics:set_contact_events(true)
 	-- Animation the boomerang.
 	self.projectile:animate("fly start")
 end
 
 BoomerangController.detach = function(self)
-	self.projectile:set_contact_events(false)
+	self.projectile.physics:set_contact_events(false)
 	self.projectile.controller = nil
-	self.projectile:set_gravity(self.projectile.spec.gravity)
+	self.projectile.physics:set_gravity(self.projectile.spec.gravity)
 	self.projectile:animate("fly stop")
 end
 

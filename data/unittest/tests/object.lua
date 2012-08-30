@@ -1,13 +1,8 @@
 Unittest:add(1, "system", "object", function()
 	local Object = require("system/object")
-	local Physics = require("system/physics")
 	local Model = require("system/model")
-	local Program = require("system/core")
 	local Quaternion = require("system/math/quaternion")
-	local Sectors = require("system/sectors")
 	local Vector = require("system/math/vector")
-	require "system/object-physics"
-	Physics:set_enable_simulation(true)
 	-- Getters and setters.
 	do
 		local obj = Object()
@@ -44,10 +39,4 @@ Unittest:add(1, "system", "object", function()
 	local num = 0
 	for k,v in pairs(__objects_realized) do num = num + 1 end
 	assert(num == 100)
-	-- Physics simulation.
-	for i = 1,1000 do
-		local o = Object{model = Model(), position = Vector(50,50,50), realized = true}
-		Program:update()
-		o:set_visible(false)
-	end
 end)

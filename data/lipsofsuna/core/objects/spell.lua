@@ -36,9 +36,9 @@ Spell.new = function(clss, args)
 	self.owner = args.owner
 	self.power = args.power
 	self:set_spec(args.spec)
-	self:set_gravity(Vector())
+	self.physics:set_gravity(Vector())
 	self:set_model_name(args.spec.model)
-	self:set_physics("rigid")
+	self.physics:set_physics("rigid")
 	return self
 end
 

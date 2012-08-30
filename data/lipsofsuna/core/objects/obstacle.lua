@@ -20,8 +20,8 @@ Obstacle.serializer = ObjectSerializer{
 	{
 		name = "angular",
 		type = "vector",
-		get = function(self) return self:get_angular() end,
-		set = function(self, v) return self:set_angular(v) end
+		get = function(self) return self.physics:get_angular() end,
+		set = function(self, v) return self.physics:set_angular(v) end
 	},
 	{
 		name = "health",
@@ -53,7 +53,7 @@ Obstacle.new = function(clss, args)
 		end
 	end
 	if args then
-		if args.angular then self:set_angular(args.angular) end
+		if args.angular then self.physics:set_angular(args.angular) end
 		if args.health then self.health = args.health end
 		if args.position then self:set_position(args.position) end
 		if args.rotation then self:set_rotation(args.rotation) end
@@ -69,7 +69,7 @@ end
 Obstacle.clone = function(self)
 	-- TODO: Clone dialog variables?
 	return Obstacle{
-		angular = self:get_angular(),
+		angular = self.physics:get_angular(),
 		health = self.health,
 		position = self:get_position(),
 		rotation = self:get_rotation(),
@@ -116,7 +116,7 @@ Obstacle.set_visible = function(self, value)
 		if cons then
 			for k,v in pairs(cons) do
 				if v.constraint == "hinge" then
-					self:insert_hinge_constraint{position = v.offset, axis = v.axis}
+					self.physics:insert_hinge_constraint{position = v.offset, axis = v.axis}
 				end
 			end
 		end
@@ -128,11 +128,11 @@ Obstacle.set_spec = function(self, value)
 	if not spec then return end
 	SimulationObject.set_spec(self, spec)
 	-- Configure physics.
-	self:set_collision_group(spec.collision_group)
-	self:set_collision_mask(spec.collision_mask)
-	self:set_gravity(spec.gravity)
-	self:set_mass(spec.mass)
-	self:set_physics(spec.physics)
+	self.physics:set_collision_group(spec.collision_group)
+	self.physics:set_collision_mask(spec.collision_mask)
+	self.physics:set_gravity(spec.gravity)
+	self.physics:set_mass(spec.mass)
+	self.physics:set_physics(spec.physics)
 	-- Create the marker.
 	if self:has_server_data() and spec.marker then
 		self.marker = Marker{name = spec.marker, position = self:get_position(), target = self:get_id()}

@@ -36,8 +36,9 @@ MissileSpell.update = function(self, secs)
 		self.orig_rotation = self:get_rotation()
 		-- Adjust velocity.
 		-- Velocity is smoothed but approaches the target value quickly.
-		self:set_velocity((self:get_velocity() + self:get_rotation() * Vector(0,0,-self.speed)) * 0.5)
-		self.orig_velocity = self:get_velocity()
+		local vel = self:get_velocity()
+		self:set_velocity(Vector(0,0,-self.speed):transform(self:get_rotation(), vel):multiply(0.5))
+		self.orig_velocity = vel
 	end
 	-- Update the base class.
 	Spell.update(self, secs)

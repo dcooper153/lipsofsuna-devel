@@ -96,26 +96,6 @@ void liobj_object_free (
 }
 
 /**
- * \brief Called when the object has moved.
- * \param self Object.
- */
-int liobj_object_moved (
-	LIObjObject* self)
-{
-	LIMatTransform transform;
-
-	/* Move between sectors. */
-	liobj_object_get_transform (self, &transform);
-	if (!private_warp (self, &transform.position))
-		return 0;
-
-	/* Notify scripts. */
-	liobj_manager_notify_object_motion (self->manager, self);
-
-	return 1;
-}
-
-/**
  * \brief Gets the bounding box size of the object.
  * \param self Object.
  * \param bounds Return location for the bounding box.

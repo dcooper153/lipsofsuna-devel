@@ -434,6 +434,7 @@ Editor.pick_scene = function(self)
 	local r1,r2 = self.camera:picking_ray{cursor = cursor, far = 20, near = 0.1}
 	local ret = Physics:cast_ray(r1, r2)
 	if not ret then return end
+	r.object = r.object and Game.objects:find_by_id(r.object)
 	return ret.point, ret.object, ret.tile
 end
 
@@ -445,7 +446,7 @@ Editor.pick = function(self)
 	-- Find or create a selection.
 	if object then
 		--determine the object face
-		local osize = object:get_bounding_box_physics().size
+		local osize = object.physics:get_bounding_box().size
 		local c = self.camera:get_position()
 		local objs = c - object:get_position() --Vector(osize.x/2,osize.y/2,osize.z/2))
 		local objsx = math.abs(objs.x)

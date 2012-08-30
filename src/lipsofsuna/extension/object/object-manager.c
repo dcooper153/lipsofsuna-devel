@@ -128,39 +128,6 @@ LIObjObject* liobj_manager_find_object (
 	return lialg_u32dic_find (self->objects, id);
 }
 
-/**
- * \brief Notifies scripts of an object being moved.
- * \param self Object manager.
- * \param object Object.
- */
-void liobj_manager_notify_object_motion (
-	LIObjManager* self,
-	LIObjObject*  object)
-{
-	float diff_pos;
-	float diff_rot;
-	const float POSITION_THRESHOLD = 0.02;
-	const float ROTATION_THRESHOLD = 0.02;
-
-	if (object->script != NULL)
-	{
-		/* Don't emit events for ridiculously small changes. */
-		diff_pos = LIMAT_ABS (object->transform.position.x - object->transform_event.position.x) +
-		           LIMAT_ABS (object->transform.position.y - object->transform_event.position.y) +
-		           LIMAT_ABS (object->transform.position.z - object->transform_event.position.z);
-		diff_rot = LIMAT_ABS (object->transform.rotation.x - object->transform_event.rotation.x) +
-		           LIMAT_ABS (object->transform.rotation.y - object->transform_event.rotation.y) +
-		           LIMAT_ABS (object->transform.rotation.z - object->transform_event.rotation.z) +
-		           LIMAT_ABS (object->transform.rotation.w - object->transform_event.rotation.w);
-		if (diff_pos < POSITION_THRESHOLD && diff_rot < ROTATION_THRESHOLD)
-			return;
-		object->transform_event = object->transform;
-
-		/* Emit an object-motion event. */
-		limai_program_event (self->program, "object-motion", "id", LIMAI_FIELD_INT, liobj_object_get_external_id (object), NULL);
-	}
-}
-
 /*****************************************************************************/
 
 static void private_model_free (

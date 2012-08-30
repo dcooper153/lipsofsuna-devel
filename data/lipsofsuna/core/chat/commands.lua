@@ -117,18 +117,18 @@ ChatCommand{
 			player:send_message("/noclip mode off.")
 			player.noclip = nil
 			player.flying = player.spec.flying or false
-			player:set_collision_mask(0xFFFF)
-			player:set_collision_group(Physics.GROUP_PLAYER)
-			player:set_gravity(player.spec.gravity)
-			player:set_gravity_liquid(player.spec.water_gravity)
+			player.physics:set_collision_mask(0xFFFF)
+			player.physics:set_collision_group(Physics.GROUP_PLAYER)
+			player.physics:set_gravity(player.spec.gravity)
+			player.physics:set_gravity_liquid(player.spec.water_gravity)
 		else
 			player:send_message("/noclip mode on.")
 			player.noclip = true
 			player.flying = true
-			player:set_collision_mask(0)
-			player:set_collision_group(0)
-			player:set_gravity(Vector())
-			player:set_gravity_liquid(Vector())
+			player.physics:set_collision_mask(0)
+			player.physics:set_collision_group(0)
+			player.physics:set_gravity(Vector())
+			player.physics:set_gravity_liquid(Vector())
 		end
 	end}
 

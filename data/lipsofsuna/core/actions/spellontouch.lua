@@ -8,6 +8,7 @@ Actionspec{name = "spell on touch", func = function(feat, info, args)
 		local src,dst = args.user:get_attack_ray()
 		local r = Physics:cast_ray(src, dst)
 		if not r then return end
+		r.object = r.object and Game.objects:find_by_id(r.object)
 		feat:apply{
 			charge = args.charge,
 			object = r.object,

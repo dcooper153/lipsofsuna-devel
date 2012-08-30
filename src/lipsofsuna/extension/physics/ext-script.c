@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,8 +22,8 @@
  * @{
  */
 
-#include "lipsofsuna/object.h"
 #include "ext-module.h"
+#include "lipsofsuna/extension/object-physics/ext-module.h"
 
 static int private_build_ignore_list (
 	LIExtModule*  module,
@@ -35,13 +35,11 @@ static int private_build_ignore_list (
 	int i;
 	int count = 0;
 	LIScrData* data;
-	LIObjObject* object;
 
 	/* Add an individual object to the ignore list. */
-	if (liscr_args_geti_data (args, index, LISCR_SCRIPT_OBJECT, &data))
+	if (liscr_args_geti_data (args, index, LIEXT_SCRIPT_PHYSICS_OBJECT, &data))
 	{
-		object = liscr_data_get_data (data);
-		result[0] = liphy_physics_find_object (module->physics, object->id);
+		result[0] = liscr_data_get_data (data);
 		if (result[0] != NULL)
 			return 1;
 		return 0;
@@ -54,11 +52,10 @@ static int private_build_ignore_list (
 		{
 			lua_pushnumber (args->lua, i);
 			lua_gettable (args->lua, -2);
-			data = liscr_isdata (args->lua, -1, LISCR_SCRIPT_OBJECT);
+			data = liscr_isdata (args->lua, -1, LIEXT_SCRIPT_PHYSICS_OBJECT);
 			if (data != NULL)
 			{
-				object = liscr_data_get_data (data);
-				result[count] = liphy_physics_find_object (module->physics, object->id);
+				result[count] = liscr_data_get_data (data);
 				if (result[count] != NULL)
 					count++;
 			}
@@ -81,7 +78,6 @@ static void Physics_cast_ray (LIScrArgs* args)
 	int mask = LIPHY_DEFAULT_COLLISION_MASK;
 	LIMatVector start;
 	LIMatVector end;
-	LIObjObject* hitobj;
 	LIExtModule* module;
 	LIMatVector vector;
 	LIPhyCollision result;
@@ -102,9 +98,7 @@ static void Physics_cast_ray (LIScrArgs* args)
 		liscr_args_sets_vector (args, "normal", &result.normal);
 		if (result.object != NULL)
 		{
-			hitobj = liphy_object_get_userdata (result.object);
-			if (hitobj != NULL && hitobj->script != NULL)
-				liscr_args_sets_data (args, "object", hitobj->script);
+			liscr_args_sets_int (args, "object", liphy_object_get_external_id (result.object));
 		}
 		if (result.terrain != NULL)
 		{
@@ -124,7 +118,6 @@ static void Physics_cast_sphere (LIScrArgs* args)
 	float radius = 0.5f;
 	LIMatVector start;
 	LIMatVector end;
-	LIObjObject* hitobj;
 	LIExtModule* module;
 	LIMatVector vector;
 	LIPhyCollision result;
@@ -147,9 +140,7 @@ static void Physics_cast_sphere (LIScrArgs* args)
 		liscr_args_sets_vector (args, "normal", &result.normal);
 		if (result.object != NULL)
 		{
-			hitobj = liphy_object_get_userdata (result.object);
-			if (hitobj != NULL && hitobj->script != NULL)
-				liscr_args_sets_data (args, "object", hitobj->script);
+			liscr_args_sets_int (args, "object", liphy_object_get_external_id (result.object));
 		}
 		if (result.terrain != NULL)
 		{

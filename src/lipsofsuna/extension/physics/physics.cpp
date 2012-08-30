@@ -69,7 +69,7 @@ LIPhyPhysics* liphy_physics_new (
 		liphy_physics_free (self);
 		return NULL;
 	}
-	self->objects = lialg_u32dic_new ();
+	self->objects = lialg_ptrdic_new ();
 	if (self->objects == NULL)
 	{
 		liphy_physics_free (self);
@@ -111,19 +111,20 @@ LIPhyPhysics* liphy_physics_new (
 void liphy_physics_free (
 	LIPhyPhysics* self)
 {
-	LIAlgU32dicIter iter;
+	LIAlgPtrdicIter iter0;
+	LIAlgU32dicIter iter1;
 
 	lisys_assert (self->constraints == NULL);
 
 	if (self->objects != NULL)
 	{
-		LIALG_U32DIC_FOREACH (iter, self->objects)
-			liphy_object_free ((LIPhyObject*) iter.value);
+		LIALG_PTRDIC_FOREACH (iter0, self->objects)
+			liphy_object_free ((LIPhyObject*) iter0.value);
 	}
 	if (self->models != NULL)
 	{
-		LIALG_U32DIC_FOREACH (iter, self->models)
-			liphy_model_free ((LIPhyModel*) iter.value);
+		LIALG_U32DIC_FOREACH (iter1, self->models)
+			liphy_model_free ((LIPhyModel*) iter1.value);
 	}
 
 	delete self->dynamics;
@@ -133,7 +134,7 @@ void liphy_physics_free (
 	delete self->broadphase;
 	delete self->ghostcallback;
 	lialg_u32dic_free (self->models);
-	lialg_u32dic_free (self->objects);
+	lialg_ptrdic_free (self->objects);
 	lialg_list_free (self->controllers);
 	lisys_free (self);
 }
@@ -381,19 +382,6 @@ LIPhyModel* liphy_physics_find_model (
 }
 
 /**
- * \brief Finds a physics object by ID.
- * \param self Physics simulation.
- * \param id Object ID.
- * \return Object or NULL.
- */
-LIPhyObject* liphy_physics_find_object (
-	LIPhyPhysics* self,
-	uint32_t      id)
-{
-	return (LIPhyObject*) lialg_u32dic_find (self->objects, id);
-}
-
-/**
  * \brief Removes the model from all objects.
  * \param self Physics simulation.
  * \param model Physics model.
@@ -402,10 +390,10 @@ void liphy_physics_remove_model (
 	LIPhyPhysics* self,
 	LIPhyModel*   model)
 {
-	LIAlgU32dicIter iter;
+	LIAlgPtrdicIter iter;
 	LIPhyObject* object;
 
-	LIALG_U32DIC_FOREACH (iter, self->objects)
+	LIALG_PTRDIC_FOREACH (iter, self->objects)
 	{
 		object = (LIPhyObject*) iter.value;
 		if (object->model == model)

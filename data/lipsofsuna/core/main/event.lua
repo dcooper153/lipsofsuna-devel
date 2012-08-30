@@ -15,13 +15,21 @@ local handle_vision = function(self, args)
 	Vision:dispatch_event(args, Game.objects)
 end
 
+local handle_motion = function(self, args)
+	local object = Game.objects:find_by_id(args.id)
+	if not object then return end
+	object:sync_transform()
+	args.object = object
+	handle_vision(self, args)
+end
+
 Eventhandler{type = "keypress", func = handle_input}
 Eventhandler{type = "keyrelease", func = handle_input}
 Eventhandler{type = "mousepress", func = handle_input}
 Eventhandler{type = "mouserelease", func = handle_input}
 Eventhandler{type = "mousescroll", func = handle_input}
 Eventhandler{type = "mousemotion", func = handle_input}
-Eventhandler{type = "object-motion", func = handle_vision}
+Eventhandler{type = "object-motion", func = handle_motion}
 Eventhandler{type = "vision-object-shown", func = handle_vision}
 Eventhandler{type = "vision-object-hidden", func = handle_vision}
 Eventhandler{type = "vision-voxel-block-changed", func = handle_vision}

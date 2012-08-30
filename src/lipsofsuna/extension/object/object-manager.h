@@ -42,10 +42,6 @@ LIAPICALL (LIObjObject*, liobj_manager_find_object, (
 	LIObjManager* self,
 	uint32_t      id));
 
-LIAPICALL (void, liobj_manager_notify_object_motion, (
-	LIObjManager* self,
-	LIObjObject*  object));
-
 /*****************************************************************************/
 
 void liext_script_object (

@@ -43,7 +43,7 @@ Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, ti
 	-- Apply object damage.
 	if defender then
 		-- Knockback the defender.
-		defender:impulse{impulse = Vector(0,0,-100):transform(attacker:get_rotation())}
+		defender.physics:impulse(Vector(0,0,-100):transform(attacker:get_rotation()))
 		-- Stagger the attacker.
 		if defender.blocking then
 			if Program:get_time() - defender.blocking > defender.spec.blocking_delay then
@@ -97,7 +97,7 @@ Combat.apply_ranged_impact = function(self, attacker, projectile, damage, point,
 	-- Apply object damage.
 	if defender then
 		-- Knockback the defender.
-		defender:impulse{impulse = Vector(0,0,-100):transform(projectile:get_rotation())}
+		defender.physics:impulse(Vector(0,0,-100):transform(projectile:get_rotation()))
 		-- Damage the defender.
 		local args = {owner = attacker, object = defender}
 		for name,value in pairs(damage.influences) do
@@ -150,7 +150,7 @@ Combat.apply_ranged_spell_impact = function(self, attacker, projectile, effect, 
 	end
 	-- Knockback the defender.
 	if defender then
-		defender:impulse{impulse = Vector(0,0,-100):transform(projectile:get_rotation())}
+		defender.physics:impulse(Vector(0,0,-100):transform(projectile:get_rotation()))
 	end
 	-- Apply the damage.
 	local absorb

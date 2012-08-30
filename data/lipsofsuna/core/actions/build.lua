@@ -20,6 +20,8 @@ Actionspec{
 			local src,dst = args.user:get_attack_ray()
 			local r = Physics:cast_ray(src, dst)
 			if not r or r.object then return end
+			r.object = Game.objects:find_by_id(r.object)
+			if not r.object then return end
 			-- Find the affected tile.
 			local t,p = Utils:find_build_point(r.point, args.user)
 			if not t then return end
