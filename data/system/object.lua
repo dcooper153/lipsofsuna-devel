@@ -101,13 +101,9 @@ end
 -- @param self Object.
 -- @param v Model.
 Object.set_model = function(self, v)
-	if type(v) == "string" then
-		self:set_model_name(v)
-	else
-		rawset(self, "__model", v)
-		rawset(self, "__particle", nil)
-		Los.object_set_model(self.handle, v and v.handle)
-	end
+	self.__model = v
+	self.__particle = nil
+	Los.object_set_model(self.handle, v and v.handle)
 end
 
 --- Gets the position of the object.

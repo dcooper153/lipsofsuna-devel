@@ -41,19 +41,17 @@ Game.init = function(self, mode, save, port)
 	if self.initialized then self:deinit() end
 	self.initialized = true
 	self.mode = mode
+	-- Initialize settings.
+	self.enable_graphics = (mode ~= "server")
+	self.enable_prediction = (mode == "join")
+	self.enable_unloading = (mode ~= "editor" and mode ~= "benchmark")
 	-- Initialize sectors.
 	if save then
 		self.database = Database("save" .. save .. ".sqlite")
 		self.database:query("PRAGMA synchronous=OFF;")
 		self.database:query("PRAGMA count_changes=OFF;")
 	end
-	self.sectors = SectorManager(self.database)
-	-- Initialize settings.
-	self.enable_graphics = (mode ~= "server")
-	self.enable_prediction = (mode == "join")
-	if mode == "editor" or mode == "benchmark" then
-		self.sectors.unload_time = nil
-	end
+	self.sectors = SectorManager(self.database, self.enable_unloading)
 	-- Initialize storage.
 	self.static_objects_by_id = setmetatable({}, {__mode = "kv"})
 	-- Initialize the server.

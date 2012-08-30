@@ -20,13 +20,14 @@ local SectorManager = Class("SectorManager")
 --- Creates a new sector manager.
 -- @param clss SectorManager class.
 -- @param database Database, or nil.
+-- @param unloading True to unable unloading.
 -- @return SectorManager.
-SectorManager.new = function(clss, database)
+SectorManager.new = function(clss, database, unloading)
 	local self = Class.new(clss)
 	self.database = database
 	self.loaders = {}
 	self.sectors = {}
-	self.unload_time = 10
+	self.unload_time = unloading and 10
 	-- Initialize the database tables needed by us.
 	if self.database then
 		self.database:query("CREATE TABLE IF NOT EXISTS objects (id INTEGER PRIMARY KEY,sector UNSIGNED INTEGER,data TEXT);");
