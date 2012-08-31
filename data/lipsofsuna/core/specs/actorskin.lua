@@ -40,6 +40,7 @@ end
 
 --- Gets skins by actor type.
 -- @param self Actorskinspec class.
+-- @param name Actor variant name.
 -- @return List of skins.
 Actorskinspec.find_by_actor = function(self, name)
 	local res = {}

@@ -38,7 +38,7 @@ end
 
 --- Validates the dialog.
 -- @param self Dialogspec.
-Dialogspec.validate = function(self, args)
+Dialogspec.validate = function(self)
 	local validate_arguments
 	local validate_branch
 	local validate_command

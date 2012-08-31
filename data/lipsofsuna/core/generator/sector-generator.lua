@@ -51,7 +51,7 @@ SectorGenerator.finish = function(self)
 end
 
 --- Updates the sector generator.
--- @param eslf SectorGenerator.
+-- @param self SectorGenerator.
 -- @param secs Seconds since the last update.
 -- @return True if still loading, false if finished.
 SectorGenerator.update = function(self, secs)

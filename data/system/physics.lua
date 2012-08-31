@@ -44,7 +44,7 @@ end
 -- @param mask Collision mask.
 -- @param ignore Object or table of objects to ignore.
 -- @return Table with point, normal, object and tile. Nil if no collision occurred.
-Physics.cast_sphere = function(self, args)
+Physics.cast_sphere = function(self, src, dst, radius, mask, ignore)
 	local r = Los.physics_cast_sphere(src.handle, dst.handle, radius, mask, ignore)
 	if not r then return end
 	r.point = Vector:new_from_handle(r.point)

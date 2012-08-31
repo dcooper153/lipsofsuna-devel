@@ -106,7 +106,7 @@ PhysicsObject.set_angular = function(self, v)
 end
 
 --- Gets the local bounding box of the collision shape of the object.
--- @oaram self PhysicsObject.
+-- @param self PhysicsObject.
 -- @return Aabb.
 PhysicsObject.get_bounding_box = function(self)
 	local h1,h2 = Los.physics_object_get_bounding_box(self.handle)
@@ -146,20 +146,20 @@ end
 
 --- Sets the collision bitmask of the object.
 -- @param self PhysicsObject.
--- @return Number.
+-- @param v Number.
 PhysicsObject.set_collision_mask = function(self, v)
 	Los.physics_object_set_collision_mask(self.handle, v)
 end
 
 --- Gets the contact event generation enable status.
--- @oaram self PhysicsObject.
+-- @param self PhysicsObject.
 -- @return Boolean.
 PhysicsObject.get_contact_events = function(self)
 	return Los.physics_object_get_contact_events(self.handle)
 end
 
 --- Sets the contact event generation enable status.
--- @oaram self PhysicsObject.
+-- @param self PhysicsObject.
 -- @param v Boolean.
 PhysicsObject.set_contact_events = function(self, v)
 	Los.physics_object_set_contact_events(self.handle, v)

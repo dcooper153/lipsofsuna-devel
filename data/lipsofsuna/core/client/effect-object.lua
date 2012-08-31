@@ -152,7 +152,7 @@ end
 
 --- Sets the visibility of the effect.
 -- @param self EffectObject.
--- @return Boolean.
+-- @param v Boolean.
 EffectObject.set_visible = function(self, v)
 	self.__visible = v
 end

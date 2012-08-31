@@ -28,7 +28,7 @@ Sectors = Class("Sectors")
 -- @param clss Sectors class.
 -- @param point Position vector, in world units.
 -- @param radius Refresh radius, in world units.
-Sectors.refresh = function(self, point, radius)
+Sectors.refresh = function(clss, point, radius)
 	Los.sectors_refresh(point.handle, radius)
 end
 

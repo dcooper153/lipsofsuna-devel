@@ -692,8 +692,8 @@ end
 --- Gets the forwards movement rate of the object.
 -- @param self Object.
 -- @return Movement rate.
-SimulationObject.get_movement = function(self, value)
-	return self.physics:get_movement(value) or 0
+SimulationObject.get_movement = function(self)
+	return self.physics:get_movement() or 0
 end
 
 --- Sets the forwards movement rate of the object.
@@ -738,8 +738,8 @@ end
 --- Gets the strafing rate of the object.
 -- @param self Object.
 -- @return Strafing rate.
-SimulationObject.get_strafing = function(self, value)
-	return self.physics:get_strafing(value) or 0
+SimulationObject.get_strafing = function(self)
+	return self.physics:get_strafing() or 0
 end
 
 --- Sets the strafing rate of the object.

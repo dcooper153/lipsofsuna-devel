@@ -1328,7 +1328,7 @@ end
 
 --- Sets the currently wielded weapon.
 -- @param self Actor.
--- @param v Item, or nil.
+-- @param value Item, or nil.
 -- @return True on success.
 Actor.set_weapon = function(self, value)
 	return self.inventory:equip_object(value, self.spec.weapon_slot)

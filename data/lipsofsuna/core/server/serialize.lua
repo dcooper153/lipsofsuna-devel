@@ -19,7 +19,7 @@ Serialize.object_version = "7"
 --- Creates a new serializer.
 -- @param clss Serialize class.
 -- @param db Database.
--- @returns Serializer.
+-- @return Serializer.
 Serialize.new = function(clss, db)
 	local self = Class.new(clss)
 	self.db = db

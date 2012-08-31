@@ -99,6 +99,7 @@ void lisnd_manager_clear (
 /**
  * \brief Clears all the loaded samples.
  * \param self Sound manager.
+ * \param secs Seconds since the last update.
  */
 void lisnd_manager_update (
 	LISndManager* self,

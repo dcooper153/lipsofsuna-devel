@@ -527,7 +527,7 @@ LIPhyPhysics* liphy_object_get_engine (
 /**
  * \brief Sets the user-specified ID of the object.
  * \param self Object.
- * \param id Any integer.
+ * \return Previously set ID.
  */
 int liphy_object_get_external_id (
 	const LIPhyObject* self)
@@ -538,7 +538,7 @@ int liphy_object_get_external_id (
 /**
  * \brief Gets the user-specified ID of the object.
  * \param self Object.
- * \return Previously set ID.
+ * \param value Any integer.
  */
 void liphy_object_set_external_id (
 	LIPhyObject* self,

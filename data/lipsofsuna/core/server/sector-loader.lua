@@ -70,7 +70,7 @@ SectorLoader.finish = function(self)
 end
 
 --- Updates the sector loader.
--- @param eslf SectorLoader.
+-- @param self SectorLoader.
 -- @param secs Seconds since the last update.
 -- @return True if still loading, false if finished.
 SectorLoader.update = function(self, secs)

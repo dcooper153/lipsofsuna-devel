@@ -65,6 +65,7 @@ SectorManager.load_sector = function(self, sector)
 end
 
 --- Increases the timestamp of the sectors inside the given sphere.
+-- @param self SectorManager.
 -- @param point Position vector, in world units.
 -- @param radius Refresh radius, in world units.
 SectorManager.refresh = function(self, point, radius)

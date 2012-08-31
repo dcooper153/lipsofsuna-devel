@@ -39,7 +39,7 @@ end
 --- Dispatches an event to appropriate visions.
 -- @param clss Vision class.
 -- @param event Event table.
--- @param object Object manager.
+-- @param objects Object manager.
 Vision.dispatch_event = function(clss, event, objects)
 	if event.type == "vision-object-shown" then
 		-- Object entered vision.
