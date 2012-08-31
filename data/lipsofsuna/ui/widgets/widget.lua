@@ -3,6 +3,7 @@ local Interpolation = require("system/math/interpolation")
 local Widget = require("system/widget")
 
 local ipol_time = 0.2
+local ipol_path_a = {0,0.1,0.2,0.5,0.8,1,1}
 local ipol_path_x = {-1,-0.5,-0.25,-0.0125,0,0,0}
 
 Widgets.Uiwidget = Class("Uiwidget", Widget)
@@ -49,16 +50,19 @@ Widgets.Uiwidget.update = function(self, secs)
 	-- Update the offset.
 	if self.__need_reoffset or self.__life then
 		self.__need_reoffset = nil
+		local alpha = 1
 		local offset = self.__offset
 		if self.__life then
 			self.__life = self.__life + secs
 			if self.__life < ipol_time then
+				alpha = Interpolation:interpolate_samples_cubic_1d(self.__life / ipol_time * 6, ipol_path_a)
 				local x = Interpolation:interpolate_samples_cubic_1d(self.__life / ipol_time * 6, ipol_path_x)
 				offset = offset:copy():add_xyz(x * 500)
 			else
 				self.__life = nil
 			end
 		end
+		self:set_alpha(alpha)
 		Widget.set_offset(self, offset)
 	end
 	-- Update the graphics.
@@ -137,7 +141,7 @@ end
 Widgets.Uiwidget.set_show_priority = function(self, v)
 	if not self.__life then return end
 	if Client.options.ui_animations then
-		self.__life = (v - 1) * -0.015
+		self.__life = -0.05 * math.log(v + 0.2)
 	else
 		self.__life = nil
 	end
