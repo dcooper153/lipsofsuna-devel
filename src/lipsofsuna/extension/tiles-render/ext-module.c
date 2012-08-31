@@ -293,12 +293,12 @@ static int private_process_result (
 	/* Start creating the render model. */
 	if (block->model_next)
 		liren_render_model_free (self->render, block->model_next);
-	block->model_next = liren_render_model_new (self->render, task->model, 0);
+	block->model_next = liren_render_model_new (self->render, task->model);
 
 	/* Start creating the render object. */
 	if (block->object_next)
 		liren_render_object_free (self->render, block->object_next);
-	block->object_next = liren_render_object_new (self->render, 0);
+	block->object_next = liren_render_object_new (self->render);
 	if (block->object_next)
 	{
 		transform = limat_transform_init (task->offset, limat_quaternion_identity ());

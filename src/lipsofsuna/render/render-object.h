@@ -24,8 +24,7 @@
 #include "render.h"
 
 LIAPICALL (int, liren_render_object_new, (
-	LIRenRender* render,
-	int          id));
+	LIRenRender* render));
 
 LIAPICALL (void, liren_render_object_free, (
 	LIRenRender* self,

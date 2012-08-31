@@ -30,16 +30,14 @@
 /**
  * \brief Creates a new render object and adds it to the scene.
  * \param render Renderer.
- * \param id Unique identifier.
- * \return Object ID or zero on failure.
+ * \return Object ID, or zero on failure.
  */
 int liren_render_object_new (
-	LIRenRender* render,
-	int          id)
+	LIRenRender* render)
 {
 	LIRenObject* self;
 
-	self = liren_object_new (render, id);
+	self = liren_object_new (render, 0);
 	if (self == NULL)
 		return 0;
 

@@ -34,17 +34,15 @@
  *
  * \param render Renderer.
  * \param model Model description.
- * \param id Unique model ID.
- * \return Model ID or zero on failure.
+ * \return Model ID, or zero on failure.
  */
 int liren_render_model_new (
 	LIRenRender* render,
-	LIMdlModel*  model,
-	int          id)
+	LIMdlModel*  model)
 {
 	LIRenModel* self;
 
-	self = liren_model_new (render, model, id);
+	self = liren_model_new (render, model, 0);
 	if (self == NULL)
 		return 0;
 

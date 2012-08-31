@@ -54,24 +54,23 @@ LIRenModel* liren_model_new (
 	self = new LIRenModel ();
 	if (self == NULL)
 		return 0;
-	self->id = 0;
+	self->id = id;
 	self->render = render;
 
 	/* Choose a unique ID. */
-	while (!id)
+	while (!self->id)
 	{
-		id = lialg_random_range (&render->random, 0x00000000, 0x7FFFFFFF);
-		if (lialg_u32dic_find (render->objects, id))
-			id = 0;
+		self->id = lialg_random_range (&render->random, 0x00000000, 0x7FFFFFFF);
+		if (lialg_u32dic_find (render->objects, self->id))
+			self->id = 0;
 	}
-	self->id = id;
 
 	/* Load the model. */
 	if (model != NULL)
 		private_create_mesh (self, model);
 
 	/* Add to the dictionary. */
-	if (!lialg_u32dic_insert (render->models, id, self))
+	if (!lialg_u32dic_insert (render->models, self->id, self))
 	{
 		liren_model_free (self);
 		return 0;

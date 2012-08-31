@@ -27,7 +27,6 @@
 LIExtRenderModel* liext_render_model_new (
 	LIExtRenderModelModule* module)
 {
-	int model;
 	LIExtRenderModel* self;
 
 	/* Allocate self. */
@@ -37,13 +36,12 @@ LIExtRenderModel* liext_render_model_new (
 	self->module = module;
 	self->render = module->render;
 
-	/* Choose the model number. */
-	self->id = 0;
-	while (!self->id)
+	/* Allocate the render model. */
+	self->id = liren_render_model_new (module->render, NULL);
+	if (!self->id)
 	{
-		self->id = lialg_random_range (&module->program->random, 0, 0x7FFFFFFF);
-		if (lialg_u32dic_find (module->models, self->id) != NULL)
-			self->id = 0;
+		liext_render_model_free (self);
+		return NULL;
 	}
 
 	/* Insert ourselves to the model list. */
@@ -52,15 +50,6 @@ LIExtRenderModel* liext_render_model_new (
 		liext_render_model_free (self);
 		return NULL;
 	}
-
-	/* Allocate the render model. */
-	model = liren_render_model_new (module->render, NULL, self->id);
-	if (!model)
-	{
-		liext_render_model_free (self);
-		return NULL;
-	}
-	lisys_assert (model == self->id);
 
 	return self;
 }

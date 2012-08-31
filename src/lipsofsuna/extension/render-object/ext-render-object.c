@@ -27,7 +27,6 @@
 LIExtRenderObject* liext_render_object_new (
 	LIExtModule* module)
 {
-	int object;
 	LIExtRenderObject* self;
 
 	/* Allocate self. */
@@ -38,13 +37,12 @@ LIExtRenderObject* liext_render_object_new (
 	self->render = module->render;
 	self->transform = limat_transform_identity ();
 
-	/* Choose the object number. */
-	self->id = 0;
-	while (!self->id)
+	/* Allocate the render object. */
+	self->id = liren_render_object_new (module->render);
+	if (!self->id)
 	{
-		self->id = lialg_random_range (&module->program->random, 0, 0x7FFFFFFF);
-		if (lialg_u32dic_find (module->objects, self->id) != NULL)
-			self->id = 0;
+		liext_render_object_free (self);
+		return NULL;
 	}
 
 	/* Insert ourselves to the object list. */
@@ -53,15 +51,6 @@ LIExtRenderObject* liext_render_object_new (
 		liext_render_object_free (self);
 		return NULL;
 	}
-
-	/* Allocate the render object. */
-	object = liren_render_object_new (module->render, self->id);
-	if (!object)
-	{
-		liext_render_object_free (self);
-		return NULL;
-	}
-	lisys_assert (object == self->id);
 
 	return self;
 }

@@ -25,8 +25,7 @@
 
 LIAPICALL (int, liren_render_model_new, (
 	LIRenRender* render,
-	LIMdlModel*  model,
-	int          id));
+	LIMdlModel*  model));
 
 LIAPICALL (void, liren_render_model_free, (
 	LIRenRender* render,
