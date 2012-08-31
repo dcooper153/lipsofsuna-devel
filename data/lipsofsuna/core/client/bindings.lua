@@ -254,7 +254,7 @@ Binding{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 	local sens = Client.options.mouse_sensitivity
 	if Client.options.invert_mouse then sens = -sens end
 	if Operators.camera:get_rotation_mode() then
-		Client.camera.tilt_speed = Client.camera.tilt_speed - v * sens
+		Client.camera.tilt_speed = Client.camera.tilt_speed + v * sens
 	else
 		Client.player_state:tilt(-v * sens)
 	end
