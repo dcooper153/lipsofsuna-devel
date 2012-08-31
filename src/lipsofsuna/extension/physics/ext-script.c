@@ -26,7 +26,7 @@
 #include "lipsofsuna/extension/physics-object/ext-module.h"
 
 static int private_build_ignore_list (
-	LIExtModule*  module,
+	LIExtPhysicsModule*  module,
 	LIScrArgs*    args,
 	int           index,
 	LIPhyObject** result,
@@ -78,7 +78,7 @@ static void Physics_cast_ray (LIScrArgs* args)
 	int mask = LIPHY_DEFAULT_COLLISION_MASK;
 	LIMatVector start;
 	LIMatVector end;
-	LIExtModule* module;
+	LIExtPhysicsModule* module;
 	LIMatVector vector;
 	LIPhyCollision result;
 	LIPhyObject* ignores[100];
@@ -118,7 +118,7 @@ static void Physics_cast_sphere (LIScrArgs* args)
 	float radius = 0.5f;
 	LIMatVector start;
 	LIMatVector end;
-	LIExtModule* module;
+	LIExtPhysicsModule* module;
 	LIMatVector vector;
 	LIPhyCollision result;
 	LIPhyObject* ignores[100];
@@ -154,7 +154,7 @@ static void Physics_cast_sphere (LIScrArgs* args)
 
 static void Physics_get_enable_simulation (LIScrArgs* args)
 {
-	LIExtModule* module;
+	LIExtPhysicsModule* module;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS);
 	liscr_args_seti_bool (args, module->simulate);
@@ -162,7 +162,7 @@ static void Physics_get_enable_simulation (LIScrArgs* args)
 static void Physics_set_enable_simulation (LIScrArgs* args)
 {
 	int value;
-	LIExtModule* module;
+	LIExtPhysicsModule* module;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS);
 	if (liscr_args_geti_bool (args, 0, &value))

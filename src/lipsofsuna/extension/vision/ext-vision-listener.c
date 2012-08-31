@@ -16,7 +16,7 @@
  */
 
 #include "lipsofsuna/extension.h"
-#include "lipsofsuna/object.h"
+#include "lipsofsuna/extension/object/object.h"
 #include "lipsofsuna/voxel.h"
 #include "ext-vision-listener.h"
 

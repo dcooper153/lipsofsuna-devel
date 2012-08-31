@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "lipsofsuna/physics.h"
+#include "lipsofsuna/extension/physics/ext-module.h"
 #include "ext-module.h"
 
 LIMaiExtensionInfo liext_camera_info =

@@ -19,7 +19,7 @@
 #define __EXT_MODULE_H__
 
 #include "lipsofsuna/extension.h"
-#include "lipsofsuna/physics.h"
+#include "lipsofsuna/extension/physics/ext-module.h"
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/voxel.h"
 

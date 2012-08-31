@@ -15,16 +15,22 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __EXT_PHYSICS_MODULE_H__
+#define __EXT_PHYSICS_MODULE_H__
 
 #include "lipsofsuna/extension.h"
-#include "lipsofsuna/physics.h"
+#include "physics.h"
+#include "physics-constraint.h"
+#include "physics-model.h"
+#include "physics-object.h"
+#include "physics-shape.h"
+#include "physics-terrain.h"
+#include "physics-types.h"
 
 #define LIEXT_SCRIPT_PHYSICS "Physics"
 
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+typedef struct _LIExtPhysicsModule LIExtPhysicsModule;
+struct _LIExtPhysicsModule
 {
 	int simulate;
 	LICalHandle calls[4];
@@ -32,11 +38,11 @@ struct _LIExtModule
 	LIPhyPhysics* physics;
 };
 
-LIExtModule* liext_physics_new (
+LIExtPhysicsModule* liext_physics_new (
 	LIMaiProgram* program);
 
 void liext_physics_free (
-	LIExtModule* self);
+	LIExtPhysicsModule* self);
 
 /*****************************************************************************/
 

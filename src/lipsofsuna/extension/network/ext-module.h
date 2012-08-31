@@ -19,8 +19,7 @@
 #define __EXT_MODULE_H__
 
 #include <enet/enet.h>
-#include <lipsofsuna/network.h>
-#include <lipsofsuna/extension.h>
+#include "lipsofsuna/extension.h"
 
 #define LIEXT_SCRIPT_NETWORK "Network"
 

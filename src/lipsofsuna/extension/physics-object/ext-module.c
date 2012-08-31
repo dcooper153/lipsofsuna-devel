@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "lipsofsuna/physics.h"
+#include "lipsofsuna/extension/physics/ext-module.h"
 #include "ext-module.h"
 
 static void private_object_contact (

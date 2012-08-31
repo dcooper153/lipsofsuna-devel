@@ -25,7 +25,6 @@
  */
 
 #include "lipsofsuna/model.h"
-#include "lipsofsuna/network.h"
 #include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-attachment-entity.hpp"
@@ -88,7 +87,7 @@ LIRenObject* liren_object_new (
 	/* Choose a unique ID. */
 	while (!self->id)
 	{
-		self->id = lialg_random_range (&render->random, LINET_RANGE_RENDER_START, LINET_RANGE_RENDER_END);
+		self->id = lialg_random_range (&render->random, 0x00000000, 0x7FFFFFFF);
 		if (lialg_u32dic_find (render->objects, self->id))
 			self->id = 0;
 	}

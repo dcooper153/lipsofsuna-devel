@@ -22,7 +22,6 @@
  * @{
  */
 
-#include "lipsofsuna/network.h"
 #include "object.h"
 #include "object-sector.h"
 
@@ -53,7 +52,7 @@ LIObjObject* liobj_object_new (
 	self->id = 0;
 	while (!self->id)
 	{
-		self->id = lialg_random_range (&manager->program->random, LINET_RANGE_ENGINE_START, LINET_RANGE_ENGINE_END);
+		self->id = lialg_random_range (&manager->program->random, 0x00000000, 0x7FFFFFFF);
 		if (liobj_manager_find_object (manager, self->id))
 			self->id = 0;
 	}

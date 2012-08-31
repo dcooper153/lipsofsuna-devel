@@ -24,7 +24,6 @@
  * @{
  */
 
-#include "lipsofsuna/network.h"
 #include "render-internal.h"
 
 static void private_create_mesh (
@@ -61,7 +60,7 @@ LIRenModel* liren_model_new (
 	/* Choose a unique ID. */
 	while (!id)
 	{
-		id = lialg_random_range (&render->random, LINET_RANGE_RENDER_START, LINET_RANGE_RENDER_END);
+		id = lialg_random_range (&render->random, 0x00000000, 0x7FFFFFFF);
 		if (lialg_u32dic_find (render->objects, id))
 			id = 0;
 	}

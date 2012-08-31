@@ -22,7 +22,6 @@
  * @{
  */
 
-#include "lipsofsuna/network.h"
 #include "lipsofsuna/system.h"
 #include "render-object.h"
 #include "internal/render.h"

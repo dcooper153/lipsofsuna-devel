@@ -25,20 +25,20 @@
 #include "ext-module.h"
 
 static int private_model_changed (
-	LIExtModule* self,
-	LIMdlModel*  model);
+	LIExtPhysicsModule* self,
+	LIMdlModel*         model);
 
 static int private_model_free (
-	LIExtModule* self,
-	LIMdlModel*  model);
+	LIExtPhysicsModule* self,
+	LIMdlModel*         model);
 
 static int private_model_new (
-	LIExtModule* self,
-	LIMdlModel*  model);
+	LIExtPhysicsModule* self,
+	LIMdlModel*         model);
 
 static int private_tick (
-	LIExtModule* self,
-	float        secs);
+	LIExtPhysicsModule* self,
+	float               secs);
 
 /*****************************************************************************/
 
@@ -49,13 +49,13 @@ LIMaiExtensionInfo liext_physics_info =
 	liext_physics_free
 };
 
-LIExtModule* liext_physics_new (
+LIExtPhysicsModule* liext_physics_new (
 	LIMaiProgram* program)
 {
-	LIExtModule* self;
+	LIExtPhysicsModule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIExtModule));
+	self = lisys_calloc (1, sizeof (LIExtPhysicsModule));
 	if (self == NULL)
 		return NULL;
 	self->program = program;
@@ -93,7 +93,7 @@ LIExtModule* liext_physics_new (
 }
 
 void liext_physics_free (
-	LIExtModule* self)
+	LIExtPhysicsModule* self)
 {
 	/* Unregister component. */
 	if (self->physics != NULL)
@@ -110,8 +110,8 @@ void liext_physics_free (
 /*****************************************************************************/
 
 static int private_model_changed (
-	LIExtModule* self,
-	LIMdlModel*  model)
+	LIExtPhysicsModule* self,
+	LIMdlModel*         model)
 {
 	LIPhyModel* model_;
 
@@ -125,8 +125,8 @@ static int private_model_changed (
 }
 
 static int private_model_free (
-	LIExtModule* self,
-	LIMdlModel*  model)
+	LIExtPhysicsModule* self,
+	LIMdlModel*         model)
 {
 	LIPhyModel* model_;
 
@@ -149,8 +149,8 @@ static int private_model_free (
 }
 
 static int private_model_new (
-	LIExtModule* self,
-	LIMdlModel*  model)
+	LIExtPhysicsModule* self,
+	LIMdlModel*         model)
 {
 	LIPhyModel* model_;
 
@@ -168,8 +168,8 @@ static int private_model_new (
 }
 
 static int private_tick (
-	LIExtModule* self,
-	float        secs)
+	LIExtPhysicsModule* self,
+	float               secs)
 {
 	/* Update physics. */
 	if (self->simulate)
