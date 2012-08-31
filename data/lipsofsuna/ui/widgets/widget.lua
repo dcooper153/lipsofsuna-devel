@@ -1,11 +1,17 @@
 local Class = require("system/class")
+local Interpolation = require("system/math/interpolation")
 local Widget = require("system/widget")
+
+local ipol_time = 0.2
+local ipol_path_x = {-1,-0.5,-0.25,-0.0125,0,0,0}
 
 Widgets.Uiwidget = Class("Uiwidget", Widget)
 
 Widgets.Uiwidget.new = function(clss, label)
 	-- Create the widget.
 	local self = Widget.new(clss)
+	self.__life = 0
+	self.__offset = Vector()
 	self.size = Vector()
 	self.label = label
 	self.need_reshape = true
@@ -39,6 +45,21 @@ Widgets.Uiwidget.update = function(self, secs)
 			self.size = size
 			Ui.need_relayout = true
 		end
+	end
+	-- Update the offset.
+	if self.__need_reoffset or self.__life then
+		self.__need_reoffset = nil
+		local offset = self.__offset
+		if self.__life then
+			self.__life = self.__life + secs
+			if self.__life < ipol_time then
+				local x = Interpolation:interpolate_samples_cubic_1d(self.__life / ipol_time * 6, ipol_path_x)
+				offset = offset:copy():add_xyz(x * 500)
+			else
+				self.__life = nil
+			end
+		end
+		Widget.set_offset(self, offset)
 	end
 	-- Update the graphics.
 	if self.need_repaint then
@@ -108,4 +129,26 @@ Widgets.Uiwidget.set_hint = function(self, v)
 	if self.hint == v then return end
 	self.hint = v
 	if self.focused then Ui:update_help() end
+end
+
+--- Sets the interpolation priority of the widget.
+-- @param self Uiwidget.
+-- @param v Number.
+Widgets.Uiwidget.set_show_priority = function(self, v)
+	if not self.__life then return end
+	if Client.options.ui_animations then
+		self.__life = (v - 1) * -0.015
+	else
+		self.__life = nil
+	end
+	self.__need_reoffset = true
+end
+
+Widgets.Uiwidget.get_offset = function(self)
+	return self.__offset
+end
+
+Widgets.Uiwidget.set_offset = function(self, v)
+	self.__offset = v
+	self.__need_reoffset = true
 end

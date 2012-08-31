@@ -83,6 +83,10 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "options",
+	widget = function() return Widgets.Uiconfigoption("ui_animations") end}
+
+Ui:add_widget{
+	state = "options",
 	widget = function()
 		return Widgets.Uiconfigoption("ui_size",
 			function() Client.options:apply() end)

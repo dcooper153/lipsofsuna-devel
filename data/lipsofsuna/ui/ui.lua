@@ -568,6 +568,10 @@ Ui.show_state = function(self, state, focus)
 		self.focused_item = nil
 	end
 	self.history[self:get_history_state()] = self.focused_item
+	-- Initialize the interpolation animations.
+	for k,v in ipairs(self.widgets) do
+		v:set_show_priority(math.abs(k - f))
+	end
 	-- Position the widgets.
 	self:set_scroll_offset(0)
 	self.need_autoscroll = true
