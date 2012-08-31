@@ -1,10 +1,7 @@
-Unittest:add(2, "system", "object render", function()
+Unittest:add(2, "system", "render object", function()
 	local Aabb = require("system/math/aabb")
-	require "system/graphics"
-	require "system/model-editing"
-	local Model = require("system/model")
-	local Object = require("system/object")
-	require "system/object-render"
+	local Model = require("system/model-editing")
+	local RenderObject = require("system/render-object")
 	local Vector = require("system/math/vector")
 	-- Checks for valgrind.
 	local create_cube_model = function(aabb)
@@ -47,6 +44,8 @@ Unittest:add(2, "system", "object render", function()
 		local m2 = create_cube_model(Aabb{point = Vector(), size = Vector(6,6,6)})
 		local m = m1:copy()
 		m:merge(m2)
-		local o = Object{model = m, realized = true}
+		local o = RenderObject()
+		o:add_model(m)
+		o:set_visible(true)
 	end
 end)

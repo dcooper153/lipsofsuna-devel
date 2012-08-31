@@ -10,7 +10,7 @@
 
 local Class = require("system/class")
 local EffectObject = require("core/client/effect-object")
-local RenderObject = require("system/object-render")
+local RenderObject = require("system/render-object")
 
 --- TODO:doc
 -- @type ParticleEffect

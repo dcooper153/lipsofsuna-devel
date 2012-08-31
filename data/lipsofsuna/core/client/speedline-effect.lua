@@ -10,7 +10,7 @@
 
 local Class = require("system/class")
 local Model = require("system/model")
-local RenderObject = require("system/object-render")
+local RenderObject = require("system/render-object")
 local RenderModel = require("system/render-model")
 
 --- TODO:doc

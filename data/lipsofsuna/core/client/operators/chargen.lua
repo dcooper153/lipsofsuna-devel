@@ -4,7 +4,7 @@ local Color = require("common/color")
 local Model = require("system/model")
 local ModelBuilder = require(Mod.path .. "model-builder")
 local ModelMerger = require("system/model-merger")
-local RenderObject = require("system/object-render")
+local RenderObject = require("system/render-object")
 local RenderModel = require("system/render-model")
 local RenderUtils = require(Mod.path .. "render-utils")
 

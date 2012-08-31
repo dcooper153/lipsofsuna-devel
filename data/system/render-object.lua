@@ -15,8 +15,8 @@ if not Los.program_load_extension("graphics") then
 	error("loading extension `graphics' failed")
 end
 
-if not Los.program_load_extension("object-render") then
-	error("loading extension `object-render' failed")
+if not Los.program_load_extension("render-object") then
+	error("loading extension `render-object' failed")
 end
 
 ------------------------------------------------------------------------------

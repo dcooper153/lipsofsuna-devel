@@ -13,8 +13,8 @@ local Class = require("system/class")
 local Quaternion = require("system/math/quaternion")
 local Vector = require("system/math/vector")
 
-if not Los.program_load_extension("object-physics") then
-	error("loading extension `object-physics' failed")
+if not Los.program_load_extension("physics-object") then
+	error("loading extension `physics-object' failed")
 end
 
 ------------------------------------------------------------------------------

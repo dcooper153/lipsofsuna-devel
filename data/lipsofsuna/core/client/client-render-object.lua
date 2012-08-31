@@ -14,7 +14,7 @@ local Model = require("system/model")
 local ModelBuilder = require("core/client/model-builder")
 local ModelEffect = require("core/client/model-effect")
 local ParticleEffect = require("core/client/particle-effect")
-local RenderObject = require("system/object-render")
+local RenderObject = require("system/render-object")
 local RenderUtils = require("core/client/render-utils")
 local SpeedlineEffect = require("core/client/speedline-effect")
 

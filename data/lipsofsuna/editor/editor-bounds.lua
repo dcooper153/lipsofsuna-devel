@@ -11,7 +11,7 @@
 local Class = require("system/class")
 local Model = require("system/model")
 local RenderModel = require("system/render-model")
-local RenderObject = require("system/object-render")
+local RenderObject = require("system/render-object")
 
 --- TODO:doc
 -- @type EditorBounds

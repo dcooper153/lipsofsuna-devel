@@ -23,7 +23,7 @@
  */
 
 #include "ext-module.h"
-#include "lipsofsuna/extension/object-physics/ext-module.h"
+#include "lipsofsuna/extension/physics-object/ext-module.h"
 
 static int private_build_ignore_list (
 	LIExtModule*  module,
