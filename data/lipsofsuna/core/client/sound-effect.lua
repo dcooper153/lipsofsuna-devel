@@ -1,4 +1,4 @@
---- TODO:doc
+--- Sound effect anchor.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -12,7 +12,7 @@ local Class = require("system/class")
 local EffectObject = require(Mod.path .. "effect-object")
 local SoundSource = require("system/sound-source")
 
---- TODO:doc
+--- Sound effect anchor.
 -- @type SoundEffect
 local SoundEffect = Class("SoundEffect", EffectObject)
 
@@ -36,15 +36,24 @@ SoundEffect.new = function(clss, args)
 	return self
 end
 
+--- Creates the actual sound source and starts playback.
+-- @param self SoundEffect.
+-- @param args Arguments as given to the constructor.
 SoundEffect.create_source = function(self, args)
 	self.source = SoundSource(args.sound, args.sound_positional)
 	self.source:set_volume((args.sound_volume or 1) * Client.options.sound_volume)
 	if args.sound_pitch then
 		self.source:set_pitch(1 + args.sound_pitch * (math.random() - 0.5))
 	end
+	if self.__queued_position then
+		self.source:set_position(self.__queued_position)
+		self.__queued_position = nil
+	end
 	self.source:set_playing(true)
 end
 
+--- Detaches the sound effect from the world.
+-- @param self SoundEffect.
 SoundEffect.detach = function(self)
 	EffectObject.detach(self)
 	if self.source then
@@ -53,6 +62,9 @@ SoundEffect.detach = function(self)
 	self.delay = nil
 end
 
+--- Updates the sound source.
+-- @param self SoundEffect.
+-- @param secs Seconds since the last update.
 SoundEffect.update = function(self, secs)
 	-- Initialize after the delay.
 	if self.delay then
@@ -71,13 +83,21 @@ SoundEffect.update = function(self, secs)
 	EffectObject.update(self, secs)
 end
 
+--- Sets the world space position of the sound effect.<br/>
+--
+-- Sets the position of the effect if playing has started. If the playback
+-- is currently being delayed, the position is queued and set when the
+-- playback starts.
+--
+-- @param self SoundEffect.
+-- @param v Vector.
 SoundEffect.set_position = function(self, v)
 	if self.source then
 		self.source:set_position(v)
+	else
+		self.__queued_position = v
 	end
 	EffectObject.set_position(self, v)
 end
 
 return SoundEffect
-
-
