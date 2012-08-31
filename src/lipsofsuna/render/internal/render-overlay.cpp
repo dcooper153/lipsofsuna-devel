@@ -58,6 +58,7 @@ LIRenOverlay* liren_overlay_new (
 	if (self == NULL)
 		return 0;
 	self->render = render;
+	self->alpha = 1.0f;
 
 	/* Choose a unique ID. */
 	while (!self->id)
@@ -195,14 +196,15 @@ void liren_overlay_add_text (
 
 		/* Create the element. */
 		Ogre::String id = self->render->data->id.next ();
-		Ogre::TextAreaOverlayElement* elem = (Ogre::TextAreaOverlayElement*) self->render->data->overlay_manager->createOverlayElement ("TextArea", id);
+		LIRenTextOverlay* elem = (LIRenTextOverlay*) self->render->data->overlay_manager->createOverlayElement ("LIRenTextOverlay", id);
 		elem->setMetricsMode (Ogre::GMM_PIXELS);
 		elem->setPosition (x, y);
 		elem->setDimensions (size[0], size[1]);
 		elem->setCharHeight (h);
 		elem->setFontName (font);
-		elem->setColour (Ogre::ColourValue (color[0], color[1], color[2], color[3]));
 		elem->setCaption (chars);
+		elem->set_color (color);
+		elem->set_alpha (self->alpha);
 		elem->show ();
 
 		/* Add to the container. */
@@ -259,6 +261,7 @@ void liren_overlay_add_tiled (
 	elem->set_tiling (source_position, source_size, source_tiling);
 	elem->set_rotation (rotation_angle, rotation_center[0], rotation_center[1]);
 	elem->set_color (color);
+	elem->set_alpha (self->alpha);
 	elem->show ();
 
 	/* Add to the container. */
@@ -307,6 +310,7 @@ void liren_overlay_add_scaled (
 	elem->set_rotation (0.0f, 0, 0);
 	elem->set_tiling (source_position, source_size, source_tiling1);
 	elem->set_color (color);
+	elem->set_alpha (self->alpha);
 	elem->show ();
 
 	/* Add to the container. */
@@ -364,6 +368,22 @@ void liren_overlay_remove_overlay (
 	/* Detach the overlay. */
 	if (overlay->parent == self)
 		private_remove_overlay (self, overlay);
+}
+
+/** Sets the multiplicative alpha of the overlay.
+ * \param self Overlay.
+ * \param value Alpha in the range [0,1].
+ */
+void liren_overlay_set_alpha (
+	LIRenOverlay* self,
+	float         value)
+{
+	float a = LIMAT_CLAMP (value, 0.0f, 1.0f);
+
+	if (self->alpha == a)
+		return;
+	self->alpha = a;
+	self->container->set_alpha (a);
 }
 
 /**

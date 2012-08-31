@@ -53,6 +53,7 @@ class LIRenAttachment;
 #include "render-container-factory.hpp"
 #include "render-image-overlay-factory.hpp"
 #include "render-scaled-overlay-factory.hpp"
+#include "render-text-overlay-factory.hpp"
 #include "render-mesh-builder.hpp"
 #include "render-resource-loading-listener.hpp"
 #include "render-unique-id.hpp"
@@ -90,6 +91,7 @@ struct _LIRenOverlay
 	int id;
 	int depth;
 	int visible;
+	float alpha;
 	LIMatVector position;
 	LIRenOverlay* parent;
 	LIRenRender* render;
@@ -118,6 +120,7 @@ struct _LIRenRenderData
 	LIRenContainerFactory* container_factory;
 	LIRenImageOverlayFactory* image_factory;
 	LIRenScaledOverlayFactory* scaled_factory;
+	LIRenTextOverlayFactory* text_factory;
 	LIRenResourceLoadingListener* resource_loading_listener;
 	LIRenUniqueId id;
 	LIAlgStrdic* mesh_builders;

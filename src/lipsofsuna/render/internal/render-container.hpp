@@ -20,6 +20,7 @@
 
 #include "lipsofsuna/system.h"
 #include "render-types.h"
+#include "render-base-overlay.hpp"
 #include <OgrePanelOverlayElement.h>
 
 class LIRenContainer : public Ogre::PanelOverlayElement
@@ -31,10 +32,11 @@ public:
 	virtual const Ogre::String& getTypeName () const;
 	virtual void getRenderOperation (Ogre::RenderOperation& op);
 	void add_container (LIRenContainer* cont, int layer);
-	void add_element (Ogre::OverlayElement* elem);
+	void add_element (LIRenBaseOverlay* elem);
 	void remove_container (int index);
 	void remove_element (int index);
 	void remove_all_elements ();
+	void set_alpha (float value);
 protected:
 	virtual Ogre::ushort _notifyZOrder (Ogre::ushort z);
 	virtual Ogre::ushort _notifyZOrderNonrecursive (Ogre::ushort z);
@@ -46,7 +48,7 @@ private:
 	static Ogre::String type_name;
 public:
 	std::vector<LIRenContainer*> containers;
-	std::vector<Ogre::OverlayElement*> elements;
+	std::vector<LIRenBaseOverlay*> elements;
 };
 
 #endif

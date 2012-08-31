@@ -41,6 +41,13 @@ LIRenImageOverlay::~LIRenImageOverlay ()
 	delete render_op.vertexData;
 }
 
+void LIRenImageOverlay::set_alpha (float alpha)
+{
+	LIRenBaseOverlay::set_alpha (alpha);
+	if (this->mInitialised)
+		updatePositionGeometry ();
+}
+
 void LIRenImageOverlay::set_color (const float* color)
 {
 	memcpy (this->color, color, 4 * sizeof (float));
@@ -172,7 +179,8 @@ void LIRenImageOverlay::updatePositionGeometry ()
 	/* Setup vertex packing. */
 	float z = Ogre::Root::getSingleton().getRenderSystem()->getMaximumDepthInputValue ();
 	LIRenTilePacker packer (z);
-	packer.set_color (color);
+	float color_[4] = { color[0], color[1], color[2], color[3] * alpha };
+	packer.set_color (color_);
 	if (rotation_angle != 0.0f)
 	{
 		float cx = left + xscale * rotation_center[0];

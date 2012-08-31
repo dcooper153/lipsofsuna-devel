@@ -135,11 +135,11 @@ Widget.popup = function(self, args)
 	return Los.widget_popup(self.handle, args)
 end
 
---- Gets the focus status of the widget.
+--- Sets the multiplicative transparency of the widget.
 -- @param self Widget.
--- @param v Boolean.
-Widget.set_focused = function(self, v)
-	self.focused = v
+-- @param v Number.
+Widget.set_alpha = function(self, v)
+	Los.widget_set_alpha(self.handle, v)
 end
 
 --- Gets the depth sorting priority of the widget.
@@ -171,6 +171,13 @@ Widget.set_floating = function(self, v)
 	if not v and self == Widgets.popup then
 		Widgets.popup = nil
 	end
+end
+
+--- Gets the focus status of the widget.
+-- @param self Widget.
+-- @param v Boolean.
+Widget.set_focused = function(self, v)
+	self.focused = v
 end
 
 --- Gets the fullscreen enable flag of the widget.

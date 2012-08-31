@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -635,6 +635,13 @@ void liwdg_widget_set_allocation (
 		private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
 		lical_callbacks_call (self->manager->callbacks, "widget-allocation", lical_marshal_DATA_PTR, self);
 	}
+}
+
+void liwdg_widget_set_alpha (
+	LIWdgWidget* self,
+	float        value)
+{
+	liren_render_overlay_set_alpha (self->manager->render, self->overlay, value);
 }
 
 int liwdg_widget_get_depth (

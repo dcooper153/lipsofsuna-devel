@@ -93,10 +93,10 @@ void LIRenContainer::add_container (LIRenContainer* cont, int layer)
 	_notifyZOrder (mZOrder);
 }
 
-void LIRenContainer::add_element (Ogre::OverlayElement* elem)
+void LIRenContainer::add_element (LIRenBaseOverlay* elem)
 {
 	elements.push_back (elem);
-	addChild (elem);
+	addChild (elem->get_ogre ());
 	_notifyZOrder (mZOrder);
 }
 
@@ -111,7 +111,7 @@ void LIRenContainer::remove_container (int index)
 
 void LIRenContainer::remove_element (int index)
 {
-	Ogre::OverlayElement* child = elements[index];
+	Ogre::OverlayElement* child = elements[index]->get_ogre ();
 	elements.erase (elements.begin () + index);
 	Ogre::String name (child->getName ());
 	removeChild (name);
@@ -124,13 +124,24 @@ void LIRenContainer::remove_all_elements ()
 
 	for (size_t i = 0 ; i < elements.size () ; i++)
 	{
-		elem = elements[i];
+		elem = elements[i]->get_ogre ();
 		Ogre::String name (elem->getName ());
 		removeChild (name);
 		Ogre::OverlayManager::getSingleton ().destroyOverlayElement (name);
 	}
 	elements.clear ();
 	_notifyZOrder (mZOrder);
+}
+
+void LIRenContainer::set_alpha (float value)
+{
+	for (size_t i = 0 ; i < containers.size () ; i++)
+		containers[i]->set_alpha (value);
+	for (size_t i = 0 ; i < elements.size () ; i++)
+	{
+		LIRenBaseOverlay* overlay = elements[i];
+		overlay->set_alpha (value);
+	}
 }
 
 Ogre::ushort LIRenContainer::_notifyZOrder (Ogre::ushort z)
@@ -171,7 +182,7 @@ Ogre::ushort LIRenContainer::_notifyZOrderNonrecursive (Ogre::ushort z)
 	z = OverlayElement::_notifyZOrder (z);
 
 	for (size_t i = 0 ; i < elements.size () ; i++)
-		z = elements[i]->_notifyZOrder (z);
+		z = elements[i]->get_ogre ()->_notifyZOrder (z);
 
 	return z + 1;
 }
@@ -182,7 +193,7 @@ void LIRenContainer::_updateRenderQueue (Ogre::RenderQueue* queue)
 	{
 		OverlayElement::_updateRenderQueue (queue);
 		for (size_t i = 0 ; i < elements.size () ; i++)
-			elements[i]->_updateRenderQueue (queue);
+			elements[i]->get_ogre ()->_updateRenderQueue (queue);
 		for (size_t i = 0 ; i < containers.size () ; i++)
 			containers[i]->_updateRenderQueue (queue);
 	}

@@ -185,6 +185,22 @@ void liren_render_overlay_remove_overlay (
 		liren_overlay_remove_overlay (overlay1, overlay2);
 }
 
+/** Sets the multiplicative alpha of the overlay.
+ * \param self Overlay.
+ * \param value Alpha in the range [0,1].
+ */
+void liren_render_overlay_set_alpha (
+	LIRenRender* self,
+	int          id,
+	float        value)
+{
+	LIRenOverlay* overlay;
+
+	overlay = lialg_u32dic_find (self->overlays, id);
+	if (overlay != NULL)
+		liren_overlay_set_alpha (overlay, value);
+}
+
 /**
  * \brief Sets the Z offset of the overlay.
  * \param self Renderer.

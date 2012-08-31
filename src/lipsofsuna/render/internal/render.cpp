@@ -94,6 +94,7 @@ int liren_internal_init (
 	self->data->container_factory = NULL;
 	self->data->image_factory = NULL;
 	self->data->scaled_factory = NULL;
+	self->data->text_factory = NULL;
 	self->data->mesh_builders = lialg_strdic_new ();
 
 	/* Disable console output. */
@@ -203,6 +204,8 @@ int liren_internal_init (
 	self->data->overlay_manager->addOverlayElementFactory (self->data->image_factory);
 	self->data->scaled_factory = new LIRenScaledOverlayFactory;
 	self->data->overlay_manager->addOverlayElementFactory (self->data->scaled_factory);
+	self->data->text_factory = new LIRenTextOverlayFactory;
+	self->data->overlay_manager->addOverlayElementFactory (self->data->text_factory);
 
 	/* Create the group for temporary resources. */
 	/* This group is used for temporary resources such as meshes or
@@ -241,6 +244,7 @@ void liren_internal_deinit (
 		delete self->data->container_factory;
 		delete self->data->image_factory;
 		delete self->data->scaled_factory;
+		delete self->data->text_factory;
 		delete self->data->log;
 		delete self->data;
 		self->data = NULL;

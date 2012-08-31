@@ -70,6 +70,10 @@ LIAPICALL (void, liren_overlay_remove_overlay, (
 	LIRenOverlay* self,
 	LIRenOverlay* overlay));
 
+LIAPICALL (void, liren_overlay_set_alpha, (
+	LIRenOverlay* self,
+	float         value));
+
 LIAPICALL (void, liren_overlay_set_depth, (
 	LIRenOverlay* self,
 	int           value));
