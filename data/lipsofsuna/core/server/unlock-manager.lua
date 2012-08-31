@@ -44,7 +44,7 @@ end
 -- @param name Unlock name.
 -- @param added True if added, false if removed.
 UnlockManager.changed = function(self, type, name, added)
-	if not Server.initialized then return end
+	if not self.db then return end
 	if added then
 		Game.messaging:server_event_broadcast("unlocks add", type, name)
 	else
