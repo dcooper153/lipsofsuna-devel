@@ -56,6 +56,7 @@ extern LIMaiExtensionInfo liext_sectors_info;
 extern LIMaiExtensionInfo liext_skeleton_info;
 extern LIMaiExtensionInfo liext_sound_info;
 extern LIMaiExtensionInfo liext_string_info;
+extern LIMaiExtensionInfo liext_terrain_info;
 extern LIMaiExtensionInfo liext_thread_info;
 extern LIMaiExtensionInfo liext_tiles_info;
 extern LIMaiExtensionInfo liext_tiles_physics_info;
@@ -105,6 +106,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "skeleton", &liext_skeleton_info },
 		{ "sound", &liext_sound_info },
 		{ "string", &liext_string_info },
+		{ "terrain", &liext_terrain_info },
 		{ "thread", &liext_thread_info },
 		{ "tiles", &liext_tiles_info },
 		{ "tiles-physics", &liext_tiles_physics_info },
