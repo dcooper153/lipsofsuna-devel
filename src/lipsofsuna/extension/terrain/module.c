@@ -27,11 +27,11 @@
 LIMaiExtensionInfo liext_terrain_info =
 {
 	LIMAI_EXTENSION_VERSION, "Terrain",
-	liext_terrain_new,
-	liext_terrain_free
+	liext_terrain_module_new,
+	liext_terrain_module_free
 };
 
-LIExtTerrainModule* liext_terrain_new (
+LIExtTerrainModule* liext_terrain_module_new (
 	LIMaiProgram* program)
 {
 	LIExtTerrainModule* self;
@@ -49,7 +49,7 @@ LIExtTerrainModule* liext_terrain_new (
 	return self;
 }
 
-void liext_terrain_free (
+void liext_terrain_module_free (
 	LIExtTerrainModule* self)
 {
 	lisys_free (self);
