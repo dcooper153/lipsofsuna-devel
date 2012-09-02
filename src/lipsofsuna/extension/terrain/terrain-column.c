@@ -443,6 +443,193 @@ int liext_terrain_column_add_stick (
 		}
 	}
 
+	/* Mark the column as changed. */
+	self->stamp++;
+
+	return 1;
+}
+
+/**
+ * \brief Builds the model of the column.
+ * \param self Terrain column.
+ * \param grid_size Grid size.
+ * \return Nonzero on success, zero on failure.
+ */
+int liext_terrain_column_build_model (
+	LIExtTerrainColumn* self,
+	float               grid_size)
+{
+	int material_id;
+	float y;
+	float u;
+	float v;
+	LIExtTerrainStick* stick;
+	LIExtTerrainStick* stick_prev;
+	LIMatVector coords_bot[2][2];
+	LIMatVector coords_top[2][2];
+	LIMatVector normal;
+	LIMdlBuilder* builder;
+	LIMdlMaterial material;
+	LIMdlVertex vertices[3];
+
+	/* Check if changes are needed. */
+	if (self->stamp == self->stamp_model)
+		return 1;
+
+	/* Allocate the model. */
+	if (self->model == NULL)
+	{
+		self->model = limdl_model_new ();
+		if (self->model == NULL)
+			return 0;
+	}
+	else
+		limdl_model_clear (self->model);
+
+	/* Allocate the material. */
+	if (!limdl_material_init (&material))
+		return 0;
+	if (!limdl_material_set_material (&material, "stickterrain1"))
+	{
+		limdl_material_free (&material);
+		return 0;
+	}
+
+	/* Allocate the model builder. */
+	builder = limdl_builder_new (self->model);
+	if (builder == NULL)
+	{
+		limdl_material_free (&material);
+		return 0;
+	}
+	if (!limdl_builder_insert_material (builder, &material))
+	{
+		limdl_material_free (&material);
+		limdl_builder_free (builder);
+		return 0;
+	}
+	material_id = 0;
+	limdl_material_free (&material);
+
+	/* Add the sticks to the builder. */
+	y = 0;
+	stick_prev = NULL;
+	coords_bot[0][0] = limat_vector_init (0.0f, 0.0f, 0.0f);
+	coords_bot[1][0] = limat_vector_init (grid_size, 0.0f, 0.0f);
+	coords_bot[0][1] = limat_vector_init (0.0f, 0.0f, grid_size);
+	coords_bot[1][1] = limat_vector_init (grid_size, 0.0f, grid_size);
+	for (stick = self->sticks ; stick != NULL ; stick = stick->next)
+	{
+		y += stick->height;
+		coords_top[0][0] = limat_vector_init (0.0f, y + stick->corners[0][0], 0.0f);
+		coords_top[1][0] = limat_vector_init (grid_size, y + stick->corners[1][0], 0.0f);
+		coords_top[0][1] = limat_vector_init (0.0f, y + stick->corners[0][1], grid_size);
+		coords_top[1][1] = limat_vector_init (grid_size, y + stick->corners[1][1], grid_size);
+		if (stick->material != 0)
+		{
+			u = (stick->material - 1) / 255.0f;
+
+			/* Left face. */
+			if (1)
+			{
+				v = 0.0f / 5.0f;
+				normal = limat_vector_init (-1.0f, 0.0f, 0.0f);
+				limdl_vertex_init (vertices + 0, &coords_bot[0][0], &normal, u, v);
+				limdl_vertex_init (vertices + 1, &coords_bot[0][1], &normal, u, v);
+				limdl_vertex_init (vertices + 2, &coords_top[0][1], &normal, u, v);
+				limdl_builder_insert_face (builder, 0, material_id, vertices, NULL);
+				limdl_vertex_init (vertices + 0, &coords_bot[0][0], &normal, u, v);
+				limdl_vertex_init (vertices + 1, &coords_top[0][1], &normal, u, v);
+				limdl_vertex_init (vertices + 2, &coords_top[0][0], &normal, u, v);
+				limdl_builder_insert_face (builder, 0, material_id, vertices, NULL);
+			}
+
+			/* Right face. */
+			if (1)
+			{
+				v = 1.0f / 5.0f;
+				normal = limat_vector_init (1.0f, 0.0f, 0.0f);
+				limdl_vertex_init (vertices + 0, &coords_bot[1][0], &normal, u, v);
+				limdl_vertex_init (vertices + 1, &coords_top[1][0], &normal, u, v);
+				limdl_vertex_init (vertices + 2, &coords_top[1][1], &normal, u, v);
+				limdl_builder_insert_face (builder, 0, material_id, vertices, NULL);
+				limdl_vertex_init (vertices + 0, &coords_bot[1][0], &normal, u, v);
+				limdl_vertex_init (vertices + 1, &coords_top[1][1], &normal, u, v);
+				limdl_vertex_init (vertices + 2, &coords_bot[1][1], &normal, u, v);
+				limdl_builder_insert_face (builder, 0, material_id, vertices, NULL);
+			}
+
+			/* Front face. */
+			if (1)
+			{
+				v = 2.0f / 5.0f;
+				normal = limat_vector_init (0.0f, 0.0f, -1.0f);
+				limdl_vertex_init (vertices + 0, &coords_bot[0][0], &normal, u, v);
+				limdl_vertex_init (vertices + 1, &coords_top[0][0], &normal, u, v);
+				limdl_vertex_init (vertices + 2, &coords_top[1][0], &normal, u, v);
+				limdl_builder_insert_face (builder, 0, material_id, vertices, NULL);
+				limdl_vertex_init (vertices + 0, &coords_bot[0][0], &normal, u, v);
+				limdl_vertex_init (vertices + 1, &coords_top[1][0], &normal, u, v);
+				limdl_vertex_init (vertices + 2, &coords_bot[1][0], &normal, u, v);
+				limdl_builder_insert_face (builder, 0, material_id, vertices, NULL);
+			}
+
+			/* Back face. */
+			if (1)
+			{
+				v = 3.0f / 5.0f;
+				normal = limat_vector_init (0.0f, 0.0f, 1.0f);
+				limdl_vertex_init (vertices + 0, &coords_bot[0][1], &normal, u, v);
+				limdl_vertex_init (vertices + 1, &coords_bot[1][1], &normal, u, v);
+				limdl_vertex_init (vertices + 2, &coords_top[1][1], &normal, u, v);
+				limdl_builder_insert_face (builder, 0, material_id, vertices, NULL);
+				limdl_vertex_init (vertices + 0, &coords_bot[0][1], &normal, u, v);
+				limdl_vertex_init (vertices + 1, &coords_top[1][1], &normal, u, v);
+				limdl_vertex_init (vertices + 2, &coords_top[0][1], &normal, u, v);
+				limdl_builder_insert_face (builder, 0, material_id, vertices, NULL);
+			}
+
+			/* Bottom face. */
+			if (stick_prev == NULL || stick_prev->material == 0)
+			{
+				v = 4.0f / 5.0f;
+				normal = limat_vector_init (0.0f, -1.0f, 0.0f);
+				limdl_vertex_init (vertices + 0, &coords_bot[0][0], &normal, u, v);
+				limdl_vertex_init (vertices + 1, &coords_bot[1][0], &normal, u, v);
+				limdl_vertex_init (vertices + 2, &coords_bot[1][1], &normal, u, v);
+				limdl_builder_insert_face (builder, 0, material_id, vertices, NULL);
+				limdl_vertex_init (vertices + 0, &coords_bot[0][0], &normal, u, v);
+				limdl_vertex_init (vertices + 1, &coords_bot[1][1], &normal, u, v);
+				limdl_vertex_init (vertices + 2, &coords_bot[0][1], &normal, u, v);
+				limdl_builder_insert_face (builder, 0, material_id, vertices, NULL);
+			}
+
+			/* Top face. */
+			if (stick->next == NULL || stick->next->material == 0)
+			{
+				v = 5.0f / 5.0f;
+				normal = limat_vector_init (0.0f, 1.0f, 0.0f);
+				limdl_vertex_init (vertices + 0, &coords_top[0][0], &normal, u, v);
+				limdl_vertex_init (vertices + 1, &coords_top[0][1], &normal, u, v);
+				limdl_vertex_init (vertices + 2, &coords_top[1][1], &normal, u, v);
+				limdl_builder_insert_face (builder, 0, material_id, vertices, NULL);
+				limdl_vertex_init (vertices + 0, &coords_top[0][0], &normal, u, v);
+				limdl_vertex_init (vertices + 1, &coords_top[1][1], &normal, u, v);
+				limdl_vertex_init (vertices + 2, &coords_top[1][0], &normal, u, v);
+				limdl_builder_insert_face (builder, 0, material_id, vertices, NULL);
+			}
+		}
+		coords_bot[0][0] = coords_top[0][0];
+		coords_bot[1][0] = coords_top[1][0];
+		coords_bot[0][1] = coords_top[0][1];
+		coords_bot[1][1] = coords_top[1][1];
+	}
+
+	/* Finish the build. */
+	limdl_builder_finish (builder);
+	limdl_builder_free (builder);
+	self->stamp_model = self->stamp;
+
 	return 1;
 }
 
@@ -455,6 +642,11 @@ void liext_terrain_column_clear (
 {
 	private_free_sticks (self->sticks);
 	self->sticks = NULL;
+	if (self->model != NULL)
+	{
+		limdl_model_free (self->model);
+		self->model = NULL;
+	}
 }
 
 /**

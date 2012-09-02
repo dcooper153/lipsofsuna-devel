@@ -65,7 +65,78 @@ void liext_terrain_chunk_free (
 		for (i = 0 ; i < self->size * self->size ; i++)
 			liext_terrain_column_clear (self->columns + i);
 	}
+	if (self->model != NULL)
+		limdl_model_free (self->model);
 	lisys_free (self);
+}
+
+/**
+ * \brief Builds the model of the chunk.
+ * \param self Terrain chunk.
+ * \param grid_size Grid size.
+ * \return Nonzero on success, zero on failure.
+ */
+int liext_terrain_chunk_build_model (
+	LIExtTerrainChunk* self,
+	float              grid_size)
+{
+	int i;
+	int j;
+	LIExtTerrainColumn* column;
+	LIMatTransform transform;
+	LIMdlBuilder* builder;
+
+	/* Check if changes are needed. */
+	if (self->stamp == self->stamp_model)
+		return 1;
+
+	/* Build the column models. */
+	for (i = 0 ; i < self->size * self->size ; i++)
+	{
+		if (!liext_terrain_column_build_model (self->columns + i, grid_size))
+			return 0;
+	}
+
+	/* Allocate the model. */
+	if (self->model == NULL)
+	{
+		self->model = limdl_model_new ();
+		if (self->model == NULL)
+			return 0;
+	}
+	else
+		limdl_model_clear (self->model);
+
+	/* Allocate the model builder. */
+	builder = limdl_builder_new (self->model);
+	if (builder == NULL)
+		return 0;
+
+	/* Merge the models. */
+	for (j = 0 ; j < self->size ; j++)
+	{
+		for (i = 0 ; i < self->size ; i++)
+		{
+			column = self->columns + i + j * self->size;
+			if (column->model != NULL)
+			{
+				transform = limat_transform_init (limat_vector_init (i * grid_size, 0.0f, j * grid_size), limat_quaternion_identity ());
+				limdl_builder_merge_model (builder, column->model, &transform);
+			}
+		}
+	}
+
+	/* Finish the build. */
+	limdl_builder_finish (builder);
+	limdl_builder_free (builder);
+	self->stamp_model = self->stamp;
+
+	/* Sanity checks. */
+	lisys_assert (self->model->materials.count <= 1);
+	lisys_assert (self->model->lod.count == 1);
+	lisys_assert (self->model->lod.array[0].face_groups.count <= 1);
+
+	return 1;
 }
 
 /**

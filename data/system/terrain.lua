@@ -9,6 +9,7 @@
 -- @alias Terrain
 
 local Class = require("system/class")
+local Model = require("system/model")
 local Packet = require("system/packet")
 
 if not Los.program_load_extension("terrain") then
@@ -42,6 +43,17 @@ end
 -- @return True on success.
 Terrain.add_stick = function(self, x, z, y, h, mat)
 	return Los.terrain_add_stick(self.handle, x, z, y, h, mat)
+end
+
+--- Builds the model for the terrain chunk.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @return Model, or nil.
+Terrain.build_chunk_model = function(self, x, z)
+	local handle = Los.terrain_build_chunk_model(self.handle, x, z)
+	if not handle then return end
+	return Model:new_from_handle(handle)
 end
 
 --- Clears a column.

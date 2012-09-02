@@ -66,6 +66,10 @@ LIAPICALL (int, liext_terrain_column_add_stick, (
 	float         world_h,
 	int           material));
 
+LIAPICALL (int, liext_terrain_column_build_model, (
+	LIExtTerrainColumn* self,
+	float               grid_size));
+
 LIAPICALL (void, liext_terrain_column_clear, (
 	LIExtTerrainColumn* self));
 
@@ -96,6 +100,10 @@ LIAPICALL (LIExtTerrainChunk*, liext_terrain_chunk_new, (
 
 LIAPICALL (void, liext_terrain_chunk_free, (
 	LIExtTerrainChunk* self));
+
+LIAPICALL (int, liext_terrain_chunk_build_model, (
+	LIExtTerrainChunk* self,
+	float              grid_size));
 
 LIAPICALL (LIExtTerrainColumn*, liext_terrain_chunk_get_column, (
 	LIExtTerrainChunk* self,

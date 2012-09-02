@@ -76,6 +76,55 @@ static void Terrain_add_stick (LIScrArgs* args)
 	liscr_args_seti_bool (args, liext_terrain_add_stick (args->self, grid_x, grid_z, world_y, world_h, material));
 }
 
+static void Terrain_build_chunk_model (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	LIExtTerrain* self;
+	LIExtTerrainChunk* chunk;
+	LIExtTerrainModule* module;
+	LIMdlModel* model;
+	LIScrData* data;
+
+	/* Get the arguments. */
+	self = args->self;
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_TERRAIN);
+	if (!liscr_args_geti_int (args, 0, &grid_x) || grid_x < 0)
+		return;
+	if (!liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
+		return;
+
+	/* Build the model. */
+	chunk = liext_terrain_get_chunk (self, grid_x, grid_z);
+	if (chunk == NULL)
+		return;
+	if (!liext_terrain_chunk_build_model (chunk, self->grid_size))
+		return;
+
+	/* Copy the model. */
+	if (chunk->model == NULL)
+		return;
+	model = limdl_model_new_copy (chunk->model, 0);
+	if (model == NULL)
+		return;
+
+	/* Allocate the unique ID. */
+	if (!limdl_manager_add_model (module->program->models, model))
+	{
+		limdl_model_free (model);
+		return;
+	}
+
+	/* Allocate the userdata. */
+	data = liscr_data_new (args->script, args->lua, model, LISCR_SCRIPT_MODEL, limdl_manager_free_model);
+	if (data == NULL)
+	{
+		limdl_model_free (model);
+		return;
+	}
+	liscr_args_seti_stack (args);
+}
+
 static void Terrain_clear_column (LIScrArgs* args)
 {
 	int grid_x;
@@ -336,6 +385,7 @@ void liext_script_terrain (
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_new", Terrain_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick", Terrain_add_stick);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_build_chunk_model", Terrain_build_chunk_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_clear_column", Terrain_clear_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_load_chunk", Terrain_load_chunk);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_unload_chunk", Terrain_unload_chunk);
