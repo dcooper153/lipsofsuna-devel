@@ -102,38 +102,6 @@ static void Model_changed (LIScrArgs* args)
 	lical_callbacks_call (program->callbacks, "model-changed", lical_marshal_DATA_PTR, args->self);
 }
 
-static void Model_get_bounding_box (LIScrArgs* args)
-{
-	LIMatVector min;
-	LIMatVector max;
-	LIMdlModel* self;
-
-	self = args->self;
-	min = self->bounds.min;
-	max = self->bounds.max;
-	liscr_args_seti_vector (args, &min);
-	liscr_args_seti_vector (args, &max);
-}
-
-static void Model_get_center_offset (LIScrArgs* args)
-{
-	LIMatVector ctr;
-	LIMdlModel* self;
-
-	self = args->self;
-	ctr = limat_vector_add (self->bounds.min, self->bounds.max);
-	ctr = limat_vector_multiply (ctr, 0.5f);
-	liscr_args_seti_vector (args, &ctr);
-}
-
-static void Model_get_memory_used (LIScrArgs* args)
-{
-	LIMdlModel* self;
-
-	self = args->self;
-	liscr_args_seti_int (args, limdl_model_get_memory (self));
-}
-
 static void Model_load (LIScrArgs* args)
 {
 	int mesh = 1;
@@ -173,6 +141,46 @@ static void Model_load (LIScrArgs* args)
 	limdl_model_free (tmpmdl);
 }
 
+static void Model_get_bounding_box (LIScrArgs* args)
+{
+	LIMatVector min;
+	LIMatVector max;
+	LIMdlModel* self;
+
+	self = args->self;
+	min = self->bounds.min;
+	max = self->bounds.max;
+	liscr_args_seti_vector (args, &min);
+	liscr_args_seti_vector (args, &max);
+}
+
+static void Model_get_center_offset (LIScrArgs* args)
+{
+	LIMatVector ctr;
+	LIMdlModel* self;
+
+	self = args->self;
+	ctr = limat_vector_add (self->bounds.min, self->bounds.max);
+	ctr = limat_vector_multiply (ctr, 0.5f);
+	liscr_args_seti_vector (args, &ctr);
+}
+
+static void Model_get_memory_used (LIScrArgs* args)
+{
+	LIMdlModel* self;
+
+	self = args->self;
+	liscr_args_seti_int (args, limdl_model_get_memory (self));
+}
+
+static void Model_get_vertex_count (LIScrArgs* args)
+{
+	LIMdlModel* self;
+
+	self = args->self;
+	liscr_args_seti_int (args, self->vertices.count);
+}
+
 /*****************************************************************************/
 
 void liext_script_model (
@@ -182,10 +190,11 @@ void liext_script_model (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_copy", Model_copy);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_calculate_bounds", Model_calculate_bounds);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_changed", Model_changed);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_load", Model_load);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_bounding_box", Model_get_bounding_box);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_center_offset", Model_get_center_offset);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_memory_used", Model_get_memory_used);
-	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_load", Model_load);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_vertex_count", Model_get_vertex_count);
 }
 
 /** @} */

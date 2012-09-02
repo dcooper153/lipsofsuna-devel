@@ -133,6 +133,11 @@ Model.get_render = function(self)
 	return self.render
 end
 
+--- Gets the vertex count of the model.
+-- @param self Model.
+-- @return Number.
+Model.get_vertex_count = function(self)
+	return Los.model_get_vertex_count(self.handle)
+end
+
 return Model
-
-
