@@ -579,6 +579,145 @@ int limdl_builder_insert_weightgroup (
 	return 1;
 }
 
+/**
+ * \brief Merges a model to the builder.
+ * \param self Model builder.
+ * \param model Model.
+ * \param transform Vertex transformation, or NULL for none.
+ * \return Nonzero on success.
+ */
+int limdl_builder_merge_model (
+	LIMdlBuilder*         self,
+	const LIMdlModel*     model,
+	const LIMatTransform* transform)
+{
+	int i;
+	int j;
+	int group;
+	int material;
+	int vertex_offset;
+	int* wgroups = NULL;
+	LIMdlFaces* srcfaces;
+	LIMdlLod* lod;
+
+	/* Map weight groups. */
+	if (model->weight_groups.count)
+	{
+		wgroups = lisys_calloc (model->weight_groups.count, sizeof (int));
+		if (wgroups == NULL)
+			return 0;
+		for (i = 0 ; i < model->weight_groups.count ; i++)
+		{
+			group = limdl_model_find_weightgroup (self->model,
+				model->weight_groups.array[i].name,
+				model->weight_groups.array[i].bone);
+			if (group == -1)
+			{
+				group = self->model->weight_groups.count;
+				if (!limdl_builder_insert_weightgroup (self, 
+				    model->weight_groups.array[i].name,
+				    model->weight_groups.array[i].bone))
+				{
+					lisys_free (wgroups);
+					return 0;
+				}
+			}
+			lisys_assert (group < self->model->weight_groups.count);
+			wgroups[i] = group;
+		}
+	}
+
+	/* Merge vertices. */
+	vertex_offset = self->model->vertices.count;
+	if (model->vertices.count)
+	{
+		if (!limdl_builder_insert_vertices (self, model->vertices.array, model->vertices.count, wgroups))
+		{
+			lisys_free (wgroups);
+			return 0;
+		}
+		if (transform != NULL)
+			limdl_builder_transform_vertices (self, self->model->vertices.count - model->vertices.count, model->vertices.count, transform);
+	}
+
+	/* Create levels of detail. */
+	if (self->lod.count < model->lod.count)
+	{
+		if (!limdl_builder_add_detail_levels (self, model->lod.count - self->lod.count))
+		{
+			lisys_free (wgroups);
+			return 0;
+		}
+	}
+
+	/* Merge each level of detail. */
+	/* If the added model doesn't have enough detail levels, the lowest
+	   quality level provided by it is used for the missing levels. */
+	for (j = 0 ; j < self->lod.count ; j++)
+	{
+		if (j < model->lod.count)
+			lod = model->lod.array + j;
+		else
+			lod = model->lod.array + model->lod.count - 1;
+
+		/* Merge each face group. */
+		for (i = 0 ; i < lod->face_groups.count ; i++)
+		{
+			srcfaces = lod->face_groups.array + i;
+
+			/* Find or create the material. */
+			material = limdl_model_find_material (self->model, model->materials.array + i);
+			if (material == -1)
+			{
+				material = self->model->materials.count;
+				if (!limdl_builder_insert_material (self, model->materials.array + i))
+				{
+					lisys_free (wgroups);
+					return 0;
+				}
+			}
+
+			/* Insert indices. */
+			if (!limdl_builder_insert_indices (self, j, material, lod->indices.array + srcfaces->start, srcfaces->count, vertex_offset))
+			{
+				lisys_free (wgroups);
+				return 0;
+			}
+		}
+	}
+
+	/* Merge node hierarchies. */
+	limdl_nodes_merge (&self->model->nodes, &model->nodes);
+	lisys_free (wgroups);
+
+	return 1;
+}
+
+
+/**
+ * \brief Transforms vertices in the builder.
+ * \param self Model builder.
+ * \param start Start vertex index.
+ * \param count Number of vertices.
+ * \param transform Transform.
+ */
+void limdl_builder_transform_vertices (
+	LIMdlBuilder*         self,
+	int                   start,
+	int                   count,
+	const LIMatTransform* transform)
+{
+	int i;
+	LIMdlVertex* vertex;
+
+	for (i = start ; i < start + count ; i++)
+	{
+		vertex = self->model->vertices.array + i;
+		vertex->coord = limat_transform_transform (*transform, vertex->coord);
+		vertex->normal = limat_quaternion_transform (transform->rotation, vertex->normal);
+	}
+}
+
 /*****************************************************************************/
 
 static int private_faces_init (

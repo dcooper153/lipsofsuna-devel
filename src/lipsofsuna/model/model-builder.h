@@ -124,4 +124,15 @@ LIAPICALL (int, limdl_builder_insert_weightgroup, (
 	const char*   name,
 	const char*   bone));
 
+LIAPICALL (int, limdl_builder_merge_model, (
+	LIMdlBuilder*         self,
+	const LIMdlModel*     model,
+	const LIMatTransform* transform));
+
+LIAPICALL (void, limdl_builder_transform_vertices, (
+	LIMdlBuilder*         self,
+	int                   start,
+	int                   count,
+	const LIMatTransform* transform));
+
 #endif

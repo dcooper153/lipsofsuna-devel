@@ -114,8 +114,8 @@ LIAPICALL (int, limdl_model_find_weightgroup, (
 	const char* bone));
 
 LIAPICALL (int, limdl_model_merge, (
-	LIMdlModel* self,
-	LIMdlModel* model));
+	LIMdlModel*       self,
+	const LIMdlModel* model));
 
 LIAPICALL (int, limdl_model_morph, (
 	LIMdlModel* self,

@@ -42,8 +42,8 @@ LIAPICALL (LIMdlNode*, limdl_nodes_find_node, (
 	const char*       name));
 
 LIAPICALL (void, limdl_nodes_merge, (
-	LIMdlNodes* self,
-	LIMdlNodes* nodes));
+	LIMdlNodes*       self,
+	const LIMdlNodes* nodes));
 
 
 #endif

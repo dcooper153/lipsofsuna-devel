@@ -580,125 +580,34 @@ int limdl_model_find_weightgroup (
 	return -1;
 }
 
+/**
+ * \brief Merges the model to this one.
+ * \param self Model.
+ * \param model Model.
+ * \return Nonzero on success.
+ */
 int limdl_model_merge (
-	LIMdlModel* self,
-	LIMdlModel* model)
+	LIMdlModel*       self,
+	const LIMdlModel* model)
 {
-	int i;
-	int j;
-	int group;
-	int material;
-	int vertex_offset;
-	int* wgroups = NULL;
 	LIMdlBuilder* builder;
-	LIMdlFaces* srcfaces;
-	LIMdlLod* lod;
 
 	/* Create a model builder. */
 	builder = limdl_builder_new (self);
 	if (builder == NULL)
 		return 0;
 
-	/* Map weight groups. */
-	if (model->weight_groups.count)
+	/* Merge the models using the builder. */
+	if (!limdl_builder_merge_model (builder, model, NULL))
 	{
-		wgroups = lisys_calloc (model->weight_groups.count, sizeof (int));
-		if (wgroups == NULL)
-		{
-			limdl_builder_free (builder);
-			return 0;
-		}
-		for (i = 0 ; i < model->weight_groups.count ; i++)
-		{
-			group = limdl_model_find_weightgroup (self,
-				model->weight_groups.array[i].name,
-				model->weight_groups.array[i].bone);
-			if (group == -1)
-			{
-				group = self->weight_groups.count;
-				if (!limdl_builder_insert_weightgroup (builder, 
-				    model->weight_groups.array[i].name,
-				    model->weight_groups.array[i].bone))
-				{
-					limdl_builder_free (builder);
-					lisys_free (wgroups);
-					return 0;
-				}
-			}
-			lisys_assert (group < self->weight_groups.count);
-			wgroups[i] = group;
-		}
+		limdl_builder_free (builder);
+		return 0;
 	}
-
-	/* Merge vertices. */
-	vertex_offset = self->vertices.count;
-	if (model->vertices.count)
-	{
-		if (!limdl_builder_insert_vertices (builder, model->vertices.array, model->vertices.count, wgroups))
-		{
-			limdl_builder_free (builder);
-			lisys_free (wgroups);
-			return 0;
-		}
-	}
-
-	/* Create levels of detail. */
-	if (builder->lod.count < model->lod.count)
-	{
-		if (!limdl_builder_add_detail_levels (builder, model->lod.count - builder->lod.count))
-		{
-			limdl_builder_free (builder);
-			lisys_free (wgroups);
-			return 0;
-		}
-	}
-
-	/* Merge each level of detail. */
-	/* If the added model doesn't have enough detail levels, the lowest
-	   quality level provided by it is used for the missing levels. */
-	for (j = 0 ; j < builder->lod.count ; j++)
-	{
-		if (j < model->lod.count)
-			lod = model->lod.array + j;
-		else
-			lod = model->lod.array + model->lod.count - 1;
-
-		/* Merge each face group. */
-		for (i = 0 ; i < lod->face_groups.count ; i++)
-		{
-			srcfaces = lod->face_groups.array + i;
-
-			/* Find or create the material. */
-			material = limdl_model_find_material (self, model->materials.array + i);
-			if (material == -1)
-			{
-				material = self->materials.count;
-				if (!limdl_builder_insert_material (builder, model->materials.array + i))
-				{
-					limdl_builder_free (builder);
-					lisys_free (wgroups);
-					return 0;
-				}
-			}
-
-			/* Insert indices. */
-			if (!limdl_builder_insert_indices (builder, j, material, lod->indices.array + srcfaces->start, srcfaces->count, vertex_offset))
-			{
-				limdl_builder_free (builder);
-				lisys_free (wgroups);
-				return 0;
-			}
-		}
-	}
-
-	/* Merge node hierarchies. */
-	limdl_nodes_merge (&self->nodes, &model->nodes);
 
 	/* FIXME: Recalculates tangents unnecessarily. */
 	/* FIXME: Recalculates the bounding box from scratch even though could just calculate the intersection. */
 	limdl_builder_finish (builder);
 	limdl_builder_free (builder);
-	lisys_free (wgroups);
 
 	return 1;
 }

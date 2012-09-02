@@ -94,8 +94,8 @@ LIMdlNode* limdl_nodes_find_node (
  * \param nodes Nodes to copy.
  */
 void limdl_nodes_merge (
-	LIMdlNodes* self,
-	LIMdlNodes* nodes)
+	LIMdlNodes*       self,
+	const LIMdlNodes* nodes)
 {
 	int i;
 
