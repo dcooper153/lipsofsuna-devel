@@ -13,7 +13,12 @@ if Settings.server then return end
 local Camera = require("system/camera")
 local Class = require("system/class")
 local Light = require("system/light")
+local Quaternion = require("system/math/quaternion")
+local RenderModel = require("system/render-model")
+local RenderObject = require("system/render-object")
 local Simulation = require("core/client/simulation")
+local Terrain = require("system/terrain")
+local Vector = require("system/math/vector")
 
 --- Provides a simple graphical benchmark.
 -- @type Benchmark
@@ -47,10 +52,6 @@ Benchmark.new = function(clss)
 	o:set_position(Vector(500,500,497))
 	o:set_visible(true)
 	o.render:init(o)
-	-- Setup terrain benchmarking.
-	self.terrain_offset = Vector(500,500,500):multiply(Voxel.tile_scale):floor():subtract_xyz(10,1,7)
-	self.terrain_timer1 = 0
-	self.terrain_timer2 = 1
 	-- Create the camera.
 	self.translation = Vector(-5, 2, -15)
 	self.camera = Camera()
@@ -63,6 +64,27 @@ Benchmark.new = function(clss)
 	self.light:set_diffuse{0.6,0.6,0.6,1.0}
 	self.light:set_equation{1.0,0.0,0.01}
 	self.light:set_enabled(true)
+	-- Create the terrain.
+	self.terrain_timer1 = 0
+	self.terrain_timer2 = 1
+	self.terrain = Terrain(32, 1)
+	self.terrain:load_chunk(0, 0)
+	for x = 0,31 do
+		for z = 0,31 do
+			self.terrain:add_stick(x, z, 0, 9 + math.random(), math.random(1, 3))
+		end
+	end
+	self.terrain:add_stick(0, 0, 0, 1, 1)
+	self.terrain:add_stick(0, 0, 5, 2, 0)
+	self.terrain:add_stick(0, 0, 15, 4, 3)
+	self.terrain:add_stick(1, 0, 0, 1.1, 1)
+	self.terrain:add_stick(1, 0, 5, 2, 2)
+	self.terrain:add_stick(1, 0, 15, 3.8, 3)
+	self.terrain_model = self.terrain:build_chunk_model(0, 0)
+	self.terrain_object = RenderObject()
+	self.terrain_object:add_model(self.terrain_model:get_render())
+	self.terrain_object:set_position(Vector(490,490,497))
+	self.terrain_object:set_visible(true)
 	return self
 end
 
@@ -73,6 +95,7 @@ Benchmark.close = function(self)
 	Game.objects:detach_all()
 	Game.sectors:unload_all()
 	self.light:set_enabled(false)
+	self.terrain_object:set_visible(false)
 	Client.sectors.unload_time = 10
 end
 
@@ -100,10 +123,7 @@ Benchmark.update = function(self, secs)
 		end
 	end
 	-- Modify terrain.
-	local x = self.terrain_timer1 % 20
-	local z = math.floor(self.terrain_timer1 / 20)
-	local q = self.terrain_offset:copy():add_xyz(x, 0, z)
-	Voxel:set_tile(q, self.terrain_timer2)
+	-- TODO
 	-- Update the terrain timer.
 	self.terrain_timer1 = self.terrain_timer1 + 1
 	if self.terrain_timer1 > 400 then
