@@ -25,13 +25,23 @@
 
 #define LIEXT_STICK_EPSILON 0.01
 
+typedef struct _LIExtTerrainVertex LIExtTerrainVertex;
+struct _LIExtTerrainVertex
+{
+	float offset;
+	float splatting;
+	LIMatVector normal;
+};
+
+/*****************************************************************************/
+
 typedef struct _LIExtTerrainStick LIExtTerrainStick;
 struct _LIExtTerrainStick
 {
 	LIExtTerrainStick* next;
 	int material;
 	float height;
-	float corners[2][2];
+	LIExtTerrainVertex vertices[2][2];
 };
 
 LIAPICALL (LIExtTerrainStick*, liext_terrain_stick_new, (
@@ -41,6 +51,13 @@ LIAPICALL (LIExtTerrainStick*, liext_terrain_stick_new, (
 LIAPICALL (void, liext_terrain_stick_free, (
 	LIExtTerrainStick* self));
 
+LIAPICALL (void, liext_terrain_stick_copy_vertices, (
+	LIExtTerrainStick* self,
+	LIExtTerrainStick* src));
+
+LIAPICALL (void, liext_terrain_stick_reset_vertices, (
+	LIExtTerrainStick* self));
+
 LIAPICALL (int, liext_terrain_stick_get_data, (
 	LIExtTerrainStick* self,
 	LIArcWriter*       writer));
@@ -48,6 +65,17 @@ LIAPICALL (int, liext_terrain_stick_get_data, (
 LIAPICALL (int, liext_terrain_stick_set_data, (
 	LIExtTerrainStick* self,
 	LIArcReader*       reader));
+
+LIAPICALL (void, liext_terrain_stick_get_normal, (
+	const LIExtTerrainStick* self,
+	LIMatVector*             result));
+
+LIAPICALL (void, liext_terrain_stick_get_normal_override, (
+	const LIExtTerrainStick* self,
+	int                      vertex_x,
+	int                      vertex_y,
+	float                    vertex_offset,
+	LIMatVector*             result));
 
 /*****************************************************************************/
 
@@ -72,6 +100,14 @@ LIAPICALL (int, liext_terrain_column_build_model, (
 
 LIAPICALL (void, liext_terrain_column_clear, (
 	LIExtTerrainColumn* self));
+
+LIAPICALL (void, liext_terrain_column_smoothen, (
+	LIExtTerrainColumn* self,
+	LIExtTerrainColumn* c10,
+	LIExtTerrainColumn* c01,
+	LIExtTerrainColumn* c11,
+	float               y,
+	float               h));
 
 LIAPICALL (int, liext_terrain_column_get_data, (
 	LIExtTerrainColumn* self,
@@ -152,6 +188,13 @@ LIAPICALL (int, liext_terrain_load_chunk, (
 	LIExtTerrain* self,
 	int           grid_x,
 	int           grid_z));
+
+LIAPICALL (int, liext_terrain_smoothen_column, (
+	LIExtTerrain* self,
+	int           grid_x,
+	int           grid_z,
+	float         world_y,
+	float         world_h));
 
 LIAPICALL (int, liext_terrain_unload_chunk, (
 	LIExtTerrain* self,

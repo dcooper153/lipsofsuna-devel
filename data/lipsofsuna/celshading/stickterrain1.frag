@@ -16,6 +16,7 @@ uniform vec4 LOS_light_spotparams[LIGHTS];
 varying vec3 F_coord;
 varying vec3 F_normal;
 varying vec2 F_texcoord;
+varying vec3 F_splatting;
 varying vec3 F_eyev;
 varying vec3 F_lightv[LIGHTS];
 
@@ -24,7 +25,14 @@ vec3 los_cel_shading(in vec4 material, in vec4 diff, in vec4 spec, in vec4 p, in
 
 void main()
 {
-	/* Texcoord generation. */
+	/* Texcoord generation.
+	 *
+	 * F_texcoord contains the texture number in X and the face index
+	 * in Y. The texture coordinate is generated using the face index
+	 * and the world space vertex coordinate. The texture atlast index
+	 * is selected using the texture number, and the texture coordinate
+	 * is fitted into the atlas image.
+	 */
 	vec2 uv_world;
 	if(F_texcoord.y < 0.25)
 		uv_world = F_coord.yz;
@@ -33,11 +41,28 @@ void main()
 	else
 		uv_world = F_coord.xz;
 	int material = int(F_texcoord.x * 255.0 + 0.5);
-	vec2 uv_orig = vec2(mod(material, 4), float(material / 4)) * 0.25;
-	vec2 uv = uv_orig + mod(uv_world * 0.2, 1.0) * 0.248 + vec2(0.001);
+	vec2 uv_atlas = vec2(mod(material, 4), floor(material / 4)) * 0.25 + vec2(0.008);
+	vec2 uv = mod(uv_world * 0.2, 1.0) * 0.234;
+
+	/* Texture splatting.
+	 *
+	 * F_splatting contains the splatting multiplier of the fragment
+	 * in X and the coordinate in the quad in YZ.
+	 *
+	 * m +           #   The influence of splatting increases as the
+	 * a |         ###   distance of the fragment from the center of
+	 * g |        ####   the quad increases.
+	 * n +-----+######
+	 *  d i s t a n c e
+	 */
+	float dist = length(F_splatting.yz - vec2(0.5));
+	float splat = F_splatting.x * smoothstep(0.0, 0.5, dist);
+	vec4 diffuse0 = texture2D(LOS_diffuse_texture_1, uv_atlas + uv);
+	vec4 diffuse1 = texture2D(LOS_diffuse_texture_1, uv);
+	vec4 diffuse = mix(diffuse0, diffuse1, splat);
+
 	/* Lighting. */
 	vec3 normal = normalize(F_normal);
-	vec4 diffuse = texture2D(LOS_diffuse_texture_1, uv);
 	vec4 diff = LOS_scene_ambient;
 	vec4 spec = vec4(0.0);
 	for(int i = 0 ; i < LIGHTS ; i++)

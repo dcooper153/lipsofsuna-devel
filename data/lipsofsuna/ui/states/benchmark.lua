@@ -15,7 +15,7 @@ Ui:add_state{
 			if w.timer > 1 then
 				w.timer = 0
 				Operators.stats:update_client_stats()
-				w.text = Operators.stats:get_client_stats_text()
+				w.text = ""--Operators.stats:get_client_stats_text()
 				w.need_reshape = true
 				w.need_repaint = true
 				Ui:queue_relayout()

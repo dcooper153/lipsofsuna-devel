@@ -40,6 +40,10 @@ LIExtTerrainStick* liext_terrain_stick_new (
 		return NULL;
 	self->material = material;
 	self->height = height;
+	self->vertices[0][0].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
+	self->vertices[1][0].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
+	self->vertices[0][1].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
+	self->vertices[1][1].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
 
 	return self;
 }
@@ -55,6 +59,35 @@ void liext_terrain_stick_free (
 }
 
 /**
+ * \brief Copies the vertices from another stick.
+ * \param self Terrain stick.
+ * \param src Terrain stick.
+ */
+void liext_terrain_stick_copy_vertices (
+	LIExtTerrainStick* self,
+	LIExtTerrainStick* src)
+{
+	self->vertices[0][0] = src->vertices[0][0];
+	self->vertices[1][0] = src->vertices[1][0];
+	self->vertices[0][1] = src->vertices[0][1];
+	self->vertices[1][1] = src->vertices[1][1];
+}
+
+/**
+ * \brief Resets the vertices to the flat orientation.
+ * \param self Terrain stick.
+ */
+void liext_terrain_stick_reset_vertices (
+	LIExtTerrainStick* self)
+{
+	memset (self->vertices, 0, sizeof (self->vertices));
+	self->vertices[0][0].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
+	self->vertices[1][0].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
+	self->vertices[0][1].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
+	self->vertices[1][1].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
+}
+
+/**
  * \brief Gets the serialized contents of the stick.
  * \param self Terrain stick.
  * \param writer Archive write.
@@ -66,10 +99,26 @@ int liext_terrain_stick_get_data (
 {
 	return liarc_writer_append_uint32 (writer, self->material) &&
 	       liarc_writer_append_float (writer, self->height) &&
-	       liarc_writer_append_float (writer, self->corners[0][0]) &&
-	       liarc_writer_append_float (writer, self->corners[1][0]) &&
-	       liarc_writer_append_float (writer, self->corners[0][1]) &&
-	       liarc_writer_append_float (writer, self->corners[1][1]);
+	       liarc_writer_append_float (writer, self->vertices[0][0].offset) &&
+	       liarc_writer_append_float (writer, self->vertices[0][0].splatting) &&
+	       liarc_writer_append_float (writer, self->vertices[0][0].normal.x) &&
+	       liarc_writer_append_float (writer, self->vertices[0][0].normal.y) &&
+	       liarc_writer_append_float (writer, self->vertices[0][0].normal.z) &&
+	       liarc_writer_append_float (writer, self->vertices[1][0].offset) &&
+	       liarc_writer_append_float (writer, self->vertices[1][0].splatting) &&
+	       liarc_writer_append_float (writer, self->vertices[1][0].normal.x) &&
+	       liarc_writer_append_float (writer, self->vertices[1][0].normal.y) &&
+	       liarc_writer_append_float (writer, self->vertices[1][0].normal.z) &&
+	       liarc_writer_append_float (writer, self->vertices[0][1].offset) &&
+	       liarc_writer_append_float (writer, self->vertices[0][1].splatting) &&
+	       liarc_writer_append_float (writer, self->vertices[0][1].normal.x) &&
+	       liarc_writer_append_float (writer, self->vertices[0][1].normal.y) &&
+	       liarc_writer_append_float (writer, self->vertices[0][1].normal.z) &&
+	       liarc_writer_append_float (writer, self->vertices[1][1].offset) &&
+	       liarc_writer_append_float (writer, self->vertices[1][1].splatting) &&
+	       liarc_writer_append_float (writer, self->vertices[1][1].normal.x) &&
+	       liarc_writer_append_float (writer, self->vertices[1][1].normal.y) &&
+	       liarc_writer_append_float (writer, self->vertices[1][1].normal.z);
 }
 
 /**
@@ -82,24 +131,96 @@ int liext_terrain_stick_set_data (
 	LIExtTerrainStick* self,
 	LIArcReader*       reader)
 {
+	int i;
+	int x;
+	int z;
 	uint32_t tmp1;
-	float tmp2[5];
+	float tmp2[21];
 
-	if (!liarc_reader_get_uint32 (reader, &tmp1) &&
-	    !liarc_reader_get_float (reader, tmp2 + 0) &&
-	    !liarc_reader_get_float (reader, tmp2 + 1) &&
-	    !liarc_reader_get_float (reader, tmp2 + 2) &&
-	    !liarc_reader_get_float (reader, tmp2 + 3) &&
-	    !liarc_reader_get_float (reader, tmp2 + 4))
+	/* Read the values. */
+	if (!liarc_reader_get_uint32 (reader, &tmp1))
 		return 0;
+	for (i = 0 ; i < 21 ; i++)
+	{
+		if (!liarc_reader_get_float (reader, tmp2 + i))
+			return 0;
+	}
+
+	/* Apply the values. */
 	self->material = tmp1;
-	self->height = tmp2[0];
-	self->corners[0][0] = tmp2[1];
-	self->corners[1][0] = tmp2[2];
-	self->corners[0][1] = tmp2[3];
-	self->corners[1][1] = tmp2[4];
+	self->height = tmp2[(i = 0)];
+	for (z = 0 ; z < 2 ; z++)
+	{
+		for (x = 0 ; x < 2 ; x++)
+		{
+			self->vertices[x][z].offset = tmp2[++i];
+			self->vertices[x][z].splatting = tmp2[++i];
+			self->vertices[x][z].normal.x = tmp2[++i];
+			self->vertices[x][z].normal.y = tmp2[++i];
+			self->vertices[x][z].normal.z = tmp2[++i];
+		}
+	}
 
 	return 1;
+}
+
+/**
+ * \brief Calculates the face normal of the stick.
+ * \param self Terrain stick.
+ * \param result Return location for the vector.
+ */
+void liext_terrain_stick_get_normal (
+	const LIExtTerrainStick* self,
+	LIMatVector*             result)
+{
+	LIMatVector v1;
+	LIMatVector v2;
+	LIMatVector v3;
+	LIMatVector v4;
+	LIMatVector n1;
+	LIMatVector n2;
+
+	v1 = limat_vector_init (1.0f, self->vertices[1][0].offset - self->vertices[0][0].offset, 0.0f);
+	v2 = limat_vector_init (0.0f, self->vertices[0][1].offset - self->vertices[0][0].offset, 1.0f);
+	v3 = limat_vector_init (-1.0f, self->vertices[1][0].offset - self->vertices[1][1].offset, 0.0f);
+	v4 = limat_vector_init (0.0f, self->vertices[0][1].offset - self->vertices[1][1].offset, -1.0f);
+	n1 = limat_vector_normalize (limat_vector_cross (v2, v1));
+	n2 = limat_vector_normalize (limat_vector_cross (v4, v3));
+	*result = limat_vector_multiply (limat_vector_add (n1, n2), 0.5f);
+}
+
+/**
+ * \brief Calculates the face normal of the stick when one vertex is overridden.
+ * \param self Terrain stick.
+ * \param result Return location for the vector.
+ */
+void liext_terrain_stick_get_normal_override (
+	const LIExtTerrainStick* self,
+	int                      vertex_x,
+	int                      vertex_y,
+	float                    vertex_offset,
+	LIMatVector*             result)
+{
+	float offsets[2][2];
+	LIMatVector v1;
+	LIMatVector v2;
+	LIMatVector v3;
+	LIMatVector v4;
+	LIMatVector n1;
+	LIMatVector n2;
+
+	offsets[0][0] = self->vertices[0][0].offset;
+	offsets[1][0] = self->vertices[1][0].offset;
+	offsets[0][1] = self->vertices[0][1].offset;
+	offsets[1][1] = self->vertices[1][1].offset;
+	offsets[vertex_x][vertex_y] = vertex_offset;
+	v1 = limat_vector_init (1.0f, offsets[1][0] - offsets[0][0], 0.0f);
+	v2 = limat_vector_init (0.0f, offsets[0][1] - offsets[0][0], 1.0f);
+	v3 = limat_vector_init (-1.0f, offsets[1][0] - offsets[1][1], 0.0f);
+	v4 = limat_vector_init (0.0f, offsets[0][1] - offsets[1][1], -1.0f);
+	n1 = limat_vector_normalize (limat_vector_cross (v2, v1));
+	n2 = limat_vector_normalize (limat_vector_cross (v4, v3));
+	*result = limat_vector_multiply (limat_vector_add (n1, n2), 0.5f);
 }
 
 /** @} */

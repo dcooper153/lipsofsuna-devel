@@ -74,6 +74,17 @@ Terrain.load_chunk = function(self, x, z)
 	return Los.terrain_load_chunk(self.handle, x, z)
 end
 
+--- Smoothens the vertices of the column.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @param y World unit Y offset.
+-- @param h World unit height.
+-- @return True on success.
+Terrain.smoothen_column = function(self, x, z, y, h)
+	return Los.terrain_smoothen_column(self.handle, x, z, y, h)
+end
+
 --- Unloads a terrain chunk.
 -- @param self Terrain.
 -- @param x Grid X coordinate.

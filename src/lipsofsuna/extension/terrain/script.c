@@ -153,6 +153,26 @@ static void Terrain_load_chunk (LIScrArgs* args)
 	liscr_args_seti_bool (args, liext_terrain_load_chunk (args->self, grid_x, grid_z));
 }
 
+static void Terrain_smoothen_column (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	float y;
+	float h;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_int (args, 0, &grid_x) || grid_x < 0)
+		return;
+	if (!liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
+		return;
+	if (!liscr_args_geti_float (args, 2, &y))
+		return;
+	if (!liscr_args_geti_float (args, 3, &h) || h <= 0.0f)
+		return;
+
+	liscr_args_seti_bool (args, liext_terrain_smoothen_column (args->self, grid_x, grid_z, y, h));
+}
+
 static void Terrain_unload_chunk (LIScrArgs* args)
 {
 	int grid_x;
@@ -217,6 +237,9 @@ static void Terrain_set_chunk_data (LIScrArgs* args)
 
 static void Terrain_get_column (LIScrArgs* args)
 {
+	int i;
+	int vtx_x;
+	int vtx_z;
 	int grid_x;
 	int grid_z;
 	LIExtTerrainColumn* column;
@@ -237,25 +260,25 @@ static void Terrain_get_column (LIScrArgs* args)
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 	for (stick = column->sticks ; stick != NULL ; stick = stick->next)
 	{
+		i = 0;
 		lua_newtable (args->lua);
-		lua_pushnumber (args->lua, 1);
-		lua_pushnumber (args->lua, stick->material);
-		lua_settable (args->lua, -3);
-		lua_pushnumber (args->lua, 2);
-		lua_pushnumber (args->lua, stick->height);
-		lua_settable (args->lua, -3);
-		lua_pushnumber (args->lua, 3);
-		lua_pushnumber (args->lua, stick->corners[0][0]);
-		lua_settable (args->lua, -3);
-		lua_pushnumber (args->lua, 4);
-		lua_pushnumber (args->lua, stick->corners[1][0]);
-		lua_settable (args->lua, -3);
-		lua_pushnumber (args->lua, 5);
-		lua_pushnumber (args->lua, stick->corners[0][1]);
-		lua_settable (args->lua, -3);
-		lua_pushnumber (args->lua, 6);
-		lua_pushnumber (args->lua, stick->corners[1][1]);
-		lua_settable (args->lua, -3);
+#define PUSHNUM(v) lua_pushnumber (args->lua, ++i);\
+                   lua_pushnumber (args->lua, v);\
+                   lua_settable (args->lua, -3);
+		PUSHNUM (stick->material);
+		PUSHNUM (stick->height);
+		for (vtx_z = 0 ; vtx_z < 2 ; vtx_z++)
+		{
+			for (vtx_x = 0 ; vtx_x < 2 ; vtx_x++)
+			{
+				PUSHNUM (stick->vertices[vtx_x][vtx_z].offset);
+				PUSHNUM (stick->vertices[vtx_x][vtx_z].splatting);
+				PUSHNUM (stick->vertices[vtx_x][vtx_z].normal.x);
+				PUSHNUM (stick->vertices[vtx_x][vtx_z].normal.y);
+				PUSHNUM (stick->vertices[vtx_x][vtx_z].normal.z);
+			}
+		}
+#undef PUSHNUM
 		liscr_args_seti_stack (args);
 	}
 }
@@ -388,6 +411,7 @@ void liext_script_terrain (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_build_chunk_model", Terrain_build_chunk_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_clear_column", Terrain_clear_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_load_chunk", Terrain_load_chunk);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_smoothen_column", Terrain_smoothen_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_unload_chunk", Terrain_unload_chunk);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_chunk_data", Terrain_get_chunk_data);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_chunk_data", Terrain_set_chunk_data);

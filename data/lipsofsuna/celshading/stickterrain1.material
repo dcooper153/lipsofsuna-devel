@@ -1,12 +1,10 @@
-import * from "outline.template"
-
 pass stickterrain1/lighting
 {
 	max_lights 3
 	ambient 0.7 0.7 0.7
 	diffuse 1.0 1.0 1.0
 	specular 1.0 1.0 1.0 1.0 64
-	cull_hardware clockwise
+	cull_hardware none
 	texture_unit
 	{
 		texture stickterrain1.png 2d
@@ -41,9 +39,6 @@ material stickterrain1
 		pass : stickterrain1/lighting
 		{
 		}
-		pass outline : outline/static
-		{
-		}
 	}
 	technique
 	{
@@ -57,9 +52,6 @@ material stickterrain1
 	{
 		scheme quality2outline
 		pass : stickterrain1/lighting
-		{
-		}
-		pass outline : outline/static
 		{
 		}
 	}

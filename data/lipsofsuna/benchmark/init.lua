@@ -72,6 +72,14 @@ Benchmark.new = function(clss)
 	for x = 0,31 do
 		for z = 0,31 do
 			self.terrain:add_stick(x, z, 0, 9 + math.random(), math.random(1, 3))
+			if z > 10 then
+				self.terrain:add_stick(x, z, 9, z/3 * math.random(), math.random(1, 3))
+			end
+		end
+	end
+	for x = 0,31 do
+		for z = 0,31 do
+			self.terrain:smoothen_column(x, z, 0, 100)
 		end
 	end
 	self.terrain:add_stick(0, 0, 0, 1, 1)
@@ -80,10 +88,14 @@ Benchmark.new = function(clss)
 	self.terrain:add_stick(1, 0, 0, 1.1, 1)
 	self.terrain:add_stick(1, 0, 5, 2, 2)
 	self.terrain:add_stick(1, 0, 15, 3.8, 3)
+	self.terrain:add_stick(8, 1, 0, 8, 2)
+	self.terrain:add_stick(8, 1, 8, 4, 3)
+	self.terrain:add_stick(8, 1, 12, 4, 2)
+	self.terrain:add_stick(8, 1, 16, 4, 1)
 	self.terrain_model = self.terrain:build_chunk_model(0, 0)
 	self.terrain_object = RenderObject()
 	self.terrain_object:add_model(self.terrain_model:get_render())
-	self.terrain_object:set_position(Vector(490,490,497))
+	self.terrain_object:set_position(Vector(490,490,494))
 	self.terrain_object:set_visible(true)
 	return self
 end
