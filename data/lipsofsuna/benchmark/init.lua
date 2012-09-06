@@ -17,7 +17,7 @@ local Quaternion = require("system/math/quaternion")
 local RenderModel = require("system/render-model")
 local RenderObject = require("system/render-object")
 local Simulation = require("core/client/simulation")
-local Terrain = require("system/terrain")
+local TerrainManager = require("core/server/terrain-manager")
 local Vector = require("system/math/vector")
 
 --- Provides a simple graphical benchmark.
@@ -53,7 +53,7 @@ Benchmark.new = function(clss)
 	o:set_visible(true)
 	o.render:init(o)
 	-- Create the camera.
-	self.translation = Vector(-5, 2, -15)
+	self.translation = Vector(-10, 30, -30)
 	self.camera = Camera()
 	self.camera:set_far(1000)
 	self.camera:set_near(0.3)
@@ -67,36 +67,8 @@ Benchmark.new = function(clss)
 	-- Create the terrain.
 	self.terrain_timer1 = 0
 	self.terrain_timer2 = 1
-	self.terrain = Terrain(32, 1)
-	self.terrain:load_chunk(0, 0)
-	for x = 0,31 do
-		for z = 0,31 do
-			self.terrain:add_stick(x, z, 0, 9 + math.random(), math.random(1, 3))
-			if z > 10 then
-				self.terrain:add_stick(x, z, 9, z/3 * math.random(), math.random(1, 3))
-			end
-		end
-	end
-	for x = 0,31 do
-		for z = 0,31 do
-			self.terrain:smoothen_column(x, z, 0, 100)
-		end
-	end
-	self.terrain:add_stick(0, 0, 0, 1, 1)
-	self.terrain:add_stick(0, 0, 5, 2, 0)
-	self.terrain:add_stick(0, 0, 15, 4, 3)
-	self.terrain:add_stick(1, 0, 0, 1.1, 1)
-	self.terrain:add_stick(1, 0, 5, 2, 2)
-	self.terrain:add_stick(1, 0, 15, 3.8, 3)
-	self.terrain:add_stick(8, 1, 0, 8, 2)
-	self.terrain:add_stick(8, 1, 8, 4, 3)
-	self.terrain:add_stick(8, 1, 12, 4, 2)
-	self.terrain:add_stick(8, 1, 16, 4, 1)
-	self.terrain_model = self.terrain:build_chunk_model(0, 0)
-	self.terrain_object = RenderObject()
-	self.terrain_object:add_model(self.terrain_model:get_render())
-	self.terrain_object:set_position(Vector(490,490,494))
-	self.terrain_object:set_visible(true)
+	self.terrain = TerrainManager(16, 1, nil, false, true, true)
+	self.terrain:refresh_point(Vector(500, 0, 500), 64)
 	return self
 end
 
@@ -106,8 +78,8 @@ Benchmark.close = function(self)
 	-- Restore the normal map state.
 	Game.objects:detach_all()
 	Game.sectors:unload_all()
+	self.terrain:unload_all()
 	self.light:set_enabled(false)
-	self.terrain_object:set_visible(false)
 	Client.sectors.unload_time = 10
 end
 
@@ -116,8 +88,11 @@ end
 -- @param secs Seconds since the last update.
 Benchmark.update = function(self, secs)
 	-- Update the camera.
-	self.camera:set_target_position(self.object:get_position() + self.translation)
-	self.camera:set_target_rotation(Quaternion{axis = Vector(0, 1, 0), angle = math.pi})
+	local camctr = Vector(500,500,500)
+	local campos = camctr + self.translation
+	local camrot = Quaternion{dir = camctr - campos, up = Vector(0,1,0)}
+	self.camera:set_target_position(campos)
+	self.camera:set_target_rotation(camrot)
 	self.camera:update(secs)
 	self.camera:warp()
 	Client.camera = self.camera
@@ -136,6 +111,7 @@ Benchmark.update = function(self, secs)
 	end
 	-- Modify terrain.
 	-- TODO
+	self.terrain:update(secs)
 	-- Update the terrain timer.
 	self.terrain_timer1 = self.terrain_timer1 + 1
 	if self.terrain_timer1 > 400 then

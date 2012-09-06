@@ -232,9 +232,9 @@ SectorManager.wait_sector_load = function(self, sector)
 	self.loaders_iterator = nil
 end
 
---- Waits for a sector to finish loading.
+--- Gets the dictionary of loaded sectors.
 -- @param self SectorManager.
--- @param sector Sector ID.
+-- @return Dictionary of sectors.
 SectorManager.get_sectors = function(self)
 	return Sectors:get_sectors()
 end
