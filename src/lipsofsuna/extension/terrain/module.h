@@ -25,6 +25,10 @@
 
 #define LIEXT_STICK_EPSILON 0.01
 
+typedef struct _LIExtTerrainModule LIExtTerrainModule;
+
+/*****************************************************************************/
+
 typedef struct _LIExtTerrainVertex LIExtTerrainVertex;
 struct _LIExtTerrainVertex
 {
@@ -101,6 +105,14 @@ LIAPICALL (int, liext_terrain_column_build_model, (
 LIAPICALL (void, liext_terrain_column_clear, (
 	LIExtTerrainColumn* self));
 
+LIAPICALL (int, liext_terrain_column_intersect_ray, (
+	LIExtTerrainColumn* self,
+	const LIMatVector*  src,
+	const LIMatVector*  dst,
+	LIMatVector*        result_point,
+	LIMatVector*        result_normal,
+	float*              result_fraction));
+
 LIAPICALL (void, liext_terrain_column_smoothen, (
 	LIExtTerrainColumn* self,
 	LIExtTerrainColumn* c10,
@@ -162,11 +174,13 @@ struct _LIExtTerrain
 	int chunk_size;
 	float grid_size;
 	LIAlgU32dic* chunks;
+	LIExtTerrainModule* module;
 };
 
 LIAPICALL (LIExtTerrain*, liext_terrain_new, (
-	int chunk_size,
-	int grid_size));
+	LIExtTerrainModule* module,
+	int                 chunk_size,
+	int                 grid_size));
 
 LIAPICALL (void, liext_terrain_free, (
 	LIExtTerrain* self));
@@ -183,6 +197,16 @@ LIAPICALL (int, liext_terrain_clear_column, (
 	LIExtTerrain* self,
 	int           grid_x,
 	int           grid_z));
+
+LIAPICALL (int, liext_terrain_intersect_ray, (
+	LIExtTerrain*      self,
+	const LIMatVector* src,
+	const LIMatVector* dst,
+	int*               result_x,
+	int*               result_z,
+	LIMatVector*       result_point,
+	LIMatVector*       result_normal,
+	float*             result_fraction));
 
 LIAPICALL (int, liext_terrain_load_chunk, (
 	LIExtTerrain* self,
@@ -237,7 +261,6 @@ LIAPICALL (int, liext_terrain_set_column_data, (
 
 /*****************************************************************************/
 
-typedef struct _LIExtTerrainModule LIExtTerrainModule;
 struct _LIExtTerrainModule
 {
 	LIMaiProgram* program;

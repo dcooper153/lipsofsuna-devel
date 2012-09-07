@@ -15,28 +15,20 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_SKELETON_MODULE_H__
-#define __EXT_SKELETON_MODULE_H__
+#ifndef __PHYSICS_RAYCAST_HOOK_HPP__
+#define __PHYSICS_RAYCAST_HOOK_HPP__
 
-#include "lipsofsuna/extension.h"
+#include "lipsofsuna/system.h"
+#include <btBulletCollisionCommon.h>
 
-#define LIEXT_SCRIPT_SKELETON "Skeleton"
-
-typedef struct _LIExtSkeletonModule LIExtSkeletonModule;
-struct _LIExtSkeletonModule
+class LIPhyRaycastHook
 {
-	LIMaiProgram* program;
+public:
+	LIPhyRaycastHook () {}
+	virtual ~LIPhyRaycastHook () {}
+	virtual void rayTest (const btVector3& rayFromWorld, const btVector3& rayToWorld, btCollisionWorld::RayResultCallback& resultCallback) const = 0;
+public:
+	LIPhyRaycastHook* next;
 };
-
-LIAPICALL (LIExtSkeletonModule*, liext_skeleton_module_new, (
-	LIMaiProgram* program));
-
-LIAPICALL (void, liext_skeleton_module_free, (
-	LIExtSkeletonModule* self));
-
-/*****************************************************************************/
-
-LIAPICALL (void, liext_script_skeleton, (
-	LIScrScript* self));
 
 #endif

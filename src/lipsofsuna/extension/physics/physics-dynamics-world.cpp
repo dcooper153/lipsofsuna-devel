@@ -22,7 +22,13 @@
 LIPhyDynamicsWorld::LIPhyDynamicsWorld (btDispatcher* dispatcher, btBroadphaseInterface* pairCache, btConstraintSolver* constraintSolver, btCollisionConfiguration* collisionConfiguration) :
 	btDiscreteDynamicsWorld (dispatcher, pairCache, constraintSolver, collisionConfiguration)
 {
+	this->raycast_hooks = NULL;
 	this->setGravity (btVector3 (0.0f, -10.0f, 0.0f));
+}
+
+LIPhyDynamicsWorld::~LIPhyDynamicsWorld ()
+{
+	lisys_assert (raycast_hooks == NULL);
 }
 
 void LIPhyDynamicsWorld::addCollisionObject (btCollisionObject* collisionObject, short int collisionFilterGroup, short int collisionFilterMask)
@@ -38,9 +44,16 @@ void LIPhyDynamicsWorld::rayTest (const btVector3& rayFromWorld, const btVector3
 	LIMatVector start;
 	LIMatVector end;
 	LIPhyCollision result;
+	LIPhyRaycastHook* hook;
 
 	/* Test against normal objects. */
 	btDiscreteDynamicsWorld::rayTest (rayFromWorld, rayToWorld, resultCallback);
+
+	/* Test against raycast hooks. */
+	for (hook = raycast_hooks ; hook != NULL ; hook = hook->next)
+	{
+		hook->rayTest (rayFromWorld, rayToWorld, resultCallback);
+	}
 
 	/* Check if a terrain test is needed. */
 	if (this->terrain == NULL)

@@ -49,6 +49,7 @@ extern LIMaiExtensionInfo liext_object_physics_info;
 extern LIMaiExtensionInfo liext_object_render_info;
 extern LIMaiExtensionInfo liext_password_info;
 extern LIMaiExtensionInfo liext_physics_info;
+extern LIMaiExtensionInfo liext_physics_terrain_info;
 extern LIMaiExtensionInfo liext_reload_info;
 extern LIMaiExtensionInfo liext_render_info;
 extern LIMaiExtensionInfo liext_render_model_info;
@@ -99,6 +100,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "noise", &liext_noise_info },
 		{ "object", &liext_object_info },
 		{ "physics-object", &liext_object_physics_info },
+		{ "physics-terrain", &liext_physics_terrain_info },
 		{ "password", &liext_password_info },
 		{ "physics", &liext_physics_info },
 		{ "reload", &liext_reload_info },

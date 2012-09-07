@@ -42,6 +42,7 @@ class LIPhyContactController;
 class LIPhyCharacterAction;
 class LIPhyObjectShape;
 class LIPhyMotionState;
+class LIPhyRaycastHook;
 
 struct _LIPhyPhysics
 {

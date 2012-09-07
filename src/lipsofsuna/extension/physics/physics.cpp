@@ -29,6 +29,7 @@
 #include "physics-model.h"
 #include "physics-object.h"
 #include "physics-private.h"
+#include "physics-raycast-hook.hpp"
 #include "physics-terrain.h"
 
 #define MAXPROXIES 1000000
@@ -137,6 +138,21 @@ void liphy_physics_free (
 	lialg_ptrdic_free (self->objects);
 	lialg_list_free (self->controllers);
 	lisys_free (self);
+}
+
+/**
+ * \brief Adds a raycast hook.
+ * \param self Physics.
+ * \param hook Raycast hook object.
+ */
+void liphy_physics_add_raycast_hook (
+	LIPhyPhysics* self,
+	void*         hook)
+{
+	LIPhyRaycastHook* h = (LIPhyRaycastHook*) hook;
+
+	h->next = self->dynamics->raycast_hooks;
+	self->dynamics->raycast_hooks = h;
 }
 
 /**
@@ -399,6 +415,34 @@ void liphy_physics_remove_model (
 		if (object->model == model)
 			liphy_object_set_model (object, NULL);
 	}
+}
+
+/**
+ * \brief Removes a raycast hook.
+ * \param self Physics.
+ * \param hook Raycast hook object.
+ */
+void liphy_physics_remove_raycast_hook (
+	LIPhyPhysics* self,
+	void*         hook)
+{
+	LIPhyRaycastHook* h = (LIPhyRaycastHook*) hook;
+	LIPhyRaycastHook* ptr;
+
+	if (h == self->dynamics->raycast_hooks)
+	{
+		self->dynamics->raycast_hooks = h->next;
+		return;
+	}
+	for (ptr = self->dynamics->raycast_hooks ; ptr != NULL ; ptr = ptr->next)
+	{
+		if (ptr->next == h)
+		{
+			ptr->next = h->next;
+			return;
+		}
+	}
+	lisys_assert (0);
 }
 
 /**

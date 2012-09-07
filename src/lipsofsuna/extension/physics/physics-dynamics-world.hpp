@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,15 +22,18 @@
 #define assert(a)
 #endif
 #include <btBulletDynamicsCommon.h>
+#include "physics-raycast-hook.hpp"
 
 class LIPhyDynamicsWorld : public btDiscreteDynamicsWorld
 {
 public:
 	LIPhyDynamicsWorld (btDispatcher* dispatcher, btBroadphaseInterface* pairCache, btConstraintSolver* constraintSolver, btCollisionConfiguration* collisionConfiguration);
+	virtual ~LIPhyDynamicsWorld ();
 	virtual void addCollisionObject (btCollisionObject* collisionObject, short int collisionFilterGroup = btBroadphaseProxy::DefaultFilter, short int collisionFilterMask = btBroadphaseProxy::AllFilter);
 	virtual void rayTest (const btVector3& rayFromWorld, const btVector3& rayToWorld, RayResultCallback& resultCallback) const;
 	virtual void removeCollisionObject (btCollisionObject* collisionObject);
 public:
+	LIPhyRaycastHook* raycast_hooks;
 	struct _LIPhyTerrain* terrain;
 };
 

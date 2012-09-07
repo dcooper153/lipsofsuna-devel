@@ -40,13 +40,15 @@ static LIExtTerrainChunkID private_get_chunk_id_and_column (
 
 /**
  * \brief Creates a new terrain.
+ * \param module Terrain module.
  * \param chunk_size Number of grid points per chunk size.
  * \param grid_size Grid spacing in world units.
  * \return New terrain, or NULL.
  */
 LIExtTerrain* liext_terrain_new (
-	int chunk_size,
-	int grid_size)
+	LIExtTerrainModule* module,
+	int                 chunk_size,
+	int                 grid_size)
 {
 	LIExtTerrain* self;
 
@@ -54,6 +56,7 @@ LIExtTerrain* liext_terrain_new (
 	self = lisys_calloc (1, sizeof (LIExtTerrain));
 	if (self == NULL)
 		return NULL;
+	self->module = module;
 	self->chunk_size = chunk_size;
 	self->grid_size = grid_size;
 
@@ -77,6 +80,12 @@ void liext_terrain_free (
 {
 	LIAlgU32dicIter iter;
 
+	/* Notify other extensions of the removal. */
+	/* This is needed by physics-terrain at the time of writing. If not
+	   informed, it would be left with an invalid pointer to this object. */
+	lical_callbacks_call (self->module->program->callbacks, "terrain-free", lical_marshal_DATA_PTR, self);
+
+	/* Free the terrain itself. */
 	if (self->chunks != NULL)
 	{
 		LIALG_U32DIC_FOREACH (iter, self->chunks)
@@ -158,6 +167,91 @@ int liext_terrain_clear_column (
 	chunk->stamp++;
 
 	return 1;
+}
+
+/**
+ * \brief Casts a ray against the terrain.
+ * \param self Terrain.
+ * \param src Source point in world units.
+ * \param dst Destination point in world units.
+ * \param result_x Return location for the grid coordinates.
+ * \param result_z Return location for the grid coordinates.
+ * \param result_point Return location for the world unit hit point.
+ * \param result_normal Return location for the normal vector.
+ * \param result_fraction Return location for the ray fraction.
+ * \return Nonzero if intersected.
+ */
+int liext_terrain_intersect_ray (
+	LIExtTerrain*      self,
+	const LIMatVector* src,
+	const LIMatVector* dst,
+	int*               result_x,
+	int*               result_z,
+	LIMatVector*       result_point,
+	LIMatVector*       result_normal,
+	float*             result_fraction)
+{
+	int x;
+	int z;
+	int prev_x;
+	int prev_z;
+	float f;
+	float len;
+	LIExtTerrainColumn* column;
+	LIMatVector diff;
+	LIMatVector dir;
+	LIMatVector point;
+	LIMatVector rel_src;
+	LIMatVector rel_dst;
+
+	/* Calculate the ray direction. */
+	diff = limat_vector_subtract (*dst, *src);
+	dir = limat_vector_normalize (diff);
+	len = limat_vector_get_length (diff);
+	prev_x = -1;
+	prev_z = -1;
+
+	/* Move along the ray and sample columns. */
+	for (f = 0.0f ; f < len ; f++)
+	{
+		/* Determine the current grid point. */
+		point = limat_vector_add (*src, limat_vector_multiply (dir, f));
+		x = (int)(point.x / self->grid_size);
+		z = (int)(point.z / self->grid_size);
+
+		/* Skip out of bounds or alrady handled grid points. */
+		if (x < 0 || z < 0)
+			continue;
+		if (x == prev_x && z == prev_z)
+			continue;
+
+		/* Collide against the column. */
+		column = liext_terrain_get_column (self, x, z);
+		if (column != NULL)
+		{
+			rel_src.x = src->x / self->grid_size - x;
+			rel_src.y = src->y;
+			rel_src.z = src->z / self->grid_size - z;
+			rel_dst.x = dst->x / self->grid_size - x;
+			rel_dst.y = dst->y;
+			rel_dst.z = dst->z / self->grid_size - z;
+			if (liext_terrain_column_intersect_ray (column, &rel_src, &rel_dst, result_point, result_normal, result_fraction))
+			{
+				*result_x = x;
+				*result_z = z;
+				*result_point = limat_vector_add (*result_point, limat_vector_init (x, 0.0f, z));
+				result_point->x *= self->grid_size;
+				result_point->z *= self->grid_size;
+				return 1;
+			}
+		}
+
+		/* Advance the sampling point. */
+		prev_x = x;
+		prev_z = z;
+	}
+
+	return 0;
 }
 
 /**

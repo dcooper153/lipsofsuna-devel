@@ -15,28 +15,32 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_SKELETON_MODULE_H__
-#define __EXT_SKELETON_MODULE_H__
+#ifndef __EXT_PHYSICS_TERRAIN_MODULE_H__
+#define __EXT_PHYSICS_TERRAIN_MODULE_H__
 
 #include "lipsofsuna/extension.h"
+#include "physics-terrain.h"
 
-#define LIEXT_SCRIPT_SKELETON "Skeleton"
+#define LIEXT_SCRIPT_PHYSICS_TERRAIN "PhysicsTerrain"
 
-typedef struct _LIExtSkeletonModule LIExtSkeletonModule;
-struct _LIExtSkeletonModule
+typedef struct _LIExtPhysicsTerrainModule LIExtPhysicsTerrainModule;
+struct _LIExtPhysicsTerrainModule
 {
+	LIAlgPtrdic* terrains;
+	LICalHandle calls[1];
 	LIMaiProgram* program;
+	LIPhyPhysics* physics;
 };
 
-LIAPICALL (LIExtSkeletonModule*, liext_skeleton_module_new, (
+LIAPICALL (LIExtPhysicsTerrainModule*, liext_physics_terrain_module_new, (
 	LIMaiProgram* program));
 
-LIAPICALL (void, liext_skeleton_module_free, (
-	LIExtSkeletonModule* self));
+LIAPICALL (void, liext_physics_terrain_module_free, (
+	LIExtPhysicsTerrainModule* self));
 
 /*****************************************************************************/
 
-LIAPICALL (void, liext_script_skeleton, (
+LIAPICALL (void, liext_script_physics_terrain, (
 	LIScrScript* self));
 
 #endif

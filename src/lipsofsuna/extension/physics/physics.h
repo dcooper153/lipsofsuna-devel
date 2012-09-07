@@ -29,6 +29,10 @@ LIAPICALL (LIPhyPhysics*, liphy_physics_new, (
 LIAPICALL (void, liphy_physics_free, (
 	LIPhyPhysics* self));
 
+LIAPICALL (void, liphy_physics_add_raycast_hook, (
+	LIPhyPhysics* self,
+	void*         hook));
+
 LIAPICALL (int, liphy_physics_cast_ray, (
 	const LIPhyPhysics* self,
 	const LIMatVector*  start,
@@ -72,6 +76,10 @@ LIAPICALL (LIPhyModel*, liphy_physics_find_model, (
 LIAPICALL (void, liphy_physics_remove_model, (
 	LIPhyPhysics* self,
 	LIPhyModel*   model));
+
+LIAPICALL (void, liphy_physics_remove_raycast_hook, (
+	LIPhyPhysics* self,
+	void*         hook));
 
 LIAPICALL (void, liphy_physics_update, (
 	LIPhyPhysics* self,

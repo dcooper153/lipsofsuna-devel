@@ -8,9 +8,9 @@ fi
 generatefile ()
 {
 	tmp=$2
-	classa="$tmp"
-	classb="$(echo $tmp | tr "[:lower:]" "[:upper:]")"
-	classc="$(echo ${tmp:0:1} | tr "[:lower:]" "[:upper:]")${tmp:1}"
+	classa="$(echo $tmp | tr - _)"
+	classb="$(echo $tmp | tr [:lower:] [:upper:] | tr - _)"
+	classc="$(echo $tmp | sed "s/[^-]*/\u&/g" | sed s/-//g)"
 	cat $1 | sed s/Skeleton/$classc/g | sed s/SKELETON/$classb/g | sed s/skeleton/$classa/g
 }
 

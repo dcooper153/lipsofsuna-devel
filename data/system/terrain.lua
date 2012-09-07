@@ -11,6 +11,7 @@
 local Class = require("system/class")
 local Model = require("system/model")
 local Packet = require("system/packet")
+local Vector = require("system/math/vector")
 
 if not Los.program_load_extension("terrain") then
 	error("loading extension `terrain' failed")
@@ -54,6 +55,17 @@ Terrain.build_chunk_model = function(self, x, z)
 	local handle = Los.terrain_build_chunk_model(self.handle, x, z)
 	if not handle then return end
 	return Model:new_from_handle(handle)
+end
+
+--- Casts a ray against the terrain.
+-- @param self Terrain.
+-- @param src Source point, in world units.
+-- @param dst Destination point, in world units.
+-- @return On hit: Point vector, normal vector, grid X, grid Z. Nil if no hit.
+Terrain.cast_ray = function(self, src, dst)
+	local gx,gy,px,py,pz,nx,ny,nz = Los.terrain_cast_ray(self.handle, src.handle, dst.handle)
+	if not gx then return end
+	return Vector(px,py,pz),Vector(nx,ny,nz),gx,gy
 end
 
 --- Clears a column.

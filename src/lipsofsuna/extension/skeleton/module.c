@@ -27,11 +27,11 @@
 LIMaiExtensionInfo liext_skeleton_info =
 {
 	LIMAI_EXTENSION_VERSION, "Skeleton",
-	liext_skeleton_new,
-	liext_skeleton_free
+	liext_skeleton_module_new,
+	liext_skeleton_module_free
 };
 
-LIExtSkeletonModule* liext_skeleton_new (
+LIExtSkeletonModule* liext_skeleton_module_new (
 	LIMaiProgram* program)
 {
 	LIExtSkeletonModule* self;
@@ -49,7 +49,7 @@ LIExtSkeletonModule* liext_skeleton_new (
 	return self;
 }
 
-void liext_skeleton_free (
+void liext_skeleton_module_free (
 	LIExtSkeletonModule* self)
 {
 	lisys_free (self);

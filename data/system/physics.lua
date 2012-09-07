@@ -9,6 +9,7 @@
 -- @alias Physics
 
 local Class = require("system/class")
+local Vector = require("system/math/vector")
 
 if not Los.program_load_extension("physics") then
 	error("loading extension `physics' failed")

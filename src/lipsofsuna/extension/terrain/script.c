@@ -29,6 +29,7 @@ static void Terrain_new (LIScrArgs* args)
 	int chunk_size;
 	float grid_size;
 	LIExtTerrain* self;
+	LIExtTerrainModule* module;
 	LIScrData* data;
 
 	/* Get the arguments. */
@@ -36,9 +37,10 @@ static void Terrain_new (LIScrArgs* args)
 		return;
 	if (!liscr_args_geti_float (args, 1, &grid_size) || grid_size <= 0.0f)
 		return;
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_TERRAIN);
 
 	/* Allocate the object. */
-	self = liext_terrain_new (chunk_size, grid_size);
+	self = liext_terrain_new (module, chunk_size, grid_size);
 	if (self == NULL)
 		return;
 
@@ -123,6 +125,34 @@ static void Terrain_build_chunk_model (LIScrArgs* args)
 		return;
 	}
 	liscr_args_seti_stack (args);
+}
+
+static void Terrain_cast_ray (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	float fraction;
+	LIMatVector src;
+	LIMatVector dst;
+	LIMatVector point;
+	LIMatVector normal;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_vector (args, 0, &src))
+		return;
+	if (!liscr_args_geti_vector (args, 1, &dst))
+		return;
+
+	if (!liext_terrain_intersect_ray (args->self, &src, &dst, &grid_x, &grid_z, &point, &normal, &fraction))
+		return;
+	liscr_args_seti_int (args, grid_x);
+	liscr_args_seti_int (args, grid_z);
+	liscr_args_seti_float (args, point.x);
+	liscr_args_seti_float (args, point.y);
+	liscr_args_seti_float (args, point.z);
+	liscr_args_seti_float (args, normal.x);
+	liscr_args_seti_float (args, normal.y);
+	liscr_args_seti_float (args, normal.z);
 }
 
 static void Terrain_clear_column (LIScrArgs* args)
@@ -409,6 +439,7 @@ void liext_script_terrain (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_new", Terrain_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick", Terrain_add_stick);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_build_chunk_model", Terrain_build_chunk_model);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_cast_ray", Terrain_cast_ray);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_clear_column", Terrain_clear_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_load_chunk", Terrain_load_chunk);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_smoothen_column", Terrain_smoothen_column);
