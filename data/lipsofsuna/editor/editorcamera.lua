@@ -30,7 +30,7 @@ local EditorCamera = Class("EditorCamera", Camera)
 -- @return First person camera.
 EditorCamera.new = function(clss, args)
 	local self = Camera.new(clss, args)
-	self:set_collision_mask(Physics.MASK_CAMERA)
+	self:set_collision_mask(Game.PHYSICS_MASK_CAMERA)
 	self:set_far(Client.options.view_distance)
 	self:set_fov(1.1)
 	self:set_mode("first-person")

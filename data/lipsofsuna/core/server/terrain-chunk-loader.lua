@@ -80,21 +80,22 @@ TerrainChunkLoader.generate_random = function(self)
 	local w = self.manager.chunk_size
 	local t = self.manager.terrain
 	local Noise = require("system/noise")
+	local bh = 1695
 	for x = self.x,self.x+w-1 do
 		for z = self.z,self.z+w-1 do
-			local h1 = Noise:perlin_noise(Vector(x,z), Vector(0.1,0.1), 1, 3, 0.5, 2345235)
-			local h2 = Noise:perlin_noise(Vector(555-x,344-z), Vector(0.2,0.2), 1, 3, 0.5, 43566)
-			t:add_stick(x, z, 0, 490 + 9 + h1, 3)
+			local h1 = Noise:perlin_noise(Vector(x,z), Vector(0.05,0.05), 1, 3, 0.5, 2345235)
+			local h2 = Noise:perlin_noise(Vector(555-x,344-z), Vector(0.1,0.1), 1, 3, 0.5, 43566)
+			t:add_stick(x, z, 0, bh + 9 + h1, 3)
 			if h2 > 0 then
-				local m = Noise:perlin_noise(Vector(234-x,435-z), Vector(0.1,0.1), 1, 3, 0.5, 1234)
+				local m = Noise:perlin_noise(Vector(234-x,435-z), Vector(0.05,0.05), 1, 3, 0.5, 1234)
 				m = math.min(math.max(1, 4 * math.abs(m)), 3)
-				t:add_stick(x, z, 490 + 9 + h1, 5 * h2, m)
+				t:add_stick(x, z, bh + 9 + h1, 5 * h2, m)
 			end
 		end
 	end
-	for x = self.x,self.x+w-1 do
-		for z = self.x,self.x+w-1 do
-			t:smoothen_column(x, z, 0, 1000)
+	for x = self.x-1,self.x+w do
+		for z = self.z-1,self.z+w do
+			t:smoothen_column(x, z, 0, bh + 100)
 		end
 	end
 end

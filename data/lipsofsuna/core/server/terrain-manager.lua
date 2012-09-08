@@ -9,6 +9,7 @@
 -- @alias TerrainManager
 
 local Class = require("system/class")
+local PhysicsTerrain = require("system/physics-terrain")
 local Program = require("system/core")
 local Terrain = require("system/terrain")
 local TerrainChunk = require("core/server/terrain-chunk")
@@ -38,6 +39,10 @@ TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, 
 	self.chunk_size = chunk_size
 	self.grid_size = grid_size
 	self.terrain = Terrain(chunk_size, grid_size)
+	self.physics = PhysicsTerrain(self.terrain)
+	self.physics:set_collision_group(Game.PHYSICS_GROUP_TERRAIN)
+	self.physics:set_collision_mask(Game.PHYSICS_MASK_TERRAIN)
+	self.physics:set_visible(true)
 	-- Initialize the database tables needed by us.
 	if self.database then
 		self.database:query([[

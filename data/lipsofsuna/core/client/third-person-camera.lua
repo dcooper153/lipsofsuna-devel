@@ -28,7 +28,7 @@ end
 -- @return Third person camera.
 ThirdPersonCamera.new = function(clss, args)
 	local self = Camera.new(clss, args)
-	self:set_collision_mask(Physics.MASK_CAMERA)
+	self:set_collision_mask(Game.PHYSICS_MASK_CAMERA)
 	self.mode = "third-person"
 	self.displacement_smoothing_rate = 0.1
 	self.tilt_speed = 0

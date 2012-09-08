@@ -375,7 +375,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, mine, args)
 		local update_player_object = function(o)
-			o.physics:set_collision_group(Physics.GROUP_PLAYERS)
+			o.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYERS)
 			Client:set_player_object(o)
 			Client:set_mouse_smoothing(Client.options.mouse_smoothing)
 			Ui:set_state("play")

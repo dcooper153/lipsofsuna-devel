@@ -25,7 +25,7 @@ local perform_attack = function(attacker, move)
 	local prev
 	local weapon = attacker:get_weapon()
 	local path = choose_path(attacker, move)
-	local mask = Physics.GROUP_ACTORS + Physics.GROUP_PLAYERS + Physics.GROUP_ITEMS
+	local mask = Game.PHYSICS_GROUP_ACTORS + Game.PHYSICS_GROUP_PLAYERS + Game.PHYSICS_GROUP_ITEMS
 	Coroutine(function(t)
 		local apply = function(r)
 			-- Calculate the damage.

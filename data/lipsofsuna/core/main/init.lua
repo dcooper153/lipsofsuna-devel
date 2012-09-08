@@ -65,6 +65,10 @@ Main.new = function(clss)
 			if Game.initialized then
 				Game.sectors:update(tick)
 			end
+			clss.timing:start_action("terrain")
+			if Game.initialized then
+				Game.terrain:update(tick)
+			end
 			clss.timing:start_action("server")
 			Server:update(tick)
 			clss.timing:start_action("models")
@@ -95,6 +99,10 @@ Main.new = function(clss)
 			clss.timing:start_action("sectors")
 			if Game.initialized then
 				Game.sectors:update(tick)
+			end
+			clss.timing:start_action("terrain")
+			if Game.initialized then
+				Game.terrain:update(tick)
 			end
 			clss.timing:start_action("server")
 			Server:update(tick)

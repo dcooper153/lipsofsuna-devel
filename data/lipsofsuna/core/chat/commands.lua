@@ -118,7 +118,7 @@ ChatCommand{
 			player.noclip = nil
 			player.flying = player.spec.flying or false
 			player.physics:set_collision_mask(0xFFFF)
-			player.physics:set_collision_group(Physics.GROUP_PLAYER)
+			player.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYER)
 			player.physics:set_gravity(player.spec.gravity)
 			player.physics:set_gravity_liquid(player.spec.water_gravity)
 		else

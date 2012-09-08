@@ -28,7 +28,7 @@ end
 -- @return First person camera.
 FirstPersonCamera.new = function(clss, args)
 	local self = Camera.new(clss, args)
-	self:set_collision_mask(Physics.MASK_CAMERA)
+	self:set_collision_mask(Game.PHYSICS_MASK_CAMERA)
 	self:set_mode("first-person")
 	self.tilt_speed = 0
 	self.tilt_state = 0

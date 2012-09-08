@@ -15,22 +15,25 @@ local Network = require("system/network")
 local ObjectManager = require("core/server/object-manager")
 local Physics = require("system/physics")
 local SectorManager = require("core/server/sector-manager")
-
-Physics.GROUP_ACTORS = 0x0001
-Physics.GROUP_ITEMS = 0x0002
-Physics.GROUP_PLAYERS = 0x0004
-Physics.GROUP_OBSTACLES = 0x1000
-Physics.GROUP_STATICS = 0x2000
-Physics.GROUP_HEIGHTMAP = 0x4000
-Physics.GROUP_VOXELS = 0x8000
-Physics.MASK_CAMERA = 0xF003
-Physics.MASK_PICK = 0xF003
+local TerrainManager = require("core/server/terrain-manager")
 
 --- TODO:doc
 -- @type Game
 Game = Class("Game")
 Game.objects = ObjectManager() --FIXME
 Game.scene_nodes_by_ref = {}
+
+Game.PHYSICS_GROUP_ACTORS = 0x0001
+Game.PHYSICS_GROUP_ITEMS = 0x0002
+Game.PHYSICS_GROUP_PLAYERS = 0x0004
+Game.PHYSICS_GROUP_TERRAIN = 0x0800
+Game.PHYSICS_GROUP_OBSTACLES = 0x1000
+Game.PHYSICS_GROUP_STATICS = 0x2000
+Game.PHYSICS_GROUP_HEIGHTMAP = 0x4000
+Game.PHYSICS_GROUP_VOXELS = 0x8000
+Game.PHYSICS_MASK_CAMERA = 0xFF03
+Game.PHYSICS_MASK_PICK = 0xFF03
+Game.PHYSICS_MASK_TERRAIN = 0x00FF
 
 --- Initializes the game.
 -- @param self Game.
@@ -45,6 +48,7 @@ Game.init = function(self, mode, save, port)
 	self.enable_graphics = (mode ~= "server")
 	self.enable_prediction = (mode == "join")
 	self.enable_unloading = (mode ~= "editor" and mode ~= "benchmark")
+	self.enable_generation = (mode == "server" or mode == "host" or mode == "single")
 	-- Initialize sectors.
 	if save then
 		self.database = Database("save" .. save .. ".sqlite")
@@ -52,6 +56,7 @@ Game.init = function(self, mode, save, port)
 		self.database:query("PRAGMA count_changes=OFF;")
 	end
 	self.sectors = SectorManager(self.database, self.enable_unloading)
+	self.terrain = TerrainManager(16, 1, self.database, self.enable_unloading, self.enable_generation, self.enable_graphics)
 	-- Initialize storage.
 	self.static_objects_by_id = setmetatable({}, {__mode = "kv"})
 	-- Initialize the server.
