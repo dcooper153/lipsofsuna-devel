@@ -63,7 +63,7 @@ float liext_cameras_clip_camera (
 	LIMatTransform* end)
 {
 	int hit;
-	LIPhyCollision tmp;
+	LIPhyContact tmp;
 	LIPhyPhysics* physics;
 
 	/* Find the physics manager. */

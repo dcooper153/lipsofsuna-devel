@@ -50,6 +50,36 @@ static void PhysicsTerrain_new (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
+static void PhysicsTerrain_set_collision_group (LIScrArgs* args)
+{
+	int value;
+
+	if (!liscr_args_geti_int (args, 0, &value))
+		return;
+
+	liext_physics_terrain_set_collision_group (args->self, value);
+}
+
+static void PhysicsTerrain_set_collision_mask (LIScrArgs* args)
+{
+	int value;
+
+	if (!liscr_args_geti_int (args, 0, &value))
+		return;
+
+	liext_physics_terrain_set_collision_mask (args->self, value);
+}
+
+static void PhysicsTerrain_set_id (LIScrArgs* args)
+{
+	int value;
+
+	if (!liscr_args_geti_int (args, 0, &value) || value <= 0)
+		return;
+
+	liext_physics_terrain_set_id (args->self, value);
+}
+
 static void PhysicsTerrain_get_valid (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liext_physics_terrain_get_valid (args->self));
@@ -71,6 +101,9 @@ void liext_script_physics_terrain (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_new", PhysicsTerrain_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_set_collision_group", PhysicsTerrain_set_collision_group);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_set_collision_mask", PhysicsTerrain_set_collision_mask);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_set_id", PhysicsTerrain_set_id);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_get_valid", PhysicsTerrain_get_valid);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_set_visible", PhysicsTerrain_set_visible);
 }

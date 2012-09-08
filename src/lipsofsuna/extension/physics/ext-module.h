@@ -24,7 +24,6 @@
 #include "physics-model.h"
 #include "physics-object.h"
 #include "physics-shape.h"
-#include "physics-terrain.h"
 #include "physics-types.h"
 
 #define LIEXT_SCRIPT_PHYSICS "Physics"

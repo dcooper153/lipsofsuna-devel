@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -19,32 +19,73 @@
 #define __PHYSICS_COLLISION_CONFIGURATION_HPP__
 
 #include "physics-private.h"
-#include "physics-terrain-collision-algorithm.hpp"
-#include "physics-terrain.hpp"
 #include <btBulletCollisionCommon.h>
+#include <BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h>
+
+class LIPhyCollisionAlgorithmCreator
+{
+public:
+	LIPhyCollisionAlgorithmCreator () {}
+	virtual ~LIPhyCollisionAlgorithmCreator () {}
+	virtual btCollisionAlgorithm* create (
+		btCollisionAlgorithmConstructionInfo& ci,
+		btCollisionObject*                    body0,
+		btCollisionObject*                    body1,
+		btSimplexSolverInterface*             simplex_solver,
+		btConvexPenetrationDepthSolver*       depth_solver,
+		int                                   perturbation_iterations,
+		int                                   perturbation_threshold) = 0;
+public:
+	LIPhyCollisionAlgorithmCreator* next;
+};
+
+/*****************************************************************************/
+
+class LIPhyCollisionAlgorithmCreateFunc;
 
 class LIPhyCollisionConfiguration : public btDefaultCollisionConfiguration
 {
 public:
-	LIPhyCollisionConfiguration () : btDefaultCollisionConfiguration ()
+	LIPhyCollisionConfiguration ();
+	virtual ~LIPhyCollisionConfiguration ();
+	virtual btCollisionAlgorithmCreateFunc* getCollisionAlgorithmCreateFunc (int proxyType0, int proxyType1);
+public:
+	void add_algorithm (LIPhyCollisionAlgorithmCreator* algorithm);
+	void remove_algorithm (LIPhyCollisionAlgorithmCreator* algorithm);
+public:
+	LIPhyCollisionAlgorithmCreator* algorithms;
+	LIPhyCollisionAlgorithmCreateFunc* create_func;
+};
+
+/*****************************************************************************/
+
+class LIPhyCollisionAlgorithmCreateFunc : public btConvexConvexAlgorithm::CreateFunc
+{
+public:
+	LIPhyCollisionAlgorithmCreateFunc (LIPhyCollisionConfiguration* configuration, btSimplexSolverInterface* simplexSolver, btConvexPenetrationDepthSolver* pdSolver) :
+		btConvexConvexAlgorithm::CreateFunc (simplexSolver, pdSolver)
 	{
-		void* mem = btAlignedAlloc (sizeof (LIPhyTerrainCollisionAlgorithm::CreateFunc), 16);
-		this->terrain_create_func = new(mem) LIPhyTerrainCollisionAlgorithm::CreateFunc (this->m_simplexSolver, this->m_pdSolver);
+		this->configuration = configuration;
 	}
-	virtual ~LIPhyCollisionConfiguration ()
+	virtual btCollisionAlgorithm* CreateCollisionAlgorithm (btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0, btCollisionObject* body1)
 	{
-		this->terrain_create_func->~CreateFunc ();
-		btAlignedFree (this->terrain_create_func);
+		LIPhyCollisionAlgorithmCreator* ptr;
+		for (ptr = configuration->algorithms ; ptr != NULL ; ptr = ptr->next)
+		{
+			btCollisionAlgorithm* algo;
+			if (body0->getCollisionShape ()->getShapeType () == CUSTOM_CONVEX_SHAPE_TYPE)
+				algo = ptr->create (ci, body0, body1, m_simplexSolver, m_pdSolver, m_numPerturbationIterations, m_minimumPointsPerturbationThreshold);
+			else
+				algo = ptr->create (ci, body1, body0, m_simplexSolver, m_pdSolver, m_numPerturbationIterations, m_minimumPointsPerturbationThreshold);
+			if (algo != NULL)
+				return algo;
+		}
+		lisys_assert (0);
+		
+		return NULL;
 	}
-	btCollisionAlgorithmCreateFunc* getCollisionAlgorithmCreateFunc (int proxyType0, int proxyType1)
-	{
-		if ((proxyType0 == CONVEX_HULL_SHAPE_PROXYTYPE) && (proxyType1 == CUSTOM_CONVEX_SHAPE_TYPE))
-			return this->terrain_create_func;
-		if ((proxyType0 == CUSTOM_CONVEX_SHAPE_TYPE) && (proxyType1 == CONVEX_HULL_SHAPE_PROXYTYPE))
-			return this->terrain_create_func;
-		return btDefaultCollisionConfiguration::getCollisionAlgorithmCreateFunc (proxyType0, proxyType1);
-	}
-	LIPhyTerrainCollisionAlgorithm::CreateFunc* terrain_create_func;
+public:
+	LIPhyCollisionConfiguration* configuration;
 };
 
 #endif

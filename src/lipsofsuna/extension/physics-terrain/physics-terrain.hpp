@@ -35,7 +35,6 @@ struct _LIExtPhysicsTerrain
 	LIPhyPointer* pointer;
 	LIExtPhysicsTerrainModule* module;
 	LIExtPhysicsTerrainShape* shape;
-	LIPhyPhysics* physics;
 	LIExtTerrain* terrain;
 	LIExtPhysicsTerrainRaycastHook* raycast_hook;
 };

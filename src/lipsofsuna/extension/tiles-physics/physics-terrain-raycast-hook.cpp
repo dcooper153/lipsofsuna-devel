@@ -15,35 +15,25 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "physics-terrain.hpp"
+#include "ext-module.h"
 #include "physics-terrain-raycast-hook.hpp"
 
-LIExtPhysicsTerrainRaycastHook::LIExtPhysicsTerrainRaycastHook (LIExtPhysicsTerrain* terrain)
+LIExtPhysicsVoxelRaycastHook::LIExtPhysicsVoxelRaycastHook (LIPhyTerrain* terrain)
 {
 	this->terrain = terrain;
 }
 
-LIExtPhysicsTerrainRaycastHook::~LIExtPhysicsTerrainRaycastHook ()
+LIExtPhysicsVoxelRaycastHook::~LIExtPhysicsVoxelRaycastHook ()
 {
 }
 
-void LIExtPhysicsTerrainRaycastHook::rayTest (const btVector3& rayFromWorld, const btVector3& rayToWorld, btCollisionWorld::RayResultCallback& resultCallback) const
+void LIExtPhysicsVoxelRaycastHook::rayTest (const btVector3& rayFromWorld, const btVector3& rayToWorld, btCollisionWorld::RayResultCallback& resultCallback) const
 {
-	int grid_x;
-	int grid_z;
-	float fraction;
 	LIMatVector start;
 	LIMatVector end;
-	LIMatVector normal;
-	LIMatVector point;
-
-	/* Check that the terrain exists. */
-	if (terrain->terrain == NULL)
-		return;
+	LIPhyContact result;
 
 	/* Check for the collision mask. */
-	if (!terrain->realized)
-		return;
 	if (!(terrain->collision_group & resultCallback.m_collisionFilterMask) ||
 	    !(terrain->collision_mask & resultCallback.m_collisionFilterGroup))
 		return;
@@ -51,15 +41,17 @@ void LIExtPhysicsTerrainRaycastHook::rayTest (const btVector3& rayFromWorld, con
 	/* Cast the ray against the terrain. */
 	start = limat_vector_init (rayFromWorld[0], rayFromWorld[1], rayFromWorld[2]);
 	end = limat_vector_init (rayToWorld[0], rayToWorld[1], rayToWorld[2]);
-	if (liext_terrain_intersect_ray (terrain->terrain, &start, &end, &grid_x, &grid_z, &point, &normal, &fraction))
+	if (liphy_terrain_cast_ray (terrain, &start, &end, &result))
 	{
-		if (fraction < resultCallback.m_closestHitFraction)
+		if (result.fraction < resultCallback.m_closestHitFraction)
 		{
-			btVector3 normal1 (normal.x, normal.y, normal.z);
-			terrain->pointer->tile[0] = grid_x;
-			terrain->pointer->tile[1] = 0;
-			terrain->pointer->tile[2] = grid_z;
-			btCollisionWorld::LocalRayResult rayres (terrain->object, NULL, normal1, fraction);
+			btVector3 normal (result.normal.x, result.normal.y, result.normal.z);
+			LIPhyTerrain* terrain = (LIPhyTerrain*) this->terrain;
+			LIPhyPointer* pointer = (LIPhyPointer*) terrain->object->getUserPointer ();
+			pointer->tile[0] = result.terrain_tile[0];
+			pointer->tile[1] = result.terrain_tile[1];
+			pointer->tile[2] = result.terrain_tile[2];
+			btCollisionWorld::LocalRayResult rayres (terrain->object, NULL, normal, result.fraction);
 			resultCallback.addSingleResult (rayres, true);
 		}
 	}

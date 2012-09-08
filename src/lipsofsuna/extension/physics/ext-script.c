@@ -80,7 +80,7 @@ static void Physics_cast_ray (LIScrArgs* args)
 	LIMatVector end;
 	LIExtPhysicsModule* module;
 	LIMatVector vector;
-	LIPhyCollision result;
+	LIPhyContact result;
 	LIPhyObject* ignores[100];
 
 	/* Handle arguments. */
@@ -96,11 +96,15 @@ static void Physics_cast_ray (LIScrArgs* args)
 		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
 		liscr_args_sets_vector (args, "point", &result.point);
 		liscr_args_sets_vector (args, "normal", &result.normal);
-		if (result.object != NULL)
+		if (result.object_id)
 		{
-			liscr_args_sets_int (args, "object", liphy_object_get_external_id (result.object));
+			liscr_args_sets_int (args, "object", result.object_id);
 		}
-		if (result.terrain != NULL)
+		if (result.terrain_id)
+		{
+			liscr_args_sets_int (args, "terrain", result.terrain_id);
+		}
+		if (result.voxels_id || result.terrain_id)
 		{
 			vector.x = result.terrain_tile[0];
 			vector.y = result.terrain_tile[1];
@@ -120,7 +124,7 @@ static void Physics_cast_sphere (LIScrArgs* args)
 	LIMatVector end;
 	LIExtPhysicsModule* module;
 	LIMatVector vector;
-	LIPhyCollision result;
+	LIPhyContact result;
 	LIPhyObject* ignores[100];
 
 	/* Handle arguments. */
@@ -138,11 +142,15 @@ static void Physics_cast_sphere (LIScrArgs* args)
 		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
 		liscr_args_sets_vector (args, "point", &result.point);
 		liscr_args_sets_vector (args, "normal", &result.normal);
-		if (result.object != NULL)
+		if (result.object_id)
 		{
-			liscr_args_sets_int (args, "object", liphy_object_get_external_id (result.object));
+			liscr_args_sets_int (args, "object", result.object_id);
 		}
-		if (result.terrain != NULL)
+		if (result.terrain_id)
+		{
+			liscr_args_sets_int (args, "terrain", result.terrain_id);
+		}
+		if (result.voxels_id || result.terrain_id)
 		{
 			vector.x = result.terrain_tile[0];
 			vector.y = result.terrain_tile[1];

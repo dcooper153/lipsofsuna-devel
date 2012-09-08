@@ -20,9 +20,29 @@
 #include "physics-terrain.hpp"
 #include "physics-terrain-collision-algorithm.hpp"
 
-float LIExtPhysicsTerrainCollisionAlgorithm::tile_size = -1.0f;
-btConvexHullShape* LIExtPhysicsTerrainCollisionAlgorithm::slopes_above[16];
-btConvexHullShape* LIExtPhysicsTerrainCollisionAlgorithm::slopes_below[16];
+void* liext_physics_terrain_collision_algorithm_new (
+	LIPhyPhysics* physics)
+{
+	LIExtPhysicsTerrainCollisionAlgorithmCreator* self;
+
+	self = new LIExtPhysicsTerrainCollisionAlgorithmCreator ();
+	physics->configuration->add_algorithm (self);
+
+	return self;
+}
+
+void liext_physics_terrain_collision_algorithm_free (
+	LIPhyPhysics* physics,
+	void*         self)
+{
+	LIExtPhysicsTerrainCollisionAlgorithmCreator* s;
+
+	s = (LIExtPhysicsTerrainCollisionAlgorithmCreator*) self;
+	physics->configuration->remove_algorithm (s);
+	delete s;
+}
+
+/*****************************************************************************/
 
 LIExtPhysicsTerrainCollisionAlgorithm::LIExtPhysicsTerrainCollisionAlgorithm (btPersistentManifold* mf, const btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0, btCollisionObject* body1, btSimplexSolverInterface* simplexSolver, btConvexPenetrationDepthSolver* pdSolver, int numPerturbationIterations, int minimumPointsPerturbationThreshold) :
 	btConvexConvexAlgorithm (mf, ci, body0, body1, simplexSolver, pdSolver, numPerturbationIterations, minimumPointsPerturbationThreshold)
@@ -62,6 +82,7 @@ void LIExtPhysicsTerrainCollisionAlgorithm::processCollision (btCollisionObject*
 	shape_convex = (btConvexHullShape*) object_convex->getCollisionShape ();
 	shape_terrain = (LIExtPhysicsTerrainShape*) object_terrain->getCollisionShape ();
 	pointer_terrain = (LIPhyPointer*) object_terrain->getUserPointer ();
+	lisys_assert (pointer_terrain->type == LIPHY_POINTER_TYPE_TERRAIN);
 
 	/* Get the range of intersecting grid points. */
 	btVector3 aabb_min;

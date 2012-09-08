@@ -30,7 +30,6 @@
 #include "physics-object.h"
 #include "physics-private.h"
 #include "physics-raycast-hook.hpp"
-#include "physics-terrain.h"
 
 #define MAXPROXIES 1000000
 
@@ -180,32 +179,22 @@ int liphy_physics_cast_ray (
 	int                 mask,
 	LIPhyObject**       ignore_array,
 	int                 ignore_count,
-	LIPhyCollision*     result)
+	LIPhyContact*       result)
 {
 	btVector3 src (start->x, start->y, start->z);
 	btVector3 dst (end->x, end->y, end->z);
 
 	/* Cast the ray. */
-	LIPhyRaycastWorld test (ignore_array, ignore_count, src, dst);
-	test.m_closestHitFraction = 1.0f;
+	LIPhyRayResultCallback test (ignore_array, ignore_count, src, dst);
 	test.m_collisionFilterGroup = group;
 	test.m_collisionFilterMask = mask;
 	self->dynamics->rayTest (src, dst, test);
 	if (test.m_closestHitFraction >= 1.0f)
 		return 0;
 
-	/* Inspect results. */
+	/* Copy the results. */
 	if (result != NULL)
-	{
-		result->fraction = test.m_closestHitFraction;
-		result->point = limat_vector_init (test.m_hitPointWorld[0], test.m_hitPointWorld[1], test.m_hitPointWorld[2]);
-		result->normal = limat_vector_init (test.m_hitNormalWorld[0], test.m_hitNormalWorld[1], test.m_hitNormalWorld[2]);
-		result->object = test.object;
-		result->terrain = test.terrain;
-		result->terrain_tile[0] = test.terrain_tile[0];
-		result->terrain_tile[1] = test.terrain_tile[1];
-		result->terrain_tile[2] = test.terrain_tile[2];
-	}
+		*result = test.result;
 
 	return 1;
 }
@@ -237,12 +226,12 @@ int liphy_physics_cast_shape (
 	int                   mask,
 	LIPhyObject**         ignore_array,
 	int                   ignore_count,
-	LIPhyCollision*       result)
+	LIPhyContact*         result)
 {
 	int i;
 	float best;
 	btConvexShape* btshape;
-	LIPhyConvexcastWorld test (ignore_array, ignore_count);
+	LIPhyConvexResultCallback test (ignore_array, ignore_count);
 	btTransform btstart (
 		btQuaternion (start->rotation.x, start->rotation.y, start->rotation.z, start->rotation.w),
 		btVector3 (start->position.x, start->position.y, start->position.z));
@@ -251,13 +240,11 @@ int liphy_physics_cast_shape (
 		btVector3 (end->position.x, end->position.y, end->position.z));
 
 	/* Initialize sweep. */
-	test.m_closestHitFraction = 1.0f;
 	test.m_collisionFilterGroup = group;
 	test.m_collisionFilterMask = mask;
 	result->fraction = best = 1.0f;
 
 	/* Sweep the shape. */
-	/* TODO: Compound shape support when the shape class supports them. */
 	for (i = 0 ; i < shape->shape->getNumChildShapes () ; i++)
 	{
 		btshape = (btConvexShape*) shape->shape->getChildShape (i);
@@ -265,14 +252,7 @@ int liphy_physics_cast_shape (
 		if (test.m_closestHitFraction <= best && test.m_hitCollisionObject != NULL)
 		{
 			best = test.m_closestHitFraction;
-			result->fraction = test.m_closestHitFraction;
-			result->point = limat_vector_init (test.m_hitPointWorld[0], test.m_hitPointWorld[1], test.m_hitPointWorld[2]);
-			result->normal = limat_vector_init (test.m_hitNormalWorld[0], test.m_hitNormalWorld[1], test.m_hitNormalWorld[2]);
-			result->object = test.object;
-			result->terrain = test.terrain;
-			result->terrain_tile[0] = test.terrain_tile[0];
-			result->terrain_tile[1] = test.terrain_tile[1];
-			result->terrain_tile[2] = test.terrain_tile[2];
+			*result = test.result;
 		}
 	}
 
@@ -306,17 +286,15 @@ int liphy_physics_cast_sphere (
 	int                 mask,
 	LIPhyObject**       ignore_array,
 	int                 ignore_count,
-	LIPhyCollision*     result)
+	LIPhyContact*       result)
 {
 	btCollisionWorld* collision;
 	btTransform btstart (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (start->x, start->y, start->z));
 	btTransform btend (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (end->x, end->y, end->z));
 	btSphereShape shape (radius);
-	LIPhyPointer* pointer;
 
 	/* Initialize sweep. */
-	LIPhyConvexcastWorld test (ignore_array, ignore_count);
-	test.m_closestHitFraction = 1.0f;
+	LIPhyConvexResultCallback test (ignore_array, ignore_count);
 	test.m_collisionFilterGroup = group;
 	test.m_collisionFilterMask = mask;
 
@@ -325,31 +303,7 @@ int liphy_physics_cast_sphere (
 	collision->convexSweepTest (&shape, btstart, btend, test);
 	if (test.m_hitCollisionObject != NULL && test.m_closestHitFraction < 1.0f)
 	{
-		result->fraction = test.m_closestHitFraction;
-		result->normal.x = test.m_hitNormalWorld[0];
-		result->normal.y = test.m_hitNormalWorld[1];
-		result->normal.z = test.m_hitNormalWorld[2];
-		result->point.x = test.m_hitPointWorld[0];
-		result->point.y = test.m_hitPointWorld[1];
-		result->point.z = test.m_hitPointWorld[2];
-		pointer = (LIPhyPointer*) test.m_hitCollisionObject->getUserPointer ();
-		if (pointer->object)
-		{
-			result->object = (LIPhyObject*) pointer->pointer;
-			result->terrain = NULL;
-			result->terrain_tile[0] = 0;
-			result->terrain_tile[1] = 0;
-			result->terrain_tile[2] = 0;
-		}
-		else
-		{
-			result->object = NULL;
-			result->terrain = (LIPhyTerrain*) pointer->pointer;
-			result->terrain_tile[0] = pointer->tile[0];
-			result->terrain_tile[1] = pointer->tile[1];
-			result->terrain_tile[2] = pointer->tile[2];
-			liphy_terrain_cast_sphere (result->terrain, start, end, radius, result);
-		}
+		*result = test.result;
 		return 1;
 	}
 
@@ -490,9 +444,11 @@ static bool private_contact_processed (
 	void*            body0,
 	void*            body1)
 {
+	int tmp;
 	LIMatVector momentum0;
 	LIMatVector momentum1;
-	LIPhyObject* object;
+	LIPhyObject* object0 = NULL;
+	LIPhyObject* object1 = NULL;
 	LIPhyPhysics* physics = NULL;
 	LIPhyPointer* pointer0;
 	LIPhyPointer* pointer1;
@@ -507,38 +463,50 @@ static bool private_contact_processed (
 	/* If the userdata is NULL, the body was a heightmap. Otherwise, was
 	   either an object or voxels depending on which one is set in the
 	   struct to which the pointer points. */
-	memset (&contact, 0, sizeof (LIPhyContact));
+	liphy_contact_init (&contact);
 	if (pointer0 != NULL)
 	{
-		if (pointer0->object)
+		if (pointer0->type == LIPHY_POINTER_TYPE_OBJECT)
 		{
-			contact.object0 = (LIPhyObject*) pointer0->pointer;
-			physics = contact.object0->physics;
+			object0 = (LIPhyObject*) pointer0->pointer;
+			contact.object_id = liphy_object_get_external_id (object0);
+			physics = object0->physics;
+		}
+		else if (pointer0->type == LIPHY_POINTER_TYPE_VOXEL)
+		{
+			contact.voxels_id = 1;
+			memcpy (contact.terrain_tile, pointer0->tile, 3 * sizeof (int));
 		}
 		else
 		{
-			contact.terrain = (LIPhyTerrain*) pointer0->pointer;
+			contact.terrain_id = pointer0->id;
 			memcpy (contact.terrain_tile, pointer0->tile, 3 * sizeof (int));
 		}
 	}
 	if (pointer1 != NULL)
 	{
-		if (pointer1->object)
+		if (pointer1->type == LIPHY_POINTER_TYPE_OBJECT)
 		{
-			contact.object1 = (LIPhyObject*) pointer1->pointer;
-			physics = contact.object1->physics;
+			object1 = (LIPhyObject*) pointer1->pointer;
+			contact.object1_id = liphy_object_get_external_id (object1);
+			physics = object1->physics;
+		}
+		else if (pointer1->type == LIPHY_POINTER_TYPE_VOXEL)
+		{
+			contact.voxels_id = 1;
+			memcpy (contact.terrain_tile, pointer1->tile, 3 * sizeof (int));
 		}
 		else
 		{
-			contact.terrain = (LIPhyTerrain*) pointer1->pointer;
+			contact.terrain_id = pointer1->id;
 			memcpy (contact.terrain_tile, pointer1->tile, 3 * sizeof (int));
 		}
 	}
 
 	/* Make sure that the contact involved at least one object with a contact
 	   callback before inserting the contact to the queue. */
-	if ((contact.object0 == NULL || !contact.object0->config.contact_events) &&
-	    (contact.object1 == NULL || !contact.object1->config.contact_events))
+	if ((object0 == NULL || !object0->config.contact_events) &&
+	    (object1 == NULL || !object1->config.contact_events))
 		return false;
 
 	/* Get collision point. */
@@ -549,30 +517,30 @@ static bool private_contact_processed (
 
 	/* Calculate impulse. */
 	/* FIXME: This is sloppy. */
-	if (contact.object0 != NULL)
+	if (object0 != NULL)
 	{
-		liphy_object_get_velocity (contact.object0, &momentum0);
-		momentum0 = limat_vector_multiply (momentum0, liphy_object_get_mass (contact.object0));
+		liphy_object_get_velocity (object0, &momentum0);
+		momentum0 = limat_vector_multiply (momentum0, liphy_object_get_mass (object0));
 	}
 	else
 		momentum1 = limat_vector_init (0.0f, 0.0f, 0.0f);
-	if (contact.object1 != NULL)
+	if (object1 != NULL)
 	{
-		liphy_object_get_velocity (contact.object1, &momentum1);
-		momentum1 = limat_vector_multiply (momentum1, liphy_object_get_mass (contact.object1));
+		liphy_object_get_velocity (object1, &momentum1);
+		momentum1 = limat_vector_multiply (momentum1, liphy_object_get_mass (object1));
 	}
 	else
 		momentum1 = limat_vector_init (0.0f, 0.0f, 0.0f);
 	contact.impulse = limat_vector_get_length (limat_vector_subtract (momentum0, momentum1));
 
 	/* Invoke callbacks. */
-	if (contact.object0 != NULL && contact.object0->config.contact_events)
+	if (object0 != NULL && object0->config.contact_events)
 		lical_callbacks_call (physics->callbacks, "object-contact", lical_marshal_DATA_PTR, &contact);
-	if (contact.object1 != NULL && contact.object1->config.contact_events)
+	if (object1 != NULL && object1->config.contact_events)
 	{
-		object = contact.object0;
-		contact.object0 = contact.object1;
-		contact.object1 = object;
+		tmp = contact.object_id;
+		contact.object_id = contact.object1_id;
+		contact.object1_id = tmp;
 		lical_callbacks_call (physics->callbacks, "object-contact", lical_marshal_DATA_PTR, &contact);
 	}
 

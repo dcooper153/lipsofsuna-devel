@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,8 +22,9 @@
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/voxel.h"
-#include "physics.h"
-#include "physics-types.h"
+#include "lipsofsuna/extension/physics/physics.h"
+
+typedef struct _LIPhyTerrain LIPhyTerrain;
 
 LIAPICALL (LIPhyTerrain*, liphy_terrain_new, (
 	LIPhyPhysics* physics,
@@ -38,21 +39,21 @@ LIAPICALL (int, liphy_terrain_cast_ray, (
 	const LIPhyTerrain* self,
 	const LIMatVector*  start,
 	const LIMatVector*  end,
-	LIPhyCollision*     result));
+	LIPhyContact*       result));
 
 LIAPICALL (int, liphy_terrain_cast_shape, (
 	const LIPhyTerrain* self,
 	const LIMatTransform* start,
 	const LIMatTransform* end,
 	const LIPhyShape*     shape,
-	LIPhyCollision*       result));
+	LIPhyContact*         result));
 
 LIAPICALL (int, liphy_terrain_cast_sphere, (
 	const LIPhyTerrain* self,
 	const LIMatVector*  start,
 	const LIMatVector*  end,
 	float               radius,
-	LIPhyCollision*     result));
+	LIPhyContact*       result));
 
 LIAPICALL (void, liphy_terrain_set_realized, (
 	LIPhyTerrain* self,

@@ -59,7 +59,8 @@ LIExtPhysicsTerrain* liext_physics_terrain_new (
 		lisys_free (self);
 		return NULL;
 	}
-	self->pointer->object = 0;
+	self->pointer->id = 1;
+	self->pointer->type = LIPHY_POINTER_TYPE_TERRAIN;
 	self->pointer->pointer = self;
 
 	/* Create the collision shape. */
@@ -107,7 +108,7 @@ int liext_physics_terrain_cast_ray (
 	const LIExtPhysicsTerrain* self,
 	const LIMatVector*         start,
 	const LIMatVector*         end,
-	LIPhyCollision*            result)
+	LIPhyContact*              result)
 {
 	int grid_x;
 	int grid_z;
@@ -125,11 +126,11 @@ int liext_physics_terrain_cast_ray (
 	p1 = *end;
 	if (!liext_terrain_intersect_ray (self->terrain, &p0, &p1, &grid_x, &grid_z, &point, &normal, &fraction))
 		return 0;
+	liphy_contact_init (result);
 	result->fraction = fraction;
 	result->normal = normal;
 	result->point = point;
-	result->object = NULL;
-	result->terrain = NULL; // FIXME
+	result->terrain_id = self->pointer->id;
 	result->terrain_tile[0] = grid_x;
 	result->terrain_tile[1] = 0;
 	result->terrain_tile[2] = grid_z;
@@ -142,7 +143,7 @@ int liext_physics_terrain_cast_shape (
 	const LIMatTransform*      start,
 	const LIMatTransform*      end,
 	const LIPhyShape*          shape,
-	LIPhyCollision*            result)
+	LIPhyContact*              result)
 {
 	/* TODO */
 	return 0;
@@ -153,7 +154,7 @@ int liext_physics_terrain_cast_sphere (
 	const LIMatVector*         start,
 	const LIMatVector*         end,
 	float                      radius,
-	LIPhyCollision*            result)
+	LIPhyContact*              result)
 {
 	/* TODO */
 	return 0;
@@ -175,7 +176,6 @@ void liext_physics_terrain_remove (
 {
 	if (self->terrain != terrain)
 		return;
-	self->terrain = NULL;
 
 	/* Remove the raycast hook. */
 	if (self->raycast_hook != NULL)
@@ -190,6 +190,71 @@ void liext_physics_terrain_remove (
 	delete self->shape;
 	self->object = NULL;
 	self->shape = NULL;
+	self->terrain = NULL;
+}
+
+/**
+ * \brief Sets the collision group of the terrain.
+ * \param self Terrain.
+ * \param value Collision group number.
+ */
+void liext_physics_terrain_set_collision_group (
+	LIExtPhysicsTerrain* self,
+	int                  value)
+{
+	/* Make sure the terrain has not been garbage collected. */
+	if (self->terrain == NULL)
+		return;
+
+	/* Set the new value. */
+	if (value == self->collision_group)
+		return;
+	self->collision_group = value;
+
+	/* Refresh the physics world. */
+	if (self->realized)
+	{
+		self->module->physics->dynamics->removeCollisionObject (self->object);
+		self->module->physics->dynamics->addCollisionObject (self->object, self->collision_group, self->collision_mask);
+	}
+}
+
+/**
+ * \brief Sets the collision group of the terrain.
+ * \param self Terrain.
+ * \param value Collision group number.
+ */
+void liext_physics_terrain_set_collision_mask (
+	LIExtPhysicsTerrain* self,
+	int                  value)
+{
+	/* Make sure the terrain has not been garbage collected. */
+	if (self->terrain == NULL)
+		return;
+
+	/* Set the new value. */
+	if (value == self->collision_mask)
+		return;
+	self->collision_mask = value;
+
+	/* Refresh the physics world. */
+	if (self->realized)
+	{
+		self->module->physics->dynamics->removeCollisionObject (self->object);
+		self->module->physics->dynamics->addCollisionObject (self->object, self->collision_group, self->collision_mask);
+	}
+}
+
+/**
+ * \brief Sets the unique ID of the terrain.
+ * \param self Terrain.
+ * \param value Number.
+ */
+void liext_physics_terrain_set_id (
+	LIExtPhysicsTerrain* self,
+	int                  value)
+{
+	self->pointer->id = value;
 }
 
 /**
@@ -216,13 +281,16 @@ void liext_physics_terrain_set_visible (
 	if (self->terrain == NULL)
 		return;
 
+	/* Set the new value. */
 	if (self->realized == value)
 		return;
 	self->realized = value;
+
+	/* Add to or remove from the physics world. */
 	if (value)
-		self->physics->dynamics->addCollisionObject (self->object, self->collision_group, self->collision_mask);
+		self->module->physics->dynamics->addCollisionObject (self->object, self->collision_group, self->collision_mask);
 	else
-		self->physics->dynamics->removeCollisionObject (self->object);
+		self->module->physics->dynamics->removeCollisionObject (self->object);
 }
 
 /** @} */

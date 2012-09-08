@@ -51,6 +51,7 @@ Unittest.run_all = function(self)
 		end
 		-- Run the test function.
 		print("Testing " .. v[2] .. "...")
+		collectgarbage()
 		xpcall(v[3], function(err) print(debug.traceback(err)) end)
 		-- Restore require.
 		require = require_real

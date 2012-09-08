@@ -15,30 +15,14 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TILES_PHYSICS_MODULE_H__
-#define __TILES_PHYSICS_MODULE_H__
+#ifndef __LIEXT_PHYSICS_TERRAIN__PHYSICS_TERRAIN_COLLISION_ALGORITHM_H__
+#define __LIEXT_PHYSICS_TERRAIN__PHYSICS_TERRAIN_COLLISION_ALGORITHM_H__
 
-#include "lipsofsuna/extension.h"
-#include "lipsofsuna/extension/physics/ext-module.h"
-#include "lipsofsuna/system.h"
-#include "lipsofsuna/voxel.h"
-#include "physics-terrain.h"
+LIAPICALL (void*, liext_physics_terrain_collision_algorithm_new, (
+	LIPhyPhysics* physics));
 
-typedef struct _LIPhyTerrain LIPhyTerrain;
-
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
-{
-	LIMaiProgram* program;
-	LIPhyPhysics* physics;
-	LIPhyTerrain* terrain;
-	LIVoxManager* voxels;
-};
-
-LIExtModule* liext_tiles_physics_new (
-	LIMaiProgram* program);
-
-void liext_tiles_physics_free (
-	LIExtModule* self);
+LIAPICALL (void, liext_physics_terrain_collision_algorithm_free, (
+	LIPhyPhysics* physics,
+	void*         self));
 
 #endif

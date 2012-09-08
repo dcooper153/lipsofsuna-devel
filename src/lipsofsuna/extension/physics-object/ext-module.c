@@ -98,31 +98,33 @@ static void private_object_contact (
 	LIExtPhysicsObjectModule* self,
 	LIPhyContact*             contact)
 {
-	LIPhyObject* object0;
-	LIPhyObject* object1;
 	LIMatVector vector;
 
-	if (contact->object1 != NULL)
+	if (contact->object1_id)
 	{
 		/* Object -> object */
-		object0 = contact->object0;
-		object1 = contact->object1;
-		limai_program_event (self->program, "object-contact", "impulse", LIMAI_FIELD_FLOAT, contact->impulse, "normal", LIMAI_FIELD_VECTOR, &contact->normal, "object", LIMAI_FIELD_INT, liphy_object_get_external_id (object1), "point", LIMAI_FIELD_VECTOR, &contact->point, "self", LIMAI_FIELD_INT, liphy_object_get_external_id (object0), NULL);
+		limai_program_event (self->program, "object-contact", "impulse", LIMAI_FIELD_FLOAT, contact->impulse, "normal", LIMAI_FIELD_VECTOR, &contact->normal, "object", LIMAI_FIELD_INT, contact->object1_id, "point", LIMAI_FIELD_VECTOR, &contact->point, "self", LIMAI_FIELD_INT, contact->object_id, NULL);
 	}
-	else if (contact->terrain != NULL)
+	else if (contact->voxels_id)
 	{
 		/* Object -> voxels */
-		object0 = contact->object0;
 		vector.x = contact->terrain_tile[0];
 		vector.y = contact->terrain_tile[1];
 		vector.z = contact->terrain_tile[2];
-		limai_program_event (self->program, "object-contact", "impulse", LIMAI_FIELD_FLOAT, contact->impulse, "normal", LIMAI_FIELD_VECTOR, &contact->normal,  "point", LIMAI_FIELD_VECTOR, &contact->point, "tile", LIMAI_FIELD_VECTOR, &vector, "self", LIMAI_FIELD_INT, liphy_object_get_external_id (object0), NULL);
+		limai_program_event (self->program, "object-contact", "impulse", LIMAI_FIELD_FLOAT, contact->impulse, "normal", LIMAI_FIELD_VECTOR, &contact->normal,  "point", LIMAI_FIELD_VECTOR, &contact->point, "tile", LIMAI_FIELD_VECTOR, &vector, "self", LIMAI_FIELD_INT, contact->object_id, NULL);
+	}
+	else if (contact->terrain_id)
+	{
+		/* Object -> terrain */
+		vector.x = contact->terrain_tile[0];
+		vector.y = contact->terrain_tile[1];
+		vector.z = contact->terrain_tile[2];
+		limai_program_event (self->program, "object-contact", "impulse", LIMAI_FIELD_FLOAT, contact->impulse, "normal", LIMAI_FIELD_VECTOR, &contact->normal,  "point", LIMAI_FIELD_VECTOR, &contact->point, "tile", LIMAI_FIELD_VECTOR, &vector, "self", LIMAI_FIELD_INT, contact->object_id, NULL);
 	}
 	else
 	{
 		/* Object -> heightmap */
-		object0 = contact->object0;
-		limai_program_event (self->program, "object-contact", "impulse", LIMAI_FIELD_FLOAT, contact->impulse, "normal", LIMAI_FIELD_VECTOR, &contact->normal, "heightmap", LIMAI_FIELD_BOOL, 1, "point", LIMAI_FIELD_VECTOR, &contact->point, "self", LIMAI_FIELD_INT, liphy_object_get_external_id (object0), NULL);
+		limai_program_event (self->program, "object-contact", "impulse", LIMAI_FIELD_FLOAT, contact->impulse, "normal", LIMAI_FIELD_VECTOR, &contact->normal, "heightmap", LIMAI_FIELD_BOOL, 1, "point", LIMAI_FIELD_VECTOR, &contact->point, "self", LIMAI_FIELD_INT, contact->object_id, NULL);
 	}
 }
 

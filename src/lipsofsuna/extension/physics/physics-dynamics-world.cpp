@@ -17,7 +17,6 @@
 
 #include "physics-dynamics-world.hpp"
 #include "physics-private.h"
-#include "physics-terrain.h"
 
 LIPhyDynamicsWorld::LIPhyDynamicsWorld (btDispatcher* dispatcher, btBroadphaseInterface* pairCache, btConstraintSolver* constraintSolver, btCollisionConfiguration* collisionConfiguration) :
 	btDiscreteDynamicsWorld (dispatcher, pairCache, constraintSolver, collisionConfiguration)
@@ -33,17 +32,11 @@ LIPhyDynamicsWorld::~LIPhyDynamicsWorld ()
 
 void LIPhyDynamicsWorld::addCollisionObject (btCollisionObject* collisionObject, short int collisionFilterGroup, short int collisionFilterMask)
 {
-	LIPhyPointer* pointer = (LIPhyPointer*) collisionObject->getUserPointer ();
-	if (pointer != NULL && !pointer->object)
-		this->terrain = (LIPhyTerrain*) pointer->pointer;
 	btDiscreteDynamicsWorld::addCollisionObject (collisionObject, collisionFilterGroup, collisionFilterMask);
 }
 
 void LIPhyDynamicsWorld::rayTest (const btVector3& rayFromWorld, const btVector3& rayToWorld, RayResultCallback& resultCallback) const
 {
-	LIMatVector start;
-	LIMatVector end;
-	LIPhyCollision result;
 	LIPhyRaycastHook* hook;
 
 	/* Test against normal objects. */
@@ -54,37 +47,9 @@ void LIPhyDynamicsWorld::rayTest (const btVector3& rayFromWorld, const btVector3
 	{
 		hook->rayTest (rayFromWorld, rayToWorld, resultCallback);
 	}
-
-	/* Check if a terrain test is needed. */
-	if (this->terrain == NULL)
-		return;
-	if (!(this->terrain->collision_group & resultCallback.m_collisionFilterMask) ||
-	    !(this->terrain->collision_mask & resultCallback.m_collisionFilterGroup))
-		return;
-
-	/* Test against terrain. */
-	start = limat_vector_init (rayFromWorld[0], rayFromWorld[1], rayFromWorld[2]);
-	end = limat_vector_init (rayToWorld[0], rayToWorld[1], rayToWorld[2]);
-	if (liphy_terrain_cast_ray (this->terrain, &start, &end, &result))
-	{
-		if (result.fraction < resultCallback.m_closestHitFraction)
-		{
-			btVector3 normal (result.normal.x, result.normal.y, result.normal.z);
-			LIPhyTerrain* terrain = (LIPhyTerrain*) this->terrain;
-			LIPhyPointer* pointer = (LIPhyPointer*) terrain->object->getUserPointer ();
-			pointer->tile[0] = result.terrain_tile[0];
-			pointer->tile[1] = result.terrain_tile[1];
-			pointer->tile[2] = result.terrain_tile[2];
-			LocalRayResult rayres (terrain->object, NULL, normal, result.fraction);
-			resultCallback.addSingleResult (rayres, true);
-		}
-	}
 }
 
 void LIPhyDynamicsWorld::removeCollisionObject (btCollisionObject* collisionObject)
 {
-	LIPhyPointer* pointer = (LIPhyPointer*) collisionObject->getUserPointer ();
-	if (pointer != NULL && !pointer->object)
-		this->terrain = NULL;
 	btDiscreteDynamicsWorld::removeCollisionObject (collisionObject);
 }

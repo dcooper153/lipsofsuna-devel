@@ -38,25 +38,37 @@ LIAPICALL (int, liext_physics_terrain_cast_ray, (
 	const LIExtPhysicsTerrain* self,
 	const LIMatVector*         start,
 	const LIMatVector*         end,
-	LIPhyCollision*            result));
+	LIPhyContact*              result));
 
 LIAPICALL (int, liext_physics_terrain_cast_shape, (
 	const LIExtPhysicsTerrain* self,
 	const LIMatTransform*      start,
 	const LIMatTransform*      end,
 	const LIPhyShape*          shape,
-	LIPhyCollision*            result));
+	LIPhyContact*              result));
 
 LIAPICALL (int, liext_physics_terrain_cast_sphere, (
 	const LIExtPhysicsTerrain* self,
 	const LIMatVector*         start,
 	const LIMatVector*         end,
 	float                      radius,
-	LIPhyCollision*            result));
+	LIPhyContact*              result));
 
 LIAPICALL (void, liext_physics_terrain_remove, (
 	LIExtPhysicsTerrain* self,
 	LIExtTerrain*        terrain));
+
+LIAPICALL (void, liext_physics_terrain_set_collision_group, (
+	LIExtPhysicsTerrain* self,
+	int                  value));
+
+LIAPICALL (void, liext_physics_terrain_set_collision_mask, (
+	LIExtPhysicsTerrain* self,
+	int                  value));
+
+LIAPICALL (void, liext_physics_terrain_set_id, (
+	LIExtPhysicsTerrain* self,
+	int                  value));
 
 LIAPICALL (int, liext_physics_terrain_get_valid, (
 	const LIExtPhysicsTerrain* self));

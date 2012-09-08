@@ -30,7 +30,55 @@ PhysicsTerrain = Class("PhysicsTerrain")
 PhysicsTerrain.new = function(clss, terrain)
 	local self = Class.new(clss)
 	self.handle = Los.physics_terrain_new(terrain.handle)
+	self.__id = 1
+	self.__collision_group = 1
+	self.__collision_mask = 0xFFFF
 	return self
+end
+
+--- Gets the collision group of the physics terrain.
+-- @param self PhysicsTerrain.
+-- @return Number.
+PhysicsTerrain.get_collision_group = function(self, v)
+	return self.__collision_group
+end
+
+--- Sets the collision group of the physics terrain.
+-- @param self PhysicsTerrain.
+-- @param v Number.
+PhysicsTerrain.set_collision_group = function(self, v)
+	self.__collision_group = v
+	Los.physics_terrain_set_collision_group(self.handle, v)
+end
+
+--- Gets the collision mask of the physics terrain.
+-- @param self PhysicsTerrain.
+-- @return Number.
+PhysicsTerrain.get_collision_mask = function(self, v)
+	return self.__collision_mask
+end
+
+--- Sets the collision mask of the physics terrain.
+-- @param self PhysicsTerrain.
+-- @param v Number.
+PhysicsTerrain.set_collision_mask = function(self, v)
+	self.__collision_mask = v
+	Los.physics_terrain_set_collision_mask(self.handle, v)
+end
+
+--- Gets the unique ID of the physics terrain.
+-- @param self PhysicsTerrain.
+-- @return Number.
+PhysicsTerrain.get_id = function(self, v)
+	return self.__id
+end
+
+--- Sets the unique ID of the physics terrain.
+-- @param self PhysicsTerrain.
+-- @param v Number.
+PhysicsTerrain.set_id = function(self, v)
+	self.__id = v
+	Los.physics_terrain_set_id(self.handle, v)
 end
 
 --- Returns true if the physics terrain has a terrain object assigned.</br>

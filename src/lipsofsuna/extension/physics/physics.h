@@ -41,7 +41,7 @@ LIAPICALL (int, liphy_physics_cast_ray, (
 	int                 mask,
 	LIPhyObject**       ignore_array,
 	int                 ignore_count,
-	LIPhyCollision*     result));
+	LIPhyContact*       result));
 
 LIAPICALL (int, liphy_physics_cast_shape, (
 	const LIPhyPhysics*   self,
@@ -52,7 +52,7 @@ LIAPICALL (int, liphy_physics_cast_shape, (
 	int                   mask,
 	LIPhyObject**         ignore_array,
 	int                   ignore_count,
-	LIPhyCollision*       result));
+	LIPhyContact*         result));
 
 LIAPICALL (int, liphy_physics_cast_sphere, (
 	const LIPhyPhysics* self,
@@ -63,7 +63,7 @@ LIAPICALL (int, liphy_physics_cast_sphere, (
 	int                 mask,
 	LIPhyObject**       ignore_array,
 	int                 ignore_count,
-	LIPhyCollision*     result));
+	LIPhyContact*       result));
 
 LIAPICALL (void, liphy_physics_clear_constraints, (
 	LIPhyPhysics* self,

@@ -15,22 +15,25 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIEXT_PHYSICS_TERRAIN__PHYSICS_TERRAIN_COLLISION_ALGORITHM_HPP__
-#define __LIEXT_PHYSICS_TERRAIN__PHYSICS_TERRAIN_COLLISION_ALGORITHM_HPP__
+#ifndef __PHYSICS_TERRAIN_COLLISION_ALGORITHM_HPP__
+#define __PHYSICS_TERRAIN_COLLISION_ALGORITHM_HPP__
 
 #include "lipsofsuna/extension/physics/physics-private.h"
 #include "lipsofsuna/extension/physics/physics-collision-configuration.hpp"
-#include <BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h>
-#include "physics-terrain-collision-algorithm.h"
 
-class LIExtPhysicsTerrainCollisionAlgorithm : public btConvexConvexAlgorithm
+class LIExtPhysicsVoxelCollisionAlgorithm : public btConvexConvexAlgorithm
 {
 public:
-	LIExtPhysicsTerrainCollisionAlgorithm (btPersistentManifold* mf, const btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0, btCollisionObject* body1, btSimplexSolverInterface* simplexSolver, btConvexPenetrationDepthSolver* pdSolver, int numPerturbationIterations, int minimumPointsPerturbationThreshold);
+	LIExtPhysicsVoxelCollisionAlgorithm (btPersistentManifold* mf, const btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0, btCollisionObject* body1, btSimplexSolverInterface* simplexSolver, btConvexPenetrationDepthSolver* pdSolver, int numPerturbationIterations, int minimumPointsPerturbationThreshold);
 	virtual void processCollision (btCollisionObject* body0, btCollisionObject* body1, const btDispatcherInfo& dispatchInfo, btManifoldResult* resultOut);
+public:
+	static void rebuild_shape_cache (float size);
+	static float tile_size;
+	static btConvexHullShape* slopes_above[16];
+	static btConvexHullShape* slopes_below[16];
 };
 
-class LIExtPhysicsTerrainCollisionAlgorithmCreator : public LIPhyCollisionAlgorithmCreator
+class LIExtPhysicsVoxelCollisionAlgorithmCreator : public LIPhyCollisionAlgorithmCreator
 {
 public:
 	virtual btCollisionAlgorithm* create (
@@ -45,11 +48,11 @@ public:
 		LIPhyPointer* pointer;
 
 		pointer = (LIPhyPointer*) body0->getUserPointer ();
-		if (pointer->type != LIPHY_POINTER_TYPE_TERRAIN)
+		if (pointer->type != LIPHY_POINTER_TYPE_VOXEL)
 			return NULL;
 
-		void* mem = ci.m_dispatcher1->allocateCollisionAlgorithm (sizeof (LIExtPhysicsTerrainCollisionAlgorithm));
-		return new(mem) LIExtPhysicsTerrainCollisionAlgorithm (ci.m_manifold, ci, body0, body1, simplex_solver, depth_solver, perturbation_iterations, perturbation_threshold);
+		void* mem = ci.m_dispatcher1->allocateCollisionAlgorithm (sizeof (LIExtPhysicsVoxelCollisionAlgorithm));
+		return new(mem) LIExtPhysicsVoxelCollisionAlgorithm (ci.m_manifold, ci, body0, body1, simplex_solver, depth_solver, perturbation_iterations, perturbation_threshold);
 	}
 };
 

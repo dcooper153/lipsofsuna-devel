@@ -15,30 +15,21 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TILES_PHYSICS_MODULE_H__
-#define __TILES_PHYSICS_MODULE_H__
+#ifndef __LIEXT_TILES_PHYSICS__PHYSICS_TERRAIN_RAYCAST_HOOK_HPP__
+#define __LIEXT_TILES_PHYSICS__PHYSICS_TERRAIN_RAYCAST_HOOK_HPP__
 
-#include "lipsofsuna/extension.h"
-#include "lipsofsuna/extension/physics/ext-module.h"
-#include "lipsofsuna/system.h"
-#include "lipsofsuna/voxel.h"
-#include "physics-terrain.h"
+#include "lipsofsuna/extension/physics/physics-private.h"
+#include "lipsofsuna/extension/physics/physics-raycast-hook.hpp"
+#include "physics-terrain.hpp"
 
-typedef struct _LIPhyTerrain LIPhyTerrain;
-
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+class LIExtPhysicsVoxelRaycastHook : public LIPhyRaycastHook
 {
-	LIMaiProgram* program;
-	LIPhyPhysics* physics;
+public:
+	LIExtPhysicsVoxelRaycastHook (LIPhyTerrain* terrain);
+	virtual ~LIExtPhysicsVoxelRaycastHook ();
+	virtual void rayTest (const btVector3& rayFromWorld, const btVector3& rayToWorld, btCollisionWorld::RayResultCallback& resultCallback) const;
+private:
 	LIPhyTerrain* terrain;
-	LIVoxManager* voxels;
 };
-
-LIExtModule* liext_tiles_physics_new (
-	LIMaiProgram* program);
-
-void liext_tiles_physics_free (
-	LIExtModule* self);
 
 #endif

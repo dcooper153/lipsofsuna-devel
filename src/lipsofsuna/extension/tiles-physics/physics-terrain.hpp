@@ -15,30 +15,44 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TILES_PHYSICS_MODULE_H__
-#define __TILES_PHYSICS_MODULE_H__
+#ifndef __PHYSICS_TERRAIN_HPP__
+#define __PHYSICS_TERRAIN_HPP__
 
-#include "lipsofsuna/extension.h"
-#include "lipsofsuna/extension/physics/ext-module.h"
-#include "lipsofsuna/system.h"
 #include "lipsofsuna/voxel.h"
+#include "lipsofsuna/extension/physics/physics-private.h"
+#include <btBulletCollisionCommon.h>
 #include "physics-terrain.h"
+#include "physics-terrain-collision-algorithm.hpp"
 
-typedef struct _LIPhyTerrain LIPhyTerrain;
+class LIExtPhysicsVoxelShape;
+class LIExtPhysicsVoxelRaycastHook;
 
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+struct _LIPhyTerrain
 {
-	LIMaiProgram* program;
+	int collision_group;
+	int collision_mask;
+	int realized;
+	btCollisionObject* object;
+	LIExtPhysicsVoxelCollisionAlgorithmCreator* collision_algorithm;
+	LIExtPhysicsVoxelRaycastHook* raycast_hook;
+	LIPhyPointer* pointer;
+	LIExtPhysicsVoxelShape* shape;
 	LIPhyPhysics* physics;
-	LIPhyTerrain* terrain;
 	LIVoxManager* voxels;
 };
 
-LIExtModule* liext_tiles_physics_new (
-	LIMaiProgram* program);
-
-void liext_tiles_physics_free (
-	LIExtModule* self);
+class LIExtPhysicsVoxelShape : public btBoxShape
+{
+public:
+	LIExtPhysicsVoxelShape (LIPhyTerrain* t) : btBoxShape (btVector3 (10000.0f, 10000.0f, 10000.0f)), terrain (t)
+	{
+		this->m_shapeType = CUSTOM_CONVEX_SHAPE_TYPE;
+	}
+	virtual const char* getName () const
+	{
+		return "Voxel";
+	}
+	LIPhyTerrain* terrain;
+};
 
 #endif

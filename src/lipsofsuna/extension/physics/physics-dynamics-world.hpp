@@ -34,7 +34,6 @@ public:
 	virtual void removeCollisionObject (btCollisionObject* collisionObject);
 public:
 	LIPhyRaycastHook* raycast_hooks;
-	struct _LIPhyTerrain* terrain;
 };
 
 #endif

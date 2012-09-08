@@ -23,6 +23,7 @@
  */
 
 #include "module.h"
+#include "physics-terrain-collision-algorithm.h"
 
 static void private_terrain_free (
 	LIExtPhysicsTerrainModule* self,
@@ -82,6 +83,14 @@ LIExtPhysicsTerrainModule* liext_physics_terrain_module_new (
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_PHYSICS_TERRAIN, self);
 	liext_script_physics_terrain (program->script);
 
+	/* Create the collision algorithm. */
+	self->collision_algorithm = liext_physics_terrain_collision_algorithm_new (self->physics);
+	if (self->collision_algorithm == NULL)
+	{
+		liext_physics_terrain_module_free (self);
+		return NULL;
+	}
+
 	return self;
 }
 
@@ -91,6 +100,10 @@ void liext_physics_terrain_module_free (
 	/* Remove callbacks. */
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 
+	if (self->collision_algorithm != NULL)
+	{
+		liext_physics_terrain_collision_algorithm_free (self->physics, self->collision_algorithm);
+	}
 	if (self->terrains != NULL)
 	{
 		lisys_assert (self->terrains->size == 0);

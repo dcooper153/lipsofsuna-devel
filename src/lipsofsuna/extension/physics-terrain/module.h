@@ -30,6 +30,7 @@ struct _LIExtPhysicsTerrainModule
 	LICalHandle calls[1];
 	LIMaiProgram* program;
 	LIPhyPhysics* physics;
+	void* collision_algorithm;
 };
 
 LIAPICALL (LIExtPhysicsTerrainModule*, liext_physics_terrain_module_new, (

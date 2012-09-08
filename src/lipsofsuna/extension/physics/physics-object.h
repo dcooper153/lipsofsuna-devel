@@ -40,14 +40,14 @@ LIAPICALL (int, liphy_object_cast_ray, (
 	LIPhyObject*       self,
 	const LIMatVector* relsrc,
 	const LIMatVector* reldst,
-	LIPhyCollision*    result));
+	LIPhyContact*      result));
 
 LIAPICALL (int, liphy_object_cast_sphere, (
 	LIPhyObject*       self,
 	const LIMatVector* relsrc,
 	const LIMatVector* reldst,
 	float              radius,
-	LIPhyCollision*    result));
+	LIPhyContact*      result));
 
 LIAPICALL (void, liphy_object_impulse, (
 	LIPhyObject*       self,

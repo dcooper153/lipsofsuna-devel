@@ -52,7 +52,7 @@ LIPhyObject* liphy_object_new (
 	if (self == NULL)
 		return NULL;
 	self->physics = physics;
-	self->pointer.object = 1;
+	self->pointer.type = LIPHY_POINTER_TYPE_OBJECT;
 	self->pointer.pointer = self;
 	self->control_mode = LIPHY_CONTROL_MODE_STATIC;
 	self->config.friction_liquid = 0.5f;
@@ -173,7 +173,7 @@ int liphy_object_cast_ray (
 	LIPhyObject*       self,
 	const LIMatVector* relsrc,
 	const LIMatVector* reldst,
-	LIPhyCollision*    result)
+	LIPhyContact*      result)
 {
 	LIMatTransform transform;
 	LIMatVector start;
@@ -208,7 +208,7 @@ int liphy_object_cast_sphere (
 	const LIMatVector* relsrc,
 	const LIMatVector* reldst,
 	float              radius,
-	LIPhyCollision*    result)
+	LIPhyContact*      result)
 {
 	LIMatTransform transform;
 	LIMatVector start;

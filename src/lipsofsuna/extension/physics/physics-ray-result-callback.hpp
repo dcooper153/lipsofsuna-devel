@@ -15,30 +15,21 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __TILES_PHYSICS_MODULE_H__
-#define __TILES_PHYSICS_MODULE_H__
+#ifndef __PHYSICS_RAY_RESULT_CALLBACK_HPP__
+#define __PHYSICS_RAY_RESULT_CALLBACK_HPP__
 
-#include "lipsofsuna/extension.h"
-#include "lipsofsuna/extension/physics/ext-module.h"
-#include "lipsofsuna/system.h"
-#include "lipsofsuna/voxel.h"
-#include "physics-terrain.h"
+#include "physics-contact.h"
+#include <btBulletCollisionCommon.h>
 
-typedef struct _LIPhyTerrain LIPhyTerrain;
-
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+class LIPhyRayResultCallback : public btCollisionWorld::ClosestRayResultCallback
 {
-	LIMaiProgram* program;
-	LIPhyPhysics* physics;
-	LIPhyTerrain* terrain;
-	LIVoxManager* voxels;
+public:
+	LIPhyRayResultCallback (LIPhyObject** ignore_array, int ignore_count, const btVector3& src, const btVector3& dst);
+	virtual btScalar addSingleResult (btCollisionWorld::LocalRayResult& result, bool world);
+public:
+	int ignore_count;
+	LIPhyObject** ignore_array;
+	LIPhyContact result;
 };
-
-LIExtModule* liext_tiles_physics_new (
-	LIMaiProgram* program);
-
-void liext_tiles_physics_free (
-	LIExtModule* self);
 
 #endif

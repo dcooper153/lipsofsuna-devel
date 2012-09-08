@@ -37,11 +37,12 @@
 #define LIPHY_BROADPHASE_DBVT
 #define PRIVATE_CCD_MOTION_THRESHOLD 1.0f
 
+class LIPhyCharacterAction;
+class LIPhyCollisionConfiguration;
 class LIPhyControl;
 class LIPhyContactController;
-class LIPhyCharacterAction;
-class LIPhyObjectShape;
 class LIPhyMotionState;
+class LIPhyObjectShape;
 class LIPhyRaycastHook;
 
 struct _LIPhyPhysics
@@ -53,16 +54,16 @@ struct _LIPhyPhysics
 #else
 	bt32BitAxisSweep3* broadphase;
 #endif
-	btDefaultCollisionConfiguration* configuration;
 	btCollisionDispatcher* dispatcher;
 	btConstraintSolver* solver;
-	LIPhyDynamicsWorld* dynamics;
 	btGhostPairCallback* ghostcallback;
 	LIAlgList* constraints;
 	LIAlgList* controllers;
 	LIAlgU32dic* models;
 	LIAlgPtrdic* objects;
 	LICalCallbacks* callbacks;
+	LIPhyCollisionConfiguration* configuration;
+	LIPhyDynamicsWorld* dynamics;
 };
 
 struct _LIPhyShape
@@ -100,15 +101,21 @@ struct _LIPhyModel
 	} meshes;
 };
 
+enum
+{
+	LIPHY_POINTER_TYPE_OBJECT,
+	LIPHY_POINTER_TYPE_VOXEL,
+	LIPHY_POINTER_TYPE_TERRAIN
+};
+
 typedef struct _LIPhyPointer LIPhyPointer;
 struct _LIPhyPointer
 {
-	int object;
+	int id;
+	int type;
 	void* pointer;
 	int tile[3];
 };
-
-#include "physics-terrain.hpp"
 
 struct _LIPhyObject
 {
@@ -280,7 +287,7 @@ public:
 
 /*****************************************************************************/
 
-#include "physics-convexcast.hpp"
-#include "physics-raycast.hpp"
+#include "physics-convex-result-callback.hpp"
+#include "physics-ray-result-callback.hpp"
 
 #endif

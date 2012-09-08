@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,21 +15,21 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "physics-private.h"
+#include "ext-module.h"
 #include "physics-terrain.h"
 #include "physics-terrain.hpp"
 #include "physics-terrain-collision-algorithm.hpp"
 
-float LIPhyTerrainCollisionAlgorithm::tile_size = -1.0f;
-btConvexHullShape* LIPhyTerrainCollisionAlgorithm::slopes_above[16];
-btConvexHullShape* LIPhyTerrainCollisionAlgorithm::slopes_below[16];
+float LIExtPhysicsVoxelCollisionAlgorithm::tile_size = -1.0f;
+btConvexHullShape* LIExtPhysicsVoxelCollisionAlgorithm::slopes_above[16];
+btConvexHullShape* LIExtPhysicsVoxelCollisionAlgorithm::slopes_below[16];
 
-LIPhyTerrainCollisionAlgorithm::LIPhyTerrainCollisionAlgorithm (btPersistentManifold* mf, const btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0, btCollisionObject* body1, btSimplexSolverInterface* simplexSolver, btConvexPenetrationDepthSolver* pdSolver, int numPerturbationIterations, int minimumPointsPerturbationThreshold) :
+LIExtPhysicsVoxelCollisionAlgorithm::LIExtPhysicsVoxelCollisionAlgorithm (btPersistentManifold* mf, const btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0, btCollisionObject* body1, btSimplexSolverInterface* simplexSolver, btConvexPenetrationDepthSolver* pdSolver, int numPerturbationIterations, int minimumPointsPerturbationThreshold) :
 	btConvexConvexAlgorithm (mf, ci, body0, body1, simplexSolver, pdSolver, numPerturbationIterations, minimumPointsPerturbationThreshold)
 {
 }
 
-void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0, btCollisionObject* body1, const btDispatcherInfo& dispatchInfo, btManifoldResult* resultOut)
+void LIExtPhysicsVoxelCollisionAlgorithm::processCollision (btCollisionObject* body0, btCollisionObject* body1, const btDispatcherInfo& dispatchInfo, btManifoldResult* resultOut)
 {
 	int i;
 	int x;
@@ -49,7 +49,7 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 	LIPhyObject* object_info;
 	LIPhyPointer* pointer_convex;
 	LIPhyPointer* pointer_terrain;
-	LIPhyTerrainShape* shape_terrain;
+	LIExtPhysicsVoxelShape* shape_terrain;
 	LIVoxMaterial* material;
 	LIVoxVoxel* tile;
 	LIVoxVoxel* tiles;
@@ -75,10 +75,11 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 	lisys_assert (object_convex->getCollisionShape ()->getShapeType () == CONVEX_HULL_SHAPE_PROXYTYPE);
 	lisys_assert (object_terrain->getCollisionShape ()->getShapeType () == CUSTOM_CONVEX_SHAPE_TYPE);
 	shape_convex = (btConvexHullShape*) object_convex->getCollisionShape ();
-	shape_terrain = (LIPhyTerrainShape*) object_terrain->getCollisionShape ();
+	shape_terrain = (LIExtPhysicsVoxelShape*) object_terrain->getCollisionShape ();
 	pointer_convex = (LIPhyPointer*) object_convex->getUserPointer ();
 	pointer_terrain = (LIPhyPointer*) object_terrain->getUserPointer ();
 	object_info = (LIPhyObject*) pointer_convex->pointer;
+	lisys_assert (pointer_terrain->type == LIPHY_POINTER_TYPE_VOXEL);
 
 	/* Get the range of intersecting tiles. */
 	tile_size = shape_terrain->terrain->voxels->tile_width;
@@ -102,7 +103,7 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 		min[0], min[1], min[2], size[0], size[1], size[2], tiles);
 
 	/* Ensure correct collision shape sizes. */
-	if (tile_size != LIPhyTerrainCollisionAlgorithm::tile_size)
+	if (tile_size != LIExtPhysicsVoxelCollisionAlgorithm::tile_size)
 		rebuild_shape_cache (tile_size);
 
 	/* Modify the terrain object. */
@@ -178,7 +179,7 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 	lisys_free (tiles);
 }
 
-void LIPhyTerrainCollisionAlgorithm::rebuild_shape_cache (float size)
+void LIExtPhysicsVoxelCollisionAlgorithm::rebuild_shape_cache (float size)
 {
 	int i;
 	int j;

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,39 +15,21 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __PHYSICS_TERRAIN_HPP__
-#define __PHYSICS_TERRAIN_HPP__
+#ifndef __PHYSICS_CONVEX_RESULT_CALLBACK_HPP__
+#define __PHYSICS_CONVEX_RESULT_CALLBACK_HPP__
 
-#include "physics-private.h"
+#include "physics-contact.h"
 #include <btBulletCollisionCommon.h>
-#include "lipsofsuna/voxel.h"
 
-class LIPhyTerrainShape;
-
-struct _LIPhyTerrain
-{
-	int collision_group;
-	int collision_mask;
-	int realized;
-	btCollisionObject* object;
-	LIPhyPointer* pointer;
-	LIPhyTerrainShape* shape;
-	LIPhyPhysics* physics;
-	LIVoxManager* voxels;
-};
-
-class LIPhyTerrainShape : public btBoxShape
+class LIPhyConvexResultCallback : public btCollisionWorld::ClosestConvexResultCallback
 {
 public:
-	LIPhyTerrainShape (LIPhyTerrain* t) : btBoxShape (btVector3 (10000.0f, 10000.0f, 10000.0f)), terrain (t)
-	{
-		this->m_shapeType = CUSTOM_CONVEX_SHAPE_TYPE;
-	}
-	virtual const char* getName () const
-	{
-		return "Terrain";
-	}
-	LIPhyTerrain* terrain;
+	LIPhyConvexResultCallback (LIPhyObject** ignore_array, int ignore_count);
+	virtual btScalar addSingleResult (btCollisionWorld::LocalConvexResult& result, bool world);
+public:
+	int ignore_count;
+	LIPhyObject** ignore_array;
+	LIPhyContact result;
 };
 
 #endif
