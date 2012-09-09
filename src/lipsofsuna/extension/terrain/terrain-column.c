@@ -95,6 +95,9 @@ static void private_smoothen_stick (
 	float              range_start,
 	float              range_end);
 
+static void private_validate (
+	LIExtTerrainColumn* self);
+
 /*****************************************************************************/
 
 /**
@@ -188,14 +191,26 @@ int liext_terrain_column_add_stick (
 			stick_prev = stick;
 		}
 
-		/* Create the new stick. */
-		stick = liext_terrain_stick_new (material, world_h);
-		if (stick == NULL)
-			return 0;
-		private_insert_stick (self, stick_prev, stick);
+		/* Append the stick. */
+		if (stick_prev != NULL && stick_prev->material == material)
+		{
+			/* Extend an existing stick. */
+			stick_prev->height += world_h;
+			private_reset_slope (stick_prev);
+		}
+		else
+		{
+			/* Create the new stick. */
+			stick = liext_terrain_stick_new (material, world_h);
+			if (stick == NULL)
+				return 0;
+			private_insert_stick (self, stick_prev, stick);
+		}
 
 		/* Mark the column as changed. */
 		self->stamp++;
+
+		private_validate (self);
 
 		return 1;
 	}
@@ -272,6 +287,8 @@ int liext_terrain_column_add_stick (
 
 		/* Mark the column as changed. */
 		self->stamp++;
+
+		private_validate (self);
 
 		return 1;
 	}
@@ -352,6 +369,8 @@ int liext_terrain_column_add_stick (
 
 		/* Mark the column as changed. */
 		self->stamp++;
+
+		private_validate (self);
 
 		return 1;
 	}
@@ -512,6 +531,8 @@ int liext_terrain_column_add_stick (
 
 	/* Mark the column as changed. */
 	self->stamp++;
+
+	private_validate (self);
 
 	return 1;
 }
@@ -1251,6 +1272,34 @@ static void private_smoothen_stick (
 			tmp[i].stick->vertices[tmp[i].vertex_x][tmp[i].vertex_z].normal = normal;
 		}
 	}
+}
+
+static void private_validate (
+	LIExtTerrainColumn* self)
+{
+#ifndef NDEBUG
+	int material = -1;
+	LIExtTerrainStick* stick;
+	LIExtTerrainStick* stick1;
+
+	for (stick = self->sticks ; stick != NULL ; stick = stick->next)
+	{
+		if (stick->material == material || stick->height <= 0.0f)
+		{
+			printf ("FATAL: Invalid terrain column detected!\n");
+			for (stick1 = self->sticks ; stick1 != NULL ; stick1 = stick1->next)
+			{
+				printf ("  material=%d, height=%f", stick1->material, stick1->height);
+				if (stick1 == stick)
+					printf (" <- HERE!\n");
+				else
+					printf ("\n");
+			}
+			lisys_assert (0 && "Terrain management logic error");
+		}
+		material = stick->material;
+	}
+#endif
 }
 
 /** @} */

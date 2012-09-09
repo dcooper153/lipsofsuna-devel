@@ -4,7 +4,7 @@ pass stickterrain1/lighting
 	ambient 0.7 0.7 0.7
 	diffuse 1.0 1.0 1.0
 	specular 1.0 1.0 1.0 1.0 64
-	cull_hardware none
+	cull_hardware clockwise
 	texture_unit
 	{
 		texture stickterrain1.png 2d
