@@ -404,12 +404,17 @@ void limdl_model_clear (
 	int id;
 	LIMdlManager* manager;
 
+	/* Clear all data. */
 	private_clear (self);
 	id = self->id;
 	manager = self->manager;
 	memset (self, 0, sizeof (LIMdlModel));
 	self->id = id;
 	self->manager = manager;
+
+	/* Allocate the mandatory LOD. */
+	self->lod.count = 1;
+	self->lod.array = lisys_calloc (1, sizeof (LIMdlLod));
 }
 
 /**

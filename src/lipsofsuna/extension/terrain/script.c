@@ -431,6 +431,26 @@ static void Terrain_set_column_data (LIScrArgs* args)
 	liscr_args_seti_bool (args, liext_terrain_set_column_data (args->self, grid_x, grid_z, packet->reader));
 }
 
+static void Terrain_get_nearest_chunk_with_outdated_model (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	int result_x;
+	int result_z;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_int (args, 0, &grid_x))
+		return;
+	if (!liscr_args_geti_int (args, 1, &grid_z))
+		return;
+
+	/* Find the chunk. */
+	if (!liext_terrain_get_nearest_chunk_with_outdated_model (args->self, grid_x, grid_z, &result_x, &result_z))
+		return;
+	liscr_args_seti_int (args, result_x);
+	liscr_args_seti_int (args, result_z);
+}
+
 /*****************************************************************************/
 
 void liext_script_terrain (
@@ -450,6 +470,7 @@ void liext_script_terrain (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_column", Terrain_set_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_column_data", Terrain_get_column_data);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_column_data", Terrain_set_column_data);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_nearest_chunk_with_outdated_model", Terrain_get_nearest_chunk_with_outdated_model);
 }
 
 /** @} */

@@ -71,6 +71,59 @@ void liext_terrain_chunk_free (
 }
 
 /**
+ * \brief Draws a stick at the given grid point and Y offset.
+ * \param self Terrain chunk.
+ * \param column_x X coordinate of the column, in grid units within the chunk.
+ * \param column_z Z coordinate of the column, in grid units within the chunk.
+ * \param world_y Y offset of the stick in world units.
+ * \param world_h Y height of the stick in world units.
+ * \param material Terrain material ID.
+ * \return Nonzero on success, zero if allocating memory failed.
+ */
+int liext_terrain_chunk_add_stick (
+	LIExtTerrainChunk* self,
+	int                column_x,
+	int                column_z,
+	float              world_y,
+	float              world_h,
+	int                material)
+{
+	LIExtTerrainColumn* column;
+
+	/* Add the stick to the column. */
+	column = liext_terrain_chunk_get_column (self, column_x, column_z);
+	if (!liext_terrain_column_add_stick (column, world_y, world_h, material))
+		return 0;
+
+	/* Update stamps. */
+	/* The stamps of the neighbor columns are updated because face culling
+	   may have changed due to the addition of the stick. */
+	self->stamp++;
+	if (column_x > 0)
+	{
+		column = liext_terrain_chunk_get_column (self, column_x - 1, column_z);
+		column->stamp++;
+	}
+	if (column_x < self->size - 1)
+	{
+		column = liext_terrain_chunk_get_column (self, column_x + 1, column_z);
+		column->stamp++;
+	}
+	if (column_z > 0)
+	{
+		column = liext_terrain_chunk_get_column (self, column_x, column_z - 1);
+		column->stamp++;
+	}
+	if (column_z < self->size - 1)
+	{
+		column = liext_terrain_chunk_get_column (self, column_x, column_z + 1);
+		column->stamp++;
+	}
+
+	return 1;
+}
+
+/**
  * \brief Builds the model of the chunk.
  * \param self Terrain chunk.
  * \param grid_size Grid size.
@@ -172,6 +225,52 @@ int liext_terrain_chunk_build_model (
 	lisys_assert (self->model->lod.array[0].face_groups.count <= 1);
 
 	return 1;
+}
+
+/**
+ * \brief Clears the stick at the given grid point.
+ * \param self Terrain chunk.
+ * \param grid_x X coordinate in grid units.
+ * \param grid_z Z coordinate in grid units.
+ */
+void liext_terrain_chunk_clear_column (
+	LIExtTerrainChunk* self,
+	int                column_x,
+	int                column_z)
+{
+	LIExtTerrainColumn* column;
+
+	/* Clear the column. */
+	column = liext_terrain_chunk_get_column (self, column_x, column_z);
+	if (column->sticks == NULL)
+		return;
+	liext_terrain_column_clear (column);
+
+	/* Update stamps. */
+	/* The stamps of the neighbor columns are updated because face culling
+	   may have changed due to the removal of the sticks. */
+	self->stamp++;
+	column->stamp++;
+	if (column_x > 0)
+	{
+		column = liext_terrain_chunk_get_column (self, column_x - 1, column_z);
+		column->stamp++;
+	}
+	if (column_x < self->size - 1)
+	{
+		column = liext_terrain_chunk_get_column (self, column_x + 1, column_z);
+		column->stamp++;
+	}
+	if (column_z > 0)
+	{
+		column = liext_terrain_chunk_get_column (self, column_x, column_z - 1);
+		column->stamp++;
+	}
+	if (column_z < self->size - 1)
+	{
+		column = liext_terrain_chunk_get_column (self, column_x, column_z + 1);
+		column->stamp++;
+	}
 }
 
 /**

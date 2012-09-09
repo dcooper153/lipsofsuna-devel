@@ -221,6 +221,8 @@ Client.update = function(self, secs)
 		Sound:set_listener_velocity(vel)
 		-- Refresh the active portion of the map.
 		self.player_object:refresh()
+		-- Notify the terrain manager of the view center.
+		Game.terrain:set_view_center(self.player_object:get_position())
 	end
 	-- Update effects.
 	-- Must be done after objects to ensure correct anchoring.

@@ -40,8 +40,10 @@ TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, 
 	self.grid_size = grid_size
 	self.terrain = Terrain(chunk_size, grid_size)
 	self.physics = PhysicsTerrain(self.terrain)
-	self.physics:set_collision_group(Game.PHYSICS_GROUP_TERRAIN)
-	self.physics:set_collision_mask(Game.PHYSICS_MASK_TERRAIN)
+	if Game then
+		self.physics:set_collision_group(Game.PHYSICS_GROUP_TERRAIN)
+		self.physics:set_collision_mask(Game.PHYSICS_MASK_TERRAIN)
+	end
 	self.physics:set_visible(true)
 	-- Initialize the database tables needed by us.
 	if self.database then
@@ -185,6 +187,18 @@ TerrainManager.update = function(self, secs)
 			end
 		end
 	end
+	-- Update outdated models.
+	if self.graphics and self.__view_center then
+		local fx,fz = self:get_chunk_xz_by_point(self.__view_center.x, self.__view_center.z)
+		local gx,gz = self.terrain:get_nearest_chunk_with_outdated_model(fx, fz)
+		if gx then
+			local id = self:get_chunk_id_by_xz(gx, gz)
+			local chunk = self.chunks[id]
+			if chunk and not self.loaders[id] then
+				chunk:create_render_object()
+			end
+		end
+	end
 	-- TODO: Unload unused chunks.
 	-- TODO: Remember chunk:detach_render_object().
 end
@@ -228,6 +242,17 @@ TerrainManager.get_chunk_xz_by_point = function(self, x, z)
 	local x = math.floor(x / chunk_width) * self.chunk_size
 	local z = math.floor(z / chunk_width) * self.chunk_size
 	return x, z
+end
+
+--- Sets the view center of the terrain manager.<br/>
+--
+-- This affects which chunks are prioritized when their models need rebuilding.
+-- To allow model rebuilding at all, this must be called with a non-nil value.
+--
+-- @param self TerrainManager.
+-- @param value Vector.
+TerrainManager.set_view_center = function(self, value)
+	self.__view_center = value
 end
 
 return TerrainManager

@@ -166,4 +166,13 @@ Terrain.set_column_data = function(self, x, z)
 	return Los.terrain_set_column_data(self.handle, x, z, packet.handle)
 end
 
+--- Finds the nearest chunk whose model is out of date.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @return Grid X and Z coordinates of the chunk, or nil if all models are up to date.
+Terrain.get_nearest_chunk_with_outdated_model = function(self, x, z)
+	return Los.terrain_get_nearest_chunk_with_outdated_model(self.handle, x, z)
+end
+
 return Terrain

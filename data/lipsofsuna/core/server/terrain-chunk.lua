@@ -43,7 +43,7 @@ TerrainChunk.create_render_object = function(self)
 	self.model = self.manager.terrain:build_chunk_model(self.x, self.z)
 	-- Assign the model.
 	if prev_model then
-		self.object:replace_model(self.prev_model:get_render(), self.model:get_render())
+		self.object:replace_model(prev_model:get_render(), self.model:get_render())
 	else
 		self.object:add_model(self.model:get_render())
 	end

@@ -153,9 +153,22 @@ LIAPICALL (LIExtTerrainChunk*, liext_terrain_chunk_new, (
 LIAPICALL (void, liext_terrain_chunk_free, (
 	LIExtTerrainChunk* self));
 
+LIAPICALL (int, liext_terrain_chunk_add_stick, (
+	LIExtTerrainChunk* self,
+	int                column_x,
+	int                column_z,
+	float              world_y,
+	float              world_h,
+	int                material));
+
 LIAPICALL (int, liext_terrain_chunk_build_model, (
 	LIExtTerrainChunk* self,
 	float              grid_size));
+
+LIAPICALL (void, liext_terrain_chunk_clear_column, (
+	LIExtTerrainChunk* self,
+	int                column_x,
+	int                column_z));
 
 LIAPICALL (LIExtTerrainColumn*, liext_terrain_chunk_get_column, (
 	LIExtTerrainChunk* self,
@@ -262,6 +275,13 @@ LIAPICALL (int, liext_terrain_set_column_data, (
 	int           grid_x,
 	int           grid_z,
 	LIArcReader*  reader));
+
+LIAPICALL (int, liext_terrain_get_nearest_chunk_with_outdated_model, (
+	LIExtTerrain* self,
+	int           grid_x,
+	int           grid_z,
+	int*          result_x,
+	int*          result_z));
 
 /*****************************************************************************/
 

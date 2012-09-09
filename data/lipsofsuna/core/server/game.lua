@@ -112,4 +112,4 @@ Game.deinit = function(self)
 	collectgarbage()
 end
 
-
+return Game

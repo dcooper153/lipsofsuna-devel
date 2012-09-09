@@ -117,7 +117,6 @@ int liext_terrain_add_stick (
 	int column_z;
 	LIExtTerrainChunkID id;
 	LIExtTerrainChunk* chunk;
-	LIExtTerrainColumn* column;
 
 	/* Get the chunk. */
 	id = private_get_chunk_id_and_column (self, grid_x, grid_z, &column_x, &column_z);
@@ -125,13 +124,8 @@ int liext_terrain_add_stick (
 	if (chunk == NULL)
 		return 0;
 
-	/* Add the stick to the column. */
-	column = liext_terrain_chunk_get_column (chunk, column_x, column_z);
-	if (!liext_terrain_column_add_stick (column, world_y, world_h, material))
-		return 0;
-	chunk->stamp++;
-
-	return 1;
+	/* Add the stick. */
+	return liext_terrain_chunk_add_stick (chunk, column_x, column_z, world_y, world_h, material);
 }
 
 /**
@@ -150,7 +144,6 @@ int liext_terrain_clear_column (
 	int column_z;
 	LIExtTerrainChunkID id;
 	LIExtTerrainChunk* chunk;
-	LIExtTerrainColumn* column;
 
 	/* Get the chunk. */
 	id = private_get_chunk_id_and_column (self, grid_x, grid_z, &column_x, &column_z);
@@ -159,12 +152,7 @@ int liext_terrain_clear_column (
 		return 0;
 
 	/* Clear the column. */
-	column = liext_terrain_chunk_get_column (chunk, column_x, column_z);
-	if (column->sticks == NULL)
-		return 1;
-	liext_terrain_column_clear (column);
-	column->stamp++;
-	chunk->stamp++;
+	liext_terrain_chunk_clear_column (chunk, column_x, column_z);
 
 	return 1;
 }
@@ -521,6 +509,55 @@ int liext_terrain_set_column_data (
 	if (!liext_terrain_column_set_data (column, reader))
 		return 0;
 	chunk->stamp++;
+
+	return 1;
+}
+
+/**
+ * \brief Get the nearest chunk to the given grid point whose model is out of date.
+ * \param self Terrain.
+ * \param grid_x X coordinate in grid units.
+ * \param grid_z Z coordinate in grid units.
+ * \param result_x Return location for the grid coordinate of the chunk.
+ * \param result_z Return location for the grid coordinate of the chunk.
+ * \return Nonzero if found, zero if all models are up to date.
+ */
+int liext_terrain_get_nearest_chunk_with_outdated_model (
+	LIExtTerrain* self,
+	int           grid_x,
+	int           grid_z,
+	int*          result_x,
+	int*          result_z)
+{
+	int best_x = -1;
+	int best_z = -1;
+	int chunk_x;
+	int chunk_z;
+	float best_dist = 0.0f;
+	float chunk_dist;
+	LIAlgU32dicIter iter;
+	LIExtTerrainChunk* chunk;
+
+	LIALG_U32DIC_FOREACH (iter, self->chunks)
+	{
+		chunk = iter.value;
+		if (chunk->stamp == chunk->stamp_model)
+			continue;
+		chunk_x = (iter.key % 0xFFFF) * self->chunk_size;
+		chunk_z = (iter.key / 0xFFFF) * self->chunk_size;
+		chunk_dist = hypotf (chunk_x - grid_x, chunk_z - grid_z);
+		if (best_x == -1 || chunk_dist < best_dist)
+		{
+			best_x = chunk_x;
+			best_z = chunk_z;
+			best_dist = chunk_dist;
+		}
+	}
+
+	if (best_x == -1)
+		return 0;
+	*result_x = best_x;
+	*result_z = best_z;
 
 	return 1;
 }
