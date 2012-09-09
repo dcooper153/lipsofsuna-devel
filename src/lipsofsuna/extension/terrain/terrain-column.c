@@ -46,6 +46,20 @@ static void private_copy_slope (
 	LIExtTerrainStick* stick,
 	LIExtTerrainStick* src);
 
+static int private_cull_wall (
+	LIExtTerrainStick**      stick,
+	float*                   stick_y,
+	float*                   stick_y0,
+	float*                   stick_y1,
+	int                      vx0,
+	int                      vz0,
+	int                      vx1,
+	int                      vz1,
+	const LIExtColumnVertex* bot0,
+	const LIExtColumnVertex* bot1,
+	const LIExtColumnVertex* top0,
+	const LIExtColumnVertex* top1);
+
 static int private_find_closest_stick (
 	LIExtTerrainStick* sticks,
 	float              y,
@@ -505,18 +519,42 @@ int liext_terrain_column_add_stick (
 /**
  * \brief Builds the model of the column.
  * \param self Terrain column.
+ * \param sticks_back Neighbour sticks used for culling.
+ * \param sticks_front Neighbour sticks used for culling.
+ * \param sticks_left Neighbour sticks used for culling.
+ * \param sticks_right Neighbour sticks used for culling.
  * \param grid_size Grid size.
  * \return Nonzero on success, zero on failure.
  */
 int liext_terrain_column_build_model (
 	LIExtTerrainColumn* self,
+	LIExtTerrainStick*  sticks_back,
+	LIExtTerrainStick*  sticks_front,
+	LIExtTerrainStick*  sticks_left,
+	LIExtTerrainStick*  sticks_right,
 	float               grid_size)
 {
-	float y;
 	float u;
 	float v;
+	float y;
+	float y_back;
+	float y_back0;
+	float y_back1;
+	float y_front;
+	float y_front0;
+	float y_front1;
+	float y_left;
+	float y_left0;
+	float y_left1;
+	float y_right;
+	float y_right0;
+	float y_right1;
 	LIExtTerrainStick* stick;
 	LIExtTerrainStick* stick_prev;
+	LIExtTerrainStick* stick_back;
+	LIExtTerrainStick* stick_front;
+	LIExtTerrainStick* stick_left;
+	LIExtTerrainStick* stick_right;
 	LIExtColumnVertex bot[2][2];
 	LIExtColumnVertex top[2][2];
 	LIMatVector normal;
@@ -563,7 +601,7 @@ int liext_terrain_column_build_model (
 	limdl_material_free (&material);
 
 	/* Initialize the bottom surface data. */
-	y = 0;
+	y = 0.0f;
 	stick_prev = NULL;
 	normal = limat_vector_init (0.0f, -1.0f, 0.0f);
 	bot[0][0].splatting = 0.0f;
@@ -578,6 +616,24 @@ int liext_terrain_column_build_model (
 	bot[1][0].normal = normal;
 	bot[0][1].normal = normal;
 	bot[1][1].normal = normal;
+
+	/* Initialize the neighbor iteration. */
+	y_back = 0.0f;
+	y_back0 = 0.0f;
+	y_back1 = 0.0f;
+	y_front = 0.0f;
+	y_front0 = 0.0f;
+	y_front1 = 0.0f;
+	y_left = 0.0f;
+	y_left0 = 0.0f;
+	y_left1 = 0.0f;
+	y_right = 0.0f;
+	y_right0 = 0.0f;
+	y_right1 = 0.0f;
+	stick_back = sticks_back;
+	stick_front = sticks_front;
+	stick_left = sticks_left;
+	stick_right = sticks_right;
 
 	/* Add the sticks to the builder. */
 	for (stick = self->sticks ; stick != NULL ; stick = stick->next)
@@ -603,7 +659,8 @@ int liext_terrain_column_build_model (
 			u = (stick->material - 1) / 255.0f;
 
 			/* Left face. */
-			if (1)
+			if (!private_cull_wall (&stick_left, &y_left, &y_left0, &y_left1,
+						1, 0, 1, 1, &bot[0][0], &bot[0][1], &top[0][0], &top[0][1]))
 			{
 				v = 0.0f / 5.0f;
 				normal = limat_vector_init (-1.0f, 0.0f, 0.0f);
@@ -615,7 +672,8 @@ int liext_terrain_column_build_model (
 			}
 
 			/* Right face. */
-			if (1)
+			if (!private_cull_wall (&stick_right, &y_right, &y_right0, &y_right1,
+						0, 1, 0, 0, &bot[1][1], &bot[1][0], &top[1][1], &top[1][0]))
 			{
 				v = 1.0f / 5.0f;
 				normal = limat_vector_init (1.0f, 0.0f, 0.0f);
@@ -627,7 +685,8 @@ int liext_terrain_column_build_model (
 			}
 
 			/* Front face. */
-			if (1)
+			if (!private_cull_wall (&stick_front, &y_front, &y_front0, &y_front1,
+						0, 1, 1, 1, &bot[0][0], &bot[1][0], &top[0][0], &top[1][0]))
 			{
 				v = 2.0f / 5.0f;
 				normal = limat_vector_init (0.0f, 0.0f, -1.0f);
@@ -639,7 +698,8 @@ int liext_terrain_column_build_model (
 			}
 
 			/* Back face. */
-			if (1)
+			if (!private_cull_wall (&stick_back, &y_back, &y_back0, &y_back1,
+						1, 0, 0, 0, &bot[1][1], &bot[0][1], &top[1][1], &top[0][1]))
 			{
 				v = 3.0f / 5.0f;
 				normal = limat_vector_init (0.0f, 0.0f, 1.0f);
@@ -882,6 +942,91 @@ static void private_copy_slope (
 		liext_terrain_stick_copy_vertices (stick, src);
 	else
 		liext_terrain_stick_reset_vertices (stick);
+}
+
+static int private_cull_wall (
+	LIExtTerrainStick**      stick,
+	float*                   stick_y,
+	float*                   stick_y0,
+	float*                   stick_y1,
+	int                      vx0,
+	int                      vz0,
+	int                      vx1,
+	int                      vz1,
+	const LIExtColumnVertex* bot0,
+	const LIExtColumnVertex* bot1,
+	const LIExtColumnVertex* top0,
+	const LIExtColumnVertex* top1)
+{
+	float stick_y_top;
+	float stick_y0_top;
+	float stick_y1_top;
+	LIExtTerrainStick* s;
+
+	/* Check that there are neighbor sticks left. */
+	/* If the wall starts above all the neighbor sticks or there are no
+	   neighbors at all, then no culling can be done. */
+	if (*stick == NULL)
+		return 0;
+
+	/* Check for the bottom culling offset. */
+	/* If an empty stick caused the stick pointer to start above the bottom
+	   of the culled wall, then no culling can be done. */
+	if (*stick_y0 > bot0->coord.y || *stick_y1 > bot1->coord.y)
+		return 0;
+
+	/* Find the bottom of the neighbor wall. */
+	/* The culled wall may start well above the current stick pointer.
+	   To simplify things and reduce future iteration, the stick pointer
+	   and the Y offsets are rewound to the first neighbor stick that
+	   starts below the wall. */
+	stick_y_top = *stick_y;
+	stick_y0_top = *stick_y0;
+	stick_y1_top = *stick_y1;
+	for ( ; *stick != NULL ; *stick = (*stick)->next)
+	{
+		stick_y_top += (*stick)->height;
+		stick_y0_top = stick_y_top + (*stick)->vertices[vx0][vz0].offset;
+		stick_y1_top = stick_y_top + (*stick)->vertices[vx1][vz1].offset;
+		if (stick_y0_top > bot0->coord.y && stick_y1_top > bot1->coord.y)
+			break;
+		*stick_y = stick_y_top;
+		*stick_y0 = stick_y0_top;
+		*stick_y1 = stick_y1_top;
+	}
+	if (*stick == NULL)
+		return 0;
+
+	/* Skip empty sticks. */
+	/* The stick pointer is currently at the bottommost stick that is
+	   still below the bottom edge of the wall. If it is an empty stick,
+	   the culling fails as the bottom of the wall is not occluded. */
+	if ((*stick)->material == 0)
+	{
+		*stick_y += (*stick)->height;
+		*stick_y0 = *stick_y + (*stick)->vertices[vx0][vz0].offset;
+		*stick_y1 = *stick_y + (*stick)->vertices[vx1][vz1].offset;
+		*stick = (*stick)->next;
+		return 0;
+	}
+
+	/* Find the top of the neighbor wall. */
+	/* If the neighbor wall extends past the culled wall, then culling
+	   should be done. If an empty stick or the end of the column occur
+	   before that, no culling can be done. */
+	for (s = *stick ; s != NULL && s->material != 0 ; s = s->next)
+	{
+		stick_y_top += s->height;
+		stick_y0_top = stick_y_top + s->vertices[vx0][vz0].offset;
+		stick_y1_top = stick_y_top + s->vertices[vx1][vz1].offset;
+		if (stick_y0_top >= top0->coord.y && stick_y0_top >= bot0->coord.y)
+			return 1;
+		*stick_y = stick_y_top;
+		*stick_y0 = stick_y0_top;
+		*stick_y1 = stick_y1_top;
+	}
+
+	return 0;
 }
 
 static int private_find_closest_stick (

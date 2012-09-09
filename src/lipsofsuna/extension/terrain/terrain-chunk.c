@@ -83,6 +83,10 @@ int liext_terrain_chunk_build_model (
 	int i;
 	int j;
 	LIExtTerrainColumn* column;
+	LIExtTerrainStick* sticks_back;
+	LIExtTerrainStick* sticks_front;
+	LIExtTerrainStick* sticks_left;
+	LIExtTerrainStick* sticks_right;
 	LIMatTransform transform;
 	LIMdlBuilder* builder;
 
@@ -91,10 +95,41 @@ int liext_terrain_chunk_build_model (
 		return 1;
 
 	/* Build the column models. */
-	for (i = 0 ; i < self->size * self->size ; i++)
+	for (j = 0 ; j < self->size ; j++)
 	{
-		if (!liext_terrain_column_build_model (self->columns + i, grid_size))
-			return 0;
+		for (i = 0 ; i < self->size ; i++)
+		{
+			/* Get the neighbor sticks. */
+			sticks_back = NULL;
+			sticks_front = NULL;
+			sticks_left = NULL;
+			sticks_right = NULL;
+			if (i > 0)
+			{
+				column = self->columns + (i - 1) + j * self->size;
+				sticks_left = column->sticks;
+			}
+			if (i < self->size - 1)
+			{
+				column = self->columns + (i + 1) + j * self->size;
+				sticks_right = column->sticks;
+			}
+			if (j > 0)
+			{
+				column = self->columns + i + (j - 1) * self->size;
+				sticks_front = column->sticks;
+			}
+			if (j < self->size - 1)
+			{
+				column = self->columns + (j + 1) * self->size;
+				sticks_back = column->sticks;
+			}
+
+			/* Build the model. */
+			column = self->columns + i + j * self->size;
+			if (!liext_terrain_column_build_model (column, sticks_back, sticks_front, sticks_left, sticks_right, grid_size))
+				return 0;
+		}
 	}
 
 	/* Allocate the model. */

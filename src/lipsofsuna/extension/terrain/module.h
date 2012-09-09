@@ -100,6 +100,10 @@ LIAPICALL (int, liext_terrain_column_add_stick, (
 
 LIAPICALL (int, liext_terrain_column_build_model, (
 	LIExtTerrainColumn* self,
+	LIExtTerrainStick*  sticks_back,
+	LIExtTerrainStick*  sticks_front,
+	LIExtTerrainStick*  sticks_left,
+	LIExtTerrainStick*  sticks_right,
 	float               grid_size));
 
 LIAPICALL (void, liext_terrain_column_clear, (
