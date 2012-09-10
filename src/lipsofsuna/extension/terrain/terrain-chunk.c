@@ -174,7 +174,7 @@ int liext_terrain_chunk_build_model (
 			}
 			if (j < self->size - 1)
 			{
-				column = self->columns + (j + 1) * self->size;
+				column = self->columns + i + (j + 1) * self->size;
 				sticks_back = column->sticks;
 			}
 

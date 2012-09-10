@@ -123,6 +123,7 @@ end
 -- @param packet Packet.
 -- @return True on success, false if the chunk is not loaded.
 Terrain.set_chunk_data = function(self, x, z, packet)
+	packet:read()
 	return Los.terrain_set_chunk_data(self.handle, x, z, packet.handle)
 end
 

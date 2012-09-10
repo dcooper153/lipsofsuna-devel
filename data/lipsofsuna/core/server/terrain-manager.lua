@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local PhysicsTerrain = require("system/physics-terrain")
+local Packet = require("system/packet")
 local Program = require("system/core")
 local Terrain = require("system/terrain")
 local TerrainChunk = require("core/server/terrain-chunk")
@@ -115,7 +116,10 @@ TerrainManager.save_chunk = function(self, x, z)
 	local id = self:get_chunk_id_by_xz(x, z)
 	if self.loaders[id] then return end
 	-- Write terrain.
-	local data = self.terrain:get_chunk_data(x, z)
+	local data = Packet(1)
+	if not self.terrain:get_chunk_data(x, z, data) then
+		print("ERROR: Could not save terrain")
+	end
 	self.database:query([[
 		DELETE FROM terrain_chunks
 		WHERE id=?;]], {id})
@@ -136,7 +140,8 @@ TerrainManager.save_all = function(self, erase)
 	end
 	-- Write each chunk.
 	for id in pairs(self.chunks) do
-		self:save_chunk(id)
+		local x,z = self:get_chunk_xz_by_id(id)
+		self:save_chunk(x, z)
 	end
 	self.database:query([[END TRANSACTION;]])
 end

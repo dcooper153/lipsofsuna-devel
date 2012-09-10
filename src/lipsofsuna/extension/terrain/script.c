@@ -246,6 +246,7 @@ static void Terrain_set_chunk_data (LIScrArgs* args)
 	int grid_x;
 	int grid_z;
 	LIArcPacket* packet;
+	LIArcReader* reader;
 	LIScrData* data;
 
 	/* Get the arguments. */
@@ -258,11 +259,27 @@ static void Terrain_set_chunk_data (LIScrArgs* args)
 	if (!liscr_args_geti_data (args, 2, LISCR_SCRIPT_PACKET, &data))
 		return;
 	packet = liscr_data_get_data (data);
-	if (packet->reader == NULL)
-		return;
 
 	/* Read the data. */
-	liscr_args_seti_bool (args, liext_terrain_set_chunk_data (args->self, grid_x, grid_z, packet->reader));
+	if (packet->reader != NULL)
+	{
+		liscr_args_seti_bool (args, liext_terrain_set_chunk_data (args->self, grid_x, grid_z, packet->reader));
+	}
+	else
+	{
+		reader = liarc_reader_new (
+			liarc_writer_get_buffer (packet->writer),
+			liarc_writer_get_length (packet->writer));
+		if (reader == NULL)
+			return;
+		if (!liarc_reader_skip_bytes (reader, 1))
+		{
+			liarc_reader_free (reader);
+			return;
+		}
+		liscr_args_seti_bool (args, liext_terrain_set_chunk_data (args->self, grid_x, grid_z, reader));
+		liarc_reader_free (reader);
+	}
 }
 
 static void Terrain_get_column (LIScrArgs* args)

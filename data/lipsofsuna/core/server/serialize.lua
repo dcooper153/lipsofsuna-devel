@@ -70,6 +70,7 @@ end
 Serialize.save = function(clss, erase)
 	if erase then Server.object_database:clear_objects() end
 	Game.sectors:save_world(erase)
+	Game.terrain:save_all(erase)
 	if not erase then
 		Server.object_database:update_world_decay()
 		Server.object_database:clear_unused_objects()

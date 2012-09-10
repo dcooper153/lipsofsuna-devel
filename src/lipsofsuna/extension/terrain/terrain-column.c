@@ -732,7 +732,7 @@ int liext_terrain_column_build_model (
 			}
 
 			/* Bottom face. */
-			if (stick_prev == NULL || stick_prev->material == 0)
+			if (stick_prev != NULL && stick_prev->material == 0)
 			{
 				v = 4.0f / 5.0f;
 				limdl_vertex_init (quad + 0, &bot[0][0].coord, &bot[0][0].normal, u, v);
@@ -896,6 +896,8 @@ int liext_terrain_column_set_data (
 	LIExtTerrainColumn* self,
 	LIArcReader*        reader)
 {
+	int x;
+	int z;
 	uint8_t tmp;
 	LIExtTerrainStick* stick;
 	LIExtTerrainStick* sticks_first;
@@ -930,15 +932,32 @@ int liext_terrain_column_set_data (
 			return 0;
 		}
 
+		/* Validate the vertex offsets. */
+		/* The above call validates the stick data internally but not against
+		   the previous stick. Here, we finish validation by checking that the
+		   vertex offsets of the previous stick do not extend above the bottom
+		   of this stick. */
+		if (sticks_last != NULL)
+		{
+			for (z = 0 ; z < 2 ; z++)
+			{
+				for (x = 0 ; x < 2 ; x++)
+				{
+					if (sticks_last->vertices[x][z].offset > stick->height)
+						sticks_last->vertices[x][z].offset = stick->height;
+				}
+			}
+		}
+
 		/* Append the stick to the linked list. */
 		if (sticks_last != NULL)
 		{
-			sticks_first = stick;
+			sticks_last->next = stick;
 			sticks_last = stick;
 		}
 		else
 		{
-			sticks_last->next = stick;
+			sticks_first = stick;
 			sticks_last = stick;
 		}
 	}
@@ -1009,7 +1028,7 @@ static int private_cull_wall (
 		stick_y_top += (*stick)->height;
 		stick_y0_top = stick_y_top + (*stick)->vertices[vx0][vz0].offset;
 		stick_y1_top = stick_y_top + (*stick)->vertices[vx1][vz1].offset;
-		if (stick_y0_top > bot0->coord.y && stick_y1_top > bot1->coord.y)
+		if (stick_y0_top > bot0->coord.y || stick_y1_top > bot1->coord.y)
 			break;
 		*stick_y = stick_y_top;
 		*stick_y0 = stick_y0_top;
@@ -1017,6 +1036,8 @@ static int private_cull_wall (
 	}
 	if (*stick == NULL)
 		return 0;
+	lisys_assert(*stick_y0 <= bot0->coord.y);
+	lisys_assert(*stick_y1 <= bot1->coord.y);
 
 	/* Skip empty sticks. */
 	/* The stick pointer is currently at the bottommost stick that is
@@ -1035,16 +1056,16 @@ static int private_cull_wall (
 	/* If the neighbor wall extends past the culled wall, then culling
 	   should be done. If an empty stick or the end of the column occur
 	   before that, no culling can be done. */
+	stick_y_top = *stick_y;
+	stick_y0_top = *stick_y0;
+	stick_y1_top = *stick_y1;
 	for (s = *stick ; s != NULL && s->material != 0 ; s = s->next)
 	{
 		stick_y_top += s->height;
 		stick_y0_top = stick_y_top + s->vertices[vx0][vz0].offset;
 		stick_y1_top = stick_y_top + s->vertices[vx1][vz1].offset;
-		if (stick_y0_top >= top0->coord.y && stick_y0_top >= bot0->coord.y)
+		if (stick_y0_top >= top0->coord.y && stick_y1_top >= top1->coord.y)
 			return 1;
-		*stick_y = stick_y_top;
-		*stick_y0 = stick_y0_top;
-		*stick_y1 = stick_y1_top;
 	}
 
 	return 0;
