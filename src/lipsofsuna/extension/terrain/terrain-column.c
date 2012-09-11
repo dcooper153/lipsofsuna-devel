@@ -84,8 +84,9 @@ static void private_remove_stick (
 	LIExtTerrainStick*  prev,
 	LIExtTerrainStick*  remove);
 
-static void private_reset_slope (
-	LIExtTerrainStick* stick);
+static void private_set_slope (
+	LIExtTerrainStick* stick,
+	const float*       slope);
 
 static void private_smoothen_stick (
 	LIExtTerrainStick* sticks[4],
@@ -105,6 +106,8 @@ static void private_validate (
  * \param self Terrain column.
  * \param world_y Y offset of the stick in world units.
  * \param world_h Y height of the stick in world units.
+ * \param slope_bot Array of 4 floats, denoting the vertex offsets of the bottom slope.
+ * \param slope_top Array of 4 floats, denoting the vertex offsets of the top slope.
  * \param material Terrain material ID.
  * \return Nonzero on success, zero if allocating memory failed.
  */
@@ -112,6 +115,8 @@ int liext_terrain_column_add_stick (
 	LIExtTerrainColumn* self,
 	float               world_y,
 	float               world_h,
+	const float*        slope_bot,
+	const float*        slope_top,
 	int                 material)
 {
 	float length;
@@ -122,6 +127,7 @@ int liext_terrain_column_add_stick (
 	LIExtTerrainStick* stick;
 	LIExtTerrainStick* stick_next;
 	LIExtTerrainStick* stick_prev;
+	LIExtTerrainStick* stick_prev_prev;
 	LIExtTerrainStick* isect_first;
 	LIExtTerrainStick* isect_last;
 
@@ -131,11 +137,13 @@ int liext_terrain_column_add_stick (
 	/* Find the first intersecting stick. */
 	isect_start_y = 0.0f;
 	stick_prev = NULL;
+	stick_prev_prev = NULL;
 	for (isect_first = self->sticks ; isect_first != NULL ; isect_first = isect_first->next)
 	{
 		if (isect_start_y + isect_first->height > world_y)
 			break;
 		isect_start_y += isect_first->height;
+		stick_prev_prev = stick_prev;
 		stick_prev = isect_first;
 	}
 
@@ -196,7 +204,7 @@ int liext_terrain_column_add_stick (
 		{
 			/* Extend an existing stick. */
 			stick_prev->height += world_h;
-			private_reset_slope (stick_prev);
+			private_set_slope (stick_prev, slope_top);
 		}
 		else
 		{
@@ -205,6 +213,8 @@ int liext_terrain_column_add_stick (
 			if (stick == NULL)
 				return 0;
 			private_insert_stick (self, stick_prev, stick);
+			private_set_slope (stick_prev, slope_bot);
+			private_set_slope (stick, slope_top);
 		}
 
 		/* Mark the column as changed. */
@@ -256,7 +266,10 @@ int liext_terrain_column_add_stick (
 	 *   = 1111   = 1111   = 1111   = 1111
 	 */
 	if (isect_first == isect_last && material == isect_first->material)
+	{
+		/* TODO: Slope? */
 		return 1;
+	}
 
 	/* Handle the intersection being inside a single stick.
 	 *
@@ -283,7 +296,8 @@ int liext_terrain_column_add_stick (
 		isect_first->next = stick;
 		isect_first->height = world_y - isect_start_y;
 		private_copy_slope (stick1, isect_first);
-		private_reset_slope (isect_first);
+		private_set_slope (isect_first, slope_bot);
+		private_set_slope (stick, slope_top);
 
 		/* Mark the column as changed. */
 		self->stamp++;
@@ -317,6 +331,7 @@ int liext_terrain_column_add_stick (
 				 *   = 33000000
 				 */
 				private_remove_stick (self, stick_prev, isect_first);
+				private_set_slope (stick_prev, slope_bot);
 			}
 			else if (stick_prev == NULL || stick_prev->material != material)
 			{
@@ -326,7 +341,8 @@ int liext_terrain_column_add_stick (
 				 *   = 332222XX
 				 */
 				isect_first->material = material;
-				private_reset_slope (isect_first);
+				private_set_slope (stick_prev, slope_bot);
+				private_set_slope (isect_first, slope_top);
 			}
 			else
 			{
@@ -336,7 +352,7 @@ int liext_terrain_column_add_stick (
 				 *   = 222222XX
 				 */
 				stick_prev->height += isect_first->height;
-				private_reset_slope (stick_prev);
+				private_set_slope (stick_prev, slope_top);
 				private_remove_stick (self, stick_prev, isect_first);
 			}
 		}
@@ -352,6 +368,7 @@ int liext_terrain_column_add_stick (
 				stick_next->height += isect_first->height;
 				private_copy_slope (stick_prev, stick_next);
 				private_remove_stick (self, stick_prev, isect_first);
+				private_set_slope (stick_prev_prev, slope_bot);
 			}
 			else
 			{
@@ -480,6 +497,7 @@ int liext_terrain_column_add_stick (
 			 *   +   0000
 			 *   = 33000000
 			 */
+			private_set_slope (stick_prev, slope_bot);
 		}
 		else if (stick_prev == NULL || stick_prev->material != material)
 		{
@@ -491,8 +509,9 @@ int liext_terrain_column_add_stick (
 			stick = liext_terrain_stick_new (material, world_h);
 			if (stick == NULL)
 				return 0;
-			private_reset_slope (stick_prev);
+			private_set_slope (stick_prev, slope_bot);
 			private_insert_stick (self, stick_prev, stick);
+			private_set_slope (stick, slope_top);
 		}
 		else
 		{
@@ -502,7 +521,7 @@ int liext_terrain_column_add_stick (
 			 *   = 222222XX
 			 */
 			stick_prev->height += world_h;
-			private_reset_slope (stick_prev);
+			private_set_slope (stick_prev, slope_top);
 		}
 	}
 	else
@@ -515,6 +534,7 @@ int liext_terrain_column_add_stick (
 			 *   = 33222222
 			 */
 			stick_next->height += world_h;
+			private_set_slope (stick_prev, slope_bot);
 		}
 		else
 		{
@@ -535,6 +555,58 @@ int liext_terrain_column_add_stick (
 	private_validate (self);
 
 	return 1;
+}
+
+/**
+ * \brief Draws a stick with the given vertex offsets.
+ * \param self Terrain column.
+ * \param bot00 Bottom vertex Y coordinate, in world units.
+ * \param bot10 Bottom vertex Y coordinate, in world units.
+ * \param bot01 Bottom vertex Y coordinate, in world units.
+ * \param bot11 Bottom vertex Y coordinate, in world units.
+ * \param top00 Top vertex Y coordinate, in world units.
+ * \param top10 Top vertex Y coordinate, in world units.
+ * \param top01 Top vertex Y coordinate, in world units.
+ * \param top11 Top vertex Y coordinate, in world units.
+ * \param material Terrain material ID.
+ * \return Nonzero on success, zero if allocating memory failed.
+ */
+int liext_terrain_column_add_stick_corners (
+	LIExtTerrainColumn* self,
+	float               bot00,
+	float               bot10,
+	float               bot01,
+	float               bot11,
+	float               top00,
+	float               top10,
+	float               top01,
+	float               top11,
+	int                 material)
+{
+	float bot;
+	float top;
+	float slope_bot[4];
+	float slope_top[4];
+
+	/* Calculate the stick offset and height. */
+	/* We estimate the offset and height of the stick by taking the average
+	   of the bottom and top surface offsets. The vertices are then offset
+	   against the end points of the stick. */
+	bot = (bot00 + bot10 + bot01 + bot11) / 4.0f;
+	top = (top00 + top10 + top01 + top11) / 4.0f;
+	if (bot >= top)
+		return 0;
+	slope_bot[0] = bot00 - bot;
+	slope_bot[1] = bot10 - bot;
+	slope_bot[2] = bot01 - bot;
+	slope_bot[3] = bot11 - bot;
+	slope_top[0] = top00 - top;
+	slope_top[1] = top10 - top;
+	slope_top[2] = top01 - top;
+	slope_top[3] = top11 - top;
+
+	/* Create the stick. */
+	return liext_terrain_column_add_stick (self, bot, top - bot, slope_bot, slope_top, material);
 }
 
 /**
@@ -1173,12 +1245,17 @@ static void private_remove_stick (
 	liext_terrain_stick_free (remove);
 }
 
-static void private_reset_slope (
-	LIExtTerrainStick* stick)
+static void private_set_slope (
+	LIExtTerrainStick* stick,
+	const float*       slope)
 {
 	if (stick == NULL)
 		return;
 	liext_terrain_stick_reset_vertices (stick);
+	stick->vertices[0][0].offset = slope[0];
+	stick->vertices[1][0].offset = slope[1];
+	stick->vertices[0][1].offset = slope[2];
+	stick->vertices[1][1].offset = slope[3];
 }
 
 static void private_smoothen_stick (

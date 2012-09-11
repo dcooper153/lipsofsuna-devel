@@ -78,6 +78,42 @@ static void Terrain_add_stick (LIScrArgs* args)
 	liscr_args_seti_bool (args, liext_terrain_add_stick (args->self, grid_x, grid_z, world_y, world_h, material));
 }
 
+static void Terrain_add_stick_corners (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	float bot[4];
+	float top[4];
+	int material;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_int (args, 0, &grid_x) || grid_x < 0)
+		return;
+	if (!liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
+		return;
+	if (!liscr_args_geti_float (args, 2, bot + 0) || bot[0] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 3, bot + 1) || bot[1] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 4, bot + 2) || bot[2] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 5, bot + 3) || bot[3] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 6, top + 0) || top[0] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 7, top + 1) || top[1] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 8, top + 2) || top[2] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 9, top + 3) || top[3] < 0.0f)
+		return;
+	if (!liscr_args_geti_int (args, 10, &material) || material < 0)
+		return;
+
+	liscr_args_seti_bool (args, liext_terrain_add_stick_corners (args->self, grid_x, grid_z,
+		bot[0], bot[1], bot[2], bot[3], top[0], top[1], top[2], top[3], material));
+}
+
 static void Terrain_build_chunk_model (LIScrArgs* args)
 {
 	int grid_x;
@@ -334,7 +370,10 @@ static void Terrain_set_column (LIScrArgs* args)
 {
 	float y;
 	float height;
+	float slope[4];
+	float slope_prev[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	int i;
+	int j;
 	int grid_x;
 	int grid_z;
 	int material;
@@ -363,6 +402,8 @@ static void Terrain_set_column (LIScrArgs* args)
 			break;
 
 		/* Get the height. */
+		lua_pushnumber (args->lua, 1);
+		lua_gettable (args->lua, -2);
 		if (lua_type (args->lua, -1) != LUA_TNUMBER)
 		{
 			lua_pop (args->lua, 2);
@@ -374,10 +415,10 @@ static void Terrain_set_column (LIScrArgs* args)
 			lua_pop (args->lua, 2);
 			continue;
 		}
-		lua_pop (args->lua, 2);
+		lua_pop (args->lua, 1);
 
 		/* Get the material. */
-		lua_pushnumber (args->lua, i + 1);
+		lua_pushnumber (args->lua, 2);
 		lua_gettable (args->lua, -2);
 		if (lua_type (args->lua, -1) != LUA_TNUMBER)
 		{
@@ -392,9 +433,26 @@ static void Terrain_set_column (LIScrArgs* args)
 		}
 		lua_pop (args->lua, 1);
 
+		/* Get the slope. */
+		for (j = 0 ; j < 4 ; j++)
+		{
+			slope[j] = 0.0f;
+			lua_pushnumber (args->lua, 2 + j);
+			lua_gettable (args->lua, -2);
+			if (lua_type (args->lua, -1) != LUA_TNUMBER)
+			{
+				lua_pop (args->lua, 1);
+				continue;
+			}
+			slope[j] = lua_tonumber (args->lua, -1);
+			lua_pop (args->lua, 1);
+		}
+		lua_pop (args->lua, 1);
+
 		/* Add the stick. */
-		liext_terrain_column_add_stick (column, y, height, material);
+		liext_terrain_column_add_stick (column, y, height, slope_prev, slope, material);
 		y += height;
+		memcpy (slope_prev, slope, 4 * sizeof (float));
 	}
 
 	liscr_args_seti_bool (args, 1);
@@ -475,6 +533,7 @@ void liext_script_terrain (
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_new", Terrain_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick", Terrain_add_stick);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick_corners", Terrain_add_stick_corners);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_build_chunk_model", Terrain_build_chunk_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_cast_ray", Terrain_cast_ray);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_clear_column", Terrain_clear_column);

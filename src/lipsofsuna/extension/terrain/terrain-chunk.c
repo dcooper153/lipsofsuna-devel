@@ -88,11 +88,77 @@ int liext_terrain_chunk_add_stick (
 	float              world_h,
 	int                material)
 {
+	const float slope[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	LIExtTerrainColumn* column;
 
 	/* Add the stick to the column. */
 	column = liext_terrain_chunk_get_column (self, column_x, column_z);
-	if (!liext_terrain_column_add_stick (column, world_y, world_h, material))
+	if (!liext_terrain_column_add_stick (column, world_y, world_h, slope, slope, material))
+		return 0;
+
+	/* Update stamps. */
+	/* The stamps of the neighbor columns are updated because face culling
+	   may have changed due to the addition of the stick. */
+	self->stamp++;
+	if (column_x > 0)
+	{
+		column = liext_terrain_chunk_get_column (self, column_x - 1, column_z);
+		column->stamp++;
+	}
+	if (column_x < self->size - 1)
+	{
+		column = liext_terrain_chunk_get_column (self, column_x + 1, column_z);
+		column->stamp++;
+	}
+	if (column_z > 0)
+	{
+		column = liext_terrain_chunk_get_column (self, column_x, column_z - 1);
+		column->stamp++;
+	}
+	if (column_z < self->size - 1)
+	{
+		column = liext_terrain_chunk_get_column (self, column_x, column_z + 1);
+		column->stamp++;
+	}
+
+	return 1;
+}
+
+/**
+ * \brief Draws a stick at the given grid point with the given vertex offsets.
+ * \param self Terrain chunk.
+ * \param column_x X coordinate of the column, in grid units within the chunk.
+ * \param column_z Z coordinate of the column, in grid units within the chunk.
+ * \param bot00 Bottom vertex Y coordinate, in world units.
+ * \param bot10 Bottom vertex Y coordinate, in world units.
+ * \param bot01 Bottom vertex Y coordinate, in world units.
+ * \param bot11 Bottom vertex Y coordinate, in world units.
+ * \param top00 Top vertex Y coordinate, in world units.
+ * \param top10 Top vertex Y coordinate, in world units.
+ * \param top01 Top vertex Y coordinate, in world units.
+ * \param top11 Top vertex Y coordinate, in world units.
+ * \param material Terrain material ID.
+ * \return Nonzero on success, zero if allocating memory failed.
+ */
+int liext_terrain_chunk_add_stick_corners (
+	LIExtTerrainChunk* self,
+	int                column_x,
+	int                column_z,
+	float              bot00,
+	float              bot10,
+	float              bot01,
+	float              bot11,
+	float              top00,
+	float              top10,
+	float              top01,
+	float              top11,
+	int                material)
+{
+	LIExtTerrainColumn* column;
+
+	/* Add the stick to the column. */
+	column = liext_terrain_chunk_get_column (self, column_x, column_z);
+	if (!liext_terrain_column_add_stick_corners (column, bot00, bot10, bot01, bot11, top00, top10, top01, top11, material))
 		return 0;
 
 	/* Update stamps. */

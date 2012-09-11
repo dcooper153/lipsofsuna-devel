@@ -129,6 +129,51 @@ int liext_terrain_add_stick (
 }
 
 /**
+ * \brief Draws a stick at the given grid point with the given vertex offsets.
+ * \param self Terrain chunk.
+ * \param column_x X coordinate of the column, in grid units within the chunk.
+ * \param column_z Z coordinate of the column, in grid units within the chunk.
+ * \param bot00 Bottom vertex Y coordinate, in world units.
+ * \param bot10 Bottom vertex Y coordinate, in world units.
+ * \param bot01 Bottom vertex Y coordinate, in world units.
+ * \param bot11 Bottom vertex Y coordinate, in world units.
+ * \param top00 Top vertex Y coordinate, in world units.
+ * \param top10 Top vertex Y coordinate, in world units.
+ * \param top01 Top vertex Y coordinate, in world units.
+ * \param top11 Top vertex Y coordinate, in world units.
+ * \param material Terrain material ID.
+ * \return Nonzero on success, zero if allocating memory failed.
+ */
+int liext_terrain_add_stick_corners (
+	LIExtTerrain* self,
+	int           grid_x,
+	int           grid_z,
+	float         bot00,
+	float         bot10,
+	float         bot01,
+	float         bot11,
+	float         top00,
+	float         top10,
+	float         top01,
+	float         top11,
+	int           material)
+{
+	int column_x;
+	int column_z;
+	LIExtTerrainChunkID id;
+	LIExtTerrainChunk* chunk;
+
+	/* Get the chunk. */
+	id = private_get_chunk_id_and_column (self, grid_x, grid_z, &column_x, &column_z);
+	chunk = lialg_u32dic_find (self->chunks, id);
+	if (chunk == NULL)
+		return 0;
+
+	/* Add the stick. */
+	return liext_terrain_chunk_add_stick_corners (chunk, column_x, column_z, bot00, bot10, bot01, bot11, top00, top10, top01, top11, material);
+}
+
+/**
  * \brief Clears the stick at the given grid point.
  * \param self Terrain.
  * \param grid_x X coordinate in grid units.
