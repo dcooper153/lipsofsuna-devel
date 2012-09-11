@@ -854,6 +854,140 @@ int liext_terrain_column_build_model (
 }
 
 /**
+ * \brief Calculates smooth normals for the vertex at the intersection point of the four columns.
+ * \param self Terrain column (0,0).
+ * \param c10 Terrain column (1,0).
+ * \param c01 Terrain column (0,1).
+ * \param c11 Terrain column (1,1).
+ */
+void liext_terrain_column_calculate_smooth_normals (
+	LIExtTerrainColumn* self,
+	LIExtTerrainColumn* c10,
+	LIExtTerrainColumn* c01,
+	LIExtTerrainColumn* c11)
+{
+	const int x[4] = { 1, 0, 1, 0 };
+	const int z[4] = { 1, 1, 0, 0 };
+	float y[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float yv[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	float splatting;
+	int i;
+	int u;
+	LIExtTerrainStick* sticks[4];
+	LIMatVector normal;
+	LIMatVector normal1;
+
+	/* Calculate the first Y offsets. */
+	sticks[0] = self->sticks;
+	sticks[1] = c10->sticks;
+	sticks[2] = c01->sticks;
+	sticks[3] = c11->sticks;
+	if (sticks[0] != NULL)
+	{
+		y[0] = sticks[0]->height;
+		yv[0] = y[0] + sticks[0]->vertices[x[0]][z[0]].offset;
+	}
+	if (sticks[1] != NULL)
+	{
+		y[1] = sticks[1]->height;
+		yv[1] = y[1] + sticks[1]->vertices[x[1]][z[1]].offset;
+	}
+	if (sticks[2] != NULL)
+	{
+		y[2] = sticks[2]->height;
+		yv[2] = y[2] + sticks[2]->vertices[x[2]][z[2]].offset;
+	}
+	if (sticks[3] != NULL)
+	{
+		y[3] = sticks[3]->height;
+		yv[3] = y[3] + sticks[3]->vertices[x[3]][z[3]].offset;
+	}
+
+	/* Iterate through the vertices of sticks. */
+	while (1)
+	{
+		/* Choose the lowest vertex for the update. */
+		if (sticks[0] != NULL &&
+				(sticks[1] == NULL || yv[0] <= yv[1]) &&
+				(sticks[2] == NULL || yv[0] <= yv[2]) &&
+				(sticks[3] == NULL || yv[0] <= yv[3]))
+		{
+			u = 0;
+		}
+		else if (sticks[1] != NULL &&
+				(sticks[2] == NULL || yv[1] <= yv[2]) &&
+				(sticks[3] == NULL || yv[1] <= yv[3]))
+		{
+			u = 1;
+		}
+		else if (sticks[2] != NULL &&
+			(sticks[3] == NULL || yv[2] <= yv[3]))
+		{
+			u = 2;
+		}
+		else if (sticks[3] != NULL)
+		{
+			u = 3;
+		}
+		else
+			break;
+
+		/* Calculate the splatting factor. */
+		splatting = 0.0f;
+		for (i = 0 ; i < 4 ; i++)
+		{
+			if (sticks[i] != NULL && LIMAT_ABS (yv[i] - yv[u]) <= LIEXT_TERRAIN_SMOOTHING_LIMIT)
+			{
+				if (sticks[i]->material != sticks[u]->material)
+				{
+					splatting = 1.0f;
+					break;
+				}
+			}
+		}
+
+		/* Calculate the new vertex normal. */
+		normal = limat_vector_init (0.0f, 0.0f, 0.0f);
+		for (i = 0 ; i < 4 ; i++)
+		{
+			if (sticks[i] != NULL && LIMAT_ABS (yv[i] - yv[u]) <= LIEXT_TERRAIN_SMOOTHING_LIMIT)
+			{
+				liext_terrain_stick_get_normal (sticks[i], &normal1);
+				normal = limat_vector_add (normal, normal1);
+			}
+		}
+		normal = limat_vector_normalize (normal);
+
+		/* Apply the new values to the connected vertices. */
+		for (i = 0 ; i < 4 ; i++)
+		{
+			if (sticks[i] != NULL && LIMAT_ABS (yv[i] - yv[u]) <= LIEXT_TERRAIN_SMOOTHING_LIMIT)
+			{
+				sticks[i]->vertices[x[i]][z[i]].splatting = splatting;
+				sticks[i]->vertices[x[i]][z[i]].normal = normal;
+			}
+		}
+
+		/* Advance the handled vertices. */
+		/* It is necessary to advance all the affected vertices here because
+		   otherwise their splatting values and normals would be overwritten
+		   in subsequent rounds. */
+		for (i = 0 ; i < 4 ; i++)
+		{
+			if (sticks[i] != NULL && LIMAT_ABS (yv[i] - yv[u]) <= LIEXT_TERRAIN_SMOOTHING_LIMIT)
+			{
+				sticks[i] = sticks[i]->next;
+				if (sticks[i] != NULL)
+				{
+					y[i] += sticks[i]->height;
+					yv[i] = y[i] + sticks[i]->vertices[x[i]][z[i]].offset;
+				}
+			}
+		}
+	}
+}
+
+/**
  * \brief Frees all the sticks of the column.
  * \param self Terrain column.
  */

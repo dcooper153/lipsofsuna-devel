@@ -23,7 +23,8 @@
 
 #define LIEXT_SCRIPT_TERRAIN "Terrain"
 
-#define LIEXT_STICK_EPSILON 0.01
+#define LIEXT_STICK_EPSILON 0.01f
+#define LIEXT_TERRAIN_SMOOTHING_LIMIT 0.1f
 
 typedef struct _LIExtTerrainModule LIExtTerrainModule;
 
@@ -119,6 +120,12 @@ LIAPICALL (int, liext_terrain_column_build_model, (
 	LIExtTerrainStick*  sticks_left,
 	LIExtTerrainStick*  sticks_right,
 	float               grid_size));
+
+LIAPICALL (void, liext_terrain_column_calculate_smooth_normals, (
+	LIExtTerrainColumn* self,
+	LIExtTerrainColumn* c10,
+	LIExtTerrainColumn* c01,
+	LIExtTerrainColumn* c11));
 
 LIAPICALL (void, liext_terrain_column_clear, (
 	LIExtTerrainColumn* self));
@@ -251,6 +258,11 @@ LIAPICALL (int, liext_terrain_add_stick_corners, (
 	float         top01,
 	float         top11,
 	int           material));
+
+LIAPICALL (int, liext_terrain_calculate_smooth_normals, (
+	LIExtTerrain* self,
+	int           grid_x,
+	int           grid_z));
 
 LIAPICALL (int, liext_terrain_clear_column, (
 	LIExtTerrain* self,

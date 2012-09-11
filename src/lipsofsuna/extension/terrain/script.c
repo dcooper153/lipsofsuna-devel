@@ -163,6 +163,20 @@ static void Terrain_build_chunk_model (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
+static void Terrain_calculate_smooth_normals (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_int (args, 0, &grid_x) || grid_x < 0)
+		return;
+	if (!liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
+		return;
+
+	liscr_args_seti_bool (args, liext_terrain_calculate_smooth_normals (args->self, grid_x, grid_z));
+}
+
 static void Terrain_cast_ray (LIScrArgs* args)
 {
 	int grid_x;
@@ -535,6 +549,7 @@ void liext_script_terrain (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick", Terrain_add_stick);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick_corners", Terrain_add_stick_corners);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_build_chunk_model", Terrain_build_chunk_model);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_calculate_smooth_normals", Terrain_calculate_smooth_normals);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_cast_ray", Terrain_cast_ray);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_clear_column", Terrain_clear_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_load_chunk", Terrain_load_chunk);

@@ -75,6 +75,15 @@ Terrain.build_chunk_model = function(self, x, z)
 	return Model:new_from_handle(handle)
 end
 
+--- Calculates smooth normals for the (1,1) vertex of the column.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @return True on success.
+Terrain.calculate_smooth_normals = function(self, x, z)
+	return Los.terrain_calculate_smooth_normals(self.handle, x, z)
+end
+
 --- Casts a ray against the terrain.
 -- @param self Terrain.
 -- @param src Source point, in world units.

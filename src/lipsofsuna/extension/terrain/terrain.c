@@ -174,6 +174,54 @@ int liext_terrain_add_stick_corners (
 }
 
 /**
+ * \brief Calculates smooth normals for the (1,1) vertex of the column.
+ * \param self Terrain.
+ * \param grid_x X coordinate in grid units.
+ * \param grid_z Z coordinate in grid units.
+ * \return Nonzero on success, zero if not loaded.
+ */
+int liext_terrain_calculate_smooth_normals (
+	LIExtTerrain* self,
+	int           grid_x,
+	int           grid_z)
+{
+	int column_x[2][2];
+	int column_z[2][2];
+	LIExtTerrainChunkID id[2][2];
+	LIExtTerrainChunk* chunk[2][2];
+	LIExtTerrainColumn* column[2][2];
+
+	/* Get the chunks. */
+	id[0][0] = private_get_chunk_id_and_column (self, grid_x    , grid_z    , &column_x[0][0], &column_z[0][0]);
+	id[1][0] = private_get_chunk_id_and_column (self, grid_x + 1, grid_z    , &column_x[1][0], &column_z[1][0]);
+	id[0][1] = private_get_chunk_id_and_column (self, grid_x    , grid_z + 1, &column_x[0][1], &column_z[0][1]);
+	id[1][1] = private_get_chunk_id_and_column (self, grid_x + 1, grid_z + 1, &column_x[1][1], &column_z[1][1]);
+	chunk[0][0] = lialg_u32dic_find (self->chunks, id[0][0]);
+	chunk[1][0] = lialg_u32dic_find (self->chunks, id[1][0]);
+	chunk[0][1] = lialg_u32dic_find (self->chunks, id[0][1]);
+	chunk[1][1] = lialg_u32dic_find (self->chunks, id[1][1]);
+	if (chunk[0][0] == NULL || chunk[1][0] == NULL || chunk[0][1] == NULL || chunk[1][1] == NULL)
+		return 0;
+
+	/* Calculate the smooth normals. */
+	column[0][0] = liext_terrain_chunk_get_column (chunk[0][0], column_x[0][0], column_z[0][0]);
+	column[1][0] = liext_terrain_chunk_get_column (chunk[1][0], column_x[1][0], column_z[1][0]);
+	column[0][1] = liext_terrain_chunk_get_column (chunk[0][1], column_x[0][1], column_z[0][1]);
+	column[1][1] = liext_terrain_chunk_get_column (chunk[1][1], column_x[1][1], column_z[1][1]);
+	liext_terrain_column_calculate_smooth_normals (column[0][0], column[1][0], column[0][1], column[1][1]);
+	column[0][0]->stamp++;
+	column[1][0]->stamp++;
+	column[0][1]->stamp++;
+	column[1][1]->stamp++;
+	chunk[0][0]->stamp++;
+	chunk[1][0]->stamp++;
+	chunk[0][1]->stamp++;
+	chunk[1][1]->stamp++;
+
+	return 1;
+}
+
+/**
  * \brief Clears the stick at the given grid point.
  * \param self Terrain.
  * \param grid_x X coordinate in grid units.

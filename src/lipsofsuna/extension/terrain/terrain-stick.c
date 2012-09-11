@@ -194,11 +194,11 @@ void liext_terrain_stick_get_normal (
 
 	v1 = limat_vector_init (1.0f, self->vertices[1][0].offset - self->vertices[0][0].offset, 0.0f);
 	v2 = limat_vector_init (0.0f, self->vertices[0][1].offset - self->vertices[0][0].offset, 1.0f);
-	v3 = limat_vector_init (-1.0f, self->vertices[1][0].offset - self->vertices[1][1].offset, 0.0f);
-	v4 = limat_vector_init (0.0f, self->vertices[0][1].offset - self->vertices[1][1].offset, -1.0f);
+	v3 = limat_vector_init (-1.0f, self->vertices[0][1].offset - self->vertices[1][1].offset, 0.0f);
+	v4 = limat_vector_init (0.0f, self->vertices[1][0].offset - self->vertices[1][1].offset, -1.0f);
 	n1 = limat_vector_normalize (limat_vector_cross (v2, v1));
 	n2 = limat_vector_normalize (limat_vector_cross (v4, v3));
-	*result = limat_vector_multiply (limat_vector_add (n1, n2), 0.5f);
+	*result = limat_vector_normalize (limat_vector_add (n1, n2));
 }
 
 /**
