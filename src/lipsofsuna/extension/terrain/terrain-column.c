@@ -871,8 +871,11 @@ void liext_terrain_column_calculate_smooth_normals (
 	float y[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	float yv[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	float splatting;
+	float tmp;
+	int handled[4];
 	int i;
 	int u;
+	int found;
 	LIExtTerrainStick* sticks[4];
 	LIMatVector normal;
 	LIMatVector normal1;
@@ -882,22 +885,26 @@ void liext_terrain_column_calculate_smooth_normals (
 	sticks[1] = c10->sticks;
 	sticks[2] = c01->sticks;
 	sticks[3] = c11->sticks;
-	if (sticks[0] != NULL)
+	handled[0] = (sticks[0] == NULL);
+	handled[1] = (sticks[1] == NULL);
+	handled[2] = (sticks[2] == NULL);
+	handled[3] = (sticks[3] == NULL);
+	if (!handled[0])
 	{
 		y[0] = sticks[0]->height;
 		yv[0] = y[0] + sticks[0]->vertices[x[0]][z[0]].offset;
 	}
-	if (sticks[1] != NULL)
+	if (!handled[1])
 	{
 		y[1] = sticks[1]->height;
 		yv[1] = y[1] + sticks[1]->vertices[x[1]][z[1]].offset;
 	}
-	if (sticks[2] != NULL)
+	if (!handled[2])
 	{
 		y[2] = sticks[2]->height;
 		yv[2] = y[2] + sticks[2]->vertices[x[2]][z[2]].offset;
 	}
-	if (sticks[3] != NULL)
+	if (!handled[3])
 	{
 		y[3] = sticks[3]->height;
 		yv[3] = y[3] + sticks[3]->vertices[x[3]][z[3]].offset;
@@ -907,25 +914,25 @@ void liext_terrain_column_calculate_smooth_normals (
 	while (1)
 	{
 		/* Choose the lowest vertex for the update. */
-		if (sticks[0] != NULL &&
-				(sticks[1] == NULL || yv[0] <= yv[1]) &&
-				(sticks[2] == NULL || yv[0] <= yv[2]) &&
-				(sticks[3] == NULL || yv[0] <= yv[3]))
+		if (!handled[0] &&
+				(handled[1] || yv[0] <= yv[1]) &&
+				(handled[2] || yv[0] <= yv[2]) &&
+				(handled[3] || yv[0] <= yv[3]))
 		{
 			u = 0;
 		}
-		else if (sticks[1] != NULL &&
-				(sticks[2] == NULL || yv[1] <= yv[2]) &&
-				(sticks[3] == NULL || yv[1] <= yv[3]))
+		else if (!handled[1] &&
+				(handled[2] || yv[1] <= yv[2]) &&
+				(handled[3] || yv[1] <= yv[3]))
 		{
 			u = 1;
 		}
-		else if (sticks[2] != NULL &&
-			(sticks[3] == NULL || yv[2] <= yv[3]))
+		else if (!handled[2] &&
+			(handled[3] || yv[2] <= yv[3]))
 		{
 			u = 2;
 		}
-		else if (sticks[3] != NULL)
+		else if (!handled[3])
 		{
 			u = 3;
 		}
@@ -968,17 +975,44 @@ void liext_terrain_column_calculate_smooth_normals (
 			}
 		}
 
-		/* Advance the handled vertices. */
+		/* Advance degenerate vertices. */
+		/* If there exist any vertices above the current one that have the
+		   exact same height, then only those vertices are advanced and the
+		   rest not. This is done to avoid areas where slopes of different
+		   materials meet to have correct splatting. */
+		found = 0;
+		for (i = 0 ; i < 4 ; i++)
+		{
+			if (!handled[i] && LIMAT_ABS (yv[i] - yv[u]) <= LIEXT_TERRAIN_SMOOTHING_LIMIT)
+			{
+				if (sticks[i]->next != NULL)
+				{
+					tmp = y[i] + sticks[i]->next->height + sticks[i]->next->vertices[x[i]][z[i]].offset;
+					if (tmp - yv[i] <= LIEXT_STICK_EPSILON)
+					{
+						found = 1;
+						sticks[i] = sticks[i]->next;
+						y[i] += sticks[i]->height;
+						/* yv[i] does not change. */
+					}
+				}
+			}
+		}
+		if (found)
+			continue;
+
+		/* Advance all handled vertices. */
 		/* It is necessary to advance all the affected vertices here because
 		   otherwise their splatting values and normals would be overwritten
 		   in subsequent rounds. */
 		for (i = 0 ; i < 4 ; i++)
 		{
-			if (sticks[i] != NULL && LIMAT_ABS (yv[i] - yv[u]) <= LIEXT_TERRAIN_SMOOTHING_LIMIT)
+			if (!handled[i] && LIMAT_ABS (yv[i] - yv[u]) <= LIEXT_TERRAIN_SMOOTHING_LIMIT)
 			{
-				sticks[i] = sticks[i]->next;
-				if (sticks[i] != NULL)
+				handled[i] = (sticks[i]->next == NULL);
+				if (!handled[i])
 				{
+					sticks[i] = sticks[i]->next;
 					y[i] += sticks[i]->height;
 					yv[i] = y[i] + sticks[i]->vertices[x[i]][z[i]].offset;
 				}
