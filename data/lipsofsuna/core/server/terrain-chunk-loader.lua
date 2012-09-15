@@ -78,25 +78,32 @@ end
 -- @param self TerrainChunkLoader.
 TerrainChunkLoader.generate_random = function(self)
 	-- FIXME: Call the generator instead.
-	local w = self.manager.chunk_size
-	local t = self.manager.terrain
 	local Noise = require("system/noise")
 	local bh = 1695
+	local get_height_at = function(x, z)
+		local h1 = Noise:perlin_noise(Vector(x,z), Vector(0.05,0.05), 1, 3, 0.5, 2345235)
+		local h2 = Noise:perlin_noise(Vector(555-x,344-z), Vector(0.1,0.1), 1, 3, 0.5, 43566)
+		return bh + 9 + h1, math.max(0, 5 * h2)
+	end
+	local w = self.manager.chunk_size
+	local t = self.manager.terrain
 	for x = self.x,self.x+w-1 do
 		for z = self.z,self.z+w-1 do
-			local h1 = Noise:perlin_noise(Vector(x,z), Vector(0.05,0.05), 1, 3, 0.5, 2345235)
-			local h2 = Noise:perlin_noise(Vector(555-x,344-z), Vector(0.1,0.1), 1, 3, 0.5, 43566)
-			t:add_stick(x, z, 0, bh + 9 + h1, 3)
-			if h2 > 0 then
+			local a00,b00 = get_height_at(x, z)
+			local a10,b10 = get_height_at(x + 1, z)
+			local a01,b01 = get_height_at(x, z + 1)
+			local a11,b11 = get_height_at(x + 1, z + 1)
+			if b00 > 0 or b10 > 0 or b01 > 0 or b11 > 0 then
 				local m = Noise:perlin_noise(Vector(234-x,435-z), Vector(0.05,0.05), 1, 3, 0.5, 1234)
 				m = math.min(math.max(1, 4 * math.abs(m)), 3)
-				t:add_stick(x, z, bh + 9 + h1, 5 * h2, m)
+				t:add_stick_corners(x, z, 0, 0, 0, 0, a00 + b00, a10 + b10, a01 + b01, a11 + b11, m)
 			end
+			t:add_stick_corners(x, z, 0, 0, 0, 0, a00, a10, a01, a11, 3)
 		end
 	end
 	for x = self.x-1,self.x+w do
 		for z = self.z-1,self.z+w do
-			t:smoothen_column(x, z, 0, bh + 100)
+			t:calculate_smooth_normals(x, z)
 		end
 	end
 end

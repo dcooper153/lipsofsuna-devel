@@ -54,6 +54,11 @@ static void Terrain_new (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
+static void Terrain_unittest (LIScrArgs* args)
+{
+	liext_terrain_unittest ();
+}
+
 static void Terrain_add_stick (LIScrArgs* args)
 {
 	int grid_x;
@@ -546,6 +551,7 @@ void liext_script_terrain (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_new", Terrain_new);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_unittest", Terrain_unittest);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick", Terrain_add_stick);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick_corners", Terrain_add_stick_corners);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_build_chunk_model", Terrain_build_chunk_model);

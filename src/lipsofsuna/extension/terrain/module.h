@@ -60,8 +60,28 @@ LIAPICALL (void, liext_terrain_stick_copy_vertices, (
 	LIExtTerrainStick* self,
 	LIExtTerrainStick* src));
 
+LIAPICALL (void, liext_terrain_stick_fix_vertices_downwards, (
+	LIExtTerrainStick* self,
+	LIExtTerrainStick* stick_first));
+
+LIAPICALL (void, liext_terrain_stick_fix_vertices_upwards, (
+	LIExtTerrainStick* self));
+
 LIAPICALL (void, liext_terrain_stick_reset_vertices, (
 	LIExtTerrainStick* self));
+
+LIAPICALL (int, liext_terrain_stick_subtract, (
+	LIExtTerrainStick* self,
+	float              y,
+	float              h,
+	float              bot00,
+	float              bot10,
+	float              bot01,
+	float              bot11,
+	float              top00,
+	float              top10,
+	float              top01,
+	float              top11));
 
 LIAPICALL (int, liext_terrain_stick_get_data, (
 	LIExtTerrainStick* self,
@@ -344,15 +364,19 @@ struct _LIExtTerrainModule
 	LIMaiProgram* program;
 };
 
-LIExtTerrainModule* liext_terrain_module_new (
-	LIMaiProgram* program);
+LIAPICALL (LIExtTerrainModule*, liext_terrain_module_new, (
+	LIMaiProgram* program));
 
-void liext_terrain_module_free (
-	LIExtTerrainModule* self);
+LIAPICALL (void, liext_terrain_module_free, (
+	LIExtTerrainModule* self));
 
 /*****************************************************************************/
 
-void liext_script_terrain (
-	LIScrScript* self);
+LIAPICALL (void, liext_script_terrain, (
+	LIScrScript* self));
+
+/*****************************************************************************/
+
+LIAPICALL (void, liext_terrain_unittest, ());
 
 #endif

@@ -65,7 +65,8 @@ Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, ti
 	if tile and weapon then
 		-- Break the tile.
 		if weapon.spec.categories["mattock"] then
-			Voxel:damage(attacker, tile)
+			self:destroy_terrain_sphere(attacker, point, tile, 2)
+			return
 		end
 		-- Damage the weapon.
 		if weapon.spec.damage_mining then
@@ -167,6 +168,99 @@ Combat.apply_ranged_spell_impact = function(self, attacker, projectile, effect, 
 		end
 	end
 	return not absorb
+end
+
+--- Destroys terrain at the given impact point.
+-- @param self Combat class.
+-- @param attacker Actor who cast the spell.
+-- @param tile Grid coordinates of the hit tile.
+-- @param radius Radius of the destroyed sphere, in grid units.
+Combat.destroy_terrain_sphere = function(self, attacker, point, tile, radius)
+	-- FIXME: Old terrain.
+	if tile.y ~= 0 then
+		Voxel:damage(attacker, tile)
+		return
+	end
+	-- Play the collapse effect.
+	-- TODO: Should use material specs.
+	Server:world_effect(point, "collapse2")
+	-- Change the tile type.
+	-- TODO: Should use material specs.
+	local r = radius
+	local cx = point.x / Game.terrain.grid_size
+	local cz = point.z / Game.terrain.grid_size
+	local x0 = math.floor(cx - r)
+	local x1 = math.floor(cx + r)
+	local z0 = math.floor(cz - r)
+	local z1 = math.floor(cz + r)
+	local f = function(dx, dz)
+		local d = math.sqrt(dx^2 + dz^2) / r
+		if d > 1 then return 0 end
+		return math.cos(d * math.pi / 2) * r * Game.terrain.grid_size
+	end
+	for z = z0,z1 do
+		for x = x0,x1 do
+			local y = point.y
+			local y00 = f(x - cx, z - cz)
+			local y10 = f(x - cx + 1, z - cz)
+			local y01 = f(x - cx, z - cz + 1)
+			local y11 = f(x - cx + 1, z - cz + 1)
+			Game.terrain.terrain:add_stick_corners(x, z,
+				y - y00, y - y10, y - y01, y - y11,
+				y + y00, y + y10, y + y01, y + y11, 0)
+		end
+	end
+	-- Smoothen the modified columns.
+	for z = z0-1,z1+1 do
+		for x = x0-1,x1+1 do
+			Game.terrain.terrain:calculate_smooth_normals(x, z)
+		end
+	end
+	-- Create items.
+	-- TODO: Should use material specs.
+		--[[
+		if m.mining_materials and user then
+			for k,v in pairs(m.mining_materials) do
+				for i = 1,v do
+					local spec = Itemspec:find{name = k}
+					local item = Item{spec = spec}
+					user.inventory:merge_or_drop_object(item)
+				end
+			end
+		end
+		--]]
+	-- Spawn random monsters.
+	-- TODO: Should use material specs.
+		--[[
+		if not n and math.random() < 0.01 then
+			local spec = Actorspec:random{category = "mining"}
+			if spec then
+				local offset = (point + Vector(0.5,0.1,0.5)) * Voxel.tile_size
+				local object = Actor{random = true, spec = spec, position = offset, realized = true}
+			end
+		end
+		--]]
+	return true
+end
+
+--- Destroys terrain at the given impact point.
+-- @param self Combat class.
+-- @param attacker Actor who cast the spell.
+-- @param tile Grid coordinates of the hit tile.
+Combat.destroy_terrain_stick = function(self, attacker, point, tile, height)
+	-- Play the collapse effect.
+	-- TODO: Should use material specs.
+	Server:world_effect(point, "collapse2")
+	-- Change the tile type.
+	-- TODO: Should use material specs.
+	Game.terrain.terrain:add_stick(tile.x, tile.z, point.y - height / 2, height, 0)
+	-- Smoothen the modified columns.
+	for z = tile.z-1,tile.z+1 do
+		for x = tile.x-1,tile.x+1 do
+			Game.terrain.terrain:calculate_smooth_normals(x, z)
+		end
+	end
+	return true
 end
 
 return Combat

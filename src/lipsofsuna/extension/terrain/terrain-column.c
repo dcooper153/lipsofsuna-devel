@@ -24,6 +24,12 @@
 
 #include "module.h"
 
+#if 0
+#define DEBUGPRINT printf
+#else
+#define DEBUGPRINT(...)
+#endif
+
 typedef struct _LIExtColumnStick LIExtColumnStick;
 struct _LIExtColumnStick
 {
@@ -41,10 +47,6 @@ struct _LIExtColumnVertex
 	LIMatVector coord;
 	LIMatVector normal;
 };
-
-static void private_copy_slope (
-	LIExtTerrainStick* stick,
-	LIExtTerrainStick* src);
 
 static int private_cull_wall (
 	LIExtTerrainStick**      stick,
@@ -79,6 +81,10 @@ static void private_insert_stick (
 	LIExtTerrainStick*  prev,
 	LIExtTerrainStick*  insert);
 
+static void private_move_slope (
+	LIExtTerrainStick* stick,
+	float              diff);
+
 static void private_remove_stick (
 	LIExtTerrainColumn* self,
 	LIExtTerrainStick*  prev,
@@ -88,6 +94,12 @@ static void private_set_slope (
 	LIExtTerrainStick* stick,
 	const float*       slope);
 
+static void private_set_slope_max (
+	LIExtTerrainColumn* self,
+	LIExtTerrainStick*  stick,
+	const float*        slope,
+	float               offset);
+
 static void private_smoothen_stick (
 	LIExtTerrainStick* sticks[4],
 	const int          order[4],
@@ -95,9 +107,6 @@ static void private_smoothen_stick (
 	const int          vertex_z[4],
 	float              range_start,
 	float              range_end);
-
-static void private_validate (
-	LIExtTerrainColumn* self);
 
 /*****************************************************************************/
 
@@ -119,440 +128,194 @@ int liext_terrain_column_add_stick (
 	const float*        slope_top,
 	int                 material)
 {
-	float length;
-	float padding;
-	float isect_start_y;
-	float isect_end_y;
-	LIExtTerrainStick* stick1;
+	int ret;
+	float h;
+	float y;
 	LIExtTerrainStick* stick;
-	LIExtTerrainStick* stick_next;
 	LIExtTerrainStick* stick_prev;
-	LIExtTerrainStick* stick_prev_prev;
-	LIExtTerrainStick* isect_first;
-	LIExtTerrainStick* isect_last;
+	LIExtTerrainStick* stick_after_isect;
+	LIExtTerrainStick* stick_before_isect;
 
-	/*************************************************************************/
-	/* Intersection range calculation. */
-
-	/* Find the first intersecting stick. */
-	isect_start_y = 0.0f;
+	y = 0.0f;
+	stick = self->sticks;
 	stick_prev = NULL;
-	stick_prev_prev = NULL;
-	for (isect_first = self->sticks ; isect_first != NULL ; isect_first = isect_first->next)
-	{
-		if (isect_start_y + isect_first->height > world_y)
-			break;
-		isect_start_y += isect_first->height;
-		stick_prev_prev = stick_prev;
-		stick_prev = isect_first;
-	}
-
-	/* Find the last intersecting stick. */
-	/* This stick is the one that extends past the end point of the added
-	   stick. If the column ends before that, it is the last stick of the
-	   column. */
-	if (isect_first != NULL)
-	{
-		isect_end_y = isect_start_y;
-		for (isect_last = isect_first ; 1 ; isect_last = isect_last->next)
-		{
-			isect_end_y += isect_last->height;
-			if (isect_last->next == NULL)
-				break;
-			if (isect_end_y >= world_y + world_h)
-				break;
-		}
-	}
-
-	/*************************************************************************/
-	/* Special cases for appending. */
-
-	/* Do not add empty sticks to the end of the list. */
-	/* The section past the end of the list is automatically considered
-	   empty so creating an empty stick at the end would be redundant.
-	   Some of the algorithms also expect there to be no empty sticks at
-	   the end so we are obliged to avoid that. */
-	if (isect_first == NULL && material == 0)
-		return 1;
-
-	/* Create a new stick if adding to the end of the list. */
-	/* When the stick is appended to the end of the list, we can take a
-	   shortcut since no intersections can occur. However, we might have
-	   to add an extra padding stick before it if there's a gap between
-	   it and the previous stick. */
-	if (isect_first == NULL)
-	{
-		/* Fill the potential gap with an empty stick. */
-		padding = world_y - isect_start_y;
-		if (padding > LIEXT_STICK_EPSILON)
-		{
-			stick = liext_terrain_stick_new (0, padding);
-			if (stick == NULL)
-				return 0;
-			if (stick_prev != NULL)
-			{
-				lisys_assert (stick_prev->material != 0);
-				stick_prev->next = stick;
-			}
-			else
-				self->sticks = stick;
-			stick_prev = stick;
-		}
-
-		/* Append the stick. */
-		if (stick_prev != NULL && stick_prev->material == material)
-		{
-			/* Extend an existing stick. */
-			stick_prev->height += world_h;
-			private_set_slope (stick_prev, slope_top);
-		}
-		else
-		{
-			/* Create the new stick. */
-			stick = liext_terrain_stick_new (material, world_h);
-			if (stick == NULL)
-				return 0;
-			private_insert_stick (self, stick_prev, stick);
-			private_set_slope (stick_prev, slope_bot);
-			private_set_slope (stick, slope_top);
-		}
-
-		/* Mark the column as changed. */
-		self->stamp++;
-
-		private_validate (self);
-
-		return 1;
-	}
-
-	/*************************************************************************/
-	/* Intersection range snapping. */
-
-	/* Snap the start and end points to the end point of a stick if very close. */
-	/* This will reduce the complexity of the column since pointlessly
-	   short sticks will become subject to removal in the later steps.
-	   The actual length of the added stick may change slightly to offset
-	   for the snapping, but the difference is visually insignificant. */
-	padding = world_y - isect_start_y;
-	if (padding < LIEXT_STICK_EPSILON)
-	{
-		/*
-		 *   0011111111 ---\  0011111111
-		 *      2222222 ---/    22222222
-		 */
-		world_y = isect_start_y;
-		world_h += padding;
-	}
-	padding = isect_end_y - world_y - world_h;
-	if (padding > 0.0f && padding < LIEXT_STICK_EPSILON)
-	{
-		/*
-		 *   1111111100 ---\  1111111100
-		 *   2222222    ---/  22222222
-		 */
-		world_h += padding;
-	}
-
-	/*************************************************************************/
-	/* Special insertion cases. */
-
-	/* Handle a single stick being overwritten with the same material.
-	 *
-	 * This is an easy no operation case so skipping it here is easy
-	 * and simplifies the rest of the algorithm.
-	 *
-	 *     1111     1111     1111     1111
-	 *   + 1111   + 11     +  11    +   11
-	 *   = 1111   = 1111   = 1111   = 1111
-	 */
-	if (isect_first == isect_last && material == isect_first->material)
-	{
-		/* TODO: Slope? */
-		return 1;
-	}
-
-	/* Handle the intersection being inside a single stick.
-	 *
-	 * This necessarily requires special handling since it is the only
-	 * case in which an existing stick needs to be split in two.
-	 *
-	 *     1111
-	 *   +  22
-	 *   = 1221
-	 */
-	if (isect_first == isect_last && world_y > isect_start_y && world_y + world_h < isect_end_y)
-	{
-		stick = liext_terrain_stick_new (material, world_h);
-		if (stick == NULL)
-			return 0;
-		stick1 = liext_terrain_stick_new (isect_first->material, isect_end_y - world_y - world_h);
-		if (stick1 == NULL)
-		{
-			liext_terrain_stick_free (stick);
-			return 0;
-		}
-		stick1->next = isect_first->next;
-		stick->next = stick1;
-		isect_first->next = stick;
-		isect_first->height = world_y - isect_start_y;
-		private_copy_slope (stick1, isect_first);
-		private_set_slope (isect_first, slope_bot);
-		private_set_slope (stick, slope_top);
-
-		/* Mark the column as changed. */
-		self->stamp++;
-
-		private_validate (self);
-
-		return 1;
-	}
-
-	/* Handle a single stick exactly matching the full intersection.
-	 *
-	 * This case follows the same logic as the regular insertion case at
-	 * the bottom of this function. Handling this separately eliminates
-	 * memory allocations since it only requires replacements and removals.
-	 * 
-	 * Note that the next stick may not exist when overwriting the last stick.
-	 * If that case, the imaginary next stick consists of the empty material.
-	 * This leads to the special case of inserting the empty material leading
-	 * to the removal of the last stick.
-	 */
-	if (isect_first == isect_last && world_y == isect_start_y && world_y + world_h == isect_end_y)
-	{
-		stick_next = isect_first->next;
-		if (stick_next == NULL || stick_next->material != material)
-		{
-			if (stick_next == NULL && material == 0)
-			{
-				/*
-				 *     33111100
-				 *   +   0000
-				 *   = 33000000
-				 */
-				private_remove_stick (self, stick_prev, isect_first);
-				private_set_slope (stick_prev, slope_bot);
-			}
-			else if (stick_prev == NULL || stick_prev->material != material)
-			{
-				/*
-				 *     331111XX
-				 *   +   2222
-				 *   = 332222XX
-				 */
-				isect_first->material = material;
-				private_set_slope (stick_prev, slope_bot);
-				private_set_slope (isect_first, slope_top);
-			}
-			else
-			{
-				/*
-				 *     221111XX
-				 *   +   2222
-				 *   = 222222XX
-				 */
-				stick_prev->height += isect_first->height;
-				private_set_slope (stick_prev, slope_top);
-				private_remove_stick (self, stick_prev, isect_first);
-			}
-		}
-		else
-		{
-			if (stick_prev == NULL || stick_prev->material != material)
-			{
-				/*
-				 *     33111122
-				 *   +   2222
-				 *   = 33222222
-				 */
-				stick_next->height += isect_first->height;
-				private_copy_slope (stick_prev, stick_next);
-				private_remove_stick (self, stick_prev, isect_first);
-				private_set_slope (stick_prev_prev, slope_bot);
-			}
-			else
-			{
-				/*
-				 *     22333322
-				 *   +   2222
-				 *   = 22222222
-				 */
-				stick_prev->height += isect_first->height + stick_next->height;
-				private_copy_slope (stick_prev, stick_next);
-				private_remove_stick (self, stick_prev, isect_first);
-				private_remove_stick (self, stick_prev, stick_next);
-			}
-		}
-
-		/* Mark the column as changed. */
-		self->stamp++;
-
-		private_validate (self);
-
-		return 1;
-	}
-
-	/*************************************************************************/
-	/* Removing intersecting sticks. */
-
-	/* Clip the first intersecting stick. */
-	/* The first intersecting stick is often only partially clipped, but
-	   it can be fully removed if it intersects for its entire length. */
-	padding = world_y - isect_start_y;
-	if (padding == 0 && world_h >= isect_first->height)
-	{
-		/*
-		 * 111111
-		 * XXXXXX
-		 */
-		private_remove_stick (self, stick_prev, isect_first);
-	}
-	else if (padding == 0)
-	{
-		/*
-		 * 111111
-		 * XXXX
-		 */
-		isect_first->height -= world_h;
-		lisys_assert (isect_first == isect_last);
-		lisys_assert (isect_first->height >= LIEXT_STICK_EPSILON);
-	}
-	else
-	{
-		/*
-		 * 111111
-		 *   XXXX
-		 */
-		stick_prev = isect_first;
-		isect_first->height -= isect_start_y + isect_first->height - world_y;
-		lisys_assert (isect_first->height >= LIEXT_STICK_EPSILON);
-	}
-
-	/* Remove the intersecting sticks between the first and the last. */
-	/* These sticks are always removed since they always intersect fully.
-	   However, if only one stick intersected, the removal is already done,
-	   and the contents of the stick pointers involved may be invalid. */
-	if (isect_first != isect_last)
-	{
-		if (stick_prev != NULL)
-			stick = stick_prev->next;
-		else
-			stick = self->sticks;
-		for ( ; stick != isect_last ; stick = stick_next)
-		{
-			/*
-			 * 111111
-			 * XXXXXX
-			 */
-			stick_next = stick->next;
-			private_remove_stick (self, stick_prev, stick);
-		}
-	}
-
-	/* Clip the last intersecting stick. */
-	/* The last intersecting stick may be either fully or partially clipped.
-	   However, if only one stick intersected, the clipping is already done,
-	   and the contents of the stick pointers involved may be invalid. */
-	if (isect_first != isect_last)
-	{
-		length = isect_end_y - world_y - world_h;
-		if (length > 0)
-		{
-			/*
-			 * 111111
-			 * XXXX
-			 */
-			lisys_assert (length >= LIEXT_STICK_EPSILON);
-			isect_last->height = length;
-		}
-		else
-		{
-			/*
-			 * 111111
-			 * XXXXXX
-			 */
-			private_remove_stick (self, stick_prev, isect_last);
-		}
-	}
-
-	/*************************************************************************/
-	/* Inserting the stick into the created gap. */
-
-	/* Create the new stick.
-	 *
-	 * Due to the special cases being handled above, the following cases
-	 * remain to be handled here. These cases require insertion, deleteion
-	 * and replacement operations.
-	 */
-	if (stick_prev != NULL)
-		stick_next = stick_prev->next;
-	else
-		stick_next = self->sticks;
-	if (stick_next == NULL || stick_next->material != material)
-	{
-		if (stick_next == NULL && material == 0)
-		{
-			/*
-			 *     33....00
-			 *   +   0000
-			 *   = 33000000
-			 */
-			private_set_slope (stick_prev, slope_bot);
-		}
-		else if (stick_prev == NULL || stick_prev->material != material)
-		{
-			/*
-			 *     33....XX
-			 *   +   2222
-			 *   = 332222XX
-			 */
-			stick = liext_terrain_stick_new (material, world_h);
-			if (stick == NULL)
-				return 0;
-			private_set_slope (stick_prev, slope_bot);
-			private_insert_stick (self, stick_prev, stick);
-			private_set_slope (stick, slope_top);
-		}
-		else
-		{
-			/*
-			 *     22....XX
-			 *   +   2222
-			 *   = 222222XX
-			 */
-			stick_prev->height += world_h;
-			private_set_slope (stick_prev, slope_top);
-		}
-	}
-	else
-	{
-		if (stick_prev == NULL || stick_prev->material != material)
-		{
-			/*
-			 *     33....22
-			 *   +   2222
-			 *   = 33222222
-			 */
-			stick_next->height += world_h;
-			private_set_slope (stick_prev, slope_bot);
-		}
-		else
-		{
-			/*
-			 *     22....22
-			 *   +   2222
-			 *   = 22222222
-			 */
-			stick_prev->height += world_h + stick_next->height;
-			private_copy_slope (stick_prev, stick_next);
-			private_remove_stick (self, stick_prev, stick_next);
-		}
-	}
-
-	/* Mark the column as changed. */
+	stick_before_isect = NULL;
 	self->stamp++;
 
-	private_validate (self);
+	/* Subtract the stick from the column. */
+	DEBUGPRINT ("Add stick: y=%.2f h=%.2f m=%d\n", world_y, world_h, material);
+	while (stick != NULL)
+	{
+		DEBUGPRINT (" Stick: y=%.2f h=%.2f\n", y, stick->height);
+		h = stick->height;
+		ret = liext_terrain_stick_subtract (stick, world_y - y, world_h,
+			slope_bot[0], slope_bot[1], slope_bot[2], slope_bot[3],
+			slope_top[0], slope_top[1], slope_top[2], slope_top[3]);
+		switch (ret)
+		{
+			/* Out of memory? */
+			case 0:
+				return 0;
+			/* A) Is the stick completely below us? */
+			case 1:
+				DEBUGPRINT ("  1-below : y=%.2f..%.2f\n", y, y + h);
+				y += h;
+				stick_prev = stick;
+				stick = stick->next;
+				break;
+			/* B) Is the stick completely above us? */
+			case 2:
+				DEBUGPRINT ("  2-above : y=%.2f..%.2f\n", y, y + h);
+				y += h;
+				stick_before_isect = stick;
+				stick_prev = stick;
+				stick = stick->next;
+				break;
+			/* C) Does the stick replace us completely? */
+			case 3:
+				DEBUGPRINT ("  3-full : y=%.2f..%.2f\n", y, y + h);
+				y += h;
+				private_remove_stick (self, stick_prev, stick);
+				if (stick_prev != NULL)
+					stick = stick_prev->next;
+				else
+					stick = self->sticks;
+				break;
+			/* D) Does the stick replace part of the bottom? */
+			case 4:
+				DEBUGPRINT ("  4-bottom: y=%.2f..%.2f\n", y, y + h);
+				y += h;
+				stick_prev = stick;
+				stick = stick->next;
+				break;
+			/* E) Does the stick replace part of the top? */
+			case 5:
+				DEBUGPRINT ("  5-top   : y=%.2f..%.2f\n", y, y + h);
+				y += h;
+				stick_before_isect = stick;
+				stick_prev = stick;
+				stick = stick->next;
+				break;
+			/* F) Does the stick replace part of the middle? */
+			case 6:
+				DEBUGPRINT ("  6-middle: y=%.2f..%.2f\n", y, y + stick->height);
+				y += stick->height + world_h;
+				stick_before_isect = stick;
+				stick_prev = stick;
+				stick = stick->next;
+				break;
+			/* Should not happen. */
+			default:
+				lisys_assert (0);
+				return 0;
+		}
+	}
+
+	/* Insert the stick to the column. */
+	if (world_y >= y)
+	{
+		/* Append after the last stick. */
+		DEBUGPRINT (" Append!\n");
+		if (material == 0)
+		{
+			DEBUGPRINT ("  Append empty: y=%.2f\n", y);
+			return 1;
+		}
+		if (world_y - y > 0.0f)
+		{
+			DEBUGPRINT ("  Create padding stick: y=%.2f h=%.2f\n", y, world_y - y);
+			stick = liext_terrain_stick_new (0, world_y - y);
+			if (stick == NULL)
+				return 0;
+			private_set_slope (stick, slope_bot);
+			private_insert_stick (self, stick_prev, stick);
+			stick_prev = stick;
+			y += stick->height;
+		}
+		if (stick_prev != NULL && stick_prev->material == material)
+		{
+			DEBUGPRINT ("  Extend last stick: y=%.2f h=%.2f\n", y, world_h);
+			stick_prev->height += world_h;
+			private_move_slope (stick_prev, -world_h);
+			private_set_slope_max (self, stick_prev, slope_top, 0.0f);
+		}
+		else
+		{
+			DEBUGPRINT ("  Append new stick: y=%.2f h=%.2f\n", y, world_h);
+			stick = liext_terrain_stick_new (material, world_h);
+			if (stick == NULL)
+				return 0;
+			private_set_slope (stick, slope_top);
+			private_insert_stick (self, stick_prev, stick);
+		}
+	}
+	else
+	{
+		/* Insert to the stick. */
+		DEBUGPRINT (" Insert!\n");
+		if (stick_before_isect != NULL)
+			stick_after_isect = stick_before_isect->next;
+		else
+			stick_after_isect = NULL;
+		if (stick_before_isect != NULL && stick_before_isect->material == material &&
+		     stick_after_isect != NULL &&  stick_after_isect->material == material)
+		{
+			/*
+			 *   11111.....11111
+			 * +      11111
+			 */
+			DEBUGPRINT (" Join up and down: y=%.2f h=%.2f\n", y_before_isect, world_h);
+			stick = stick_after_isect;
+			stick_before_isect->height += world_h + stick->height;
+			private_move_slope (stick_before_isect, -world_h - stick->height);
+			private_set_slope_max (self, stick_before_isect, slope_top, -stick->height);
+			stick_before_isect->next = stick->next;
+			liext_terrain_stick_free (stick);
+		}
+		else if (stick_before_isect != NULL && stick_before_isect->material == material)
+		{
+			/*
+			 *   11111.....22222
+			 * +      11111
+			 */
+			DEBUGPRINT (" Join down: y=%.2f h=%.2f\n", y_before_isect, world_h);
+			stick_before_isect->height += world_h;
+			private_move_slope (stick_before_isect, -world_h);
+			private_set_slope_max (self, stick_before_isect, slope_top, 0.0f);
+		}
+		else if (stick_after_isect != NULL && stick_after_isect->material == material)
+		{
+			/*
+			 *   22222.....11111
+			 * +      11111
+			 */
+			DEBUGPRINT (" Join up: y=%.2f h=%.2f\n", y_before_isect, world_h);
+			stick_after_isect->height += world_h;
+			private_set_slope_max (self, stick_after_isect, slope_top, -world_h);
+		}
+		else if (stick_before_isect != NULL || material != 0 ||
+				(self->sticks != NULL && self->sticks->height > world_y))
+		{
+			/*
+			 *   22222.....22222
+			 * +      11111
+			 */
+			DEBUGPRINT (" Create new stick: y=%.2f h=%.2f\n", y, world_h);
+			stick = liext_terrain_stick_new (material, world_h);
+			if (stick == NULL)
+				return 0;
+			private_set_slope (stick, slope_top);
+			private_insert_stick (self, stick_before_isect, stick);
+		}
+		else
+		{
+			/*
+			 *   22222.....
+			 * +      00000
+			 */
+			DEBUGPRINT (" Replace by empty stick: y=%.2f h=%.2f\n", y, world_h);
+		}
+	}
 
 	return 1;
 }
@@ -729,7 +492,7 @@ int liext_terrain_column_build_model (
 	stick_right = sticks_right;
 
 	/* Add the sticks to the builder. */
-	for (stick = self->sticks ; stick != NULL ; stick = stick->next)
+	for (stick = self->sticks ; stick != NULL ; stick_prev = stick, stick = stick->next)
 	{
 		/* Calculate the top surface data. */
 		y += stick->height;
@@ -1212,18 +975,6 @@ int liext_terrain_column_set_data (
 
 /*****************************************************************************/
 
-static void private_copy_slope (
-	LIExtTerrainStick* stick,
-	LIExtTerrainStick* src)
-{
-	if (stick == NULL)
-		return;
-	if (src != NULL)
-		liext_terrain_stick_copy_vertices (stick, src);
-	else
-		liext_terrain_stick_reset_vertices (stick);
-}
-
 static int private_cull_wall (
 	LIExtTerrainStick**      stick,
 	float*                   stick_y,
@@ -1395,6 +1146,18 @@ static void private_insert_stick (
 	}
 }
 
+static void private_move_slope (
+	LIExtTerrainStick* stick,
+	float              diff)
+{
+	if (stick == NULL)
+		return;
+	stick->vertices[0][0].offset += diff;
+	stick->vertices[1][0].offset += diff;
+	stick->vertices[0][1].offset += diff;
+	stick->vertices[1][1].offset += diff;
+}
+
 static void private_remove_stick (
 	LIExtTerrainColumn* self,
 	LIExtTerrainStick*  prev,
@@ -1424,6 +1187,21 @@ static void private_set_slope (
 	stick->vertices[1][0].offset = slope[1];
 	stick->vertices[0][1].offset = slope[2];
 	stick->vertices[1][1].offset = slope[3];
+}
+
+static void private_set_slope_max (
+	LIExtTerrainColumn* self,
+	LIExtTerrainStick*  stick,
+	const float*        slope,
+	float               offset)
+{
+	if (stick == NULL)
+		return;
+	stick->vertices[0][0].offset = LIMAT_MAX (stick->vertices[0][0].offset + offset, slope[0]);
+	stick->vertices[1][0].offset = LIMAT_MAX (stick->vertices[1][0].offset + offset, slope[1]);
+	stick->vertices[0][1].offset = LIMAT_MAX (stick->vertices[0][1].offset + offset, slope[2]);
+	stick->vertices[1][1].offset = LIMAT_MAX (stick->vertices[1][1].offset + offset, slope[3]);
+	liext_terrain_stick_fix_vertices_upwards (stick);
 }
 
 static void private_smoothen_stick (
@@ -1538,34 +1316,6 @@ static void private_smoothen_stick (
 			tmp[i].stick->vertices[tmp[i].vertex_x][tmp[i].vertex_z].normal = normal;
 		}
 	}
-}
-
-static void private_validate (
-	LIExtTerrainColumn* self)
-{
-#ifndef NDEBUG
-	int material = -1;
-	LIExtTerrainStick* stick;
-	LIExtTerrainStick* stick1;
-
-	for (stick = self->sticks ; stick != NULL ; stick = stick->next)
-	{
-		if (stick->material == material || stick->height <= 0.0f)
-		{
-			printf ("FATAL: Invalid terrain column detected!\n");
-			for (stick1 = self->sticks ; stick1 != NULL ; stick1 = stick1->next)
-			{
-				printf ("  material=%d, height=%f", stick1->material, stick1->height);
-				if (stick1 == stick)
-					printf (" <- HERE!\n");
-				else
-					printf ("\n");
-			}
-			lisys_assert (0 && "Terrain management logic error");
-		}
-		material = stick->material;
-	}
-#endif
 }
 
 /** @} */
