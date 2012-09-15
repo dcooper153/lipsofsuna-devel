@@ -697,6 +697,12 @@ end
 Actor.update = function(self, secs)
 	if not self:get_visible() then return end
 	if self:has_server_data() then
+		-- Freeze until the terrain has been loaded.
+		if not Game.terrain:is_point_loaded(self:get_position()) then
+			self.physics:set_physics("static")
+		else
+			self.physics:set_physics(self.dead and "rigid" or "kinematic")
+		end
 		-- Update the state.
 		self.update_timer = self.update_timer + secs
 		if self.update_timer > 0.3 then

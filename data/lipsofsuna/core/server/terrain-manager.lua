@@ -66,6 +66,16 @@ TerrainManager.is_chunk_loaded = function(self, x, z)
 	return true
 end
 
+--- Returns true if the point has finished loading.
+-- @param self TerrainManager.
+-- @param point Point vector in world units.
+TerrainManager.is_point_loaded = function(self, point)
+	local id = self:get_chunk_id_by_point(point.x, point.z)
+	if not self.chunks[id] then return end
+	if self.loaders[id] then return end
+	return true
+end
+
 --- Reads a chunk from the database.
 -- @param self TerrainManager.
 -- @param x X coordinate in grid units.
