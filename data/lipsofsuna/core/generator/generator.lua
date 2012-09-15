@@ -244,6 +244,8 @@ Generator.generate_overworld = function(self)
 end
 
 Generator.find_overworld_generation_point = function(self)
+	-- FIXME: Stick terrain.
+	do return end
 	for i = 1,10 do
 		local min = Map.aabb.point
 		local max = Map.aabb.point + Map.aabb.size
@@ -273,6 +275,7 @@ Generator.generate_dungeon = function(self, pattern)
 	if not pattern2 then return end
 	-- Find the overworld point.
 	local point1 = self:find_overworld_generation_point()
+	if not point1 then return end
 	point1:multiply(Voxel.tile_scale):subtract_xyz(0.5*pattern.size.x,0,0.5*pattern.size.z):ceil()
 	if not self:validate_pattern_position(pattern, point1, true) then return end
 	if not point1 then return end

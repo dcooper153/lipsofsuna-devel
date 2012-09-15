@@ -109,11 +109,12 @@ end
 -- @param clss Utils class.
 -- @return Point in world units.
 Utils.find_random_overworld_point = function(clss)
+	-- FIXME: Stick terrain.
 	local point = Vector()
 	while true do
 		point.x = Map.aabb.point.x + Map.aabb.size.x * math.random()
 		point.z = Map.aabb.point.z + Map.aabb.size.z * math.random()
-		local hm = Map.heightmap:get_height(point, false)
+		local hm = 1710--Map.heightmap:get_height(point, false)
 		if hm then
 			point.y = hm
 			return point
@@ -126,6 +127,7 @@ end
 -- @param point Point in world space.
 -- @return Point in world units, or nil.
 Utils.find_spawn_point = function(clss, point)
+	-- FIXME: Stick terrain.
 	-- Find an empty tile.
 	local t,c = Voxel:find_tile{match = "empty", point = point, radius = Voxel.tile_size}
 	if not t then return end
@@ -144,12 +146,6 @@ Utils.find_spawn_point = function(clss, point)
 			end
 		end
 	end
-	-- Find the heightmap floor.
-	-- FIXME: Doesn't check if there are voxels blocking the point.
-	local hm = Map.heightmap:get_height(point, false)
-	if hm and point.y - 3 < hm and hm < point.y + 0.1 then
-		return Vector(point.x, hm, point.z)
-	end
 end
 
 --- Finds spawns point suitable for actors.
@@ -159,6 +155,7 @@ end
 -- @param allow_yield True to allow yielding.
 -- @return List of vectors in world units.
 Utils.find_spawn_points_in_sector = function(clss, sector, count, allow_yield)
+	-- FIXME: Stick terrain.
 	local c = Vector()
 	local num = 0
 	local org = Sector:get_tile_by_id(sector)
@@ -176,12 +173,6 @@ Utils.find_spawn_points_in_sector = function(clss, sector, count, allow_yield)
 			   Voxel:get_tile(p:set_xyz(c.x, y+2, c.z)) == 0 then
 				return p:set_xyz(c.x+0.5, y+1.5, c.z+0.5):multiply(Voxel.tile_size)
 			end
-		end
-		-- Find the heightmap floor.
-		-- FIXME: Doesn't check if there are voxels blocking the point.
-		local hm = Map.heightmap:get_height(c, false)
-		if hm and hm > c.y and hm < c.y + 11 * Voxel.tile_size then
-			return p:set_xyz(c.x, hm, c.z)
 		end
 	end
 	for i = 1,2*count do
@@ -206,13 +197,10 @@ end
 -- @param point Point in world space.
 -- @return Point in world units, or nil.
 Utils.find_summon_point = function(clss, point)
+	-- FIXME: Stick terrain.
 	local p = Vector(point.x, point.y, point.z)
 	local validate_heightmap = function(p)
-		local hm = Map.heightmap:get_height(p, false)
-		if not hm then return "float" end
-		if p.y > hm - 100 and p.y < hm then return "block" end
-		if p.y > hm + 2 then return "float" end
-		return "stand"
+		return "float"
 	end
 	local validate_voxel = function(p)
 		local c = p:copy():multiply(Voxel.tile_scale):round()

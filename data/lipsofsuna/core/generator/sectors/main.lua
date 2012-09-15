@@ -43,6 +43,8 @@ Generator.sector_types.Main.get_cluster = function(self, pos, size)
 end
 
 Generator.sector_types.Main.get_sector = function(self, pos, size)
+	-- FIXME: Replace with stick terrain generation.
+	do return "Empty" end
 	if pos.y > 1200 and pos.y < 1300 then return "Overworld" end
 	if pos.y > 1100 then return "Empty" end
 	-- Predefined sectors.

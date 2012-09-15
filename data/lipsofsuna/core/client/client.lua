@@ -235,10 +235,7 @@ Client.update = function(self, secs)
 	-- FIXME
 	if self.player_object then
 		self:update_camera()
-		local player_y = self.player_object:get_position().y
-		local overworld_y = Map.heightmap.position.y - 10
-		local overworld = (player_y > overworld_y)
-		Map.heightmap:set_visible(overworld)
+		local overworld = true
 		self.lighting:set_dungeon_mode(not overworld)
 		local wd = overworld and self.options.view_distance or self.options.view_distance_underground
 		self.camera1:set_far(wd)
