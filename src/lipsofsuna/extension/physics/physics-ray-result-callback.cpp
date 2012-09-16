@@ -71,6 +71,7 @@ btScalar LIPhyRayResultCallback::addSingleResult (btCollisionWorld::LocalRayResu
 		this->result.terrain_tile[1] = pointer->tile[1];
 		this->result.terrain_tile[2] = pointer->tile[2];
 	}
+	this->result.fraction = m_closestHitFraction;
 	this->result.point = limat_vector_init (m_hitPointWorld[0], m_hitPointWorld[1], m_hitPointWorld[2]);
 	this->result.normal = limat_vector_init (m_hitNormalWorld[0], m_hitNormalWorld[1], m_hitNormalWorld[2]);
 
