@@ -45,12 +45,14 @@ LISndSystem* lisnd_system_new ()
 	self->device = alcOpenDevice (NULL);
 	if (self->device == NULL)
 	{
+		lisys_error_set (EINVAL, "opening the sound device failed");
 		lisnd_system_free (self);
 		return NULL;
 	}
 	self->context = alcCreateContext (self->device, NULL);
 	if (self->context == NULL)
 	{
+		lisys_error_set (EINVAL, "creating the sound context failed");
 		lisnd_system_free (self);
 		return NULL;
 	}

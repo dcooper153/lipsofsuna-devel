@@ -60,7 +60,7 @@ LIExtModule* liext_sound_new (
 	if (self->system != NULL)
 		self->sound = lisnd_manager_new (self->system);
 	else
-		printf ("WARNING: cannot initialize sound\n");
+		printf ("WARNING: cannot initialize sound: %s\n", lisys_error_get_string ());
 
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (program->callbacks, "tick", 1, private_tick, self, self->calls + 0))
@@ -241,7 +241,8 @@ static int private_tick (
 	velocity = self->listener_velocity;
 	direction = limat_quaternion_get_basis (self->listener_rotation, 2);
 	up = limat_quaternion_get_basis (self->listener_rotation, 1);
-	lisnd_system_set_listener (self->system, &self->listener_position, &velocity, &direction, &up);
+	if (self->system != NULL)
+		lisnd_system_set_listener (self->system, &self->listener_position, &velocity, &direction, &up);
 
 	/* Update music. */
 	if (self->music_fade != NULL)
@@ -265,7 +266,8 @@ static int private_tick (
 	}
 
 	/* Update sound sources. */
-	lisnd_manager_update (self->sound, secs);
+	if (self->sound != NULL)
+		lisnd_manager_update (self->sound, secs);
 
 	return 1;
 }
