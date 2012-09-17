@@ -190,7 +190,7 @@ end
 -- @param self TerrainManager.
 -- @param secs Seconds since the last update.
 TerrainManager.update = function(self, secs)
-	-- Update sector loaders.
+	-- Update chunk loaders.
 	for i = 1,3 do
 		local key,loader = next(self.loaders, self.loaders_iterator)
 		self.loaders_iterator = key
@@ -214,8 +214,29 @@ TerrainManager.update = function(self, secs)
 			end
 		end
 	end
-	-- TODO: Unload unused chunks.
-	-- TODO: Remember chunk:detach_render_object().
+	-- Unload unused chunks.
+	local t = Program:get_time()
+	for i = 1,2 do
+		local key,chunk = next(self.chunks, self.chunks_iterator)
+		self.chunks_iterator = key
+		if chunk and t - chunk.time > self.unload_time then
+			local x,z = self:get_chunk_xz_by_id(key)
+			-- Save fully loaded chunks.
+			if self.loaders[key] then
+				self.loaders[key] = nil
+				self.loaders_iterator = nil
+			else
+				self:save_chunk(x, z)
+			end
+			-- Detach the render object.
+			if self.graphics then
+				chunk:detach_render_object()
+			end
+			-- Unload the chunk data.
+			self.terrain:unload_chunk(x, z)
+			self.chunks[key] = nil
+		end
+	end
 end
 
 --- Maps a world space point to a chunk ID.

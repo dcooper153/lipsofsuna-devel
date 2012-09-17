@@ -58,10 +58,7 @@ TerrainChunk.detach_render_object = function(self)
 		self.object:set_visible(false)
 		self.object = nil
 	end
-	if self.model then
-		self.model:set_visible(false)
-		self.model = nil
-	end
+	self.model = nil
 end
 
 return TerrainChunk
