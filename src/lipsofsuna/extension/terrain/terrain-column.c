@@ -267,7 +267,7 @@ int liext_terrain_column_add_stick (
 			DEBUGPRINT (" Join up and down: y=%.2f h=%.2f\n", y_before_isect, world_h);
 			stick = stick_after_isect;
 			stick_before_isect->height += world_h + stick->height;
-			private_move_slope (stick_before_isect, -world_h - stick->height);
+			liext_terrain_stick_copy_vertices (stick_before_isect, stick);
 			private_set_slope_max (self, stick_before_isect, slope_top, -stick->height);
 			stick_before_isect->next = stick->next;
 			liext_terrain_stick_free (stick);
@@ -291,7 +291,7 @@ int liext_terrain_column_add_stick (
 			 */
 			DEBUGPRINT (" Join up: y=%.2f h=%.2f\n", y_before_isect, world_h);
 			stick_after_isect->height += world_h;
-			private_set_slope_max (self, stick_after_isect, slope_top, -world_h);
+			private_set_slope_max (self, stick_after_isect, slope_top, -stick_after_isect->height - world_h);
 		}
 		else if (stick_before_isect != NULL || material != 0 ||
 				(self->sticks != NULL && self->sticks->height > world_y))
@@ -1151,11 +1151,13 @@ static void private_insert_stick (
 {
 	if (prev == NULL)
 	{
+		liext_terrain_stick_clamp_vertices (insert, self->sticks);
 		insert->next = self->sticks;
 		self->sticks = insert;
 	}
 	else
 	{
+		liext_terrain_stick_clamp_vertices (insert, prev->next);
 		insert->next = prev->next;
 		prev->next = insert;
 	}
@@ -1212,10 +1214,10 @@ static void private_set_slope_max (
 {
 	if (stick == NULL)
 		return;
-	stick->vertices[0][0].offset = LIMAT_MAX (stick->vertices[0][0].offset + offset, slope[0]);
-	stick->vertices[1][0].offset = LIMAT_MAX (stick->vertices[1][0].offset + offset, slope[1]);
-	stick->vertices[0][1].offset = LIMAT_MAX (stick->vertices[0][1].offset + offset, slope[2]);
-	stick->vertices[1][1].offset = LIMAT_MAX (stick->vertices[1][1].offset + offset, slope[3]);
+	stick->vertices[0][0].offset = LIMAT_MAX (stick->vertices[0][0].offset, slope[0] + offset);
+	stick->vertices[1][0].offset = LIMAT_MAX (stick->vertices[1][0].offset, slope[1] + offset);
+	stick->vertices[0][1].offset = LIMAT_MAX (stick->vertices[0][1].offset, slope[2] + offset);
+	stick->vertices[1][1].offset = LIMAT_MAX (stick->vertices[1][1].offset, slope[3] + offset);
 	liext_terrain_stick_fix_vertices_upwards (stick);
 }
 

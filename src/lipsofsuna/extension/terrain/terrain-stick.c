@@ -65,6 +65,18 @@ void liext_terrain_stick_free (
 }
 
 /**
+ * \brief Clamps the vertices of the stick so that they fit below the next stick's vertices.
+ * \param self Terrain stick.
+ * \param next Terrain stick.
+ */
+void liext_terrain_stick_clamp_vertices (
+	LIExtTerrainStick* self,
+	LIExtTerrainStick* next)
+{
+	private_clamp_vertices (self, next);
+}
+
+/**
  * \brief Copies the vertices from another stick.
  * \param self Terrain stick.
  * \param src Terrain stick.

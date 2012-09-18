@@ -56,6 +56,10 @@ LIAPICALL (LIExtTerrainStick*, liext_terrain_stick_new, (
 LIAPICALL (void, liext_terrain_stick_free, (
 	LIExtTerrainStick* self));
 
+LIAPICALL (void, liext_terrain_stick_clamp_vertices, (
+	LIExtTerrainStick* self,
+	LIExtTerrainStick* next));
+
 LIAPICALL (void, liext_terrain_stick_copy_vertices, (
 	LIExtTerrainStick* self,
 	LIExtTerrainStick* src));
