@@ -351,6 +351,41 @@ Unittest:add(1, "system", "terrain: add stick corners", function()
 	--print_column(c)
 end)
 
+Unittest:add(1, "system", "terrain: count materials", function()
+	local Terrain = require("system/terrain")
+	local t = Terrain(32, 0.5)
+	assert(not t:build_chunk_model(0, 0))
+	t:load_chunk(0, 0)
+	-- Empty column.
+	local r = t:count_column_materials(0, 0)
+	for k,v in pairs(r) do
+		assert(false)
+	end
+	-- Multiple results.
+	t:add_stick(0, 0, 0, 2.5, 2)
+	t:add_stick(0, 0, 5, 5.5, 1)
+	t:add_stick(0, 0, 10.5, 0.5, 2)
+	t:add_stick(0, 0, 11, 2, 3)
+	local r = t:count_column_materials(0, 0)
+	assert(r[0] == 2.5)
+	assert(r[1] == 5.5)
+	assert(r[2] == 3)
+	assert(r[3] == 2)
+	-- Limit range.
+	local r = t:count_column_materials(0, 0, 10, 2)
+	assert(not r[0])
+	assert(r[1] == 0.5)
+	assert(r[2] == 0.5)
+	assert(r[3] == 1)
+	-- Reusing the table.
+	local r1 = t:count_column_materials(0, 0, 10, 2, r)
+	assert(r == r1)
+	assert(not r[0])
+	assert(r[1] == 1)
+	assert(r[2] == 1)
+	assert(r[3] == 2)
+end)
+
 Unittest:add(1, "system", "terrain: build model", function()
 	local Terrain = require("system/terrain")
 	local t = Terrain(32, 0.5)

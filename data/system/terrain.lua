@@ -113,6 +113,20 @@ Terrain.clear_column = function(self, x, z)
 	return Los.terrain_clear_column(self.handle, x, z)
 end
 
+--- Counts the materials in the column.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @param y Start of the matched range, or nil for the beginning.
+-- @param h Height of the matched range, or nil for infinite.
+-- @param t Table to which to add the results, or nil to create a new one.
+-- @return Table.
+Terrain.count_column_materials = function(self, x, z, y, h, t)
+	local t1 = t or {}
+	Los.terrain_count_column_materials(self.handle, x, z, y, h, t1)
+	return t1
+end
+
 --- Loads a terrain chunk.
 -- @param self Terrain.
 -- @param x Grid X coordinate.

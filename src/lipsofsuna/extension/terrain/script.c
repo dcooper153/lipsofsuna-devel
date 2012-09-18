@@ -247,6 +247,64 @@ static void Terrain_clear_column (LIScrArgs* args)
 	liscr_args_seti_bool (args, liext_terrain_clear_column (args->self, grid_x, grid_z));
 }
 
+static void Terrain_count_column_materials (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	float y;
+	float min;
+	float max;
+	float length;
+	float start = 0.0f;
+	float height = -1.0f;
+	LIExtTerrainColumn* column;
+	LIExtTerrainStick* stick;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_int (args, 0, &grid_x) || grid_x < 0)
+		return;
+	if (!liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
+		return;
+	if (liscr_args_geti_float (args, 2, &start))
+		start = LIMAT_MAX (0.0f, start);
+	if (liscr_args_geti_float (args, 3, &height))
+		height = LIMAT_MAX (0.0f, height);
+	if (!liscr_args_geti_table (args, 4))
+		return;
+
+	/* Get the column. */
+	column = liext_terrain_get_column (args->self, grid_x, grid_z);
+	if (column == NULL)
+		return;
+
+	/* Count the materials and add the counts to the table. */
+	for (y = 0.0f, stick = column->sticks ; stick != NULL ; y += stick->height, stick = stick->next)
+	{
+		if (height >= 0.0f)
+		{
+			min = LIMAT_MAX (y, start);
+			max = LIMAT_MIN (y + stick->height, start + height);
+		}
+		else
+		{
+			min = LIMAT_MAX (y, start);
+			max = y + stick->height;
+		}
+		length = max - min;
+		if (length > 0.0f)
+		{
+			lua_pushnumber (args->lua, stick->material);
+			lua_pushnumber (args->lua, stick->material);
+			lua_gettable (args->lua, -3);
+			if (lua_type (args->lua, -1) == LUA_TNUMBER)
+				length += lua_tonumber (args->lua, -1);
+			lua_pop (args->lua, 1);
+			lua_pushnumber (args->lua, length);
+			lua_settable (args->lua, -3);
+		}
+	}
+}
+
 static void Terrain_load_chunk (LIScrArgs* args)
 {
 	int grid_x;
@@ -582,6 +640,7 @@ void liext_script_terrain (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_cast_ray", Terrain_cast_ray);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_clear_chunk_model", Terrain_clear_chunk_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_clear_column", Terrain_clear_column);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_count_column_materials", Terrain_count_column_materials);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_load_chunk", Terrain_load_chunk);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_smoothen_column", Terrain_smoothen_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_unload_chunk", Terrain_unload_chunk);
