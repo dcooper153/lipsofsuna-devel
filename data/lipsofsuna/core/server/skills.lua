@@ -66,7 +66,7 @@ Skills.calculate_attributes = function(self)
 		melee = 1,
 		ranged = 1,
 		speed = 0.5,
-		view_distance = 15}
+		view_distance = 32}
 	for k,v in pairs(self.skills) do
 		local skill = Skillspec:find{name = k}
 		if skill then skill.assign(attr) end

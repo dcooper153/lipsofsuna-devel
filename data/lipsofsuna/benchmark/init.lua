@@ -68,7 +68,7 @@ Benchmark.new = function(clss)
 	self.terrain_timer1 = 0
 	self.terrain_timer2 = 1
 	self.terrain = TerrainManager(16, 1, nil, false, true, true)
-	self.terrain:refresh_point(Vector(500, 0, 500), 64)
+	self.terrain:refresh_chunks_by_point(Vector(500, 0, 500), 64)
 	return self
 end
 

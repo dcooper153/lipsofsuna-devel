@@ -54,11 +54,14 @@ end
 --- Detaches the render object from the scene.
 -- @param self TerrainChunk.
 TerrainChunk.detach_render_object = function(self)
+	-- Free the object and model.
 	if self.object then
 		self.object:set_visible(false)
 		self.object = nil
 	end
 	self.model = nil
+	-- Clear the timestamp.
+	self.time_model = nil
 end
 
 return TerrainChunk

@@ -95,6 +95,15 @@ Terrain.cast_ray = function(self, src, dst)
 	return Vector(px,py,pz),Vector(nx,ny,nz),gx,gy
 end
 
+--- Clears the model of the chunk.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @return True on success, false if the chunk is not loaded.
+Terrain.clear_chunk_model = function(self, x, z)
+	return Los.terrain_clear_chunk_model(self.handle, x, z)
+end
+
 --- Clears a column.
 -- @param self Terrain.
 -- @param x Grid X coordinate.

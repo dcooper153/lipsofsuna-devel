@@ -150,6 +150,9 @@ LIAPICALL (void, liext_terrain_column_calculate_smooth_normals, (
 LIAPICALL (void, liext_terrain_column_clear, (
 	LIExtTerrainColumn* self));
 
+LIAPICALL (void, liext_terrain_column_clear_model, (
+	LIExtTerrainColumn* self));
+
 LIAPICALL (int, liext_terrain_column_intersect_ray, (
 	LIExtTerrainColumn* self,
 	const LIMatVector*  src,
@@ -224,6 +227,9 @@ LIAPICALL (void, liext_terrain_chunk_clear_column, (
 	LIExtTerrainChunk* self,
 	int                column_x,
 	int                column_z));
+
+LIAPICALL (void, liext_terrain_chunk_clear_model, (
+	LIExtTerrainChunk* self));
 
 LIAPICALL (LIExtTerrainColumn*, liext_terrain_chunk_get_column, (
 	LIExtTerrainChunk* self,

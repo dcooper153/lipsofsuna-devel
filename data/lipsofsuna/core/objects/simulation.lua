@@ -430,7 +430,7 @@ end
 SimulationObject.refresh = function(self, radius)
 	Game.sectors:refresh(self:get_position(), radius)
 	if Game.enable_generation then
-		Game.terrain:refresh_point(self:get_position(), radius or 16)
+		Game.terrain:refresh_chunks_by_point(self:get_position(), radius or 16)
 	end
 end
 

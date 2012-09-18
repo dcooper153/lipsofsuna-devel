@@ -801,6 +801,21 @@ void liext_terrain_column_clear (
 }
 
 /**
+ * \brief Frees the model of the column.
+ * \param self Terrain column.
+ */
+void liext_terrain_column_clear_model (
+	LIExtTerrainColumn* self)
+{
+	if (self->model != NULL)
+	{
+		limdl_model_free (self->model);
+		self->model = NULL;
+		self->stamp_model = self->stamp - 1;
+	}
+}
+
+/**
  * \brief Smoothens the vertices of the four columns in the given Y range.
  * \param self Terrain column (0,0).
  * \param c10 Terrain column (1,0).

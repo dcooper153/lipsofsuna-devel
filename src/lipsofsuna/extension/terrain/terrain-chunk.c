@@ -340,6 +340,27 @@ void liext_terrain_chunk_clear_column (
 }
 
 /**
+ * \brief Clears the model of the chunk.
+ * \param self Terrain chunk.
+ */
+void liext_terrain_chunk_clear_model (
+	LIExtTerrainChunk* self)
+{
+	int i;
+
+	for (i = 0 ; i < self->size * self->size ; i++)
+	{
+		liext_terrain_column_clear_model (self->columns + i);
+	}
+	if (self->model != NULL)
+	{
+		limdl_model_free (self->model);
+		self->model = NULL;
+		self->stamp_model = self->stamp - 1;
+	}
+}
+
+/**
  * \brief Gets a column by the grid point within the chunk.
  * \param self Terrain chunk.
  * \param x X grid coordinate withing the chunk.

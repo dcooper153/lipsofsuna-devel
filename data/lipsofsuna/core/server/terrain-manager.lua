@@ -37,10 +37,12 @@ TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, 
 	self.loaders = {}
 	self.chunks = {}
 	self.unload_time = unloading and 10
+	self.unload_time_model = 3
 	self.chunk_size = chunk_size
 	self.grid_size = grid_size
 	self.terrain = Terrain(chunk_size, grid_size)
 	self.physics = PhysicsTerrain(self.terrain)
+	self.__view_distance = 48
 	if Game then
 		self.physics:set_collision_group(Game.PHYSICS_GROUP_TERRAIN)
 		self.physics:set_collision_mask(Game.PHYSICS_MASK_TERRAIN)
@@ -101,17 +103,32 @@ end
 -- @param self TerrainManager.
 -- @param point Point in world space.
 -- @param radius Radius in world units.
-TerrainManager.refresh_point = function(self, point, radius)
-	local chunk_width = self.chunk_size * self.grid_size
-	local x0 = math.max(0, math.floor((point.x - radius) / chunk_width)) * self.chunk_size
-	local z0 = math.max(0, math.floor((point.z - radius) / chunk_width)) * self.chunk_size
-	local x1 = math.max(0, math.floor((point.x + radius) / chunk_width)) * self.chunk_size
-	local z1 = math.max(0, math.floor((point.z + radius) / chunk_width)) * self.chunk_size
-	for z = z0,z1 do
-		for x = x0,x1 do
+TerrainManager.refresh_chunks_by_point = function(self, point, radius, model)
+	local x0,z0,x1,z1 = self:get_chunk_xz_range_by_point(point, radius)
+	local t = Program:get_time()
+	for z = z0,z1,self.chunk_size do
+		for x = x0,x1,self.chunk_size do
 			if not self:load_chunk(x, z) then
 				local id = self:get_chunk_id_by_xz(x, z)
-				self.chunks[id].time = Program:get_time()
+				self.chunks[id].time = t
+			end
+		end
+	end
+end
+
+--- Increases the timestamp of the chunks inside the given sphere.
+-- @param self TerrainManager.
+-- @param point Point in world space.
+-- @param radius Radius in world units.
+TerrainManager.refresh_models_by_point = function(self, point, radius)
+	local x0,z0,x1,z1 = self:get_chunk_xz_range_by_point(point, radius)
+	local t = Program:get_time()
+	for z = z0,z1,self.chunk_size do
+		for x = x0,x1,self.chunk_size do
+			local id = self:get_chunk_id_by_xz(x, z)
+			local chunk = self.chunks[id]
+			if chunk then
+				chunk.time_model = t
 			end
 		end
 	end
@@ -196,21 +213,23 @@ TerrainManager.update = function(self, secs)
 		self.loaders_iterator = key
 		if loader and not loader:update(secs) then
 			self.loaders[key] = nil
-			if self.graphics then
-				local chunk = self.chunks[key]
-				if chunk then chunk:create_render_object() end
-			end
 		end
 	end
-	-- Update outdated models.
+	-- Update chunk models.
 	if self.graphics and self.__view_center then
+		-- Mark chunks that require models.
+		self:refresh_models_by_point(self.__view_center, self.__view_distance)
+		-- Find the closest chunk that needs a model built.
 		local fx,fz = self:get_chunk_xz_by_point(self.__view_center.x, self.__view_center.z)
 		local gx,gz = self.terrain:get_nearest_chunk_with_outdated_model(fx, fz)
+		-- Build the model of the chunk.
 		if gx then
 			local id = self:get_chunk_id_by_xz(gx, gz)
 			local chunk = self.chunks[id]
 			if chunk and not self.loaders[id] then
-				chunk:create_render_object()
+				if chunk.object or chunk.time_model then
+					chunk:create_render_object()
+				end
 			end
 		end
 	end
@@ -219,22 +238,29 @@ TerrainManager.update = function(self, secs)
 	for i = 1,2 do
 		local key,chunk = next(self.chunks, self.chunks_iterator)
 		self.chunks_iterator = key
-		if chunk and t - chunk.time > self.unload_time then
-			local x,z = self:get_chunk_xz_by_id(key)
-			-- Save fully loaded chunks.
-			if self.loaders[key] then
-				self.loaders[key] = nil
-				self.loaders_iterator = nil
-			else
-				self:save_chunk(x, z)
-			end
-			-- Detach the render object.
-			if self.graphics then
+		if chunk then
+			if t - chunk.time > self.unload_time then
+				-- Save fully loaded chunks.
+				local x,z = self:get_chunk_xz_by_id(key)
+				if self.loaders[key] then
+					self.loaders[key] = nil
+					self.loaders_iterator = nil
+				else
+					self:save_chunk(x, z)
+				end
+				-- Detach the render object.
+				if self.graphics then
+					chunk:detach_render_object()
+				end
+				-- Unload the chunk data.
+				self.terrain:unload_chunk(x, z)
+				self.chunks[key] = nil
+			elseif chunk.time_model and t - chunk.time_model >= self.unload_time_model then
+				-- Detach the render object.
+				local x,z = self:get_chunk_xz_by_id(key)
 				chunk:detach_render_object()
+				self.terrain:clear_chunk_model(x, z)
 			end
-			-- Unload the chunk data.
-			self.terrain:unload_chunk(x, z)
-			self.chunks[key] = nil
 		end
 	end
 end
@@ -278,6 +304,20 @@ TerrainManager.get_chunk_xz_by_point = function(self, x, z)
 	local x = math.floor(x / chunk_width) * self.chunk_size
 	local z = math.floor(z / chunk_width) * self.chunk_size
 	return x, z
+end
+
+--- Gets the XZ grid point range of chunks inside the given sphere.
+-- @param self TerrainManager.
+-- @param point Point in world space.
+-- @param radius Radius in world units.
+-- @return X min, Z min, X max, Z max
+TerrainManager.get_chunk_xz_range_by_point = function(self, point, radius)
+	local chunk_width = self.chunk_size * self.grid_size
+	local x0 = math.max(0, math.floor((point.x - radius) / chunk_width)) * self.chunk_size
+	local z0 = math.max(0, math.floor((point.z - radius) / chunk_width)) * self.chunk_size
+	local x1 = math.max(0, math.floor((point.x + radius) / chunk_width)) * self.chunk_size
+	local z1 = math.max(0, math.floor((point.z + radius) / chunk_width)) * self.chunk_size
+	return x0, z0, x1, z1
 end
 
 --- Sets the view center of the terrain manager.<br/>
