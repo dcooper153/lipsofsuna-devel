@@ -51,6 +51,22 @@ Spec.find = function(clss, args)
 	end
 end
 
+--- Finds a spec by ID.
+-- @param clss Spec class.
+-- @param id ID.
+-- @return Spec, or nil if not found.
+Spec.find_by_id = function(clss, id)
+	return clss.dict_id[id]
+end
+
+--- Finds a spec by name.
+-- @param clss Spec class.
+-- @param name String.
+-- @return Spec, or nil if not found.
+Spec.find_by_name = function(clss, name)
+	return clss.dict_name[name]
+end
+
 --- Creates a new spec.
 -- @param clss Spec class.
 -- @param args Arguments.<ul>

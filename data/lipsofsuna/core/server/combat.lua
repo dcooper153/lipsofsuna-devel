@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Damage = require("core/server/damage")
+local Item = require("core/objects/item")
 
 --- Damage calculation and applying helpers.
 -- @type Combat
@@ -172,7 +173,8 @@ end
 
 --- Destroys terrain at the given impact point.
 -- @param self Combat class.
--- @param attacker Actor who cast the spell.
+-- @param attacker Actor who destroyed terrain.
+-- @param point Impact point in world space.
 -- @param tile Grid coordinates of the hit tile.
 -- @param radius Radius of the destroyed sphere, in grid units.
 Combat.destroy_terrain_sphere = function(self, attacker, point, tile, radius)
@@ -181,11 +183,7 @@ Combat.destroy_terrain_sphere = function(self, attacker, point, tile, radius)
 		Voxel:damage(attacker, tile)
 		return
 	end
-	-- Play the collapse effect.
-	-- TODO: Should use material specs.
-	Server:world_effect(point, "collapse2")
-	-- Change the tile type.
-	-- TODO: Should use material specs.
+	-- Erase sticks.
 	local r = radius
 	local cx = point.x / Game.terrain.grid_size
 	local cz = point.z / Game.terrain.grid_size
@@ -198,6 +196,7 @@ Combat.destroy_terrain_sphere = function(self, attacker, point, tile, radius)
 		if d > 1 then return 0 end
 		return math.cos(d * math.pi / 2) * r * Game.terrain.grid_size
 	end
+	local materials = {}
 	for z = z0,z1 do
 		for x = x0,x1 do
 			local y = point.y
@@ -205,6 +204,8 @@ Combat.destroy_terrain_sphere = function(self, attacker, point, tile, radius)
 			local y10 = f(x - cx + 1, z - cz)
 			local y01 = f(x - cx, z - cz + 1)
 			local y11 = f(x - cx + 1, z - cz + 1)
+			local yavg = (y00 + y10 + y01 + y11) / 4
+			Game.terrain.terrain:count_column_materials(x, z, y - yavg, yavg * 2, materials)
 			Game.terrain.terrain:add_stick_corners(x, z,
 				y - y00, y - y10, y - y01, y - y11,
 				y + y00, y + y10, y + y01, y + y11, 0)
@@ -216,19 +217,10 @@ Combat.destroy_terrain_sphere = function(self, attacker, point, tile, radius)
 			Game.terrain.terrain:calculate_smooth_normals(x, z)
 		end
 	end
+	-- Play the collapse effect.
+	self:__play_terrain_destruction_effect(point, materials)
 	-- Create items.
-	-- TODO: Should use material specs.
-		--[[
-		if m.mining_materials and user then
-			for k,v in pairs(m.mining_materials) do
-				for i = 1,v do
-					local spec = Itemspec:find{name = k}
-					local item = Item{spec = spec}
-					user.inventory:merge_or_drop_object(item)
-				end
-			end
-		end
-		--]]
+	self:__create_terrain_mining_items(attacker, materials)
 	-- Spawn random monsters.
 	-- TODO: Should use material specs.
 		--[[
@@ -245,14 +237,12 @@ end
 
 --- Destroys terrain at the given impact point.
 -- @param self Combat class.
--- @param attacker Actor who cast the spell.
+-- @param attacker Actor who destroyed terrain.
+-- @param point Impact point in world space.
 -- @param tile Grid coordinates of the hit tile.
 Combat.destroy_terrain_stick = function(self, attacker, point, tile, height)
-	-- Play the collapse effect.
-	-- TODO: Should use material specs.
-	Server:world_effect(point, "collapse2")
-	-- Change the tile type.
-	-- TODO: Should use material specs.
+	-- Erase sticks.
+	local materials = Game.terrain.terrain:count_column_materials(tile.x, tile.z, point.y - height / 2, height)
 	Game.terrain.terrain:add_stick(tile.x, tile.z, point.y - height / 2, height, 0)
 	-- Smoothen the modified columns.
 	for z = tile.z-1,tile.z+1 do
@@ -260,7 +250,48 @@ Combat.destroy_terrain_stick = function(self, attacker, point, tile, height)
 			Game.terrain.terrain:calculate_smooth_normals(x, z)
 		end
 	end
+	-- Play the collapse effect.
+	self:__play_terrain_destruction_effect(point, materials)
+	-- Create items.
+	self:__create_terrain_mining_items(attacker, materials)
 	return true
+end
+
+--- Plays the terrain destruction effect.
+-- @param self Combat class.
+-- @param attacker Actor who destroyed terrain.
+-- @param materials Dictionary of destroyed materials.
+Combat.__create_terrain_mining_items = function(self, attacker, materials)
+	for k,v in pairs(materials) do
+		local mat = TerrainMaterialSpec:find_by_id(k)
+		if mat and mat.mining_item and v >= 0.5 then
+			local spec = Itemspec:find_by_name(mat.mining_item)
+			local item = Item{spec = spec}
+			item:set_count(math.floor(v + 0.5))
+			attacker.inventory:merge_or_drop_object(item)
+		end
+	end
+end
+
+--- Plays the terrain destruction effect.
+-- @param self Combat class.
+-- @param point Impact point in world space.
+-- @param materials Dictionary of destroyed materials.
+Combat.__play_terrain_destruction_effect = function(self, point, materials)
+	local effect = "collapse2"
+	local best_k,best_v
+	for k,v in pairs(materials) do
+		if k ~= 0 and (not best_k or best_v < v) then
+			best_k,best_v = k,v
+		end
+	end
+	if best_k then
+		local mat = TerrainMaterialSpec:find_by_id(best_k)
+		if mat and mat.effect_collapse then
+			effect = mat.effect_collapse
+		end
+	end
+	Server:world_effect(point, effect)
 end
 
 return Combat
