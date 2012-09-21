@@ -30,8 +30,57 @@ Terrain = Class("Terrain")
 -- @return Terrain.
 Terrain.new = function(clss, chunk_size, grid_size)
 	local self = Class.new(clss)
+	self.chunk_size = chunk_size
+	self.grid_size = grid_size
 	self.handle = Los.terrain_new(chunk_size, grid_size)
 	return self
+end
+
+--- Adds a sphere to the terrain.
+-- @param self Terrain.
+-- @param point Point in world units.
+-- @param radius Radius in world units.
+-- @param mat Terrain material number.
+Terrain.add_sphere = function(self, point, radius, mat)
+	local materials = t or {}
+	for x,z,y,y0,y1,y2,y3 in self:get_sticks_in_sphere(point, radius) do
+		Game.terrain.terrain:add_stick_corners(x, z,
+			y - y0, y - y1, y - y2, y - y3,
+			y + y0, y + y1, y + y2, y + y3, mat)
+	end
+	return materials
+end
+
+--- Adds a sphere to the terrain.
+-- @param self Terrain.
+-- @param point Point in world units.
+-- @param radius Radius in world units.
+-- @param mat Terrain material number.
+-- @param id Terrain material number for the filter.
+Terrain.add_sphere_filter_id = function(self, point, radius, mat, id)
+	local materials = t or {}
+	for x,z,y,y0,y1,y2,y3 in self:get_sticks_in_sphere(point, radius) do
+		Game.terrain.terrain:add_stick_corners_filter_id(x, z,
+			y - y0, y - y1, y - y2, y - y3,
+			y + y0, y + y1, y + y2, y + y3, mat, id)
+	end
+	return materials
+end
+
+--- Adds a sphere to the terrain.
+-- @param self Terrain.
+-- @param point Point in world units.
+-- @param radius Radius in world units.
+-- @param mat Terrain material number.
+-- @param mask Terrain material mask for the filter.
+Terrain.add_sphere_filter_mask = function(self, point, radius, mat, mask)
+	local materials = t or {}
+	for x,z,y,y0,y1,y2,y3 in self:get_sticks_in_sphere(point, radius) do
+		Game.terrain.terrain:add_stick_corners_filter_mask(x, z,
+			y - y0, y - y1, y - y2, y - y3,
+			y + y0, y + y1, y + y2, y + y3, mat, mask)
+	end
+	return materials
 end
 
 --- Adds a stick to the terrain.
@@ -148,6 +197,25 @@ Terrain.calculate_smooth_normals = function(self, x, z)
 	return Los.terrain_calculate_smooth_normals(self.handle, x, z)
 end
 
+--- Calculates smooth normals for vertices in the sphere.
+-- @param self Terrain.
+-- @param point Point in world units.
+-- @param radius Radius in world units.
+Terrain.calculate_smooth_normals_in_sphere = function(self, point, radius)
+	local r = radius / self.grid_size
+	local cx = point.x / self.grid_size
+	local cz = point.z / self.grid_size
+	local x0 = math.floor(cx - r)
+	local x1 = math.floor(cx + r)
+	local z0 = math.floor(cz - r)
+	local z1 = math.floor(cz + r)
+	for z = z0-1,z1+1 do
+		for x = x0-1,x1+1 do
+			self:calculate_smooth_normals(x, z)
+		end
+	end
+end
+
 --- Casts a ray against the terrain.
 -- @param self Terrain.
 -- @param src Source point, in world units.
@@ -189,6 +257,21 @@ Terrain.count_column_materials = function(self, x, z, y, h, t)
 	local t1 = t or {}
 	Los.terrain_count_column_materials(self.handle, x, z, y, h, t1)
 	return t1
+end
+
+--- Counts the materials inside the given sphere.
+-- @param self Terrain.
+-- @param point Point in world units.
+-- @param radius Radius in world units.
+-- @param t Table to which to add the results, or nil to create a new one.
+-- @return Table of materials.
+Terrain.count_materials_in_sphere = function(self, point, radius, t)
+	local materials = t or {}
+	for x,z,y,y0,y1,y2,y3 in self:get_sticks_in_sphere(point, radius) do
+		local avg = (y0 + y1 + y2 + y3) / 4
+		self:count_column_materials(x, z, y - avg, avg * 2, materials)
+	end
+	return materials
 end
 
 --- Loads a terrain chunk.
@@ -288,6 +371,39 @@ end
 -- @return Grid X and Z coordinates of the chunk, or nil if all models are up to date.
 Terrain.get_nearest_chunk_with_outdated_model = function(self, x, z)
 	return Los.terrain_get_nearest_chunk_with_outdated_model(self.handle, x, z)
+end
+
+--- Returns an iterator for sticks in the given sphere.
+-- @param self Terrain.
+-- @param point Point in world units.
+-- @param radius Radius in world units.
+Terrain.get_sticks_in_sphere = function(self, point, radius)
+	return coroutine.wrap(function()
+		local r = radius / self.grid_size
+		local cx = point.x / self.grid_size
+		local cz = point.z / self.grid_size
+		local x0 = math.floor(cx - r)
+		local x1 = math.floor(cx + r)
+		local z0 = math.floor(cz - r)
+		local z1 = math.floor(cz + r)
+		local f = function(dx, dz)
+			local d = math.sqrt(dx^2 + dz^2) / r
+			if d > 1 then return 0 end
+			return math.cos(d * math.pi / 2) * radius
+		end
+		local y = point.y
+		for z = z0,z1 do
+			for x = x0,x1 do
+				local y00 = f(x - cx, z - cz)
+				local y10 = f(x - cx + 1, z - cz)
+				local y01 = f(x - cx, z - cz + 1)
+				local y11 = f(x - cx + 1, z - cz + 1)
+				if y00 > 0 or y10 > 0 or y01 > 0 or y11 > 0 then
+					coroutine.yield(x, z, y, y00, y10, y01, y11)
+				end
+			end
+		end
+	end)
 end
 
 return Terrain

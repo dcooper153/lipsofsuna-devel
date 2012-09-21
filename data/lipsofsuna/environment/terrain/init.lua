@@ -1,13 +1,13 @@
 Program:add_path(Mod.path)
 
 TerrainMaterialSpec{
-	name = "granite",
+	name = "granite1",
 	mining_item = "granite stone"}
 
 TerrainMaterialSpec{
-	name = "grass",
+	name = "grass1",
 	mining_item = "soil chunk"}
 
 TerrainMaterialSpec{
-	name = "soil",
+	name = "soil1",
 	mining_item = "soil chunk"}

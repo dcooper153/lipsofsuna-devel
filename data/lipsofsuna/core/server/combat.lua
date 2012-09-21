@@ -184,39 +184,16 @@ Combat.destroy_terrain_sphere = function(self, attacker, point, tile, radius)
 		return
 	end
 	-- Erase sticks.
-	local r = radius
-	local cx = point.x / Game.terrain.grid_size
-	local cz = point.z / Game.terrain.grid_size
-	local x0 = math.floor(cx - r)
-	local x1 = math.floor(cx + r)
-	local z0 = math.floor(cz - r)
-	local z1 = math.floor(cz + r)
-	local f = function(dx, dz)
-		local d = math.sqrt(dx^2 + dz^2) / r
-		if d > 1 then return 0 end
-		return math.cos(d * math.pi / 2) * r * Game.terrain.grid_size
-	end
 	local materials = {}
-	for z = z0,z1 do
-		for x = x0,x1 do
-			local y = point.y
-			local y00 = f(x - cx, z - cz)
-			local y10 = f(x - cx + 1, z - cz)
-			local y01 = f(x - cx, z - cz + 1)
-			local y11 = f(x - cx + 1, z - cz + 1)
-			local yavg = (y00 + y10 + y01 + y11) / 4
-			Game.terrain.terrain:count_column_materials(x, z, y - yavg, yavg * 2, materials)
-			Game.terrain.terrain:add_stick_corners(x, z,
-				y - y00, y - y10, y - y01, y - y11,
-				y + y00, y + y10, y + y01, y + y11, 0)
-		end
+	for x,z,y,y00,y10,y01,y11 in Game.terrain.terrain:get_sticks_in_sphere(point, radius) do
+		local yavg = (y00 + y10 + y01 + y11) / 4
+		Game.terrain.terrain:count_column_materials(x, z, y - yavg, yavg * 2, materials)
+		Game.terrain.terrain:add_stick_corners(x, z,
+			y - y00, y - y10, y - y01, y - y11,
+			y + y00, y + y10, y + y01, y + y11, 0)
 	end
 	-- Smoothen the modified columns.
-	for z = z0-1,z1+1 do
-		for x = x0-1,x1+1 do
-			Game.terrain.terrain:calculate_smooth_normals(x, z)
-		end
-	end
+	Game.terrain.terrain:calculate_smooth_normals_in_sphere(point, radius)
 	-- Play the collapse effect.
 	self:__play_terrain_destruction_effect(point, materials)
 	-- Create items.
@@ -257,10 +234,10 @@ Combat.destroy_terrain_stick = function(self, attacker, point, tile, height)
 	return true
 end
 
---- Plays the terrain destruction effect.
+--- Creates inventory items for mined materials.
 -- @param self Combat class.
--- @param attacker Actor who destroyed terrain.
--- @param materials Dictionary of destroyed materials.
+-- @param point Point in world units.
+-- @param radius Radius in world units.
 Combat.__create_terrain_mining_items = function(self, attacker, materials)
 	for k,v in pairs(materials) do
 		local mat = TerrainMaterialSpec:find_by_id(k)

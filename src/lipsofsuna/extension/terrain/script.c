@@ -440,6 +440,23 @@ static void Terrain_count_column_materials (LIScrArgs* args)
 			lua_settable (args->lua, -3);
 		}
 	}
+
+	/* Add the remainder if the range was given. */
+	if (height >= 0.0f)
+	{
+		length = start + height - y;
+		if (length > 0.0f)
+		{
+			lua_pushnumber (args->lua, 0);
+			lua_pushnumber (args->lua, 0);
+			lua_gettable (args->lua, -3);
+			if (lua_type (args->lua, -1) == LUA_TNUMBER)
+				length += lua_tonumber (args->lua, -1);
+			lua_pop (args->lua, 1);
+			lua_pushnumber (args->lua, length);
+			lua_settable (args->lua, -3);
+		}
+	}
 }
 
 static void Terrain_load_chunk (LIScrArgs* args)
