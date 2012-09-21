@@ -103,15 +103,19 @@ void liext_terrain_free (
  * \param world_y Y offset of the stick in world units.
  * \param world_h Y height of the stick in world units.
  * \param material Terrain material ID.
+ * \param filter_func Filter function for choosing what sticks to modify.
+ * \param filter_data Userdata to be passed to the filter function.
  * \return Nonzero on success, zero if not loaded or allocating memory failed.
  */
 int liext_terrain_add_stick (
-	LIExtTerrain* self,
-	int           grid_x,
-	int           grid_z,
-	float         world_y,
-	float         world_h,
-	int           material)
+	LIExtTerrain*           self,
+	int                     grid_x,
+	int                     grid_z,
+	float                   world_y,
+	float                   world_h,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data)
 {
 	int column_x;
 	int column_z;
@@ -125,7 +129,8 @@ int liext_terrain_add_stick (
 		return 0;
 
 	/* Add the stick. */
-	return liext_terrain_chunk_add_stick (chunk, column_x, column_z, world_y, world_h, material);
+	return liext_terrain_chunk_add_stick (chunk, column_x, column_z, world_y, world_h,
+		material, filter_func, filter_data);
 }
 
 /**
@@ -142,21 +147,25 @@ int liext_terrain_add_stick (
  * \param top01 Top vertex Y coordinate, in world units.
  * \param top11 Top vertex Y coordinate, in world units.
  * \param material Terrain material ID.
+ * \param filter_func Filter function for choosing what sticks to modify.
+ * \param filter_data Userdata to be passed to the filter function.
  * \return Nonzero on success, zero if allocating memory failed.
  */
 int liext_terrain_add_stick_corners (
-	LIExtTerrain* self,
-	int           grid_x,
-	int           grid_z,
-	float         bot00,
-	float         bot10,
-	float         bot01,
-	float         bot11,
-	float         top00,
-	float         top10,
-	float         top01,
-	float         top11,
-	int           material)
+	LIExtTerrain*           self,
+	int                     grid_x,
+	int                     grid_z,
+	float                   bot00,
+	float                   bot10,
+	float                   bot01,
+	float                   bot11,
+	float                   top00,
+	float                   top10,
+	float                   top01,
+	float                   top11,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data)
 {
 	int column_x;
 	int column_z;
@@ -170,7 +179,8 @@ int liext_terrain_add_stick_corners (
 		return 0;
 
 	/* Add the stick. */
-	return liext_terrain_chunk_add_stick_corners (chunk, column_x, column_z, bot00, bot10, bot01, bot11, top00, top10, top01, top11, material);
+	return liext_terrain_chunk_add_stick_corners (chunk, column_x, column_z, bot00, bot10, bot01, bot11, top00, top10, top01, top11,
+		material, filter_func, filter_data);
 }
 
 /**

@@ -60,6 +60,10 @@ LIAPICALL (void, liext_terrain_stick_clamp_vertices, (
 	LIExtTerrainStick* self,
 	LIExtTerrainStick* next));
 
+LIAPICALL (void, liext_terrain_stick_clamp_vertices_bottom, (
+	LIExtTerrainStick* self,
+	LIExtTerrainStick* prev));
+
 LIAPICALL (void, liext_terrain_stick_copy_vertices, (
 	LIExtTerrainStick* self,
 	LIExtTerrainStick* src));
@@ -70,6 +74,10 @@ LIAPICALL (void, liext_terrain_stick_fix_vertices_downwards, (
 
 LIAPICALL (void, liext_terrain_stick_fix_vertices_upwards, (
 	LIExtTerrainStick* self));
+
+LIAPICALL (void, liext_terrain_stick_move_vertices, (
+	LIExtTerrainStick* self,
+	float              diff));
 
 LIAPICALL (void, liext_terrain_stick_reset_vertices, (
 	LIExtTerrainStick* self));
@@ -95,6 +103,11 @@ LIAPICALL (int, liext_terrain_stick_set_data, (
 	LIExtTerrainStick* self,
 	LIArcReader*       reader));
 
+LIAPICALL (int, liext_terrain_stick_get_intersection_type, (
+	const LIExtTerrainStick* self,
+	float                    y,
+	float                    h));
+
 LIAPICALL (void, liext_terrain_stick_get_normal, (
 	const LIExtTerrainStick* self,
 	LIMatVector*             result));
@@ -105,6 +118,33 @@ LIAPICALL (void, liext_terrain_stick_get_normal_override, (
 	int                      vertex_y,
 	float                    vertex_offset,
 	LIMatVector*             result));
+
+LIAPICALL (void, liext_terrain_stick_set_vertices, (
+	LIExtTerrainStick* self,
+	const float*       slope,
+	float              offset));
+
+LIAPICALL (void, liext_terrain_stick_set_vertices_max, (
+	LIExtTerrainStick* self,
+	const float*       slope,
+	float              offset));
+
+LIAPICALL (void, liext_terrain_stick_set_vertices_min, (
+	LIExtTerrainStick* self,
+	const float*       slope,
+	float              offset));
+
+/*****************************************************************************/
+
+typedef int (*LIExtTerrainStickFilter)(LIExtTerrainStick* stick, void* data);
+
+LIAPICALL (int, liext_terrain_stick_filter_id, (
+	LIExtTerrainStick* stick,
+	void*              data));
+
+LIAPICALL (int, liext_terrain_stick_filter_mask, (
+	LIExtTerrainStick* stick,
+	void*              data));
 
 /*****************************************************************************/
 
@@ -118,24 +158,28 @@ struct _LIExtTerrainColumn
 };
 
 LIAPICALL (int, liext_terrain_column_add_stick, (
-	LIExtTerrainColumn* self,
-	float         world_y,
-	float         world_h,
-	const float*  slope_bot,
-	const float*  slope_top,
-	int           material));
+	LIExtTerrainColumn*     self,
+	float                   world_y,
+	float                   world_h,
+	const float*            slope_bot,
+	const float*            slope_top,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data));
 
 LIAPICALL (int, liext_terrain_column_add_stick_corners, (
-	LIExtTerrainColumn* self,
-	float               bot00,
-	float               bot10,
-	float               bot01,
-	float               bot11,
-	float               top00,
-	float               top10,
-	float               top01,
-	float               top11,
-	int                 material));
+	LIExtTerrainColumn*     self,
+	float                   bot00,
+	float                   bot10,
+	float                   bot01,
+	float                   bot11,
+	float                   top00,
+	float                   top10,
+	float                   top01,
+	float                   top11,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data));
 
 LIAPICALL (int, liext_terrain_column_build_model, (
 	LIExtTerrainColumn* self,
@@ -202,26 +246,30 @@ LIAPICALL (void, liext_terrain_chunk_free, (
 	LIExtTerrainChunk* self));
 
 LIAPICALL (int, liext_terrain_chunk_add_stick, (
-	LIExtTerrainChunk* self,
-	int                column_x,
-	int                column_z,
-	float              world_y,
-	float              world_h,
-	int                material));
+	LIExtTerrainChunk*      self,
+	int                     column_x,
+	int                     column_z,
+	float                   world_y,
+	float                   world_h,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data));
 
 LIAPICALL (int, liext_terrain_chunk_add_stick_corners, (
-	LIExtTerrainChunk* self,
-	int                column_x,
-	int                column_z,
-	float              bot00,
-	float              bot10,
-	float              bot01,
-	float              bot11,
-	float              top00,
-	float              top10,
-	float              top01,
-	float              top11,
-	int                material));
+	LIExtTerrainChunk*      self,
+	int                     column_x,
+	int                     column_z,
+	float                   bot00,
+	float                   bot10,
+	float                   bot01,
+	float                   bot11,
+	float                   top00,
+	float                   top10,
+	float                   top01,
+	float                   top11,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data));
 
 LIAPICALL (int, liext_terrain_chunk_build_model, (
 	LIExtTerrainChunk* self,
@@ -268,26 +316,30 @@ LIAPICALL (void, liext_terrain_free, (
 	LIExtTerrain* self));
 
 LIAPICALL (int, liext_terrain_add_stick, (
-	LIExtTerrain* self,
-	int           grid_x,
-	int           grid_z,
-	float         world_y,
-	float         world_h,
-	int           material));
+	LIExtTerrain*           self,
+	int                     grid_x,
+	int                     grid_z,
+	float                   world_y,
+	float                   world_h,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data));
 
 LIAPICALL (int, liext_terrain_add_stick_corners, (
-	LIExtTerrain* self,
-	int           grid_x,
-	int           grid_z,
-	float         bot00,
-	float         bot10,
-	float         bot01,
-	float         bot11,
-	float         top00,
-	float         top10,
-	float         top01,
-	float         top11,
-	int           material));
+	LIExtTerrain*           self,
+	int                     grid_x,
+	int                     grid_z,
+	float                   bot00,
+	float                   bot10,
+	float                   bot01,
+	float                   bot11,
+	float                   top00,
+	float                   top10,
+	float                   top01,
+	float                   top11,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data));
 
 LIAPICALL (int, liext_terrain_calculate_smooth_normals, (
 	LIExtTerrain* self,

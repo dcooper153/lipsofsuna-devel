@@ -78,22 +78,26 @@ void liext_terrain_chunk_free (
  * \param world_y Y offset of the stick in world units.
  * \param world_h Y height of the stick in world units.
  * \param material Terrain material ID.
+ * \param filter_func Filter function for choosing what sticks to modify.
+ * \param filter_data Userdata to be passed to the filter function.
  * \return Nonzero on success, zero if allocating memory failed.
  */
 int liext_terrain_chunk_add_stick (
-	LIExtTerrainChunk* self,
-	int                column_x,
-	int                column_z,
-	float              world_y,
-	float              world_h,
-	int                material)
+	LIExtTerrainChunk*      self,
+	int                     column_x,
+	int                     column_z,
+	float                   world_y,
+	float                   world_h,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data)
 {
 	const float slope[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	LIExtTerrainColumn* column;
 
 	/* Add the stick to the column. */
 	column = liext_terrain_chunk_get_column (self, column_x, column_z);
-	if (!liext_terrain_column_add_stick (column, world_y, world_h, slope, slope, material))
+	if (!liext_terrain_column_add_stick (column, world_y, world_h, slope, slope, material, filter_func, filter_data))
 		return 0;
 
 	/* Update stamps. */
@@ -138,27 +142,31 @@ int liext_terrain_chunk_add_stick (
  * \param top01 Top vertex Y coordinate, in world units.
  * \param top11 Top vertex Y coordinate, in world units.
  * \param material Terrain material ID.
+ * \param filter_func Filter function for choosing what sticks to modify.
+ * \param filter_data Userdata to be passed to the filter function.
  * \return Nonzero on success, zero if allocating memory failed.
  */
 int liext_terrain_chunk_add_stick_corners (
-	LIExtTerrainChunk* self,
-	int                column_x,
-	int                column_z,
-	float              bot00,
-	float              bot10,
-	float              bot01,
-	float              bot11,
-	float              top00,
-	float              top10,
-	float              top01,
-	float              top11,
-	int                material)
+	LIExtTerrainChunk*      self,
+	int                     column_x,
+	int                     column_z,
+	float                   bot00,
+	float                   bot10,
+	float                   bot01,
+	float                   bot11,
+	float                   top00,
+	float                   top10,
+	float                   top01,
+	float                   top11,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data)
 {
 	LIExtTerrainColumn* column;
 
 	/* Add the stick to the column. */
 	column = liext_terrain_chunk_get_column (self, column_x, column_z);
-	if (!liext_terrain_column_add_stick_corners (column, bot00, bot10, bot01, bot11, top00, top10, top01, top11, material))
+	if (!liext_terrain_column_add_stick_corners (column, bot00, bot10, bot01, bot11, top00, top10, top01, top11, material, filter_func, filter_data))
 		return 0;
 
 	/* Update stamps. */

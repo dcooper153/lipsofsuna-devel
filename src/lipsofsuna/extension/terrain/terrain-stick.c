@@ -77,6 +77,38 @@ void liext_terrain_stick_clamp_vertices (
 }
 
 /**
+ * \brief Clamps the vertices of the stick so that they fit above the previous stick's vertices.
+ * \param self Terrain stick.
+ * \param prev Terrain stick.
+ */
+void liext_terrain_stick_clamp_vertices_bottom (
+	LIExtTerrainStick* self,
+	LIExtTerrainStick* prev)
+{
+	int x;
+	int z;
+
+	for (z = 0 ; z < 2 ; z++)
+	{
+		for (x = 0 ; x < 2 ; x++)
+		{
+			if (prev != NULL)
+			{
+				self->vertices[x][z].offset = LIMAT_MAX (
+					self->vertices[x][z].offset,
+					prev->vertices[x][z].offset - self->height);
+			}
+			else
+			{
+				self->vertices[x][z].offset = LIMAT_MAX (
+					self->vertices[x][z].offset,
+					-self->height);
+			}
+		}
+	}
+}
+
+/**
  * \brief Copies the vertices from another stick.
  * \param self Terrain stick.
  * \param src Terrain stick.
@@ -225,6 +257,23 @@ void liext_terrain_stick_fix_vertices_upwards (
 			return;
 		stick = stick->next;
 	}
+}
+
+/**
+ * \brief Moves the vertices of the stick.
+ * \param self Terrain stick.
+ * \param diff Amount to move.
+ */
+void liext_terrain_stick_move_vertices (
+	LIExtTerrainStick* self,
+	float              diff)
+{
+	if (self == NULL)
+		return;
+	self->vertices[0][0].offset += diff;
+	self->vertices[1][0].offset += diff;
+	self->vertices[0][1].offset += diff;
+	self->vertices[1][1].offset += diff;
 }
 
 /**
@@ -496,6 +545,72 @@ int liext_terrain_stick_set_data (
 }
 
 /**
+ * \brief Gets the intersection type of the two sticks.
+ * \param self Terrain stick.
+ * \param y Vertical offset of the compared stick, relative to the bottom of self.
+ * \param h Height of the compared stick.
+ * \return Number between 1-6.
+ */
+int liext_terrain_stick_get_intersection_type (
+	const LIExtTerrainStick* self,
+	float                    y,
+	float                    h)
+{
+	/* A) Is the stick completely below us?
+	 * 
+	 * .....SSSSSSSSSS.....
+	 * XXX??...............
+	 */
+	if (y + h <= 0.0f)
+		return 1;
+
+	/* B) Is the stick completely above us?
+	 * 
+	 * .....SSSSSSSSSS.....
+	 * ...............??XXX
+	 */
+	if (y >= self->height)
+		return 2;
+
+	/* C) Does the stick replace us completely?
+	 * 
+	 * .....SSSSSSSSSS.....
+	 * ..???XXXXXXXXXX???..
+	 */
+	if (y <= 0.0f && y + h >= self->height)
+		return 3;
+
+	/* D) Does the stick replace part of the bottom?
+	 * 
+	 * .....SSSSSSSSSS.....
+	 * ..???XXXXX..........
+	 */
+	if (y <= 0.0f)
+		return 4;
+
+	/* E) Does the stick replace part of the top?
+	 * 
+	 * .....SSSSSSSSSS.....
+	 * ..........XXXXX???..
+	 */
+	if (y + h >= self->height)
+		return 5;
+
+	/* F) Does the stick replace part of the middle?
+	 * 
+	 * .....SSSSSSSSSS.....
+	 * ........XXXX........
+	 */
+	if (y > 0.0f && y + h < self->height)
+		return 6;
+
+	/* Only the above six cases are possible. */
+	lisys_assert (0);
+
+	return 0;
+}
+
+/**
  * \brief Calculates the face normal of the stick.
  * \param self Terrain stick.
  * \param result Return location for the vector.
@@ -552,6 +667,72 @@ void liext_terrain_stick_get_normal_override (
 	n1 = limat_vector_normalize (limat_vector_cross (v2, v1));
 	n2 = limat_vector_normalize (limat_vector_cross (v4, v3));
 	*result = limat_vector_multiply (limat_vector_add (n1, n2), 0.5f);
+}
+
+/**
+ * \brief Sets the vertex offsets of the stick.
+ * \param self Stick.
+ * \param slope List of four floats.
+ * \param offset Extra offset to add to the slope values.
+ */
+void liext_terrain_stick_set_vertices (
+	LIExtTerrainStick* self,
+	const float*       slope,
+	float              offset)
+{
+	if (self == NULL)
+		return;
+	liext_terrain_stick_reset_vertices (self);
+	self->vertices[0][0].offset = slope[0] + offset;
+	self->vertices[1][0].offset = slope[1] + offset;
+	self->vertices[0][1].offset = slope[2] + offset;
+	self->vertices[1][1].offset = slope[3] + offset;
+}
+
+/**
+ * \brief Sets the vertex offsets of the stick.
+ *
+ * The values chosen are the maximum of the current ones and those given in
+ * the slope argument.
+ *
+ * \param self Stick.
+ * \param slope List of four floats.
+ * \param offset Extra offset to add to the slope values.
+ */
+void liext_terrain_stick_set_vertices_max (
+	LIExtTerrainStick* self,
+	const float*       slope,
+	float              offset)
+{
+	if (self == NULL)
+		return;
+	self->vertices[0][0].offset = LIMAT_MAX (self->vertices[0][0].offset, slope[0] + offset);
+	self->vertices[1][0].offset = LIMAT_MAX (self->vertices[1][0].offset, slope[1] + offset);
+	self->vertices[0][1].offset = LIMAT_MAX (self->vertices[0][1].offset, slope[2] + offset);
+	self->vertices[1][1].offset = LIMAT_MAX (self->vertices[1][1].offset, slope[3] + offset);
+}
+
+/**
+ * \brief Sets the vertex offsets of the stick.
+ *
+ * The values chosen are the minimum of the current ones and those given in
+ * the slope argument.
+ *
+ * \param self Stick.
+ * \param slope List of four floats.
+ * \param offset Extra offset to add to the slope values.
+ */
+void liext_terrain_stick_set_vertices_min (
+	LIExtTerrainStick* self,
+	const float*       slope,
+	float              offset)
+{
+	if (self == NULL)
+		return;
+	self->vertices[0][0].offset = LIMAT_MIN (self->vertices[0][0].offset, slope[0] + offset);
+	self->vertices[1][0].offset = LIMAT_MIN (self->vertices[1][0].offset, slope[1] + offset);
+	self->vertices[0][1].offset = LIMAT_MIN (self->vertices[0][1].offset, slope[2] + offset);
+	self->vertices[1][1].offset = LIMAT_MIN (self->vertices[1][1].offset, slope[3] + offset);
 }
 
 /*****************************************************************************/

@@ -46,6 +46,32 @@ Terrain.add_stick = function(self, x, z, y, h, mat)
 	return Los.terrain_add_stick(self.handle, x, z, y, h, mat)
 end
 
+--- Adds a stick to the terrain.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @param y World unit Y offset.
+-- @param h World unit height.
+-- @param mat Terrain material number.
+-- @param id Terrain material number for the filter.
+-- @return True on success.
+Terrain.add_stick_filter_id = function(self, x, z, y, h, mat, id)
+	return Los.terrain_add_stick_filter_id(self.handle, x, z, y, h, mat, id)
+end
+
+--- Adds a stick to the terrain.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @param y World unit Y offset.
+-- @param h World unit height.
+-- @param mat Terrain material number.
+-- @param mask Terrain material mask for the filter.
+-- @return True on success.
+Terrain.add_stick_filter_mask = function(self, x, z, y, h, mat, mask)
+	return Los.terrain_add_stick_filter_mask(self.handle, x, z, y, h, mat, mask)
+end
+
 --- Adds a stick to the terrain using corner offsets.
 -- @param self Terrain.
 -- @param x Grid X coordinate.
@@ -62,6 +88,44 @@ end
 -- @return True on success.
 Terrain.add_stick_corners = function(self, x, z, bot00, bot01, bot10, bot11, top00, top01, top10, top11, mat)
 	return Los.terrain_add_stick_corners(self.handle, x, z, bot00, bot01, bot10, bot11, top00, top01, top10, top11, mat)
+end
+
+--- Adds a stick to the terrain using corner offsets.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @param bot00 World unit Y offset of the bottom vertices.
+-- @param bot10 World unit Y offset of the bottom vertices.
+-- @param bot01 World unit Y offset of the bottom vertices.
+-- @param bot11 World unit Y offset of the bottom vertices.
+-- @param top00 World unit Y offset of the top vertices.
+-- @param top10 World unit Y offset of the top vertices.
+-- @param top01 World unit Y offset of the top vertices.
+-- @param top11 World unit Y offset of the top vertices.
+-- @param mat Terrain material number.
+-- @param id Terrain material number for the filter.
+-- @return True on success.
+Terrain.add_stick_corners_filter_id = function(self, x, z, bot00, bot01, bot10, bot11, top00, top01, top10, top11, mat, id)
+	return Los.terrain_add_stick_corners(self.handle, x, z, bot00, bot01, bot10, bot11, top00, top01, top10, top11, mat, id)
+end
+
+--- Adds a stick to the terrain using corner offsets.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @param bot00 World unit Y offset of the bottom vertices.
+-- @param bot10 World unit Y offset of the bottom vertices.
+-- @param bot01 World unit Y offset of the bottom vertices.
+-- @param bot11 World unit Y offset of the bottom vertices.
+-- @param top00 World unit Y offset of the top vertices.
+-- @param top10 World unit Y offset of the top vertices.
+-- @param top01 World unit Y offset of the top vertices.
+-- @param top11 World unit Y offset of the top vertices.
+-- @param mat Terrain material number.
+-- @param mask Terrain material mask for the filter.
+-- @return True on success.
+Terrain.add_stick_corners_filter_mask = function(self, x, z, bot00, bot01, bot10, bot11, top00, top01, top10, top11, mat, mask)
+	return Los.terrain_add_stick_corners(self.handle, x, z, bot00, bot01, bot10, bot11, top00, top01, top10, top11, mat, mask)
 end
 
 --- Builds the model for the terrain chunk.

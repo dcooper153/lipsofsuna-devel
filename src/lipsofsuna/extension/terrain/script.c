@@ -80,7 +80,64 @@ static void Terrain_add_stick (LIScrArgs* args)
 	if (!liscr_args_geti_int (args, 4, &material) || material < 0)
 		return;
 
-	liscr_args_seti_bool (args, liext_terrain_add_stick (args->self, grid_x, grid_z, world_y, world_h, material));
+	liscr_args_seti_bool (args, liext_terrain_add_stick (args->self, grid_x, grid_z, world_y, world_h,
+		material, NULL, NULL));
+}
+
+static void Terrain_add_stick_filter_id (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	float world_y;
+	float world_h;
+	int material;
+	int id;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_int (args, 0, &grid_x) || grid_x < 0)
+		return;
+	if (!liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
+		return;
+	if (!liscr_args_geti_float (args, 2, &world_y) || world_y < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 3, &world_h))
+		return;
+	world_h = LIMAT_MAX (world_h, LIEXT_STICK_EPSILON);
+	if (!liscr_args_geti_int (args, 4, &material) || material < 0)
+		return;
+	if (!liscr_args_geti_int (args, 5, &id) || id < 0)
+		return;
+
+	liscr_args_seti_bool (args, liext_terrain_add_stick (args->self, grid_x, grid_z, world_y, world_h, material,
+		liext_terrain_stick_filter_id, &id));
+}
+
+static void Terrain_add_stick_filter_mask (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	float world_y;
+	float world_h;
+	int material;
+	int mask;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_int (args, 0, &grid_x) || grid_x < 0)
+		return;
+	if (!liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
+		return;
+	if (!liscr_args_geti_float (args, 2, &world_y) || world_y < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 3, &world_h))
+		return;
+	world_h = LIMAT_MAX (world_h, LIEXT_STICK_EPSILON);
+	if (!liscr_args_geti_int (args, 4, &material) || material < 0)
+		return;
+	if (!liscr_args_geti_int (args, 5, &mask) || mask < 0)
+		return;
+
+	liscr_args_seti_bool (args, liext_terrain_add_stick (args->self, grid_x, grid_z, world_y, world_h, material,
+		liext_terrain_stick_filter_mask, &mask));
 }
 
 static void Terrain_add_stick_corners (LIScrArgs* args)
@@ -116,7 +173,87 @@ static void Terrain_add_stick_corners (LIScrArgs* args)
 		return;
 
 	liscr_args_seti_bool (args, liext_terrain_add_stick_corners (args->self, grid_x, grid_z,
-		bot[0], bot[1], bot[2], bot[3], top[0], top[1], top[2], top[3], material));
+		bot[0], bot[1], bot[2], bot[3], top[0], top[1], top[2], top[3], material, NULL, NULL));
+}
+
+static void Terrain_add_stick_corners_filter_id (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	float bot[4];
+	float top[4];
+	int material;
+	int id;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_int (args, 0, &grid_x) || grid_x < 0)
+		return;
+	if (!liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
+		return;
+	if (!liscr_args_geti_float (args, 2, bot + 0) || bot[0] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 3, bot + 1) || bot[1] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 4, bot + 2) || bot[2] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 5, bot + 3) || bot[3] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 6, top + 0) || top[0] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 7, top + 1) || top[1] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 8, top + 2) || top[2] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 9, top + 3) || top[3] < 0.0f)
+		return;
+	if (!liscr_args_geti_int (args, 10, &material) || material < 0)
+		return;
+	if (!liscr_args_geti_int (args, 11, &id) || id < 0)
+		return;
+
+	liscr_args_seti_bool (args, liext_terrain_add_stick_corners (args->self, grid_x, grid_z,
+		bot[0], bot[1], bot[2], bot[3], top[0], top[1], top[2], top[3], material,
+		liext_terrain_stick_filter_id, &id));
+}
+
+static void Terrain_add_stick_corners_filter_mask (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	float bot[4];
+	float top[4];
+	int material;
+	int mask;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_int (args, 0, &grid_x) || grid_x < 0)
+		return;
+	if (!liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
+		return;
+	if (!liscr_args_geti_float (args, 2, bot + 0) || bot[0] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 3, bot + 1) || bot[1] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 4, bot + 2) || bot[2] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 5, bot + 3) || bot[3] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 6, top + 0) || top[0] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 7, top + 1) || top[1] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 8, top + 2) || top[2] < 0.0f)
+		return;
+	if (!liscr_args_geti_float (args, 9, top + 3) || top[3] < 0.0f)
+		return;
+	if (!liscr_args_geti_int (args, 10, &material) || material < 0)
+		return;
+	if (!liscr_args_geti_int (args, 11, &mask) || mask < 0)
+		return;
+
+	liscr_args_seti_bool (args, liext_terrain_add_stick_corners (args->self, grid_x, grid_z,
+		bot[0], bot[1], bot[2], bot[3], top[0], top[1], top[2], top[3], material,
+		liext_terrain_stick_filter_mask, &mask));
 }
 
 static void Terrain_build_chunk_model (LIScrArgs* args)
@@ -550,7 +687,7 @@ static void Terrain_set_column (LIScrArgs* args)
 		lua_pop (args->lua, 1);
 
 		/* Add the stick. */
-		liext_terrain_column_add_stick (column, y, height, slope_prev, slope, material);
+		liext_terrain_column_add_stick (column, y, height, slope_prev, slope, material, NULL, NULL);
 		y += height;
 		memcpy (slope_prev, slope, 4 * sizeof (float));
 	}
@@ -634,7 +771,11 @@ void liext_script_terrain (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_new", Terrain_new);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_unittest", Terrain_unittest);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick", Terrain_add_stick);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick_filter_id", Terrain_add_stick_filter_id);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick_filter_mask", Terrain_add_stick_filter_mask);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick_corners", Terrain_add_stick_corners);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick_corners_filter_id", Terrain_add_stick_corners_filter_id);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_add_stick_corners_filter_mask", Terrain_add_stick_corners_filter_mask);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_build_chunk_model", Terrain_build_chunk_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_calculate_smooth_normals", Terrain_calculate_smooth_normals);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_cast_ray", Terrain_cast_ray);
