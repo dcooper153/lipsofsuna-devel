@@ -121,6 +121,7 @@ int liext_terrain_column_add_stick (
 	float y;
 	float dy;
 	float dh;
+	float length;
 	LIExtTerrainStick* stick;
 	LIExtTerrainStick* stick1;
 	LIExtTerrainStick* stick2;
@@ -217,25 +218,28 @@ int liext_terrain_column_add_stick (
 					DEBUGPRINT ("   Join up and down.\n");
 					/* Extend the previous stick. */
 					liext_terrain_stick_copy_vertices (stick_prev, stick->next);
-					stick_prev->height += stick->height + stick->next->height;
+					length = stick->height + stick->next->height;
+					stick_prev->height += length;
 					liext_terrain_stick_clamp_vertices (stick_prev, stick->next->next);
 					/* Delete the current and next sticks. */
 					private_remove_stick (self, stick, stick->next);
 					private_remove_stick (self, stick_prev, stick);
-					/* Redo the merged stick. */
+					/* Advance to the next stick. */
+					y += length;
 					stick = stick_prev->next;
 				}
 				else if (stick_prev != NULL && stick_prev->material == material)
 				{
 					DEBUGPRINT ("   Join down.\n");
 					/* Extend the previous stick. */
-					stick_prev->height += stick->height;
+					length = stick->height;
+					stick_prev->height += length;
 					liext_terrain_stick_copy_vertices (stick_prev, stick);
 					liext_terrain_stick_clamp_vertices (stick_prev, stick->next);
 					/* Delete the current stick. */
-					y += stick->height;
 					private_remove_stick (self, stick_prev, stick);
 					/* Advance to the next stick. */
+					y += length;
 					stick = stick_prev->next;
 				}
 				else if (stick->next != NULL && stick->next->material == material)
@@ -246,7 +250,6 @@ int liext_terrain_column_add_stick (
 					/* Delete the current stick. */
 					private_remove_stick (self, stick_prev, stick);
 					/* Advance to the next stick. */
-					y += dy + dh;
 					stick_prev = stick;
 					stick = stick->next;
 				}
@@ -325,7 +328,7 @@ int liext_terrain_column_add_stick (
 					liext_terrain_stick_clamp_vertices (stick, stick->next);
 					liext_terrain_stick_clamp_vertices (stick1, stick);
 					/* Advance to the next stick. */
-					y += dy + dh;
+					y += stick->height;
 					stick_prev = stick;
 					stick = stick1;
 				}

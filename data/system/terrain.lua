@@ -379,6 +379,7 @@ end
 -- @param radius Radius in world units.
 Terrain.get_sticks_in_sphere = function(self, point, radius)
 	return coroutine.wrap(function()
+		local t = 0.5 * radius
 		local r = radius / self.grid_size
 		local cx = point.x / self.grid_size
 		local cz = point.z / self.grid_size
@@ -389,7 +390,9 @@ Terrain.get_sticks_in_sphere = function(self, point, radius)
 		local f = function(dx, dz)
 			local d = math.sqrt(dx^2 + dz^2) / r
 			if d > 1 then return 0 end
-			return math.cos(d * math.pi / 2) * radius
+			local h = math.cos(d * math.pi / 2) * radius
+			if h < t then return 0 end
+			return h
 		end
 		local y = point.y
 		for z = z0,z1 do

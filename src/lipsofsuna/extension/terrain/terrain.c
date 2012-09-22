@@ -48,7 +48,7 @@ static LIExtTerrainChunkID private_get_chunk_id_and_column (
 LIExtTerrain* liext_terrain_new (
 	LIExtTerrainModule* module,
 	int                 chunk_size,
-	int                 grid_size)
+	float               grid_size)
 {
 	LIExtTerrain* self;
 

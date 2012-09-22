@@ -310,7 +310,7 @@ struct _LIExtTerrain
 LIAPICALL (LIExtTerrain*, liext_terrain_new, (
 	LIExtTerrainModule* module,
 	int                 chunk_size,
-	int                 grid_size));
+	float               grid_size));
 
 LIAPICALL (void, liext_terrain_free, (
 	LIExtTerrain* self));
