@@ -19,14 +19,20 @@ local perform_attack = function(attacker)
 		local r = Physics:cast_ray(src, dst)
 		if not r or r.object then return end
 		-- Check for sufficient materials.
-		local radius = 1.5
+		local radius = 1.2
 		local materials = Game.terrain.terrain:count_materials_in_sphere(r.point, radius)
 		local need = materials[0]
 		if not need then return end
 		if need > weapon:get_count() then return end
 		-- Build the tile.
 		weapon:subtract(need)
-		Game.terrain.terrain:add_sphere_filter_id(r.point, radius, material.id, 0)
+		local p
+		if r.normal.y > 0 then
+			p = Vector(0,-radius/4,0):add(r.point)
+		else
+			p = Vector(0,radius/4,0):add(r.point)
+		end
+		Game.terrain.terrain:add_sphere_filter_id(p, radius, material.id, 0)
 		Server:world_effect(r.point, material.effect_build)
 	end)
 end

@@ -66,7 +66,7 @@ Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, ti
 	if tile and weapon then
 		-- Break the tile.
 		if weapon.spec.categories["mattock"] then
-			self:destroy_terrain_sphere(attacker, point, tile, 2)
+			self:destroy_terrain_sphere(attacker, point, tile, 1.5)
 			return
 		end
 		-- Damage the weapon.

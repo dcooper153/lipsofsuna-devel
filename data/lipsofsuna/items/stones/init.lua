@@ -5,6 +5,7 @@ Itemspec{
 	categories = {["material"] = true},
 	icon = "stone2",
 	mass = 4,
+	mass_inventory = 0.1,
 	model = "adamantium1",
 	stacking = true}
 
@@ -14,6 +15,7 @@ Itemspec{
 	model = "aquanitestone1",
 	icon = "stone2",
 	mass = 2,
+	mass_inventory = 0.1,
 	stacking = true}
 
 Itemspec{
@@ -25,6 +27,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	icon = "stone1",
 	mass = 5,
+	mass_inventory = 0.1,
 	model = "basaltstone1",
 	stacking = true}
 
@@ -33,6 +36,7 @@ Itemspec{
 	categories = {["material"] = true},
 	icon = "stone2",
 	mass = 4,
+	mass_inventory = 0.1,
 	model = "crimsonstone1",
 	stacking = true}
 
@@ -45,6 +49,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	icon = "stone2",
 	mass = 4,
+	mass_inventory = 0.1,
 	model = "ferrostone1",
 	stacking = true}
 
@@ -59,6 +64,7 @@ Itemspec{
 	health = 50,
 	icon = "stone1",
 	mass = 5,
+	mass_inventory = 0.1,
 	model = "granitestone1",
 	stacking = true}
 
@@ -73,6 +79,7 @@ Itemspec{
 	health = 50,
 	icon = "sand1",
 	mass = 3,
+	mass_inventory = 0.1,
 	model = "sandchunk1",
 	stacking = true}
 
@@ -87,5 +94,6 @@ Itemspec{
 	health = 50,
 	icon = "dirt1",
 	mass = 3,
+	mass_inventory = 0.1,
 	model = "soilchunk1",
 	stacking = true}
