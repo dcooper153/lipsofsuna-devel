@@ -64,6 +64,7 @@ void liext_terrain_chunk_free (
 	{
 		for (i = 0 ; i < self->size * self->size ; i++)
 			liext_terrain_column_clear (self->columns + i);
+		lisys_free (self->columns);
 	}
 	if (self->model != NULL)
 		limdl_model_free (self->model);
