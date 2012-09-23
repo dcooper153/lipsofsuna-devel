@@ -514,18 +514,6 @@ int liext_terrain_stick_set_data (
 			return 0;
 	}
 
-	/* Validate the values to the best of our ability. */
-	/* We check that the height is positive and that the vertex offsets are
-	   not below the bottom of the stick. We cannot check that the offsets do
-	   not extend above the bottom of the next stick. */
-	if (tmp2[0] <= 0.0f)
-		return 0;
-	for (i = 0 ; i < 4 ; i++)
-	{
-		if (tmp2[5 * i + 1] > tmp2[0])
-			tmp2[5 * i + 1] = tmp2[0];
-	}
-
 	/* Apply the values. */
 	self->material = tmp1;
 	self->height = tmp2[(i = 0)];

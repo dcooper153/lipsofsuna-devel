@@ -65,12 +65,12 @@ Client.init = function(self)
 	self.camera1:set_collision_mask(Game.PHYSICS_MASK_CAMERA)
 	self.camera1:set_far(self.options.view_distance)
 	self.camera1:set_fov(1.1)
-	self.camera1:set_near(0.01)
+	self.camera1:set_near(0.1)
 	self.camera3 = ThirdPersonCamera()
 	self.camera3:set_collision_mask(Game.PHYSICS_MASK_CAMERA)
 	self.camera3:set_far(self.options.view_distance)
 	self.camera3:set_fov(1.1)
-	self.camera3:set_near(0.01)
+	self.camera3:set_near(0.1)
 	self:set_camera_mode("third-person")
 	-- Initialize data.
 	self:reset_data()
@@ -235,11 +235,9 @@ Client.update = function(self, secs)
 	-- FIXME
 	if self.player_object then
 		self:update_camera()
-		local overworld = true
-		self.lighting:set_dungeon_mode(not overworld)
-		local wd = overworld and self.options.view_distance or self.options.view_distance_underground
-		self.camera1:set_far(wd)
-		self.camera3:set_far(wd)
+		self.lighting:set_dungeon_mode(false)
+		self.camera1:set_far(self.options.view_distance)
+		self.camera3:set_far(self.options.view_distance)
 	end
 end
 

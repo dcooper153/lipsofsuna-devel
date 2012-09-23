@@ -47,7 +47,6 @@ TerrainChunk.create_render_object = function(self)
 	else
 		self.object:add_model(self.model:get_render())
 	end
-	self.object:set_position(Vector(self.x * size, 0.0, self.z * size))
 	self.object:set_visible(true)
 end
 

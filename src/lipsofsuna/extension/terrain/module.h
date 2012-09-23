@@ -273,7 +273,8 @@ LIAPICALL (int, liext_terrain_chunk_add_stick_corners, (
 
 LIAPICALL (int, liext_terrain_chunk_build_model, (
 	LIExtTerrainChunk* self,
-	float              grid_size));
+	float              grid_size,
+	const LIMatVector* offset));
 
 LIAPICALL (void, liext_terrain_chunk_clear_column, (
 	LIExtTerrainChunk* self,

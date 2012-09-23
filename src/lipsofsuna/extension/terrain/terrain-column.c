@@ -1117,6 +1117,7 @@ int liext_terrain_column_set_data (
 	int x;
 	int z;
 	uint8_t tmp;
+	float offset;
 	LIExtTerrainStick* stick;
 	LIExtTerrainStick* sticks_first;
 	LIExtTerrainStick* sticks_last;
@@ -1151,18 +1152,17 @@ int liext_terrain_column_set_data (
 		}
 
 		/* Validate the vertex offsets. */
-		/* The above call validates the stick data internally but not against
-		   the previous stick. Here, we finish validation by checking that the
-		   vertex offsets of the previous stick do not extend above the bottom
-		   of this stick. */
+		/* We check that the vertex offsets of the previous stick do not
+		   extend above the vertices of this stick. */
 		if (sticks_last != NULL)
 		{
 			for (z = 0 ; z < 2 ; z++)
 			{
 				for (x = 0 ; x < 2 ; x++)
 				{
-					if (sticks_last->vertices[x][z].offset > stick->height)
-						sticks_last->vertices[x][z].offset = stick->height;
+					offset = stick->height + sticks_last->vertices[x][z].offset;
+					if (sticks_last->vertices[x][z].offset > offset)
+						sticks_last->vertices[x][z].offset = offset;
 				}
 			}
 		}

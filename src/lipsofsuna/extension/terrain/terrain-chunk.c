@@ -202,11 +202,13 @@ int liext_terrain_chunk_add_stick_corners (
  * \brief Builds the model of the chunk.
  * \param self Terrain chunk.
  * \param grid_size Grid size.
+ * \param offset Offset of the chunk, in world units.
  * \return Nonzero on success, zero on failure.
  */
 int liext_terrain_chunk_build_model (
 	LIExtTerrainChunk* self,
-	float              grid_size)
+	float              grid_size,
+	const LIMatVector* offset)
 {
 	int i;
 	int j;
@@ -216,6 +218,7 @@ int liext_terrain_chunk_build_model (
 	LIExtTerrainStick* sticks_left;
 	LIExtTerrainStick* sticks_right;
 	LIMatTransform transform;
+	LIMatVector pos;
 	LIMdlBuilder* builder;
 
 	/* Check if changes are needed. */
@@ -283,7 +286,8 @@ int liext_terrain_chunk_build_model (
 			column = self->columns + i + j * self->size;
 			if (column->model != NULL)
 			{
-				transform = limat_transform_init (limat_vector_init (i * grid_size, 0.0f, j * grid_size), limat_quaternion_identity ());
+				pos = limat_vector_add (*offset, limat_vector_init (i * grid_size, 0.0f, j * grid_size));
+				transform = limat_transform_init (pos, limat_quaternion_identity ());
 				limdl_builder_merge_model (builder, column->model, &transform);
 			}
 		}

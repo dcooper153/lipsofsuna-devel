@@ -21,7 +21,6 @@ varying vec3 F_eyev;
 varying vec3 F_lightv[LIGHTS];
 
 vec3 los_blinn_phong(in vec3 lv, in vec3 ev, in vec3 ld, in vec4 eq, in vec3 normal, in float shininess);
-vec3 los_cel_shading(in vec4 material, in vec4 diff, in vec4 spec, in vec4 p, in sampler1D t1, in sampler1D t2);
 
 void main()
 {
@@ -64,15 +63,12 @@ void main()
 	/* Lighting. */
 	vec3 normal = normalize(F_normal);
 	vec4 diff = LOS_scene_ambient;
-	vec4 spec = vec4(0.0);
 	for(int i = 0 ; i < LIGHTS ; i++)
 	{
 		vec3 l = los_blinn_phong(F_lightv[i], F_eyev, LOS_light_direction[i],
 			LOS_light_equation[i], normal, LOS_material_shininess);
 		diff += l.z * l.x * LOS_light_diffuse[i];
-		spec += l.z * l.y * LOS_light_specular[i];
 	}
-	vec3 color = los_cel_shading(LOS_material_diffuse * diffuse, diff, spec,
-		LOS_material_celshading, LOS_diffuse_texture_2, LOS_diffuse_texture_3);
+	vec3 color = (LOS_material_diffuse * diffuse).rgb * diff.rgb;
 	gl_FragColor = vec4(color, diffuse.a);
 }

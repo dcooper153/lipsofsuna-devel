@@ -263,6 +263,7 @@ static void Terrain_build_chunk_model (LIScrArgs* args)
 	LIExtTerrain* self;
 	LIExtTerrainChunk* chunk;
 	LIExtTerrainModule* module;
+	LIMatVector offset;
 	LIMdlModel* model;
 	LIScrData* data;
 
@@ -273,12 +274,14 @@ static void Terrain_build_chunk_model (LIScrArgs* args)
 		return;
 	if (!liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
 		return;
+	if (!liscr_args_geti_vector (args, 2, &offset))
+		offset = limat_vector_init (grid_x * self->grid_size, 0.0f, grid_z * self->grid_size);
 
 	/* Build the model. */
 	chunk = liext_terrain_get_chunk (self, grid_x, grid_z);
 	if (chunk == NULL)
 		return;
-	if (!liext_terrain_chunk_build_model (chunk, self->grid_size))
+	if (!liext_terrain_chunk_build_model (chunk, self->grid_size, &offset))
 		return;
 
 	/* Copy the model. */

@@ -181,9 +181,10 @@ end
 -- @param self Terrain.
 -- @param x Grid X coordinate.
 -- @param z Grid Z coordinate.
+-- @param offset World space offset vector of the chunk, or nil for automatic.
 -- @return Model, or nil.
-Terrain.build_chunk_model = function(self, x, z)
-	local handle = Los.terrain_build_chunk_model(self.handle, x, z)
+Terrain.build_chunk_model = function(self, x, z, offset)
+	local handle = Los.terrain_build_chunk_model(self.handle, x, z, offset and offset.handle)
 	if not handle then return end
 	return Model:new_from_handle(handle)
 end
