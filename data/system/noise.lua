@@ -1,4 +1,4 @@
---- TODO:doc
+--- Generates geometrically consistent noise.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -16,9 +16,21 @@ end
 
 ------------------------------------------------------------------------------
 
---- TODO:doc
+--- Generates geometrically consistent noise.
 -- @type Noise
 local Noise = Class("Noise")
+
+--- Generates harmonic 2D noise.
+-- @param self Noise class.
+-- @param x X coordinate.
+-- @param y Y coordinate.
+-- @param n Number of octaves.
+-- @param f Frequency of octaves.
+-- @param p Persistence of octaves.
+-- @return Number.
+Noise.harmonic_noise_2d = function(self, x, y, n, f, p)
+	return Los.noise_harmonic_noise_2d(x, y, n, f, p)
+end
 
 --- Generates Perlin noise.
 -- @param self Noise class.
@@ -87,6 +99,23 @@ Noise.perlin_threshold = function(self, ...)
 	end
 end
 
+--- Generates plasma 2D noise.
+-- @param self Noise class.
+-- @param x X coordinate.
+-- @param y Y coordinate.
+-- @param f Noise frequency.
+-- @return Number.
+Noise.plasma_noise_2d = function(self, x, y, f)
+	return Los.noise_plasma_noise_2d(x, y, f)
+end
+
+--- Generates simplex 2D noise.
+-- @param self Noise class.
+-- @param x X coordinate.
+-- @param y Y coordinate.
+-- @return Number.
+Noise.simplex_noise_2d = function(self, x, y)
+	return Los.noise_simplex_noise_2d(x, y)
+end
+
 return Noise
-
-

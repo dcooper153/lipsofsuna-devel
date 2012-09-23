@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,6 +24,28 @@
 
 #include "lipsofsuna/voxel.h"
 #include "ext-module.h"
+
+static void Noise_harmonic_noise_2d (LIScrArgs* args)
+{
+	float x;
+	float y;
+	int n;
+	float f;
+	float p;
+
+	if (!liscr_args_geti_float (args, 0, &x))
+		return;
+	if (!liscr_args_geti_float (args, 1, &y))
+		return;
+	if (!liscr_args_geti_int (args, 2, &n))
+		return;
+	if (!liscr_args_geti_float (args, 3, &f))
+		return;
+	if (!liscr_args_geti_float (args, 4, &p))
+		return;
+		
+	liscr_args_seti_float (args, liext_noise_harmonic_noise_2d (x, y, n, f, p));
+}
 
 static void Noise_perlin_noise (LIScrArgs* args)
 {
@@ -197,14 +219,66 @@ static void Noise_perlin_threshold (LIScrArgs* args)
 	}
 }
 
+static void Noise_plasma_noise_2d (LIScrArgs* args)
+{
+	float x;
+	float y;
+	float f;
+
+	if (!liscr_args_geti_float (args, 0, &x))
+		return;
+	if (!liscr_args_geti_float (args, 1, &y))
+		return;
+	if (!liscr_args_geti_float (args, 2, &f))
+		return;
+		
+	liscr_args_seti_float (args, liext_noise_plasma_noise_2d (x, y, f));
+}
+
+static void Noise_range_noise_2d(LIScrArgs* args)
+{
+	float x;
+	float y;
+	float min;
+	float max;
+
+	if (!liscr_args_geti_float (args, 0, &x))
+		return;
+	if (!liscr_args_geti_float (args, 1, &y))
+		return;
+	if (!liscr_args_geti_float (args, 2, &min))
+		return;
+	if (!liscr_args_geti_float (args, 3, &max))
+		return;
+		
+	liscr_args_seti_float (args, liext_noise_range_noise_2d (x, y, min, max));
+}
+
+static void Noise_simplex_noise_2d (LIScrArgs* args)
+{
+	float x;
+	float y;
+
+	if (!liscr_args_geti_float (args, 0, &x))
+		return;
+	if (!liscr_args_geti_float (args, 1, &y))
+		return;
+		
+	liscr_args_seti_float (args, liext_noise_simplex_noise_2d (x, y));
+}
+
 /*****************************************************************************/
 
 void liext_script_noise (
 	LIScrScript* self)
 {
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NOISE, "noise_harmonic_noise_2d", Noise_harmonic_noise_2d);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NOISE, "noise_perlin_noise", Noise_perlin_noise);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NOISE, "noise_perlin_terrain", Noise_perlin_terrain);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NOISE, "noise_perlin_threshold", Noise_perlin_threshold);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NOISE, "noise_plasma_noise_2d", Noise_plasma_noise_2d);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NOISE, "noise_range_noise_2d", Noise_range_noise_2d);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NOISE, "noise_simplex_noise_2d", Noise_simplex_noise_2d);
 }
 
 /** @} */
