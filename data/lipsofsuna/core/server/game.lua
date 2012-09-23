@@ -56,7 +56,7 @@ Game.init = function(self, mode, save, port)
 		self.database:query("PRAGMA count_changes=OFF;")
 	end
 	self.sectors = SectorManager(self.database, self.enable_unloading)
-	self.terrain = TerrainManager(16, 1, self.database, self.enable_unloading, self.enable_generation, self.enable_graphics)
+	self.terrain = TerrainManager(8, 0.75, self.database, self.enable_unloading, self.enable_generation, self.enable_graphics)
 	-- Initialize storage.
 	self.static_objects_by_id = setmetatable({}, {__mode = "kv"})
 	-- Initialize the server.
