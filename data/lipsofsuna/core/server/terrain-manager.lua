@@ -235,7 +235,7 @@ TerrainManager.update = function(self, secs)
 	end
 	-- Unload unused chunks.
 	local t = Program:get_time()
-	for i = 1,2 do
+	for i = 1,8 do
 		local key,chunk = next(self.chunks, self.chunks_iterator)
 		self.chunks_iterator = key
 		if chunk then
