@@ -79,7 +79,6 @@ end
 TerrainChunkLoader.generate_random = function(self)
 	-- FIXME: Call the generator instead.
 	local Noise = require("system/noise")
-	local bh = 1700
 	local get_height_at = function(x, z)
 		-- Choose the bumpiness of the region.
 		-- p=0.7: Very smooth.
@@ -99,25 +98,64 @@ TerrainChunkLoader.generate_random = function(self)
 		local g = Noise:plasma_noise_2d(0.03 * x, 0.03 * z, 3 - r)
 		local n3 = math.max(0, g) * n2
 		-- Return the combined heights.
-		return bh + 100 * n1, 2 * n2, 0.5 * n3
+		return 1700 + 100 * n1, 2 * n2, 0.5 * n3
 	end
 	local w = self.manager.chunk_size
 	local t = self.manager.terrain
-	for x = self.x,self.x+w-1 do
-		for z = self.z,self.z+w-1 do
+	-- Calculate the heights.
+	local h = {}
+	local i = 0
+	for z = 0,w do
+		for x = 0,w do
+			h[i], h[i + 1], h[i + 2] = get_height_at(self.x + x, self.z + z)
+			i = i + 3
+		end
+	end
+	-- Generate the surface.
+	local p = Vector()
+	local stride = 3 * (w + 1)
+	local get_height_at = function(x, z)
+		local i = 3 * x + stride * z
+		return h[i], h[i + 1], h[i + 2]
+	end
+	for z = 0,w-1 do
+		for x = 0,w-1 do
+			-- Calculate the corner heights.
 			local a00,b00,c00 = get_height_at(x, z)
 			local a10,b10,c10 = get_height_at(x + 1, z)
 			local a01,b01,c01 = get_height_at(x, z + 1)
 			local a11,b11,c11 = get_height_at(x + 1, z + 1)
+			-- Generate the grass.
 			if c00 > 0 or c10 > 0 or c01 > 0 or c11 > 0 then
-				t:add_stick_corners(x, z, 0, 0, 0, 0, a00 + b00 + c00, a10 + b10 + c10, a01 + b01 + c01, a11 + b11 + c11, 2)
+				local y0,y1,y2,y3 = a00 + b00 + c00, a10 + b10 + c10, a01 + b01 + c01, a11 + b11 + c11
+				t:add_stick_corners(self.x + x, self.z + z, 0, 0, 0, 0, y0, y1, y2, y3, 2)
+				-- Generate plants.
+				local r = math.random() - 0.99
+				if r >= 0 then
+					-- Calculate the position.
+					p:set_xyz(self.x + x + 0.5, 0.0, self.z + z + 0.5)
+					p:multiply(self.manager.grid_size)
+					p:add_xyz(0, (y0 + y1 + y2 + y3) / 4, 0)
+					p:multiply(Voxel.tile_scale)
+					-- Calculate the forest ratio.
+					local f = Noise:plasma_noise_2d(2342 + 0.005 * x, 593 + 0.005 * z, 2)
+					-- Choose and create the obstacle.
+					if r > f * 0.01 then
+						Voxel:place_obstacle{point = p, category = "tree"}
+					else
+						Voxel:place_obstacle{point = p, category = "small-plant"}
+					end
+				end
 			end
+			-- Generate the soil.
 			if b00 > 0 or b10 > 0 or b01 > 0 or b11 > 0 then
-				t:add_stick_corners(x, z, 0, 0, 0, 0, a00 + b00, a10 + b10, a01 + b01, a11 + b11, 1)
+				t:add_stick_corners(self.x + x, self.z + z, 0, 0, 0, 0, a00 + b00, a10 + b10, a01 + b01, a11 + b11, 1)
 			end
-			t:add_stick_corners(x, z, 0, 0, 0, 0, a00, a10, a01, a11, 3)
+			-- Generate the stone.
+			t:add_stick_corners(self.x + x, self.z + z, 0, 0, 0, 0, a00, a10, a01, a11, 3)
 		end
 	end
+	-- Smoothen the surface.
 	for x = self.x-1,self.x+w do
 		for z = self.z-1,self.z+w do
 			t:calculate_smooth_normals(x, z)
