@@ -1,4 +1,4 @@
---- TODO:doc
+--- Implements communications between the server and the client.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -9,11 +9,11 @@
 -- @alias Messaging
 
 local Class = require("system/class")
-local Message = require(Mod.path .. "message")
+local Message = require("core/messaging/message")
 local Network = require("system/network")
 local Packet = require("system/packet")
 
---- TODO:doc
+--- Implements communications between the server and the client.
 -- @type Messaging
 local Messaging = Class("Messaging")
 
@@ -121,5 +121,3 @@ Messaging.handle_packet = function(self, client, packet)
 end
 
 return Messaging
-
-

@@ -239,7 +239,7 @@ TerrainManager.update = function(self, secs)
 		local key,chunk = next(self.chunks, self.chunks_iterator)
 		self.chunks_iterator = key
 		if chunk then
-			if t - chunk.time > self.unload_time then
+			if self.unload_time and t - chunk.time > self.unload_time then
 				-- Save fully loaded chunks.
 				local x,z = self:get_chunk_xz_by_id(key)
 				if self.loaders[key] then
