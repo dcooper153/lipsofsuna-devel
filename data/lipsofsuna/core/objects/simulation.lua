@@ -428,7 +428,9 @@ end
 -- @param self Object.
 -- @param radius Refresh radius, or 0 for default.
 SimulationObject.refresh = function(self, radius)
-	Game.sectors:refresh(self:get_position(), radius)
+	if Game.sectors then
+		Game.sectors:refresh(self:get_position(), radius)
+	end
 	if Game.terrain and Game.enable_generation then
 		Game.terrain:refresh_chunks_by_point(self:get_position(), radius or 16)
 	end
@@ -510,6 +512,14 @@ end
 -- @param secs Seconds since the last update.
 SimulationObject.update = function(self, secs)
 	if not self:get_visible() then return end
+	if self:has_server_data() then
+		-- Freeze until the terrain has been loaded.
+		if not Game.terrain:is_point_loaded(self:get_position()) then
+			self.physics:set_physics("static")
+		else
+			self.physics:set_physics(self:get_physics_mode())
+		end
+	end
 	if self:has_client_data() then
 		-- Update sound.
 		if self.animated then
@@ -704,6 +714,13 @@ end
 -- @param value Movement rate.
 SimulationObject.set_movement = function(self, value)
 	self.physics:set_movement(value)
+end
+
+--- Gets the preferred physics mode of the object.
+-- @param self Object.
+-- @return String.
+SimulationObject.get_physics_mode = function(self)
+	return self.spec and self.spec.physics or "rigid"
 end
 
 --- Sets the position of the object.

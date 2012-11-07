@@ -119,7 +119,11 @@ end
 -- @param self ObjectManager.
 -- @param secs Seconds since the last update.
 ObjectManager.update = function(self, secs)
-	for k,v in pairs(self.active_by_id) do
+	-- FIXME: Updates all objects due to terrain and object loading not being
+	-- in sync currently. The update is required by SimulationObject.update()
+	-- to freeze object physics until the terrain has been loaded.
+	for k,v in pairs(self.objects_by_id) do
+	--for k,v in pairs(self.active_by_id) do
 		v:update(secs)
 	end
 end
