@@ -354,7 +354,7 @@ end
 SimulationObject.get_tile_range = function(self)
 	-- TODO: Should depend on actor spec.
 	local size = Vector(1,self.spec.type == "actor" and 2 or 1,1)
-	local src = self:get_position() * Voxel.tile_scale
+	local src = self:get_position()
 	src.x = math.floor(src.x)
 	src.y = math.floor(src.y + 0.3)
 	src.z = math.floor(src.z)

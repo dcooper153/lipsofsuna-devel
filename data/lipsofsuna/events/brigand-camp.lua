@@ -1,3 +1,5 @@
+local MapUtils = require("core/server/map-utils")
+
 Globaleventspec{
 	name = "brigand camp",
 	update = function(self, event, secs)
@@ -9,13 +11,13 @@ Globaleventspec{
 		local spawn = Server.events:find_actor_spawn_point()
 		if not spawn then return end
 		-- Spawn the brigands.
-		Voxel:place_actor{point = spawn:copy():multiply(Voxel.tile_scale), name = "brigandmale"}
+		MapUtils:place_actor{point = spawn:copy(), name = "brigandmale"}
 		local count = math.random(3,6)
 		for i = 1,count do
 			local p = Utils:find_spawn_point(spawn:copy():add_xyz(
 				5 * math.random(), 5 * math.random(), 5 * math.random()))
 			if p then
-				Voxel:place_actor{point = p:multiply(Voxel.tile_scale), name = "brigandmale"}
+				MapUtils:place_actor{point = p, name = "brigandmale"}
 			end
 		end
 	end}

@@ -1,49 +1,16 @@
 local Actor = require("core/objects/actor")
+local Class = require("system/class")
 local Item = require("core/objects/item")
-local Material = require("system/material")
 local Obstacle = require("core/objects/obstacle")
 local Sectors = require("system/sectors")
 local Staticobject = require("core/objects/static")
 
-Voxel.tile_size = Sectors:get_sector_size() / Voxel.tiles_per_line
-Voxel.tile_scale = 1 / Voxel.tile_size
-
---- Checks what kind of tiles are within the range.
--- @param src Tile range start.
--- @param dst Tile range end.
--- @return Table of scan result.
-Voxel.check_range = function(clss, src, dst)
-	local result = {empty = 0, liquid = 0, magma = 0, solid = 0, total = 0}
-	local v = Vector()
-	for x = src.x,dst.x do
-		v.x = x
-		for y = src.y,dst.y do
-			v.y = y
-			for z = src.z,dst.z do
-				v.z = z
-				local t = clss:get_tile(v)
-				if t == 0 then
-					result.empty = result.empty + 1
-				else
-					local m = Material:find{id = t}
-					if m and m:get_type() == "liquid" then
-						result.liquid = result.liquid + 1
-						if m:get_magma() then
-							result.magma = result.magma + 1
-						end
-					else
-						result.solid = result.solid + 1
-					end
-				end
-				result.total = result.total + 1
-			end
-		end
-	end
-	return result
-end
+--- Various helpers for populating the map.
+-- @type MapUtils
+MapUtils = Class("MapUtils")
 
 --- Places a monster to the map.
--- @param clss Voxel class.
+-- @param clss MapUtils class.
 -- @param args Arguments.<ul>
 --   <li>category: Actorspec category.</li>
 --   <li>class: Forces all objects to use the given class.</li>
@@ -51,7 +18,7 @@ end
 --   <li>name: Actorspec name.</li>
 --   <li>point: Position vector, in tiles.</li>
 --   <li>rotation: Rotation around Y axis.</li></ul>
-Voxel.place_actor = function(clss, args)
+MapUtils.place_actor = function(clss, args)
 	-- Choose the actor.
 	-- The actor can by explicitly named or randomly selected from a specific
 	-- category. Selection from a category can also optionally be limited by the
@@ -82,45 +49,45 @@ Voxel.place_actor = function(clss, args)
 	local obj = clss_()
 	obj.random = true
 	obj:set_spec(spec)
-	obj:set_position(args.point * clss.tile_size)
+	obj:set_position(args.point)
 	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
 	obj:set_visible(true)
 end
 
 --- Places an item to the map.
--- @param clss Voxel class.
+-- @param clss MapUtils class.
 -- @param args Arguments.<ul>
 --   <li>category: Item category.</li>
 --   <li>class: Forces all objects to use the given class.</li>
 --   <li>name: Item name.</li>
 --   <li>point: Position vector, in tiles.</li>
 --   <li>rotation: Rotation around Y axis.</li></ul>
-Voxel.place_item = function(clss, args)
+MapUtils.place_item = function(clss, args)
 	local spec = Itemspec:random(args)
 	if not spec then return end
 	local clss_ = args.class or Item or Object
 	local obj = clss_()
 	obj.random = true
 	obj:set_spec(spec)
-	obj:set_position(args.point * clss.tile_size)
+	obj:set_position(args.point)
 	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
 	obj:set_visible(true)
 end
 
 --- Places an obstacle to the map.
--- @param clss Voxel class.
+-- @param clss MapUtils class.
 -- @param args Arguments.<ul>
 --   <li>class: Forces all objects to use the given class.</li>
 --   <li>name: Obstacle name.</li>
 --   <li>point: Position vector, in tiles.</li>
 --   <li>rotation: Rotation around Y axis.</li></ul>
-Voxel.place_obstacle = function(clss, args)
+MapUtils.place_obstacle = function(clss, args)
 	local spec = Obstaclespec:random(args)
 	if not spec then return end
 	local clss_ = args.class or Obstacle or Object
 	local obj = clss_()
 	obj:set_spec(spec)
-	obj:set_position(args.point * clss.tile_size)
+	obj:set_position(args.point)
 	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
 	obj:set_visible(true)
 end
@@ -132,13 +99,13 @@ end
 --   <li>name: Static object name.</li>
 --   <li>point: Position vector, in tiles.</li>
 --   <li>rotation: Rotation around Y axis.</li></ul>
-Voxel.place_static = function(clss, args)
+MapUtils.place_static = function(clss, args)
 	local spec = Staticspec:random(args)
 	if not spec then return end
 	local clss_ = args.class or Staticobject or Object
 	local obj = clss_()
 	obj:set_spec(spec)
-	obj:set_position(args.point * clss.tile_size)
+	obj:set_position(args.point)
 	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
 	obj:set_visible(true)
 end
@@ -150,7 +117,7 @@ end
 --   <li>name: Pattern name.</li>
 --   <li>point: Position vector, in tiles.</li>
 --   <li>rotation: Counter-clockwise rotation in 90 degree steps.</li></ul>
-Voxel.place_pattern = function(clss, args)
+MapUtils.place_pattern = function(clss, args)
 	local pat = Patternspec:random(args)
 	if not pat then return end
 	-- Initialize rotation
@@ -207,3 +174,5 @@ Voxel.place_pattern = function(clss, args)
 		clss:place_actor{class = args.class, name = v[4], point = point, rotation = v[5]}
 	end
 end
+
+return MapUtils

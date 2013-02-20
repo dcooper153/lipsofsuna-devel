@@ -40,20 +40,6 @@ end
 -- @param sector Sector ID.
 -- @param yield Function.
 SectorLoader.execute = function(clss, manager, sector, yield)
-	-- Load terrain.
-	local rows = manager.database:query("SELECT * FROM terrain WHERE sector=?;", {sector})
-	local terrain = #rows ~= 0
-	yield()
-	-- Generate terrain.
-	if terrain then
-		for k,v in ipairs(rows) do
-			Voxel:paste_region{sector = sector, packet = v[2]}
-			yield()
-		end
-	else
-		SectorGenerator:execute(Server.generator, sector, yield)
-		yield()
-	end
 	-- Load objects.
 	local objects = Server.object_database:load_sector_objects(sector)
 	yield()

@@ -15,8 +15,13 @@ local Vector = require("system/math/vector")
 -- @type Sector
 local Sector = Class("Sector")
 
+local blocks_per_line = 1
+local tiles_per_line = 12
+local tile_size = 1
+local tile_scale = 1
+
 Sector.get_block_offset_by_block_id = function(self, id)
-	local bpl = Voxel.blocks_per_line * 128
+	local bpl = blocks_per_line * 128
 	local x = id % bpl
 	local y = math.floor(id / bpl) % bpl
 	local z = math.floor(id / bpl^2) % bpl
@@ -24,13 +29,13 @@ Sector.get_block_offset_by_block_id = function(self, id)
 end
 
 Sector.get_block_id_by_block_offset = function(self, x, y, z)
-	local bpl = Voxel.blocks_per_line * 128
+	local bpl = blocks_per_line * 128
 	return x + y * bpl + z * bpl^2
 end
 
 Sector.get_center_by_id = function(self, id)
 	return self:get_offset_by_id(id):add_xyz(0.5,0.5,0.5):
-		multiply(Voxel.tiles_per_line * Voxel.tile_size)
+		multiply(tiles_per_line * tile_size)
 end
 
 Sector.get_id_by_offset = function(self, offset)
@@ -40,11 +45,11 @@ Sector.get_id_by_offset = function(self, offset)
 end
 
 Sector.get_id_by_point = function(self, point)
-	return self:get_id_by_offset(point * Voxel.tile_scale * (1 / Voxel.tiles_per_line))
+	return self:get_id_by_offset(point * tile_scale * (1 / tiles_per_line))
 end
 
 Sector.get_id_by_tile = function(self, tile)
-	return self:get_id_by_offset(tile * (1 / Voxel.tiles_per_line))
+	return self:get_id_by_offset(tile * (1 / tiles_per_line))
 end
 
 --- Gets the ID of the sector.

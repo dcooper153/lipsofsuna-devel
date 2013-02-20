@@ -74,9 +74,7 @@ Game.init = function(self, mode, save, port)
 	end
 	-- Initialize terrain updates.
 	if Server.initialized then
-		Voxel.block_changed_cb = function(index, stamp)
-			Server:global_event("voxel-block-changed", {index = index, stamp = stamp})
-		end
+		-- TODO: Stick terrain
 	end
 end
 
@@ -87,7 +85,7 @@ Game.deinit = function(self)
 	self.initialized = nil
 	self.mode = nil
 	-- Deinitialized terrain updates.
-	Voxel.block_changed_cb = nil
+	-- TODO: Stick terrain
 	-- Terminate the server.
 	if Server.initialized then
 		Server.serialize:save()

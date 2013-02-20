@@ -9,6 +9,7 @@
 -- @alias TerrainChunkLoader
 
 local Class = require("system/class")
+local MapUtils = require("core/server/map-utils")
 
 --- Implements asynchronous terrain chunk loading.
 -- @type TerrainChunkLoader
@@ -98,7 +99,7 @@ TerrainChunkLoader.generate_random = function(self)
 		local g = Noise:plasma_noise_2d(0.03 * x, 0.03 * z, 3 - r)
 		local n3 = math.max(0, g) * n2
 		-- Return the combined heights.
-		return 1700 + 100 * n1, 2 * n2, 0.5 * n3
+		return 100 + 100 * n1, 2 * n2, 0.5 * n3
 	end
 	local w = self.manager.chunk_size
 	local t = self.manager.terrain
@@ -136,14 +137,13 @@ TerrainChunkLoader.generate_random = function(self)
 					p:set_xyz(self.x + x + 0.5, 0.0, self.z + z + 0.5)
 					p:multiply(self.manager.grid_size)
 					p:add_xyz(0, (y0 + y1 + y2 + y3) / 4, 0)
-					p:multiply(Voxel.tile_scale)
 					-- Calculate the forest ratio.
 					local f = Noise:plasma_noise_2d(2342 + 0.005 * x, 593 + 0.005 * z, 2)
 					-- Choose and create the obstacle.
 					if r > f * 0.01 then
-						Voxel:place_obstacle{point = p, category = "tree"}
+						MapUtils:place_obstacle{point = p, category = "tree"}
 					else
-						Voxel:place_obstacle{point = p, category = "small-plant"}
+						MapUtils:place_obstacle{point = p, category = "small-plant"}
 					end
 				end
 			end

@@ -31,7 +31,6 @@ SectorManager.new = function(clss, database, unloading)
 	-- Initialize the database tables needed by us.
 	if self.database then
 		self.database:query("CREATE TABLE IF NOT EXISTS objects (id INTEGER PRIMARY KEY,sector UNSIGNED INTEGER,data TEXT);");
-		self.database:query("CREATE TABLE IF NOT EXISTS terrain (sector INTEGER PRIMARY KEY,data BLOB);");
 	end
 	return self
 end
@@ -82,10 +81,6 @@ SectorManager.save_sector = function(self, sector)
 	if Server.initialized then
 		Server.object_database:save_sector_objects(sector)
 	end
-	-- Write terrain.
-	self.database:query("DELETE FROM terrain WHERE sector=?;", {sector})
-	local data = Voxel:copy_region{sector = sector}
-	self.database:query("INSERT INTO terrain (sector,data) VALUES (?,?);", {sector, data})
 end
 
 --- Saves all active sectors to the database.
@@ -95,10 +90,6 @@ end
 SectorManager.save_world = function(self, erase, progress)
 	if not self.database then return end
 	self.database:query("BEGIN TRANSACTION;")
-	-- Erase old world from the database.
-	if erase then
-		self.database:query("DELETE FROM terrain;")
-	end
 	-- Write the new world data.
 	local sectors = Sectors:get_sectors()
 	if progress then

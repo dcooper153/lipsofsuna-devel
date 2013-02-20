@@ -840,37 +840,8 @@ end
 -- @param secs Seconds since the last update.
 -- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
 Actor.update_environment = function(self, secs)
-	-- Don't update every frame.
-	if not self:get_visible() then return true end
-	self.env_timer = (self.env_timer or 0) + secs
-	if self.env_timer < 1.2 then return true end
-	local tick = self.env_timer
-	self.env_timer = 0
-	-- Count tiles affecting us.
-	local src,dst = self:get_tile_range()
-	local env = Voxel:check_range(src, dst)
-	if not env then return true end
-	-- Count liquid tiles.
-	local liquid = env.liquid / env.total
-	local magma = env.magma / env.total
-	if liquid ~= (self.submerged or 0) then
-		self.submerged = liquid > 0 and liquid or nil
-	end
-	if magma ~= (self.submerged_in_magma or 0) then
-		self.submerged_in_magma = magma > 0 and magma or nil
-	end
-	-- Apply liquid damage.
-	if not self.dead and self.submerged then
-		local magma = self.submerged_in_magma or 0
-		local water = self.submerged - magma
-		if magma > 0 and self.damage_from_magma ~= 0 then
-			self:damaged{amount = self.spec.damage_from_magma * magma * tick, type = "liquid"}
-		end
-		if water > 0 and self.damage_from_water ~= 0 then
-			self:damaged{amount = self.spec.damage_from_water * water * tick, type = "liquid"}
-		end
-	end
-	return true, env
+	-- TODO: Count water submerging once water is implemented again.
+	return true
 end
 
 --- Updates the skills and related attributes of the actor.

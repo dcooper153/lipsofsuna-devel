@@ -442,8 +442,9 @@ Player.vision_cb = function(self, args)
 			local id = Game.messaging:get_event_id("update terrain")
 			local x,y,z = Sector:get_block_offset_by_block_id(args.index)
 			local packet = Packet(id, "uint32", x, "uint32", y, "uint32", z)
-			Voxel:get_block(x, y, z, packet)
-			Game.messaging:server_event("update terrain", self.client, packet)
+			-- FIXME
+			--Voxel:get_block(x, y, z, packet)
+			--Game.messaging:server_event("update terrain", self.client, packet)
 		end,
 		["world-effect"] = function(args)
 			Game.messaging:server_event("world effect", self.client, args.point, args.effect)
