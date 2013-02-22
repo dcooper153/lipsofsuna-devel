@@ -156,7 +156,7 @@ end
 -- @return Vector.
 Utils.get_player_spawn_point = function(self)
 	-- FIXME: Stick terrain.
-	return Vector(500,200,500)
+	return Vector(500,1000,500)
 end
 
 --- Gets the difficulty of the spawn point.

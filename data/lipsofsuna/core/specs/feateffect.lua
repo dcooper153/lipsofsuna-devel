@@ -38,7 +38,10 @@ Feateffectspec.introspect = Introspect{
 		{name = "radius", type = "number", default = 0, description = "Area of effect radius."},
 		{name = "range", type = "number", default = 0, description = "Maximum firing range for bullet and ray targeting modes."},
 		{name = "required_reagents", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of required reagents.", details = {keys = {spec = "Itemspec"}}},
-		{name = "required_stats", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of required stats."}
+		{name = "required_stats", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of required stats."},
+		{name = "modifier", type = "ignore"},
+		{name = "ranged", type = "ignore"},
+		{name = "touch", type = "ignore"},
 	}}
 
 --- Registers a feat effect.

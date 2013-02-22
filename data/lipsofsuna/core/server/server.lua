@@ -205,6 +205,7 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 	if not home or spawnpoint then
 		home = player:set_spawn_point(spawnpoint)
 		player:teleport{position = home}
+		player:inflict_modifier("respawn", 1)
 	end
 	player:set_visible(true)
 	player:set_client(client)
