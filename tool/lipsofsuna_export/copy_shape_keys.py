@@ -14,18 +14,18 @@ class LICopyShapeKeys:
 		return True
 
 	@classmethod
-	def transfer_key(cls, srcobj, srckey, dstobj, dstkey, closest, smoothing, clipping):
+	def transfer_key(cls, srcobj, srckey, dstobj, dstkey, closest, smoothing, clipping, vertex):
 		for i in range(len(closest)):
-			cls.transfer_vertex(srcobj, srckey, dstobj, dstkey, closest, i, smoothing, clipping)
+			cls.transfer_vertex(srcobj, srckey, dstobj, dstkey, closest, i, smoothing, clipping, vertex)
 
 	@classmethod
-	def transfer_vertex(cls, srcobj, srckey, dstobj, dstkey, closest, index, smoothing, clipping):
+	def transfer_vertex(cls, srcobj, srckey, dstobj, dstkey, closest, index, smoothing, clipping, vertex):
 		# Derive the vertex position in the shape key.
 		mapping = closest[index]
 		if mapping['type'] == 'vertex':
 			# Exact vertex match.
 			dstkey.data[index].co = srckey.data[mapping['vertex']].co
-		else:
+		elif not vertex:
 			# Surface match with a potential normal component.
 			face = srcobj.data.polygons[mapping['face']]
 			src = [mathutils.Vector(srcobj.data.vertices[v].co) for v in face.vertices]
@@ -41,6 +41,8 @@ class LICopyShapeKeys:
 			else:
 				co = cls.transform_vertex_on_triangle(mapping['point'], src, dst, normal)
 			dstkey.data[index].co = co
+		else:
+			return
 		# Enforce X-axis clipping.
 		if clipping:
 			basis_co = mathutils.Vector(dstobj.data.vertices[index].co)
@@ -78,7 +80,7 @@ class LICopyShapeKeys:
 		return tmp2
 
 	@classmethod
-	def run(cls, srcobj, dstobj, smooth, clipping):
+	def run(cls, srcobj, dstobj, smooth, clipping, vertex):
 		# Disable undo.
 		bpy.context.user_preferences.edit.use_global_undo = False
 		toggled = False
@@ -97,7 +99,7 @@ class LICopyShapeKeys:
 					count_added += 1
 					dstobj.shape_key_add(name=srckey.name, from_mix=False)
 					dstkey = dstobj.data.shape_keys.key_blocks[srckey.name]
-					cls.transfer_key(srcobj, srckey, dstobj, dstkey, closest, smoothing, clipping)
+					cls.transfer_key(srcobj, srckey, dstobj, dstkey, closest, smoothing, clipping, vertex)
 		# Remove useless shape keys.
 		if count_added:
 			ref = None
