@@ -1,7 +1,36 @@
 #! /usr/bin/lua
 
 require "lfs"
-local Class = require("../data/system/class")
+
+------------------------------------------------------------------------------
+
+local class_call = function(self, ...)
+	return self:new(...)
+end
+
+local class_tostring = function(self)
+	return "class:" .. self.class_name
+end
+
+local data_tostring = function(self)
+	return "data:" .. self.class_name
+end
+
+local Class = setmetatable({class_name = "Class"}, {
+	__call = class_call,
+	__tostring = class_tostring})
+
+Class.new = function(clss, name, base)
+	if clss == Class then
+		return setmetatable({super = base or Class, class_name = name}, {
+			__index = base or Class,
+			__call = class_call,
+			__tostring = class_tostring})
+	else
+		local self = {class = clss, __index = clss, __tostring = data_tostring}
+		return setmetatable(self, self)
+	end
+end
 
 ------------------------------------------------------------------------------
 
@@ -13,8 +42,9 @@ Utils.get_file_type = function(self, name)
 	if string.match(name, ".*[.]cs$") then return "C#" end
 	if string.match(name, ".*[.]h$") then return "C" end
 	if string.match(name, ".*[.]hpp$") then return "C++" end
-	if string.match(name, ".*[.]lua") then return "Lua" end
-	if string.match(name, ".*[.]php") then return "PHP" end
+	if string.match(name, ".*[.]js$") then return "JavaScript" end
+	if string.match(name, ".*[.]lua$") then return "Lua" end
+	if string.match(name, ".*[.]php$") then return "PHP" end
 	if string.match(name, ".*[.]py$") then return "Python" end
 	if string.match(name, ".*[.]vhd$") then return "VHDL" end
 end
@@ -27,7 +57,7 @@ Utils.find_files = function(self, path)
 				if not string.match(name, "^[.]") then
 					local file = path .. name
 					local attr = lfs.attributes(file)
-					if attr.mode == "directory" then
+					if attr and attr.mode == "directory" then
 						recurse(file .. "/")
 					else
 						coroutine.yield(path, name)
