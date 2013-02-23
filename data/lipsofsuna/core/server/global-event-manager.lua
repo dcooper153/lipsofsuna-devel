@@ -71,7 +71,8 @@ GlobalEventManager.find_actor_spawn_point = function(self)
 	if not spawn then return end
 	-- Ensure that the point is in a loaded sector.
 	local sector = Sector:get_id_by_point(spawn)
-	if not Game.sectors:is_sector_loaded(sector) then return end
+	-- FIXME: Why is the sector never loaded?
+	--if not Game.sectors:is_sector_loaded(sector) then return end
 	return spawn
 end
 

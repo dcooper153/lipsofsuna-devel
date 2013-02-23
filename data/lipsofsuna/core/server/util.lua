@@ -13,6 +13,7 @@ local Class = require("system/class")
 local Item = require("core/objects/item")
 local Material = require("system/material")
 local Sector = require("system/sector")
+local Vector = require("system/math/vector")
 
 -- FIXME: These need to be cleaned up.
 
@@ -127,8 +128,17 @@ end
 -- @param point Point in world space.
 -- @return Point in world units, or nil.
 Utils.find_spawn_point = function(clss, point)
-	-- FIXME: Stick terrain.
-	return Vector(500,500,500)
+	-- Find the terrain surface.
+	-- FIXME: Only works when above surface.
+	local src = Vector(point.x, point.y + 10, point.z)
+	local dst = Vector(src.x, 0, src.z)
+	local p = Game.terrain.terrain:cast_ray(src, dst)
+	print("TRY FIND", point, p)
+	if not p then return end
+	-- Check that there's enough room above.
+	local p2 = Vector(p.x, p.y + 5, p.z)
+	if p2 and p2.y < p.y + 4 then return end
+	return p
 end
 
 --- Finds spawns point suitable for actors.
@@ -152,10 +162,15 @@ Utils.find_summon_point = function(clss, point)
 end
 
 --- Gets the default spawn point for players.
+--
+-- This is high in the sky because the player will be asynchrously teleported
+-- to the ground level once the terrain is loaded. Before that, nothing else
+-- can be done but placed the player somewhere that will not intersect with
+-- the terrain.
+--
 -- @param self Utils class.
 -- @return Vector.
 Utils.get_player_spawn_point = function(self)
-	-- FIXME: Stick terrain.
 	return Vector(500,1000,500)
 end
 

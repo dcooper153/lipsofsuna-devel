@@ -258,6 +258,8 @@ end
 -- @param self Actor.
 -- @return True if could climb.
 Actor.can_climb_low = function(self)
+	-- FIXME: Stick terrain
+	do return end
 	if self:get_movement() < 0 then return end
 	local ctr = self:get_position():copy():multiply(Voxel.tile_scale):add_xyz(0,0.5,0)
 	local dir = self:get_rotation() * Vector(0,0,-1)
@@ -272,6 +274,8 @@ end
 -- @param self Actor.
 -- @return True if could climb.
 Actor.can_climb_high = function(self)
+	-- FIXME: Stick terrain
+	do return end
 	if self:get_movement() < 0 then return end
 	local ctr = self:get_position():copy():multiply(Voxel.tile_scale):add_xyz(0,0.5,0)
 	local dir = self:get_rotation() * Vector(0,0,-1)
@@ -336,6 +340,8 @@ Actor.check_enemy = function(self, object)
 end
 
 Actor.climb = function(self)
+	-- FIXME: Stick terrain
+	do return end
 	if self.blocking then return end
 	if self.climbing then return end
 	local align_object = function()

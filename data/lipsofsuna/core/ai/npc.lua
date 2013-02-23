@@ -62,14 +62,15 @@ NpcAi.choose_combat_action = function(self)
 	local dist = diff.length - 0.5 * (size1 + size2).length
 	local hint = 0.7 * spec.aim_ray_end
 	-- Calculate the tile offset.
-	local ctr = self.object:get_position():copy():multiply(Voxel.tile_scale):add_xyz(0,0.5,0)
+	local ctr = self.object:get_position():copy():add_xyz(0,0.5,0)
 	local dir = self.target:get_position() - self.object:get_position()
 	dir = Vector(dir.x,0,dir.z):normalize()
 	-- Check if we could walk forward.
 	if spec.ai_enable_walk then
 		local dst = (ctr + dir):floor()
-		local f1 = Voxel:get_tile(dst)
-		local f2 = Voxel:get_tile(dst + Vector(0,1,0))
+		-- FIXME: Stick terrain
+		local f1 = 0--Voxel:get_tile(dst)
+		local f2 = 0--Voxel:get_tile(dst + Vector(0,1,0))
 		if f1 == 0 and f2 == 0 then
 			allow_forward = true
 		elseif f2 == 0 and spec.ai_enable_jump then
@@ -82,8 +83,9 @@ NpcAi.choose_combat_action = function(self)
 	-- Check if we could walk backward.
 	if spec.ai_enable_backstep and math.random() > spec.ai_offense_factor then
 		local dstb = (ctr - dir):floor()
-		local b1 = Voxel:get_tile(dstb)
-		local b2 = Voxel:get_tile(dstb + Vector(0,1,0))
+		-- FIXME: Stick terrain
+		local b1 = 0--Voxel:get_tile(dstb)
+		local b2 = 0--Voxel:get_tile(dstb + Vector(0,1,0))
 		if b1 == 0 and b2 == 0 then
 			allow_backward = true
 		elseif b2 == 0 and spec.ai_enable_jump then
@@ -97,8 +99,9 @@ NpcAi.choose_combat_action = function(self)
 	if spec.ai_enable_strafe and math.random() > spec.ai_offense_factor then
 		local dirl = Quaternion{axis = Vector(0,1), angle = 0.5 * math.pi} * dir
 		local dstl = (ctr + dirl):floor()
-		local l1 = Voxel:get_tile(dstl)
-		local l2 = Voxel:get_tile(dstl + Vector(0,1))
+		-- FIXME: Stick terrain
+		local l1 = 0--Voxel:get_tile(dstl)
+		local l2 = 0--Voxel:get_tile(dstl + Vector(0,1))
 		if l2 == 0 then
 			if l1 == 0 then
 				allow_strafe_left = true
@@ -112,8 +115,9 @@ NpcAi.choose_combat_action = function(self)
 	if spec.ai_enable_strafe and math.random() > spec.ai_offense_factor then
 		local dirr = Quaternion{axis = Vector(0,1), angle = -0.5 * math.pi} * dir
 		local dstr = (ctr + dirr):floor()
-		local r1 = Voxel:get_tile(dstr)
-		local r2 = Voxel:get_tile(dstr + Vector(0,1))
+		-- FIXME: Stick terrain
+		local r1 = 0--Voxel:get_tile(dstr)
+		local r2 = 0--Voxel:get_tile(dstr + Vector(0,1))
 		if r2 == 0 then
 			if r1 == 0 then
 				allow_strafe_right = true
@@ -184,20 +188,22 @@ end
 -- @param self AI.
 NpcAi.choose_wander_target = function(self)
 	-- Randomize the search order.
-	local src = self.object:get_position():copy():multiply(Voxel.tile_scale):add_xyz(0,0.5,0):floor()
+	local src = self.object:get_position():copy()
 	local dirs = {Vector(1,0,0), Vector(-1,0,0), Vector(0,0,1), Vector(0,0,-1)}
 	for a=1,4 do
 		local b = math.random(1,4)
 		dirs[a],dirs[b] = dirs[b],dirs[a]
 	end
 	-- Try to find an open path.
+	-- FIXME: Stick terrain.
+	--[[
 	for k,v in ipairs(dirs) do
 		local dst = src + v * Voxel.tile_size
 		if self:avoid_wander_obstacles(dst) then
 			self.target = (src + v * 10 + Vector(0.5,0.5,0.5)) * Voxel.tile_size
 			return
 		end
-	end
+	end]]
 	-- Fallback to a random direction.
 	local rot = Quaternion{axis = Vector(0,1,0), angle = math.random() * 6.28}
 	self.target = self.object:get_position() + rot * Vector(0, 0, 10)
@@ -208,19 +214,22 @@ end
 -- @param target Point vector in world space.
 -- @return True if avoided successfully.
 NpcAi.avoid_wander_obstacles = function(self, target)
-	local src = self.object:get_position():multiply(Voxel.tile_scale):add_xyz(0,0.5,0):floor()
+	local src = self.object:get_position():add_xyz(0,0.5,0):floor()
 	local dst = (target * Voxel.tile_scale):add_xyz(0,0.5,0):floor()
 	local p = Vector(
 		math.min(math.max(dst.x, src.x - 1), src.x + 1), src.y,
 		math.min(math.max(dst.z, src.z - 1), src.z + 1), src.y)
-	local t1 = Voxel:get_tile(p)
+	-- FIXME: Stick terrain
+	local t1 = 0--Voxel:get_tile(p)
 	p.y = p.y + 1
-	local t2 = Voxel:get_tile(p)
+	-- FIXME: Stick terrain
+	local t2 = 0--Voxel:get_tile(p)
 	if t1 == 0 and t2 == 0 then
 		return true
 	end
 	p.y = p.y + 1
-	local t3 = Voxel:get_tile(p)
+	-- FIXME: Stick terrain
+	local t3 = 0--Voxel:get_tile(p)
 	if t2 == 0 and t3 == 0 then
 		self.object:jump()
 		return true
