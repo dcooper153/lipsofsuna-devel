@@ -75,6 +75,7 @@ int liext_terrain_column_intersect_ray (
 	};
 
 	/* Collide against each stick. */
+	int found = 0;
 	float ys = 0.0f;
 	float ys_min = 0.0f;
 	float ys_max = 0.0f;
@@ -103,11 +104,14 @@ int liext_terrain_column_intersect_ray (
 			btConvexHullShape shape ((btScalar*) verts, 8, sizeof (btVector3));
 			if (private_convex_ray_cast (t0, t1, &shape, &fraction, &normal))
 			{
-				btVector3 p (p0 + (p1 - p0) * fraction);
-				*result_point = limat_vector_init (p[0], p[1], p[2]);
-				*result_normal = limat_vector_init (normal[0], normal[1], normal[2]);
-				*result_fraction = fraction;
-				return 1;
+				if (!found || fraction < *result_fraction)
+				{
+					btVector3 p (p0 + (p1 - p0) * fraction);
+					*result_point = limat_vector_init (p[0], p[1], p[2]);
+					*result_normal = limat_vector_init (normal[0], normal[1], normal[2]);
+					*result_fraction = fraction;
+					found = 1;
+				}
 			}
 		}
 
@@ -122,7 +126,7 @@ int liext_terrain_column_intersect_ray (
 		ys_min = LIMAT_MIN (ys_max, verts[7][1]);
 	}
 
-	return 0;
+	return found;
 }
 
 /*****************************************************************************/
