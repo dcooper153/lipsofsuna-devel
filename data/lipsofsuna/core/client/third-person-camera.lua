@@ -129,6 +129,9 @@ ThirdPersonCamera.get_transform = function(self)
 	return pos,rot,turn1,displ_pos,displ_rot
 end
 
+--- Updates the camera transformation.
+-- @param self Camera.
+-- @param secs Seconds since the last update.
 ThirdPersonCamera.update = function(self, secs)
 	self.timer = self.timer + secs
 	while self.timer > self.tick do
@@ -158,7 +161,7 @@ ThirdPersonCamera.update = function(self, secs)
 		-- Mix in the free rotation mode.
 		local mix = math.max(math.abs(self.turn_state),math.abs(self.tilt_state))
 		drot:nlerp(Quaternion(), 1 - math.min(1, 30 * mix))
-		-- Min in the camera quake.
+		-- Mix in the camera quake.
 		if self.quake then
 			local rnd = Vector(2*math.random()-1, 2*math.random()-1, 2*math.random()-1)
 			pos = pos + rnd * 6 * math.min(1, self.quake)
@@ -168,8 +171,10 @@ ThirdPersonCamera.update = function(self, secs)
 			end
 		end
 		-- Set the target transformation.
-		self:set_target_position(dpos:transform(turn, pos))
-		self:set_target_rotation(drot:concat(rot))
+		local target_pos = dpos:transform(turn, pos)
+		local target_rot = drot:concat(rot)
+		self:set_target_position(target_pos)
+		self:set_target_rotation(target_rot)
 		-- Interpolate.
 		Camera.update(self, self.tick)
 	end

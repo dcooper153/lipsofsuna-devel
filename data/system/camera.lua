@@ -1,4 +1,4 @@
---- TODO:doc
+--- Generic camera interface.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -16,7 +16,7 @@ end
 
 ------------------------------------------------------------------------------
 
---- TODO:doc
+--- Generic camera interface.
 -- @type Camera
 local Camera = Class("Camera")
 
@@ -270,14 +270,14 @@ Camera.get_target_rotation = function(self)
 	return Quaternion:new_from_handle(Los.camera_get_target_rotation(self.handle))
 end
 
---- Sets the rotation rotation of the camera.
+--- Sets the target rotation of the camera.
 -- @param self Camera.
 -- @param v Quaternion.
 Camera.set_target_rotation = function(self, v)
 	Los.camera_set_target_rotation(self.handle, v.handle)
 end
 
---- The viewport of the camera.
+--- Gets the viewport of the camera.
 -- @param self Camera.
 -- @return Table of four numbers.
 Camera.get_viewport = function(self)
@@ -292,5 +292,3 @@ Camera.set_viewport = function(self, v)
 end
 
 return Camera
-
-
