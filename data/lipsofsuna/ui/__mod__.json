@@ -1,0 +1,6 @@
+{
+	"server": false,
+	"resources": [".", "sounds"],
+	"scripts": ["theme", "ui"],
+	"specs": ["specs"]
+}
