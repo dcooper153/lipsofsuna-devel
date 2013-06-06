@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 require(Mod.path .. "spec")
-require "common/string"
 
 --- TODO:doc
 -- @type CraftingRecipeSpec
@@ -38,5 +37,3 @@ CraftingRecipeSpec.new = function(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
-
-

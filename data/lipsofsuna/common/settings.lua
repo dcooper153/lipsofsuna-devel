@@ -9,12 +9,12 @@
 -- @alias Settings
 
 local Class = require("system/class")
-require "common/string"
+local String = require("system/string")
 
 --- TODO:doc
 -- @type Settings
 Settings = Class("Settings")
-Settings.arguments = string.split(Program:get_args())
+Settings.arguments = String.split(Program:get_args())
 Settings.address = "localhost"
 Settings.port = 10101
 Settings.account = "guest"

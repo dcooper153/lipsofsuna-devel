@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Damage = require("core/server/damage")
+local Serialize = require("system/serialize")
 
 --- TODO:doc
 -- @type Feat
@@ -394,7 +395,7 @@ end
 -- @param self Feat.
 -- @return String.
 Feat.write = function(self)
-	return string.format("return Feat%s", serialize{
+	return string.format("return Feat%s", Serialize:write{
 		animation = self.animation,
 		effects = self.effects})
 end

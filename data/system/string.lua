@@ -1,4 +1,4 @@
---- TODO:doc
+--- String helpers.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -16,10 +16,14 @@ end
 
 ------------------------------------------------------------------------------
 
---- TODO:doc
+--- String helpers.
 -- @type String
 local String = Class("String")
 
+--- Splits the string.
+-- @param self String.
+-- @sep Separator.
+-- @return List of strings.
 String.split = function(self, sep)
 	local sep,fields = sep or " ", {}
 	local pattern = string.format("([^%s]+)", sep)
@@ -42,5 +46,3 @@ String.wchar_to_utf8 = function(wstr)
 end
 
 return String
-
-

@@ -11,7 +11,6 @@
 local Class = require("system/class")
 local Crafting = require("crafting/crafting")
 require(Mod.path .. "spec")
-require "common/string"
 
 --- TODO:doc
 -- @type Itemspec

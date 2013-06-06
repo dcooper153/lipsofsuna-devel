@@ -1,3 +1,22 @@
+--- Generic serialization of Lua types.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module system.serialize
+-- @alias Serialize
+
+local Class = require("system/class")
+
+------------------------------------------------------------------------------
+
+--- Generic serialization of Lua types.
+-- @type Serialize
+local Serialize = Class("Serialize")
+
+local serialize
 serialize = function(val)
 	if type(val) == "string" then
 		-- Write an escaped and quoted string.
@@ -39,3 +58,12 @@ serialize = function(val)
 		return "nil"
 	end
 end
+
+--- Serializes the value.
+-- @param value Value.
+-- @return String.
+Serialize.write = function(self, value)
+	serialize(value)
+end
+
+return Serialize

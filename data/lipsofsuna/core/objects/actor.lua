@@ -13,6 +13,7 @@ local Coroutine = require("system/coroutine")
 local Item = require("core/objects/item")
 local Physics = require("system/physics")
 local ObjectSerializer = require("core/server/object-serializer")
+local Serialize = require("system/serialize")
 local SimulationObject = require("core/objects/simulation")
 local Skills = require("core/server/skills")
 local Stats = require("core/server/stats")
@@ -968,7 +969,7 @@ end
 -- @return String.
 Actor.write_preset = function(self)
 	assert(self:has_client_data())
-	return serialize{
+	return Serialize:write{
 		animation_profile = self.animation_profile,
 		body_scale = self.body_scale,
 		body_style = self.body_style,
