@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Keysym = require("system/keysym")
 local String = require("system/string")
 require(Mod.path .. "widget")
 

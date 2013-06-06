@@ -1,4 +1,5 @@
 local Binding = require("core/client/binding")
+local Keysym = require("system/keysym")
 
 Binding{name = "attack", mode = "toggle", key1 = "mouse1", func = function(v)
 	if not Client.player_object then return end

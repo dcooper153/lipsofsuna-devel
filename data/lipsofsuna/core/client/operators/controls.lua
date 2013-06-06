@@ -1,5 +1,7 @@
 local Class = require("system/class")
 local ConfigFile = require("system/config-file")
+local Keycode = require("system/keycode")
+local Keysym = require("system/keysym")
 
 Operators.controls = Class("ControlsOperator")
 Operators.controls.data = {}

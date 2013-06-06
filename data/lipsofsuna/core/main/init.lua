@@ -13,6 +13,7 @@ local Class = require("system/class")
 local Eventhandler = require("system/eventhandler")
 local ModelManager = require("core/main/model-manager")
 local Timing = require("core/main/timing")
+local Watchdog = require("system/watchdog")
 
 --- The main loop of the game.
 -- @type Main
@@ -88,7 +89,7 @@ Main.new = function(clss)
 			clss.timing:start_frame()
 			clss.timing:start_action("program")
 			if Settings.watchdog then
-				Program:watchdog_start(30)
+				Watchdog:start(30)
 			end
 			Program:update()
 			Program:update_scene(tick)

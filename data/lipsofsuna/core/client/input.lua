@@ -9,6 +9,7 @@
 -- @alias Input
 
 local Class = require("system/class")
+local Keycode = require("system/keycode")
 
 --- TODO:doc
 -- @type Input

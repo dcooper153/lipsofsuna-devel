@@ -1,4 +1,5 @@
 local Binding = require("core/client/binding")
+local Keysym = require("system/keysym")
 
 Binding{name = "editor_copy", mode = "press", key1 = Keysym.x, func = function(v)
 	if Ui.root ~= "editor" then return end
