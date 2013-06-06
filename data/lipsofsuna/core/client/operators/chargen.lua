@@ -1,6 +1,6 @@
 local Camera = require("system/camera")
 local Class = require("system/class")
-local Color = require("common/color")
+local Color = require("system/color")
 local Model = require("system/model")
 local ModelBuilder = require(Mod.path .. "model-builder")
 local ModelMerger = require("system/model-merger")

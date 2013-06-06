@@ -10,7 +10,7 @@
 
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
-local Color = require("common/color")
+local Color = require("system/color")
 local Item = require("core/objects/item")
 local Obstacle = require("core/objects/obstacle")
 local Physics = require("system/physics")

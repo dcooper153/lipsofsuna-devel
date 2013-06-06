@@ -9,7 +9,7 @@
 -- @alias Actorspec
 
 local Class = require("system/class")
-local Color = require("common/color")
+local Color = require("system/color")
 local Spec = require(Mod.path .. "spec")
 
 --- TODO:doc

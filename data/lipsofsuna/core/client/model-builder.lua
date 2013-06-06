@@ -9,7 +9,7 @@
 -- @alias ModelBuilder
 
 local Class = require("system/class")
-local Color = require("common/color")
+local Color = require("system/color")
 local Model = require("system/model")
 local ModelMerger = require("system/model-merger")
 
