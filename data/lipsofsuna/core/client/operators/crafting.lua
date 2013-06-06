@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Crafting = require("crafting/crafting")
 
 Operators.crafting = Class("CraftingOperator")
 Operators.crafting.data = {}

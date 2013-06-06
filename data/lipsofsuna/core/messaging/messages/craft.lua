@@ -1,3 +1,5 @@
+local Crafting = require("crafting/crafting")
+
 Message{
 	name = "craft",
 	client_to_server_encode = function(self, id, name)
