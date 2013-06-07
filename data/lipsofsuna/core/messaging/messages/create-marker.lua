@@ -1,3 +1,5 @@
+local Marker = require("core/marker")
+
 Message{
 	name = "create marker",
 	server_to_client_encode = function(self, name, point)

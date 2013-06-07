@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local ObjectSerializer = require("core/server/object-serializer")
+local Marker = require("core/marker")
 local SimulationObject = require("core/objects/simulation")
 
 --- TODO:doc

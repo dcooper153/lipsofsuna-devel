@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Marker = require("core/marker")
 
 Operators.quests = Class("QuestsOperator")
 Operators.quests.data = {}

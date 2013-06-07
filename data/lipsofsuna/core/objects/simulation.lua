@@ -11,6 +11,7 @@
 local Class = require("system/class")
 local Inventory = require("core/server/inventory")
 local Object = require("system/object")
+local Marker = require("core/marker")
 local Model = require("system/model")
 local PhysicsObject = require("system/physics-object")
 local Settings = require("common/settings")

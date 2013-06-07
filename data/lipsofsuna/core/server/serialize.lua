@@ -9,6 +9,7 @@
 -- @alias Serialize
 
 local Class = require("system/class")
+local Marker = require("core/marker")
 
 --- TODO:doc
 -- @type Serialize

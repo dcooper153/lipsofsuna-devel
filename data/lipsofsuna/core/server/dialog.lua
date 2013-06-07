@@ -11,6 +11,7 @@
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Item = require("core/objects/item")
+local Marker = require("core/marker")
 local Obstacle = require("core/objects/obstacle")
 local Trading = require(Mod.path .. "trading")
 

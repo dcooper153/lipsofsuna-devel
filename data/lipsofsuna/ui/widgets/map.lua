@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Marker = require("core/marker")
 require(Mod.path .. "widget")
 
 Widgets.Uimap = Class("Uimap", Widgets.Uiwidget)

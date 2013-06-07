@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Material = require("system/material")
+local Marker = require("core/marker")
 local Network = require("system/network")
 local Region = require("core/generator/region")
 local Sector = require("system/sector")

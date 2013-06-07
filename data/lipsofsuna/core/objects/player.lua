@@ -10,6 +10,7 @@
 
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
+local Marker = require("core/marker")
 local Packet = require("system/packet")
 local Sector = require("system/sector")
 local Vision = require("system/vision")

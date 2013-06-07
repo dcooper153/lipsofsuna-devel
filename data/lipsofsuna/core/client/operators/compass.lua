@@ -1,3 +1,5 @@
+local Marker = require("core/marker")
+
 --- Gets the currently shown map marker.
 -- @param self Client.
 -- @return Marker or nil.

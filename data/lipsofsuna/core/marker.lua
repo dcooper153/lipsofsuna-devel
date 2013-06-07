@@ -1,18 +1,18 @@
---- TODO:doc
+--- Map marker.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module common.marker
+-- @module lipsofsuna.core.marker
 -- @alias Marker
 
 local Class = require("system/class")
 
---- TODO:doc
+--- Map marker.
 -- @type Marker
-Marker = Class("Marker")
+local Marker = Class("Marker")
 Marker.dict_name = {}
 Marker.dict_discoverable = {}
 
@@ -69,4 +69,4 @@ Marker.unlock = function(self)
 	Server.serialize:save_marker(self)
 end
 
-
+return Marker

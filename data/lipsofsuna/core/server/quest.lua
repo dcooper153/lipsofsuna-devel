@@ -8,8 +8,8 @@
 -- @module core.server.quest
 -- @alias Quest
 
-require "common/marker"
 local Class = require("system/class")
+local Marker = require("core/marker")
 
 --- TODO:doc
 -- @type Quest
