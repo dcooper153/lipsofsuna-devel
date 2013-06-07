@@ -12,7 +12,7 @@ local Class = require("system/class")
 local Binding = require("core/client/binding")
 local EffectManager = require("core/client/effect-manager")
 local File = require("system/file")
-local FirstPersonCamera = require("core/client/first-person-camera")
+local Hooks = require("system/hooks")
 local Input = require("core/client/input")
 local Lighting = require("core/client/lighting")
 local Options = require("core/client/options")
@@ -22,7 +22,6 @@ local Reload = require("system/reload")
 local Simulation = require("core/client/simulation")
 local Skills = require("core/server/skills")
 local TerrainSync = require("core/client/terrain-sync")
-local ThirdPersonCamera = require("core/client/third-person-camera")
 local UnlockManager = require("core/server/unlock-manager")
 
 --- TODO:doc
@@ -30,8 +29,10 @@ local UnlockManager = require("core/server/unlock-manager")
 Client = Class("Client")
 
 -- FIXME
-Client.init_hooks = {}
-Client.update_hooks = {}
+Client.init_hooks = Hooks()
+Client.player_hooks = Hooks()
+Client.reset_hooks = Hooks()
+Client.update_hooks = Hooks()
 
 -- FIXME
 Client.operators = {}
@@ -53,25 +54,9 @@ Client.init = function(self)
 	Reload:set_enabled(true)
 	self.lighting = Lighting()
 	-- Call the initialization hooks.
-	for k,v in ipairs(self.init_hooks) do
-		v.hook(secs)
-	end
+	self.init_hooks:call(secs)
 	-- Initialize the editor.
 	--self.editor = Editor()
-	-- Initialize the camera.
-	-- These need to be initialized before options since they'll be
-	-- reconfigured when the options are loaded.
-	self.camera1 = FirstPersonCamera()
-	self.camera1:set_collision_mask(Game.PHYSICS_MASK_CAMERA)
-	self.camera1:set_far(self.options.view_distance)
-	self.camera1:set_fov(1.1)
-	self.camera1:set_near(0.1)
-	self.camera3 = ThirdPersonCamera()
-	self.camera3:set_collision_mask(Game.PHYSICS_MASK_CAMERA)
-	self.camera3:set_far(self.options.view_distance)
-	self.camera3:set_fov(1.1)
-	self.camera3:set_near(0.1)
-	self:set_camera_mode("third-person")
 	-- Initialize data.
 	self:reset_data()
 	self.terrain_sync = TerrainSync()
@@ -135,8 +120,9 @@ Client.create_world = function(self)
 end
 
 Client.reset_data = function(self)
-	Operators.camera:reset()
-	Operators.chargen:reset()
+	-- Call the reset hooks.
+	self.reset_hooks:call(secs)
+
 	Operators.inventory:reset()
 	Operators.spells:reset()
 	Operators.quests:reset()
@@ -164,47 +150,32 @@ end
 -- @param priority Priority.
 -- @param hook Function.
 Client.register_init_hook = function(self, priority, hook)
-	local h = {priority = priority, hook = hook}
-	for k,v in ipairs(self.init_hooks) do
-		if priority < v.priority then
-			table.insert(self.init_hooks, k, h)
-			return
-		end
-	end
-	table.insert(self.init_hooks, h)
+	self.init_hooks:register(priority, hook)
+end
+
+--- Registers a player object change hook.
+-- @param priority Priority.
+-- @param hook Function.
+Client.register_player_hook = function(self, priority, hook)
+	self.player_hooks:register(priority, hook)
+end
+
+--- Registers a game reset hook.
+-- @param priority Priority.
+-- @param hook Function.
+Client.register_reset_hook = function(self, priority, hook)
+	self.reset_hooks:register(priority, hook)
 end
 
 --- Registers an update hook.
 -- @param priority Priority.
 -- @param hook Function.
 Client.register_update_hook = function(self, priority, hook)
-	local h = {priority = priority, hook = hook}
-	for k,v in ipairs(self.update_hooks) do
-		if priority < v.priority then
-			table.insert(self.update_hooks, k, h)
-			return
-		end
-	end
-	table.insert(self.update_hooks, h)
+	self.update_hooks:register(priority, hook)
 end
 
 Client.update = function(self, secs)
-	for k,v in ipairs(self.update_hooks) do
-		v.hook(secs)
-	end
-end
-
-Client.update_camera = function(self)
-	--Program:set_multisamples(Client.options.multisamples)
-	Program:set_camera_far(self.camera:get_far())
-	Program:set_camera_near(self.camera:get_near())
-	Program:set_camera_position(self.camera:get_position())
-	Program:set_camera_rotation(self.camera:get_rotation())
-	local mode = Program:get_video_mode()
-	local viewport = {0, 0, mode[1], mode[2]}
-	self.camera:set_viewport(viewport)
-	self.camera1:set_viewport(viewport)
-	self.camera3:set_viewport(viewport)
+	self.update_hooks:call(secs)
 end
 
 --- Sets or unsets the text of the action label.
@@ -242,14 +213,6 @@ Client.terminate_game = function(self)
 	self.terrain_sync:clear()
 end
 
-Client.get_camera_mode = function(self)
-	if self.camera == self.camera1 then
-		return "first-person"
-	else
-		return "third-person"
-	end
-end
-
 Client.get_connected = function(self)
 	return self.data.connection.waiting
 end
@@ -258,24 +221,9 @@ Client.get_player_object = function(self)
 	return self.player_object
 end
 
-Client.set_camera_mode = function(self, v)
-	if v == "first-person" then
-		self.camera = self.camera1
-	else
-		self.camera = self.camera3
-	end
-	self.camera:reset()
-end
-
-Client.set_mouse_smoothing = function(self, v)
-	local s = v and 0.7 or 1
-	self.camera3:set_rotation_smoothing(s)
-	self.camera3:set_position_smoothing(s)
-end
-
 Client.set_player_object = function(self, v)
 	self.player_object = v
-	self.camera = self.camera3
+	self.player_hooks:call(v)
 end
 
 return Client

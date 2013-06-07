@@ -59,18 +59,6 @@ end
 -- @param self PlayerState.
 -- @param secs Seconds since the last update.
 PlayerState.update = function(self, secs)
-	-- Update targeting.
-	if Client.player_object then
-		local r1,r2 = Client.camera1:get_picking_ray()
-		if r1 then
-			local p,o = Simulation:pick_scene_by_ray(r1, r2)
-			self:set_targeted_object(o)
-			self.crosshair = (p or r2) - (r2 - r1):normalize() * 0.1
-		end
-	else
-		self:set_targeted_object()
-		self.crosshair = nil
-	end
 	-- Update rotation.
 	if Client.player_object and not Client.player_object.dead then
 		local spec = Client.player_object.spec

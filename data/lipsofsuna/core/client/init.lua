@@ -40,13 +40,6 @@ Client:register_update_hook(10, function(secs)
 	end
 	-- Update the player state.
 	Client.player_state:update(secs)
-	if Client.player_object then
-		Client.camera1.object = Client.player_object
-		Client.camera3.object = Client.player_object
-		Client.camera1:update(secs)
-		Client.camera3:update(secs)
-		Client.lighting:update(secs)
-	end
 end)
 Client:register_update_hook(20, function(secs)
 	if Client.player_object then
@@ -65,9 +58,6 @@ Client:register_update_hook(20, function(secs)
 	end
 	-- FIXME
 	if Client.player_object then
-		Client:update_camera()
 		Client.lighting:set_dungeon_mode(false)
-		Client.camera1:set_far(Client.options.view_distance)
-		Client.camera3:set_far(Client.options.view_distance)
 	end
 end)

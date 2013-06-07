@@ -1,14 +1,14 @@
 local Class = require("system/class")
 
-Operators.camera = Class("CameraOperator")
-Operators.camera.data = {}
+local Camera = Class("CameraOperator")
+Camera.data = {}
 
 --- Initializes the camera operator.
 --
 -- Context: The game must have been joined and the character created.
 --
 -- @param self Operator.
-Operators.camera.reset = function(self)
+Camera.reset = function(self)
 	self.data = {}
 end
 
@@ -18,7 +18,7 @@ end
 --
 -- @param self Operator.
 -- @return True if being rotated.
-Operators.camera.get_rotation_mode = function(self)
+Camera.get_rotation_mode = function(self)
 	return self.data.rotating
 end
 
@@ -28,6 +28,8 @@ end
 --
 -- @param self Operator.
 -- @param value True to enable rotation.
-Operators.camera.set_rotation_mode = function(self, value)
+Camera.set_rotation_mode = function(self, value)
 	self.data.rotating = value
 end
+
+return Camera
