@@ -15,6 +15,7 @@ Program:set_window_title("Lips of Suna")
 
 require("core/client/bindings")
 local Client = require("core/client/client")
+local Network = require("system/network")
 local Simulation = require("core/client/simulation")
 
 -- FIXME: Most of these should be registered elsewhere.

@@ -16,15 +16,12 @@ local File = require("system/file")
 local FirstPersonCamera = require("core/client/first-person-camera")
 local Input = require("core/client/input")
 local Lighting = require("core/client/lighting")
-local Network = require("system/network")
 local Options = require("core/client/options")
 local Physics = require("system/physics")
 local PlayerState = require("core/client/player-state")
-local Quickslots = require("core/quickslots/quickslots")
 local Reload = require("system/reload")
 local Simulation = require("core/client/simulation")
 local Skills = require("core/server/skills")
-local Sound = require("system/sound")
 local TerrainSync = require("core/client/terrain-sync")
 local ThirdPersonCamera = require("core/client/third-person-camera")
 local UnlockManager = require("core/server/unlock-manager")
@@ -34,6 +31,7 @@ local UnlockManager = require("core/server/unlock-manager")
 Client = Class("Client")
 
 -- FIXME
+Client.init_hooks = {}
 Client.update_hooks = {}
 
 -- FIXME
@@ -55,12 +53,13 @@ Client.init = function(self)
 	Program:load_graphics()
 	Reload:set_enabled(true)
 	self.lighting = Lighting()
-	-- Initialize the UI.
-	Ui:init()
 	-- Initialize the database.
 	self.db = Database("client.sqlite")
 	self.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
-	Quickslots:init()
+	-- Call the initialization hooks.
+	for k,v in ipairs(self.init_hooks) do
+		v.hook(secs)
+	end
 	-- Initialize the editor.
 	--self.editor = Editor()
 	-- Initialize the camera.
@@ -163,6 +162,20 @@ Client.reset_data = function(self)
 		for k1,v1 in pairs(v.requires) do found = true end
 		self.data.skills[k] = {active = not found, value = false}
 	end
+end
+
+--- Registers an initialization hook.
+-- @param priority Priority.
+-- @param hook Function.
+Client.register_init_hook = function(self, priority, hook)
+	local h = {priority = priority, hook = hook}
+	for k,v in ipairs(self.init_hooks) do
+		if priority < v.priority then
+			table.insert(self.init_hooks, k, h)
+			return
+		end
+	end
+	table.insert(self.init_hooks, h)
 end
 
 --- Registers an update hook.
