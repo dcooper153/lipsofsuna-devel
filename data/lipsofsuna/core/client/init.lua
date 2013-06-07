@@ -13,5 +13,60 @@ require "system/widgets"
 
 Program:set_window_title("Lips of Suna")
 
-require(Mod.path .. "bindings")
-require(Mod.path .. "client")
+require("core/client/bindings")
+local Client = require("core/client/client")
+local Simulation = require("core/client/simulation")
+
+-- FIXME: Most of these should be registered elsewhere.
+Client:register_update_hook(10, function(secs)
+	-- Update the simulation.
+	Simulation:update(secs)
+	-- Update the benchmark.
+	if Client.benchmark then
+		Client.benchmark:update(secs)
+		return
+	end
+	-- Update the connection status.
+	if Client:get_connected() and not Network:get_connected() then
+		Client:terminate_game()
+		Client.options.host_restart = false
+		Client.data.connection.active = false
+		Client.data.connection.waiting = false
+		Client.data.connection.connecting = false
+		Client.data.connection.text = "Lost connection to the server!"
+		Client.data.load.next_state = "start-game"
+		Ui:set_state("load")
+	end
+	-- Update the player state.
+	Client.player_state:update(secs)
+	if Client.player_object then
+		Client.camera1.object = Client.player_object
+		Client.camera3.object = Client.player_object
+		Client.camera1:update(secs)
+		Client.camera3:update(secs)
+		Client.lighting:update(secs)
+	end
+end)
+Client:register_update_hook(20, function(secs)
+	if Client.player_object then
+		-- Refresh the active portion of the map.
+		Client.player_object:refresh()
+		-- Notify the terrain manager of the view center.
+		Game.terrain:set_view_center(Client.player_object:get_position())
+	end
+	-- Update effects.
+	-- Must be done after objects to ensure correct anchoring.
+	if Game.initialized then
+		for k in pairs(Game.scene_nodes_by_ref) do
+			k:update(secs)
+		end
+		Client.effects:update(secs)
+	end
+	-- FIXME
+	if Client.player_object then
+		Client:update_camera()
+		Client.lighting:set_dungeon_mode(false)
+		Client.camera1:set_far(Client.options.view_distance)
+		Client.camera3:set_far(Client.options.view_distance)
+	end
+end)

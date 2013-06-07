@@ -1,14 +1,14 @@
 local Class = require("system/class")
 local Feat = require("arena/feat")
 
-Widgets.Quickpage = Class("Quickpage")
+local Quickpage = Class("Quickpage")
 
 --- Creates a new quickslots page.
 -- @param clss Quickpage class.
 -- @param args Arguments.<ul>
 --   <li>type: Page type.</li></ul>
 -- @return Quickpage.
-Widgets.Quickpage.new = function(clss, args)
+Quickpage.new = function(clss, args)
 	-- Create self.
 	local self = Class.new(clss)
 	self.type = args and args.type or "feats"
@@ -23,7 +23,7 @@ end
 --- Clears a quickslot assignment.
 -- @param self Quickpage.
 -- @param index Quickslot index number.
-Widgets.Quickpage.assign_none = function(self, index)
+Quickpage.assign_none = function(self, index)
 	if index > #self.buttons then return end
 	self.buttons[index].feat = nil
 	self.buttons[index].item = nil
@@ -34,7 +34,7 @@ end
 -- @param self Quickpage.
 -- @param index Quickslot index number.
 -- @param feat Feat to assign.
-Widgets.Quickpage.assign_feat = function(self, index, feat)
+Quickpage.assign_feat = function(self, index, feat)
 	if not feat then return end
 	if index > #self.buttons then return end
 	self.buttons[index].feat = feat
@@ -46,7 +46,7 @@ end
 -- @param self Quickpage class.
 -- @param index Quickslot index number.
 -- @param item Item to assign.
-Widgets.Quickpage.assign_item = function(self, index, item)
+Quickpage.assign_item = function(self, index, item)
 	if index > #self.buttons then return end
 	self.buttons[index].feat = nil
 	self.buttons[index].item = item.name
@@ -58,7 +58,7 @@ end
 -- to the slot. Otherwise, the item or feat in the slot is activated.
 -- @param self Quickpage class.
 -- @param index Quickslot index number.
-Widgets.Quickpage.activate = function(self, index)
+Quickpage.activate = function(self, index)
 	local feat = self.buttons[index].feat
 	local item = self.buttons[index].item
 	if feat then
@@ -87,7 +87,7 @@ end
 
 --- Loads feats from the database.
 -- @param self Quickpage.
-Widgets.Quickpage.load = function(self)
+Quickpage.load = function(self)
 	-- Only load feats.
 	if self.type ~= "feats" then return end
 	self.db = Client.db
@@ -115,7 +115,7 @@ end
 
 --- Saves feats to the database.
 -- @param self Quickpage.
-Widgets.Quickpage.save = function(self)
+Quickpage.save = function(self)
 	if self.type ~= "feats" then return end
 	if self.loading then return end
 	for k,v in ipairs(self.buttons) do
@@ -124,3 +124,5 @@ Widgets.Quickpage.save = function(self)
 		self.db:query("REPLACE INTO quickslots (slot,item,feat) VALUES (?,?,?);", {k, item, feat})
 	end
 end
+
+return Quickpage

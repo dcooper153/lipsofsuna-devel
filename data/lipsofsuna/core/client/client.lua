@@ -9,23 +9,24 @@
 -- @alias Client
 
 local Class = require("system/class")
-local Binding = require(Mod.path .. "binding")
+local Binding = require("core/client/binding")
 local Database = require("system/database")
-local EffectManager = require(Mod.path .. "effect-manager")
+local EffectManager = require("core/client/effect-manager")
 local File = require("system/file")
-local FirstPersonCamera = require(Mod.path .. "first-person-camera")
-local Input = require(Mod.path .. "input")
-local Lighting = require(Mod.path .. "lighting")
+local FirstPersonCamera = require("core/client/first-person-camera")
+local Input = require("core/client/input")
+local Lighting = require("core/client/lighting")
 local Network = require("system/network")
-local Options = require(Mod.path .. "options")
+local Options = require("core/client/options")
 local Physics = require("system/physics")
-local PlayerState = require(Mod.path .. "player-state")
+local PlayerState = require("core/client/player-state")
+local Quickslots = require("core/quickslots/quickslots")
 local Reload = require("system/reload")
-local Simulation = require(Mod.path .. "simulation")
+local Simulation = require("core/client/simulation")
 local Skills = require("core/server/skills")
 local Sound = require("system/sound")
-local TerrainSync = require(Mod.path .. "terrain-sync")
-local ThirdPersonCamera = require(Mod.path .. "third-person-camera")
+local TerrainSync = require("core/client/terrain-sync")
+local ThirdPersonCamera = require("core/client/third-person-camera")
 local UnlockManager = require("core/server/unlock-manager")
 
 --- TODO:doc
@@ -33,9 +34,12 @@ local UnlockManager = require("core/server/unlock-manager")
 Client = Class("Client")
 
 -- FIXME
+Client.update_hooks = {}
+
+-- FIXME
 Client.operators = {}
 Operators = Client.operators
-File:require_directory(Mod.path .. "operators")
+File:require_directory("core/client/operators")
 
 Client.init = function(self)
 	self.effects = EffectManager()
@@ -58,7 +62,7 @@ Client.init = function(self)
 	self.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
 	Quickslots:init()
 	-- Initialize the editor.
-	self.editor = Editor()
+	--self.editor = Editor()
 	-- Initialize the camera.
 	-- These need to be initialized before options since they'll be
 	-- reconfigured when the options are loaded.
@@ -141,7 +145,7 @@ Client.reset_data = function(self)
 	Operators.inventory:reset()
 	Operators.spells:reset()
 	Operators.quests:reset()
-	self.editor:reset()
+	--self.editor:reset()
 	self.data = {}
 	self.data.admin = {}
 	self.data.book = {}
@@ -161,84 +165,23 @@ Client.reset_data = function(self)
 	end
 end
 
+--- Registers an update hook.
+-- @param priority Priority.
+-- @param hook Function.
+Client.register_update_hook = function(self, priority, hook)
+	local h = {priority = priority, hook = hook}
+	for k,v in ipairs(self.update_hooks) do
+		if priority < v.priority then
+			table.insert(self.update_hooks, k, h)
+			return
+		end
+	end
+	table.insert(self.update_hooks, h)
+end
+
 Client.update = function(self, secs)
-	-- Emit key repeat events.
-	local t = Program:get_time()
-	for k,v in pairs(self.input.pressed) do
-		if t - v.time > 0.05 then
-			v.type = "keyrepeat"
-			v.mods = self.input.mods
-			v.time = t
-			Ui:handle_event(v)
-		end
-	end
-	-- Update the user interface state.
-	Ui:update(secs)
-	-- Update the window size.
-	if Ui.was_resized then
-		local v = Program:get_video_mode()
-		self.options.window_width = v[1]
-		self.options.window_height = v[2]
-		self.options.fullscreen = v[3]
-		self.options.vsync = v[4]
-		self.options:save()
-	end
-	-- Update the simulation.
-	Simulation:update(secs)
-	-- Update the benchmark.
-	if self.benchmark then
-		self.benchmark:update(secs)
-		return
-	end
-	-- Update the connection status.
-	if self:get_connected() and not Network:get_connected() then
-		self:terminate_game()
-		self.options.host_restart = false
-		self.data.connection.active = false
-		self.data.connection.waiting = false
-		self.data.connection.connecting = false
-		self.data.connection.text = "Lost connection to the server!"
-		self.data.load.next_state = "start-game"
-		Ui:set_state("load")
-	end
-	-- Update the player state.
-	self.player_state:update(secs)
-	if self.player_object then
-		self.camera1.object = self.player_object
-		self.camera3.object = self.player_object
-		self.camera1:update(secs)
-		self.camera3:update(secs)
-		self.lighting:update(secs)
-		-- Sound playback.
-		local p,r = self.player_object:find_node{name = "#neck", space = "world"}
-		if p then
-			Sound:set_listener_position(p)
-			Sound:set_listener_rotation(r)
-		else
-			Sound:set_listener_position(self.player_object:get_position() + Vector(0,1.5,0))
-			Sound:set_listener_rotation(self.player_object:get_rotation())
-		end
-		local vel = self.player_object:get_velocity()
-		Sound:set_listener_velocity(vel)
-		-- Refresh the active portion of the map.
-		self.player_object:refresh()
-		-- Notify the terrain manager of the view center.
-		Game.terrain:set_view_center(self.player_object:get_position())
-	end
-	-- Update effects.
-	-- Must be done after objects to ensure correct anchoring.
-	if Game.initialized then
-		for k in pairs(Game.scene_nodes_by_ref) do
-			k:update(secs)
-		end
-		self.effects:update(secs)
-	end
-	-- FIXME
-	if self.player_object then
-		self:update_camera()
-		self.lighting:set_dungeon_mode(false)
-		self.camera1:set_far(self.options.view_distance)
-		self.camera3:set_far(self.options.view_distance)
+	for k,v in ipairs(self.update_hooks) do
+		v.hook(secs)
 	end
 end
 
@@ -326,4 +269,4 @@ Client.set_player_object = function(self, v)
 	self.camera = self.camera3
 end
 
-
+return Client

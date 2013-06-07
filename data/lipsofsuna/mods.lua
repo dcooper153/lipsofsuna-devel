@@ -16,7 +16,6 @@ Mod:load "core/objects"
 Mod:load "core/server"
 Mod:load "core/shadows"
 Mod:load "core/misc"
-Mod:load "client"
 Mod:load "benchmark"
 
 -- Actors
@@ -91,7 +90,7 @@ Mod:load "plants/mushroom"
 Mod:load "plants/tree"
 Mod:load "plants/watermelon"
 
--- Obstacles and other environment
+-- Environment
 Mod:load "environment/bricks"
 Mod:load "environment/building"
 Mod:load "environment/crafting"

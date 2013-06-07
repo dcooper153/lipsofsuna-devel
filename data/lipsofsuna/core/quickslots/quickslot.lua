@@ -1,14 +1,14 @@
 local Class = require("system/class")
 local Widget = require("system/widget")
 
-Widgets.Quickslot = Class("Quickslot", Widget)
+local Quickslot = Class("Quickslot", Widget)
 
-Widgets.Quickslot.new = function(clss, args)
+Quickslot.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	return self
 end
 
-Widgets.Quickslot.reshaped = function(self)
+Quickslot.reshaped = function(self)
 	local icon = self.icon or self.DEFAULT
 	self:set_request(39, 34, true)
 	local w = self:get_width()
@@ -62,5 +62,7 @@ Widgets.Quickslot.reshaped = function(self)
 	self:canvas_compile()
 end
 
-Widgets.Quickslot.pressed = function(self, args)
+Quickslot.pressed = function(self, args)
 end
+
+return Quickslot

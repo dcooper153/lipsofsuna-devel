@@ -10,16 +10,16 @@
 
 local Class = require("system/class")
 local Widget = require("system/widget")
-require "client/widgets/quickpage"
+local Quickpage = require("core/quickslots/quickpage")
 
 --- TODO:doc
 -- @type Quickslots
-Quickslots = Class("Quickslots")
+local Quickslots = Class("Quickslots")
 
 Quickslots.init = function(clss)
 	clss.group = Widget()
-	clss.items = Widgets.Quickpage{type = "items"}
-	clss.feats = Widgets.Quickpage{type = "feats"}
+	clss.items = Quickpage{type = "items"}
+	clss.feats = Quickpage{type = "feats"}
 	clss.mode = "feats"
 end
 
@@ -80,4 +80,4 @@ Quickslots.save = function(clss)
 	clss.feats:save()
 end
 
-
+return Quickslots

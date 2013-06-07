@@ -1,3 +1,5 @@
+local Quickslots = require("core/quickslots/quickslots")
+
 Message{
 	name = "accept character",
 	server_to_client_encode = function(self)

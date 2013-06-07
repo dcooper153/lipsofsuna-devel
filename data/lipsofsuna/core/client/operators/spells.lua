@@ -1,5 +1,6 @@
 local Class = require("system/class")
 local Feat = require("arena/feat")
+local Quickslots = require("core/quickslots/quickslots")
 
 Operators.spells = Class("SpellsOperator")
 Operators.spells.data = {slot = 1}

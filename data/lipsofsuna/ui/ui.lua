@@ -888,3 +888,5 @@ Ui.set_scroll_offset = function(self, v)
 	self.__scroll_offset = v
 	self.__scroll_range = {h, v, self.size.y}
 end
+
+return Ui
