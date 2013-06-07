@@ -1,12 +1,22 @@
+--- Character generator.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module character.chargen
+-- @alias Chargen
+
 local Camera = require("system/camera")
 local Class = require("system/class")
 local Color = require("system/color")
 local Model = require("system/model")
-local ModelBuilder = require(Mod.path .. "model-builder")
+local ModelBuilder = require("lipsofsuna/core/client/model-builder")
 local ModelMerger = require("system/model-merger")
 local RenderObject = require("system/render-object")
 local RenderModel = require("system/render-model")
-local RenderUtils = require(Mod.path .. "render-utils")
+local RenderUtils = require("lipsofsuna/core/client/render-utils")
 
 local scale255 = function(t)
 	local res = {}
@@ -14,24 +24,33 @@ local scale255 = function(t)
 	return res
 end
 
-Operators.chargen = Class("ChargenOperator")
-Operators.chargen.char = {}
-Operators.chargen.data = {}
+--- Character generator.
+-- @type Chargen
+local Chargen = Class("Chargen")
 
--- FIXME: Should not be here.
-Operators.chargen.list_races = {
-	{"Aer", "aer"},
-	{"Android", "android"},
-	{"Devora", "devora"},
-	{"Kraken", "kraken"},
-	{"Wyrm", "wyrm"}}
+--- Creates a new character generator.
+-- @param clss Chargen class.
+-- @return Chargen.
+Chargen.new = function(clss)
+	local self = Class.new(clss)
+	self.char = {}
+	self.data = {}
+	-- FIXME: Should not be here.
+	self.list_races = {
+		{"Aer", "aer"},
+		{"Android", "android"},
+		{"Devora", "devora"},
+		{"Kraken", "kraken"},
+		{"Wyrm", "wyrm"}}
+	return self
+end
 
 --- Initializes the character creator.
 --
 -- Context: Any.
 --
 -- @param self Operator.
-Operators.chargen.init = function(self)
+Chargen.init = function(self)
 	-- Create the object.
 	self.data.merger = ModelMerger()
 	self.data.render = RenderObject()
@@ -56,7 +75,7 @@ end
 -- Context: Any.
 --
 -- @param self Operator.
-Operators.chargen.reset = function(self)
+Chargen.reset = function(self)
 	if self.data.render then self.data.render:set_visible(false) end
 	self.data = {}
 	self.char = {
@@ -81,7 +100,7 @@ end
 -- Context: The character creator must have been initialized.
 --
 -- @param self Operator.
-Operators.chargen.apply = function(self)
+Chargen.apply = function(self)
 	Game.messaging:client_event("create character", {
 		animation_profile = self.char.animation_profile,
 		body_style = scale255(self.char.body),
@@ -106,7 +125,7 @@ end
 -- @param self Operator.
 -- @param args Event arguments.
 -- @return True if the caller should handle the event.
-Operators.chargen.input = function(self, args)
+Chargen.input = function(self, args)
 	if not Ui:get_pointer_grab() then return true end
 	local ret = true
 	-- Rotate the character.
@@ -131,7 +150,7 @@ end
 -- Context: The character creator must have been initialized.
 --
 -- @param self Operator.
-Operators.chargen.randomize = function(self)
+Chargen.randomize = function(self)
 	local index = math.random(1, #self.list_races)
 	self:set_race(self.list_races[index][2])
 	self.data.update_needed = true
@@ -143,7 +162,7 @@ end
 --
 -- @param self Operator.
 -- @return value Rotation amount.
-Operators.chargen.rotate = function(self, value)
+Chargen.rotate = function(self, value)
 	local rad = math.pi * value / 300
 	local rot = Quaternion{axis = Vector(0, 1, 0), angle = rad}
 	self.data.render:set_rotation(self.data.render:get_rotation() * rot)
@@ -155,7 +174,7 @@ end
 --
 -- @param self Operator.
 -- @return value Translation amount.
-Operators.chargen.translate = function(self, value)
+Chargen.translate = function(self, value)
 	local y = self.data.translation.y + value / 300
 	self.data.translation.y = math.min(math.max(y, 1), 2)
 end
@@ -166,7 +185,7 @@ end
 --
 -- @param self Operator.
 -- @param secs Seconds since the last update.
-Operators.chargen.update = function(self, secs)
+Chargen.update = function(self, secs)
 	local spec = Actorspec:find{name = self.char.race .. "-player"}
 	-- Build models.
 	if self.data.update_needed then
@@ -220,7 +239,7 @@ end
 --
 -- @param self Operator.
 -- @return Profile name.
-Operators.chargen.get_animation_profile = function(self)
+Chargen.get_animation_profile = function(self)
 	return self.char.animation_profile
 end
 
@@ -230,7 +249,7 @@ end
 --
 -- @param self Operator.
 -- @param value Profile name.
-Operators.chargen.set_animation_profile = function(self, value)
+Chargen.set_animation_profile = function(self, value)
 	self.char.animation_profile = value
 	self.data.update_needed = true
 end
@@ -242,7 +261,7 @@ end
 -- @param self Operator.
 -- @param slider Slider index.
 -- @return Slider value.
-Operators.chargen.get_body = function(self, slider)
+Chargen.get_body = function(self, slider)
 	return self.char.body[slider]
 end
 
@@ -253,7 +272,7 @@ end
 -- @param self Operator.
 -- @param slider Slider index.
 -- @param value Slider value.
-Operators.chargen.set_body = function(self, slider, value)
+Chargen.set_body = function(self, slider, value)
 	self.char.body[slider] = value
 	self.data.update_needed = true
 end
@@ -264,7 +283,7 @@ end
 --
 -- @param self Operator.
 -- @return Style name.
-Operators.chargen.get_eye_style = function(self)
+Chargen.get_eye_style = function(self)
 	return self.char.eye_style
 end
 
@@ -274,7 +293,7 @@ end
 --
 -- @param self Operator.
 -- @param value Style name.
-Operators.chargen.set_eye_style = function(self, value)
+Chargen.set_eye_style = function(self, value)
 	self.char.eye_style = value
 	self.data.update_needed = true
 end
@@ -286,7 +305,7 @@ end
 -- @param self Operator.
 -- @param channel Channel index.
 -- @return Channel value.
-Operators.chargen.get_eye_color = function(self, channel)
+Chargen.get_eye_color = function(self, channel)
 	return self.char.eye_color[channel]
 end
 
@@ -297,7 +316,7 @@ end
 -- @param self Operator.
 -- @param channel Channel index.
 -- @param value Channel value.
-Operators.chargen.set_eye_color = function(self, channel, value)
+Chargen.set_eye_color = function(self, channel, value)
 	self.char.eye_color[channel] = value
 	self.data.update_needed = true
 end
@@ -309,7 +328,7 @@ end
 -- @param self Operator.
 -- @param slider Slider index.
 -- @return Slider value.
-Operators.chargen.get_face = function(self, slider)
+Chargen.get_face = function(self, slider)
 	return self.char.face[slider]
 end
 
@@ -320,7 +339,7 @@ end
 -- @param self Operator.
 -- @param slider Slider index.
 -- @param value Slider value.
-Operators.chargen.set_face = function(self, slider, value)
+Chargen.set_face = function(self, slider, value)
 	self.char.face[slider] = value
 	self.data.update_needed = true
 end
@@ -331,7 +350,7 @@ end
 --
 -- @param self Operator.
 -- @return Style name.
-Operators.chargen.get_hair_style = function(self)
+Chargen.get_hair_style = function(self)
 	return self.char.hair_style
 end
 
@@ -341,7 +360,7 @@ end
 --
 -- @param self Operator.
 -- @param value Style name.
-Operators.chargen.set_hair_style = function(self, value)
+Chargen.set_hair_style = function(self, value)
 	self.char.hair_style = value
 	self.data.update_needed = true
 end
@@ -353,7 +372,7 @@ end
 -- @param self Operator.
 -- @param channel Channel index.
 -- @return Channel value.
-Operators.chargen.get_hair_color = function(self, channel)
+Chargen.get_hair_color = function(self, channel)
 	return self.char.hair_color[channel]
 end
 
@@ -364,7 +383,7 @@ end
 -- @param self Operator.
 -- @param channel Channel index.
 -- @param value Channel value.
-Operators.chargen.set_hair_color = function(self, channel, value)
+Chargen.set_hair_color = function(self, channel, value)
 	self.char.hair_color[channel] = value
 	self.data.update_needed = true
 end
@@ -375,7 +394,7 @@ end
 --
 -- @param self Operator.
 -- @return Style name.
-Operators.chargen.get_head_style = function(self)
+Chargen.get_head_style = function(self)
 	return self.char.head_style
 end
 
@@ -385,7 +404,7 @@ end
 --
 -- @param self Operator.
 -- @param value Style name.
-Operators.chargen.set_head_style = function(self, value)
+Chargen.set_head_style = function(self, value)
 	self.char.head_style = value
 	self.data.update_needed = true
 end
@@ -396,7 +415,7 @@ end
 --
 -- @param self Operator.
 -- @return Height.
-Operators.chargen.get_height = function(self, value)
+Chargen.get_height = function(self, value)
 	return self.char.height
 end
 
@@ -406,7 +425,7 @@ end
 --
 -- @param self Operator.
 -- @param value Height.
-Operators.chargen.set_height = function(self, value)
+Chargen.set_height = function(self, value)
 	self.char.height = value
 	self.data.update_needed = true
 end
@@ -417,7 +436,7 @@ end
 --
 -- @param self Operator.
 -- @return Name.
-Operators.chargen.get_name = function(self)
+Chargen.get_name = function(self)
 	return self.char.name
 end
 
@@ -427,7 +446,7 @@ end
 --
 -- @param self Operator.
 -- @param value Name.
-Operators.chargen.set_name = function(self, value)
+Chargen.set_name = function(self, value)
 	self.char.name = value
 end
 
@@ -437,7 +456,7 @@ end
 --
 -- @param self Operator.
 -- @param args Preset table.
-Operators.chargen.set_preset = function(self, args)
+Chargen.set_preset = function(self, args)
 	for k,v in pairs(args) do
 		if k ~= "name" then
 			if type(v) == "table" then
@@ -461,7 +480,7 @@ end
 --
 -- @param self Operator.
 -- @return Indexed list of presets.
-Operators.chargen.get_presets = function(self)
+Chargen.get_presets = function(self)
 	local presets = {}
 	for k,v in pairs(Actorpresetspec.dict_name) do
 		if v.playable then
@@ -478,7 +497,7 @@ end
 --
 -- @param self Operator.
 -- @return Race name.
-Operators.chargen.get_race = function(self)
+Chargen.get_race = function(self)
 	return self.char.race
 end
 
@@ -488,7 +507,7 @@ end
 --
 -- @param self Operator.
 -- @param race Race name.
-Operators.chargen.set_race = function(self, race)
+Chargen.set_race = function(self, race)
 	-- Set the race selection.
 	self.char.race = race
 	-- Choose a random preset.
@@ -503,7 +522,7 @@ end
 --
 -- @param self Operator.
 -- @return Indexed list of races.
-Operators.chargen.get_races = function(self)
+Chargen.get_races = function(self)
 	return self.list_races
 end
 
@@ -513,7 +532,7 @@ end
 --
 -- @param self Operator.
 -- @return Skin style name.
-Operators.chargen.get_skin_style = function(self)
+Chargen.get_skin_style = function(self)
 	return self.char.skin_style
 end
 
@@ -523,7 +542,7 @@ end
 --
 -- @param self Operator.
 -- @param value Style name.
-Operators.chargen.set_skin_style = function(self, value)
+Chargen.set_skin_style = function(self, value)
 	self.char.skin_style = value
 	self.data.update_needed = true
 end
@@ -535,7 +554,7 @@ end
 -- @param self Operator.
 -- @param channel Channel index.
 -- @return Channel value.
-Operators.chargen.get_skin_color = function(self, channel)
+Chargen.get_skin_color = function(self, channel)
 	return self.char.skin_color[channel]
 end
 
@@ -546,7 +565,7 @@ end
 -- @param self Operator.
 -- @param channel Channel index.
 -- @param value Channel value.
-Operators.chargen.set_skin_color = function(self, channel, value)
+Chargen.set_skin_color = function(self, channel, value)
 	self.char.skin_color[channel] = value
 	self.data.update_needed = true
 end
@@ -557,7 +576,7 @@ end
 --
 -- @param self Operator.
 -- @return Spawn point name.
-Operators.chargen.get_spawn_point = function(self, channel)
+Chargen.get_spawn_point = function(self, channel)
 	return self.char.spawn_point
 end
 
@@ -567,6 +586,8 @@ end
 --
 -- @param self Operator.
 -- @param value Spawn point name.
-Operators.chargen.set_spawn_point = function(self, value)
+Chargen.set_spawn_point = function(self, value)
 	self.char.spawn_point = value
 end
+
+return Chargen

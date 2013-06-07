@@ -135,5 +135,8 @@ Mod:load "ui/widgets"
 Mod:load "ui/hud"
 Mod:load "ui/states"
 
+-- Games
+Mod:load "character"
+
 -- Custom
 Mod:load_optional "custom"

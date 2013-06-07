@@ -32,7 +32,9 @@ local UnlockManager = require("core/server/unlock-manager")
 -- @type Client
 Client = Class("Client")
 
-Operators = {}
+-- FIXME
+Client.operators = {}
+Operators = Client.operators
 File:require_directory(Mod.path .. "operators")
 
 Client.init = function(self)
