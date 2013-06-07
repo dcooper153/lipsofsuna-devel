@@ -1,7 +1,7 @@
 local Binding = require("core/client/binding")
 local Client = require("core/client/client")
 local Keysym = require("system/keysym")
-local Quickslots = require("core/quickslots/quickslots")
+local Ui = require("ui/ui")
 
 Binding{name = "camera", mode = "press", key1 = Keysym.y, func = function()
 	if not Client.player_object then return end
@@ -13,13 +13,13 @@ Binding{name = "camera", mode = "press", key1 = Keysym.y, func = function()
 			Client.player_object:set_rotation(Quaternion{euler = e})
 		end
 	else
-		Client:set_camera_mode("first-person")
+		Client.camera_manager:set_camera_mode("first-person")
 	end
 end}
 
 Binding{name = "rotate_camera", mode = "toggle", key1 = Keysym.LCTRL, func = function(v)
 	if not Client.player_object then return end
-	Operators.camera:set_rotation_mode(v)
+	Client.camera_manager:set_rotation_mode(v)
 end}
 
 -- FIXME: Also has movement code.
@@ -27,8 +27,8 @@ Binding{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 	if not Client.player_object then return end
 	local sens = Client.options.mouse_sensitivity
 	if Client.options.invert_mouse then sens = -sens end
-	if Operators.camera:get_rotation_mode() then
-		Client.camera.tilt_speed = Client.camera.tilt_speed + v * sens
+	if Client.camera_manager:get_rotation_mode() then
+		Client.camera_manager:tilt(v * sens)
 	else
 		Client.player_state:tilt(-v * sens)
 	end
@@ -38,8 +38,8 @@ end}
 Binding{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
 	if not Client.player_object then return end
 	local sens = Client.options.mouse_sensitivity
-	if Operators.camera:get_rotation_mode() then
-		Client.camera.turn_speed = Client.camera.turn_speed + v * sens
+	if Client.camera_manager:get_rotation_mode() then
+		Client.camera_manager:turn(v * sens)
 	else
 		Client.player_state:turn(-v * sens)
 	end
@@ -48,5 +48,5 @@ end}
 Binding{name = "zoom", mode = "analog", key1 = "mousez", key2 = "", func = function(v)
 	if not Client.player_object then return end
 	if Ui:get_state() ~= "play" then return end
-	Client.camera:zoom{rate = -v}
+	Client.camera_manager:zoom(v)
 end}

@@ -73,7 +73,7 @@ FirstPersonCamera.get_transform = function(self)
 end
 
 FirstPersonCamera.update = function(self, secs)
-	if Operators.camera:get_rotation_mode() then
+	if self.rotation_mode then
 		-- Update turning.
 		self.turn_state = self.turn_state + self.turn_speed * secs
 		self.turn_state = radian_wrap(self.turn_state)

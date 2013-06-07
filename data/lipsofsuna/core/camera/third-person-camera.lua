@@ -136,7 +136,7 @@ ThirdPersonCamera.update = function(self, secs)
 	self.timer = self.timer + secs
 	while self.timer > self.tick do
 		self.timer = self.timer - self.tick
-		if Operators.camera:get_rotation_mode() then
+		if self.rotation_mode then
 			-- Update turning.
 			self.turn_state = self.turn_state + self.turn_speed * self.tick
 			self.turn_state = radian_wrap(self.turn_state)
