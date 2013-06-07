@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Feat = require("arena/feat")
 
 Widgets.Quickpage = Class("Quickpage")
 
@@ -93,9 +94,9 @@ Widgets.Quickpage.load = function(self)
 	self.db:query("CREATE TABLE IF NOT EXISTS quickslots (slot INTEGER PRIMARY KEY,item TEXT,feat TEXT);")
 	self.loading = true
 	-- First set defaults.
-	self:assign_feat(1, Feat{animation = "spell on self", effects = {{"restore health", 10}}})
-	self:assign_feat(2, Feat{animation = "ranged spell", effects = {{"fire damage", 10}}})
-	self:assign_feat(3, Feat{animation = "spell on self", effects = {{"light", 1}}})
+	self:assign_feat(1, Feat("spell on self", {{"restore health", 10}}))
+	self:assign_feat(2, Feat("ranged spell", {{"fire damage", 10}}))
+	self:assign_feat(3, Feat("spell on self", {{"light", 1}}))
 	-- Load from the database.
 	local rows = self.db:query("SELECT slot,item,feat FROM quickslots;")
 	for k,v in ipairs(rows) do

@@ -9,6 +9,7 @@
 -- @alias Ai
 
 local Class = require("system/class")
+local Feat = require("arena/feat")
 
 --- TODO:doc
 -- @type Ai
@@ -194,7 +195,7 @@ Ai.find_best_feat = function(self, args)
 	local best_score = -1
 	local process_anim = function(anim)
 		-- Check if the feat type is usable.
-		local feat = Feat{animation = anim.name}
+		local feat = Feat(anim.name)
 		if not feat:usable{user = self.object} then return end
 		-- Make sure that the feat can reach the target.
 		local range = anim.range or self.object.spec.aim_ray_end * 0.7

@@ -1,5 +1,6 @@
 local AreaSpell = require("core/objects/areaspell")
 local Coroutine = require("system/coroutine")
+local Feat = require("arena/feat")
 
 Actionspec{
 	name = "area spell",
@@ -14,7 +15,7 @@ Actionspec{
 				local effect = Feateffectspec:find{name = v[1]}
 				local spec = effect and Spellspec:find{name = effect.projectile}
 				if effect and spec then
-					local sub = Feat{animation = "area spell", effects = {{v[1], v[2]}}}
+					local sub = Feat("area spell", {{v[1], v[2]}})
 					local spell = AreaSpell{
 						duration = effect.duration, radius = effect.radius,
 						feat = sub, owner = args.user, position = args.user:get_position(),

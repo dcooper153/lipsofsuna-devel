@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Feat = require("arena/feat")
 
 Operators.spells = Class("SpellsOperator")
 Operators.spells.data = {slot = 1}
@@ -43,7 +44,7 @@ end
 Operators.spells.get_spell = function(self)
 	local feat = Quickslots.feats.buttons[self.data.slot].feat
 	if feat then return feat end
-	return Feat{animation = "ranged spell"}
+	return Feat("ranged spell")
 end
 
 --- Assigns a spell to the given slot.
@@ -55,7 +56,7 @@ end
 -- @param type Spell type.
 -- @param effects Spell effects.
 Operators.spells.set_spell = function(self, type, effects)
-	local feat = Feat{animation = type, effects = effects}
+	local feat = Feat(type, effects)
 	Quickslots:assign_feat(self.data.slot, feat)
 end
 

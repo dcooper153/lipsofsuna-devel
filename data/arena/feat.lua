@@ -1,31 +1,30 @@
---- TODO:doc
+--- Generic combat action.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module common.feat
+-- @module arena.feat
 -- @alias Feat
 
 local Class = require("system/class")
 local Damage = require("core/server/damage")
 local Serialize = require("system/serialize")
 
---- TODO:doc
+--- Generic combat action.
 -- @type Feat
-Feat = Class("Feat")
+local Feat = Class("Feat")
 
 --- Creates a new feat.
 -- @param clss Feat class.
--- @param args Arguments.<ul>
---   <li>animation: Feat type name.</li>
---   <li>effects: List of effects and their magnitudes.</li></ul>
+-- @param animation Feat type name.
+-- @param effects List of effects and their magnitudes.
 -- @return New feat.
-Feat.new = function(clss, args)
+Feat.new = function(clss, animation, effects)
 	local self = Class.new(clss)
-	for k,v in pairs(args) do self[k] = v end
-	self.effects = self.effects or {}
+	self.animation = animation
+	self.effects = effects or {}
 	return self
 end
 
@@ -400,4 +399,4 @@ Feat.write = function(self)
 		effects = self.effects})
 end
 
-
+return Feat

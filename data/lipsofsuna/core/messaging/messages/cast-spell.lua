@@ -1,3 +1,5 @@
+local Feat = require("arena/feat")
+
 Message{
 	name = "cast spell",
 	client_to_server_encode = function(self, anim, e1, v1, e2, v2, e3, v3, on)
@@ -24,8 +26,7 @@ Message{
 		if e1 == "" or not Feateffectspec:find{name = e1} then e1 = nil end
 		if e2 == "" or not Feateffectspec:find{name = e2} then e2 = nil end
 		if e3 == "" or not Feateffectspec:find{name = e3} then e3 = nil end
-		local feat = Feat{animation = anim, effects = {
-			e1 and {e1, 1}, e2 and {e2, 1}, e3 and {e3, 1}}}
+		local feat = Feat(anim, {e1 and {e1, 1}, e2 and {e2, 1}, e3 and {e3, 1}})
 		-- Inform the client about failures.
 		local ok,msg = feat:usable{user = player}
 		if on and not ok then
