@@ -98,6 +98,7 @@ Mod:load "environment/crafting"
 Mod:load "environment/door"
 Mod:load "environment/furnace"
 Mod:load "environment/furniture"
+Mod:load "environment/heightmap"
 Mod:load "environment/mines"
 Mod:load "environment/obelisk"
 Mod:load "environment/portal"
@@ -107,8 +108,6 @@ Mod:load "environment/voxel"
 Mod:load "environment/wood"
 
 -- Miscellaneous
-Mod:load "celshading"
-Mod:load "heightmap"
 Mod:load "help"
 Mod:load "misc"
 Mod:load "particle"
@@ -137,6 +136,7 @@ Mod:load "ui/states"
 
 -- Games
 Mod:load "character"
+Mod:load "character/celshading"
 
 -- Custom
 Mod:load_optional "custom"
