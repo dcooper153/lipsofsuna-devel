@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local Binding = require("core/client/binding")
-local Database = require("system/database")
 local EffectManager = require("core/client/effect-manager")
 local File = require("system/file")
 local FirstPersonCamera = require("core/client/first-person-camera")
@@ -53,9 +52,6 @@ Client.init = function(self)
 	Program:load_graphics()
 	Reload:set_enabled(true)
 	self.lighting = Lighting()
-	-- Initialize the database.
-	self.db = Database("client.sqlite")
-	self.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
 	-- Call the initialization hooks.
 	for k,v in ipairs(self.init_hooks) do
 		v.hook(secs)

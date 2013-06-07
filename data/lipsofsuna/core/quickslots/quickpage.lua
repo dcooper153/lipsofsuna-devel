@@ -90,15 +90,16 @@ end
 Quickpage.load = function(self)
 	-- Only load feats.
 	if self.type ~= "feats" then return end
-	self.db = Client.db
-	self.db:query("CREATE TABLE IF NOT EXISTS quickslots (slot INTEGER PRIMARY KEY,item TEXT,feat TEXT);")
+	--self.db = Client.db
+	--self.db:query("CREATE TABLE IF NOT EXISTS quickslots (slot INTEGER PRIMARY KEY,item TEXT,feat TEXT);")
 	self.loading = true
 	-- First set defaults.
 	self:assign_feat(1, Feat("spell on self", {{"restore health", 10}}))
 	self:assign_feat(2, Feat("ranged spell", {{"fire damage", 10}}))
 	self:assign_feat(3, Feat("spell on self", {{"light", 1}}))
 	-- Load from the database.
-	local rows = self.db:query("SELECT slot,item,feat FROM quickslots;")
+	--local rows = self.db:query("SELECT slot,item,feat FROM quickslots;")
+	local rows = {}
 	for k,v in ipairs(rows) do
 		if v[1] >= 1 and v[1] <= #self.buttons then
 			if v[2] and v[2] ~= "" then
@@ -121,7 +122,7 @@ Quickpage.save = function(self)
 	for k,v in ipairs(self.buttons) do
 		local feat = v.feat and v.feat:write()
 		local item = v.item
-		self.db:query("REPLACE INTO quickslots (slot,item,feat) VALUES (?,?,?);", {k, item, feat})
+		--self.db:query("REPLACE INTO quickslots (slot,item,feat) VALUES (?,?,?);", {k, item, feat})
 	end
 end
 
