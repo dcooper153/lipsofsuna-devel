@@ -8,6 +8,6 @@ Message{
 	end,
 	server_to_client_handle = function(self)
 		Client:set_player_object(nil)
-		Operators.chargen:init()
+		Client.chargen:init()
 		Ui:set_state("chargen")
 	end}

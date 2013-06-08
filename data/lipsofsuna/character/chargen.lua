@@ -52,20 +52,13 @@ end
 -- @param self Operator.
 Chargen.init = function(self)
 	-- Create the object.
+	self.data.active = true
 	self.data.merger = ModelMerger()
 	self.data.render = RenderObject()
 	self.data.render:set_position(Vector(1, 1, 1))
 	self.data.render:set_visible(true)
 	self:randomize()
-	-- Create the camera.
 	self.data.translation = Vector(0.3, 1.8, -2)
-	self.data.camera = Camera()
-	self.data.camera:set_far(60)
-	self.data.camera:set_near(0.3)
-	self.data.camera:set_mode("first-person")
-	self.data.camera:warp()
-	self:update(0.0)
-	Client.camera = self.data.camera
 	-- Change the music track.
 	Client.effects:switch_music_track("char")
 end
@@ -186,6 +179,8 @@ end
 -- @param self Operator.
 -- @param secs Seconds since the last update.
 Chargen.update = function(self, secs)
+	if not self.data.active then return end
+	Client.camera_manager:set_camera_mode("chargen")
 	local spec = Actorspec:find{name = self.char.race .. "-player"}
 	-- Build models.
 	if self.data.update_needed then
@@ -224,11 +219,6 @@ Chargen.update = function(self, secs)
 		local args = RenderUtils:create_scale_animation(spec, self.char.height)
 		if args then self.data.render:animate(args) end
 	end
-	-- Update the camera.
-	self.data.camera:set_target_position(self.data.render:get_position() + self.data.translation)
-	self.data.camera:set_target_rotation(Quaternion{axis = Vector(0, 1, 0), angle = math.pi})
-	self.data.camera:update(secs)
-	--Client:update_camera()
 	-- Update lighting.
 	Client.lighting:update(secs)
 end
@@ -275,6 +265,14 @@ end
 Chargen.set_body = function(self, slider, value)
 	self.char.body[slider] = value
 	self.data.update_needed = true
+end
+
+--- Gets the camera focus position.
+-- @param self Operator.
+-- @return Vector if active. Nil otherwise.
+Chargen.get_camera_focus = function(self)
+	if not self.data.active then return end
+	return self.data.render:get_position() + self.data.translation
 end
 
 --- Gets the eye style of the character.

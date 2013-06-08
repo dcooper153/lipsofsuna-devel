@@ -4,9 +4,7 @@ Ui:add_state{
 	hint = "",
 	init = function()
 		Client.effects:switch_music_track("game")
-		if Client.camera ~= Client.camera1 and Client.camera ~= Client.camera2 then
-			Client.camera = Client.camera3
-		end
+		Client.camera_manager:set_camera_mode("third-person")
 	end,
 	input = function(args)
 		-- Only handle apply button presses.

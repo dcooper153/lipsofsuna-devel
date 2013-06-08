@@ -5,7 +5,7 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module benchmark.benchmark_camera
+-- @module benchmark.camera
 -- @alias BenchmarkCamera
 
 local Camera = require("system/camera")
