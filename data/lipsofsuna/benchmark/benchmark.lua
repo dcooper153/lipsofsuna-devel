@@ -33,7 +33,7 @@ Benchmark.new = function(clss)
 	-- Create the objects.
 	self.objects = setmetatable({}, {__mode = "kv"})
 	local anims = {"idle", "walk", "strafe left"}
-	local spec = Actorspec:find{name = "Lips guard archer"}
+	local spec = Actorspec:find{name = "benchmark test actor"}
 	for i = 1,20 do
 		local o = Simulation:create_object_by_spec(spec)
 		local a = i/20*2*math.pi
@@ -51,7 +51,7 @@ Benchmark.new = function(clss)
 	o:set_visible(true)
 	o.render:init(o)
 	-- Create the camera.
-	self.translation = Vector(-10, 30, -30)
+	self.translation = Vector(-10, 20, -20)
 	-- Create the light.
 	self.light = Light()
 	self.light:set_ambient{0.3,0.3,0.3,1.0}

@@ -1,0 +1,23 @@
+[
+	{
+		"type": "Actorspec",
+		"name": "benchmark test actor",
+		"ai_type": "camper",
+		"base": "aer",
+		"eye_style": "random",
+		"hair_style": "random",
+		"inventory_items":
+		{
+			"iron greaves": 1,
+			"iron breastplate": 1,
+			"iron gauntlets": 1,
+			"crimson crossbow": 1,
+			"arrow": 100
+		},
+		"personality": "lawful",
+		"skills":
+		{
+			"Health lv2": true
+		}
+	}
+]

@@ -15,7 +15,7 @@ Ui:add_state{
 			if w.timer > 1 then
 				w.timer = 0
 				Operators.stats:update_client_stats()
-				w.text = ""--Operators.stats:get_client_stats_text()
+				w.text = Operators.stats:get_client_stats_text()
 				w.need_reshape = true
 				w.need_repaint = true
 				Ui:queue_relayout()
@@ -26,4 +26,7 @@ Ui:add_state{
 Ui:add_widget{
 	state = "benchmark",
 	id = "stats",
-	widget = function() return Widgets.Uilabel(Operators.stats:get_client_stats_text()) end}
+	widget = function()
+		Operators.stats:update_client_stats()
+		return Widgets.Uilabel(Operators.stats:get_client_stats_text())
+	end}

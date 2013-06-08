@@ -21,9 +21,3 @@ Client:register_update_hook(11, function()
 		Client.benchmark:update(secs)
 	end
 end)
-
-Client:register_update_hook(26, function()
-	if Client.benchmark then
-		return Hooks.STOP
-	end
-end)

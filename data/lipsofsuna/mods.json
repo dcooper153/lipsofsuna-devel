@@ -24,7 +24,6 @@
 	["load", "core/server"],
 	["load", "core/shadows"],
 	["load", "core/misc"],
-	["load", "benchmark"],
 
 	["# Actors"],
 	["load", "actors/aer"],
@@ -142,6 +141,7 @@
 	["load", "ui/states"],
 
 	["# Games"],
+	["load", "benchmark"],
 	["load", "character"],
 	["load", "character/celshading"],
 
