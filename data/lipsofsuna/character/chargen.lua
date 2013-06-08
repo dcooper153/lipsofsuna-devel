@@ -228,7 +228,7 @@ Chargen.update = function(self, secs)
 	self.data.camera:set_target_position(self.data.render:get_position() + self.data.translation)
 	self.data.camera:set_target_rotation(Quaternion{axis = Vector(0, 1, 0), angle = math.pi})
 	self.data.camera:update(secs)
-	Client:update_camera()
+	--Client:update_camera()
 	-- Update lighting.
 	Client.lighting:update(secs)
 end

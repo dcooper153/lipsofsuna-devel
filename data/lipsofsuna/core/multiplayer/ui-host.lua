@@ -48,14 +48,11 @@ Ui:add_widget{
 			if #name == 0 then return end
 			if Operators.single_player:does_save_name_exist(name) then return end
 			-- Start the game.
-			Settings.address = "localhost"
 			Settings.file = Operators.single_player:get_save_filename()--Client.options.host_savefile
 			Settings.admin = Client.options.host_admin
 			Settings.generate = Client.options.host_restart
-			Settings.host = true
-			Settings.port = 10101
 			Settings.account = Client.options.host_account
 			Settings.password = Client.options.host_password
-			Client:host_game()
+			Client.host:host_game(Settings.file, Client.options.host_port)
 		end)
 	end}

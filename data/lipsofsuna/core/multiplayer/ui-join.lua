@@ -38,12 +38,9 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "join",
 	widget = function() return Widgets.Uibutton("Connect", function()
-			Settings.address = Client.options.join_address
-			Settings.host = false
-			Settings.port = Client.options.join_port
 			Settings.account = Client.options.join_account
 			Settings.password = Client.options.join_password
-			Client:join_game()
+			Client.join:join_game(Client.options.join_address, Client.options.join_port)
 		end)
 	end}
 

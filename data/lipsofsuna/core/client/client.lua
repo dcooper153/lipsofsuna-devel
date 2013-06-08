@@ -189,6 +189,23 @@ Client.set_player_dead = function(self, value)
 	end
 end
 
+--- Starts a single player game.
+-- @param self Client.
+Client.start_single_player = function(self)
+	-- Start the server.
+	Sectors:unload_all()
+	Game:init("single", Settings.file)
+	-- Set information for the UI.
+	Client.data.connection.mode = "single"
+	Client.data.connection.text = "Starting the single player mode..."
+	Client.data.connection.active = true
+	Client.data.connection.connecting = false
+	Client.data.connection.waiting = false
+	-- Enter the start game mode.
+	Client.data.load.next_state = "start-game"
+	Ui:set_state("load")
+end
+
 --- Terminates the connection to the server.
 -- @param self Client class.
 Client.terminate_game = function(self)

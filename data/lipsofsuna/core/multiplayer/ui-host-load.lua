@@ -45,15 +45,14 @@ Ui:add_widget{
 			if file then
 				local name = Operators.single_player:decode_save_filename(file)
 				table.insert(widgets, Widgets.Uibutton(name, function()
-					Settings.address = "localhost"
 					Settings.file = file
 					Settings.admin = Client.options.host_admin
 					Settings.generate = Client.options.host_restart
-					Settings.host = true
-					Settings.port = 10101
+					Settings.host = "localhost:10101"
+					Settings.join = nil
 					Settings.account = Client.options.host_account
 					Settings.password = Client.options.host_password
-					Client:host_game()
+					Client.host:host_game()
 				end))
 			end
 		end
