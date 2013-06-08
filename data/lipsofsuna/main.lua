@@ -23,7 +23,6 @@ if not Settings:parse_command_line() then
 end
 
 -- Load mods.
-require "common/mod"
-require "mods"
-
+Mod = require("common/mod") --FIXME: global
+Mod:load_list("mods.json")
 Main()

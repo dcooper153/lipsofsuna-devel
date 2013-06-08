@@ -1,4 +1,4 @@
---- TODO:doc
+--- Mod loading.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -12,9 +12,37 @@ local Class = require("system/class")
 local File = require("system/file")
 local Json = require("system/json")
 
---- TODO:doc
+--- Mod loading.
 -- @type Mod
-Mod = Class("Mod")
+local Mod = Class("Mod")
+
+--- Loads a list of mods from a JSON file.
+-- @param self Mod class.
+-- @param file Filename.
+Mod.load_list = function(self, file)
+	-- Open the file.
+	local info = File:read(file)
+	if not info then
+		error("opening mod list \"" .. file .. "\" failed")
+	end
+	-- Parse the file.
+	local res,err = Json:decode(info)
+	if err then
+		error("loading mod list \"" .. file .. "\" failed: " .. err)
+	end
+	-- Load the listed mods.
+	for k,v in ipairs(res) do
+		if type(v) == "table" then
+			if v[1] == "load" then
+				self:load(v[2])
+			elseif v[1] == "load_list" then
+				self:load_list(v[2] .. ".json")
+			elseif v[1] == "load_optional" then
+				self:load_optional(v[2])
+			end
+		end
+	end
+end
 
 --- Loads a mod by name.
 -- @param self Mod class.
@@ -106,4 +134,4 @@ Mod.load_optional = function(self, name)
 	self.path = prev_path
 end
 
-
+return Mod
