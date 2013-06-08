@@ -9,7 +9,7 @@ Ui:add_state{
 	input = function(args)
 		-- Only handle apply button presses.
 		if args.type ~= "keypress" then return true end
-		local action = Client.bindings:find_by_name("menu apply")
+		local action = Client.bindings:find_by_name("menu_apply")
 		if not action then return true end
 		if not action:handle_event(args) then return true end
 		-- Activate the item the player is looking at.

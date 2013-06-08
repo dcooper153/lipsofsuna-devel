@@ -28,7 +28,7 @@ Widgets.Hudtarget.update = function(self, secs)
 		return
 	end
 	-- Format the text.
-	local key = Client.bindings:get_control_name("menu apply") or "[---]"
+	local key = Client.bindings:get_control_name("menu_apply") or "[---]"
 	if obj:get_count() > 1 then
 		self.text = string.format("%s %s (%d)", key, obj.spec.name, obj:get_count())
 	else

@@ -75,7 +75,7 @@ Widgets.Uibinding.handle_event = function(self, args)
 			self.input_key = nil
 			self.hint = "$A: Change the control\n$$B\n$$U\n$$D"
 		end
-		Clients.input:save()
+		Client.input:save()
 		Ui:repaint_state()
 	end
 end

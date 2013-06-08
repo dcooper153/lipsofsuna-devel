@@ -47,7 +47,7 @@ Mod.init_all = function(self)
 			local prev_name = self.name
 			local prev_path = self.path
 			self.name = v[1]
-			self.path = v[2] .. "/"
+			self.path = v[2]
 			require(v[3])
 			self.name = prev_name
 			self.path = prev_path

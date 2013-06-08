@@ -58,8 +58,8 @@ Widgets.Uiscrollfloat.handle_event = function(self, args)
 			if args.type == "keyrepeat" then
 				a.type = "keypress"
 			end
-			local action1 = Client.bindings:find_by_name("menu apply")
-			local action2 = Client.bindings:find_by_name("menu back")
+			local action1 = Client.bindings:find_by_name("menu_apply")
+			local action2 = Client.bindings:find_by_name("menu_back")
 			if (action1 and action1:get_event_response(a) ~= nil) then
 				self:apply()
 				handled = true
@@ -69,8 +69,8 @@ Widgets.Uiscrollfloat.handle_event = function(self, args)
 			end
 		end
 		-- Stop editing if a vertical menu key.
-		local action3 = Client.bindings:find_by_name("menu up")
-		local action4 = Client.bindings:find_by_name("menu down")
+		local action3 = Client.bindings:find_by_name("menu_up")
+		local action4 = Client.bindings:find_by_name("menu_down")
 		if (action3 and action3:get_event_response(args) ~= nil) or
 		   (action4 and action4:get_event_response(args) ~= nil) then
 			self.hint = "$A: Edit\n$$B\n$$U\n$$D"

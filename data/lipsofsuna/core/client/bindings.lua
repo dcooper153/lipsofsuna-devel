@@ -108,6 +108,16 @@ Client:register_init_hook(500, function()
 		end
 	end}
 
+	Client.input:register_binding{name = "run", mode = "toggle", key1 = Keysym.LSHIFT, func = function(v)
+		if not Client.player_object then return end
+		Game.messaging:client_event("run", not v)
+	end}
+
+	Client.input:register_binding{name = "screenshot", mode = "press", key1 = Keysym.PRINT, func = function()
+		local n = Program:capture_screen()
+		Client:append_log("Screenshot: " .. n)
+	end}
+
 	Client.input:register_binding{name = "skills", mode = "press", key1 = Keysym.k, func = function()
 		if not Client.player_object then return end
 		if Ui:get_state() ~= "skills" then
@@ -115,6 +125,16 @@ Client:register_init_hook(500, function()
 		else
 			Ui:set_state("play")
 		end
+	end}
+
+	Client.input:register_binding{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
+		if not Client.player_object then return end
+		Game.messaging:client_event("sidestep", v)
+	end}
+
+	Client.input:register_binding{name = "use", mode = "press", key1 = Keysym.b, func = function()
+		if not Client.player_object then return end
+		Ui:set_state("world/object")
 	end}
 
 end)

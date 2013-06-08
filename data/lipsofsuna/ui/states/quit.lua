@@ -8,7 +8,7 @@ Ui:add_state{
 Ui:add_widget{
 	state = "quit",
 	widget = function() return Widgets.Uibutton("Quit to main menu", function()
-			if Client.editor.initialized then
+			if Client.editor and Client.editor.initialized then
 				Client.editor:uninitialize()
 			end
 			Client:terminate_game()

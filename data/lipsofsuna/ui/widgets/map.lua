@@ -54,8 +54,8 @@ Widgets.Uimap.handle_event = function(self, args)
 		if args.type == "keyrepeat" then
 			a.type = "keypress"
 		end
-		local action1 = Client.bindings:find_by_name("menu up")
-		local action2 = Client.bindings:find_by_name("menu down")
+		local action1 = Client.bindings:find_by_name("menu_up")
+		local action2 = Client.bindings:find_by_name("menu_down")
 		if (action1 and action1:get_event_response(a) ~= nil) then
 			self:zoom("in")
 			return
