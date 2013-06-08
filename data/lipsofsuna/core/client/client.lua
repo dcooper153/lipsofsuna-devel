@@ -9,10 +9,8 @@
 -- @alias Client
 
 local Class = require("system/class")
-local Binding = require("core/client/binding")
 local File = require("system/file")
 local Hooks = require("system/hooks")
-local Input = require("core/client/input")
 local Lighting = require("core/client/lighting")
 local Options = require("core/client/options")
 local Physics = require("system/physics")
@@ -41,13 +39,9 @@ File:require_directory("core/client/operators")
 
 Client.init = function(self)
 	-- Initialize input.
-	self.input = Input()
-	self.bindings = Binding
 	self.player_state = PlayerState()
 	-- Initialize options.
 	self.options = Options()
-	Operators.controls:init()
-	Operators.controls:load()
 	-- Initialize graphics.
 	Program:load_graphics()
 	Reload:set_enabled(true)

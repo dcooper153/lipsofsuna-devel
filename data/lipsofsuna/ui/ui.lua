@@ -691,12 +691,12 @@ Ui.update = function(self, secs)
 	self.repeat_timer = self.repeat_timer + secs
 	if self.repeat_timer >= 0.15 then
 		self.repeat_timer = 0
-		local action1 = Client.bindings:find_by_name("menu up")
-		if action1:is_pressed() and self.repeat_up then
+		local action1 = Client.bindings:find_by_name("menu_up")
+		if action1 and action1:is_pressed() and self.repeat_up then
 			self:command("up", true)
 		end
-		local action2 = Client.bindings:find_by_name("menu down")
-		if action2:is_pressed() and self.repeat_down then
+		local action2 = Client.bindings:find_by_name("menu_down")
+		if action2 and action2:is_pressed() and self.repeat_down then
 			self:command("down", true)
 		end
 	end

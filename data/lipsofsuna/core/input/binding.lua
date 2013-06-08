@@ -5,7 +5,7 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.binding
+-- @module core.input.binding
 -- @alias Binding
 
 local Class = require("system/class")
@@ -127,5 +127,3 @@ Binding.is_pressed = function(self)
 end
 
 return Binding
-
-

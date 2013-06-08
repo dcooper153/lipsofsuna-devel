@@ -1,17 +1,20 @@
---- TODO:doc
+--- Input binding management.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.input
+-- @module core.input.input
 -- @alias Input
 
+local Binding = require("core/input/binding")
 local Class = require("system/class")
+local ControlsSerializer = require("core/input/controls-serializer")
+local Hooks = require("system/hooks")
 local Keycode = require("system/keycode")
 
---- TODO:doc
+--- Input binding management.
 -- @type Input
 local Input = Class("Input")
 
@@ -24,7 +27,15 @@ Input.new = function(clss)
 	self.mouse_sensitivity_x = 0.5
 	self.mouse_sensitivity_y = 0.3
 	self.pressed = {}
+	self.bindings = Binding --FIXME
+	self.serializer = ControlsSerializer()
 	return self
+end
+
+--- Loads the input bindings.
+-- @param self Input.
+Input.load = function(self)
+	self.serializer:load(self.bindings)
 end
 
 --- Updates the input state.
@@ -65,6 +76,26 @@ Input.is_pressed = function(self, control)
 	return self.pressed[control]
 end
 
+--- Registers an input binding.
+-- @param self Input.
+-- @param args Arguments.
+-- @return Binding.
+Input.register_binding = function(self, args)
+	local func = args.func
+	local binding = self.bindings.dict_name[args.name]
+	if not binding then
+		args.func = function(...) binding.hooks:call(...) end
+		binding = Binding(args)
+		binding.hooks = Hooks()
+	end
+	binding.hooks:register(0, func)
+	return binding
+end
+
+--- Saves the input bindings.
+-- @param self Input.
+Input.save = function(self)
+	self.serializer:save(self.bindings)
+end
+
 return Input
-
-

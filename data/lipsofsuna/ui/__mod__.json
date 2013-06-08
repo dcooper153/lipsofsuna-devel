@@ -1,6 +1,6 @@
 {
 	"server": false,
 	"resources": [".", "sounds"],
-	"scripts": ["main", "theme"],
+	"scripts": ["main", "theme", "bindings"],
 	"specs": ["specs"]
 }
