@@ -1,3 +1,21 @@
 {
+	"launchers":
+	[
+		{
+			"name": "server",
+			"desc": "Run as a dedicated server.",
+			"short": "-S",
+			"long": "--server"
+		}
+	],
+	"options":
+	[
+		{
+			"name": "generate",
+			"desc": "Generate a new map."
+			"short": "-g",
+			"long": "--generate",
+		}
+	],
 	"scripts": ["game", "modifier", "quest", "server", "util"]
 }

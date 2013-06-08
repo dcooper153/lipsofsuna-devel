@@ -16,6 +16,140 @@ local Json = require("system/json")
 -- @type Mod
 local Mod = Class("Mod")
 
+-- FIXME
+Mod.launchers = {}
+Mod.mods = {}
+Mod.options = {}
+Mod.resources = {}
+Mod.scripts = {}
+Mod.specs = {}
+
+--- Initializes all the loaded mods.
+-- @param self Mod class.
+Mod.init_all = function(self)
+	local needed = function(name)
+		local m = self.mods[name]
+		if Settings.server and m.server == false then return end
+		if Settings.client and m.client == false then return end
+		return true
+	end
+	-- Add the resource paths.
+	if self.resources then
+		for k,v in ipairs(self.resources) do
+			if needed(v[1]) then
+				Program:add_path(v[2])
+			end
+		end
+	end
+	-- Run the scripts.
+	for k,v in ipairs(self.scripts) do
+		if needed(v[1]) then
+			local prev_name = self.name
+			local prev_path = self.path
+			self.name = v[1]
+			self.path = v[2] .. "/"
+			require(v[3])
+			self.name = prev_name
+			self.path = prev_path
+		end
+	end
+	-- Create the specs.
+	for k,v in ipairs(self.specs) do
+		if needed(v[1]) then
+			-- FIXME: Should not accept just any global.
+			local cls = _G[v[3]]
+			if not cls then
+				error("loading mod \"" .. v[1] .. "\" failed: " ..
+					"invalid spec type \"" .. v[3] .. "\" in \"" .. v[2] .. "\"")
+			end
+			cls(v[4])
+		end
+	end
+end
+
+--- Loads a mod by name.
+-- @param self Mod class.
+-- @param name Mod name.
+Mod.load = function(self, name)
+	local load_spec = function(info, file)
+		-- Open the file.
+		local path = name .. "/" .. file .. ".json"
+		local specs = File:read(path)
+		if not specs then
+			return "could not open specs \"" .. path .. "\""
+		end
+		-- Decode the file.
+		local res,err = Json:decode(specs)
+		if err then
+			return "could not load specs \"" .. path .. "\": " .. err
+		end
+		specs = res
+		-- Create each spec.
+		for k,spec in ipairs(specs) do
+			-- Get the type.
+			local type_ = spec["type"]
+			if not type_ then
+				return "missing spec type in \"" .. path .. "\""
+			end
+			-- Validate the type.
+			-- FIXME: Should not accept just any type.
+			spec["type"] = nil
+			table.insert(self.specs, {name, path, type_, spec})
+		end
+	end
+
+	-- Do not load multiple times.
+	if self.mods[name] then return end
+	-- Load the info.
+	local info = File:read(name .. "/__mod__.json")
+	if info then
+		local res,err = Json:decode(info)
+		if err then
+			error("loading mod \"" .. name .. "\" failed: " .. err)
+		end
+		info = res
+	else
+		info = {scripts = {"init"}} -- Backwards compatibility.
+	end
+	self.mods[name] = info
+	-- Collect resource paths.
+	if info.resources then
+		for k,v in ipairs(info.resources) do
+			table.insert(self.resources, {name, name .. "/" .. v})
+		end
+	end
+	-- Collect launchers.
+	if info.launchers then
+		for k,v in ipairs(info.launchers) do
+			v["mod"] = name
+			table.insert(self.launchers, v)
+		end
+	end
+	-- Collect options.
+	if info.options then
+		for k,v in ipairs(info.options) do
+			v["mod"] = name
+			table.insert(self.options, v)
+		end
+	end
+	-- Collect specs.
+	if info.specs then
+		for k,v in ipairs(info.specs) do
+			local err = load_spec(info, v)
+			if err then
+				error("loading mod \"" .. name .. "\" failed: " .. err)
+			end
+		end
+	end
+	-- Collect scripts.
+	if info.scripts then
+		local path = name .. "/"
+		for k,v in ipairs(info.scripts) do
+			table.insert(self.scripts, {name, path, name .. "/" .. v})
+		end
+	end
+end
+
 --- Loads a list of mods from a JSON file.
 -- @param self Mod class.
 -- @param file Filename.
@@ -44,92 +178,12 @@ Mod.load_list = function(self, file)
 	end
 end
 
---- Loads a mod by name.
--- @param self Mod class.
--- @param name Mod name.
-Mod.load = function(self, name)
-	local load_spec = function(file)
-		-- Open the file.
-		local path = name .. "/" .. file .. ".json"
-		local specs = File:read(path)
-		if not specs then
-			return "could not open specs \"" .. path .. "\""
-		end
-		-- Decode the file.
-		local res,err = Json:decode(specs)
-		if err then
-			return "could not load specs \"" .. path .. "\": " .. err
-		end
-		specs = res
-		-- Create each spec.
-		for k,spec in ipairs(specs) do
-			-- Get the type.
-			local t = spec["type"]
-			if not t then
-				return "missing spec type in \"" .. path .. "\""
-			end
-			-- Validate the type.
-			-- FIXME: Should not accept just any global.
-			spec["type"] = nil
-			local cls = _G[t]
-			if not cls then
-				return "invalid spec type \"" .. t .. "\" in \"" .. path .. "\""
-			end
-			-- Create the spec.
-			cls(spec)
-		end
-	end
-
-	-- Load the info.
-	local info = File:read(name .. "/__mod__.json")
-	if info then
-		local res,err = Json:decode(info)
-		if not err then
-			info = res
-		else
-			error("loading mod \"" .. name .. "\" failed: " .. err)
-		end
-	else
-		info = {scripts = {"init"}} -- Backwards compatiblity.
-	end
-	-- Check for the game mode.
-	if Settings.server and info.server == false then return end
-	if Settings.client and info.client == false then return end
-	-- Add the resource paths.
-	if info.resources then
-		for k,v in ipairs(info.resources) do
-			Program:add_path(name .. "/" .. v)
-		end
-	end
-	-- Load the specs.
-	if info.specs then
-		for k,v in ipairs(info.specs) do
-			local err = load_spec(v)
-			if err then
-				error("loading mod \"" .. name .. "\" failed: " .. err)
-			end
-		end
-	end
-	-- Load the scripts.
-	if info.scripts then
-		local prev_name = self.name
-		local prev_path = self.path
-		self.name = name
-		self.path = name .. "/"
-		for k,v in ipairs(info.scripts) do
-			require(name .. "/" .. v)
-		end
-		self.name = prev_name
-		self.path = prev_path
-	end
-end
-
 Mod.load_optional = function(self, name)
 	local prev_name = self.name
 	local prev_path = self.path
 	self.name = name
 	self.path = name .. "/"
-	pcall(require, name .. "/init")
+	pcall(require, name .. "/init") --FIXME: should queue and load in init_all()
 	self.name = prev_name
 	self.path = prev_path
 end

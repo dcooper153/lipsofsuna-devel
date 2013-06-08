@@ -1,0 +1,33 @@
+{
+	"options":
+	[
+		{
+			"name": "file",
+			"desc": "Save file name.",
+			"short": "-f",
+			"long": "--file",
+			"var": "FILE",
+			"type": "string",
+			"default": "1"
+		},
+		{
+			"name": "help",
+			"desc": "Show this help message and exit.",
+			"short": "-h",
+			"long": "--help"
+		},
+		{
+			"name": "unittest",
+			"desc": "Run unittests.",
+			"short": "-U",
+			"long": "--unittest",
+		},
+		{
+			"name": "version",
+			"desc": "Print the version number and exit.",
+			"short": "-v",
+			"long": "--version",
+		}
+	],
+	"resources": [".", "materials", "shaders"]
+}

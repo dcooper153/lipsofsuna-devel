@@ -1,0 +1,19 @@
+{
+	"options":
+	[
+		{
+			"name": "quit",
+			"desc": "Quit immediately after startup.",
+			"short": "-q",
+			"long": "--quit"
+		},
+		{
+			"name": "watchdog",
+			"desc": "Disable the watchdog timer.",
+			"short": "-w",
+			"long": "--watchdog",
+			"default": false
+		}
+	],
+	"resources": ["init"]
+}

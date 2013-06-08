@@ -22,9 +22,9 @@ local Settings = require("common/settings")
 -- FIXME: Most of these should be registered elsewhere.
 Client:register_start_hook(10, function(secs)
 	if Settings.join then
-		self:join_game()
+		Client:join_game()
 	elseif Settings.host then
-		self:host_game()
+		Client:host_game()
 	elseif Settings.editor then
 		Ui:set_state("editor")
 	else

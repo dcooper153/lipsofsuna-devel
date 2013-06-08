@@ -8,7 +8,7 @@ Client.host_game = function(self)
 	Game:init("host", Settings.file, Settings.port)
 	-- Set information for the UI.
 	self.data.connection.mode = "host"
-	self.data.connection.text = "Starting the server on " .. Settings.address .. ":" .. Settings.port .. "..."
+	self.data.connection.text = "Starting the server on port " .. Settings.port .. "..."
 	self.data.connection.active = true
 	self.data.connection.connecting = false
 	self.data.connection.waiting = false
@@ -23,7 +23,7 @@ Client.start_single_player = function(self)
 	Game:init("single", Settings.file)
 	-- Set information for the UI.
 	self.data.connection.mode = "single"
-	self.data.connection.text = "Starting the server on " .. Settings.address .. ":" .. Settings.port .. "..."
+	self.data.connection.text = "Starting the single player mode..."
 	self.data.connection.active = true
 	self.data.connection.connecting = false
 	self.data.connection.waiting = false

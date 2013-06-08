@@ -8,7 +8,7 @@ Client.join_game = function(self)
 	Game:init("join")
 	-- Set information for the UI.
 	self.data.connection.mode = "join"
-	self.data.connection.text = "Joining the server at " .. Settings.address .. ":" .. Settings.port .. "..."
+	self.data.connection.text = "Joining the server at " .. Settings.join .. "..."
 	self.data.connection.active = true
 	self.data.connection.connecting = false
 	self.data.connection.waiting = false

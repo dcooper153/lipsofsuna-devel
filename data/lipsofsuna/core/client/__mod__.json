@@ -1,0 +1,46 @@
+{
+	"options":
+	[
+		{
+			"name": "account",
+			"desc": "Name of the player account.",
+			"short": "-a",
+			"long": "--account",
+			"var": "ACCOUNT",
+			"type": "string",
+			"default": "guest"
+		},
+		{
+			"name": "admin",
+			"desc": "Play as an admin on a hosted server.",
+			"short": "-d",
+			"long": "--admin"
+		},
+		{
+			"name": "host",
+			"desc": "Start a server and join it.",
+			"short": "-H",
+			"long": "--host",
+			"var": "PORT",
+			"type": "int"
+		},
+		{
+			"name": "join",
+			"desc": "Join a remove server.",
+			"short": "-J",
+			"long": "--join",
+			"var": "ADDR:PORT",
+			"type": "string"
+		},
+		{
+			"name": "password",
+			"desc": "Password of the player account.",
+			"short": "-p",
+			"long": "--password",
+			"var": "PASSWORD",
+			"type": "string",
+			"default": ""
+		}
+	],
+	"scripts": ["init"]
+}

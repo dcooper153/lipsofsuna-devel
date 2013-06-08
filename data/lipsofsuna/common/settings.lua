@@ -9,108 +9,64 @@
 -- @alias Settings
 
 local Class = require("system/class")
+local Mod = require("common/mod")
 local String = require("system/string")
 
 --- TODO:doc
 -- @type Settings
-Settings = Class("Settings")
+local Settings = Class("Settings")
 Settings.arguments = String.split(Program:get_args())
-Settings.address = "localhost"
-Settings.port = 10101
-Settings.account = "guest"
-Settings.password = ""
-Settings.file = 1
-Settings.watchdog = true
 
 --- Parses command line arguments.
 -- @param clss Settings class.
 Settings.parse_command_line = function(clss)
-	local i = 1
-	local a = clss.arguments
-	local parse_pattern = function()
-		local num = 0
-		while i <= #a and string.sub(a[i], 1, 1) ~= "-" do
-			if clss.pattern then
-				clss.pattern = clss.region .. " " .. a[i]
-			else
-				clss.pattern = a[i]
-			end
-			i = i + 1
+	-- Parses an individual argument.
+	local parse_argument = function(mode, a, i)
+		if mode == "string" then
+			if i < #a then return end
+			return a[i + 1],2
+		elseif mode == "int" then
+			if i < #a then return end
+			return tonumber(a[i + 1]),2
+		elseif mode == "false" then
+			return false,1
+		else
+			return true,1
 		end
-		if not clss.pattern then clss.pattern = "spawnpoint1" end
-		return num
 	end
-	local parse_addr_port = function()
-		if i > #a or string.sub(a[i], 1, 1) == "-" then return 0 end
-		Settings.address = a[i]
-		if i > #a or string.sub(a[i + 1], 1, 1) == "-" then return 1 end
-		Settings.port = tostring(a[i + 1])
-		return 2
+	-- Set default options.
+	for k,v in ipairs(Mod.options) do
+		if v.default ~= nil then
+			clss[v.name] = v.default
+		end
 	end
 	-- Parse arguments.
+	local i = 1
+	local a = clss.arguments
 	while i <= #a do
-		if a[i] == "--account" or a[i] == "-a" then
-			i = i + 1
-			if i <= #a then
-				clss.account = a[i]
-				i = i + 1
+		local incr = nil
+		-- Try mod launchers.
+		for k,v in ipairs(Mod.launchers) do
+			if a[i] == v.short or a[i] == v.long then
+				clss[v.name] = true
+				incr = 1
 			end
-		elseif a[i] == "--admin" or a[i] == "-d" then
-			clss.admin = true
-			i = i + 1
-		elseif a[i] == "--benchmark" or a[i] == "-B" then
-			clss.benchmark = true
-			i = i + 1
-		elseif a[i] == "--editor" or a[i] == "-E" then
-			clss.editor = true
-			i = i + 1
-			i = i + parse_pattern()
-		elseif a[i] == "--file" or a[i] == "-f" then
-			i = i + 1
-			if i <= #a then
-				local f = tonumber(a[i])
-				if f then clss.file = f end
-				i = i + 1
+		end
+		-- Try mod options.
+		for k,v in ipairs(Mod.options) do
+			if a[i] == v.short or a[i] == v.long then
+				local val,inc = parse_argument(v.type, a, i)
+				incr = inc
+				if not incr then break end
+				clss[v.name] = val
 			end
-		elseif a[i] == "--generate" or a[i] == "-g" then
-			clss.generate = true
-			i = i + 1
-		elseif a[i] == "--help" or a[i] == "-h" then
-			clss.help = true
-			i = i + 1
-		elseif a[i] == "--host" or a[i] == "-H" then
-			clss.host = true
-			clss.client = true
-			i = i + 1
-			i = i + parse_addr_port()
-		elseif a[i] == "--join" or a[i] == "-J" then
-			clss.join = true
-			clss.client = true
-			i = i + 1
-			i = i + parse_addr_port()
-		elseif a[i] == "--password" or a[i] == "-p" then
-			i = i + 1
-			if i <= #a then
-				clss.password = a[i]
-				i = i + 1
-			end
-		elseif a[i] == "--quit" or a[i] == "-q" then
-			clss.quit = true
-			i = i + 1
-		elseif a[i] == "--server" or a[i] == "-S" then
-			clss.server = true
-			i = i + 1
-			i = i + parse_addr_port()
-		elseif a[i] == "--version" or a[i] == "-v" then
-			clss.version = true
-			i = i + 1
-		elseif a[i] == "--watchdog" or a[i] == "-w" then
-			clss.watchdog = false
-			i = i + 1
-		else
+		end
+		-- Increment the position.
+		if not incr then
 			clss.help = true
 			break
 		end
+		i = i + incr
 	end
 	-- Host by default.
 	if not clss.client and not clss.server and not clss.editor then
@@ -136,27 +92,25 @@ Settings.usage = function(clss)
 	if clss.version then
 		return Program:get_version()
 	else
-		return [[Usage: lipsofsuna [options]
-
-Options:
-  -a --account <account>      Name of the player account.
-  -B --benchmark              Run graphics benchmarks.
-  -d --admin                  Play as an admin on a hosted server.
-  -E --editor <pattern>       Edit a map region.
-  -f --file <number>          Save file number.
-  -g --generate               Generate a new map.
-  -h --help                   Show this help message and exit.
-  -H --host localhost <port>  Start a server and join it.
-  -J --join <server> <port>   Join a remove server.
-  -p --password <password>    Password of the player account.
-  -q --quit                   Quit immediately after startup.
-  -S --server                 Run as a dedicated server.
-  -U --unittest               Run unittests.
-  -v --version                Print the version number and exit.
-  -w --watchdog               Disable the watchdog timer.]]
+  		local msg = "Usage: lipsofsuna [options]\n\nOptions:\n"
+		local opts = {}
+		-- Add mod launchers.
+		for k,v in ipairs(Mod.launchers) do
+			table.insert(opts, string.format("  %-2s %-24s %s", v.short or "", v.long or "", v.desc or ""))
+		end
+		-- Add mod options.
+		for k,v in ipairs(Mod.options) do
+			if v.var then
+				local long = v.long and (v.long .. " " .. v.var) or v.var
+				table.insert(opts, string.format("  %-2s %-24s %s", v.short or "", long, v.desc or ""))
+			else
+				table.insert(opts, string.format("  %-2s %-24s %s", v.short or "", v.long or "", v.desc or ""))
+			end
+		end
+		-- Sort the options.
+		table.sort(opts)
+		return msg .. table.concat(opts, "\n")
 	end
 end
 
 return Settings
-
-
