@@ -5,10 +5,8 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module benchmark.init
+-- @module benchmark.benchmark
 -- @alias Benchmark
-
-if Settings.server then return end
 
 local Camera = require("system/camera")
 local Class = require("system/class")

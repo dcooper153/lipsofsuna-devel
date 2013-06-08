@@ -30,6 +30,7 @@ Client.init_hooks = Hooks()
 Client.player_hooks = Hooks()
 Client.reset_hooks = Hooks()
 Client.speech_hooks = Hooks()
+Client.start_hooks = Hooks()
 Client.update_hooks = Hooks()
 
 -- FIXME
@@ -47,7 +48,7 @@ Client.init = function(self)
 	Reload:set_enabled(true)
 	self.lighting = Lighting()
 	-- Call the initialization hooks.
-	self.init_hooks:call(secs)
+	self.init_hooks:call()
 	-- Initialize the editor.
 	--self.editor = Editor()
 	-- Initialize data.
@@ -57,18 +58,7 @@ Client.init = function(self)
 	self.threads = {}
 	-- Execute the startup command.
 	self.options:apply()
-	if Settings.join then
-		self:join_game()
-	elseif Settings.host then
-		self:host_game()
-	elseif Settings.editor then
-		Ui:set_state("editor")
-	elseif Settings.benchmark then
-		Ui:set_state("benchmark")
-		self.benchmark = Benchmark()
-	else
-		Ui:set_state("mainmenu")
-	end
+	self.start_hooks:call()
 end
 
 Client.deinit = function(self)
@@ -154,6 +144,13 @@ end
 -- @param hook Function.
 Client.register_speech_hook = function(self, priority, hook)
 	self.speech_hooks:register(priority, hook)
+end
+
+--- Registers a start hook.
+-- @param priority Priority.
+-- @param hook Function.
+Client.register_start_hook = function(self, priority, hook)
+	self.start_hooks:register(priority, hook)
 end
 
 --- Registers an update hook.

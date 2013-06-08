@@ -17,16 +17,25 @@ require("core/client/bindings")
 local Client = require("core/client/client")
 local Network = require("system/network")
 local Simulation = require("core/client/simulation")
+local Settings = require("common/settings")
 
 -- FIXME: Most of these should be registered elsewhere.
+Client:register_start_hook(10, function(secs)
+	if Settings.join then
+		self:join_game()
+	elseif Settings.host then
+		self:host_game()
+	elseif Settings.editor then
+		Ui:set_state("editor")
+	else
+		Ui:set_state("mainmenu")
+	end
+end)
 Client:register_update_hook(10, function(secs)
 	-- Update the simulation.
 	Simulation:update(secs)
-	-- Update the benchmark.
-	if Client.benchmark then
-		Client.benchmark:update(secs)
-		return
-	end
+end)
+Client:register_update_hook(12, function(secs)
 	-- Update the connection status.
 	if Client:get_connected() and not Network:get_connected() then
 		Client:terminate_game()

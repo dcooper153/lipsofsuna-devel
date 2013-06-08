@@ -16,6 +16,8 @@ local Class = require("system/class")
 -- @type Hooks
 local Hooks = Class("Hooks")
 
+Hooks.STOP = "stop"
+
 --- Creates a new hook manager.
 -- @param clss Hooks class.
 -- @return New hook manager.
@@ -30,7 +32,7 @@ end
 -- @param ... Optional arguments.
 Hooks.call = function(self, ...)
 	for k,v in ipairs(self.hooks) do
-		v.hook(...)
+		if v.hook(...) == self.STOP then return end
 	end
 end
 
