@@ -23,7 +23,6 @@ Operators.stats.update_client_stats = function(self, show_objects)
 FPS: %.2f
 Database memory: %d kB
 Script memory: %d kB
-Terrain memory: %d kB
 Model memory: %d kB
 
 %s
@@ -36,7 +35,7 @@ Allocated meshes: %d : %dkB
 Allocated skeletons: %d
 Allocated textures: %d/%d : %dkB
 Allocated materials: %d/%d
-]], Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024, Voxel:get_memory_used() / 1024, models / 1024,
+]], Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024, models / 1024,
 Main.timing:get_profiling_string(),
 stats.batch_count, stats.face_count, stats.attachment_count, stats.entity_count, stats.mesh_count,
 stats.mesh_memory / 1000, stats.skeleton_count, stats.texture_count_loaded, stats.texture_count,

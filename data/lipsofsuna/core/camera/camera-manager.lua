@@ -73,14 +73,17 @@ end
 -- @param self CameraManager.
 -- @param secs Seconds since the last update.
 CameraManager.update = function(self, secs)
-	-- Update the camera.
+	-- Update target objects.
 	if Client.player_object then
 		for k,v in pairs(self.cameras) do
 			v.object = Client.player_object -- FIXME: should be a function
-			v:update(secs)
 		end
-		Client.lighting:update(secs)
 	end
+	-- Update the camera.
+	for k,v in pairs(self.cameras) do
+		v:update(secs)
+	end
+	Client.lighting:update(secs)
 	-- Update targeting.
 	if Client.player_object then
 		local r1,r2 = self.cameras["first-person"]:get_picking_ray() --FIXME
@@ -94,21 +97,19 @@ CameraManager.update = function(self, secs)
 		Client.player_state.crosshair = nil
 	end
 	-- Update the viewport.
-	if Client.player_object then
-		--Program:set_multisamples(Client.options.multisamples)
-		Program:set_camera_far(self.camera:get_far())
-		Program:set_camera_near(self.camera:get_near())
-		Program:set_camera_position(self.camera:get_position())
-		Program:set_camera_rotation(self.camera:get_rotation())
-		local mode = Program:get_video_mode()
-		local viewport = {0, 0, mode[1], mode[2]}
-		for k,v in pairs(self.cameras) do
-			v:set_viewport(viewport)
-		end
-		Client.lighting:set_dungeon_mode(false)
-		for k,v in pairs(self.cameras) do
-			v:set_far(Client.options.view_distance)
-		end
+	--Program:set_multisamples(Client.options.multisamples)
+	Program:set_camera_far(self.camera:get_far())
+	Program:set_camera_near(self.camera:get_near())
+	Program:set_camera_position(self.camera:get_position())
+	Program:set_camera_rotation(self.camera:get_rotation())
+	local mode = Program:get_video_mode()
+	local viewport = {0, 0, mode[1], mode[2]}
+	for k,v in pairs(self.cameras) do
+		v:set_viewport(viewport)
+	end
+	Client.lighting:set_dungeon_mode(false)
+	for k,v in pairs(self.cameras) do
+		v:set_far(Client.options.view_distance)
 	end
 end
 

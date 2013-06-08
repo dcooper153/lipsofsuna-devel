@@ -133,6 +133,7 @@ end
 -- @param self Camera.
 -- @param secs Seconds since the last update.
 ThirdPersonCamera.update = function(self, secs)
+	if not self.object then return end
 	self.timer = self.timer + secs
 	while self.timer > self.tick do
 		self.timer = self.timer - self.tick

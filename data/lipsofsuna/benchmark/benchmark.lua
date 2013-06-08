@@ -52,10 +52,6 @@ Benchmark.new = function(clss)
 	o.render:init(o)
 	-- Create the camera.
 	self.translation = Vector(-10, 30, -30)
-	self.camera = Camera()
-	self.camera:set_far(1000)
-	self.camera:set_near(0.3)
-	self.camera:set_mode("first-person")
 	-- Create the light.
 	self.light = Light()
 	self.light:set_ambient{0.3,0.3,0.3,1.0}
@@ -85,16 +81,6 @@ end
 -- @param self Benchmark.
 -- @param secs Seconds since the last update.
 Benchmark.update = function(self, secs)
-	-- Update the camera.
-	local camctr = Vector(500,500,500)
-	local campos = camctr + self.translation
-	local camrot = Quaternion{dir = camctr - campos, up = Vector(0,1,0)}
-	self.camera:set_target_position(campos)
-	self.camera:set_target_rotation(camrot)
-	self.camera:update(secs)
-	self.camera:warp()
-	Client.camera = self.camera
-	Client:update_camera()
 	-- Update lighting.
 	Client.lighting:update(secs)
 	-- Modify objects.

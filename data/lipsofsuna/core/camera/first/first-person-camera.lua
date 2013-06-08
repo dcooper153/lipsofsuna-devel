@@ -73,6 +73,7 @@ FirstPersonCamera.get_transform = function(self)
 end
 
 FirstPersonCamera.update = function(self, secs)
+	if not self.object then return end
 	if self.rotation_mode then
 		-- Update turning.
 		self.turn_state = self.turn_state + self.turn_speed * secs
