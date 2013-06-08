@@ -119,7 +119,11 @@ PlayerState.set_targeted_object = function(self, object)
 	if object and object.spec and object.spec.interactive then
 		local key = Client.bindings:get_control_name("use")
 		local name = object.name ~= "" and object.name or object.spec.name
-		Client:set_target_text(string.format("%s Interact with %s", key, name))
+		if key and name then
+			Client:set_target_text(string.format("%s Interact with %s", key, name))
+		else
+			Client:set_target_text()
+		end
 	else
 		Client:set_target_text()
 	end

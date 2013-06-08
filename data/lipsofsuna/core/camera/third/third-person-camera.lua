@@ -1,18 +1,18 @@
---- TODO:doc
+--- Third person camera.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.third_person_camera
+-- @module core.camera.third_person_camera.third_person_camera
 -- @alias ThirdPersonCamera
 
 local Camera = require("system/camera")
 local Class = require("system/class")
 local Physics = require("system/physics")
 
---- TODO:doc
+--- Third person camera.
 -- @type ThirdPersonCamera
 local ThirdPersonCamera = Class("ThirdPersonCamera", Camera)
 

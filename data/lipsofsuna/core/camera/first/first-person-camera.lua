@@ -1,18 +1,18 @@
---- TODO:doc
+--- First person camera.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.first_person_camera
+-- @module core.camera.first_person_camera.first_person_camera
 -- @alias FirstPersonCamera
 
 local Camera = require("system/camera")
 local Class = require("system/class")
 local Physics = require("system/physics")
 
---- TODO:doc
+--- First person camera.
 -- @type FirstPersonCamera
 local FirstPersonCamera = Class("FirstPersonCamera", Camera)
 
@@ -104,5 +104,3 @@ FirstPersonCamera.update = function(self, secs)
 end
 
 return FirstPersonCamera
-
-
