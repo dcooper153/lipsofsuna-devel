@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local Binding = require("core/client/binding")
-local EffectManager = require("core/client/effect-manager")
 local File = require("system/file")
 local Hooks = require("system/hooks")
 local Input = require("core/client/input")
@@ -32,6 +31,7 @@ Client = Class("Client")
 Client.init_hooks = Hooks()
 Client.player_hooks = Hooks()
 Client.reset_hooks = Hooks()
+Client.speech_hooks = Hooks()
 Client.update_hooks = Hooks()
 
 -- FIXME
@@ -40,7 +40,6 @@ Operators = Client.operators
 File:require_directory("core/client/operators")
 
 Client.init = function(self)
-	self.effects = EffectManager()
 	-- Initialize input.
 	self.input = Input()
 	self.bindings = Binding
@@ -85,19 +84,8 @@ end
 Client.add_speech_text = function(self, args)
 	-- Add to the chat log.
 	self:append_log("<" .. args.name .. "> " .. args.text)
-	-- Play the sound effect.
-	self.effects:play_object("chat1", args.object)
-	-- Create a text bubble.
-	local bounds = args.object:get_bounding_box()
-	local offset = bounds.point.y + bounds.size.y + 0.5
-	self.effects:create_speech_bubble{
-		life = 5,
-		fade = 1,
-		object = args.object,
-		offset = Vector(0,offset,0),
-		text = args.text,
-		text_color = {1,1,1,1},
-		text_font = "medium"}
+	-- Call the speech hooks.
+	self.speech_hooks:call(args)
 end
 
 --- Appends a message to the log.
@@ -165,6 +153,13 @@ end
 -- @param hook Function.
 Client.register_reset_hook = function(self, priority, hook)
 	self.reset_hooks:register(priority, hook)
+end
+
+--- Registers a speech hook.
+-- @param priority Priority.
+-- @param hook Function.
+Client.register_speech_hook = function(self, priority, hook)
+	self.speech_hooks:register(priority, hook)
 end
 
 --- Registers an update hook.

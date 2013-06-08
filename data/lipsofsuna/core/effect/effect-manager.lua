@@ -1,21 +1,22 @@
---- TODO:doc
+--- Manages audiovisual effects.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.effect_manager
+-- @module core.effect.effect_manager
 -- @alias EffectManager
 
 local Class = require("system/class")
+local Client = require("core/client/client")
 local DamageLabelEffect = require(Mod.path .. "damage-label-effect")
 local ParticleEffect = require(Mod.path .. "particle-effect")
 local Sound = require("system/sound")
 local SoundEffect = require(Mod.path .. "sound-effect")
 local SpeechBubbleEffect = require(Mod.path .. "speech-bubble-effect")
 
---- TODO:doc
+--- Manages audiovisual effects.
 -- @type EffectManager
 local EffectManager = Class("EffectManager")
 
@@ -35,8 +36,9 @@ EffectManager.apply_quake = function(self, point, magnitude)
 	if point and magnitude and Client.player_object then
 		local dist = (Client.player_object:get_position() - point).length
 		local quake = math.min(math.max(magnitude / (0.05 * dist * dist + 0.5), 0), 1)
-		Client.camera1.quake = math.max(Client.camera1.quake or 0, quake)
-		Client.camera3.quake = math.max(Client.camera3.quake or 0, quake)
+		if Client.camera_manager then
+			Client.camera_manager:quake(quake)
+		end
 	end
 end
 
@@ -176,6 +178,22 @@ EffectManager.play_world = function(self, name, position)
 	self:apply_quake(Vector(x,y,z), effect.quake)
 end
 
+EffectManager.speech = function(self, args)
+	-- Play the sound effect.
+	self:play_object("chat1", args.object)
+	-- Create a text bubble.
+	local bounds = args.object:get_bounding_box()
+	local offset = bounds.point.y + bounds.size.y + 0.5
+	self:create_speech_bubble{
+		life = 5,
+		fade = 1,
+		object = args.object,
+		offset = Vector(0,offset,0),
+		text = args.text,
+		text_color = {1,1,1,1},
+		text_font = "medium"}
+end
+
 EffectManager.update = function(self, secs)
 	-- Update text bubbles.
 	for k in pairs(self.speech_bubble_dict) do
@@ -184,5 +202,3 @@ EffectManager.update = function(self, secs)
 end
 
 return EffectManager
-
-

@@ -5,7 +5,7 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.sound_effect
+-- @module core.effect.sound_effect
 -- @alias SoundEffect
 
 local Class = require("system/class")

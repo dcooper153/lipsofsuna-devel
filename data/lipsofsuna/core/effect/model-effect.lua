@@ -5,13 +5,13 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.model_effect
+-- @module core.effect.model_effect
 -- @alias ModelEffect
 
 local Class = require("system/class")
-local EffectObject = require("core/client/effect-object")
+local EffectObject = require("core/effect/effect-object")
 local RenderObject = require("system/render-object")
-local SpeedlineEffect = require("core/client/speedline-effect")
+local SpeedlineEffect = require("core/effect/speedline-effect")
 
 --- TODO:doc
 -- @type ModelEffect

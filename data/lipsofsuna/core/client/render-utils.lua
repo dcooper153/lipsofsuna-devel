@@ -10,8 +10,8 @@
 
 local Animation = require("system/animation")
 local Class = require("system/class")
-local LightEffect = require("core/client/light-effect")
-local ParticleEffect = require("core/client/particle-effect")
+local LightEffect = require("core/effect/light-effect") --FIXME
+local ParticleEffect = require("core/effect/particle-effect") --FIXME
 
 --- TODO:doc
 -- @type RenderUtils

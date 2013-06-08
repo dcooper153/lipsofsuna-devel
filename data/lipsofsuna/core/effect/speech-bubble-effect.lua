@@ -5,7 +5,7 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.speech_bubble_effect
+-- @module core.effect.speech_bubble_effect
 -- @alias SpeechBubbleEffect
 
 local Class = require("system/class")

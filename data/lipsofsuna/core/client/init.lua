@@ -54,7 +54,6 @@ Client:register_update_hook(20, function(secs)
 		for k in pairs(Game.scene_nodes_by_ref) do
 			k:update(secs)
 		end
-		Client.effects:update(secs)
 	end
 	-- FIXME
 	if Client.player_object then

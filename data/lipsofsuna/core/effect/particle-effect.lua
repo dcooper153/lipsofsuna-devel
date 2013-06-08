@@ -5,11 +5,11 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.particle_effect
+-- @module core.effect.particle_effect
 -- @alias ParticleEffect
 
 local Class = require("system/class")
-local EffectObject = require("core/client/effect-object")
+local EffectObject = require("core/effect/effect-object")
 local RenderObject = require("system/render-object")
 
 --- TODO:doc

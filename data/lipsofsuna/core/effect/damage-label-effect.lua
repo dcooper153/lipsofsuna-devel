@@ -5,7 +5,7 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.damage_label_effect
+-- @module core.effect.damage_label_effect
 -- @alias DamageLabelEffect
 
 local Class = require("system/class")

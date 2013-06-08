@@ -51,6 +51,14 @@ CameraManager.reset = function(self)
 	self:set_mouse_smoothing(Client.options.mouse_smoothing)
 end
 
+--- Quakes the camera.
+-- @param self CameraManager.
+-- @param amount Quake amount.
+CameraManager.quake = function(self, amount)
+	self.camera1.quake = math.max(self.camera1.quake or 0, amount)
+	self.camera3.quake = math.max(self.camera3.quake or 0, amount)
+end
+
 --- Tilts the camera.
 -- @param self CameraManager.
 -- @param amount Tilting amount.

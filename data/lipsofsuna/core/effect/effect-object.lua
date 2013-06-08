@@ -5,7 +5,7 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.effect_object
+-- @module core.effect.effect_object
 -- @alias EffectObject
 
 local Class = require("system/class")

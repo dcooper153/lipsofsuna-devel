@@ -5,7 +5,7 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.speedline_effect
+-- @module core.effect.speedline_effect
 -- @alias SpeedlineEffect
 
 local Class = require("system/class")
