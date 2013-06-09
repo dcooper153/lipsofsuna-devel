@@ -15,5 +15,5 @@
 			"default": false
 		}
 	],
-	"resources": ["init"]
+	"resources": ["event"]
 }

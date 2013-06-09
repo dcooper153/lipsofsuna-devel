@@ -15,18 +15,7 @@ require "system/thread"
 require "system/time"
 require "system/timer"
 
--- Load the mods.
-Mod = require("common/mod") --FIXME: global
-Mod:load_list("mods.json")
-
--- Handle command line arguments.
-Settings = require("common/settings") --FIXME: global
-if not Settings:parse_command_line() then
-	print(Settings:usage())
-	return
-end
-
--- Run the mods.
-require "core/main/init"
-Mod:init_all()
-Main()
+-- Load main.
+Main = require("core/main/init")
+Main:load()
+Main:main()

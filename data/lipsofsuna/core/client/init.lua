@@ -1,6 +1,3 @@
-if not Settings then return end
-if Settings.server then return end
-
 -- Initialize the default video mode.
 local Options = require(Mod.path .. "options")
 local options = Options()
@@ -17,15 +14,14 @@ require("core/client/bindings")
 local Client = require("core/client/client")
 local Network = require("system/network")
 local Simulation = require("core/client/simulation")
-local Settings = require("common/settings")
 
 -- FIXME: Most of these should be registered elsewhere.
 Client:register_start_hook(10, function(secs)
-	if Settings.join then
+	if Main.settings.join then
 		Client:join_game()
-	elseif Settings.host then
+	elseif Main.settings.host then
 		Client:host_game()
-	elseif Settings.editor then
+	elseif Main.settings.editor then
 		Ui:set_state("editor")
 	else
 		Ui:set_state("mainmenu")

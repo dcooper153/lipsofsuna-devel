@@ -14,10 +14,9 @@ local Object = require("system/object")
 local Marker = require("core/marker")
 local Model = require("system/model")
 local PhysicsObject = require("system/physics-object")
-local Settings = require("common/settings")
 local Timer = require("system/timer")
-local ClientRenderObject = not Settings.server and require("core/client/client-render-object")
-local MovementPrediction = not Settings.server and require("core/client/movement-prediction")
+local ClientRenderObject = not Main.settings.server and require("core/client/client-render-object")
+local MovementPrediction = not Main.settings.server and require("core/client/movement-prediction")
 
 --- The base class for game objects.
 -- @type SimulationObject

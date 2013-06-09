@@ -16,21 +16,27 @@ local Json = require("system/json")
 -- @type Mod
 local Mod = Class("Mod")
 
--- FIXME
-Mod.launchers = {}
-Mod.mods = {}
-Mod.options = {}
-Mod.resources = {}
-Mod.scripts = {}
-Mod.specs = {}
+--- Creates new mod loader.
+-- @param clss Mod class.
+-- @return Mod.
+Mod.new = function(clss, mods)
+	local self = Class.new(clss)
+	self.launchers = {}
+	self.mods = {}
+	self.options = {}
+	self.resources = {}
+	self.scripts = {}
+	self.specs = {}
+	return self
+end
 
 --- Initializes all the loaded mods.
--- @param self Mod class.
-Mod.init_all = function(self)
+-- @param self Mod.
+Mod.init_all = function(self, settings)
 	local needed = function(name)
 		local m = self.mods[name]
-		if Settings.server and m.server == false then return end
-		if Settings.client and m.client == false then return end
+		if settings.server and m.server == false then return end
+		if settings.client and m.client == false then return end
 		return true
 	end
 	-- Add the resource paths.
@@ -68,7 +74,7 @@ Mod.init_all = function(self)
 end
 
 --- Loads a mod by name.
--- @param self Mod class.
+-- @param self Mod.
 -- @param name Mod name.
 Mod.load = function(self, name)
 	local load_spec = function(info, file)
@@ -151,7 +157,7 @@ Mod.load = function(self, name)
 end
 
 --- Loads a list of mods from a JSON file.
--- @param self Mod class.
+-- @param self Mod.
 -- @param file Filename.
 Mod.load_list = function(self, file)
 	-- Open the file.
@@ -172,20 +178,10 @@ Mod.load_list = function(self, file)
 			elseif v[1] == "load_list" then
 				self:load_list(v[2] .. ".json")
 			elseif v[1] == "load_optional" then
-				self:load_optional(v[2])
+				-- TODO
 			end
 		end
 	end
-end
-
-Mod.load_optional = function(self, name)
-	local prev_name = self.name
-	local prev_path = self.path
-	self.name = name
-	self.path = name .. "/"
-	pcall(require, name .. "/init") --FIXME: should queue and load in init_all()
-	self.name = prev_name
-	self.path = prev_path
 end
 
 return Mod
