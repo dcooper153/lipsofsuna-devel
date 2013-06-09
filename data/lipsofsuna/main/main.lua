@@ -8,13 +8,13 @@
 -- @module core.main.init
 -- @alias Main
 
-require("core/main/event")
+require("main/event")
 local Class = require("system/class")
 local Eventhandler = require("system/eventhandler")
-local ModelManager = require("core/main/model-manager")
-local Mod = require("core/main/mod")
-local Settings = require("core/main/settings")
-local Timing = require("core/main/timing")
+local ModelManager = require("main/model-manager")
+local Mod = require("main/mod")
+local Settings = require("main/settings")
+local Timing = require("main/timing")
 local Watchdog = require("system/watchdog")
 
 --- The main loop of the game.
@@ -38,6 +38,7 @@ end
 -- @param self Main.
 Main.load = function(self)
 	-- Load the mods.
+	self.mods:load("main")
 	self.mods:load_list("mods.json")
 	-- Handle command line arguments.
 	if not self.settings:parse_command_line() then return end

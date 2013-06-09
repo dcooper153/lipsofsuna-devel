@@ -9,7 +9,6 @@
 -- @alias TerrainChunkLoader
 
 local Class = require("system/class")
-local MapUtils = require("core/server/map-utils")
 
 --- Implements asynchronous terrain chunk loading.
 -- @type TerrainChunkLoader
@@ -79,6 +78,7 @@ end
 -- @param self TerrainChunkLoader.
 TerrainChunkLoader.generate_random = function(self)
 	-- FIXME: Call the generator instead.
+	local MapUtils = require("core/server/map-utils")
 	local Noise = require("system/noise")
 	local get_surface_height_at = function(x, z)
 		-- Choose the bumpiness of the region.

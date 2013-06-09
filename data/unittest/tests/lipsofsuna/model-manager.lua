@@ -1,5 +1,5 @@
 Unittest:add(1, "lipsofsuna", "model manager", function()
-	local ModelManager = require("core/main/model-manager")
+	local ModelManager = require("main/model-manager")
 	-- Initialization.
 	local mgr = ModelManager()
 	assert(tostring(mgr) == "data:ModelManager")

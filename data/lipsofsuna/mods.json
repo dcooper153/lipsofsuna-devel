@@ -17,7 +17,6 @@
 	["load", "core/generator"],
 	["load", "core/input"],
 	["load", "core/messaging"],
-	["load", "core/main"],
 	["load", "core/multiplayer"],
 	["load", "core/objects"],
 	["load", "core/quickslots"],
