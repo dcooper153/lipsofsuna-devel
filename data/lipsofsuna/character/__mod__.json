@@ -1,4 +1,13 @@
 {
+	"launchers":
+	[
+		{
+			"name": "character",
+			"desc": "Run the character creator.",
+			"short": "-C",
+			"long": "--character"
+		}
+	],
 	"server": false,
 	"scripts": ["main", "ui-chargen"]
 }

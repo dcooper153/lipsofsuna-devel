@@ -46,12 +46,11 @@ Chargen.new = function(clss)
 end
 
 --- Initializes the character creator.
---
--- Context: Any.
---
--- @param self Operator.
-Chargen.init = function(self)
+-- @param self Chargen.
+-- @param standalone True to run in standalone mode.
+Chargen.init = function(self, standalone)
 	-- Create the object.
+	self.data.standalone = standalone
 	self.data.active = true
 	self.data.merger = ModelMerger()
 	self.data.render = RenderObject()
@@ -67,7 +66,7 @@ end
 --
 -- Context: Any.
 --
--- @param self Operator.
+-- @param self Chargen.
 Chargen.reset = function(self)
 	if self.data.render then self.data.render:set_visible(false) end
 	self.data = {}
@@ -92,8 +91,9 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 Chargen.apply = function(self)
+	if self.data.standalone then return end
 	Game.messaging:client_event("create character", {
 		animation_profile = self.char.animation_profile,
 		body_style = scale255(self.char.body),
@@ -115,7 +115,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param args Event arguments.
 -- @return True if the caller should handle the event.
 Chargen.input = function(self, args)
@@ -142,7 +142,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 Chargen.randomize = function(self)
 	local index = math.random(1, #self.list_races)
 	self:set_race(self.list_races[index][2])
@@ -153,7 +153,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return value Rotation amount.
 Chargen.rotate = function(self, value)
 	local rad = math.pi * value / 300
@@ -165,7 +165,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return value Translation amount.
 Chargen.translate = function(self, value)
 	local y = self.data.translation.y + value / 300
@@ -176,7 +176,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param secs Seconds since the last update.
 Chargen.update = function(self, secs)
 	if not self.data.active then return end
@@ -227,7 +227,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return Profile name.
 Chargen.get_animation_profile = function(self)
 	return self.char.animation_profile
@@ -237,7 +237,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param value Profile name.
 Chargen.set_animation_profile = function(self, value)
 	self.char.animation_profile = value
@@ -248,7 +248,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param slider Slider index.
 -- @return Slider value.
 Chargen.get_body = function(self, slider)
@@ -259,7 +259,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param slider Slider index.
 -- @param value Slider value.
 Chargen.set_body = function(self, slider, value)
@@ -268,7 +268,7 @@ Chargen.set_body = function(self, slider, value)
 end
 
 --- Gets the camera focus position.
--- @param self Operator.
+-- @param self Chargen.
 -- @return Vector if active. Nil otherwise.
 Chargen.get_camera_focus = function(self)
 	if not self.data.active then return end
@@ -279,7 +279,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return Style name.
 Chargen.get_eye_style = function(self)
 	return self.char.eye_style
@@ -289,7 +289,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param value Style name.
 Chargen.set_eye_style = function(self, value)
 	self.char.eye_style = value
@@ -300,7 +300,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param channel Channel index.
 -- @return Channel value.
 Chargen.get_eye_color = function(self, channel)
@@ -311,7 +311,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param channel Channel index.
 -- @param value Channel value.
 Chargen.set_eye_color = function(self, channel, value)
@@ -323,7 +323,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param slider Slider index.
 -- @return Slider value.
 Chargen.get_face = function(self, slider)
@@ -334,7 +334,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param slider Slider index.
 -- @param value Slider value.
 Chargen.set_face = function(self, slider, value)
@@ -346,7 +346,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return Style name.
 Chargen.get_hair_style = function(self)
 	return self.char.hair_style
@@ -356,7 +356,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param value Style name.
 Chargen.set_hair_style = function(self, value)
 	self.char.hair_style = value
@@ -367,7 +367,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param channel Channel index.
 -- @return Channel value.
 Chargen.get_hair_color = function(self, channel)
@@ -378,7 +378,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param channel Channel index.
 -- @param value Channel value.
 Chargen.set_hair_color = function(self, channel, value)
@@ -390,7 +390,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return Style name.
 Chargen.get_head_style = function(self)
 	return self.char.head_style
@@ -400,7 +400,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param value Style name.
 Chargen.set_head_style = function(self, value)
 	self.char.head_style = value
@@ -411,7 +411,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return Height.
 Chargen.get_height = function(self, value)
 	return self.char.height
@@ -421,7 +421,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param value Height.
 Chargen.set_height = function(self, value)
 	self.char.height = value
@@ -432,7 +432,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return Name.
 Chargen.get_name = function(self)
 	return self.char.name
@@ -442,7 +442,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param value Name.
 Chargen.set_name = function(self, value)
 	self.char.name = value
@@ -452,7 +452,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param args Preset table.
 Chargen.set_preset = function(self, args)
 	for k,v in pairs(args) do
@@ -476,7 +476,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return Indexed list of presets.
 Chargen.get_presets = function(self)
 	local presets = {}
@@ -493,7 +493,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return Race name.
 Chargen.get_race = function(self)
 	return self.char.race
@@ -503,7 +503,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param race Race name.
 Chargen.set_race = function(self, race)
 	-- Set the race selection.
@@ -518,7 +518,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return Indexed list of races.
 Chargen.get_races = function(self)
 	return self.list_races
@@ -528,7 +528,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return Skin style name.
 Chargen.get_skin_style = function(self)
 	return self.char.skin_style
@@ -538,7 +538,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param value Style name.
 Chargen.set_skin_style = function(self, value)
 	self.char.skin_style = value
@@ -549,7 +549,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param channel Channel index.
 -- @return Channel value.
 Chargen.get_skin_color = function(self, channel)
@@ -560,7 +560,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param channel Channel index.
 -- @param value Channel value.
 Chargen.set_skin_color = function(self, channel, value)
@@ -572,7 +572,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @return Spawn point name.
 Chargen.get_spawn_point = function(self, channel)
 	return self.char.spawn_point
@@ -582,7 +582,7 @@ end
 --
 -- Context: The character creator must have been initialized.
 --
--- @param self Operator.
+-- @param self Chargen.
 -- @param value Spawn point name.
 Chargen.set_spawn_point = function(self, value)
 	self.char.spawn_point = value
