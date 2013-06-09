@@ -49,15 +49,17 @@ end
 -- @param self Chargen.
 -- @param standalone True to run in standalone mode.
 Chargen.init = function(self, standalone)
-	-- Create the object.
+	-- Initialize the state.
 	self.data.standalone = standalone
 	self.data.active = true
+	self.data.rotation = 0
+	self.data.translation = Vector(0.3, 1.8, -2)
+	-- Create the object.
 	self.data.merger = ModelMerger()
 	self.data.render = RenderObject()
 	self.data.render:set_position(Vector(1, 1, 1))
 	self.data.render:set_visible(true)
 	self:randomize()
-	self.data.translation = Vector(0.3, 1.8, -2)
 	-- Change the music track.
 	Client.effects:switch_music_track("char")
 end
@@ -119,23 +121,18 @@ end
 -- @param args Event arguments.
 -- @return True if the caller should handle the event.
 Chargen.input = function(self, args)
-	if not Ui:get_pointer_grab() then return true end
-	local ret = true
-	-- Rotate the character.
-	local action1 = Client.bindings:find_by_name("turn")
-	local response1 = action1 and action1:get_event_response(args)
-	if response1 then
-		self:rotate(response1)
-		ret = false
+	if args.type == "mousepress" and args.button == 1 then
+		self.data.drag = true
+		return false
+	elseif args.type == "mouserelease" and args.button == 1 then
+		self.data.drag = nil
+		return false
+	elseif args.type == "mousemotion" and self.data.drag then
+		self:rotate(args.dx)
+		self:translate(args.dy)
+		return false
 	end
-	-- Move the character.
-	local action2 = Client.bindings:find_by_name("tilt")
-	local response2 = action2 and action2:get_event_response(args)
-	if response2 then
-		self:translate(response2)
-		ret = false
-	end
-	return ret
+	return true
 end
 
 --- Randomizes the character.
@@ -157,8 +154,9 @@ end
 -- @return value Rotation amount.
 Chargen.rotate = function(self, value)
 	local rad = math.pi * value / 300
-	local rot = Quaternion{axis = Vector(0, 1, 0), angle = rad}
-	self.data.render:set_rotation(self.data.render:get_rotation() * rot)
+	self.data.rotation = self.data.rotation + rad
+	local rot = Quaternion{axis = Vector(0, 1, 0), angle = self.data.rotation}
+	self.data.render:set_rotation(rot)
 end
 
 --- Translates the model of the character creator.

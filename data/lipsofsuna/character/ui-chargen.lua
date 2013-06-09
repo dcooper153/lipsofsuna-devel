@@ -16,7 +16,7 @@ Ui:add_state{
 	label = "Create character",
 	init = function() Client.lighting:set_dungeon_mode(false) end,
 	exit_root = function() Client.chargen:reset() end,
-	input = chargen_input,
+	input_post = chargen_input,
 	update = chargen_update}
 
 Ui:add_widget{
@@ -85,7 +85,7 @@ Ui:add_state{
 		end
 		return widgets
 	end,
-	input = chargen_input,
+	input_post = chargen_input,
 	update = chargen_update}
 
 ------------------------------------------------------------------------------
@@ -106,7 +106,7 @@ Ui:add_state{
 		end
 		return widgets
 	end,
-	input = chargen_input,
+	input_post = chargen_input,
 	update = chargen_update}
 
 ------------------------------------------------------------------------------
@@ -114,7 +114,7 @@ Ui:add_state{
 Ui:add_state{
 	state = "chargen/body",
 	label = "Customize body",
-	input = chargen_input,
+	input_post = chargen_input,
 	update = chargen_update}
 
 Ui:add_widget{
@@ -178,7 +178,7 @@ Ui:add_state{
 		end
 		return widgets
 	end,
-	input = chargen_input,
+	input_post = chargen_input,
 	update = chargen_update}
 
 ------------------------------------------------------------------------------
@@ -186,7 +186,7 @@ Ui:add_state{
 Ui:add_state{
 	state = "chargen/face",
 	label = "Customize face",
-	input = chargen_input,
+	input_post = chargen_input,
 	update = chargen_update}
 
 Ui:add_widget{
@@ -253,7 +253,7 @@ Ui:add_state{
 		end
 		return widgets
 	end,
-	input = chargen_input,
+	input_post = chargen_input,
 	update = chargen_update}
 
 ------------------------------------------------------------------------------
@@ -261,7 +261,7 @@ Ui:add_state{
 Ui:add_state{
 	state = "chargen/misc",
 	label = "Customize other",
-	input = chargen_input,
+	input_post = chargen_input,
 	update = chargen_update}
 
 Ui:add_widget{
@@ -384,7 +384,7 @@ Ui:add_state{
 		end
 		return widgets
 	end,
-	input = chargen_input,
+	input_post = chargen_input,
 	update = chargen_update}
 
 ------------------------------------------------------------------------------
@@ -414,7 +414,7 @@ Ui:add_state{
 		end
 		return widgets
 	end,
-	input = chargen_input,
+	input_post = chargen_input,
 	update = chargen_update}
 
 ------------------------------------------------------------------------------
@@ -445,5 +445,5 @@ Ui:add_state{
 		end
 		return widgets
 	end,
-	input = chargen_input,
+	input_post = chargen_input,
 	update = chargen_update}

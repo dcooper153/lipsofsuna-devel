@@ -63,7 +63,7 @@ end
 -- @param value Value.
 -- @return String.
 Serialize.write = function(self, value)
-	serialize(value)
+	return serialize(value)
 end
 
 return Serialize

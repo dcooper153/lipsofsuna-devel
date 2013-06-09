@@ -109,7 +109,8 @@ end
 --   <li>history: Name of the state with which to share focus history.</li>
 --   <li>hint: Controls hint text shown to the user.</li>
 --   <li>init: Initializer function.</li>
---   <li>input: Input handler function.</li>
+--   <li>input: Input handler function called before widget input.</li>
+--   <li>input_post: Input handler function called after widget input.</li>
 --   <li>label: State name shown to the user.</li>
 --   <li>root: Root state name.</li>
 --   <li>state: State name.</li>
@@ -127,6 +128,7 @@ Ui.add_state = function(self, args)
 			ids = {},
 			init = {},
 			input = {},
+			input_post = {},
 			update = {},
 			widgets = {}}
 		self.states[args.state] = state
@@ -162,6 +164,9 @@ Ui.add_state = function(self, args)
 	-- Add the input handler.
 	if args.input then
 		table.insert(state.input, args.input)
+	end
+	if args.input_post then
+		table.insert(state.input_post, args.input_post)
 	end
 	-- Set the label text.
 	if args.label then
@@ -408,6 +413,10 @@ Ui.handle_event = function(self, args)
 	local widget = Widgets:find_handler_widget("handle_event")
 	if widget and not widget:handle_event(args) then
 		return
+	end
+	-- Call the post event handler functions of the state.
+	for k,v in pairs(state_.input_post) do
+		if not v(args) then return end
 	end
 	-- Scroll with remaining mouse wheel events.
 	if args.type == "mousescroll" then
