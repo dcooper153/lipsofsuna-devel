@@ -4,13 +4,6 @@ local Network = require("system/network")
 local Timer = require("system/timer")
 local Vision = require("system/vision")
 
-local handle_input = function(self, args)
-	Client.input:event(args)
-	if Ui:handle_event(args) then
-		Client.bindings:event(args)
-	end
-end
-
 local handle_vision = function(self, args)
 	Vision:dispatch_event(args, Game.objects)
 end
@@ -23,20 +16,10 @@ local handle_motion = function(self, args)
 	handle_vision(self, args)
 end
 
-Eventhandler{type = "keypress", func = handle_input}
-Eventhandler{type = "keyrelease", func = handle_input}
-Eventhandler{type = "mousepress", func = handle_input}
-Eventhandler{type = "mouserelease", func = handle_input}
-Eventhandler{type = "mousescroll", func = handle_input}
-Eventhandler{type = "mousemotion", func = handle_input}
 Eventhandler{type = "object-motion", func = handle_motion}
 Eventhandler{type = "vision-object-shown", func = handle_vision}
 Eventhandler{type = "vision-object-hidden", func = handle_vision}
 Eventhandler{type = "vision-voxel-block-changed", func = handle_vision}
-
-Eventhandler{type = "music-ended", func = function(self, args)
-	Client.effects:cycle_music_track()
-end}
 
 Eventhandler{type = "quit", func = function(self, args)
 	Program:set_quit(true)

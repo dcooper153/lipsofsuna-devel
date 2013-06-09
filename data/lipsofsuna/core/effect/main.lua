@@ -1,5 +1,6 @@
 local Client = require("core/client/client")
 local EffectManager = require("core/effect/effect-manager")
+local Eventhandler = require("system/eventhandler")
 
 Client:register_init_hook(0, function()
 	Client.effects = EffectManager()
@@ -16,3 +17,7 @@ Client:register_update_hook(40, function(secs)
 		Client.effects:update(secs)
 	end
 end)
+
+Eventhandler{type = "music-ended", func = function(self, args)
+	Client.effects:cycle_music_track()
+end}
