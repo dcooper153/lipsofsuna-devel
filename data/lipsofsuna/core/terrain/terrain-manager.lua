@@ -9,6 +9,7 @@
 -- @alias TerrainManager
 
 local Class = require("system/class")
+local Hooks = require("system/hooks")
 local PhysicsTerrain = require("system/physics-terrain")
 local Packet = require("system/packet")
 local Program = require("system/core")
@@ -40,6 +41,7 @@ TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, 
 	self.unload_time_model = 3
 	self.chunk_size = chunk_size
 	self.grid_size = grid_size
+	self.generate_hooks = Hooks()
 	self.terrain = Terrain(chunk_size, grid_size)
 	self.physics = PhysicsTerrain(self.terrain)
 	self.__view_distance = 48
@@ -132,6 +134,14 @@ TerrainManager.refresh_models_by_point = function(self, point, radius)
 			end
 		end
 	end
+end
+
+--- Registers a terrain chunk generator hook.
+-- @param self TerrainManager.
+-- @param priority Priority.
+-- @param hook Hook.
+TerrainManager.register_generate_hook = function(self, priority, hook)
+	self.generate_hooks:register(priority, hook)
 end
 
 --- Saves a chunk to the database.
