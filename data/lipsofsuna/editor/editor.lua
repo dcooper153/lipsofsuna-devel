@@ -56,7 +56,7 @@ end
 --- Initializes the editor mode.
 -- @param self Editor.
 Editor.initialize = function(self)
-	Game:init("editor")
+	Main:start_game("editor")
 	self.initialized = true
 	if Settings.pattern then
 		self:load(Settings.pattern)
@@ -69,7 +69,7 @@ end
 --- Uninitializes the editor mode.
 -- @param self Editor.
 Editor.uninitialize = function(self)
-	Game:deinit()
+	Main:end_game()
 	self.initialized = nil
 	self.light:set_enabled(false)
 end

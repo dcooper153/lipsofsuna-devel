@@ -202,7 +202,7 @@ end
 Client.start_single_player = function(self)
 	-- Start the server.
 	Sectors:unload_all()
-	Game:init("single", Settings.file)
+	Main:start_game("single", Main.settings.file)
 	-- Set information for the UI.
 	Client.data.connection.mode = "single"
 	Client.data.connection.text = "Starting the single player mode..."
@@ -220,7 +220,7 @@ Client.terminate_game = function(self)
 	self.data.connection.active = false
 	self.data.connection.connecting = false
 	self.data.connection.waiting = false
-	Game:deinit()
+	Main:end_game()
 	self.terrain_sync:clear()
 end
 

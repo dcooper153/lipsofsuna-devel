@@ -1,5 +1,5 @@
 Unittest:add(1, "lipsofsuna", "terrain manager", function()
-	local TerrainManager = require("core/server/terrain-manager")
+	local TerrainManager = require("core/terrain/terrain-manager")
 	-- Initialization.
 	local mgr = TerrainManager(16, 1)
 	assert(mgr)
@@ -9,7 +9,7 @@ Unittest:add(1, "lipsofsuna", "terrain manager", function()
 end)
 
 Unittest:add(1, "lipsofsuna", "terrain manager: loading and unloading", function()
-	local TerrainManager = require("core/server/terrain-manager")
+	local TerrainManager = require("core/terrain/terrain-manager")
 	local Vector = require("system/math/vector")
 	-- Loading.
 	local mgr = TerrainManager(16, 2, nil, false, true, true)
@@ -32,7 +32,7 @@ Unittest:add(1, "lipsofsuna", "terrain manager: loading and unloading", function
 end)
 
 Unittest:add(1, "lipsofsuna", "terrain manager: coordinate system", function()
-	local TerrainManager = require("core/server/terrain-manager")
+	local TerrainManager = require("core/terrain/terrain-manager")
 	local mgr = TerrainManager(16, 10)
 	assert(mgr)
 	assert(mgr.chunk_size == 16)

@@ -13,8 +13,8 @@ local PhysicsTerrain = require("system/physics-terrain")
 local Packet = require("system/packet")
 local Program = require("system/core")
 local Terrain = require("system/terrain")
-local TerrainChunk = require("core/server/terrain-chunk")
-local TerrainChunkLoader = require("core/server/terrain-chunk-loader")
+local TerrainChunk = require("core/terrain/terrain-chunk")
+local TerrainChunkLoader = require("core/terrain/terrain-chunk-loader")
 
 --- Manages terrain chunks.
 -- @type TerrainManager

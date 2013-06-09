@@ -15,6 +15,20 @@ local Client = require("core/client/client")
 local Network = require("system/network")
 local Simulation = require("core/client/simulation")
 
+Main.main_start_hooks:register(10, function(secs)
+	Main.client = Client --FIXME
+	Main.client:init()
+end)
+
+Main.main_end_hooks:register(10, function(secs)
+	Main.client:deinit()
+end)
+
+Main.update_hooks:register(10, function(secs)
+	Main.timing:start_action("client")
+	Main.client:update(secs)
+end)
+
 -- FIXME: Most of these should be registered elsewhere.
 Client:register_start_hook(10, function(secs)
 	if Main.settings.join then

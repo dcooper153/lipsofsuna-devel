@@ -15,7 +15,6 @@ local Network = require("system/network")
 local ObjectManager = require("core/server/object-manager")
 local Physics = require("system/physics")
 local SectorManager = require("core/server/sector-manager")
-local TerrainManager = require("core/server/terrain-manager")
 
 --- TODO:doc
 -- @type Game
@@ -56,26 +55,8 @@ Game.init = function(self, mode, save, port)
 		self.database:query("PRAGMA count_changes=OFF;")
 	end
 	self.sectors = SectorManager(self.database, self.enable_unloading)
-	self.terrain = TerrainManager(8, 0.75, self.database, self.enable_unloading, self.enable_generation, self.enable_graphics)
 	-- Initialize storage.
 	self.static_objects_by_id = setmetatable({}, {__mode = "kv"})
-	-- Initialize the server.
-	if mode == "server" then
-		Server:init(true, false)
-		self.messaging = Messaging(port or Server.config.server_port)
-	elseif mode == "host" then
-		Server:init(true, true)
-		self.messaging = Messaging(port or Server.config.server_port)
-	elseif mode == "single" then
-		Server:init(false, true)
-		self.messaging = Messaging()
-	else
-		self.messaging = Messaging()
-	end
-	-- Initialize terrain updates.
-	if Server.initialized then
-		-- TODO: Stick terrain
-	end
 end
 
 --- Uninitializes the game.

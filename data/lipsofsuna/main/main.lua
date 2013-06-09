@@ -11,6 +11,8 @@
 require("main/event")
 local Class = require("system/class")
 local Eventhandler = require("system/eventhandler")
+local Hooks = require("system/hooks")
+local Game = require("core/server/game") --FIXME
 local ModelManager = require("main/model-manager")
 local Mod = require("main/mod")
 local Settings = require("main/settings")
@@ -29,6 +31,11 @@ Main.new = function(clss)
 	self.timing = Timing()
 	self.mods = Mod()
 	self.settings = Settings(self.mods)
+	self.game_start_hooks = Hooks()
+	self.game_end_hooks = Hooks()
+	self.main_start_hooks = Hooks()
+	self.main_end_hooks = Hooks()
+	self.update_hooks = Hooks()
 	_G["Mod"] = self.mods --FIXME: global
 	_G["Settings"] = self.settings --FIXME: global
 	return self
@@ -48,7 +55,7 @@ Main.load = function(self)
 end
 
 --- Enters the main loop.
--- @param self Main class.
+-- @param self Main.
 Main.main = function(self)
 	if not self.start then
 		print(self.settings:usage())
@@ -77,7 +84,8 @@ Main.main = function(self)
 		Program:set_quit(true)
 	elseif self.settings.server then
 		-- Server main.
-		Game:init("server", self.settings.file, self.settings.port)
+		self.main_start_hooks:call()
+		self:start_game("server", self.settings.file, self.settings.port)
 		Server:load()
 		Program:set_sleep(1/60)
 		self:enable_manual_gc()
@@ -91,26 +99,22 @@ Main.main = function(self)
 			self.timing:start_action("event")
 			Eventhandler:update()
 			-- Update the logic.
+			self.update_hooks:call(tick)
 			self.timing:start_action("sectors")
 			if Game.initialized then
 				Game.sectors:update(tick)
 			end
-			self.timing:start_action("terrain")
-			if Game.initialized then
-				Game.terrain:update(tick)
-			end
-			self.timing:start_action("server")
-			Server:update(tick)
 			self.timing:start_action("models")
 			self.models:update(tick)
 			-- Collect garbage.
 			self.timing:start_action("garbage")
 			self:perform_manual_gc(tick)
 		end
-		Game:deinit()
+		self:end_game()
+		self.main_end_hooks:call()
 	else
 		-- Client main.
-		Client:init()
+		self.main_start_hooks:call()
 		self:enable_manual_gc()
 		while not Program:get_quit() do
 			-- Update the program state.
@@ -130,14 +134,7 @@ Main.main = function(self)
 			if Game.initialized then
 				Game.sectors:update(tick)
 			end
-			self.timing:start_action("terrain")
-			if Game.initialized then
-				Game.terrain:update(tick)
-			end
-			self.timing:start_action("server")
-			Server:update(tick)
-			self.timing:start_action("client")
-			Client:update(tick)
+			self.update_hooks:call(tick)
 			self.timing:start_action("models")
 			self.models:update(tick)
 			-- Render the scene.
@@ -147,7 +144,48 @@ Main.main = function(self)
 			self.timing:start_action("garbage")
 			self:perform_manual_gc(tick)
 		end
-		Client:deinit()
+		self.main_end_hooks:call()
+	end
+end
+
+--- Ends the game.
+-- @param self Main.
+Main.end_game = function(self)
+	if not self.game then return end
+	self.game:deinit()
+	self.game = nil
+end
+
+--- Starts the game.
+-- @param self Main.
+-- @param mode Game mode, "benchmark"/"editor"/"host"/"join"/"server".
+-- @param save Save file name, or nil when not using local I/O.
+-- @param port Server port number, or nil if not hosting.
+Main.start_game = function(self, mode, save, port)
+	-- Initialize the game.
+	self.game = Game --FIXME
+	self.game:init(mode, save, port)
+	-- Call the game start hooks.
+	self.game_start_hooks:call()
+
+	-- FIXME
+	-- Initialize the server.
+	local Messaging = require("core/messaging/messaging")
+	if mode == "server" then
+		Server:init(true, false)
+		self.game.messaging = Messaging(port or Server.config.server_port)
+	elseif mode == "host" then
+		Server:init(true, true)
+		self.messaging = Messaging(port or Server.config.server_port)
+	elseif mode == "single" then
+		Server:init(false, true)
+		self.game.messaging = Messaging()
+	else
+		self.game.messaging = Messaging()
+	end
+	-- Initialize terrain updates.
+	if Server.initialized then
+		-- TODO: Stick terrain
 	end
 end
 

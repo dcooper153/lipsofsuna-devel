@@ -42,7 +42,7 @@ Join.join_game = function(self, addr, port)
 	self.data.status = "Joining the server at " .. self.data.remote .. "..."
 	-- Clear the world.
 	Sectors:unload_all()
-	Game:init("join")
+	Main:start_game("join")
 	-- Enter the connection state.
 	Ui:set_state("join/connect")
 end

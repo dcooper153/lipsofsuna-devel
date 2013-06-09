@@ -15,7 +15,7 @@ local Quaternion = require("system/math/quaternion")
 local RenderModel = require("system/render-model")
 local RenderObject = require("system/render-object")
 local Simulation = require("core/client/simulation")
-local TerrainManager = require("core/server/terrain-manager")
+local TerrainManager = require("core/terrain/terrain-manager")
 local Vector = require("system/math/vector")
 
 --- Provides a simple graphical benchmark.
@@ -28,7 +28,7 @@ Benchmark = Class("Benchmark")
 Benchmark.new = function(clss)
 	local self = Class.new(clss)
 	-- Initialize the game.
-	Game:init("benchmark")
+	Main:start_game("benchmark")
 	Game.sectors.unload_time = nil
 	-- Create the objects.
 	self.objects = setmetatable({}, {__mode = "kv"})
