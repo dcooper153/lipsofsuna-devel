@@ -20,14 +20,12 @@ varying vec2 F_texcoord;
 varying vec3 F_eyev;
 varying vec3 F_lightv[LIGHTS];
 
-vec3 los_normal_mapping(in vec3 normal, in vec3 tangent, in vec4 sample);
 vec3 los_blinn_phong(in vec3 lv, in vec3 ev, in vec3 ld, in vec4 eq, in vec3 normal, in float shininess);
 vec3 los_cel_shading_skin(in vec4 material, in vec4 diff, in vec4 spec, in vec4 p, in sampler1D t1, in sampler1D t2);
 
 void main()
 {
-	vec4 normalmap = texture2D(LOS_diffuse_texture_1, F_texcoord);
-	vec3 normal = los_normal_mapping(F_normal, F_tangent, normalmap);
+	vec3 normal = normalize(F_normal);
 	vec4 diffuse = texture2D(LOS_diffuse_texture_0, F_texcoord);
 	vec4 diff = LOS_scene_ambient;
 	vec4 spec = vec4(0.0);
