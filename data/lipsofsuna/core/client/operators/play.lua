@@ -10,6 +10,7 @@ Operators.play.data = {}
 -- @param self Operator.
 Operators.play.reset = function(self)
 	self.data.join_time = Program:get_time()
+	Client.play_hooks:call()
 end
 
 --- Checks if the game was just started.</br>

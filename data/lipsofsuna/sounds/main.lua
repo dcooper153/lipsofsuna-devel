@@ -1,5 +1,3 @@
-Program:add_path(Mod.path)
-
 local Client = require("core/client/client")
 local Sound = require("system/sound")
 

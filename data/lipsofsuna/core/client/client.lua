@@ -27,6 +27,7 @@ Client = Class("Client")
 
 -- FIXME
 Client.init_hooks = Hooks()
+Client.play_hooks = Hooks()
 Client.player_hooks = Hooks()
 Client.reset_hooks = Hooks()
 Client.speech_hooks = Hooks()
@@ -123,6 +124,13 @@ end
 -- @param hook Function.
 Client.register_init_hook = function(self, priority, hook)
 	self.init_hooks:register(priority, hook)
+end
+
+--- Registers a playing start hook.
+-- @param priority Priority.
+-- @param hook Function.
+Client.register_play_hook = function(self, priority, hook)
+	self.play_hooks:register(priority, hook)
 end
 
 --- Registers a player object change hook.
