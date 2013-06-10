@@ -11,7 +11,7 @@
 local Animation = require("system/animation")
 local Class = require("system/class")
 local Model = require("system/model")
-local ModelBuilder = require("core/client/model-builder")
+local ModelBuilder = require("character/model-builder") --FIXME
 local ModelEffect = require("core/effect/model-effect") --FIXME
 local ParticleEffect = require("core/effect/particle-effect") --FIXME
 local RenderObject = require("system/render-object")
