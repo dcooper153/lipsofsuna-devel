@@ -31,7 +31,7 @@ material animhair1
 			vertex_program_ref animdiffnorm1_vert
 			{
 			}
-			fragment_program_ref diffnorm1_frag
+			fragment_program_ref diff1_frag
 			{
 			}
 		}

@@ -136,25 +136,13 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "chargen/body",
 	widget = function()
-		local sliders = {
-			{"Arm muscularity", false},
-			{"Body width", true},
-			{"Bust size", false},
-			{"Hips width", false},
-			{"Leg muscularity", false},
-			{"Torso width", false},
-			{"Waist fatness", false},
-			{"Waist width", false},
-			{"Shoulder width", false}}
 		-- Create the body proportion sliders.
 		local widgets = {}
-		for k,v in ipairs(sliders) do
-			local value = Client.chargen:get_body(k)
-			if v[2] then value = 1 - value end
-			local widget = Widgets.Uiscrollfloat(v[1], 0, 1, value, function(w)
-				Client.chargen:set_body(k, w.inverse and 1 - w.value or w.value)
+		for k,v in ipairs(ChargenSliderSpec:find_by_category("body")) do
+			local value = Client.chargen:get_body(v.field_index) or 0
+			local widget = Widgets.Uiscrollfloat(v.name, 0, 1, value, function(w)
+				Client.chargen:set_body(k, w.value)
 			end)
-			widget.inverse = v[2]
 			table.insert(widgets, widget)
 		end
 		return widgets
@@ -214,31 +202,13 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "chargen/face",
 	widget = function()
-		local sliders = {
-			{"Cheekbone size", true},
-			{"Cheek size", true},
-			{"Chin sharpness", false},
-			{"Chin size", true},
-			{"Eye inner", false},
-			{"Eye distance", true},
-			{"Eye outer", false},
-			{"Eye size", true},
-			{"Face roughness", false},
-			{"Jaw pronounced", true},
-			{"Jaw width", false},
-			{"Lips protruded", false},
-			{"Mouth width", false},
-			{"Nose pointedness", true},
-			{"Nose position", false}}
 		-- Create the face shape sliders.
 		local widgets = {}
-		for k,v in ipairs(sliders) do
-			local value = Client.chargen:get_face(k)
-			if v[2] then value = 1 - value end
-			local widget = Widgets.Uiscrollfloat(v[1], 0, 1, value, function(w)
-				Client.chargen:set_face(k, w.inverse and 1 - w.value or w.value)
+		for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
+			local value = Client.chargen:get_face(v.field_index) or 0
+			local widget = Widgets.Uiscrollfloat(v.name, 0, 1, value, function(w)
+				Client.chargen:set_body(k, w.value)
 			end)
-			widget.inverse = v[2]
 			table.insert(widgets, widget)
 		end
 		return widgets

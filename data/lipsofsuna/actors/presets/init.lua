@@ -6,7 +6,7 @@ Actorpresetspec{
 	face = {0.2,0.3,0.5925,0.3,0,0.4952,0.019,0.238,0.0153,0.5161,0.2371,0.5714,0.3556,0.5,0.7},
 	hair_color = {0.7074,0.5037,0.3481},
 	hair_style = "hair4",
-	head_style = "aerhead2",
+	head_style = "aerhead1",
 	height = 0.9112,
 	playable = true,
 	skin_color = {1,0.1,1},
@@ -20,7 +20,7 @@ Actorpresetspec{
 	face = {0.3,0.3,0.6,0,0.7,0.2952,0,0,0.0153,0.6,0.3,0.5,0.2,0.4,0.4},
 	hair_color = {0.7074,0.5037,0.3481},
 	hair_style = "hair1",
-	head_style = "aerhead2",
+	head_style = "aerhead1",
 	height = 0.9906,
 	playable = true,
 	skin_color = {1,0.1,1},
@@ -34,7 +34,7 @@ Actorpresetspec{
 	face = {0.4,0.4,0.6,0.2,0,0.4952,0.6,0.238,0.0153,0.6,0,0.5,0.3556,0.1,1},
 	hair_color = {0.7074,0.5037,0.3481},
 	hair_style = "hair5",
-	head_style = "aerhead2",
+	head_style = "aerhead1",
 	height = 1.0485,
 	playable = true,
 	skin_color = {1,0.1,1},
@@ -51,7 +51,7 @@ Actorpresetspec{
 	height = 0.9112,
 	playable = true,
 	skin_color = {1,0.1,1},
-	skin_style = "aer2"}
+	skin_style = "aer1"}
 
 Actorpresetspec{
 	name = "Male 2",
@@ -64,7 +64,7 @@ Actorpresetspec{
 	height = 0.9741,
 	playable = true,
 	skin_color = {1,0.1,1},
-	skin_style = "aer2"}
+	skin_style = "aer1"}
 
 Actorpresetspec{
 	name = "Male 3",
@@ -77,4 +77,4 @@ Actorpresetspec{
 	height = 1.0366,
 	playable = true,
 	skin_color = {1,0.1,1},
-	skin_style = "aer2"}
+	skin_style = "aer1"}

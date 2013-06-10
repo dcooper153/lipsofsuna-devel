@@ -1,0 +1,107 @@
+[
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Arm muscularity",
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 1,
+		"shape_keys": ["arm muscular"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Body width",
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 2,
+		"shape_keys": ["body wide"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Breast sag",
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 3,
+		"shape_keys": ["breast sag"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Breast size",
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 4,
+		"shape_keys": ["breast small", "breast big"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Butt size",
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 5,
+		"shape_keys": ["butt big"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Hips width",
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 6,
+		"invert": true,
+		"shape_keys": ["hips narrow"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Leg muscularity",
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 7,
+		"shape_keys": ["leg muscular"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Torso width"
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 8,
+		"shape_keys": ["torso wide"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Waist fatness",
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 9,
+		"shape_keys": ["waist fat"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Waist width",
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 10,
+		"shape_keys": ["waist wide"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Shoulder width",
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 11,
+		"shape_keys": ["shoulder wide"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Nipple length",
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 12,
+		"shape_keys": ["nipple long"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Nipple puffiness",
+		"categories": {"body": true},
+		"field_name": "body_style",
+		"field_index": 13,
+		"shape_keys": ["nipple puffy"]
+	}
+]

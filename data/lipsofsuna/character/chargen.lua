@@ -59,7 +59,8 @@ Chargen.init = function(self, standalone)
 	self.data.render = RenderObject()
 	self.data.render:set_position(Vector(1, 1, 1))
 	self.data.render:set_visible(true)
-	self:randomize()
+	self:set_race("aer")
+	self.data.update_needed = true
 	-- Change the music track.
 	Client.effects:switch_music_track("char")
 end
@@ -87,6 +88,14 @@ Chargen.reset = function(self)
 		skin_color = {1,1,1},
 		skin_style = "",
 		spawn_point = "Home"}
+	-- Initialize the body sliders.
+	for k,v in ipairs(ChargenSliderSpec:find_by_category("body")) do
+		self.char.body[v.field_index] = 0
+	end
+	-- Initialize the face sliders.
+	for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
+		self.char.face[v.field_index] = 0
+	end
 end
 
 --- Sends the character to the server.

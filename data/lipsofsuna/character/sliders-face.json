@@ -1,0 +1,54 @@
+[
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Cheekbone size",
+		"categories": {"face": true},
+		"field_name": "face_style",
+		"field_index": 1,
+		"invert": true,
+		"shape_keys": ["cheekbone small"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Cheek size",
+		"categories": {"face": true},
+		"field_name": "face_style",
+		"field_index": 2,
+		"shape_keys": ["cheek big"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Chin sharpness",
+		"categories": {"face": true},
+		"field_name": "face_style",
+		"field_index": 3,
+		"shape_keys": ["chin sharp"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Chin size",
+		"categories": {"face": true},
+		"field_name": "face_style",
+		"field_index": 4,
+		"invert": true,
+		"shape_keys": ["chin small"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Jaw straightness",
+		"categories": {"face": true},
+		"field_name": "face_style",
+		"field_index": 5,
+		"invert": true,
+		"shape_keys": ["jaw straight"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Jaw width",
+		"categories": {"face": true},
+		"field_name": "face_style",
+		"field_index": 6,
+		"invert": true,
+		"shape_keys": ["jaw wide"]
+	}
+]

@@ -51,6 +51,14 @@ Spec.find = function(clss, args)
 	end
 end
 
+--- Finds specs by category.
+-- @param clss Spec class.
+-- @param name String.
+-- @return Table of specs.
+Spec.find_by_category = function(clss, name)
+	return clss.dict_cat[name] or {}
+end
+
 --- Finds a spec by ID.
 -- @param clss Spec class.
 -- @param id ID.

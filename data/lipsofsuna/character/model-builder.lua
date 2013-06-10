@@ -141,47 +141,52 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 	-- Load the model.
 	local ref = Main.models:find_by_name(file)
 	local morph = {}
-	local add = function(name, value)
+	local add = function(spec, value)
+		-- Validate the slider.
 		if not value then return end
-		table.insert(morph, name)
-		table.insert(morph, value / 255)
+		local num = #spec.shape_keys
+		if num == 0 then return end
+		-- Scale and invert the value.
+		value = math.min(math.max(value / 255, 0), 1)
+		if spec.invert then value = 1 - value end
+		-- Add the shape key.
+		if num == 1 then
+			-- Single with the default in the beginning of the chain.
+			table.insert(morph, spec.shape_keys[1])
+			table.insert(morph, value)
+		elseif num == 2 then
+			-- Dual with the default between the two keys.
+			if value < 0.5 then
+				table.insert(morph, spec.shape_keys[1])
+				table.insert(morph, 1 - value * 2)
+			else
+				table.insert(morph, spec.shape_keys[2])
+				table.insert(morph, value * 2 - 1)
+			end
+		else
+			-- TODO
+			val = val * num
+			local key = math.min(math.floor(val) + 1, num)
+			table.insert(morph, spec.sliders[key])
+			table.insert(morph, val - key)
+		end
 	end
 	-- Face customization.
 	if args.face_style and (string.match(name, ".*head.*") or string.match(name, ".*eye.*")) then
-		add("cheekbone small", args.face_style[1])
-		add("cheek small", args.face_style[2])
-		add("chin sharp", args.face_style[3])
-		add("chin small", args.face_style[4])
-		add("eye inner", args.face_style[5])
-		add("eye near", args.face_style[6])
-		add("eye outer", args.face_style[7])
-		add("eye small", args.face_style[8])
-		add("face wrinkle", args.face_style[9])
-		add("jaw straight", args.face_style[10])
-		add("jaw wide", args.face_style[11])
-		add("lips protrude", args.face_style[12])
-		add("mouth wide", args.face_style[13])
-		add("nose dull", args.face_style[14])
-		add("nose up", args.face_style[15])
+		for k,spec in ipairs(ChargenSliderSpec:find_by_category("face")) do
+			local field = args[spec.field_name]
+			if field then
+				add(spec, field[spec.field_index])
+			end
+		end
 	end
 	-- Body customization.
 	if args.body_style then
-		add("arms muscular", args.body_style[1])
-		add("body thin", args.body_style[2])
-		if args.body_style[3] then
-			if args.body_style[3] < 127 then
-				add("breast small", 255 - 2 * args.body_style[3])
-			elseif args.body_style[3] > 127 then
-				add("breast big", 2 * args.body_style[3] - 255)
+		for k,spec in ipairs(ChargenSliderSpec:find_by_category("body")) do
+			local field = args[spec.field_name]
+			if field then
+				add(spec, field[spec.field_index])
 			end
-		end
-		add("hips wide", args.body_style[4])
-		add("legs muscular", args.body_style[5])
-		add("torso wide", args.body_style[6])
-		add("waist fat", args.body_style[7])
-		add("waist wide", args.body_style[8])
-		if args.body_style[9] then
-			add("shoulder thin", 255 - args.body_style[9])
 		end
 	end
 	-- Morph and merge.
@@ -189,5 +194,3 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 end
 
 return ModelBuilder
-
-
