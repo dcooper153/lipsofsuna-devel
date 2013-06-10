@@ -173,11 +173,11 @@ end
 --- Reads an object from the database.
 -- @param self ObjectDatabase.
 -- @param id Object ID.
--- @param type Object type.
+-- @param type_ Object type.
 -- @param spec Spec name.
 -- @param dead One for dead, zero for alive.
 -- @return Object.
-ObjectDatabase.load_object = function(self, id, type, spec, dead)
+ObjectDatabase.load_object = function(self, id, type_, spec, dead)
 	-- Create arguments out of the queried row.
 	local args = {}
 	args.id = id
@@ -185,18 +185,22 @@ ObjectDatabase.load_object = function(self, id, type, spec, dead)
 	args.spec = spec
 	-- Create the object.
 	local init = function(args)
-		if type == "actor" then return Actor(args)
-		elseif type == "item" then return Item(args)
-		elseif type == "obstacle" then return Obstacle(args)
-		elseif type == "player" then return Player(args)
-		elseif type == "static" then return Staticobject(args)
+		if type_ == "actor" then return Actor(args)
+		elseif type_ == "item" then return Item(args)
+		elseif type_ == "obstacle" then return Obstacle(args)
+		elseif type_ == "player" then return Player(args)
+		elseif type_ == "static" then return Staticobject(args)
 		else
-			error(string.format("invalid object type %q", type))
+			error(string.format("invalid object type %q", type_))
 		end
 	end
 	local ok1,object = pcall(init, args)
 	if not ok1 then
 		print("ERROR: " .. object)
+		return
+	end
+	if not object.spec or type(object.spec) == "string" then
+		print("WARNING: missing spec \"" .. spec .. "\"")
 		return
 	end
 	-- Read additional data.
