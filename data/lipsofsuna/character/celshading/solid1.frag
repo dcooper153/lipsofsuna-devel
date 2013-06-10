@@ -23,7 +23,6 @@ vec3 los_cel_shading(in vec4 material, in vec4 diff, in vec4 spec, in vec4 p, in
 void main()
 {
 	vec3 normal = normalize(F_normal);
-	vec4 diffuse = vec4(1.0);
 	vec4 diff = LOS_scene_ambient;
 	vec4 spec = vec4(0.0);
 	for(int i = 0 ; i < LIGHTS ; i++)
@@ -33,7 +32,7 @@ void main()
 		diff += l.z * l.x * LOS_light_diffuse[i];
 		spec += l.z * l.y * LOS_light_specular[i];
 	}
-	vec3 color = los_cel_shading(LOS_material_diffuse * diffuse, diff, spec,
+	vec3 color = los_cel_shading(LOS_material_diffuse, diff, spec,
 		LOS_material_celshading, LOS_diffuse_texture_2, LOS_diffuse_texture_3);
-	gl_FragColor = vec4(color, diffuse.a);
+	gl_FragColor = vec4(color, 1.0);
 }
