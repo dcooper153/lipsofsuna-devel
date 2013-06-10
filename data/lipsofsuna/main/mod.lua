@@ -76,7 +76,8 @@ end
 --- Loads a mod by name.
 -- @param self Mod.
 -- @param name Mod name.
-Mod.load = function(self, name)
+-- @param optional True for optional.
+Mod.load = function(self, name, optional)
 	local load_spec = function(info, file)
 		-- Open the file.
 		local path = name .. "/" .. file .. ".json"
@@ -115,6 +116,7 @@ Mod.load = function(self, name)
 		end
 		info = res
 	else
+		if optional then return end
 		info = {scripts = {"init"}} -- Backwards compatibility.
 	end
 	self.mods[name] = info
@@ -178,7 +180,7 @@ Mod.load_list = function(self, file)
 			elseif v[1] == "load_list" then
 				self:load_list(v[2] .. ".json")
 			elseif v[1] == "load_optional" then
-				-- TODO
+				self:load(v[2], true)
 			end
 		end
 	end
