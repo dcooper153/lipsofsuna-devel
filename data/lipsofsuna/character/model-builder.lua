@@ -25,9 +25,9 @@ ModelBuilder.build_for_actor = function(clss, object)
 	if not object.spec.models then return end
 	-- Create the equipment list.
 	local equipment = {}
-	for k in pairs(object.spec.equipment_slots) do
-		local item = object.inventory:get_object_by_slot(k)
-		if item then equipment[k] = item.spec.name end
+	for k,v in pairs(object.inventory.equipped) do
+		local item = object.inventory:get_object_by_index(v)
+		equipment[k] = item.spec.name
 	end
 	-- Create or reuse the model merger.
 	local merger = object.model_merger
