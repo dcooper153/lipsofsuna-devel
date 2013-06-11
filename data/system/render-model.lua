@@ -1,4 +1,4 @@
---- TODO:doc
+--- Renderable model.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -16,7 +16,7 @@ end
 
 ------------------------------------------------------------------------------
 
---- TODO:doc
+--- Renderable model.
 -- @type RenderModel
 local RenderModel = Class("RenderModel")
 
@@ -28,6 +28,14 @@ RenderModel.new = function(clss, model)
 	local self = Class.new(clss)
 	self.handle = Los.render_model_new(model.handle)
 	return self
+end
+
+--- Replaces a texture with an image.
+-- @param self Render model.
+-- @param name Texture name without extension.
+-- @param image Image.
+RenderModel.replace_texture = function(self, name, image)
+	Los.render_model_replace_texture(self.handle, name, image.handle)
 end
 
 --- Returns true if the model has finished background loading.
@@ -45,5 +53,3 @@ RenderModel.set_model = function(self, model)
 end
 
 return RenderModel
-
-

@@ -39,12 +39,7 @@ public:
 	void step_3_fg (Ogre::Mesh* mesh);
 	void step_4_fg (Ogre::Mesh* mesh);
 private:
-	Ogre::MaterialPtr create_material (LIMdlMaterial* mat);
 	bool create_skeleton (Ogre::Mesh* mesh);
-	bool check_material_override (Ogre::MaterialPtr& material);
-	bool check_name_override (const Ogre::String& name);
-	void initialize_pass (LIMdlMaterial* mat, Ogre::Pass* pass);
-	void override_pass (LIMdlMaterial* mat, Ogre::Pass* pass);
 	void update_entities ();
 private:
 	/* Static data. */

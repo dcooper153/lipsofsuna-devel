@@ -23,6 +23,7 @@
  */
 
 #include "ext-module.h"
+#include "lipsofsuna/extension/image/module.h"
 
 static void RenderObject_new (LIScrArgs* args)
 {
@@ -287,6 +288,23 @@ static void RenderObject_replace_model (LIScrArgs* args)
 	}
 }
 
+static void RenderObject_replace_texture (LIScrArgs* args)
+{
+	const char* name;
+	LIExtRenderObject* self;
+	LIImgImage* image;
+	LIScrData* value;
+
+	self = args->self;
+	if (liscr_args_geti_string (args, 0, &name) &&
+	    liscr_args_geti_data (args, 1, LIEXT_SCRIPT_IMAGE, &value))
+	{
+		image = liscr_data_get_data (value);
+		liren_render_object_replace_texture (self->render, self->id, name,
+			image->width, image->height, image->pixels);
+	}
+}
+
 static void RenderObject_set_effect (LIScrArgs* args)
 {
 	float params[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -404,6 +422,7 @@ void liext_script_render_object (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_particle_animation", RenderObject_particle_animation);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_remove_model", RenderObject_remove_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_replace_model", RenderObject_replace_model);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_replace_texture", RenderObject_replace_texture);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_effect", RenderObject_set_effect);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_particle", RenderObject_set_particle);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_particle_emitting", RenderObject_set_particle_emitting);

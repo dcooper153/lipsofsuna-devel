@@ -222,6 +222,7 @@ int liren_internal_init (
 	self->data->texture_manager = &Ogre::TextureManager::getSingleton ();
 	self->data->texture_manager->setDefaultNumMipmaps (5);
 	self->data->material_manager = &Ogre::MaterialManager::getSingleton ();
+	self->data->material_utils = new LIRenMaterialUtils(self);
 
 	return 1;
 }
@@ -241,6 +242,7 @@ void liren_internal_deinit (
 		/* Free the Ogre root. */
 		delete self->data->root;
 		delete self->data->resource_loading_listener;
+		delete self->data->material_utils;
 		delete self->data->container_factory;
 		delete self->data->image_factory;
 		delete self->data->scaled_factory;

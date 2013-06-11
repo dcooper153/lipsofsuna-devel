@@ -32,6 +32,7 @@ public:
 	virtual bool has_model (LIRenModel* model);
 	virtual bool is_loaded () const;
 	virtual void remove_model (LIRenModel* model);
+	virtual void replace_texture (const char* name, Ogre::TexturePtr& texture);
 	virtual void update (float secs);
 	virtual void update_pose (LIMdlPoseSkeleton* skeleton);
 	virtual void update_settings ();

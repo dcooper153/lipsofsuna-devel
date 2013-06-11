@@ -358,6 +358,36 @@ void liren_object_replace_model (
 	liren_object_add_model (self, model_new);
 }
 
+/**
+ * \brief Replaces a texture.
+ * \param self Object.
+ * \param name Name of the replaced texture.
+ * \param width Width of the new texture.
+ * \param height Height of the new texture.
+ * \param pixels Pixels in the RGBA format.
+ */
+void liren_object_replace_texture (
+	LIRenObject* self,
+	const char*  name,
+	int          width,
+	int          height,
+	const void*  pixels)
+{
+	// Create the new texture.
+	// FIXME: Why does the Ogre::PF_R8G8B8A8 format not work?
+	Ogre::Image img;
+	img.loadDynamicImage ((Ogre::uchar*) pixels, width, height, 1, Ogre::PF_A8B8G8R8);
+	Ogre::String unique_name = self->render->data->id.next ();
+	Ogre::TexturePtr texture = self->render->data->texture_manager->loadImage (unique_name, LIREN_RESOURCES_TEMPORARY, img);
+
+	// Replace in all non-deprecated entities.
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+	{
+		if (!self->attachments[i]->get_replacer ())
+			self->attachments[i]->replace_texture (name, texture);
+	}
+}
+
 void liren_object_update (
 	LIRenObject* self,
 	float        secs)

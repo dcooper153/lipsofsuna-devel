@@ -212,6 +212,30 @@ void liren_render_object_replace_model (
 }
 
 /**
+ * \brief Replaces a texture.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \param name Name of the replaced texture.
+ * \param width Width of the new texture.
+ * \param height Height of the new texture.
+ * \param pixels Pixels in the RGBA format.
+ */
+void liren_render_object_replace_texture (
+	LIRenRender* self,
+	int          id,
+	const char*  name,
+	int          width,
+	int          height,
+	const void*  pixels)
+{
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		liren_object_replace_texture (object, name, width, height, pixels);
+}
+
+/**
  * \brief Removes a model from the object.
  * \param self Object.
  * \param self Renderer.

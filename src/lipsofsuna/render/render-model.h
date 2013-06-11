@@ -31,6 +31,14 @@ LIAPICALL (void, liren_render_model_free, (
 	LIRenRender* render,
 	int          id));
 
+LIAPICALL (void, liren_render_model_replace_texture, (
+	LIRenRender* render,
+	int          id,
+	const char*  name,
+	int          width,
+	int          height,
+	const void*  pixels));
+
 LIAPICALL (int, liren_render_model_get_loaded, (
 	LIRenRender* render,
 	int          id));

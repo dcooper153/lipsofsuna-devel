@@ -35,6 +35,7 @@ typedef struct _LIRenRenderData LIRenRenderData;
 
 #ifdef __cplusplus
 class LIRenAttachment;
+class LIRenMaterialUtils;
 #include <OgreBorderPanelOverlayElement.h>
 #include <OgreCamera.h>
 #include <OgreEntity.h>
@@ -54,6 +55,7 @@ class LIRenAttachment;
 #include "render-image-overlay-factory.hpp"
 #include "render-scaled-overlay-factory.hpp"
 #include "render-text-overlay-factory.hpp"
+#include "render-material-utils.hpp"
 #include "render-mesh-builder.hpp"
 #include "render-resource-loading-listener.hpp"
 #include "render-unique-id.hpp"
@@ -121,6 +123,7 @@ struct _LIRenRenderData
 	LIRenImageOverlayFactory* image_factory;
 	LIRenScaledOverlayFactory* scaled_factory;
 	LIRenTextOverlayFactory* text_factory;
+	LIRenMaterialUtils* material_utils;
 	LIRenResourceLoadingListener* resource_loading_listener;
 	LIRenUniqueId id;
 	LIAlgStrdic* mesh_builders;

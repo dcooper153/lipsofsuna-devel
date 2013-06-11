@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -252,7 +252,7 @@ void LIRenMeshBuilder::step_2_fg (Ogre::Mesh* mesh)
 	for (int i = 0 ; i < model->materials.count ; i++)
 	{
 		/* Create the material. */
-		Ogre::MaterialPtr material = create_material (model->materials.array + i);
+		Ogre::MaterialPtr material = render->data->material_utils->create_material (model->materials.array + i);
 
 		/* Set the material name of the submesh. */
 		Ogre::SubMesh* submesh = mesh->getSubMesh (i);
@@ -342,88 +342,6 @@ void LIRenMeshBuilder::step_4_fg (Ogre::Mesh* mesh)
 	}
 }
 
-/**
- * \brief Creates a material.
- * \param mat Model material.
- */
-Ogre::MaterialPtr LIRenMeshBuilder::create_material (
-	LIMdlMaterial* mat)
-{
-	bool existing = false;
-	bool override = true;
-	Ogre::MaterialPtr material;
-	Ogre::String unique_name = render->data->id.next ();
-
-	/* Try to load an existing material. */
-	if (mat->material != NULL && mat->material[0] != '\0')
-	{
-		Ogre::String name = Ogre::String (mat->material);
-		material = render->data->material_manager->getByName (name);
-		if (!material.isNull())
-			existing = true;
-	}
-
-	/* Try to default to diff1 if no material found yet. */
-	/* Although the model could specify almost all the important properties,
-	   we strongly prefer to use a base material. This can be avoided by not
-	   specifying the `diff1' shader, though there should be no reason for that. */
-	if (!existing)
-	{
-		material = render->data->material_manager->getByName ("diff1");
-		if (!material.isNull())
-			existing = true;
-	}
-
-	/* Create a new material if an existing one was not found. */
-	if (!existing)
-	{
-		Ogre::String group = LIREN_RESOURCES_TEMPORARY;
-		material = render->data->material_manager->create (unique_name, group);
-		if (mat->flags & LIMDL_MATERIAL_FLAG_TRANSPARENCY)
-			material->setSceneBlending (Ogre::SBT_TRANSPARENT_ALPHA);
-		if (mat->flags & LIMDL_MATERIAL_FLAG_CULLFACE)
-			material->setCullingMode (Ogre::CULL_CLOCKWISE);
-		else
-			material->setCullingMode (Ogre::CULL_NONE);
-	}
-
-	/* Instantiate the material if it needs to be overridden. */
-	/* The original material is in the group of permanent resources but
-	   the instantiated material needs to be put into the temporary group
-	   so that it can be removed when the model is garbage collected. */
-	if (existing)
-	{
-		if (check_material_override (material))
-			material = material->clone (unique_name, true, LIREN_RESOURCES_TEMPORARY);
-		else
-			override = false;
-	}
-
-	/* Override the fields of techniques. */
-	if (override)
-	{
-		for (int i = 0 ; i < material->getNumTechniques () ; i++)
-		{
-			Ogre::Technique* technique = material->getTechnique (i);
-			if (existing)
-			{
-				for (int j = 0 ; j < technique->getNumPasses () ; j++)
-				{
-					Ogre::Pass* pass = technique->getPass (j);
-					override_pass (mat, pass);
-				}
-			}
-			else
-			{
-				Ogre::Pass* pass = technique->getPass (0);
-				initialize_pass (mat, pass);
-			}
-		}
-	}
-
-	return material;
-}
-
 bool LIRenMeshBuilder::create_skeleton (Ogre::Mesh* mesh)
 {
 	Ogre::Bone* bone;
@@ -476,111 +394,6 @@ bool LIRenMeshBuilder::create_skeleton (Ogre::Mesh* mesh)
 	mesh->setSkeletonName (skeleton->getName ());
 
 	return true;
-}
-
-bool LIRenMeshBuilder::check_material_override (
-	Ogre::MaterialPtr& material)
-{
-	for (int k = 0 ; k < material->getNumTechniques () ; k++)
-	{
-		Ogre::Technique* tech = material->getTechnique (k);
-		for (int i = 0 ; i < tech->getNumPasses () ; i++)
-		{
-			/* Check if the pass needs to be overridden. */
-			Ogre::Pass* pass = tech->getPass (i);
-			if (check_name_override (pass->getName ()))
-				return true;
-
-			/* Check if any textures need to be overridden. */
-			for (int i = 0 ; i < pass->getNumTextureUnitStates () ; i++)
-			{
-				Ogre::TextureUnitState* state = pass->getTextureUnitState (i);
-				if (check_name_override (state->getName ()))
-					return true;
-			}
-		}
-	}
-
-	return false;
-}
-
-bool LIRenMeshBuilder::check_name_override (
-	const Ogre::String& name)
-{
-	if (name.size () < 3)
-		return 0;
-	if (name[0] != 'L' || name[1] != 'O' || name[2] != 'S')
-		return 0;
-	return 1;
-}
-
-void LIRenMeshBuilder::initialize_pass (
-	LIMdlMaterial* mat,
-	Ogre::Pass*    pass)
-{
-	/* Initialize pass properties. */
-	pass->setSelfIllumination (mat->emission, mat->emission, mat->emission);
-	pass->setShininess (mat->shininess);
-	pass->setDiffuse (Ogre::ColourValue (mat->diffuse[0], mat->diffuse[1], mat->diffuse[2], mat->diffuse[3]));
-	pass->setSpecular (Ogre::ColourValue (mat->specular[0], mat->specular[1], mat->specular[2], mat->specular[3]));
-	pass->setVertexColourTracking (Ogre::TVC_DIFFUSE);
-
-	/* Initialize texture units. */
-	for (int i = 0 ; i < mat->textures.count && i < 1 ; i++)
-	{
-		Ogre::String tex = Ogre::String (mat->textures.array[i].string);
-		pass->createTextureUnitState (tex + ".dds");
-	}
-}
-
-void LIRenMeshBuilder::override_pass (
-	LIMdlMaterial* mat,
-	Ogre::Pass*    pass)
-{
-	/* Set pass properties. */
-	/* If this is a newly created material or the name of the first pass
-	   starts with the string "LOS", we override some of the parameters. */
-	if (check_name_override (pass->getName ()))
-	{
-		pass->setSelfIllumination (mat->emission, mat->emission, mat->emission);
-		pass->setShininess (mat->shininess);
-		Ogre::TrackVertexColourType track = pass->getVertexColourTracking ();
-		if (track != Ogre::TVC_DIFFUSE)
-			pass->setDiffuse (Ogre::ColourValue (mat->diffuse[0], mat->diffuse[1], mat->diffuse[2], mat->diffuse[3]));
-		if (track != Ogre::TVC_SPECULAR)
-			pass->setSpecular (Ogre::ColourValue (mat->specular[0], mat->specular[1], mat->specular[2], mat->specular[3]));
-	}
-
-	/* Override texture units. */
-	/* Texture units whose names start with "LOS" are considered overridable. */
-	int j = 0;
-	for (int i = 0 ; i < pass->getNumTextureUnitStates () ; i++)
-	{
-		if (j >= mat->textures.count)
-			break;
-		Ogre::TextureUnitState* state = pass->getTextureUnitState (i);
-		if (check_name_override (state->getName ()))
-		{
-			/* Check if a PNG version is available. */
-			Ogre::String texname = Ogre::String (mat->textures.array[j].string);
-			Ogre::String pngname = texname + ".png";
-			const char* path = lipth_paths_find_file (render->paths, pngname.c_str ());
-			int gotpng;
-			if (path != NULL)
-				gotpng = lisys_filesystem_access (path, LISYS_ACCESS_READ);
-			else
-				gotpng = 0;
-
-			/* Use either a PNG or a DDS file. */
-			/* PNG is favored over DDS so that artists don't need to bother
-			   with converting their textures when testing them. */
-			if (gotpng)
-				state->setTextureName (pngname);
-			else
-				state->setTextureName (texname + ".dds");
-			j++;
-		}
-	}
 }
 
 /** @} */

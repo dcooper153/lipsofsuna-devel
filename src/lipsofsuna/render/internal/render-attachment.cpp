@@ -62,6 +62,10 @@ void LIRenAttachment::remove_model (LIRenModel* model)
 {
 }
 
+void LIRenAttachment::replace_texture (const char* name, Ogre::TexturePtr& texture)
+{
+}
+
 void LIRenAttachment::update (float secs)
 {
 }

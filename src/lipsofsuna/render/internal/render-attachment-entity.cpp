@@ -27,6 +27,7 @@
 #include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-attachment-entity.hpp"
+#include <OgreSubEntity.h>
 #include <OgreSubMesh.h>
 #include <OgreResourceBackgroundQueue.h>
 #include <OgreSkeletonManager.h>
@@ -122,6 +123,35 @@ void LIRenAttachmentEntity::remove_model (LIRenModel* model)
 	loading_mesh = false;
 	loading_deps = false;
 	loaded = true;
+}
+
+void LIRenAttachmentEntity::replace_texture (const char* name, Ogre::TexturePtr& texture)
+{
+	// TODO: Queue if not loaded yet.
+	if (!loaded)
+		return;
+
+	if (mesh.isNull () || entity == NULL)
+		return;
+
+	for (size_t subent_idx = 0 ; subent_idx < entity->getNumSubEntities () ; ++subent_idx)
+	{
+		// Get the material of the subent.
+		Ogre::SubEntity* subent = entity->getSubEntity (subent_idx);
+		Ogre::MaterialPtr submat = subent->getMaterial ();
+		if (submat.isNull ())
+			continue;
+
+		// Check if there are replaceable textures.
+		if (!render->data->material_utils->has_overridable_texture (submat, name))
+			continue;
+
+		// Create a modified version of the material.
+		Ogre::String new_name = render->data->id.next ();
+		Ogre::MaterialPtr material = submat->clone (new_name, true, LIREN_RESOURCES_TEMPORARY);
+		render->data->material_utils->replace_texture (material, name, texture->getName ());
+		subent->setMaterial (material);
+	}
 }
 
 void LIRenAttachmentEntity::update (float secs)

@@ -132,6 +132,14 @@ RenderObject.replace_model = function(self, model_old, model_new)
 		model_new and model_new.handle or nil)
 end
 
+--- Replaces a texture with an image.
+-- @param self Render object.
+-- @param name Texture name without extension.
+-- @param image Image.
+RenderObject.replace_texture = function(self, name, image)
+	Los.render_object_replace_texture(self.handle, name, image.handle)
+end
+
 --- Set or clears the additional effect layer of the object.
 -- @param self Object.
 -- @param ... Arguments.<ul>

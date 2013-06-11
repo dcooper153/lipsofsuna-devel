@@ -25,6 +25,7 @@
  */
 
 #include "render-internal.h"
+#include <OgreSubMesh.h>
 
 static void private_create_mesh (
 	LIRenModel* self,
@@ -96,6 +97,59 @@ void liren_model_free (
 	/* Remove from the model dictionary. */
 	lialg_u32dic_remove (self->render->models, self->id);
 	delete self;
+}
+
+/**
+ * \brief Replaces a texture.
+ * \param self Model.
+ * \param name Name of the replaced texture.
+ * \param width Width of the new texture.
+ * \param height Height of the new texture.
+ * \param pixels Pixels in the RGBA format.
+ */
+void liren_model_replace_texture (
+	LIRenModel* self,
+	const char* name,
+	int         width,
+	int         height,
+	const void* pixels)
+{
+	Ogre::TexturePtr texture;
+
+	if (self->mesh.isNull ())
+		return;
+	if (!liren_model_get_loaded (self))
+		return;
+
+	for (int submesh_idx = 0 ; submesh_idx < self->mesh->getNumSubMeshes () ; ++submesh_idx)
+	{
+		// Get the material of the submesh.
+		Ogre::SubMesh* submesh = self->mesh->getSubMesh (submesh_idx);
+		const Ogre::String& submeshmatname = submesh->getMaterialName ();
+		Ogre::MaterialPtr submeshmat = self->render->data->material_manager->getByName (submeshmatname);
+		if (submeshmat.isNull ())
+			continue;
+
+		// Check if there are replaceable textures.
+		if (!self->render->data->material_utils->has_overridable_texture (submeshmat, name))
+			continue;
+
+		// Create the replacement texture.
+		// FIXME: Why does the Ogre::PF_R8G8B8A8 format not work?
+		if (texture.isNull ())
+		{
+			Ogre::Image img;
+			img.loadDynamicImage ((Ogre::uchar*) pixels, width, height, 1, Ogre::PF_A8B8G8R8);
+			Ogre::String unique_name = self->render->data->id.next ();
+			texture = self->render->data->texture_manager->loadImage (unique_name, LIREN_RESOURCES_TEMPORARY, img);
+		}
+
+		// Create the texture aliases.
+		Ogre::String tmp(name);
+		submesh->addTextureAlias(tmp + ".png", texture->getName ());
+		submesh->addTextureAlias(tmp + ".dds", texture->getName ());
+		submesh->updateMaterialUsingTextureAliases (); // FIXME: Needed?
+	}
 }
 
 /**

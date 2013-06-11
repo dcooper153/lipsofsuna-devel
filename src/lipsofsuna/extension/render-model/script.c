@@ -23,6 +23,7 @@
  */
 
 #include "module.h"
+#include "lipsofsuna/extension/image/module.h"
 
 static void RenderModel_new (LIScrArgs* args)
 {
@@ -55,6 +56,23 @@ static void RenderModel_new (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
+static void RenderModel_replace_texture (LIScrArgs* args)
+{
+	const char* name;
+	LIExtRenderModel* self;
+	LIImgImage* image;
+	LIScrData* value;
+
+	self = args->self;
+	if (liscr_args_geti_string (args, 0, &name) &&
+	    liscr_args_geti_data (args, 1, LIEXT_SCRIPT_IMAGE, &value))
+	{
+		image = liscr_data_get_data (value);
+		liren_render_model_replace_texture (self->render, self->id, name,
+			image->width, image->height, image->pixels);
+	}
+}
+
 static void RenderModel_get_loaded (LIScrArgs* args)
 {
 	LIExtRenderModel* self;
@@ -84,6 +102,7 @@ void liext_script_render_model (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER_MODEL, "render_model_new", RenderModel_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_MODEL, "render_model_replace_texture", RenderModel_replace_texture);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_MODEL, "render_model_get_loaded", RenderModel_get_loaded);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_MODEL, "render_model_set_model", RenderModel_set_model);
 }

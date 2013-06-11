@@ -66,6 +66,30 @@ void liren_render_model_free (
 }
 
 /**
+ * \brief Replaces a texture.
+ * \param self Renderer.
+ * \param id Model ID.
+ * \param name Name of the replaced texture.
+ * \param width Width of the new texture.
+ * \param height Height of the new texture.
+ * \param pixels Pixels in the RGBA format.
+ */
+void liren_render_model_replace_texture (
+	LIRenRender* self,
+	int          id,
+	const char*  name,
+	int          width,
+	int          height,
+	const void*  pixels)
+{
+	LIRenModel* model;
+
+	model = lialg_u32dic_find (self->models, id);
+	if (model != NULL)
+		liren_model_replace_texture (model, name, width, height, pixels);
+}
+
+/**
  * \brief Returns nonzero if the model has been fully background loaded.
  * \param self Renderer.
  * \param id Model ID.

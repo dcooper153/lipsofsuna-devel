@@ -84,6 +84,13 @@ LIAPICALL (void, liren_object_replace_model, (
 	LIRenModel*  model_old,
 	LIRenModel*  model_new));
 
+LIAPICALL (void, liren_object_replace_texture, (
+	LIRenObject* self,
+	const char*  name,
+	int          width,
+	int          height,
+	const void*  pixels));
+
 LIAPICALL (void, liren_object_update, (
 	LIRenObject* self,
 	float        secs));
@@ -118,6 +125,13 @@ LIAPICALL (int, liren_object_set_realized, (
 LIAPICALL (void, liren_object_remove_model, (
 	LIRenObject* self,
 	LIRenModel*  model));
+
+LIAPICALL (void, liren_object_replace_texture, (
+	LIRenObject* self,
+	const char*  name,
+	int          width,
+	int          height,
+	const void*  pixels));
 
 LIAPICALL (void, liren_object_set_render_distance, (
 	LIRenObject* self,
