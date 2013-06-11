@@ -71,10 +71,13 @@ int liimg_png_load (
 		for (x = 0 ; x < w ; x++, i++)
 		{
 			FreeImage_GetPixelColor (image, x, h - y - 1, &color);
-			pixels[4 * i + 0] = color.rgbBlue;
+			pixels[4 * i + 0] = color.rgbRed;
 			pixels[4 * i + 1] = color.rgbGreen;
 			pixels[4 * i + 2] = color.rgbBlue;
-			pixels[4 * i + 3] = color.rgbReserved;
+			if (FreeImage_GetBPP (image) == 32)
+				pixels[4 * i + 3] = color.rgbReserved;
+			else
+				pixels[4 * i + 3] = 0xFF;
 		}
 	}
 

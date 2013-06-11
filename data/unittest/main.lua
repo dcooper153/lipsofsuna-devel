@@ -1,4 +1,7 @@
 local File = require("system/file")
+local Program = require("system/core")
+
+Program:add_path("data")
 
 Unittest = {}
 Unittest.tests = {}

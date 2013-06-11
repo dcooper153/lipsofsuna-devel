@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -17,6 +17,8 @@
 
 #ifndef __EXT_IMAGE_IMAGE_H__
 #define __EXT_IMAGE_IMAGE_H__
+
+#include "color.h"
 
 typedef struct _LIImgImage LIImgImage;
 struct _LIImgImage
@@ -37,9 +39,18 @@ LIAPICALL (LIImgImage*, liimg_image_new_from_image, (
 LIAPICALL (void, liimg_image_free, (
 	LIImgImage* self));
 
+LIAPICALL (int, liimg_image_alloc, (
+	LIImgImage* self,
+	int         w,
+	int         h));
+
 LIAPICALL (void, liimg_image_blit, (
 	LIImgImage* self,
 	LIImgImage* image));
+
+LIAPICALL (void, liimg_image_fill, (
+	LIImgImage*       self,
+	const LIImgColor* color));
 
 LIAPICALL (int, liimg_image_load_dds, (
 	LIImgImage* self,
@@ -59,5 +70,16 @@ LIAPICALL (int, liimg_image_save_s3tc, (
 
 LIAPICALL (void, liimg_image_shrink_half, (
 	LIImgImage* self));
+
+LIAPICALL (LIImgColor, liimg_image_get_pixel, (
+	const LIImgImage* self,
+	int               x,
+	int               y));
+
+LIAPICALL (void, liimg_image_set_pixel, (
+	LIImgImage*       self,
+	int               x,
+	int               y,
+	const LIImgColor* color));
 
 #endif

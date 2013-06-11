@@ -110,6 +110,39 @@ void liimg_image_free (
 }
 
 /**
+ * \brief Allocates or reallocates the pixels.
+ * \param self Image.
+ * \param w Width.
+ * \param h Height.
+ * \return One on success. Zero otherwise.
+ */
+int liimg_image_alloc (
+	LIImgImage* self,
+	int         w,
+	int         h)
+{
+	void* tmp;
+	if (w && h)
+	{
+		tmp = lisys_calloc (1, 4 * w * h);
+		if (tmp == NULL)
+			return 0;
+		self->width = w;
+		self->height = h;
+		self->pixels = tmp;
+	}
+	else
+	{
+		lisys_free (self->pixels);
+		self->width = w;
+		self->height = h;
+		self->pixels = NULL;
+	}
+
+	return 1;
+}
+
+/**
  * \brief Blits another image over this one.
  * \param self Image.
  * \param image Image.
@@ -120,7 +153,8 @@ void liimg_image_blit (
 {
 	int x;
 	int y;
-	int a;
+	int a1;
+	int a2;
 	uint8_t* src;
 	uint8_t* dst;
 
@@ -130,12 +164,37 @@ void liimg_image_blit (
 		{
 			src = image->pixels + 4 * (x + y * image->width);
 			dst = self->pixels + 4 * (x + y * self->width);
-			a = src[3];
-			dst[0] = ((src[0] << 8) * a + (dst[0] << 8) * (255 - a)) >> 8;
-			dst[1] = ((src[1] << 8) * a + (dst[1] << 8) * (255 - a)) >> 8;
-			dst[2] = ((src[2] << 8) * a + (dst[2] << 8) * (255 - a)) >> 8;
-			dst[3] = LIMAT_MIN (255, dst[3] + a);
+			a1 = src[3];
+			a2 = 256 - a1;
+			dst[0] = (src[0] * a1 + dst[0] * a2) >> 8;
+			dst[1] = (src[1] * a1 + dst[1] * a2) >> 8;
+			dst[2] = (src[2] * a1 + dst[2] * a2) >> 8;
+			dst[3] = LIMAT_MIN (255, dst[3] + a1);
 		}
+	}
+}
+
+/**
+ * \brief Fills the image.
+ * \param self Image.
+ * \param color Color.
+ */
+void liimg_image_fill (
+	LIImgImage*       self,
+	const LIImgColor* color)
+{
+	int i;
+	int n;
+	uint8_t* pixel;
+
+	n = 4 * self->width * self->height;
+	for (i = 0 ; i < n ; i += 4)
+	{
+		pixel = self->pixels + i;
+		pixel[0] = color->r;
+		pixel[1] = color->g;
+		pixel[2] = color->b;
+		pixel[3] = color->a;
 	}
 }
 
@@ -414,6 +473,52 @@ void liimg_image_shrink_half (
 		else
 			self->height = self->height >> 1;
 	}
+}
+
+/**
+ * \brief Gets the color of the pixel.
+ * \param self Image.
+ * \param x X coordinate.
+ * \param y Y coordinate.
+ * \return Color.
+ */
+LIImgColor liimg_image_get_pixel (
+	const LIImgImage* self,
+	int               x,
+	int               y)
+{
+	LIImgColor color;
+	const uint8_t* pixel;
+
+	pixel = self->pixels + 4 * (x + y * self->width);
+	color.r = pixel[0];
+	color.g = pixel[1];
+	color.b = pixel[2];
+	color.a = pixel[3];
+
+	return color;
+}
+
+/**
+ * \brief Sets the color of the pixel.
+ * \param self Image.
+ * \param x X coordinate.
+ * \param y Y coordinate.
+ * \param color Color.
+ */
+void liimg_image_set_pixel (
+	LIImgImage*       self,
+	int               x,
+	int               y,
+	const LIImgColor* color)
+{
+	uint8_t* pixel;
+
+	pixel = self->pixels + 4 * (x + y * self->width);
+	pixel[0] = color->r;
+	pixel[1] = color->g;
+	pixel[2] = color->b;
+	pixel[3] = color->a;
 }
 
 /** @} */
