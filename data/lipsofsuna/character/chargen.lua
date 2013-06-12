@@ -17,6 +17,7 @@ local ModelMerger = require("system/model-merger")
 local RenderObject = require("system/render-object")
 local RenderModel = require("system/render-model")
 local RenderUtils = require("lipsofsuna/core/client/render-utils")
+local TextureBuilder = require("character/texture-builder")
 
 local scale255 = function(t)
 	local res = {}
@@ -219,12 +220,36 @@ Chargen.update = function(self, secs)
 			self.data.render:add_model(r)
 		end
 		self.data.render.model = r
+		self.data.texture_rebuild_needed = true
 		-- Reset the animation.
 		local args = spec:get_animation_arguments("idle", self.char.animation_profile)
 		self.data.render:animate(args)
 		-- Set the body scale.
 		local args = RenderUtils:create_scale_animation(spec, self.char.height)
 		if args then self.data.render:animate(args) end
+	end
+	-- Rebuild the textures.
+	-- TODO: Should be done in a different thread.
+	if self.data.texture_rebuild_needed and self.data.render and self.data.render:get_loaded() then
+		local overrides = TextureBuilder:build{
+			beheaded = false,
+			body_scale = self.char.height,
+			body_style = scale255(self.char.body),
+			equipment = {},
+			eye_color = Color:hsv_to_rgb(self.char.eye_color),
+			eye_style = self.char.eye_style,
+			face_style = scale255(self.char.face),
+			hair_color = Color:hsv_to_rgb(self.char.hair_color),
+			hair_style = self.char.hair_style,
+			head_style = self.char.head_style,
+			nudity = Client.options.nudity_enabled,
+			skin_color = Color:hsv_to_rgb(self.char.skin_color),
+			skin_style = self.char.skin_style,
+			spec = spec}
+		for k,v in pairs(overrides) do
+			self.data.render:replace_texture(k, v)
+		end
+		self.data.texture_rebuild_needed = nil
 	end
 	-- Update lighting.
 	Client.lighting:update(secs)

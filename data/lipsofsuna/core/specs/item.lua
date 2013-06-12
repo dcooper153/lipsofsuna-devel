@@ -47,6 +47,7 @@ Itemspec.introspect = Introspect{
 		{name = "equipment_models", type = "dict", dict = {type = "dict", dict = {type = "string"}}, description = "Dictionary of equipment models."},
 		{name = "equipment_slot", type = "string", description = "Equipment slot into which the item can be placed."},
 		{name = "equipment_slots_reserved", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of equipment slots that the item reserves in addition to the main slot."},
+		{name = "equipment_textures", type = "dict", dict = {type = "dict", dict = {type = "string"}}, description = "Dictionary of equipment texture blit instructions. The dictionary keys are the base texture names and the values the source texture names."},
 		{name = "gravity", type = "vector", default = Vector(0,-15), description = "Gravity vector."},
 		{name = "gravity_projectile", type = "vector", default = Vector(0,-15), description = "Gravity vector for projectile mode."},
 		{name = "health", type = "number", description = "Number of hit points the item has."},
@@ -160,6 +161,22 @@ Itemspec.get_equipment_models = function(self, name, lod)
 	if not models then models = self.equipment_models_lod end
 	-- Find the equipment models for the race.
 	return models and models[name]
+end
+
+--- Finds the equipment textures of the item for the given race.
+-- @param self Itemspec.
+-- @param name Name of the equipment class matching the race.
+-- @param lod True for low level of detail.
+-- @return Table of equipment models or nil.
+Itemspec.get_equipment_textures = function(self, name, lod)
+	-- Choose the level of detail.
+	-- If the requested level doesn't exist, fall back to the other one.
+	local textures = nil
+	if lod then textures = self.equipment_textures_lod end
+	if not textures then textures = self.equipment_textures end
+	if not textures then textures = self.equipment_textures_lod end
+	-- Find the equipment textures for the race.
+	return textures and textures[name]
 end
 
 --- Finds the special effects of the item.

@@ -73,16 +73,19 @@ ModelBuilder.build_with_merger = function(clss, merger, args)
 		meshes.hair = args.hair_style
 	end
 	-- Add equipment models.
+	local textures = {}
 	if args.equipment then
 		for slot,name in pairs(args.equipment) do
 			local spec = Itemspec:find{name = name}
-			local models = spec and spec:get_equipment_models(args.spec.equipment_class or args.spec.name, lod)
-			if models then
-				for k,v in pairs(models) do
-					if v ~= "" then
-						meshes[k] = v
-					else
-						meshes[k] = nil
+			if spec then
+				local models = spec:get_equipment_models(args.spec.equipment_class or args.spec.name, lod)
+				if models then
+					for k,v in pairs(models) do
+						if v ~= "" then
+							meshes[k] = v
+						else
+							meshes[k] = nil
+						end
 					end
 				end
 			end

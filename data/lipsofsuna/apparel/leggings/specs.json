@@ -1,0 +1,26 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "leather leggings",
+		"effect": "craftsewing1",
+		"materials": {"hide": 4}
+	},
+	{
+		"type": "Itemspec",
+		"name": "leather leggings",
+		"model": "leggings1",
+		"icon": "leatherarmor1",
+		"armor_class": 0.04,
+		"categories": {"armor": true},
+		"equipment_models":
+		{
+			"aer": {"feet": "aerfootsock1"}
+		},
+		"equipment_textures":
+		{
+			"aer": {"aer1": "aerleggings1"}
+		},
+		"equipment_slot": "feet",
+		"mass": 5
+	}
+]

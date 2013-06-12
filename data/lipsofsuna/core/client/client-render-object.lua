@@ -17,6 +17,7 @@ local ParticleEffect = require("core/effect/particle-effect") --FIXME
 local RenderObject = require("system/render-object")
 local RenderUtils = require("core/client/render-utils")
 local SpeedlineEffect = require("core/effect/speedline-effect") --FIXME
+local TextureBuilder = require("character/texture-builder") --FIXME
 
 --- TODO:doc
 -- @type ClientRenderObject
@@ -305,7 +306,20 @@ ClientRenderObject.update = function(self, secs)
 		if m then
 			self:set_model(m:get_render())
 			self.model.bounding_box = m:get_bounding_box()
+			self.texture_rebuild_needed = true
 		end
+	end
+	-- Handle texture rebuilding.
+	--
+	-- TODO: Should be done in a different thread.
+	if self.texture_rebuild_needed and self:get_loaded() then
+		if self.object.spec.models then
+			local overrides = TextureBuilder:build_for_actor(self.object)
+			for k,v in pairs(overrides) do
+				self:replace_texture(k, v)
+			end
+		end
+		self.texture_rebuild_needed = nil
 	end
 end
 
