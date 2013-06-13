@@ -1,0 +1,50 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "dress",
+		"effect": "craftsewing1",
+		"materials": {"hide": 3}
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "sexy dress",
+		"effect": "craftsewing1",
+		"materials": {"hide": 3}
+	},
+	{
+		"type": "Itemspec",
+		"name": "dress",
+		"model": "chinadress1",
+		"icon": "cloth1",
+		"armor_class": 0.02,
+		"categories": {"armor": true},
+		"equipment_models":
+		{
+			"aer": {"lower": "aerlowerdress1", "upper": "aerupperclothed1", "upper_safe": ""}
+		},
+		"equipment_textures":
+		{
+			"aer": {"aer1": "aerdress2"}
+		},
+		"equipment_slot": "upperbody",
+		"mass": 1
+	},
+	{
+		"type": "Itemspec",
+		"name": "sexy dress",
+		"model": "chinadress1",
+		"icon": "cloth1",
+		"armor_class": 0.015,
+		"categories": {"armor": true},
+		"equipment_models":
+		{
+			"aer": {"lower": "aerlowerdress1", "upper_safe": ""}
+		},
+		"equipment_textures":
+		{
+			"aer": {"aer1": "aerdress1"}
+		},
+		"equipment_slot": "upperbody",
+		"mass": 1
+	}
+]

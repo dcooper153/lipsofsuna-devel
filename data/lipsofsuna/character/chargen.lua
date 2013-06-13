@@ -192,21 +192,7 @@ Chargen.update = function(self, secs)
 	local spec = Actorspec:find{name = self.char.race .. "-player"}
 	-- Build models.
 	if self.data.update_needed then
-		ModelBuilder:build_with_merger(self.data.merger, {
-			beheaded = false,
-			body_scale = self.char.height,
-			body_style = scale255(self.char.body),
-			equipment = {},
-			eye_color = Color:hsv_to_rgb(self.char.eye_color),
-			eye_style = self.char.eye_style,
-			face_style = scale255(self.char.face),
-			hair_color = Color:hsv_to_rgb(self.char.hair_color),
-			hair_style = self.char.hair_style,
-			head_style = self.char.head_style,
-			nudity = Client.options.nudity_enabled,
-			skin_color = Color:hsv_to_rgb(self.char.skin_color),
-			skin_style = self.char.skin_style,
-			spec = spec})
+		ModelBuilder:build_with_merger(self.data.merger, self:get_build_data())
 		self.data.update_needed = nil
 	end
 	-- Apply models.
@@ -231,21 +217,7 @@ Chargen.update = function(self, secs)
 	-- Rebuild the textures.
 	-- TODO: Should be done in a different thread.
 	if self.data.texture_rebuild_needed and self.data.render and self.data.render:get_loaded() then
-		local overrides = TextureBuilder:build{
-			beheaded = false,
-			body_scale = self.char.height,
-			body_style = scale255(self.char.body),
-			equipment = {},
-			eye_color = Color:hsv_to_rgb(self.char.eye_color),
-			eye_style = self.char.eye_style,
-			face_style = scale255(self.char.face),
-			hair_color = Color:hsv_to_rgb(self.char.hair_color),
-			hair_style = self.char.hair_style,
-			head_style = self.char.head_style,
-			nudity = Client.options.nudity_enabled,
-			skin_color = Color:hsv_to_rgb(self.char.skin_color),
-			skin_style = self.char.skin_style,
-			spec = spec}
+		local overrides = TextureBuilder:build(self:get_build_data())
 		for k,v in pairs(overrides) do
 			self.data.render:replace_texture(k, v)
 		end
@@ -297,6 +269,28 @@ end
 Chargen.set_body = function(self, slider, value)
 	self.char.body[slider] = value
 	self.data.update_needed = true
+end
+
+--- Gets the data form model and texture builders.
+-- @param self Chargen.
+-- @return Table.
+Chargen.get_build_data = function(self)
+	local spec = Actorspec:find{name = self.char.race .. "-player"}
+	return {
+		beheaded = false,
+		body_scale = self.char.height,
+		body_style = scale255(self.char.body),
+		equipment = {},
+		eye_color = Color:hsv_to_rgb(self.char.eye_color),
+		eye_style = self.char.eye_style,
+		face_style = scale255(self.char.face),
+		hair_color = Color:hsv_to_rgb(self.char.hair_color),
+		hair_style = self.char.hair_style,
+		head_style = self.char.head_style,
+		nudity = Client.options.nudity_enabled,
+		skin_color = Color:hsv_to_rgb(self.char.skin_color),
+		skin_style = self.char.skin_style,
+		spec = spec}
 end
 
 --- Gets the camera focus position.
