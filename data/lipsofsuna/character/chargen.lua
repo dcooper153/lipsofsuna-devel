@@ -11,6 +11,7 @@
 local Camera = require("system/camera")
 local Class = require("system/class")
 local Color = require("system/color")
+local Json = require("system/json")
 local Model = require("system/model")
 local ModelBuilder = require("character/model-builder")
 local ModelMerger = require("system/model-merger")
@@ -76,10 +77,10 @@ Chargen.reset = function(self)
 	self.data = {}
 	self.char = {
 		animation_profile = "default",
-		body = {0,0,0,0,0,0,0,0,0,0},
+		body = {},
 		eye_color = {1,1,1},
 		eye_style = "default",
-		face = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		face = {},
 		hair_color = {1,1,1},
 		hair_style = "default",
 		head_style = "aerhead1",
@@ -90,12 +91,26 @@ Chargen.reset = function(self)
 		skin_style = "",
 		spawn_point = "Home"}
 	-- Initialize the body sliders.
+	local max_body = 0
 	for k,v in ipairs(ChargenSliderSpec:find_by_category("body")) do
-		self.char.body[v.field_index] = 0
+		self.char.body[v.field_index] = v.default
+		max_body = math.max(max_body, v.field_index)
+	end
+	for i = 1,max_body do
+		if not self.char.body[i] then
+			self.char.body[i] = 0
+		end
 	end
 	-- Initialize the face sliders.
+	local max_face = 0
 	for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
-		self.char.face[v.field_index] = 0
+		self.char.face[v.field_index] = v.default
+		max_face = math.max(max_face, v.field_index)
+	end
+	for i = 1,max_face do
+		if not self.char.face[i] then
+			self.char.face[i] = 0
+		end
 	end
 end
 
@@ -167,6 +182,39 @@ Chargen.rotate = function(self, value)
 	self.data.rotation = self.data.rotation + rad
 	local rot = Quaternion{axis = Vector(0, 1, 0), angle = self.data.rotation}
 	self.data.render:set_rotation(rot)
+end
+
+--- Saves the current character.
+-- @param self Chargen.
+Chargen.save = function(self)
+	-- Set the simple fields.
+	local preset = {
+		type = "Actorpresetspec",
+		animation_profile = self.char.animation_profile,
+		body = {},
+		eye_color = self.char.eye_color,
+		face = {},
+		hair_color = self.char.hair_color,
+		hair_style = self.char.hair_style,
+		head_style = self.char.head_style,
+		skin_color = self.char.skin_color,
+		skin_style = self.char.skin_style}
+	-- Set the body slider states.
+	for k,v in ipairs(ChargenSliderSpec:find_by_category("body")) do
+		local val = self.char.body[v.field_index]
+		if val then
+			preset.body[v.name] = val
+		end
+	end
+	-- Set the face slider states.
+	for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
+		local val = self.char.face[v.field_index]
+		if val then
+			preset.face[v.name] = val
+		end
+	end
+	-- TODO: Save to a file
+	print(Json:encode(preset))
 end
 
 --- Translates the model of the character creator.
@@ -479,20 +527,19 @@ end
 -- Context: The character creator must have been initialized.
 --
 -- @param self Chargen.
--- @param args Preset table.
-Chargen.set_preset = function(self, args)
-	for k,v in pairs(args) do
-		if k ~= "name" then
-			if type(v) == "table" then
-				local t = {}
-				for k1,v1 in pairs(v) do t[k1] = v1 end
-				self.char[k] = t
-			else
-				self.char[k] = v
-			end
+-- @param spec Preset spec.
+Chargen.set_preset = function(self, spec)
+	if not spec then return end
+	for k,v in pairs(spec:get_chargen()) do
+		if type(v) == "table" then
+			local t = {}
+			for k1,v1 in pairs(v) do t[k1] = v1 end
+			self.char[k] = t
+		else
+			self.char[k] = v
 		end
 	end
-	if not args.animation_profile then
+	if not spec.animation_profile then
 		self.char.animation_profile = "default"
 	end
 	self.data.update_needed = true

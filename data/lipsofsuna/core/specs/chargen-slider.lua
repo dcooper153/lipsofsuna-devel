@@ -23,6 +23,7 @@ ChargenSliderSpec.introspect = Introspect{
 	fields = {
 		{name = "name", type = "string", description = "Name of the spec."},
 		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories. Used in the user interface for grouping."},
+		{name = "default", type = "number", default = 0, description = "Default value."},
 		{name = "field_name", type = "string", description = "Name of the actor field connected to the slider."},
 		{name = "field_index", type = "number", description = "Index of the actor field connected to the slider."},
 		{name = "invert", type = "boolean", default = false, description = "Inversion of the slider."},

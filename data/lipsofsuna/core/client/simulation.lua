@@ -9,6 +9,7 @@
 -- @alias Simulation
 
 local Actor = require("core/objects/actor")
+local Actorpresetspec = require("core/specs/actorpreset")
 local Class = require("system/class")
 local Color = require("system/color")
 local Item = require("core/objects/item")
@@ -48,6 +49,7 @@ Simulation.create_object_by_spec = function(self, spec, id)
 	if spec.preset then
 		local preset = Actorpresetspec:find{name = spec.preset}
 		if preset then
+			preset = preset:get_chargen()
 			local copy_table = function(t)
 				if not t then return end
 				local u = {}

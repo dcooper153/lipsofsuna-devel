@@ -39,7 +39,6 @@
 	["load", "actors/imp"],
 	["load", "actors/kraken"],
 	["load", "actors/lizardman"],
-	["load", "actors/presets"],
 	["load", "actors/rat"],
 	["load", "actors/scapegoat"],
 	["load", "actors/seirei"],

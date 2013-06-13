@@ -118,6 +118,13 @@ Ui:add_state{
 	input_post = chargen_input,
 	update = chargen_update}
 
+Ui:add_widget{
+	state = "chargen/presets",
+	widget = function() return Widgets.Uibutton("Save the current character", function()
+			Client.chargen:save()
+		end)
+	end}
+
 ------------------------------------------------------------------------------
 
 Ui:add_state{

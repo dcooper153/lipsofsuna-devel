@@ -8,6 +8,7 @@
 -- @module core.objects.simulation
 -- @alias SimulationObject
 
+local Actorpresetspec = require("core/specs/actorpreset")
 local Class = require("system/class")
 local Inventory = require("core/server/inventory")
 local Object = require("system/object")

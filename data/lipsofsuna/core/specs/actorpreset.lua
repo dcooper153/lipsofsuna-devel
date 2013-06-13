@@ -9,7 +9,8 @@
 -- @alias Actorpresetspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local ChargenSliderSpec = require("core/specs/chargen-slider")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Actorpresetspec
@@ -46,4 +47,57 @@ Actorpresetspec.new = function(clss, args)
 	return self
 end
 
+--- Gets the spec data in the form suitable for character creation.
+-- @param self Actorpresetspec.
+-- @return Table.
+Actorpresetspec.get_chargen = function(self)
+	return {
+		animation_profile = self.animation_profile,
+		body = self:get_chargen_body(),
+		eye_color = self.eye_color,
+		face = self:get_chargen_face(),
+		hair_color = self.hair_color,
+		hair_style = self.hair_style,
+		head_style = self.head_style,
+		height = self.height,
+		skin_color = self.skin_color,
+		skin_style = self.skin_style}
+end
 
+--- Gets the body in the list form suitable for character creation.
+-- @param self Actorpresetspec.
+-- @return List of numbers.
+Actorpresetspec.get_chargen_body = function(self)
+	local list = {}
+	local count = 0
+	for k,v in ipairs(ChargenSliderSpec:find_by_category("body")) do
+		count = math.max(count, v.field_index)
+		list[v.field_index] = self.body[v.name] or v.default
+	end
+	for i = 1,count do
+		if not list[i] then
+			list[i] = 0
+		end
+	end
+	return list
+end
+
+--- Gets the face in the list form suitable for character creation.
+-- @param self Actorpresetspec.
+-- @return List of numbers.
+Actorpresetspec.get_chargen_face = function(self)
+	local list = {}
+	local count = 0
+	for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
+		count = math.max(count, v.field_index)
+		list[v.field_index] = self.body[v.name] or v.default
+	end
+	for i = 1,count do
+		if not list[i] then
+			list[i] = 0
+		end
+	end
+	return list
+end
+
+return Actorpresetspec
