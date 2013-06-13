@@ -111,35 +111,18 @@ Message{
 		if o.body_scale or o.body_style then
 			flags = flags + FlagType.BODY
 			add(data, "uint8", o.body_scale or 128)
-			add(data, "uint8", o.body_style and o.body_style[1] or 0)
-			add(data, "uint8", o.body_style and o.body_style[2] or 0)
-			add(data, "uint8", o.body_style and o.body_style[3] or 0)
-			add(data, "uint8", o.body_style and o.body_style[4] or 128)
-			add(data, "uint8", o.body_style and o.body_style[5] or 0)
-			add(data, "uint8", o.body_style and o.body_style[6] or 0)
-			add(data, "uint8", o.body_style and o.body_style[7] or 0)
-			add(data, "uint8", o.body_style and o.body_style[8] or 255)
-			add(data, "uint8", o.body_style and o.body_style[9] or 0)
-			add(data, "uint8", o.body_style and o.body_style[10] or 255)
+			add(data, "uint16", #o.body_style)
+			for k,v in ipairs(o.body_style) do
+				add(data, "uint8", o.body_style[k])
+			end
 		end
 		-- Face style.
 		if o.face_style then
 			flags = flags + FlagType.FACE
-			add(data, "uint8", o.face_style and o.face_style[1] or 0)
-			add(data, "uint8", o.face_style and o.face_style[2] or 0)
-			add(data, "uint8", o.face_style and o.face_style[3] or 0)
-			add(data, "uint8", o.face_style and o.face_style[4] or 0)
-			add(data, "uint8", o.face_style and o.face_style[5] or 0)
-			add(data, "uint8", o.face_style and o.face_style[6] or 0)
-			add(data, "uint8", o.face_style and o.face_style[7] or 0)
-			add(data, "uint8", o.face_style and o.face_style[8] or 0)
-			add(data, "uint8", o.face_style and o.face_style[9] or 0)
-			add(data, "uint8", o.face_style and o.face_style[10] or 127)
-			add(data, "uint8", o.face_style and o.face_style[11] or 127)
-			add(data, "uint8", o.face_style and o.face_style[12] or 127)
-			add(data, "uint8", o.face_style and o.face_style[13] or 127)
-			add(data, "uint8", o.face_style and o.face_style[14] or 0)
-			add(data, "uint8", o.face_style and o.face_style[15] or 0)
+			add(data, "uint16", #o.face_style)
+			for k,v in ipairs(o.face_style) do
+				add(data, "uint8", o.face_style[k])
+			end
 		end
 		-- Animations.
 		if o.animations then
@@ -297,20 +280,26 @@ Message{
 		end
 		-- Body style.
 		if Bitwise:band(args.flags, FlagType.BODY) ~= 0 then
-			local ok,scale,a,b,c,d,e,f,g,h,i = packet:resume(
-				"uint8", "uint8", "uint8", "uint8", "uint8", "uint8",
-				"uint8", "uint8", "uint8", "uint8", "uint8")
+			local ok,scale,count = packet:resume("uint8", "uint16")
 			if not ok then return end
 			args.body_scale = scale
-			args.body_style = {a, b, c, d, e, f, g, h, i, i}
+			args.body_style = {}
+			for i = 1,count do
+				local ok,val = packet:resume("uint8")
+				if not ok then return end
+				args.body_style[i] = val
+			end
 		end
 		-- Face style.
 		if Bitwise:band(args.flags, FlagType.FACE) ~= 0 then
-			local ok,a,b,c,d,e,f,g,h,i,j,k,l,m,n,p = packet:resume(
-				"uint8", "uint8", "uint8", "uint8", "uint8", "uint8", "uint8",
-				"uint8", "uint8", "uint8", "uint8", "uint8", "uint8", "uint8", "uint8")
+			local ok,count = packet:resume("uint16")
 			if not ok then return end
-			args.face_style = {a, b, c, d, e, f, g, h, i, j, k, l, m, n, p}
+			args.face_style = {}
+			for i = 1,count do
+				local ok,val = packet:resume("uint8")
+				if not ok then return end
+				args.face_style[i] = val
+			end
 		end
 		-- Animations.
 		if Bitwise:band(args.flags, FlagType.ANIMS) ~= 0 then
