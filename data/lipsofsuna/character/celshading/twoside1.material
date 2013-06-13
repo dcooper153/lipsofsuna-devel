@@ -1,26 +1,13 @@
-pass twoside1/3/lighting
+import * from "celshading.template"
+
+pass twoside1/lighting : celshading/pass
 {
-	max_lights 3
-	ambient 0.3 0.3 0.3
-	diffuse 1.0 1.0 1.0
-	specular 1.0 1.0 1.0 1.0 64
 	alpha_rejection greater_equal 128
 	cull_hardware none
-	texture_unit LOS1
+	vertex_program_ref diff1/vert
 	{
 	}
-	texture_unit LOS2
-	{
-	}
-	texture_unit
-	{
-		texture celramp1.png 1d
-		tex_address_mode clamp
-	}
-	vertex_program_ref diff1_vert
-	{
-	}
-	fragment_program_ref diff1_frag
+	fragment_program_ref diff1/frag
 	{
 	}
 }
@@ -31,15 +18,18 @@ material twoside1
 	technique
 	{
 		shadow_caster_material shadowcasteralpha1
-		pass LOS1 : twoside1/3/lighting
+		pass LOS1 : twoside1/lighting
 		{
+			fragment_program_ref diff1/frag/mrt
+			{
+			}
 		}
 	}
 	technique
 	{
 		scheme quality3
 		shadow_caster_material shadowcasteralpha1
-		pass LOS1 : twoside1/3/lighting
+		pass LOS1 : twoside1/lighting
 		{
 		}
 	}
@@ -47,15 +37,18 @@ material twoside1
 	{
 		scheme quality2outline
 		shadow_caster_material shadowcasteralpha1
-		pass LOS1 : twoside1/3/lighting
+		pass LOS1 : twoside1/lighting
 		{
+			fragment_program_ref diff1/frag/mrt
+			{
+			}
 		}
 	}
 	technique
 	{
 		scheme quality2
 		shadow_caster_material shadowcasteralpha1
-		pass LOS1 : twoside1/3/lighting
+		pass LOS1 : twoside1/lighting
 		{
 		}
 	}

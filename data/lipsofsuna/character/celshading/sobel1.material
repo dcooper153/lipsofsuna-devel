@@ -1,0 +1,28 @@
+material sobel1
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_check off
+			vertex_program_ref compositor1_vert
+			{
+			}
+			fragment_program_ref sobel1/frag
+			{
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+  				filtering none
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+  				filtering none
+			}
+		}
+	}
+}

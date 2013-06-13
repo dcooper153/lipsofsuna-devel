@@ -1,0 +1,23 @@
+vertex_program skybox1/vert glsl
+{
+	source skybox1.vert
+	includes_skeletal_animation true
+	default_params
+	{
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+	}
+}
+
+fragment_program skybox1/frag glsl
+{
+	source skybox1.frag
+	default_params
+	{
+		param_named LOS_diffuse_texture_0 int 0
+	}
+}
+
+fragment_program skybox1/frag/mrt glsl : skybox1/frag
+{
+	preprocessor_defines ENABLE_MRT=1
+}

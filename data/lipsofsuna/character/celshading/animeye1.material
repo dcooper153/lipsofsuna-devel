@@ -1,29 +1,13 @@
-pass animeye1/lighting
+import * from "celshading.template"
+
+pass animeye1/lighting : celshading/pass
 {
-	max_lights 3
 	ambient 0.8 0.8 0.8
-	diffuse 1.0 1.0 1.0
 	specular 0.0 0.0 0.0 0.0 1
-	texture_unit LOS1
+	vertex_program_ref animdiff1/vert
 	{
 	}
-	texture_unit
-	{
-	}
-	texture_unit
-	{
-		texture celramp1.png 1d
-		tex_address_mode clamp
-	}
-	texture_unit
-	{
-		texture celramp2.png 1d
-		tex_address_mode clamp
-	}
-	vertex_program_ref animdiff1_vert
-	{
-	}
-	fragment_program_ref eye1_frag
+	fragment_program_ref eye1/frag
 	{
 	}
 }
@@ -36,6 +20,9 @@ material animeye1
 		shadow_caster_material animshadowcaster1
 		pass LOS1 : animeye1/lighting
 		{
+			fragment_program_ref eye1/frag/mrt
+			{
+			}
 		}
 	}
 	technique
@@ -52,6 +39,9 @@ material animeye1
 		shadow_caster_material animshadowcaster1
 		pass LOS1 : animeye1/lighting
 		{
+			fragment_program_ref eye1/frag/mrt
+			{
+			}
 		}
 	}
 	technique

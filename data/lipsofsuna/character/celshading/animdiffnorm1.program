@@ -1,4 +1,4 @@
-vertex_program animdiffnorm1_vert glsl
+vertex_program animdiffnorm1/vert glsl
 {
 	source animdiffnorm1.vert
 	preprocessor_defines LIGHTS=3,BONES=32

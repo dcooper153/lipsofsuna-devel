@@ -1,54 +1,5 @@
-material animhair1
+import * from "animdiffnorm1.material"
+
+material animhair1 : animdiffnorm1
 {
-	receive_shadows off
-	technique
-	{
-		shadow_caster_material animshadowcaster1
-		pass LOS1
-		{
-			max_lights 3
-			ambient 0.7 0.7 0.7
-			diffuse 1.0 1.0 1.0
-			specular 1.0 1.0 1.0 1.0 64
-			alpha_rejection greater_equal 128
-			cull_hardware none
-			texture_unit LOS1
-			{
-			}
-			texture_unit LOS2
-			{
-			}
-			texture_unit
-			{
-				texture celramp1.png 1d
-				tex_address_mode clamp
-			}
-			texture_unit
-			{
-				texture celramp2.png 1d
-				tex_address_mode clamp
-			}
-			vertex_program_ref animdiffnorm1_vert
-			{
-			}
-			fragment_program_ref diff1_frag
-			{
-			}
-		}
-	}
-	technique
-	{
-		scheme quality1
-		pass LOS1
-		{
-			ambient 0.3 0.3 0.3
-			diffuse 1.0 1.0 1.0
-			specular 0.0 0.0 0.0 1.0 1
-			alpha_rejection greater_equal 128
-			cull_hardware none
-			texture_unit LOS1
-			{
-			}
-		}
-	}
 }

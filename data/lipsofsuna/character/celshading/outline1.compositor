@@ -1,0 +1,40 @@
+compositor outline1
+{
+	technique
+	{
+		texture mrt_output target_width target_height PF_FLOAT16_RGBA PF_FLOAT16_RGBA pooled chain_scope
+		target mrt_output
+		{
+			input none
+			pass clear
+			{
+			}
+			pass render_scene
+			{
+				first_render_queue 1
+				last_render_queue 79
+			}
+		}
+		target_output
+		{
+			input none
+			pass render_quad
+			{
+				material sobel1
+				input 0 mrt_output 0
+				input 1 mrt_output 1
+			}
+			pass render_scene
+			{
+				first_render_queue 80
+			}
+		}
+	}
+	technique
+	{
+		target_output
+		{
+			input previous
+		}
+	}
+}

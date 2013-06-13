@@ -1,61 +1,12 @@
-import * from "outline.template"
+import * from "celshading.template"
 
-pass animdiffnorm1/3/lighting
+pass animdiffnorm1/lighting : celshading/pass
 {
-	max_lights 3
 	ambient 0.7 0.7 0.7
-	diffuse 1.0 1.0 1.0
-	specular 1.0 1.0 1.0 1.0 64
-	texture_unit LOS1
+	vertex_program_ref animdiffnorm1/vert
 	{
 	}
-	texture_unit LOS2
-	{
-	}
-	texture_unit
-	{
-		texture celramp1.png 1d
-		tex_address_mode clamp
-	}
-	texture_unit
-	{
-		texture celramp2.png 1d
-		tex_address_mode clamp
-	}
-	vertex_program_ref animdiffnorm1_vert
-	{
-	}
-	fragment_program_ref diffnorm1_frag
-	{
-	}
-}
-
-pass animdiffnorm1/2/lighting
-{
-	max_lights 3
-	ambient 0.7 0.7 0.7
-	diffuse 1.0 1.0 1.0
-	specular 1.0 1.0 1.0 1.0 64
-	texture_unit LOS1
-	{
-	}
-	texture_unit
-	{
-	}
-	texture_unit
-	{
-		texture celramp1.png 1d
-		tex_address_mode clamp
-	}
-	texture_unit
-	{
-		texture celramp2.png 1d
-		tex_address_mode clamp
-	}
-	vertex_program_ref animdiff1_vert
-	{
-	}
-	fragment_program_ref diff1_frag
+	fragment_program_ref diffnorm1/frag
 	{
 	}
 }
@@ -66,18 +17,18 @@ material animdiffnorm1
 	technique
 	{
 		shadow_caster_material animshadowcaster1
-		pass LOS1 : animdiffnorm1/3/lighting
+		pass LOS1 : animdiffnorm1/lighting
 		{
-		}
-		pass outline : outline/anim
-		{
+			fragment_program_ref diffnorm1/frag/mrt
+			{
+			}
 		}
 	}
 	technique
 	{
 		scheme quality3
 		shadow_caster_material animshadowcaster1
-		pass LOS1 : animdiffnorm1/3/lighting
+		pass LOS1 : animdiffnorm1/lighting
 		{
 		}
 	}
@@ -85,19 +36,28 @@ material animdiffnorm1
 	{
 		scheme quality2outline
 		shadow_caster_material animshadowcaster1
-		pass LOS1 : animdiffnorm1/2/lighting
+		pass LOS1 : animdiffnorm1/lighting
 		{
-		}
-		pass outline : outline/anim
-		{
+			fragment_program_ref animdiff1/vert
+			{
+			}
+			fragment_program_ref diff1/frag/mrt
+			{
+			}
 		}
 	}
 	technique
 	{
 		scheme quality2
 		shadow_caster_material animshadowcaster1
-		pass LOS1 : animdiffnorm1/2/lighting
+		pass LOS1 : animdiffnorm1/lighting
 		{
+			fragment_program_ref animdiff1/vert
+			{
+			}
+			fragment_program_ref diff1/frag
+			{
+			}
 		}
 	}
 	technique

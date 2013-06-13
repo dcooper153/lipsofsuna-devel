@@ -1,29 +1,15 @@
-pass glass1/lighting
+import * from "celshading.template"
+
+pass glass1/lighting : celshading/pass
 {
-	max_lights 3
 	ambient 0.7 0.7 0.7
-	diffuse 1.0 1.0 1.0
-	specular 1.0 1.0 1.0 1.0 64
 	cull_hardware none
 	depth_write off
 	scene_blend alpha_blend
-	texture_unit
-	{
-		texture celramp1.png 1d
-		tex_address_mode clamp
-	}
-	texture_unit
-	{
-		texture celramp2.png 1d
-		tex_address_mode clamp
-	}
-	vertex_program_ref solid1_vert
+	vertex_program_ref solid1/vert
 	{
 	}
-	fragment_program_ref glass1_frag
-	{
-	}
-	shadow_caster_vertex_program_ref shadow_vert
+	fragment_program_ref glass1/frag
 	{
 	}
 }
@@ -35,9 +21,9 @@ material glass1
 	{
 		pass : glass1/lighting
 		{
-			ambient 0.3 0.3 0.3
-			diffuse 1.0 1.0 1.0 0.1
-			specular 0.0 0.0 0.0 1.0 1
+			fragment_program_ref glass1/frag/mrt
+			{
+			}
 		}
 	}
 	technique
@@ -53,6 +39,9 @@ material glass1
 		scheme quality2outline
 		pass : glass1/lighting
 		{
+			fragment_program_ref glass1/frag/mrt
+			{
+			}
 		}
 	}
 	technique

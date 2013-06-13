@@ -1,4 +1,4 @@
-fragment_program eye1_frag glsl
+fragment_program eye1/frag glsl
 {
 	source eye1.frag
 	attach los_blinn_phong los_cel_shading
@@ -19,4 +19,9 @@ fragment_program eye1_frag glsl
 		param_named_auto LOS_light_equation light_attenuation_array 3
 		param_named_auto LOS_light_spotparams spotlight_params_array 3
 	}
+}
+
+fragment_program eye1/frag/mrt glsl : eye1/frag
+{
+	preprocessor_defines LIGHTS=3,ENABLE_MRT=1
 }

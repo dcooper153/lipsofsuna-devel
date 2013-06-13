@@ -20,10 +20,10 @@ pass stickterrain1/lighting
 		texture celramp2.png 1d
 		tex_address_mode clamp
 	}
-	vertex_program_ref stickterrain1_vert
+	vertex_program_ref stickterrain1/vert
 	{
 	}
-	fragment_program_ref stickterrain1_frag
+	fragment_program_ref stickterrain1/frag
 	{
 	}
 	shadow_caster_vertex_program_ref shadow_vert
@@ -36,41 +36,52 @@ material stickterrain1
 	receive_shadows off
 	technique
 	{
-		pass : stickterrain1/lighting
+		shadow_caster_material shadowcaster1
+		pass LOS1 : stickterrain1/lighting
 		{
+			fragment_program_ref stickterrain1/frag/mrt
+			{
+			}
 		}
 	}
 	technique
 	{
 		scheme quality3
 		shadow_caster_material shadowcaster1
-		pass stickterrain1/lighting
+		pass LOS1 : stickterrain1/lighting
 		{
 		}
 	}
 	technique
 	{
 		scheme quality2outline
-		pass : stickterrain1/lighting
+		shadow_caster_material shadowcaster1
+		pass LOS1 : stickterrain1/lighting
 		{
+			fragment_program_ref stickterrain1/frag/mrt
+			{
+			}
 		}
 	}
 	technique
 	{
 		scheme quality2
 		shadow_caster_material shadowcaster1
-		pass : stickterrain1/lighting
+		pass LOS1 : stickterrain1/lighting
 		{
 		}
 	}
 	technique
 	{
 		scheme quality1
-		pass
+		pass LOS1
 		{
 			ambient 0.3 0.3 0.3
 			diffuse 1.0 1.0 1.0
 			specular 0.0 0.0 0.0 1.0 1
+			texture_unit LOS1
+			{
+			}
 		}
 	}
 }

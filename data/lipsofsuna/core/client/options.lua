@@ -158,9 +158,15 @@ Options.apply = function(self)
 		Render:set_material_scheme("quality1")
 	end
 	-- Set the bloom pass.
+	Render:remove_compositor("outline1")
 	Render:remove_compositor("bloom1")
-	if self.shader_quality > 1 and self.bloom_enabled then
-		Render:add_compositor("bloom1")
+	if self.shader_quality > 1 then
+	   if self.outlines_enabled then
+		   Render:add_compositor("outline1")
+	   end
+	   if self.bloom_enabled then
+		   Render:add_compositor("bloom1")
+	   end
 	end
 	-- Set the UI theme.
 	if Theme:set_theme(self.ui_size) then

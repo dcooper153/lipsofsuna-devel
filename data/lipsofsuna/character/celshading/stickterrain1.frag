@@ -1,4 +1,5 @@
 #version 120
+#extension GL_ARB_draw_buffers : enable
 
 uniform sampler2D LOS_diffuse_texture_1;
 uniform sampler1D LOS_diffuse_texture_2;
@@ -70,5 +71,10 @@ void main()
 		diff += l.z * l.x * LOS_light_diffuse[i];
 	}
 	vec3 color = (LOS_material_diffuse * diffuse).rgb * diff.rgb;
+#ifdef ENABLE_MRT
+	gl_FragData[0] = vec4(color, diffuse.a);
+	gl_FragData[1] = gl_FragCoord;
+#else
 	gl_FragColor = vec4(color, diffuse.a);
+#endif
 }

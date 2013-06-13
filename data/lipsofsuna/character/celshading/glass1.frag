@@ -35,5 +35,10 @@ void main()
 	}
 	vec3 color = los_cel_shading(LOS_material_diffuse * diffuse, diff, spec,
 		LOS_material_celshading, LOS_diffuse_texture_2, LOS_diffuse_texture_3);
+#ifdef ENABLE_MRT
+	gl_FragData[0] = vec4(color, 0.3 + 0.1 * spec.a);
+	gl_FragData[1] = gl_FragCoord;
+#else
 	gl_FragColor = vec4(color, 0.3 + 0.1 * spec.a);
+#endif
 }

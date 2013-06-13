@@ -1,4 +1,4 @@
-vertex_program diffnorm1_vert glsl
+vertex_program diffnorm1/vert glsl
 {
 	source diffnorm1.vert
 	preprocessor_defines LIGHTS=3
@@ -11,7 +11,7 @@ vertex_program diffnorm1_vert glsl
 	}
 }
 
-fragment_program diffnorm1_frag glsl
+fragment_program diffnorm1/frag glsl
 {
 	source diffnorm1.frag
 	attach los_blinn_phong los_cel_shading los_normal_mapping
@@ -32,4 +32,9 @@ fragment_program diffnorm1_frag glsl
 		param_named_auto LOS_light_equation light_attenuation_array 3
 		param_named_auto LOS_light_spotparams spotlight_params_array 3
 	}
+}
+
+fragment_program diffnorm1/frag/mrt glsl : diffnorm1/frag
+{
+	preprocessor_defines LIGHTS=3,ENABLE_MRT=1
 }

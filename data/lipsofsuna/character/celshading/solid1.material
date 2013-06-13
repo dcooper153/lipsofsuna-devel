@@ -1,27 +1,8 @@
-import * from "outline.template"
+import * from "celshading.template"
 
-pass solid1/lighting
+pass solid1/lighting : celshading/pass
 {
-	max_lights 3
 	ambient 0.7 0.7 0.7
-	diffuse 1.0 1.0 1.0
-	specular 1.0 1.0 1.0 1.0 64
-	texture_unit
-	{
-		texture celramp1.png 1d
-		tex_address_mode clamp
-	}
-	texture_unit
-	{
-		texture celramp2.png 1d
-		tex_address_mode clamp
-	}
-	vertex_program_ref solid1_vert
-	{
-	}
-	fragment_program_ref solid1_frag
-	{
-	}
 	shadow_caster_vertex_program_ref shadow_vert
 	{
 	}
@@ -34,9 +15,9 @@ material solid1
 	{
 		pass LOS1 : solid1/lighting
 		{
-		}
-		pass outline : outline/static
-		{
+			fragment_program_ref solid1/frag/mrt
+			{
+			}
 		}
 	}
 	technique
@@ -52,9 +33,9 @@ material solid1
 		scheme quality2outline
 		pass LOS1 : solid1/lighting
 		{
-		}
-		pass outline : outline/static
-		{
+			fragment_program_ref solid1/frag/mrt
+			{
+			}
 		}
 	}
 	technique

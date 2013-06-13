@@ -1,8 +1,60 @@
+pass skybox1/lighting
+{
+	depth_write off
+	texture_unit
+	{
+		cubic_texture divine_fr.png divine_bk.png divine_lf.png divine_rt.png divine_up.png divine_dn.png separateUV
+		tex_address_mode clamp
+	}
+	vertex_program_ref skybox1/vert
+	{
+	}
+	fragment_program_ref skybox1/frag
+	{
+	}
+}
+
 material skybox1
 {
+	receive_shadows off
 	technique
 	{
-		pass
+		pass LOS1 : skybox1/lighting
+		{
+			fragment_program_ref skybox1/frag/mrt
+			{
+			}
+		}
+	}
+	technique
+	{
+		scheme quality3
+		pass LOS1 : skybox1/lighting
+		{
+		}
+	}
+	technique
+	{
+		scheme quality2outline
+		pass LOS1 : skybox1/lighting
+		{
+			fragment_program_ref skybox1/frag/mrt
+			{
+			}
+		}
+	}
+	technique
+	{
+		scheme quality2
+		shadow_caster_material shadowcaster1
+		pass LOS1 : skybox1/lighting
+		{
+		}
+	}
+	technique
+	{
+		scheme quality1
+		pass LOS1
 		{
 			lighting off
 			depth_write off
@@ -15,4 +67,3 @@ material skybox1
 		}
 	}
 }
-

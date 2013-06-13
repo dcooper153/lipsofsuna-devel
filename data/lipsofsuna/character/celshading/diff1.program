@@ -1,4 +1,4 @@
-vertex_program diff1_vert glsl
+vertex_program diff1/vert glsl
 {
 	source diff1.vert
 	preprocessor_defines LIGHTS=3
@@ -11,7 +11,7 @@ vertex_program diff1_vert glsl
 	}
 }
 
-fragment_program diff1_frag glsl
+fragment_program diff1/frag glsl
 {
 	source diff1.frag
 	attach los_blinn_phong los_cel_shading
@@ -32,4 +32,9 @@ fragment_program diff1_frag glsl
 		param_named_auto LOS_light_equation light_attenuation_array 3
 		param_named_auto LOS_light_spotparams spotlight_params_array 3
 	}
+}
+
+fragment_program diff1/frag/mrt glsl : diff1/frag
+{
+	preprocessor_defines LIGHTS=3,ENABLE_MRT=1
 }

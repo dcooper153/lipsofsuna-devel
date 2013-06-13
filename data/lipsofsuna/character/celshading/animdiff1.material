@@ -1,32 +1,12 @@
-import * from "earlyz.template"
-import * from "outline.template"
+import * from "celshading.template"
 
-pass animdiff1/lighting
+pass animdiff1/lighting : celshading/pass
 {
-	max_lights 3
 	ambient 0.7 0.7 0.7
-	diffuse 1.0 1.0 1.0
-	specular 1.0 1.0 1.0 1.0 64
-	texture_unit LOS1
+	vertex_program_ref animdiff1/vert
 	{
 	}
-	texture_unit
-	{
-	}
-	texture_unit
-	{
-		texture celramp1.png 1d
-		tex_address_mode clamp
-	}
-	texture_unit
-	{
-		texture celramp2.png 1d
-		tex_address_mode clamp
-	}
-	vertex_program_ref animdiff1_vert
-	{
-	}
-	fragment_program_ref diff1_frag
+	fragment_program_ref diff1/frag
 	{
 	}
 }
@@ -36,49 +16,39 @@ material animdiff1
 	receive_shadows off
 	technique
 	{
+		set $enable_mrt 1
 		shadow_caster_material animshadowcaster1
-		pass earlyz : earlyz/3/anim
-		{
-		}
 		pass LOS1 : animdiff1/lighting
 		{
-		}
-		pass outline : outline/anim
-		{
+			fragment_program_ref diff1/frag/mrt
+			{
+			}
 		}
 	}
 	technique
 	{
 		scheme quality3
 		shadow_caster_material animshadowcaster1
-		pass earlyz : earlyz/3/anim
-		{
-		}
 		pass LOS1 : animdiff1/lighting
 		{
 		}
 	}
 	technique
 	{
+		set $enable_mrt 1
 		scheme quality2outline
 		shadow_caster_material animshadowcaster1
-		pass earlyz : earlyz/2/anim
-		{
-		}
 		pass LOS1 : animdiff1/lighting
 		{
-		}
-		pass outline : outline/anim
-		{
+			fragment_program_ref diff1/frag/mrt
+			{
+			}
 		}
 	}
 	technique
 	{
 		scheme quality2
 		shadow_caster_material animshadowcaster1
-		pass earlyz : earlyz/2/anim
-		{
-		}
 		pass LOS1 : animdiff1/lighting
 		{
 		}
