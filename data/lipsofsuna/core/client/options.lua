@@ -142,31 +142,27 @@ Options.apply = function(self)
 	-- Set the anisotropic filter.
 	Render:set_anisotrophy(self.anisotropic_filter)
 	-- Set the shader scheme.
-	if self.shader_quality == 3 then
-		if self.outlines_enabled then
-			Render:set_material_scheme("Default")
-		else
-			Render:set_material_scheme("quality3")
-		end
-	elseif self.shader_quality == 2 then
-		if self.outlines_enabled then
-			Render:set_material_scheme("quality2outline")
-		else
-			Render:set_material_scheme("quality2")
-		end
-	else
-		Render:set_material_scheme("quality1")
-	end
-	-- Set the bloom pass.
+	-- TODO: Change this now since quality 2 is not used.
 	Render:remove_compositor("outline1")
+	Render:remove_compositor("outline2")
 	Render:remove_compositor("bloom1")
 	if self.shader_quality > 1 then
-	   if self.outlines_enabled then
-		   Render:add_compositor("outline1")
-	   end
-	   if self.bloom_enabled then
-		   Render:add_compositor("bloom1")
-	   end
+		if self.outlines_enabled then
+			if self.mrt_enabled then --FIXME: Never true.
+				Render:set_material_scheme("none")
+				Render:add_compositor("outline2")
+			else
+				Render:set_material_scheme("none")
+				Render:add_compositor("outline1")
+			end
+			if self.bloom_enabled then
+			   Render:add_compositor("bloom1")
+			end
+		else
+			Render:set_material_scheme("srt_color")
+		end
+	else
+		Render:set_material_scheme("fixed")
 	end
 	-- Set the UI theme.
 	if Theme:set_theme(self.ui_size) then

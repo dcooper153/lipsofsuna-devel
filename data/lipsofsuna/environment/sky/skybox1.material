@@ -19,6 +19,7 @@ material skybox1
 	receive_shadows off
 	technique
 	{
+		scheme mrt
 		pass LOS1 : skybox1/lighting
 		{
 			fragment_program_ref skybox1/frag/mrt
@@ -28,32 +29,21 @@ material skybox1
 	}
 	technique
 	{
-		scheme quality3
+		scheme srt_color
 		pass LOS1 : skybox1/lighting
 		{
 		}
 	}
 	technique
 	{
-		scheme quality2outline
-		pass LOS1 : skybox1/lighting
-		{
-			fragment_program_ref skybox1/frag/mrt
-			{
-			}
-		}
-	}
-	technique
-	{
-		scheme quality2
-		shadow_caster_material shadowcaster1
-		pass LOS1 : skybox1/lighting
+		scheme srt_depth
+		pass dummy
 		{
 		}
 	}
 	technique
 	{
-		scheme quality1
+		scheme fixed
 		pass LOS1
 		{
 			lighting off

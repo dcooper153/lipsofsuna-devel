@@ -1,0 +1,16 @@
+vertex_program depth1/vert glsl
+{
+	source depth1.vert
+	default_params
+	{
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+	}
+}
+
+fragment_program depth1/frag glsl
+{
+	source depth1.frag
+	default_params
+	{
+	}
+}

@@ -1,4 +1,4 @@
-pass terrain1/3/lighting
+pass terrain1/lighting
 {
 	max_lights 3
 	ambient 0.7 0.7 0.7
@@ -30,10 +30,10 @@ pass terrain1/3/lighting
 	{
 		content_type shadow
 	}
-	vertex_program_ref terrain1_vert
+	vertex_program_ref terrain1/vert
 	{
 	}
-	fragment_program_ref terrain1_frag
+	fragment_program_ref terrain1/frag
 	{
 	}
 }
@@ -42,13 +42,38 @@ material terrain1
 {
 	technique
 	{
-		pass LOS1 : terrain1/3/lighting
+		scheme mrt
+		pass LOS1 : terrain1/lighting
+		{
+			fragment_program_ref terrain1/frag/mrt
+			{
+			}
+		}
+	}
+	technique
+	{
+		scheme srt_color
+		pass LOS1 : terrain1/lighting
 		{
 		}
 	}
 	technique
 	{
-		scheme quality1
+		scheme srt_depth
+		shadow_caster_material shadowcaster1
+		pass LOS1
+		{
+			vertex_program_ref depth1/vert
+			{
+			}
+			fragment_program_ref depth1/frag
+			{
+			}
+		}
+	}
+	technique
+	{
+		scheme fixed
 		pass
 		{
 			ambient 1.0 1.0 1.0

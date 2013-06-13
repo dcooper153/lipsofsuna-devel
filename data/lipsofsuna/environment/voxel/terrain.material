@@ -1,4 +1,4 @@
-pass terrainmaterial/3/lighting
+pass terrainmaterial/lighting
 {
 	set $cullmode "clockwise"
 	set $texture1 "granite1.png"
@@ -35,53 +35,10 @@ pass terrainmaterial/3/lighting
 	{
 		content_type shadow
 	}
-	vertex_program_ref terrain1_vert
+	vertex_program_ref terrain1/vert
 	{
 	}
-	fragment_program_ref terrain1_frag
-	{
-	}
-}
-
-pass terrainmaterial/2/lighting
-{
-	set $cullmode "clockwise"
-	set $texture1 "granite1.png"
-	set $texture3 "stone-001.dds"
-	max_lights 3
-	ambient 0.7 0.7 0.7
-	diffuse vertexcolour
-	specular 0.1 0.1 0.1 0.1 64
-	cull_hardware $cullmode
-	texture_unit
-	{
-		texture $texture1
-	}
-	texture_unit
-	{
-	}
-	texture_unit
-	{
-		texture $texture3
-	}
-	texture_unit
-	{
-		texture celramp1.png 1d
-		tex_address_mode clamp
-	}
-	texture_unit
-	{
-		texture celramp2.png 1d
-		tex_address_mode clamp
-	}
-	texture_unit
-	{
-		content_type shadow
-	}
-	vertex_program_ref terrain2_vert
-	{
-	}
-	fragment_program_ref terrain2_frag
+	fragment_program_ref terrain1/frag
 	{
 	}
 }
@@ -94,34 +51,38 @@ material terrainmaterial
 	set $texture3 "stone-001.dds"
 	technique
 	{
-		pass LOS1 : terrainmaterial/3/lighting
+		scheme mrt
+		pass LOS1 : terrainmaterial/lighting
+		{
+			fragment_program_ref terrain1/frag/mrt
+			{
+			}
+		}
+	}
+	technique
+	{
+		scheme srt_color
+		pass LOS1 : terrainmaterial/lighting
 		{
 		}
 	}
 	technique
 	{
-		scheme quality3
-		pass LOS1 : terrainmaterial/3/lighting
+		scheme srt_depth
+		shadow_caster_material shadowcaster1
+		pass LOS1
 		{
+			vertex_program_ref depth1/vert
+			{
+			}
+			fragment_program_ref depth1/frag
+			{
+			}
 		}
 	}
 	technique
 	{
-		scheme quality2outline
-		pass LOS1 : terrainmaterial/2/lighting
-		{
-		}
-	}
-	technique
-	{
-		scheme quality2
-		pass LOS1 : terrainmaterial/2/lighting
-		{
-		}
-	}
-	technique
-	{
-		scheme quality1
+		scheme fixed
 		pass
 		{
 			ambient 1.0 1.0 1.0

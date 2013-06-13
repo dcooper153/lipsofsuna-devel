@@ -37,7 +37,7 @@ void main()
 		LOS_material_celshading, LOS_diffuse_texture_2, LOS_diffuse_texture_3);
 #ifdef ENABLE_MRT
 	gl_FragData[0] = vec4(color, 0.3 + 0.1 * spec.a);
-	gl_FragData[1] = gl_FragCoord;
+	gl_FragData[1] = vec4(gl_FragCoord.z);
 #else
 	gl_FragColor = vec4(color, 0.3 + 0.1 * spec.a);
 #endif

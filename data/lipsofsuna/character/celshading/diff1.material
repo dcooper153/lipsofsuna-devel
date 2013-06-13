@@ -16,6 +16,8 @@ material diff1
 	receive_shadows off
 	technique
 	{
+		scheme mrt
+		shadow_caster_material shadowcaster1
 		pass LOS1 : diff1/lighting
 		{
 			fragment_program_ref diff1/frag/mrt
@@ -25,7 +27,7 @@ material diff1
 	}
 	technique
 	{
-		scheme quality3
+		scheme srt_color
 		shadow_caster_material shadowcaster1
 		pass LOS1 : diff1/lighting
 		{
@@ -33,25 +35,21 @@ material diff1
 	}
 	technique
 	{
-		scheme quality2outline
-		pass LOS1 : diff1/lighting
+		scheme srt_depth
+		shadow_caster_material shadowcaster1
+		pass LOS1
 		{
-			fragment_program_ref diff1/frag/mrt
+			vertex_program_ref depth1/vert
+			{
+			}
+			fragment_program_ref depth1/frag
 			{
 			}
 		}
 	}
 	technique
 	{
-		scheme quality2
-		shadow_caster_material shadowcaster1
-		pass LOS1 : diff1/lighting
-		{
-		}
-	}
-	technique
-	{
-		scheme quality1
+		scheme fixed
 		pass LOS1
 		{
 			ambient 0.3 0.3 0.3

@@ -73,7 +73,7 @@ void main()
 	vec3 color = (LOS_material_diffuse * diffuse).rgb * diff.rgb;
 #ifdef ENABLE_MRT
 	gl_FragData[0] = vec4(color, diffuse.a);
-	gl_FragData[1] = gl_FragCoord;
+	gl_FragData[1] = vec4(gl_FragCoord.z);
 #else
 	gl_FragColor = vec4(color, diffuse.a);
 #endif

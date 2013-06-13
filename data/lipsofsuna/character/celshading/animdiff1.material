@@ -16,7 +16,7 @@ material animdiff1
 	receive_shadows off
 	technique
 	{
-		set $enable_mrt 1
+		scheme mrt
 		shadow_caster_material animshadowcaster1
 		pass LOS1 : animdiff1/lighting
 		{
@@ -27,7 +27,7 @@ material animdiff1
 	}
 	technique
 	{
-		scheme quality3
+		scheme srt_color
 		shadow_caster_material animshadowcaster1
 		pass LOS1 : animdiff1/lighting
 		{
@@ -35,27 +35,21 @@ material animdiff1
 	}
 	technique
 	{
-		set $enable_mrt 1
-		scheme quality2outline
+		scheme srt_depth
 		shadow_caster_material animshadowcaster1
 		pass LOS1 : animdiff1/lighting
 		{
-			fragment_program_ref diff1/frag/mrt
+			vertex_program_ref animdepth1/vert
+			{
+			}
+			fragment_program_ref depth1/frag
 			{
 			}
 		}
 	}
 	technique
 	{
-		scheme quality2
-		shadow_caster_material animshadowcaster1
-		pass LOS1 : animdiff1/lighting
-		{
-		}
-	}
-	technique
-	{
-		scheme quality1
+		scheme fixed
 		pass LOS1
 		{
 			ambient 0.3 0.3 0.3

@@ -1,0 +1,17 @@
+vertex_program depthalpha1/vert glsl
+{
+	source depthalpha1.vert
+	default_params
+	{
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+	}
+}
+
+fragment_program depthalpha1/frag glsl
+{
+	source depthalpha1.frag
+	default_params
+	{
+		param_named LOS_diffuse_texture_0 int 0
+	}
+}

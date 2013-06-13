@@ -10,7 +10,7 @@ varying vec2 F_uv;
 
 float mapz(vec4 tex)
 {
-	return tex.z;
+	return tex.x;
 }
 
 void main()

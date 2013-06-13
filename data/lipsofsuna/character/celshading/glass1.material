@@ -19,6 +19,7 @@ material glass1
 	receive_shadows off
 	technique
 	{
+		scheme mrt
 		pass : glass1/lighting
 		{
 			fragment_program_ref glass1/frag/mrt
@@ -28,7 +29,7 @@ material glass1
 	}
 	technique
 	{
-		scheme quality3
+		scheme srt_color
 		shadow_caster_material shadowcaster1
 		pass : glass1/lighting
 		{
@@ -36,25 +37,14 @@ material glass1
 	}
 	technique
 	{
-		scheme quality2outline
-		pass : glass1/lighting
-		{
-			fragment_program_ref glass1/frag/mrt
-			{
-			}
-		}
-	}
-	technique
-	{
-		scheme quality2
-		shadow_caster_material shadowcaster1
-		pass LOS1 : glass1/lighting
+		scheme srt_depth
+		pass dummy
 		{
 		}
 	}
 	technique
 	{
-		scheme quality1
+		scheme fixed
 		pass
 		{
 			ambient 0.3 0.3 0.3
