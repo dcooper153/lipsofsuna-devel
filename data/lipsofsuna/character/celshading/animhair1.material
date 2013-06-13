@@ -1,5 +1,5 @@
-import * from "animdiffnorm1.material"
+import * from "animdiff1.material"
 
-material animhair1 : animdiffnorm1
+material animhair1 : animdiff1
 {
 }
