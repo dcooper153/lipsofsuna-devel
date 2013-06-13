@@ -94,7 +94,10 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "options",
-	widget = function() return Widgets.Uiconfigoption("mouse_smoothing", function(k,v) Client:set_mouse_smoothing(v) end) end}
+	widget = function()
+		if not Client.camera_manager then return end
+		return Widgets.Uiconfigoption("mouse_smoothing", function(k,v) Client.camera_manager:set_mouse_smoothing(v) end)
+	end}
 
 Ui:add_widget{
 	state = "options",
