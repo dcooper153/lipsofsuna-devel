@@ -72,21 +72,26 @@ ModelBuilder.build_with_merger = function(clss, merger, args)
 	if args.hair_style and args.hair_style ~= "" then
 		meshes.hair = args.hair_style
 	end
-	-- Add equipment models.
-	local textures = {}
+	-- Sort equipment by priority.
+	local equipment = {}
 	if args.equipment then
 		for slot,name in pairs(args.equipment) do
 			local spec = Itemspec:find{name = name}
 			if spec then
-				local models = spec:get_equipment_models(args.spec.equipment_class or args.spec.name, lod)
-				if models then
-					for k,v in pairs(models) do
-						if v ~= "" then
-							meshes[k] = v
-						else
-							meshes[k] = nil
-						end
-					end
+				table.insert(equipment, spec)
+			end
+		end
+		table.sort(equipment, function(a,b) return a.equipment_priority < b.equipment_priority end)
+	end
+	-- Add equipment models.
+	for i,spec in ipairs(equipment) do
+		local models = spec:get_equipment_models(args.spec.equipment_class or args.spec.name, lod)
+		if models then
+			for k,v in pairs(models) do
+				if v ~= "" then
+					meshes[k] = v
+				else
+					meshes[k] = nil
 				end
 			end
 		end

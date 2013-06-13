@@ -45,6 +45,7 @@ Itemspec.introspect = Introspect{
 		{name = "effect_use", type = "string", description = "Name of the effect to play when the item is used."},
 		{name = "equipment_anchor", type = "string", description = "Name of the node snapped to the hand of the actor when wielded."},
 		{name = "equipment_models", type = "dict", dict = {type = "dict", dict = {type = "string"}}, description = "Dictionary of equipment models."},
+		{name = "equipment_priority", type = "number", default = 0, description = "The priority of equipment models and textures when worn."},
 		{name = "equipment_slot", type = "string", description = "Equipment slot into which the item can be placed."},
 		{name = "equipment_slots_reserved", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of equipment slots that the item reserves in addition to the main slot."},
 		{name = "equipment_textures", type = "dict", dict = {type = "dict", dict = {type = "string"}}, description = "Dictionary of equipment texture blit instructions. The dictionary keys are the base texture names and the values the source texture names."},

@@ -53,22 +53,27 @@ end
 -- @param args Model building arguments.
 -- @return Texture override dictionary.
 TextureBuilder.build = function(clss, args)
-	-- Add equipment textures.
-	-- TODO: Texture priorities for equipment.
-	local textures = {}
+	-- Sort equipment by priority.
+	local equipment = {}
 	if args.equipment then
 		for slot,name in pairs(args.equipment) do
 			local spec = Itemspec:find{name = name}
 			if spec then
-				local tex = spec:get_equipment_textures(args.spec.equipment_class or args.spec.name, lod)
-				if tex then
-					for k,v in pairs(tex) do
-						if textures[k] then
-							table.insert(textures[k], v)
-						else
-							textures[k] = {v}
-						end
-					end
+				table.insert(equipment, spec)
+			end
+		end
+		table.sort(equipment, function(a,b) return a.equipment_priority < b.equipment_priority end)
+	end
+	-- Add equipment textures.
+	local textures = {}
+	for i,spec in ipairs(equipment) do
+		local tex = spec:get_equipment_textures(args.spec.equipment_class or args.spec.name, lod)
+		if tex then
+			for k,v in pairs(tex) do
+				if textures[k] then
+					table.insert(textures[k], v)
+				else
+					textures[k] = {v}
 				end
 			end
 		end
