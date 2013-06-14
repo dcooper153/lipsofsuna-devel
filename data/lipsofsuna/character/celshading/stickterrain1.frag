@@ -4,6 +4,7 @@
 uniform sampler2D LOS_diffuse_texture_1;
 uniform sampler1D LOS_diffuse_texture_2;
 uniform sampler1D LOS_diffuse_texture_3;
+uniform sampler2D LOS_shadow_texture_0;
 uniform vec4 LOS_scene_ambient;
 uniform vec4 LOS_material_diffuse;
 uniform vec4 LOS_material_celshading;
@@ -19,6 +20,7 @@ varying vec3 F_normal;
 varying vec2 F_texcoord;
 varying vec3 F_splatting;
 varying vec3 F_eyev;
+varying vec4 F_shadow;
 varying vec3 F_lightv[LIGHTS];
 
 vec3 los_blinn_phong(in vec3 lv, in vec3 ev, in vec3 ld, in vec4 eq, in vec3 normal, in float shininess);
@@ -68,6 +70,8 @@ void main()
 	{
 		vec3 l = los_blinn_phong(F_lightv[i], F_eyev, LOS_light_direction[i],
 			LOS_light_equation[i], normal, LOS_material_shininess);
+		if (i == 0)
+			l *= texture2DProj(LOS_shadow_texture_0, F_shadow).x;
 		diff += l.z * l.x * LOS_light_diffuse[i];
 	}
 	vec3 color = (LOS_material_diffuse * diffuse).rgb * diff.rgb;

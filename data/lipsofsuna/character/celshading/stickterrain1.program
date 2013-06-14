@@ -8,6 +8,7 @@ vertex_program stickterrain1/vert glsl
 		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
 		param_named_auto LOS_camera_position camera_position_object_space
 		param_named_auto LOS_light_position light_position_object_space_array 3
+		param_named_auto LOS_matrix_shadow texture_worldviewproj_matrix_array 1
 	}
 }
 
@@ -22,6 +23,7 @@ fragment_program stickterrain1/frag glsl
 		param_named LOS_diffuse_texture_1 int 0
 		param_named LOS_diffuse_texture_2 int 1
 		param_named LOS_diffuse_texture_3 int 2
+		param_named LOS_shadow_texture_0 int 3
 		param_named_auto LOS_scene_ambient derived_scene_colour
 		param_named_auto LOS_material_diffuse surface_diffuse_colour
 		param_named_auto LOS_material_shininess surface_shininess
