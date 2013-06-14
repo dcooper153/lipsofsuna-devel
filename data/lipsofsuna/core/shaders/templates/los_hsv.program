@@ -1,0 +1,4 @@
+fragment_program los_hsv glsl
+{
+	source los_hsv.frag
+}

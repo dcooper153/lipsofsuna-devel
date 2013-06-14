@@ -53,7 +53,7 @@ end
 
 --- Converts a [0,1] color to [0,255]
 -- @param clss Color class.
--- @param color Ccolor.
+-- @param color color.
 -- @return Color.
 Color.float_to_ubyte = function(clss, color)
 	if not color then return end
@@ -62,11 +62,61 @@ end
 
 --- Converts a [0,255] color to [0,1]
 -- @param clss Color class.
--- @param color Ccolor.
+-- @param color color.
 -- @return Color.
 Color.ubyte_to_float = function(clss, color)
 	if not color then return end
 	return {color[1] / 255, color[2] / 255, color[3] / 255}
+end
+
+--- Multiplies the saturation of the RGB color.
+--
+-- rgb' = mult * (rgb - max) + max
+--
+-- @param clss Color class.
+-- @param rgb RGB color.
+-- @param mult Number.
+-- @return RGB color.
+Color.rgb_multiply_saturation = function(clss, rgb, mult)
+	local v = math.max(math.max(rgb[1], rgb[2]), rgb[3])
+	return {(rgb[1] - v) * mult + v, (rgb[2] - v) * mult + v, (rgb[3] - v) * mult + v}
+end
+
+--- Multiplies the value of the RGB color.
+-- @param clss Color class.
+-- @param rgb RGB color.
+-- @param mult Number.
+-- @return RGB color.
+Color.rgb_multiply_value = function(clss, rgb, mult)
+	return {rgb[1] * mult, rgb[2] * mult, rgb[3] * mult}
+end
+
+--- Sets the saturation of the RGB color.
+--
+-- mult * (min - max) + max = max * (1 - sat')
+--
+-- @param clss Color class.
+-- @param rgb RGB color.
+-- @param saturation Saturation.
+-- @return RGB color.
+Color.rgb_set_saturation = function(clss, rgb, saturation)
+	local v = math.max(math.max(rgb[1], rgb[2]), rgb[3])
+	local m = math.min(math.min(rgb[1], rgb[2]), rgb[3])
+	if m == v then return {rgb[0], rgb[1], rgb[2]} end
+	local mult = saturation * v / (v - m)
+	return {(rgb[1] - v) * mult + v, (rgb[2] - v) * mult + v, (rgb[3] - v) * mult + v}
+end
+
+--- Sets the value of the RGB color.
+-- @param clss Color class.
+-- @param rgb RGB color.
+-- @param value Value.
+-- @return RGB color.
+Color.rgb_set_value = function(clss, rgb, value)
+	local v = math.max(math.max(rgb[1], rgb[2]), rgb[3])
+	if v == 0 then return {value, value, value} end
+	local mult = value / v
+	return {rgb[1] * mult, rgb[2] * mult, rgb[3] * mult}
 end
 
 return Color
