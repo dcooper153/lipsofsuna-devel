@@ -11,12 +11,7 @@ material bounds1
 			cull_hardware none
 			texture_unit
 			{
-				texture celramp1.png 1d
-				tex_address_mode clamp
-			}
-			texture_unit
-			{
-				texture celramp2.png 1d
+				texture celramp1.png 2d
 				tex_address_mode clamp
 			}
 			vertex_program_ref bounds1_vert

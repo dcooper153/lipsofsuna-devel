@@ -24,12 +24,11 @@ vec3 los_rgb_to_hsv(in vec3 rgb)
 	else if(v == rgb.b) h = ((rgb.r - rgb.g) / c + 4.0) / 6.0;
 	return vec3(h, c / v, v);
 }
-vec3 los_cel_shading(in vec4 material, in vec4 diff, in vec4 spec, in vec4 p, in sampler1D t1, in sampler1D t2)
+vec3 los_cel_shading(in vec4 material, in vec4 diff, in vec4 spec, in sampler2D t1)
 {
 	vec3 diff_hsv = los_rgb_to_hsv(diff.rgb);
 	vec3 spec_hsv = los_rgb_to_hsv(spec.rgb);
-	float diff_f = texture1D(t1, p.x * diff_hsv.b).x;
-	float spec_f = texture1D(t2, p.y * spec_hsv.b).x;
-	vec3 hsv = vec3(diff_hsv.rg + spec_hsv.rg, diff_f + spec_f);
+	float diffspec = texture2D(t1, vec2(diff_hsv.b, spec_hsv.b)).r;
+	vec3 hsv = vec3(diff_hsv.rg + spec_hsv.rg, diffspec);
 	return material.rgb * los_hsv_to_rgb(hsv);
 }

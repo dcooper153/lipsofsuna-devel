@@ -1,27 +1,11 @@
-import * from "outline.template"
+import * from "celshading.template"
 
-pass animsolid1/lighting
+pass animsolid1/lighting : celshading/pass
 {
 	max_lights 3
 	ambient 0.7 0.7 0.7
 	diffuse 1.0 1.0 1.0
 	specular 1.0 1.0 1.0 1.0 64
-	texture_unit LOS1
-	{
-	}
-	texture_unit
-	{
-	}
-	texture_unit
-	{
-		texture celramp1.png 1d
-		tex_address_mode clamp
-	}
-	texture_unit
-	{
-		texture celramp2.png 1d
-		tex_address_mode clamp
-	}
 	vertex_program_ref animsolid1/vert
 	{
 	}

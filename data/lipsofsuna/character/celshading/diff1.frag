@@ -2,11 +2,9 @@
 
 uniform sampler2D LOS_diffuse_texture_0;
 uniform sampler2D LOS_diffuse_texture_1;
-uniform sampler1D LOS_diffuse_texture_2;
-uniform sampler1D LOS_diffuse_texture_3;
+uniform sampler2D LOS_cel_texture;
 uniform vec4 LOS_scene_ambient;
 uniform vec4 LOS_material_diffuse;
-uniform vec4 LOS_material_celshading;
 uniform float LOS_material_shininess;
 uniform vec3 LOS_light_direction[LIGHTS];
 uniform vec4 LOS_light_diffuse[LIGHTS];
@@ -20,7 +18,7 @@ varying vec3 F_eyev;
 varying vec3 F_lightv[LIGHTS];
 
 vec3 los_blinn_phong(in vec3 lv, in vec3 ev, in vec3 ld, in vec4 eq, in vec3 normal, in float shininess);
-vec3 los_cel_shading(in vec4 material, in vec4 diff, in vec4 spec, in vec4 p, in sampler1D t1, in sampler1D t2);
+vec3 los_cel_shading(in vec4 material, in vec4 diff, in vec4 spec, in sampler2D t1);
 
 void main()
 {
@@ -35,8 +33,7 @@ void main()
 		diff += l.z * l.x * LOS_light_diffuse[i];
 		spec += l.z * l.y * LOS_light_specular[i];
 	}
-	vec3 color = los_cel_shading(LOS_material_diffuse * diffuse, diff, spec,
-		LOS_material_celshading, LOS_diffuse_texture_2, LOS_diffuse_texture_3);
+	vec3 color = los_cel_shading(LOS_material_diffuse * diffuse, diff, spec, LOS_cel_texture);
 #ifdef ENABLE_MRT
 	gl_FragData[0] = vec4(color, diffuse.a);
 	gl_FragData[1] = vec4(gl_FragCoord.z);

@@ -1,8 +1,7 @@
-vertex_program stickterrain1/vert glsl
+vertex_program terrain2/vert glsl
 {
-	source stickterrain1.vert
+	source terrain2.vert
 	preprocessor_defines LIGHTS=3
-	includes_skeletal_animation true
 	default_params
 	{
 		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
@@ -12,18 +11,18 @@ vertex_program stickterrain1/vert glsl
 	}
 }
 
-fragment_program stickterrain1/frag glsl
+fragment_program terrain2/frag glsl
 {
-	source stickterrain1.frag
+	source terrain2.frag
 	attach los_blinn_phong los_cel_shading
 	preprocessor_defines LIGHTS=3
 	default_params
 	{
-		param_named LOS_material_celshading float4 1.0 1.0 0.9 0.9
-		param_named LOS_diffuse_texture_1 int 0
-		param_named LOS_diffuse_texture_2 int 1
-		param_named LOS_diffuse_texture_3 int 2
-		param_named LOS_shadow_texture_0 int 3
+		param_named LOS_diffuse_texture_0 int 0
+		param_named LOS_diffuse_texture_1 int 1
+		param_named LOS_diffuse_texture_2 int 2
+		param_named LOS_cel_texture int 3
+		param_named LOS_shadow_texture_0 int 4
 		param_named_auto LOS_scene_ambient derived_scene_colour
 		param_named_auto LOS_material_diffuse surface_diffuse_colour
 		param_named_auto LOS_material_shininess surface_shininess
@@ -35,7 +34,7 @@ fragment_program stickterrain1/frag glsl
 	}
 }
 
-fragment_program stickterrain1/frag/mrt glsl : stickterrain1/frag
+fragment_program terrain2/frag/mrt glsl : terrain2/frag
 {
 	preprocessor_defines LIGHTS=3,ENABLE_MRT=1
 }

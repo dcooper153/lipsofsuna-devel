@@ -29,5 +29,5 @@
 			"long": "--version",
 		}
 	],
-	"resources": [".", "materials", "shaders"]
+	"resources": [".", "materials"]
 }

@@ -1,13 +1,10 @@
 #version 120
 #extension GL_ARB_draw_buffers : enable
 
-uniform sampler2D LOS_diffuse_texture_1;
-uniform sampler1D LOS_diffuse_texture_2;
-uniform sampler1D LOS_diffuse_texture_3;
+uniform sampler2D LOS_diffuse_texture_0;
 uniform sampler2D LOS_shadow_texture_0;
 uniform vec4 LOS_scene_ambient;
 uniform vec4 LOS_material_diffuse;
-uniform vec4 LOS_material_celshading;
 uniform float LOS_material_shininess;
 uniform vec3 LOS_light_direction[LIGHTS];
 uniform vec4 LOS_light_diffuse[LIGHTS];
@@ -59,8 +56,8 @@ void main()
 	 */
 	float dist = length(F_splatting.yz - vec2(0.5));
 	float splat = F_splatting.x * smoothstep(0.0, 0.5, dist);
-	vec4 diffuse0 = texture2D(LOS_diffuse_texture_1, uv_atlas + uv);
-	vec4 diffuse1 = texture2D(LOS_diffuse_texture_1, uv);
+	vec4 diffuse0 = texture2D(LOS_diffuse_texture_0, uv_atlas + uv);
+	vec4 diffuse1 = texture2D(LOS_diffuse_texture_0, uv);
 	vec4 diffuse = mix(diffuse0, diffuse1, splat);
 
 	/* Lighting. */

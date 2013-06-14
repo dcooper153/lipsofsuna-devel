@@ -23,12 +23,7 @@ pass terrainmaterial/lighting
 	}
 	texture_unit
 	{
-		texture celramp1.png 1d
-		tex_address_mode clamp
-	}
-	texture_unit
-	{
-		texture celramp2.png 1d
+		texture celramp1.png 2d
 		tex_address_mode clamp
 	}
 	texture_unit

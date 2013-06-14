@@ -12,16 +12,6 @@ pass stickterrain1/lighting
 	}
 	texture_unit
 	{
-		texture celramp1.png 1d
-		tex_address_mode clamp
-	}
-	texture_unit
-	{
-		texture celramp2.png 1d
-		tex_address_mode clamp
-	}
-	texture_unit
-	{
 		content_type shadow
 	}
 	vertex_program_ref stickterrain1/vert
@@ -37,7 +27,7 @@ material stickterrain1
 	technique
 	{
 		scheme mrt
-		pass LOS1 : stickterrain1/lighting
+		pass : stickterrain1/lighting
 		{
 			fragment_program_ref stickterrain1/frag/mrt
 			{
@@ -47,14 +37,14 @@ material stickterrain1
 	technique
 	{
 		scheme srt_color
-		pass LOS1 : stickterrain1/lighting
+		pass : stickterrain1/lighting
 		{
 		}
 	}
 	technique
 	{
 		scheme srt_depth
-		pass LOS1
+		pass
 		{
 			vertex_program_ref depth1/vert
 			{
@@ -72,7 +62,7 @@ material stickterrain1
 			ambient 0.3 0.3 0.3
 			diffuse 1.0 1.0 1.0
 			specular 0.0 0.0 0.0 1.0 1
-			texture_unit LOS1
+			texture_unit
 			{
 			}
 		}

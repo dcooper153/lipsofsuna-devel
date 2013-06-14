@@ -1,15 +1,28 @@
-fragment_program eye1/frag glsl
+vertex_program terrain1/vert glsl
 {
-	source eye1.frag
-	attach los_blinn_phong los_cel_shading
+	source terrain1.vert
 	preprocessor_defines LIGHTS=3
 	default_params
 	{
-		param_named LOS_material_celshading float4 1.0 1.0 0.9 0.9
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+		param_named_auto LOS_camera_position camera_position_object_space
+		param_named_auto LOS_light_position light_position_object_space_array 3
+		param_named_auto LOS_matrix_shadow texture_worldviewproj_matrix_array 1
+	}
+}
+
+fragment_program terrain1/frag glsl
+{
+	source terrain1.frag
+	attach los_blinn_phong los_cel_shading los_normal_mapping
+	preprocessor_defines LIGHTS=3
+	default_params
+	{
 		param_named LOS_diffuse_texture_0 int 0
 		param_named LOS_diffuse_texture_1 int 1
 		param_named LOS_diffuse_texture_2 int 2
-		param_named LOS_diffuse_texture_3 int 3
+		param_named LOS_cel_texture int 3
+		param_named LOS_shadow_texture_0 int 4
 		param_named_auto LOS_scene_ambient derived_scene_colour
 		param_named_auto LOS_material_diffuse surface_diffuse_colour
 		param_named_auto LOS_material_shininess surface_shininess
@@ -21,7 +34,7 @@ fragment_program eye1/frag glsl
 	}
 }
 
-fragment_program eye1/frag/mrt glsl : eye1/frag
+fragment_program terrain1/frag/mrt glsl : terrain1/frag
 {
 	preprocessor_defines LIGHTS=3,ENABLE_MRT=1
 }

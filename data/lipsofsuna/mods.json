@@ -21,6 +21,7 @@
 	["load", "core/objects"],
 	["load", "core/quickslots"],
 	["load", "core/server"],
+	["load", "core/shaders"],
 	["load", "core/terrain"],
 	["load", "core/shadows"],
 	["load", "core/misc"],

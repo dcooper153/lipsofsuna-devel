@@ -10,14 +10,15 @@ abstract pass celshading/pass
 	texture_unit LOS2
 	{
 	}
-	texture_unit
+	texture_unit LOS3
 	{
-		texture celramp1.png 1d
-		tex_address_mode clamp
+	}
+	texture_unit LOS4
+	{
 	}
 	texture_unit
 	{
-		texture celramp2.png 1d
+		texture celramp1.png 2d
 		tex_address_mode clamp
 	}
 	shadow_caster_vertex_program_ref shadow_vert
