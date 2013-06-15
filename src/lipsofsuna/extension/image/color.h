@@ -29,4 +29,20 @@ struct _LIImgColor
 	uint8_t a;
 };
 
+typedef struct _LIImgColorHSV LIImgColorHSV;
+struct _LIImgColorHSV
+{
+	float h;
+	float s;
+	float v;
+};
+
+LIAPICALL (void, liimg_color_rgb_to_hsv, (
+	const LIImgColor* self,
+	LIImgColorHSV*    result));
+
+LIAPICALL (void, liimg_color_hsv_to_rgb, (
+	const LIImgColorHSV* self,
+	LIImgColor*          result));
+
 #endif

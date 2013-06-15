@@ -91,6 +91,24 @@ static void Image_new_empty (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
+static void Image_add_hsv (LIScrArgs* args)
+{
+	float hue_add;
+	float sat_add;
+	float val_add;
+	LIImgImage* self;
+
+	self = args->self;
+	if (!liscr_args_geti_float (args, 0, &hue_add))
+		hue_add = 0.0f;
+	if (!liscr_args_geti_float (args, 1, &sat_add))
+		sat_add = 0.0f;
+	if (!liscr_args_geti_float (args, 2, &val_add))
+		val_add = 0.0f;
+
+	liimg_image_add_hsv (self, hue_add, sat_add, val_add);
+}
+
 static void Image_blit (LIScrArgs* args)
 {
 	LIImgImage* self;
@@ -103,6 +121,29 @@ static void Image_blit (LIScrArgs* args)
 		image = liscr_data_get_data (value);
 		liimg_image_blit (self, image);
 	}
+}
+
+static void Image_blit_hsv_add (LIScrArgs* args)
+{
+	float hue_add;
+	float sat_add;
+	float val_add;
+	LIImgImage* self;
+	LIImgImage* image;
+	LIScrData* value;
+
+	self = args->self;
+	if (!liscr_args_geti_data (args, 0, LIEXT_SCRIPT_IMAGE, &value))
+		return;
+	if (!liscr_args_geti_float (args, 1, &hue_add))
+		hue_add = 0.0f;
+	if (!liscr_args_geti_float (args, 2, &sat_add))
+		sat_add = 0.0f;
+	if (!liscr_args_geti_float (args, 3, &val_add))
+		val_add = 0.0f;
+
+	image = liscr_data_get_data (value);
+	liimg_image_blit_hsv_add (self, image, hue_add, sat_add, val_add);
 }
 
 static void Image_copy (LIScrArgs* args)
@@ -232,7 +273,9 @@ void liext_script_image (
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_IMAGE, "image_new", Image_new);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_IMAGE, "image_new_empty", Image_new_empty);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_add_hsv", Image_add_hsv);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_blit", Image_blit);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_blit_hsv_add", Image_blit_hsv_add);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_copy", Image_copy);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_fill", Image_fill);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_get_pixel", Image_get_pixel);

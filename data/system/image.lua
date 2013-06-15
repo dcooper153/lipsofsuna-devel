@@ -38,11 +38,30 @@ Image.new = function(clss, file_or_width, height)
 	return self
 end
 
+--- Alters the color of the image in the HSV color space.
+-- @param self Image.
+-- @param hue_add Amount to add to hue. The hue range is [0,1].
+-- @param sat_add Amount to add to saturation. The saturation range is [0,1].
+-- @param val_add Amount to add to value. The value range is [0,1].
+Image.add_hsv = function(self, hue_add, sat_add, val_add)
+	Los.image_add_hsv(self.handle, hue_add, sat_add, val_add)
+end
+
 --- Blits an image.
 -- @param self Image.
 -- @param image Image.
 Image.blit = function(self, image)
 	Los.image_blit(self.handle, image.handle)
+end
+
+--- Blits an HSV altered image over this one.
+-- @param self Image.
+-- @param image Image.
+-- @param hue_add Amount to add to hue. The hue range is [0,1].
+-- @param sat_add Amount to add to saturation. The saturation range is [0,1].
+-- @param val_add Amount to add to value. The value range is [0,1].
+Image.blit_hsv_add = function(self, image, hue_add, sat_add, val_add)
+	Los.image_blit_hsv_add(self.handle, image.handle, hue_add, sat_add, val_add)
 end
 
 --- Copies the image.
