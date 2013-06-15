@@ -125,16 +125,7 @@ ModelBuilder.build_with_merger = function(clss, merger, args)
 		clss:build_submesh(merger, k, v, args)
 	end
 	-- Colorize materials.
-	local skin = args.skin_style and Actorskinspec:find{name = args.skin_style}
-	merger:replace_material{match_material = "animeye1", diffuse = args.eye_color}
 	merger:replace_material{match_material = "animhair1", diffuse = args.hair_color}
-	if skin then
-		merger:replace_material{match_material = "animskin1", diffuse = args.skin_color,
-			material = skin.material, textures = skin.textures}
-	else
-		merger:replace_material{match_material = "animskin1", diffuse = args.skin_color,
-			material = args.spec.skin_material, textures = args.spec.skin_textures}
-	end
 	-- Queue the build.
 	merger:finish()
 end

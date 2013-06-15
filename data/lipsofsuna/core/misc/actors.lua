@@ -32,7 +32,7 @@ Actorspec{
 	-- Customization.
 	body_scale_min = 0.9,
 	body_scale_max = 1.05,
-	eye_styles = {["Default"] = ""},
+	eye_styles = {["Default"] = "aereye1", ["Angled"] = "aereye2"},
 	hair_styles = {["Bald"] = "", ["Pigtails"] = "hair1", ["Pigtails 2"] = "hair6", ["Pigtails 3"] = "hair3", ["Long"] = "hair2", ["Drill"] = "hair4", ["Short"] = "hair5"},
 		--{"Short", "aershorthair1"} -- TODO: Adapt to head mesh changes
 	head_styles = {["Head 1"] = "aerhead1"},

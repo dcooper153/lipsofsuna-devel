@@ -27,6 +27,7 @@ Actorpresetspec.introspect = Introspect{
 		{name = "animation_profile", type = "string", description = "Default animation profile."},
 		{name = "body", type = "list", list = {type = "number"}, description = "Body morph table."},
 		{name = "eye_color", type = "color", description = "Eye color."},
+		{name = "eye_style", type = "string", description = "Eye style name."},
 		{name = "face", type = "list", list = {type = "number"}, description = "Face morph table."},
 		{name = "hair_color", type = "color", description = "Hair color."},
 		{name = "hair_style", type = "string", description = "Hair style name."},

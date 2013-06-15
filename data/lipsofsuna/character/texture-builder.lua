@@ -81,8 +81,25 @@ TextureBuilder.build = function(clss, args)
 	-- Merge the textures.
 	local overrides = {}
 	for basename,blits in pairs(textures) do
-		local base = Image(basename .. ".png")
+		-- Open the skin texture.
+		local skinspec = args.skin_style and Actorskinspec:find_by_name(args.skin_style)
+		local skin = skinspec and skinspec.textures[1] or basename
+		local base = Image(skin .. ".png")
 		if base then
+			base:add_hsv(args.skin_color[1], -1 + 2 * args.skin_color[2], -1 + 2 * args.skin_color[3])
+			-- Blit the eye texture.
+			local eye = args.eye_style
+			if eye then
+				local blit = Image(eye .. ".png")
+				if blit then
+					if args.eye_color then
+						base:blit_hsv_add(blit, args.eye_color[1], -1 + 2 * args.eye_color[2], -1 + 2 * args.eye_color[3])
+					else
+						base:blit(blit)
+					end
+				end
+			end
+			-- Blit equipment textures.
 			for k,blitname in ipairs(blits) do
 				local blit = Image(blitname .. ".png")
 				if blit then

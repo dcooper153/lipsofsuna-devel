@@ -46,6 +46,10 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "chargen",
+	widget = function() return Widgets.Uitransition("Head", "chargen/head") end}
+
+Ui:add_widget{
+	state = "chargen",
 	widget = function() return Widgets.Uitransition("Face", "chargen/face") end}
 
 Ui:add_widget{
@@ -194,8 +198,8 @@ Ui:add_state{
 ------------------------------------------------------------------------------
 
 Ui:add_state{
-	state = "chargen/face",
-	label = "Customize face",
+	state = "chargen/head",
+	label = "Customize head",
 	grab = function()
 		return false
 	end,
@@ -203,28 +207,77 @@ Ui:add_state{
 	update = chargen_update}
 
 Ui:add_widget{
-	state = "chargen/face",
-	widget = function() return Widgets.Uitransition("Head style", "chargen/face/headstyle") end}
+	state = "chargen/head",
+	widget = function() return Widgets.Uitransition("Head style", "chargen/head/headstyle") end}
 
 Ui:add_widget{
-	state = "chargen/face",
+	state = "chargen/head",
+	widget = function() return Widgets.Uitransition("Hair style", "chargen/head/hairstyle") end}
+
+Ui:add_widget{
+	state = "chargen/head",
 	widget = function()
-		-- Create the face shape sliders.
-		local widgets = {}
-		for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
-			local value = Client.chargen:get_face(v.field_index) or 0
-			local widget = Widgets.Uiscrollfloat(v.name, 0, 1, value, function(w)
-				Client.chargen:set_body(k, w.value)
-			end)
-			table.insert(widgets, widget)
-		end
-		return widgets
+		local value = Client.chargen:get_hair_color(1)
+		return Widgets.Uiscrollfloat("Hair hue", 0, 1, value, function(w)
+			Client.chargen:set_hair_color(1, w.value)
+		end)
+	end}
+
+Ui:add_widget{
+	state = "chargen/head",
+	widget = function()
+		local value = Client.chargen:get_hair_color(2)
+		return Widgets.Uiscrollfloat("Hair saturation", 0, 1, value, function(w)
+			Client.chargen:set_hair_color(2, w.value)
+		end)
+	end}
+
+Ui:add_widget{
+	state = "chargen/head",
+	widget = function()
+		local value = Client.chargen:get_hair_color(3)
+		return Widgets.Uiscrollfloat("Hair lightness", 0, 1, value, function(w)
+			Client.chargen:set_hair_color(3, w.value)
+		end)
 	end}
 
 ------------------------------------------------------------------------------
 
 Ui:add_state{
-	state = "chargen/face/headstyle",
+	state = "chargen/head/hairstyle",
+	label = "Select hair style",
+	grab = function()
+		return false
+	end,
+	init = function()
+		local widgets = {}
+		local race = Client.chargen:get_race()
+		local spec = Actorspec:find{name = race}
+		if not spec.hair_styles then return end
+		local lst = {}
+		for k,v in pairs(spec.hair_styles) do
+			table.insert(lst, {k, v})
+		end
+		table.sort(lst, function(a,b) return a[1] < b[1] end)
+		for k,v in ipairs(lst) do
+			local widget = Widgets.Uiradio(v[1], "hair", function(w)
+				Client.chargen:set_hair_style(w.style)
+			end)
+			widget.style = v[2]
+			if Client.chargen:get_hair_style() == widget.style then
+				widget.value = true
+			end
+			table.insert(widgets, widget)
+		end
+		return widgets
+	end,
+	input_post = chargen_input,
+	update = chargen_update}
+
+------------------------------------------------------------------------------
+
+Ui:add_state{
+	state = "chargen/head/headstyle",
 	label = "Select head style",
 	grab = function()
 		return false
@@ -257,6 +310,96 @@ Ui:add_state{
 ------------------------------------------------------------------------------
 
 Ui:add_state{
+	state = "chargen/face",
+	label = "Customize face",
+	grab = function()
+		return false
+	end,
+	input_post = chargen_input,
+	update = chargen_update}
+
+Ui:add_widget{
+	state = "chargen/face",
+	widget = function() return Widgets.Uitransition("Eye style", "chargen/face/eyestyle") end}
+
+Ui:add_widget{
+	state = "chargen/face",
+	widget = function()
+		local value = Client.chargen:get_eye_color(1)
+		return Widgets.Uiscrollfloat("Eye hue", 0, 1, value, function(w)
+			Client.chargen:set_eye_color(1, w.value)
+		end)
+	end}
+
+Ui:add_widget{
+	state = "chargen/face",
+	widget = function()
+		local value = Client.chargen:get_eye_color(2)
+		return Widgets.Uiscrollfloat("Eye saturation", 0, 1, value, function(w)
+			Client.chargen:set_eye_color(2, w.value)
+		end)
+	end}
+
+Ui:add_widget{
+	state = "chargen/face",
+	widget = function()
+		local value = Client.chargen:get_eye_color(3)
+		return Widgets.Uiscrollfloat("Eye lightness", 0, 1, value, function(w)
+			Client.chargen:set_eye_color(3, w.value)
+		end)
+	end}
+
+Ui:add_widget{
+	state = "chargen/face",
+	widget = function()
+		-- Create the face shape sliders.
+		local widgets = {}
+		for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
+			local value = Client.chargen:get_face(v.field_index) or 0
+			local widget = Widgets.Uiscrollfloat(v.name, 0, 1, value, function(w)
+				Client.chargen:set_body(k, w.value)
+			end)
+			table.insert(widgets, widget)
+		end
+		return widgets
+	end}
+
+------------------------------------------------------------------------------
+
+Ui:add_state{
+	state = "chargen/face/eyestyle",
+	label = "Select eye style",
+	grab = function()
+		return false
+	end,
+	init = function()
+		local widgets = {}
+		local race = Client.chargen:get_race()
+		local spec = Actorspec:find{name = race}
+		if not spec.head_styles then return end
+		local lst = {}
+		for k,v in pairs(spec.eye_styles) do
+			table.insert(lst, {k, v})
+		end
+		table.sort(lst, function(a,b) return a[1] < b[1] end)
+		for k,v in ipairs(lst) do
+			local widget = Widgets.Uiradio(v[1], "eye", function(w)
+				Client.chargen:set_eye_style(w.style)
+			end)
+			widget.style = v[2]
+			if Client.chargen:get_eye_style() == widget.style then
+				widget.value = true
+			end
+			table.insert(widgets, widget)
+		end
+		return widgets
+	end,
+	input_post = chargen_input,
+	update = chargen_update}
+
+------------------------------------------------------------------------------
+
+Ui:add_state{
 	state = "chargen/misc",
 	label = "Customize other",
 	grab = function()
@@ -268,68 +411,6 @@ Ui:add_state{
 Ui:add_widget{
 	state = "chargen/misc",
 	widget = function() return Widgets.Uitransition("Animation profile", "chargen/misc/animation") end}
-
-Ui:add_widget{
-	state = "chargen/misc",
-	widget = function() return Widgets.Uitransition("Hair style", "chargen/misc/hairstyle") end}
-
-Ui:add_widget{
-	state = "chargen/misc",
-	widget = function()
-		local value = Client.chargen:get_hair_color(1)
-		return Widgets.Uiscrollfloat("Hair hue", 0, 1, value, function(w)
-			Client.chargen:set_hair_color(1, w.value)
-		end)
-	end}
-
-Ui:add_widget{
-	state = "chargen/misc",
-	widget = function()
-		local value = Client.chargen:get_hair_color(2)
-		return Widgets.Uiscrollfloat("Hair saturation", 0, 1, value, function(w)
-			Client.chargen:set_hair_color(2, w.value)
-		end)
-	end}
-
-Ui:add_widget{
-	state = "chargen/misc",
-	widget = function()
-		local value = Client.chargen:get_hair_color(3)
-		return Widgets.Uiscrollfloat("Hair lightness", 0, 1, value, function(w)
-			Client.chargen:set_hair_color(3, w.value)
-		end)
-	end}
-
---[[Ui:add_widget{
-	state = "chargen/misc",
-	widget = function() return Widgets.Uitransition("Eye style", "chargen/misc/eyestyle") end}]]
-
-Ui:add_widget{
-	state = "chargen/misc",
-	widget = function()
-		local value = Client.chargen:get_eye_color(1)
-		return Widgets.Uiscrollfloat("Eye hue", 0, 1, value, function(w)
-			Client.chargen:set_eye_color(1, w.value)
-		end)
-	end}
-
-Ui:add_widget{
-	state = "chargen/misc",
-	widget = function()
-		local value = Client.chargen:get_eye_color(2)
-		return Widgets.Uiscrollfloat("Eye saturation", 0, 1, value, function(w)
-			Client.chargen:set_eye_color(2, w.value)
-		end)
-	end}
-
-Ui:add_widget{
-	state = "chargen/misc",
-	widget = function()
-		local value = Client.chargen:get_eye_color(3)
-		return Widgets.Uiscrollfloat("Eye lightness", 0, 1, value, function(w)
-			Client.chargen:set_eye_color(3, w.value)
-		end)
-	end}
 
 Ui:add_widget{
 	state = "chargen/misc",
@@ -382,39 +463,6 @@ Ui:add_state{
 			end)
 			widget.profile = v[2]
 			if Client.chargen:get_animation_profile() == widget.style then
-				widget.value = true
-			end
-			table.insert(widgets, widget)
-		end
-		return widgets
-	end,
-	input_post = chargen_input,
-	update = chargen_update}
-
-------------------------------------------------------------------------------
-
-Ui:add_state{
-	state = "chargen/misc/hairstyle",
-	label = "Select hair style",
-	grab = function()
-		return false
-	end,
-	init = function()
-		local widgets = {}
-		local race = Client.chargen:get_race()
-		local spec = Actorspec:find{name = race}
-		if not spec.hair_styles then return end
-		local lst = {}
-		for k,v in pairs(spec.hair_styles) do
-			table.insert(lst, {k, v})
-		end
-		table.sort(lst, function(a,b) return a[1] < b[1] end)
-		for k,v in ipairs(lst) do
-			local widget = Widgets.Uiradio(v[1], "hair", function(w)
-				Client.chargen:set_hair_style(w.style)
-			end)
-			widget.style = v[2]
-			if Client.chargen:get_hair_style() == widget.style then
 				widget.value = true
 			end
 			table.insert(widgets, widget)
