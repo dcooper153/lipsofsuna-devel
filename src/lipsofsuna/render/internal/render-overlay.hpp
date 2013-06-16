@@ -18,8 +18,6 @@
 #ifndef __RENDER_INTERNAL_OVERLAY_HPP__
 #define __RENDER_INTERNAL_OVERLAY_HPP__
 
-#include "render-types.hpp"
-
 class LIRenContainer;
 
 class LIRenOverlay

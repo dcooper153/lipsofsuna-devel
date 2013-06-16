@@ -25,6 +25,9 @@
  */
 
 #include "render-internal.h"
+#include "render-material-utils.hpp"
+#include "render-mesh-builder.hpp"
+#include <OgreMeshManager.h>
 #include <OgreSubMesh.h>
 
 /**

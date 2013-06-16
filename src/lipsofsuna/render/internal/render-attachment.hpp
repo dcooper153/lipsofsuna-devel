@@ -20,11 +20,11 @@
 
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/model.h"
-#include "render-types.hpp"
 #include <OgreTexture.h>
 
 class LIRenModel;
 class LIRenObject;
+class LIRenRender;
 
 class LIRenAttachment
 {

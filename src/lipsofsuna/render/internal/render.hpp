@@ -19,8 +19,8 @@
 #define __RENDER_INTERNAL_RENDER_HPP__
 
 #include "lipsofsuna/paths.h"
-#include "render-types.hpp"
 #include "render-unique-id.hpp"
+#include "../render-types.h"
 #include <OgreRoot.h>
 #include <OgreCamera.h>
 #include <OgreMaterialManager.h>

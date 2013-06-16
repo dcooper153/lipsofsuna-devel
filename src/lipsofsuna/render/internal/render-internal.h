@@ -26,7 +26,6 @@
 #include "render-model.hpp"
 #include "render-object.hpp"
 #include "render-overlay.hpp"
-#include "render-types.hpp"
 #endif
 
 #endif

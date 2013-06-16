@@ -19,7 +19,6 @@
 #define __RENDER_INTERNAL_UNIQUE_ID_HPP__
 
 #include "lipsofsuna/system.h"
-#include "render-types.hpp"
 #include <OgreString.h>
 
 class LIRenUniqueId

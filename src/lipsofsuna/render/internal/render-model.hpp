@@ -20,7 +20,6 @@
 
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
-#include "render-types.hpp"
 
 class LIRenModel
 {

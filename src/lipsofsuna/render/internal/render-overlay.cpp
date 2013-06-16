@@ -25,6 +25,9 @@
  */
 
 #include "render-internal.h"
+#include "render-image-overlay.hpp"
+#include "render-container.hpp"
+#include "render-text-overlay.hpp"
 #include "../font/font.h"
 #include "../font/font-layout.h"
 

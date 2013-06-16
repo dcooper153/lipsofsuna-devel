@@ -18,8 +18,6 @@
 #ifndef __RENDER_INTERNAL_LIGHT_H__
 #define __RENDER_INTERNAL_LIGHT_H__
 
-#include "render-types.hpp"
-
 class LIRenLight
 {
 public:

@@ -19,7 +19,6 @@
 #define __RENDER_INTERNAL_IMAGE_TEXT_HPP__
 
 #include "lipsofsuna/system.h"
-#include "render-types.hpp"
 #include "render-base-overlay.hpp"
 #include <OgreOverlayElement.h>
 #include <OgreTextAreaOverlayElement.h>
