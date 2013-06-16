@@ -12,6 +12,7 @@ local Camera = require("system/camera")
 local Class = require("system/class")
 local Color = require("system/color")
 local Json = require("system/json")
+local ImageMerger = require("system/image-merger")
 local Model = require("system/model")
 local ModelBuilder = require("character/model-builder")
 local ModelMerger = require("system/model-merger")
@@ -57,7 +58,8 @@ Chargen.init = function(self, standalone)
 	self.data.rotation = 0
 	self.data.translation = Vector(0.3, 1.8, -2)
 	-- Create the object.
-	self.data.merger = ModelMerger()
+	self.data.model_merger = ModelMerger()
+	self.data.image_merger = ImageMerger()
 	self.data.render = RenderObject()
 	self.data.render:set_position(Vector(1, 1, 1))
 	self.data.render:set_visible(true)
@@ -239,13 +241,15 @@ Chargen.update = function(self, secs)
 	if not self.data.active then return end
 	Client.camera_manager:set_camera_mode("chargen")
 	local spec = Actorspec:find{name = self.char.race .. "-player"}
-	-- Build models.
+	-- Build models and textures.
 	if self.data.update_needed then
-		ModelBuilder:build_with_merger(self.data.merger, self:get_build_data())
+		local data = self:get_build_data()
+		ModelBuilder:build_with_merger(self.data.model_merger, data)
+		TextureBuilder:build_with_merger(self.data.image_merger, data)
 		self.data.update_needed = nil
 	end
 	-- Apply models.
-	local model = self.data.merger:pop_model()
+	local model = self.data.model_merger:pop_model()
 	if model then
 		-- Set the new model.
 		local r = RenderModel(model)
@@ -255,7 +259,6 @@ Chargen.update = function(self, secs)
 			self.data.render:add_model(r)
 		end
 		self.data.render.model = r
-		self.data.texture_rebuild_needed = true
 		-- Reset the animation.
 		local args = spec:get_animation_arguments("idle", self.char.animation_profile)
 		self.data.render:animate(args)
@@ -263,14 +266,12 @@ Chargen.update = function(self, secs)
 		local args = RenderUtils:create_scale_animation(spec, self.char.height)
 		if args then self.data.render:animate(args) end
 	end
-	-- Rebuild the textures.
-	-- TODO: Should be done in a different thread.
-	if self.data.texture_rebuild_needed and self.data.render and self.data.render:get_loaded() then
-		local overrides = TextureBuilder:build(self:get_build_data())
-		for k,v in pairs(overrides) do
-			self.data.render:replace_texture(k, v)
+	-- Apply textures.
+	if self.data.render and self.data.render:get_loaded() then
+		local image = self.data.image_merger:pop_image()
+		if image then
+			self.data.render:replace_texture("aer1", image) -- FIXME
 		end
-		self.data.texture_rebuild_needed = nil
 	end
 	-- Update lighting.
 	Client.lighting:update(secs)

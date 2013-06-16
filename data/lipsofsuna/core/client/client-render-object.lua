@@ -280,7 +280,7 @@ end
 -- @param secs Seconds since the last update.
 ClientRenderObject.update = function(self, secs)
 	if not self.initialized then return end
-	-- Handle model rebuilding.
+	-- Handle model and texture rebuilding.
 	--
 	-- Equipment changes can occur frequently when newly appearing actors are
 	-- being setup. Because of that, a delay is used to avoid too many expensive
@@ -293,6 +293,8 @@ ClientRenderObject.update = function(self, secs)
 				-- Build the character model in a separate thread.
 				-- The result is handled in the tick handler below.
 				ModelBuilder:build_for_actor(self.object)
+				-- Build the character texture in a separate thread.
+				TextureBuilder:build_for_actor(self.object)
 			end
 		end
 	end
@@ -306,20 +308,17 @@ ClientRenderObject.update = function(self, secs)
 		if m then
 			self:set_model(m:get_render())
 			self.model.bounding_box = m:get_bounding_box()
-			self.texture_rebuild_needed = true
 		end
 	end
-	-- Handle texture rebuilding.
+	-- Apply built textures.
 	--
-	-- TODO: Should be done in a different thread.
-	if self.texture_rebuild_needed and self:get_loaded() then
-		if self.object.spec.models then
-			local overrides = TextureBuilder:build_for_actor(self.object)
-			for k,v in pairs(overrides) do
-				self:replace_texture(k, v)
-			end
+	-- Textures are built asynchronously similar to models. The build result
+	-- is handled here.
+	if self.object.image_merger and self:get_loaded() then
+		local image = self.object.image_merger:pop_image()
+		if image then
+			self:replace_texture("aer1", image) -- FIXME
 		end
-		self.texture_rebuild_needed = nil
 	end
 end
 

@@ -11,6 +11,7 @@
 local Class = require("system/class")
 local Color = require("system/color")
 local Image = require("system/image")
+local ImageMerger = require("system/image-merger")
 
 --- Builds character textures.
 -- @type TextureBuilder
@@ -18,7 +19,7 @@ local TextureBuilder = Class("TextureBuilder")
 
 --- Builds the textures for the given actor.
 -- @param clss TextureBuilder class.
--- @param object Object whose model to build.
+-- @param object Object whose texture to build.
 -- @return Texture override dictionary.
 TextureBuilder.build_for_actor = function(clss, object)
 	if not object.spec then return end
@@ -29,9 +30,15 @@ TextureBuilder.build_for_actor = function(clss, object)
 		local item = object.inventory:get_object_by_index(v)
 		equipment[k] = item.spec.name
 	end
+	-- Create or reuse the image merger.
+	local merger = object.image_merger
+	if not merger then
+		merger = ImageMerger()
+		object.image_merger = merger
+	end
 	-- Build the character textures.
 	-- The result is handled in the tick handler in event.lua.
-	return clss:build{
+	clss:build_with_merger(merger, {
 		beheaded = object:get_beheaded(),
 		body_scale = object.body_scale,
 		body_style = object.body_style,
@@ -45,14 +52,14 @@ TextureBuilder.build_for_actor = function(clss, object)
 		nudity = Client.options.nudity_enabled,
 		skin_color = Color:ubyte_to_float(object.skin_color),
 		skin_style = object.skin_style,
-		spec = object:get_spec()}
+		spec = object:get_spec()})
 end
 
 --- Builds the mesh for the given object.
 -- @param clss TextureBuilder class.
--- @param args Model building arguments.
--- @return Texture override dictionary.
-TextureBuilder.build = function(clss, args)
+-- @param merger Image merger to use.
+-- @param args Image building arguments.
+TextureBuilder.build_with_merger = function(clss, merger, args)
 	-- Sort equipment by priority.
 	local equipment = {}
 	if args.equipment then
@@ -78,38 +85,39 @@ TextureBuilder.build = function(clss, args)
 			end
 		end
 	end
-	-- Merge the textures.
-	local overrides = {}
-	for basename,blits in pairs(textures) do
-		-- Open the skin texture.
-		local skinspec = args.skin_style and Actorskinspec:find_by_name(args.skin_style)
-		local skin = skinspec and skinspec.textures[1] or basename
-		local base = Main.images:copy_by_name(skin)
-		if base then
-			base:add_hsv(args.skin_color[1], -1 + 2 * args.skin_color[2], -1 + 2 * args.skin_color[3])
-			-- Blit the eye texture.
-			local eye = args.eye_style
-			if eye then
-				local blit = Main.images:copy_by_name(eye)
-				if blit then
-					if args.eye_color then
-						base:blit_hsv_add(blit, args.eye_color[1], -1 + 2 * args.eye_color[2], -1 + 2 * args.eye_color[3])
-					else
-						base:blit(blit)
-					end
-				end
+	-- Set the base texture.
+	local basename = "aer1" -- FIXME
+	local skinspec = args.skin_style and Actorskinspec:find_by_name(args.skin_style)
+	local skinname = skinspec and skinspec.textures[1] or basename
+	local base = Main.images:copy_by_name(skinname)
+	if not base then return end
+	merger:replace(base)
+	if args.skin_color then
+		merger:add_hsv(args.skin_color[1], -1 + 2 * args.skin_color[2], -1 + 2 * args.skin_color[3])
+	end
+	-- Blit the eye texture.
+	local eye = args.eye_style
+	if eye then
+		local blit = Main.images:copy_by_name(eye)
+		if blit then
+			if args.eye_color then
+				merger:blit_hsv_add(blit, args.eye_color[1], -1 + 2 * args.eye_color[2], -1 + 2 * args.eye_color[3])
+			else
+				merger:blit(blit)
 			end
-			-- Blit equipment textures.
-			for k,blitname in ipairs(blits) do
-				local blit = Main.images:copy_by_name(blitname)
-				if blit then
-					base:blit(blit)
-				end
-			end
-			overrides[basename] = base
 		end
 	end
-	return overrides
+	-- Blit the additional textures.
+	local blits = textures[basename]
+	if blits then
+		for k,blitname in ipairs(blits) do
+			local blit = Main.images:copy_by_name(blitname)
+			if blit then
+				merger:blit(blit)
+			end
+		end
+	end
+	merger:finish()
 end
 
 return TextureBuilder
