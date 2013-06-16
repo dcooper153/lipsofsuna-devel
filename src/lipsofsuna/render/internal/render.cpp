@@ -87,22 +87,19 @@ int liren_internal_init (
 	Ogre::String data1 (self->paths->module_data);
 
 	/* Initialize the private data. */
-	self->data = new LIRenRenderData;
-	if (self->data == NULL)
-		return 0;
-	self->data->unload_timer = 0.0f;
-	self->data->container_factory = NULL;
-	self->data->image_factory = NULL;
-	self->data->scaled_factory = NULL;
-	self->data->text_factory = NULL;
-	self->data->mesh_builders = lialg_strdic_new ();
+	self->unload_timer = 0.0f;
+	self->container_factory = NULL;
+	self->image_factory = NULL;
+	self->scaled_factory = NULL;
+	self->text_factory = NULL;
+	self->mesh_builders = lialg_strdic_new ();
 
 	/* Disable console output. */
-	self->data->log = new Ogre::LogManager ();
-	self->data->log->createLog ("render.log", true, false, false);
+	self->log = new Ogre::LogManager ();
+	self->log->createLog ("render.log", true, false, false);
 
 	/* Initialize the Ogre root. */
-	self->data->root = new Ogre::Root("", "", "");
+	self->root = new Ogre::Root("", "", "");
 
 	/* Load plugins. */
 	private_load_plugin (self, "RenderSystem_GL");
@@ -114,8 +111,8 @@ int liren_internal_init (
 		return 0;
 
 	/* Initialize the render system. */
-	self->data->render_system = self->data->root->getRenderSystemByName ("OpenGL Rendering Subsystem");
-	if (!(self->data->render_system->getName () == "OpenGL Rendering Subsystem"))
+	self->render_system = self->root->getRenderSystemByName ("OpenGL Rendering Subsystem");
+	if (!(self->render_system->getName () == "OpenGL Rendering Subsystem"))
 		return 0;
 
 	/* Choose the video mode. */
@@ -123,13 +120,13 @@ int liren_internal_init (
 	Ogre::String video_mode =
 		Ogre::StringConverter::toString (mode->width) + " x " +
 		Ogre::StringConverter::toString (mode->height);
-	self->data->render_system->setConfigOption ("Full Screen", mode->fullscreen? "Yes" : "No");
-	self->data->render_system->setConfigOption ("VSync", mode->sync? "Yes" : "No");
-	self->data->render_system->setConfigOption ("Video Mode", video_mode);
-	self->data->render_system->setConfigOption ("FSAA", fsaa);
+	self->render_system->setConfigOption ("Full Screen", mode->fullscreen? "Yes" : "No");
+	self->render_system->setConfigOption ("VSync", mode->sync? "Yes" : "No");
+	self->render_system->setConfigOption ("Video Mode", video_mode);
+	self->render_system->setConfigOption ("FSAA", fsaa);
 
 	/* Initialize the render window. */
-	self->data->root->setRenderSystem (self->data->render_system);
+	self->root->setRenderSystem (self->render_system);
 
 	/* Initialize custom render system capabilities. */
 	/* This is a debug feature that allows emulating older hardware by setting
@@ -143,7 +140,7 @@ int liren_internal_init (
 		Ogre::RenderSystemCapabilities* caps = rscm->loadParsedCapabilities (capsname);
 		if (caps != NULL)
 		{
-			self->data->root->useCustomRenderSystemCapabilities (caps);
+			self->root->useCustomRenderSystemCapabilities (caps);
 			printf ("NOTE: read rendercaps `%s'\n", capsname.c_str ());
 		}
 		else
@@ -154,7 +151,7 @@ int liren_internal_init (
 	}
 
 	/* Create the main window. */
-	self->data->render_window = self->data->root->initialise (true, "Lips of Suna");
+	self->render_window = self->root->initialise (true, "Lips of Suna");
 	self->mode = *mode;
 	private_update_mode (self);
 
@@ -163,7 +160,7 @@ int liren_internal_init (
 	   realistically expect anyone to write them manually. */
 	if (getenv ("LOS_WRITE_RENDERCAPS"))
 	{
-		const Ogre::RenderSystemCapabilities* caps = self->data->render_system->getCapabilities ();
+		const Ogre::RenderSystemCapabilities* caps = self->render_system->getCapabilities ();
 		Ogre::RenderSystemCapabilitiesSerializer s;
 		Ogre::String capsname = getenv ("LOS_WRITE_RENDERCAPS");
 		Ogre::String filename = data1 + "/debug/" + capsname + ".rendercaps";
@@ -172,40 +169,40 @@ int liren_internal_init (
 	}
 
 	/* Initialize the scene manager. */
-	self->data->scene_manager = self->data->root->createSceneManager("OctreeSceneManager", "DefaultSceneManager");
-	self->data->scene_manager->setAmbientLight (Ogre::ColourValue (0.5, 0.5, 0.5));
-	self->data->scene_manager->setShadowTechnique (Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-	self->data->scene_manager->setShadowTextureSelfShadow (false);
-	self->data->scene_manager->setShadowCasterRenderBackFaces (false);
-	self->data->scene_manager->setShadowFarDistance (50.0f);
-	self->data->scene_manager->setShadowDirLightTextureOffset (0.6f);
+	self->scene_manager = self->root->createSceneManager("OctreeSceneManager", "DefaultSceneManager");
+	self->scene_manager->setAmbientLight (Ogre::ColourValue (0.5, 0.5, 0.5));
+	self->scene_manager->setShadowTechnique (Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+	self->scene_manager->setShadowTextureSelfShadow (false);
+	self->scene_manager->setShadowCasterRenderBackFaces (false);
+	self->scene_manager->setShadowFarDistance (50.0f);
+	self->scene_manager->setShadowDirLightTextureOffset (0.6f);
 	Ogre::LiSPSMShadowCameraSetup* shadow_camera = new Ogre::LiSPSMShadowCameraSetup ();
 	shadow_camera->setOptimalAdjustFactor (2.0f);
-	self->data->scene_manager->setShadowCameraSetup (Ogre::ShadowCameraSetupPtr (shadow_camera));
-	self->data->scene_manager->setShadowTextureCount (3);
-	self->data->scene_manager->setShadowTextureSize (1024);
-	self->data->scene_root = self->data->scene_manager->getRootSceneNode ();
+	self->scene_manager->setShadowCameraSetup (Ogre::ShadowCameraSetupPtr (shadow_camera));
+	self->scene_manager->setShadowTextureCount (3);
+	self->scene_manager->setShadowTextureSize (1024);
+	self->scene_root = self->scene_manager->getRootSceneNode ();
 
 	/* Initialize the camera. */
-	self->data->camera = self->data->scene_manager->createCamera ("Camera");
-	self->data->camera->setNearClipDistance (1);
-	self->data->camera->setFarClipDistance (75);
-	self->data->viewport = self->data->render_window->addViewport (self->data->camera);
-	self->data->viewport->setBackgroundColour (Ogre::ColourValue (0.0f, 0.0f, 0.0f));
-	w = Ogre::Real (self->data->viewport->getActualWidth ());
-	h = Ogre::Real (self->data->viewport->getActualHeight ());
-	self->data->camera->setAspectRatio (w / h);
+	self->camera = self->scene_manager->createCamera ("Camera");
+	self->camera->setNearClipDistance (1);
+	self->camera->setFarClipDistance (75);
+	self->viewport = self->render_window->addViewport (self->camera);
+	self->viewport->setBackgroundColour (Ogre::ColourValue (0.0f, 0.0f, 0.0f));
+	w = Ogre::Real (self->viewport->getActualWidth ());
+	h = Ogre::Real (self->viewport->getActualHeight ());
+	self->camera->setAspectRatio (w / h);
 
 	/* Initialize the user interface. */
-	self->data->overlay_manager = &(Ogre::OverlayManager::getSingleton ());
-	self->data->container_factory = new LIRenContainerFactory;
-	self->data->overlay_manager->addOverlayElementFactory (self->data->container_factory);
-	self->data->image_factory = new LIRenImageOverlayFactory;
-	self->data->overlay_manager->addOverlayElementFactory (self->data->image_factory);
-	self->data->scaled_factory = new LIRenScaledOverlayFactory;
-	self->data->overlay_manager->addOverlayElementFactory (self->data->scaled_factory);
-	self->data->text_factory = new LIRenTextOverlayFactory;
-	self->data->overlay_manager->addOverlayElementFactory (self->data->text_factory);
+	self->overlay_manager = &(Ogre::OverlayManager::getSingleton ());
+	self->container_factory = new LIRenContainerFactory;
+	self->overlay_manager->addOverlayElementFactory (self->container_factory);
+	self->image_factory = new LIRenImageOverlayFactory;
+	self->overlay_manager->addOverlayElementFactory (self->image_factory);
+	self->scaled_factory = new LIRenScaledOverlayFactory;
+	self->overlay_manager->addOverlayElementFactory (self->scaled_factory);
+	self->text_factory = new LIRenTextOverlayFactory;
+	self->overlay_manager->addOverlayElementFactory (self->text_factory);
 
 	/* Create the group for temporary resources. */
 	/* This group is used for temporary resources such as meshes or
@@ -215,14 +212,14 @@ int liren_internal_init (
 	mgr.createResourceGroup (LIREN_RESOURCES_TEMPORARY);
 
 	/* Allow overriding of resources. */
-	self->data->resource_loading_listener = new LIRenResourceLoadingListener (self->paths);
-	mgr.setLoadingListener (self->data->resource_loading_listener);
+	self->resource_loading_listener = new LIRenResourceLoadingListener (self->paths);
+	mgr.setLoadingListener (self->resource_loading_listener);
 
 	/* Inialize texture and material managers. */
-	self->data->texture_manager = &Ogre::TextureManager::getSingleton ();
-	self->data->texture_manager->setDefaultNumMipmaps (5);
-	self->data->material_manager = &Ogre::MaterialManager::getSingleton ();
-	self->data->material_utils = new LIRenMaterialUtils(self);
+	self->texture_manager = &Ogre::TextureManager::getSingleton ();
+	self->texture_manager->setDefaultNumMipmaps (5);
+	self->material_manager = &Ogre::MaterialManager::getSingleton ();
+	self->material_utils = new LIRenMaterialUtils(self);
 
 	return 1;
 }
@@ -230,27 +227,22 @@ int liren_internal_init (
 void liren_internal_deinit (
 	LIRenRender* self)
 {
-	if (self->data != NULL)
-	{
-		/* Free the mesh builders. */
-		/* Some meshes may be being loaded in other threads so the Ogre root
-		   needs to be shut down first to guarantee clean shutdown. */
-		self->data->root->shutdown ();
-		private_garbage_collect_builders (self);
-		lialg_strdic_free (self->data->mesh_builders);
+	/* Free the mesh builders. */
+	/* Some meshes may be being loaded in other threads so the Ogre root
+	   needs to be shut down first to guarantee clean shutdown. */
+	self->root->shutdown ();
+	private_garbage_collect_builders (self);
+	lialg_strdic_free (self->mesh_builders);
 
-		/* Free the Ogre root. */
-		delete self->data->root;
-		delete self->data->resource_loading_listener;
-		delete self->data->material_utils;
-		delete self->data->container_factory;
-		delete self->data->image_factory;
-		delete self->data->scaled_factory;
-		delete self->data->text_factory;
-		delete self->data->log;
-		delete self->data;
-		self->data = NULL;
-	}
+	/* Free the Ogre root. */
+	delete self->root;
+	delete self->resource_loading_listener;
+	delete self->material_utils;
+	delete self->container_factory;
+	delete self->image_factory;
+	delete self->scaled_factory;
+	delete self->text_factory;
+	delete self->log;
 }
 
 /**
@@ -262,8 +254,8 @@ void liren_internal_add_compositor (
 	LIRenRender* self,
 	const char*  name)
 {
-	Ogre::CompositorManager::getSingleton ().addCompositor (self->data->viewport, name);
-	Ogre::CompositorManager::getSingleton ().setCompositorEnabled (self->data->viewport, name, true);
+	Ogre::CompositorManager::getSingleton ().addCompositor (self->viewport, name);
+	Ogre::CompositorManager::getSingleton ().setCompositorEnabled (self->viewport, name, true);
 }
 
 /**
@@ -275,7 +267,7 @@ void liren_internal_remove_compositor (
 	LIRenRender* self,
 	const char*  name)
 {
-	Ogre::CompositorManager::getSingleton ().removeCompositor (self->data->viewport, name);
+	Ogre::CompositorManager::getSingleton ().removeCompositor (self->viewport, name);
 }
 
 /**
@@ -436,8 +428,8 @@ void liren_internal_project (
 	const LIMatVector* world,
 	LIMatVector*       screen)
 {
-	Ogre::Matrix4 proj = self->data->camera->getProjectionMatrix ();
-	Ogre::Matrix4 view = self->data->camera->getViewMatrix ();
+	Ogre::Matrix4 proj = self->camera->getProjectionMatrix ();
+	Ogre::Matrix4 view = self->camera->getViewMatrix ();
 	Ogre::Vector3 w (world->x, world->y, world->z);
 	Ogre::Vector3 s = proj * view * w;
 	screen->x = (0.5f + 0.5f * s.x) * self->mode.width;
@@ -468,14 +460,14 @@ void liren_internal_render (
 	LIRenRender* self)
 {
 	/* Render a frame. */
-	self->data->root->renderOneFrame ();
+	self->root->renderOneFrame ();
 }
 
 int liren_internal_screenshot (
 	LIRenRender* self,
 	const char*  path)
 {
-	self->data->render_window->writeContentsToFile (path);
+	self->render_window->writeContentsToFile (path);
 
 	return 1;
 }
@@ -502,14 +494,14 @@ int liren_internal_update (
 
 	/* Update the backend. */
 	Ogre::WindowEventUtilities::messagePump ();
-	if (self->data->render_window->isClosed ())
+	if (self->render_window->isClosed ())
 		return 0;
 	private_update_mode (self);
 
 	/* Update the aspect ratio of the camera. */
-	Ogre::Real w (self->data->viewport->getActualWidth ());
-	Ogre::Real h (self->data->viewport->getActualHeight ());
-	self->data->camera->setAspectRatio (w / h);
+	Ogre::Real w (self->viewport->getActualWidth ());
+	Ogre::Real h (self->viewport->getActualHeight ());
+	self->camera->setAspectRatio (w / h);
 
 	/* Free unused resources. */
 	/* Ogre internals seem to be sloppy with using resource pointers. At
@@ -517,10 +509,10 @@ int liren_internal_update (
 	   resources. We need to limit unloading to our own resource group. */
 	/* Ogre seems to not have a function for removing unreferenced
 	   resources from a specific group so we need to do it manually. */
-	self->data->unload_timer += secs;
-	if (self->data->unload_timer > 5.0f)
+	self->unload_timer += secs;
+	if (self->unload_timer > 5.0f)
 	{
-		self->data->unload_timer = 0.0f;
+		self->unload_timer = 0.0f;
 		private_unload_unused_resources (self, Ogre::MeshManager::getSingleton ());
 		private_unload_unused_resources (self, Ogre::SkeletonManager::getSingleton ());
 		private_unload_unused_resources (self, Ogre::MaterialManager::getSingleton ());
@@ -544,11 +536,11 @@ void liren_internal_set_anisotropy (
 	if (value != self->anisotropy)
 	{
 		self->anisotropy = value;
-		self->data->material_manager->setDefaultAnisotropy (value);
+		self->material_manager->setDefaultAnisotropy (value);
 		if (value)
-			self->data->material_manager->setDefaultTextureFiltering (Ogre::TFO_ANISOTROPIC);
+			self->material_manager->setDefaultTextureFiltering (Ogre::TFO_ANISOTROPIC);
 		else
-			self->data->material_manager->setDefaultTextureFiltering (Ogre::TFO_BILINEAR);
+			self->material_manager->setDefaultTextureFiltering (Ogre::TFO_BILINEAR);
 		/* TODO: Update texture units? */
 	}
 }
@@ -562,7 +554,7 @@ void liren_internal_set_camera_far (
 	LIRenRender* self,
 	float        value)
 {
-	self->data->camera->setFarClipDistance (value);
+	self->camera->setFarClipDistance (value);
 }
 
 /**
@@ -574,7 +566,7 @@ void liren_internal_set_camera_near (
 	LIRenRender* self,
 	float        value)
 {
-	self->data->camera->setNearClipDistance (value);
+	self->camera->setNearClipDistance (value);
 }
 
 /**
@@ -586,8 +578,8 @@ void liren_internal_set_camera_transform (
 	LIRenRender*          self,
 	const LIMatTransform* value)
 {
-	self->data->camera->setPosition (value->position.x, value->position.y, value->position.z);
-	self->data->camera->setOrientation (Ogre::Quaternion (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z));
+	self->camera->setPosition (value->position.x, value->position.y, value->position.z);
+	self->camera->setOrientation (Ogre::Quaternion (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z));
 }
 
 /**
@@ -599,14 +591,14 @@ void liren_internal_set_material_scheme (
 	LIRenRender* self,
 	const char*  value)
 {
-	self->data->viewport->setMaterialScheme (value);
+	self->viewport->setMaterialScheme (value);
 }
 
 void liren_internal_set_scene_ambient (
 	LIRenRender* self,
 	const float* value)
 {
-	self->data->scene_manager->setAmbientLight (Ogre::ColourValue (value[0], value[1], value[2]));
+	self->scene_manager->setAmbientLight (Ogre::ColourValue (value[0], value[1], value[2]));
 }
 
 /**
@@ -622,22 +614,22 @@ void liren_internal_set_skybox (
 	{
 		try
 		{
-			self->data->scene_manager->setSkyBox (true, value, 10.0f, true);
+			self->scene_manager->setSkyBox (true, value, 10.0f, true);
 			return;
 		}
 		catch (...)
 		{
 		}
 	}
-	self->data->scene_manager->setSkyBox (false, "");
+	self->scene_manager->setSkyBox (false, "");
 }
 
 void liren_internal_get_stats (
 	LIRenRender* self,
 	LIRenStats*  result)
 {
-	result->batch_count = self->data->viewport->_getNumRenderedBatches ();
-	result->face_count = self->data->viewport->_getNumRenderedFaces ();
+	result->batch_count = self->viewport->_getNumRenderedBatches ();
+	result->face_count = self->viewport->_getNumRenderedFaces ();
 	result->material_count = private_count_resources (self, Ogre::MaterialManager::getSingleton ());
 	result->material_count_loaded = private_count_resources_loaded (self, Ogre::MaterialManager::getSingleton ());
 	result->mesh_count = private_count_resources (self, Ogre::MeshManager::getSingleton ());
@@ -649,7 +641,7 @@ void liren_internal_get_stats (
 
 	/* Count entities. */
 	result->entity_count = 0;
-	Ogre::SceneManager::MovableObjectIterator iterator = self->data->scene_manager->getMovableObjectIterator ("Entity");
+	Ogre::SceneManager::MovableObjectIterator iterator = self->scene_manager->getMovableObjectIterator ("Entity");
 	while (iterator.hasMoreElements ())
 	{
 		result->entity_count++;
@@ -673,12 +665,12 @@ void liren_internal_set_title (
 #ifdef HAVE_XLIB
 	Display* display;
 	Window window;
-	self->data->render_window->getCustomAttribute ("DISPLAY", &display);
-	self->data->render_window->getCustomAttribute ("WINDOW", &window);
+	self->render_window->getCustomAttribute ("DISPLAY", &display);
+	self->render_window->getCustomAttribute ("WINDOW", &window);
 	XStoreName (display, window, value);
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	HWND window;
-	self->data->render_window->getCustomAttribute ("WINDOW", &window);
+	self->render_window->getCustomAttribute ("WINDOW", &window);
 	SetWindowText (window, value);
 #else
 	/* TODO */
@@ -690,9 +682,9 @@ int liren_internal_set_videomode (
 	LIRenVideomode* mode)
 {
 	if (mode->fullscreen)
-		self->data->render_window->setFullscreen (true, mode->width, mode->height);
+		self->render_window->setFullscreen (true, mode->width, mode->height);
 	else
-		self->data->render_window->setFullscreen (false, mode->width, mode->height);
+		self->render_window->setFullscreen (false, mode->width, mode->height);
 	return 1;
 }
 
@@ -702,7 +694,7 @@ int liren_internal_get_videomodes (
 	int*             modes_num)
 {
 	/* Count modes. */
-	const Ogre::StringVector& list = self->data->render_system->
+	const Ogre::StringVector& list = self->render_system->
 		getConfigOptions()["Video Mode"].possibleValues;
 	if (!list.size ())
 		return 0;
@@ -773,13 +765,13 @@ static void private_load_plugin (
 
 	try
 	{
-		self->data->root->loadPlugin (path + name);
+		self->root->loadPlugin (path + name);
 	}
 	catch (Ogre::InternalErrorException e)
 	{
 		try
 		{
-			self->data->root->loadPlugin (path + name + Ogre::String("_d"));
+			self->root->loadPlugin (path + name + Ogre::String("_d"));
 		}
 		catch (...)
 		{
@@ -792,7 +784,7 @@ static int private_check_plugin (
 	LIRenRender* self,
 	const char*  name)
 {
-	Ogre::Root::PluginInstanceList ip = self->data->root->getInstalledPlugins ();
+	Ogre::Root::PluginInstanceList ip = self->root->getInstalledPlugins ();
 	for (Ogre::Root::PluginInstanceList::iterator k = ip.begin(); k != ip.end(); k++)
 	{
 		if ((*k)->getName () == name)
@@ -812,12 +804,12 @@ static void private_garbage_collect_builders (
 	/* Ogre will happily leak our manual resource loaders. To avoid them being
 	   permanently leaked, we have stored them a dictionary by mesh name. If
 	   the mesh no longer exists, we free the associated builder. */
-	LIALG_STRDIC_FOREACH (iter, self->data->mesh_builders)
+	LIALG_STRDIC_FOREACH (iter, self->mesh_builders)
 	{
 		Ogre::MeshPtr ptr = mgr.getByName (iter.key, LIREN_RESOURCES_TEMPORARY);
 		if (ptr.isNull ())
 		{
-			lialg_strdic_remove (self->data->mesh_builders, iter.key);
+			lialg_strdic_remove (self->mesh_builders, iter.key);
 			OGRE_DELETE ((LIRenMeshBuilder*) iter.value);
 		}
 	}
@@ -865,10 +857,10 @@ static void private_update_mode (
 	unsigned int w, h, d;
 	int x, y;
 
-	self->data->render_window->getMetrics (w, h, d, x, y);
+	self->render_window->getMetrics (w, h, d, x, y);
 	self->mode.width = w;
 	self->mode.height = h;
-	self->mode.fullscreen = self->data->render_window->isFullScreen ();
+	self->mode.fullscreen = self->render_window->isFullScreen ();
 }
 
 /** @} */

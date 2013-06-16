@@ -63,7 +63,7 @@ LIRenObject::LIRenObject (
 	}
 
 	/* Create the scene node. */
-	node = render->data->scene_root->createChildSceneNode ();
+	node = render->scene_root->createChildSceneNode ();
 	node->setVisible (false);
 
 	/* Add self to the object dictionary. */
@@ -83,7 +83,7 @@ LIRenObject::~LIRenObject ()
 
 	/* Free the scene node. */
 	if (node != NULL)
-		render->data->scene_root->removeAndDestroyChild (node->getName ());
+		render->scene_root->removeAndDestroyChild (node->getName ());
 
 	/* Free the pose. */
 	if (pose_skeleton != NULL)
@@ -318,8 +318,8 @@ void LIRenObject::replace_texture (
 	// FIXME: Why does the Ogre::PF_R8G8B8A8 format not work?
 	Ogre::Image img;
 	img.loadDynamicImage ((Ogre::uchar*) pixels, width, height, 1, Ogre::PF_A8B8G8R8);
-	Ogre::String unique_name = render->data->id.next ();
-	Ogre::TexturePtr texture = render->data->texture_manager->loadImage (unique_name, LIREN_RESOURCES_TEMPORARY, img);
+	Ogre::String unique_name = render->id.next ();
+	Ogre::TexturePtr texture = render->texture_manager->loadImage (unique_name, LIREN_RESOURCES_TEMPORARY, img);
 
 	// Replace in all non-deprecated entities.
 	for (size_t i = 0 ; i < attachments.size () ; i++)
@@ -369,7 +369,7 @@ void LIRenObject::update (
 	   the render distance for the object. */
 	if (render_distance > 0)
 	{
-		float dist2 = node->getSquaredViewDepth (render->data->camera);
+		float dist2 = node->getSquaredViewDepth (render->camera);
 		if (dist2 > render_distance * render_distance)
 			node->setVisible (false);
 		else

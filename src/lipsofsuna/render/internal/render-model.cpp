@@ -106,12 +106,12 @@ void LIRenModel::replace_texture (
 		// Get the material of the submesh.
 		Ogre::SubMesh* submesh = mesh->getSubMesh (submesh_idx);
 		const Ogre::String& submeshmatname = submesh->getMaterialName ();
-		Ogre::MaterialPtr submeshmat = render->data->material_manager->getByName (submeshmatname);
+		Ogre::MaterialPtr submeshmat = render->material_manager->getByName (submeshmatname);
 		if (submeshmat.isNull ())
 			continue;
 
 		// Check if there are replaceable textures.
-		if (!render->data->material_utils->has_overridable_texture (submeshmat, name))
+		if (!render->material_utils->has_overridable_texture (submeshmat, name))
 			continue;
 
 		// Create the replacement texture.
@@ -120,8 +120,8 @@ void LIRenModel::replace_texture (
 		{
 			Ogre::Image img;
 			img.loadDynamicImage ((Ogre::uchar*) pixels, width, height, 1, Ogre::PF_A8B8G8R8);
-			Ogre::String unique_name = render->data->id.next ();
-			texture = render->data->texture_manager->loadImage (unique_name, LIREN_RESOURCES_TEMPORARY, img);
+			Ogre::String unique_name = render->id.next ();
+			texture = render->texture_manager->loadImage (unique_name, LIREN_RESOURCES_TEMPORARY, img);
 		}
 
 		// Create the texture aliases.
@@ -162,7 +162,7 @@ LIMdlModel* LIRenModel::get_model () const
 		return NULL;
 
 	LIRenMeshBuilder* builder = (LIRenMeshBuilder*) lialg_strdic_find (
-		render->data->mesh_builders, mesh->getName ().c_str ());
+		render->mesh_builders, mesh->getName ().c_str ());
 	if (builder == NULL)
 		return NULL;
 
@@ -192,8 +192,8 @@ void LIRenModel::create_mesh (
 	   loader to a dictionary that is searched by mesh name. The render class
 	   will also use the dictionary to garbage collect unused loaders. */
 	LIRenMeshBuilder* builder = new LIRenMeshBuilder (render, model);
-	Ogre::String name = render->data->id.next ();
-	lialg_strdic_insert (render->data->mesh_builders, name.c_str (), builder);
+	Ogre::String name = render->id.next ();
+	lialg_strdic_insert (render->mesh_builders, name.c_str (), builder);
 
 	/* Create the manual mesh. */
 	Ogre::String group = LIREN_RESOURCES_TEMPORARY;

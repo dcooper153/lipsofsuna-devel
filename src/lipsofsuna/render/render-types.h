@@ -38,8 +38,13 @@ enum
 	LIREN_MATERIAL_FLAG_SORTFACES = 0x080000
 };
 
+#ifndef __cplusplus
+typedef void* LIRenRender;
+#else
+class LIRenRender;
+#endif
+
 typedef enum _LIRenFlags LIRenFlags;
-typedef struct _LIRenRender LIRenRender;
 typedef struct _LIRenVideomode LIRenVideomode;
 
 struct _LIRenVideomode

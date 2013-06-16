@@ -43,13 +43,13 @@ Ogre::MaterialPtr LIRenMaterialUtils::create_material (
 	bool existing = false;
 	bool override = true;
 	Ogre::MaterialPtr material;
-	Ogre::String unique_name = render->data->id.next ();
+	Ogre::String unique_name = render->id.next ();
 
 	/* Try to load an existing material. */
 	if (mat->material != NULL && mat->material[0] != '\0')
 	{
 		Ogre::String name = Ogre::String (mat->material);
-		material = render->data->material_manager->getByName (name);
+		material = render->material_manager->getByName (name);
 		if (!material.isNull())
 			existing = true;
 	}
@@ -60,7 +60,7 @@ Ogre::MaterialPtr LIRenMaterialUtils::create_material (
 	   specifying the `diff1' shader, though there should be no reason for that. */
 	if (!existing)
 	{
-		material = render->data->material_manager->getByName ("diff1");
+		material = render->material_manager->getByName ("diff1");
 		if (!material.isNull())
 			existing = true;
 	}
@@ -69,7 +69,7 @@ Ogre::MaterialPtr LIRenMaterialUtils::create_material (
 	if (!existing)
 	{
 		Ogre::String group = LIREN_RESOURCES_TEMPORARY;
-		material = render->data->material_manager->create (unique_name, group);
+		material = render->material_manager->create (unique_name, group);
 		if (mat->flags & LIMDL_MATERIAL_FLAG_TRANSPARENCY)
 			material->setSceneBlending (Ogre::SBT_TRANSPARENT_ALPHA);
 		if (mat->flags & LIMDL_MATERIAL_FLAG_CULLFACE)

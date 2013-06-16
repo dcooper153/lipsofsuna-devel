@@ -59,7 +59,7 @@ LIRenAttachmentEntity::~LIRenAttachmentEntity ()
 	if (entity != NULL)
 	{
 		object->node->detachObject (entity);
-		render->data->scene_manager->destroyEntity (entity);
+		render->scene_manager->destroyEntity (entity);
 	}
 }
 
@@ -85,7 +85,7 @@ LIMdlModel* LIRenAttachmentEntity::get_model () const
 		return NULL;
 
 	LIRenMeshBuilder* builder = (LIRenMeshBuilder*) lialg_strdic_find (
-		render->data->mesh_builders, mesh->getName ().c_str ());
+		render->mesh_builders, mesh->getName ().c_str ());
 	if (builder == NULL)
 		return NULL;
 
@@ -117,7 +117,7 @@ void LIRenAttachmentEntity::remove_model (LIRenModel* model)
 	if (entity != NULL)
 	{
 		object->node->detachObject (entity);
-		render->data->scene_manager->destroyEntity (entity);
+		render->scene_manager->destroyEntity (entity);
 		entity = NULL;
 	}
 
@@ -145,13 +145,13 @@ void LIRenAttachmentEntity::replace_texture (const char* name, Ogre::TexturePtr&
 			continue;
 
 		// Check if there are replaceable textures.
-		if (!render->data->material_utils->has_overridable_texture (submat, name))
+		if (!render->material_utils->has_overridable_texture (submat, name))
 			continue;
 
 		// Create a modified version of the material.
-		Ogre::String new_name = render->data->id.next ();
+		Ogre::String new_name = render->id.next ();
 		Ogre::MaterialPtr material = submat->clone (new_name, true, LIREN_RESOURCES_TEMPORARY);
-		render->data->material_utils->replace_texture (material, name, texture->getName ());
+		render->material_utils->replace_texture (material, name, texture->getName ());
 		subent->setMaterial (material);
 	}
 }
@@ -217,8 +217,8 @@ void LIRenAttachmentEntity::update (float secs)
 	}
 
 	/* Create the entity. */
-	Ogre::String e_name = render->data->id.next ();
-	entity = render->data->scene_manager->createEntity (e_name, mesh->getName (), LIREN_RESOURCES_TEMPORARY);
+	Ogre::String e_name = render->id.next ();
+	entity = render->scene_manager->createEntity (e_name, mesh->getName (), LIREN_RESOURCES_TEMPORARY);
 	object->node->attachObject (entity);
 
 	/* Create the skeleton and its pose buffer. */

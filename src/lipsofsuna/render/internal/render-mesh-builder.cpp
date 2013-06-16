@@ -252,7 +252,7 @@ void LIRenMeshBuilder::step_2_fg (Ogre::Mesh* mesh)
 	for (int i = 0 ; i < model->materials.count ; i++)
 	{
 		/* Create the material. */
-		Ogre::MaterialPtr material = render->data->material_utils->create_material (model->materials.array + i);
+		Ogre::MaterialPtr material = render->material_utils->create_material (model->materials.array + i);
 
 		/* Set the material name of the submesh. */
 		Ogre::SubMesh* submesh = mesh->getSubMesh (i);
@@ -359,7 +359,7 @@ bool LIRenMeshBuilder::create_skeleton (Ogre::Mesh* mesh)
 	}
 
 	/* Create the skeleton. */
-	Ogre::String name (render->data->id.next ());
+	Ogre::String name (render->id.next ());
 	Ogre::ResourcePtr resource = Ogre::SkeletonManager::getSingleton ().create (name, LIREN_RESOURCES_TEMPORARY, true);
 	Ogre::SkeletonPtr skeleton (resource);
 

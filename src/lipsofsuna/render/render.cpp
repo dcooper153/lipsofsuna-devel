@@ -35,7 +35,7 @@ LIRenRender* liren_render_new (
 	LIRenRender* self;
 
 	/* Allocate self. */
-	self = (LIRenRender*) lisys_calloc (1, sizeof (LIRenRender));
+	self = new LIRenRender ();
 	if (self == NULL)
 		return NULL;
 	self->paths = paths;
@@ -139,7 +139,7 @@ void liren_render_free (
 	/* Free the backend. */
 	liren_internal_deinit (self);
 
-	lisys_free (self);
+	delete self;
 }
 
 /**

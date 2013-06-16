@@ -21,8 +21,9 @@
 #include "lipsofsuna/paths.h"
 #include "render-types.hpp"
 
-struct _LIRenRender
+class LIRenRender
 {
+public:
 	int anisotropy;
 	LIAlgRandom random;
 	LIAlgStrdic* fonts;
@@ -32,7 +33,27 @@ struct _LIRenRender
 	LIAlgU32dic* overlays;
 	LIPthPaths* paths;
 	LIRenVideomode mode;
-	LIRenRenderData* data;
+
+	float unload_timer;
+	Ogre::Root* root;
+	Ogre::Camera* camera;
+	Ogre::MaterialManager* material_manager;
+	Ogre::OverlayManager* overlay_manager;
+	Ogre::RenderWindow* render_window;
+	Ogre::RenderSystem* render_system;
+	Ogre::SceneManager* scene_manager;
+	Ogre::SceneNode* scene_root;
+	Ogre::TextureManager* texture_manager;
+	Ogre::Viewport* viewport;
+	Ogre::LogManager* log;
+	LIRenContainerFactory* container_factory;
+	LIRenImageOverlayFactory* image_factory;
+	LIRenScaledOverlayFactory* scaled_factory;
+	LIRenTextOverlayFactory* text_factory;
+	LIRenMaterialUtils* material_utils;
+	LIRenResourceLoadingListener* resource_loading_listener;
+	LIRenUniqueId id;
+	LIAlgStrdic* mesh_builders;
 };
 
 LIAPICALL (int, liren_internal_init, (

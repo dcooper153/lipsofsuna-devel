@@ -35,7 +35,7 @@ LIInpSystem::LIInpSystem (LIInpInput* input, bool grab) :
 {
 	/* Get the window handle. */
 	size_t window = 0;
-	input->render->data->render_window->getCustomAttribute ("WINDOW", &window);
+	input->render->render_window->getCustomAttribute ("WINDOW", &window);
 	OIS::ParamList params;
 	params.insert (std::make_pair (std::string("WINDOW"), Ogre::StringConverter::toString (window)));
 
@@ -112,7 +112,7 @@ void LIInpSystem::update (float secs)
 		/* Update the window size. */
 		int left, top;
 		unsigned int width, height, depth;
-		this->input->render->data->render_window->getMetrics (width, height, depth, left, top);
+		this->input->render->render_window->getMetrics (width, height, depth, left, top);
 		const OIS::MouseState& mouse_state = this->mouse->getMouseState ();
 		mouse_state.width  = width;
 		mouse_state.height = height;
