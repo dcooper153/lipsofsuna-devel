@@ -20,13 +20,11 @@
 
 #include "render.h"
 #include "render-light.h"
-#include "render-message.h"
 #ifdef __cplusplus
 #include "render-model.hpp"
 #include "render-object.hpp"
 #endif
 #include "render-overlay.h"
-#include "render-queue.h"
 #include "render-types.h"
 
 #endif
