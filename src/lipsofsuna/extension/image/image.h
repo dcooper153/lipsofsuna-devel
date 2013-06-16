@@ -34,7 +34,7 @@ LIAPICALL (LIImgImage*, liimg_image_new_from_file, (
 	const char* path));
 
 LIAPICALL (LIImgImage*, liimg_image_new_from_image, (
-	LIImgImage* image));
+	const LIImgImage* image));
 
 LIAPICALL (void, liimg_image_free, (
 	LIImgImage* self));
@@ -72,6 +72,10 @@ LIAPICALL (int, liimg_image_load_dds, (
 LIAPICALL (int, liimg_image_load_png, (
 	LIImgImage* self,
 	const char* path));
+
+LIAPICALL (int, liimg_image_replace, (
+	LIImgImage*       self,
+	const LIImgImage* image));
 
 LIAPICALL (int, liimg_image_save_rgba, (
 	LIImgImage* self,

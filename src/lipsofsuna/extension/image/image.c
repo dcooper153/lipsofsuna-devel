@@ -76,7 +76,7 @@ LIImgImage* liimg_image_new_from_file (
  * \return New image or NULL.
  */
 LIImgImage* liimg_image_new_from_image (
-	LIImgImage* image)
+	const LIImgImage* image)
 {
 	LIImgImage* self;
 
@@ -379,6 +379,33 @@ int liimg_image_load_png (
 	const char* path)
 {
 	return liimg_png_load (path, &self->width, &self->height, &self->pixels);
+}
+
+/**
+ * \brief Replaces the contents of the image with that of another.
+ * \param self Image.
+ * \param image Image.
+ * \return One on success. Zero otherwise.
+ */
+int liimg_image_replace (
+	LIImgImage*       self,
+	const LIImgImage* image)
+{
+	void* pixels = NULL;
+
+	if (image->width && image->height)
+	{
+		pixels = lisys_malloc (4 * image->width * image->height * sizeof (uint8_t));
+		if (pixels == NULL)
+			return 0;
+		memcpy (pixels, image->pixels, 4 * image->width * image->height * sizeof (uint8_t));
+	}
+	lisys_free (self->pixels);
+	self->pixels = pixels;
+	self->width = image->width;
+	self->height = image->height;
+
+	return 1;
 }
 
 /**

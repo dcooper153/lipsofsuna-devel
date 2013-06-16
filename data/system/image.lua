@@ -38,6 +38,16 @@ Image.new = function(clss, file_or_width, height)
 	return self
 end
 
+--- Creates a new image from an internal handle.
+-- @param clss Image class.
+-- @param handle Handle.
+-- @return New image.
+Image.new_from_handle = function(clss, handle)
+	local self = Class.new(clss)
+	self.handle = handle
+	return self
+end
+
 --- Alters the color of the image in the HSV color space.
 -- @param self Image.
 -- @param hue_add Amount to add to hue. The hue range is [0,1].
