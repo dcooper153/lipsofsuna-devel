@@ -19,7 +19,7 @@
 #define __RENDER_INTERNAL_BASE_OVERLAY_HPP__
 
 #include "lipsofsuna/system.h"
-#include "render-types.h"
+#include "render-types.hpp"
 #include <OgreOverlayElement.h>
 
 class LIRenBaseOverlay

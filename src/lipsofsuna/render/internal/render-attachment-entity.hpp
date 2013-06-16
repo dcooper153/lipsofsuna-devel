@@ -21,7 +21,7 @@
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/model.h"
 #include "render-attachment.hpp"
-#include "render-types.h"
+#include "render-types.hpp"
 #include <OgreEntity.h>
 #include <OgreResource.h>
 

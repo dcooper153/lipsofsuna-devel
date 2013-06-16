@@ -25,7 +25,7 @@
  */
 
 #include "lipsofsuna/system.h"
-#include "render.h"
+#include "render.hpp"
 #include "render-attachment-particle.hpp"
 #include "render-object.hpp"
 

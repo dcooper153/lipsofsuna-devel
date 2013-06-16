@@ -15,11 +15,11 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_RENDER_H__
-#define __RENDER_INTERNAL_RENDER_H__
+#ifndef __RENDER_INTERNAL_RENDER_HPP__
+#define __RENDER_INTERNAL_RENDER_HPP__
 
 #include "lipsofsuna/paths.h"
-#include "render-types.h"
+#include "render-types.hpp"
 
 struct _LIRenRender
 {

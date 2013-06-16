@@ -25,7 +25,7 @@
  */
 
 #include "render-internal.h"
-#include "render.h"
+#include "render.hpp"
 
 #define LIGHT_RANGE_MAX 32.0f
 

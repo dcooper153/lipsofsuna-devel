@@ -19,7 +19,7 @@
 #define __RENDER_INTERNAL_SCALED_OVERLAY_FACTORY_HPP__
 
 #include "lipsofsuna/system.h"
-#include "render-types.h"
+#include "render-types.hpp"
 #include "render-scaled-overlay.hpp"
 #include <OgreOverlayElementFactory.h>
 

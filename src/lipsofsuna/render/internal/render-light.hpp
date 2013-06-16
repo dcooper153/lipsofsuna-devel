@@ -18,7 +18,7 @@
 #ifndef __RENDER_INTERNAL_LIGHT_H__
 #define __RENDER_INTERNAL_LIGHT_H__
 
-#include "render-types.h"
+#include "render-types.hpp"
 
 LIAPICALL (LIRenLight*, liren_light_new, (
 	LIRenRender* render,

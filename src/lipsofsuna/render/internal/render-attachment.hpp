@@ -20,7 +20,7 @@
 
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/model.h"
-#include "render-types.h"
+#include "render-types.hpp"
 
 class LIRenAttachment
 {

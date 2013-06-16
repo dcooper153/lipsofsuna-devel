@@ -15,8 +15,8 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_TYPES_H__
-#define __RENDER_INTERNAL_TYPES_H__
+#ifndef __RENDER_INTERNAL_TYPES_HPP__
+#define __RENDER_INTERNAL_TYPES_HPP__
 
 #include "lipsofsuna/math.h"
 #include "../render-types.h"
@@ -30,11 +30,7 @@ typedef struct _LIRenMessage LIRenMessage;
 typedef struct _LIRenOverlay LIRenOverlay;
 typedef struct _LIRenQueue LIRenQueue;
 typedef struct _LIRenRenderData LIRenRenderData;
-#ifndef __cplusplus
-typedef void* LIRenModel;
-#endif
 
-#ifdef __cplusplus
 class LIRenAttachment;
 class LIRenMaterialUtils;
 class LIRenModel;
@@ -110,6 +106,5 @@ struct _LIRenRenderData
 	LIRenUniqueId id;
 	LIAlgStrdic* mesh_builders;
 };
-#endif
 
 #endif

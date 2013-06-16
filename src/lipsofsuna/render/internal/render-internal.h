@@ -18,13 +18,15 @@
 #ifndef __RENDER_INTERNAL_INTERNAL_H__
 #define __RENDER_INTERNAL_INTERNAL_H__
 
-#include "render.h"
-#include "render-light.h"
-#ifdef __cplusplus
+#ifndef __cplusplus
+#error "Only usable from C++"
+#else
+#include "render.hpp"
+#include "render-light.hpp"
 #include "render-model.hpp"
 #include "render-object.hpp"
+#include "render-overlay.hpp"
+#include "render-types.hpp"
 #endif
-#include "render-overlay.h"
-#include "render-types.h"
 
 #endif

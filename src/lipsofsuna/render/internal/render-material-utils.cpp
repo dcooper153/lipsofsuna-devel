@@ -25,7 +25,7 @@
  */
 
 #include "lipsofsuna/system.h"
-#include "render.h"
+#include "render.hpp"
 #include "render-material-utils.hpp"
 
 LIRenMaterialUtils::LIRenMaterialUtils (LIRenRender* render) : render(render)

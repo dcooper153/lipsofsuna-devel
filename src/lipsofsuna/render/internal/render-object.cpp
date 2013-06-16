@@ -26,7 +26,7 @@
 
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
-#include "render.h"
+#include "render.hpp"
 #include "render-attachment-entity.hpp"
 #include "render-attachment-particle.hpp"
 #include "render-model.hpp"

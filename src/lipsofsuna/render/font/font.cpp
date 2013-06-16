@@ -25,7 +25,7 @@
  */
 
 #include "lipsofsuna/system.h"
-#include "../internal/render-types.h"
+#include "../internal/render-types.hpp"
 #include "font.h"
 #include <OgreFont.h>
 #include <OgreFontManager.h>

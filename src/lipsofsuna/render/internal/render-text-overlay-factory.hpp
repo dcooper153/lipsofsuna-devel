@@ -19,7 +19,7 @@
 #define __RENDER_INTERNAL_TEXT_OVERLAY_FACTORY_HPP__
 
 #include "lipsofsuna/system.h"
-#include "render-types.h"
+#include "render-types.hpp"
 #include "render-text-overlay.hpp"
 #include <OgreOverlayElementFactory.h>
 

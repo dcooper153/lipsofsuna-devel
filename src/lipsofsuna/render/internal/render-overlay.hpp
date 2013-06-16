@@ -15,10 +15,10 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_OVERLAY_H__
-#define __RENDER_INTERNAL_OVERLAY_H__
+#ifndef __RENDER_INTERNAL_OVERLAY_HPP__
+#define __RENDER_INTERNAL_OVERLAY_HPP__
 
-#include "render-types.h"
+#include "render-types.hpp"
 
 LIAPICALL (LIRenOverlay*, liren_overlay_new, (
 	LIRenRender* render));

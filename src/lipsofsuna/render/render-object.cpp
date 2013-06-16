@@ -24,7 +24,7 @@
 
 #include "lipsofsuna/system.h"
 #include "render-object.h"
-#include "internal/render.h"
+#include "internal/render.hpp"
 #include "internal/render-object.hpp"
 
 /**

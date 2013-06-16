@@ -18,7 +18,7 @@
 #ifndef __RENDER_INTERNAL_OBJECT_HPP__
 #define __RENDER_INTERNAL_OBJECT_HPP__
 
-#include "render-types.h"
+#include "render-types.hpp"
 
 class LIRenObject
 {

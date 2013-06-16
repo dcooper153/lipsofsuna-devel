@@ -53,7 +53,7 @@ void liren_render_overlay_free (
 {
 	LIRenOverlay* overlay;
 
-	overlay = lialg_u32dic_find (self->overlays, id);
+	overlay = (LIRenOverlay*) lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
 		liren_overlay_free (overlay);
 }
@@ -69,7 +69,7 @@ void liren_render_overlay_clear (
 {
 	LIRenOverlay* overlay;
 
-	overlay = lialg_u32dic_find (self->overlays, id);
+	overlay = (LIRenOverlay*) lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
 		liren_overlay_clear (overlay);
 }
@@ -101,7 +101,7 @@ void liren_render_overlay_add_text (
 {
 	LIRenOverlay* overlay;
 
-	overlay = lialg_u32dic_find (self->overlays, id);
+	overlay = (LIRenOverlay*) lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
 		liren_overlay_add_text (overlay, shader, font, text, color, scissor, pos, size, align);
 }
@@ -118,7 +118,7 @@ void liren_render_overlay_add_scaled (
 {
 	LIRenOverlay* overlay;
 
-	overlay = lialg_u32dic_find (self->overlays, id);
+	overlay = (LIRenOverlay*) lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
 		liren_overlay_add_scaled (overlay, material_name, dest_position, dest_size, source_position, source_tiling, color);
 }
@@ -138,7 +138,7 @@ void liren_render_overlay_add_tiled (
 {
 	LIRenOverlay* overlay;
 
-	overlay = lialg_u32dic_find (self->overlays, id);
+	overlay = (LIRenOverlay*) lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
 		liren_overlay_add_tiled (overlay, material_name, dest_clip, dest_position, dest_size, source_position, source_tiling, rotation_angle, rotation_center, color);
 }
@@ -159,8 +159,8 @@ void liren_render_overlay_add_overlay (
 	LIRenOverlay* overlay1;
 	LIRenOverlay* overlay2;
 
-	overlay1 = lialg_u32dic_find (self->overlays, id);
-	overlay2 = lialg_u32dic_find (self->overlays, overlay);
+	overlay1 = (LIRenOverlay*) lialg_u32dic_find (self->overlays, id);
+	overlay2 = (LIRenOverlay*) lialg_u32dic_find (self->overlays, overlay);
 	if (overlay1 != NULL && overlay2 != NULL)
 		liren_overlay_add_overlay (overlay1, overlay2, layer);
 }
@@ -179,8 +179,8 @@ void liren_render_overlay_remove_overlay (
 	LIRenOverlay* overlay1;
 	LIRenOverlay* overlay2;
 
-	overlay1 = lialg_u32dic_find (self->overlays, id);
-	overlay2 = lialg_u32dic_find (self->overlays, overlay);
+	overlay1 = (LIRenOverlay*) lialg_u32dic_find (self->overlays, id);
+	overlay2 = (LIRenOverlay*) lialg_u32dic_find (self->overlays, overlay);
 	if (overlay1 != NULL && overlay2 != NULL)
 		liren_overlay_remove_overlay (overlay1, overlay2);
 }
@@ -196,7 +196,7 @@ void liren_render_overlay_set_alpha (
 {
 	LIRenOverlay* overlay;
 
-	overlay = lialg_u32dic_find (self->overlays, id);
+	overlay = (LIRenOverlay*) lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
 		liren_overlay_set_alpha (overlay, value);
 }
@@ -214,7 +214,7 @@ void liren_render_overlay_set_depth (
 {
 	LIRenOverlay* overlay;
 
-	overlay = lialg_u32dic_find (self->overlays, id);
+	overlay = (LIRenOverlay*) lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
 		liren_overlay_set_depth (overlay, value);
 }
@@ -232,7 +232,7 @@ void liren_render_overlay_set_floating (
 {
 	LIRenOverlay* overlay;
 
-	overlay = lialg_u32dic_find (self->overlays, id);
+	overlay = (LIRenOverlay*) lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
 		liren_overlay_set_floating (overlay, value);
 }
@@ -250,7 +250,7 @@ void liren_render_overlay_set_position (
 {
 	LIRenOverlay* overlay;
 
-	overlay = lialg_u32dic_find (self->overlays, id);
+	overlay = (LIRenOverlay*) lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
 		liren_overlay_set_position (overlay, value);
 }
@@ -268,7 +268,7 @@ void liren_render_overlay_set_visible (
 {
 	LIRenOverlay* overlay;
 
-	overlay = lialg_u32dic_find (self->overlays, id);
+	overlay = (LIRenOverlay*) lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
 		liren_overlay_set_visible (overlay, value);
 }

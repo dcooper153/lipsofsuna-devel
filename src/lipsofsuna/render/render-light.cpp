@@ -68,7 +68,7 @@ void liren_render_light_free (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_free (light);
 }
@@ -86,7 +86,7 @@ void liren_render_light_set_ambient (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_ambient (light, value);
 }
@@ -104,7 +104,7 @@ void liren_render_light_set_diffuse (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_diffuse (light, value);
 }
@@ -122,7 +122,7 @@ void liren_render_light_set_directional (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_directional (light, value);
 }
@@ -140,7 +140,7 @@ void liren_render_light_set_enabled (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_enabled (light, value);
 }
@@ -158,7 +158,7 @@ void liren_render_light_set_equation (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_equation (light, value);
 }
@@ -176,7 +176,7 @@ void liren_render_light_set_priority (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_priority (light, value);
 }
@@ -194,7 +194,7 @@ void liren_render_light_set_shadow (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_shadow (light, value);
 }
@@ -212,7 +212,7 @@ void liren_render_light_set_shadow_far (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_shadow_far (light, value);
 }
@@ -230,7 +230,7 @@ void liren_render_light_set_shadow_near (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_shadow_near (light, value);
 }
@@ -248,7 +248,7 @@ void liren_render_light_set_specular (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_specular (light, value);
 }
@@ -266,7 +266,7 @@ void liren_render_light_set_spot_cutoff (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_spot_cutoff (light, value);
 }
@@ -284,7 +284,7 @@ void liren_render_light_set_spot_exponent (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_spot_exponent (light, value);
 }
@@ -302,7 +302,7 @@ void liren_render_light_get_transform (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_get_transform (light, value);
 }
@@ -320,7 +320,7 @@ void liren_render_light_set_transform (
 {
 	LIRenLight* light;
 
-	light = lialg_u32dic_find (self->lights, id);
+	light = (LIRenLight*) lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_transform (light, value);
 }
