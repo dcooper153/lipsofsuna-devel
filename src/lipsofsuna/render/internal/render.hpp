@@ -24,10 +24,11 @@
 class LIRenRender
 {
 public:
-	int init (
+	LIRenRender (
+		LIPthPaths*     paths,
 		LIRenVideomode* mode);
 
-	void deinit ();
+	~LIRenRender ();
 
 	void add_compositor (
 		const char* name);
