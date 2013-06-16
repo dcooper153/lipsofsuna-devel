@@ -18,6 +18,11 @@
 #ifndef __RENDER_INTERNAL_LIGHT_H__
 #define __RENDER_INTERNAL_LIGHT_H__
 
+#include "lipsofsuna/math.h"
+#include <OgreLight.h>
+
+class LIRenRender;
+
 class LIRenLight
 {
 public:

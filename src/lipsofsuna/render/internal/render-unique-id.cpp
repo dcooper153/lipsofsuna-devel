@@ -24,7 +24,6 @@
  * @{
  */
 
-#include "render-internal.h"
 #include "render-unique-id.hpp"
 
 LIRenUniqueId::LIRenUniqueId () : index (0)

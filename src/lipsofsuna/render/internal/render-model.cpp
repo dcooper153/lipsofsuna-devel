@@ -24,9 +24,11 @@
  * @{
  */
 
-#include "render-internal.h"
+#include "render.hpp"
 #include "render-material-utils.hpp"
 #include "render-mesh-builder.hpp"
+#include "render-model.hpp"
+#include "render-object.hpp"
 #include <OgreMeshManager.h>
 #include <OgreSubMesh.h>
 

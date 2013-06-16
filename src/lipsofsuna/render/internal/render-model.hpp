@@ -20,6 +20,9 @@
 
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
+#include <OgreMesh.h>
+
+class LIRenRender;
 
 class LIRenModel
 {

@@ -23,7 +23,7 @@
  */
 
 #include "heightmap.h"
-#include "lipsofsuna/render/internal/render-internal.h"
+#include "lipsofsuna/render/internal/render.hpp"
 #include <OgreTerrainGroup.h>
 
 /**

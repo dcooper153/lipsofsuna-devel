@@ -24,10 +24,13 @@
  * @{
  */
 
-#include "render-internal.h"
+#include "render.hpp"
 #include "render-material-utils.hpp"
 #include "render-mesh-builder.hpp"
+#include "render-model.hpp"
+#include "render-object.hpp"
 #include "render-resource-loading-listener.hpp"
+#include "../render-types.h"
 #include "../font/font.h"
 #include "../font/font-layout.h"
 #include "../overlay/render-overlay-manager.hpp"

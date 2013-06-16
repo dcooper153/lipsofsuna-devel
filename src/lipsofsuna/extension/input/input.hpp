@@ -20,7 +20,6 @@
 
 #include "input.h"
 #include "input-system.hpp"
-#include "lipsofsuna/render/internal/render-internal.h"
 
 struct _LIInpInput
 {

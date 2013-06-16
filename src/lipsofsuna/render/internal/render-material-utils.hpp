@@ -20,7 +20,10 @@
 
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/model.h"
-#include <OgreResource.h>
+#include <OgreMaterial.h>
+#include <OgreString.h>
+
+class LIRenRender;
 
 class LIRenMaterialUtils
 {

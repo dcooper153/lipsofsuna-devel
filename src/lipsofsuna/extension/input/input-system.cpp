@@ -23,6 +23,7 @@
  */
 
 #include "lipsofsuna/system.h"
+#include "lipsofsuna/render/internal/render.hpp"
 #include "input.hpp"
 #include "input-system.hpp"
 

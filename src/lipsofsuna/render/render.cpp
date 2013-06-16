@@ -26,7 +26,7 @@
 #include "render.h"
 #include "render-overlay.h"
 #include "font/font.h"
-#include "internal/render-internal.h"
+#include "internal/render.hpp"
 
 LIRenRender* liren_render_new (
 	LIPthPaths*     paths,

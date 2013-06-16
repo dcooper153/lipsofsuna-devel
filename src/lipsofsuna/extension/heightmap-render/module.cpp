@@ -23,7 +23,7 @@
  */
 
 #include "module.h"
-#include "lipsofsuna/render/internal/render-internal.h"
+#include "lipsofsuna/render/internal/render.hpp"
 #include "lipsofsuna/render/internal/render-terrain-material-generator.hpp"
 #include <OgreTerrainGroup.h>
 

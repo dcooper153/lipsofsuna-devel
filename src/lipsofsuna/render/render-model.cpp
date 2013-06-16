@@ -24,7 +24,8 @@
 
 #include "lipsofsuna/system.h"
 #include "render-model.h"
-#include "internal/render-internal.h"
+#include "internal/render.hpp"
+#include "internal/render-model.hpp"
 
 /**
  * \brief Creates a new model from a loaded model buffer.
