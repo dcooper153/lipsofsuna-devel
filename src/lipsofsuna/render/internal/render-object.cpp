@@ -100,10 +100,39 @@ void LIRenObject::add_model (
 	LIRenModel*  model)
 {
 	/* Create the new entity. */
-	attachments.push_back (OGRE_NEW LIRenAttachmentEntity (this, model));
+	LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (this, model);
+	attachments.push_back (attachment);
 	skeleton_rebuild_needed = 1;
+
+	/* Apply the texture aliases. */
+	apply_texture_aliases (attachment);
 }
 
+/**
+ * \brief Adds a permanent texture alias.
+ * \param name Name of the replaced texture.
+ * \param width Width of the new texture.
+ * \param height Height of the new texture.
+ * \param pixels Pixels in the RGBA format.
+ */
+void LIRenObject::add_texture_alias (
+	const char* name,
+	int         width,
+	int         height,
+	const void* pixels)
+{
+	Ogre::TexturePtr texture = create_texture (width, height, pixels);
+	replace_texture (name, texture);
+	texture_aliases[name] = texture;
+}
+
+/**
+ * \brief Adds an animation to an animation channel.
+ * \param channel Channel number.
+ * \param keep Non-zero to try to avoid replacing existing animations.
+ * \param info Pose channel.
+ * \return One on success. Zero otherwise.
+ */
 int LIRenObject::channel_animate (
 	int                     channel,
 	int                     keep,
@@ -245,10 +274,14 @@ void LIRenObject::model_changed (
 	{
 		if (attachments[i]->has_model (model))
 		{
+			/* Create a new attachment. */
 			LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (this, model);
 			attachments[i]->set_replacer (attachment);
 			attachments.insert (attachments.begin () + i, attachment);
 			i++;
+
+			/* Apply the texture aliases. */
+			apply_texture_aliases (attachment);
 		}
 	}
 }
@@ -289,10 +322,14 @@ void LIRenObject::replace_model (
 	{
 		if (attachments[i]->has_model (model_old))
 		{
+			/* Create a replacement attachment. */
 			LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (this, model_new);
 			attachments[i]->set_replacer (attachment);
 			attachments.insert (attachments.begin () + i, attachment);
 			skeleton_rebuild_needed = 1;
+
+			/* Apply the texture aliases. */
+			apply_texture_aliases (attachment);
 			return;
 		}
 	}
@@ -314,19 +351,8 @@ void LIRenObject::replace_texture (
 	int         height,
 	const void* pixels)
 {
-	// Create the new texture.
-	// FIXME: Why does the Ogre::PF_R8G8B8A8 format not work?
-	Ogre::Image img;
-	img.loadDynamicImage ((Ogre::uchar*) pixels, width, height, 1, Ogre::PF_A8B8G8R8);
-	Ogre::String unique_name = render->id.next ();
-	Ogre::TexturePtr texture = render->texture_manager->loadImage (unique_name, LIREN_RESOURCES_TEMPORARY, img);
-
-	// Replace in all non-deprecated entities.
-	for (size_t i = 0 ; i < attachments.size () ; i++)
-	{
-		if (!attachments[i]->get_replacer ())
-			attachments[i]->replace_texture (name, texture);
-	}
+	Ogre::TexturePtr texture = create_texture (width, height, pixels);
+	replace_texture (name, texture);
 }
 
 void LIRenObject::update (
@@ -454,6 +480,9 @@ int LIRenObject::set_model (
 		attachments[i]->set_replacer (attachment);
 	attachments.push_back (attachment);
 
+	/* Apply the texture aliases. */
+	apply_texture_aliases (attachment);
+
 	return 1;
 }
 
@@ -536,6 +565,14 @@ void LIRenObject::set_transform (
 
 /*****************************************************************************/
 
+void LIRenObject::apply_texture_aliases (
+	LIRenAttachment* attachment)
+{
+	std::map<Ogre::String, Ogre::TexturePtr>::iterator iter;
+	for (iter = texture_aliases.begin () ; iter != texture_aliases.end () ; ++iter)
+		attachment->replace_texture (iter->first.c_str (), iter->second);
+}
+
 LIMdlPose* LIRenObject::channel_animate (
 	LIMdlPose*              pose,
 	int                     channel,
@@ -573,6 +610,15 @@ void LIRenObject::channel_fade (
 {
 	if (pose != NULL)
 		limdl_pose_fade_channel (pose, channel, time);
+}
+
+Ogre::TexturePtr LIRenObject::create_texture (int width, int height, const void* pixels) const
+{
+	// FIXME: Why does the Ogre::PF_R8G8B8A8 format not work?
+	Ogre::Image img;
+	img.loadDynamicImage ((Ogre::uchar*) pixels, width, height, 1, Ogre::PF_A8B8G8R8);
+	Ogre::String unique_name = render->id.next ();
+	return render->texture_manager->loadImage (unique_name, LIREN_RESOURCES_TEMPORARY, img);
 }
 
 void LIRenObject::rebuild_skeleton ()
@@ -647,6 +693,16 @@ void LIRenObject::remove_entity (
 
 	/* Free the attachment. */
 	OGRE_DELETE attachment;
+}
+
+void LIRenObject::replace_texture (const char* name, Ogre::TexturePtr& texture)
+{
+	// Replace in all non-deprecated entities.
+	for (size_t i = 0 ; i < attachments.size () ; i++)
+	{
+		if (!attachments[i]->get_replacer ())
+			attachments[i]->replace_texture (name, texture);
+	}
 }
 
 void LIRenObject::update_entity_settings ()

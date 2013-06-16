@@ -1,11 +1,11 @@
---- TODO:doc
+--- Renderable object.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module system.object_render
+-- @module system.render_object
 -- @alias RenderObject
 
 local Animation = require("system/animation")
@@ -21,7 +21,7 @@ end
 
 ------------------------------------------------------------------------------
 
---- TODO:doc
+--- Renderable object.
 -- @type RenderObject
 local RenderObject = Class("RenderObject")
 
@@ -40,6 +40,19 @@ end
 RenderObject.add_model = function(self, model)
 	if not model then return end
 	Los.render_object_add_model(self.handle, model.handle)
+end
+
+--- Adds a permanent texture alias.
+--
+-- The alias causes the graphics engine to invoke replace_texture() with the
+-- given arguments for all current and future models attached to the object.
+-- Contrast to replace_texture(), which only affects the current models.
+--
+-- @param self Render object.
+-- @param name Texture name without extension.
+-- @param image Image.
+RenderObject.add_texture_alias = function(self, name, image)
+	Los.render_object_add_texture_alias(self.handle, name, image.handle)
 end
 
 --- Sets or clears an animation.

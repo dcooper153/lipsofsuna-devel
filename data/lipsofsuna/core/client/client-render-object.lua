@@ -314,10 +314,10 @@ ClientRenderObject.update = function(self, secs)
 	--
 	-- Textures are built asynchronously similar to models. The build result
 	-- is handled here.
-	if self.object.image_merger and self:get_loaded() then
+	if self.object.image_merger then
 		local image = self.object.image_merger:pop_image()
 		if image then
-			self:replace_texture("aer1", image) -- FIXME
+			self:add_texture_alias("aer1", image) -- FIXME
 		end
 	end
 end

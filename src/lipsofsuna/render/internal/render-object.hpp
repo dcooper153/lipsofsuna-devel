@@ -18,7 +18,15 @@
 #ifndef __RENDER_INTERNAL_OBJECT_HPP__
 #define __RENDER_INTERNAL_OBJECT_HPP__
 
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/model.h"
+#include <map>
+#include <vector>
+#include <OgreTexture.h>
+
 class LIRenAttachment;
+class LIRenModel;
+class LIRenRender;
 
 class LIRenObject
 {
@@ -31,6 +39,12 @@ public:
 
 	void add_model (
 		LIRenModel* model);
+
+	void add_texture_alias (
+		const char*  name,
+		int          width,
+		int          height,
+		const void*  pixels);
 
 	int channel_animate (
 		int                     channel,
@@ -120,6 +134,9 @@ public:
 
 private:
 
+	void apply_texture_aliases (
+		LIRenAttachment* attachment);
+
 	LIMdlPose* channel_animate (
 		LIMdlPose*              pose,
 		int                     channel,
@@ -131,10 +148,14 @@ private:
 		int        channel,
 		float      time);
 
+	Ogre::TexturePtr create_texture (int width, int height, const void* pixels) const;
+
 	void rebuild_skeleton ();
 
 	void remove_entity (
 		int index);
+
+	void replace_texture (const char* name, Ogre::TexturePtr& texture);
 
 	void update_entity_settings ();
 
@@ -147,6 +168,7 @@ private:
 	LIMatTransform transform;
 	LIMdlPose* pose;
 	std::vector<LIRenAttachment*> attachments;
+	std::map<Ogre::String, Ogre::TexturePtr> texture_aliases;
 
 // FIXME
 public:

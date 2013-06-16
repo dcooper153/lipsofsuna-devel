@@ -267,10 +267,10 @@ Chargen.update = function(self, secs)
 		if args then self.data.render:animate(args) end
 	end
 	-- Apply textures.
-	if self.data.render and self.data.render:get_loaded() then
+	if self.data.render then
 		local image = self.data.image_merger:pop_image()
 		if image then
-			self.data.render:replace_texture("aer1", image) -- FIXME
+			self.data.render:add_texture_alias("aer1", image) -- FIXME
 		end
 	end
 	-- Update lighting.

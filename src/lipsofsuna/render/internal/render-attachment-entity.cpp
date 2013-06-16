@@ -131,36 +131,22 @@ void LIRenAttachmentEntity::remove_model (LIRenModel* model)
 
 void LIRenAttachmentEntity::replace_texture (const char* name, Ogre::TexturePtr& texture)
 {
-	// TODO: Queue if not loaded yet.
 	if (!loaded)
-		return;
-
-	if (mesh.isNull () || entity == NULL)
-		return;
-
-	for (size_t subent_idx = 0 ; subent_idx < entity->getNumSubEntities () ; ++subent_idx)
 	{
-		// Get the material of the subent.
-		Ogre::SubEntity* subent = entity->getSubEntity (subent_idx);
-		Ogre::MaterialPtr submat = subent->getMaterial ();
-		if (submat.isNull ())
-			continue;
-
-		// Check if there are replaceable textures.
-		if (!render->material_utils->has_overridable_texture (submat, name))
-			continue;
-
-		// Create a modified version of the material.
-		Ogre::String new_name = render->id.next ();
-		Ogre::MaterialPtr material = submat->clone (new_name, true, LIREN_RESOURCES_TEMPORARY);
-		render->material_utils->replace_texture (material, name, texture->getName ());
-		subent->setMaterial (material);
+		// Queue if not loaded yet.
+		LIRenTextureReplace repl = { name, texture };
+		queued_texture_replaces.push_back (repl);
+	}
+	else
+	{
+		// Replace if loaded already.
+		replace_texture_now (name, texture);
 	}
 }
 
 void LIRenAttachmentEntity::update (float secs)
 {
-	/* Only needed when background loading dependencies. */
+	/* Check if background loading has finished. */
 	if (loaded)
 		return;
 	if (entity != NULL)
@@ -210,7 +196,7 @@ void LIRenAttachmentEntity::update (float secs)
 		return;
 	}
 
-	/* Wait for the dependencies to load. */
+	// Wait for the dependencies to load.
 	for (size_t i = 0 ; i < resources.size () ; i++)
 	{
 		Ogre::ResourcePtr& resource = resources[i];
@@ -218,12 +204,12 @@ void LIRenAttachmentEntity::update (float secs)
 			return;
 	}
 
-	/* Create the entity. */
+	// Create the entity.
 	Ogre::String e_name = render->id.next ();
 	entity = render->scene_manager->createEntity (e_name, mesh->getName (), LIREN_RESOURCES_TEMPORARY);
 	object->node->attachObject (entity);
 
-	/* Create the skeleton and its pose buffer. */
+	// Create the skeleton and its pose buffer.
 	if (create_skeleton ())
 	{
 		LIMdlModel* model = get_model ();
@@ -236,16 +222,28 @@ void LIRenAttachmentEntity::update (float secs)
 		}
 	}
 
-	/* Set the entity flags. */
+	// Set the entity flags.
 	entity->setCastShadows (object->get_shadow_casting ());
 
-	/* Set entity visibility. */
-	/* If a visible entity is added to a hidden scene node, the entity is
-	   still rendered. Hence, newly added entities needs to be explicitly
-	   hidden or Ogre will render our invisible objects. */
+	// Trigger queued texture replacements.
+	//
+	// This needs to be done before showing the entity in order to avoid
+	// the textures flickering for a few frames.
+	for (size_t i = 0 ; i < queued_texture_replaces.size () ; ++i)
+	{
+		LIRenTextureReplace& repl = queued_texture_replaces[i];
+		replace_texture_now (repl.name, repl.texture);
+	}
+	queued_texture_replaces.clear();
+
+	// Set entity visibility.
+	//
+	// If a visible entity is added to a hidden scene node, the entity is
+	// still rendered. Hence, newly added entities needs to be explicitly
+	// hidden or Ogre will render our invisible objects. */
 	entity->setVisible (object->get_visible ());
 
-	/* Clear the now useless dependency list. */
+	// Clear the now useless dependency list.
 	resources.clear ();
 	loading_mesh = false;
 	loading_deps = false;
@@ -336,6 +334,44 @@ bool LIRenAttachmentEntity::create_skeleton ()
 	skeleton->setBindingPose ();
 
 	return true;
+}
+
+void LIRenAttachmentEntity::replace_texture_now (const Ogre::String& name, Ogre::TexturePtr& texture)
+{
+	if (mesh.isNull () || entity == NULL)
+		return;
+
+	// Translate the name if already replaced before.
+	std::map<Ogre::String, Ogre::String>::const_iterator iter;
+	iter = applied_texture_replaces.find(name);
+	Ogre::String real_name;
+	if (iter != applied_texture_replaces.end())
+		real_name = iter->second;
+	else
+		real_name = name;
+
+	// Save the replaced name for future translations.
+	applied_texture_replaces[name] = texture->getName ();
+
+	// Replace in each submesh.
+	for (size_t subent_idx = 0 ; subent_idx < entity->getNumSubEntities () ; ++subent_idx)
+	{
+		// Get the material of the subent.
+		Ogre::SubEntity* subent = entity->getSubEntity (subent_idx);
+		Ogre::MaterialPtr submat = subent->getMaterial ();
+		if (submat.isNull ())
+			continue;
+
+		// Check if there are replaceable textures.
+		if (!render->material_utils->has_overridable_texture (submat, real_name))
+			continue;
+
+		// Create a modified version of the material.
+		Ogre::String new_name = render->id.next ();
+		Ogre::MaterialPtr material = submat->clone (new_name, true, LIREN_RESOURCES_TEMPORARY);
+		render->material_utils->replace_texture (material, real_name, texture->getName ());
+		subent->setMaterial (material);
+	}
 }
 
 /** @} */

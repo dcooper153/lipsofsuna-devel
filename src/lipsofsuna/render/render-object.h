@@ -35,6 +35,14 @@ LIAPICALL (void, liren_render_object_add_model, (
 	int          id,
 	int          model));
 
+LIAPICALL (void, liren_render_object_add_texture_alias, (
+	LIRenRender* render,
+	int          id,
+	const char*  name,
+	int          width,
+	int          height,
+	const void*  pixels));
+
 LIAPICALL (void, liren_render_object_channel_animate, (
 	LIRenRender*            self,
 	int                     id,
@@ -80,7 +88,6 @@ LIAPICALL (void, liren_render_object_replace_model, (
 	int          id,
 	int          model_old,
 	int          model_new));
-
 
 LIAPICALL (void, liren_render_object_replace_texture, (
 	LIRenRender* render,

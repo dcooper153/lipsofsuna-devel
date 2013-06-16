@@ -21,8 +21,16 @@
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/model.h"
 #include "render-attachment.hpp"
+#include <map>
+#include <vector>
 #include <OgreEntity.h>
 #include <OgreResource.h>
+
+struct LIRenTextureReplace
+{
+	Ogre::String name;
+	Ogre::TexturePtr texture;
+};
 
 class LIRenAttachmentEntity : public LIRenAttachment
 {
@@ -41,6 +49,7 @@ public:
 protected:
 	void clear ();
 	bool create_skeleton ();
+	void replace_texture_now (const Ogre::String& name, Ogre::TexturePtr& texture);
 protected:
 	bool loaded;
 	bool loading_mesh;
@@ -51,6 +60,8 @@ protected:
 	Ogre::MeshPtr mesh;
 	Ogre::SkeletonPtr skeleton;
 	std::vector<Ogre::ResourcePtr> resources;
+	std::vector<LIRenTextureReplace> queued_texture_replaces;
+	std::map<Ogre::String, Ogre::String> applied_texture_replaces;
 };
 
 #endif

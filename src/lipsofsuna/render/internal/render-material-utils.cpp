@@ -137,8 +137,12 @@ bool LIRenMaterialUtils::has_overridable_texture (const Ogre::MaterialPtr& mater
 					continue;
 
 				// Check if the texture matches.
+				//
+				// The first condition is for internally created materials that
+				// are of form "_LOS/id". The second condition is for Ogre
+				// textures whose names are of form "NAME.png".
 				const Ogre::String& filename = state->getTextureName();
-				if (texture_filename_to_name(filename) == name)
+				if (name == filename || texture_filename_to_name(filename) == name)
 					return true;
 			}
 		}
@@ -170,8 +174,12 @@ void LIRenMaterialUtils::replace_texture (Ogre::MaterialPtr& material, const Ogr
 					continue;
 
 				// Check if the texture matches.
+				//
+				// The first condition is for internally created materials that
+				// are of form "_LOS/id". The second condition is for Ogre
+				// textures whose names are of form "NAME.png".
 				const Ogre::String& filename = state->getTextureName();
-				if (texture_filename_to_name(filename) == name)
+				if (filename == name || texture_filename_to_name(filename) == name)
 					state->setTextureName (new_name);
 			}
 		}

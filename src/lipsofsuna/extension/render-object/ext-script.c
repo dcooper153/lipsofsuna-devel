@@ -63,6 +63,23 @@ static void RenderObject_add_model (LIScrArgs* args)
 	}
 }
 
+static void RenderObject_add_texture_alias (LIScrArgs* args)
+{
+	const char* name;
+	LIExtRenderObject* self;
+	LIImgImage* image;
+	LIScrData* value;
+
+	self = args->self;
+	if (liscr_args_geti_string (args, 0, &name) &&
+	    liscr_args_geti_data (args, 1, LIEXT_SCRIPT_IMAGE, &value))
+	{
+		image = liscr_data_get_data (value);
+		liren_render_object_add_texture_alias (self->render, self->id, name,
+			image->width, image->height, image->pixels);
+	}
+}
+
 static void RenderObject_animate (LIScrArgs* args)
 {
 	int additive = 0;
@@ -414,6 +431,7 @@ void liext_script_render_object (
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_new", RenderObject_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_add_model", RenderObject_add_model);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_add_texture_alias", RenderObject_add_texture_alias);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_animate", RenderObject_animate);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_animate_fade", RenderObject_animate_fade);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_clear_animations", RenderObject_clear_animations);

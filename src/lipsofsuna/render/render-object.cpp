@@ -84,6 +84,39 @@ void liren_render_object_add_model (
 	}
 }
 
+/**
+ * \brief Adds a permanent texture alias.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \brief Adds a permanent texture alias.
+ * \param name Name of the replaced texture.
+ * \param width Width of the new texture.
+ * \param height Height of the new texture.
+ * \param pixels Pixels in the RGBA format.
+ */
+void liren_render_object_add_texture_alias (
+	LIRenRender* self,
+	int          id,
+	const char*  name,
+	int          width,
+	int          height,
+	const void*  pixels)
+{
+	LIRenObject* object;
+
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		object->add_texture_alias (name, width, height, pixels);
+}
+
+/**
+ * \brief Adds an animation to an animation channel.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \param channel Channel number.
+ * \param keep Non-zero to try to avoid replacing existing animations.
+ * \param info Pose channel.
+ */
 void liren_render_object_channel_animate (
 	LIRenRender*            self,
 	int                     id,
