@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -23,8 +23,7 @@
  */
 
 #include "lipsofsuna/system.h"
-#include "model.h"
-#include "model-async-merger.h"
+#include "async-merger.h"
 
 static LIMdlModel* private_task_handle (
 	LIMdlAsyncMergerTask* task);
@@ -34,6 +33,10 @@ static void private_task_free (
 
 /*****************************************************************************/
 
+/**
+ * \brief Creates a new merger.
+ * \return New merger.
+ */
 LIMdlAsyncMerger* limdl_async_merger_new ()
 {
 	LIMdlAsyncMerger* self;
@@ -69,6 +72,10 @@ LIMdlAsyncMerger* limdl_async_merger_new ()
 	return self;
 }
 
+/**
+ * \brief Frees the merger.
+ * \param self Merger.
+ */
 void limdl_async_merger_free (
 	LIMdlAsyncMerger* self)
 {
@@ -79,6 +86,12 @@ void limdl_async_merger_free (
 	lisys_free (self);
 }
 
+/**
+ * \brief Queues a model merge task.
+ * \param self Merger.
+ * \param model Model.
+ * \return One if succeeded. False otherwise.
+ */
 int limdl_async_merger_add_model (
 	LIMdlAsyncMerger* self,
 	const LIMdlModel* model)
@@ -87,6 +100,8 @@ int limdl_async_merger_add_model (
 
 	/* Create the task. */
 	task = lisys_calloc (1, sizeof (LIMdlAsyncMergerTask));
+	if (task == NULL)
+		return 0;
 	task->add_model.type = LIMDL_ASYNC_MERGER_ADD_MODEL;
 	task->add_model.model = self->model;
 	task->add_model.model_add = limdl_model_new_copy (model, 0);
@@ -101,6 +116,14 @@ int limdl_async_merger_add_model (
 	return 1;
 }
 
+/**
+ * \brief Queues a morphed model merge task.
+ * \param self Merger.
+ * \param model Model.
+ * \param morph_array Array of morphs.
+ * \param morph_count Number of morphs.
+ * \return One if succeeded. False otherwise.
+ */
 int limdl_async_merger_add_model_morph (
 	LIMdlAsyncMerger*            self,
 	const LIMdlModel*            model,
@@ -111,6 +134,8 @@ int limdl_async_merger_add_model_morph (
 
 	/* Create the task. */
 	task = lisys_calloc (1, sizeof (LIMdlAsyncMergerTask));
+	if (task == NULL)
+		return 0;
 	task->add_model_morph.type = LIMDL_ASYNC_MERGER_ADD_MODEL_MORPH;
 	task->add_model_morph.model = self->model;
 	task->add_model_morph.model_add = limdl_model_new_copy (model, 0);
@@ -132,6 +157,11 @@ int limdl_async_merger_add_model_morph (
 	return 1;
 }
 
+/**
+ * \brief Queues a building finish task.
+ * \param self Merger.
+ * \return One if succeeded. False otherwise.
+ */
 int limdl_async_merger_finish (
 	LIMdlAsyncMerger* self)
 {
@@ -139,6 +169,8 @@ int limdl_async_merger_finish (
 
 	/* Create the task. */
 	task = lisys_calloc (1, sizeof (LIMdlAsyncMergerTask));
+	if (task == NULL)
+		return 0;
 	task->finish.type = LIMDL_ASYNC_MERGER_FINISH;
 	task->finish.model = self->model;
 
@@ -158,12 +190,28 @@ int limdl_async_merger_finish (
 	return 1;
 }
 
+/**
+ * \brief Pops a build result.
+ * \param self Merger.
+ * \return Model if built. NULL otherwise.
+ */
 LIMdlModel* limdl_async_merger_pop_model (
 	LIMdlAsyncMerger* self)
 {
 	return lisys_serial_worker_pop_result (self->worker);
 }
 
+/**
+ * \brief Queues a texture replacement task.
+ * \param self Merger.
+ * \param match_material Material name to match.
+ * \param set_diffuse Diffuse color to set, or NULL to not alter.
+ * \param set_specular Specular color to set, or NULL to not alter.
+ * \param set_material Material name to set, or NULL to not alter.
+ * \param set_textures Texture list to set, or NULL to not alter.
+ * \param set_textures_count Number of textures in the texture list.
+ * \return One if succeeded. False otherwise.
+ */
 int limdl_async_merger_replace_material (
 	LIMdlAsyncMerger* self,
 	const char*       match_material,
@@ -178,6 +226,8 @@ int limdl_async_merger_replace_material (
 
 	/* Create the task. */
 	task = lisys_calloc (1, sizeof (LIMdlAsyncMergerTask));
+	if (task == NULL)
+		return 0;
 	task->replace_material.type = LIMDL_ASYNC_MERGER_REPLACE_MATERIAL;
 	task->replace_material.model = self->model;
 	task->replace_material.match_material = lisys_string_dup (match_material);

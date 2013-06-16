@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,11 +15,11 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __MODEL_ASYNC_MERGER_H__
-#define __MODEL_ASYNC_MERGER_H__
+#ifndef __EXT_MODEL_MERGE_ASYNC_MERGER_H__
+#define __EXT_MODEL_MERGE_ASYNC_MERGER_H__
 
 #include "lipsofsuna/system.h"
-#include "model.h"
+#include "lipsofsuna/model.h"
 
 #define LIMDL_ASYNC_MERGER_SHAPE_LENGTH_MAX 32
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,10 +22,10 @@
  * @{
  */
 
-#include "lipsofsuna/model.h"
-#include "ext-module.h"
+#include "async-merger.h"
+#include "module.h"
 
-static void Merger_new (LIScrArgs* args)
+static void ModelMerger_new (LIScrArgs* args)
 {
 	LIMdlAsyncMerger* self;
 	LIScrData* data;
@@ -36,7 +36,7 @@ static void Merger_new (LIScrArgs* args)
 		return;
 
 	/* Allocate the userdata. */
-	data = liscr_data_new (args->script, args->lua, self, LIEXT_SCRIPT_MERGER, limdl_async_merger_free);
+	data = liscr_data_new (args->script, args->lua, self, LIEXT_SCRIPT_MODEL_MERGER, limdl_async_merger_free);
 	if (data == NULL)
 	{
 		limdl_async_merger_free (self);
@@ -45,7 +45,7 @@ static void Merger_new (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
-static void Merger_add_model (LIScrArgs* args)
+static void ModelMerger_add_model (LIScrArgs* args)
 {
 	LIMdlAsyncMerger* self;
 	LIMdlModel* model;
@@ -61,7 +61,7 @@ static void Merger_add_model (LIScrArgs* args)
 	limdl_async_merger_add_model (self, model);
 }
 
-static void Merger_add_model_morph (LIScrArgs* args)
+static void ModelMerger_add_model_morph (LIScrArgs* args)
 {
 	int i = 0;
 	float value;
@@ -90,7 +90,7 @@ static void Merger_add_model_morph (LIScrArgs* args)
 	limdl_async_merger_add_model_morph (self, model, morphs, i);
 }
 
-static void Merger_finish (LIScrArgs* args)
+static void ModelMerger_finish (LIScrArgs* args)
 {
 	LIMdlAsyncMerger* self;
 
@@ -101,7 +101,7 @@ static void Merger_finish (LIScrArgs* args)
 	limdl_async_merger_finish (self);
 }
 
-static void Merger_pop_model (LIScrArgs* args)
+static void ModelMerger_pop_model (LIScrArgs* args)
 {
 	LIMaiProgram* program;
 	LIMdlAsyncMerger* self;
@@ -134,7 +134,7 @@ static void Merger_pop_model (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
-static void Merger_replace_material (LIScrArgs* args)
+static void ModelMerger_replace_material (LIScrArgs* args)
 {
 	int has_diffuse = 0;
 	int has_specular = 0;
@@ -188,15 +188,15 @@ static void Merger_replace_material (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void liext_script_merger (
+void liext_script_model_merger (
 	LIScrScript* self)
 {
-	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_MERGER, "merger_new", Merger_new);
-	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MERGER, "merger_add_model", Merger_add_model);
-	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MERGER, "merger_add_model_morph", Merger_add_model_morph);
-	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MERGER, "merger_finish", Merger_finish);
-	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MERGER, "merger_pop_model", Merger_pop_model);
-	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MERGER, "merger_replace_material", Merger_replace_material);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_new", ModelMerger_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_add_model", ModelMerger_add_model);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_add_model_morph", ModelMerger_add_model_morph);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_finish", ModelMerger_finish);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_pop_model", ModelMerger_pop_model);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_replace_material", ModelMerger_replace_material);
 }
 
 /** @} */

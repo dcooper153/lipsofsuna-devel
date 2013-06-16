@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,28 +15,44 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODEL_MERGE_MODULE_H__
-#define __EXT_MODEL_MERGE_MODULE_H__
+/**
+ * \addtogroup LIExt Extension
+ * @{
+ * \addtogroup LIExtModelMerge ModelMerge
+ * @{
+ */
 
-#include "lipsofsuna/extension.h"
+#include "module.h"
 
-#define LIEXT_SCRIPT_MERGER "Merger"
-
-typedef struct _LIExtModelMerge LIExtModelMerge;
-struct _LIExtModelMerge
+LIMaiExtensionInfo liext_model_merge_info =
 {
-	LIMaiProgram* program;
+	LIMAI_EXTENSION_VERSION, "ModelMerge",
+	liext_model_merge_new,
+	liext_model_merge_free
 };
 
 LIExtModelMerge* liext_model_merge_new (
-	LIMaiProgram* program);
+	LIMaiProgram* program)
+{
+	LIExtModelMerge* self;
+
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIExtModelMerge));
+	if (self == NULL)
+		return NULL;
+	self->program = program;
+
+	/* Register the class. */
+	liext_script_model_merger (program->script);
+
+	return self;
+}
 
 void liext_model_merge_free (
-	LIExtModelMerge* self);
+	LIExtModelMerge* self)
+{
+	lisys_free (self);
+}
 
-/*****************************************************************************/
-
-void liext_script_merger (
-	LIScrScript* self);
-
-#endif
+/** @} */
+/** @} */
