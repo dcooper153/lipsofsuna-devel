@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,39 +15,51 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_MODEL_H__
-#define __RENDER_INTERNAL_MODEL_H__
+#ifndef __RENDER_INTERNAL_MODEL_HPP__
+#define __RENDER_INTERNAL_MODEL_HPP__
 
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "render-types.h"
 
-LIAPICALL (LIRenModel*, liren_model_new, (
-	LIRenRender* render,
-	LIMdlModel*  model,
-	int          id));
+class LIRenModel
+{
+public:
+	LIRenModel (
+		LIRenRender* render,
+		LIMdlModel*  model,
+		int          id);
 
-LIAPICALL (void, liren_model_free, (
-	LIRenModel* self));
+	~LIRenModel ();
 
-LIAPICALL (void, liren_model_replace_texture, (
-	LIRenModel* self,
-	const char* name,
-	int         width,
-	int         height,
-	const void* pixels));
+	void replace_texture (
+		const char* name,
+		int         width,
+		int         height,
+		const void* pixels);
 
-LIAPICALL (int, liren_model_get_id, (
-	LIRenModel* self));
+	int get_id () const;
 
-LIAPICALL (int, liren_model_get_loaded, (
-	LIRenModel* self));
+	int get_loaded () const;
 
-LIAPICALL (LIMdlModel*, liren_model_get_model, (
-	LIRenModel* self));
+	LIMdlModel* get_model () const;
 
-LIAPICALL (int, liren_model_set_model, (
-	LIRenModel* self,
-	LIMdlModel* model));
+	int set_model (
+		LIMdlModel* model);
+
+private:
+
+	void create_mesh (
+		LIMdlModel* model);
+
+private:
+	int id;
+	LIMdlModel* model;
+	LIRenRender* render;
+
+// FIXME
+public:
+	Ogre::MeshPtr mesh;
+};
 
 #endif

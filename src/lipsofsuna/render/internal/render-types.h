@@ -29,12 +29,15 @@ typedef struct _LIRenLight LIRenLight;
 typedef struct _LIRenMessage LIRenMessage;
 typedef struct _LIRenOverlay LIRenOverlay;
 typedef struct _LIRenQueue LIRenQueue;
-typedef struct _LIRenModel LIRenModel;
 typedef struct _LIRenRenderData LIRenRenderData;
+#ifndef __cplusplus
+typedef void* LIRenModel;
+#endif
 
 #ifdef __cplusplus
 class LIRenAttachment;
 class LIRenMaterialUtils;
+class LIRenModel;
 class LIRenObject;
 #include <OgreBorderPanelOverlayElement.h>
 #include <OgreCamera.h>
@@ -66,27 +69,6 @@ struct _LIRenLight
 	LIMatTransform transform;
 	LIRenRender* render;
 	Ogre::Light* light;
-};
-struct _LIRenModel
-{
-	int id;
-	LIMdlModel* model;
-	LIRenRender* render;
-	Ogre::MeshPtr mesh;
-};
-struct _LIRenObject
-{
-	int id;
-	int visible;
-	int shadow_casting;
-	int skeleton_rebuild_needed;
-	float render_distance;
-	LIMatTransform transform;
-	LIMdlPose* pose;
-	LIMdlPoseSkeleton* pose_skeleton;
-	LIRenRender* render;
-	Ogre::SceneNode* node;
-	std::vector<LIRenAttachment*> attachments;
 };
 struct _LIRenOverlay
 {

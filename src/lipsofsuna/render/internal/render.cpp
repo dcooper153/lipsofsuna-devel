@@ -662,7 +662,7 @@ void liren_internal_get_stats (
 	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		LIRenObject* object = (LIRenObject*) iter.value;
-		result->attachment_count += object->attachments.size ();
+		result->attachment_count += object->get_attachment_count ();
 	}
 }
 

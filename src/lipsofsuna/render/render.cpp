@@ -35,7 +35,7 @@ LIRenRender* liren_render_new (
 	LIRenRender* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIRenRender));
+	self = (LIRenRender*) lisys_calloc (1, sizeof (LIRenRender));
 	if (self == NULL)
 		return NULL;
 	self->paths = paths;
@@ -116,7 +116,7 @@ void liren_render_free (
 	if (self->models != NULL)
 	{
 		LIALG_U32DIC_FOREACH (iter2, self->models)
-			liren_model_free (iter2.value);
+			delete (LIRenModel*) iter2.value;
 		lialg_u32dic_free (self->models);
 	}
 
@@ -132,7 +132,7 @@ void liren_render_free (
 	if (self->fonts != NULL)
 	{
 		LIALG_STRDIC_FOREACH (iter1, self->fonts)
-			lifnt_font_free (iter1.value);
+			lifnt_font_free ((LIFntFont*) iter1.value);
 		lialg_strdic_free (self->fonts);
 	}
 

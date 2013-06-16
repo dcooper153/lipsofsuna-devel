@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -42,11 +42,11 @@ int liren_render_model_new (
 {
 	LIRenModel* self;
 
-	self = liren_model_new (render, model, 0);
+	self = new LIRenModel (render, model, 0);
 	if (self == NULL)
 		return 0;
 
-	return liren_model_get_id (self);
+	return self->get_id ();
 }
 
 /**
@@ -60,9 +60,9 @@ void liren_render_model_free (
 {
 	LIRenModel* model;
 
-	model = lialg_u32dic_find (self->models, id);
+	model = (LIRenModel*) lialg_u32dic_find (self->models, id);
 	if (model != NULL)
-		liren_model_free (model);
+		delete model;
 }
 
 /**
@@ -84,9 +84,9 @@ void liren_render_model_replace_texture (
 {
 	LIRenModel* model;
 
-	model = lialg_u32dic_find (self->models, id);
+	model = (LIRenModel*) lialg_u32dic_find (self->models, id);
 	if (model != NULL)
-		liren_model_replace_texture (model, name, width, height, pixels);
+		model->replace_texture (name, width, height, pixels);
 }
 
 /**
@@ -101,13 +101,18 @@ int liren_render_model_get_loaded (
 {
 	LIRenModel* model;
 
-	model = lialg_u32dic_find (self->models, id);
+	model = (LIRenModel*) lialg_u32dic_find (self->models, id);
 	if (model != NULL)
-		return liren_model_get_loaded (model);
+		return model->get_loaded ();
 	else
 		return 1;
 }
 
+/**
+ * \brief Replaces the contents of the model.
+ * \param id Model ID.
+ * \param model Model.
+ */
 void liren_render_model_set_model (
 	LIRenRender* self,
 	int          id,
@@ -115,9 +120,9 @@ void liren_render_model_set_model (
 {
 	LIRenModel* model_;
 
-	model_ = lialg_u32dic_find (self->models, id);
+	model_ = (LIRenModel*) lialg_u32dic_find (self->models, id);
 	if (model_ != NULL)
-		liren_model_set_model (model_, model);
+		model_->set_model (model);
 }
 
 /** @} */

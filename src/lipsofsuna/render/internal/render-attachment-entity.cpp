@@ -27,6 +27,7 @@
 #include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-attachment-entity.hpp"
+#include "render-model.hpp"
 #include "render-object.hpp"
 #include <OgreSubEntity.h>
 #include <OgreSubMesh.h>

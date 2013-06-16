@@ -29,7 +29,7 @@
 #include "render.h"
 #include "render-attachment-entity.hpp"
 #include "render-attachment-particle.hpp"
-#include "render-model.h"
+#include "render-model.hpp"
 #include "render-object.hpp"
 
 /**

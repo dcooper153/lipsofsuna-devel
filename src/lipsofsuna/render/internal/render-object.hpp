@@ -87,6 +87,8 @@ public:
 		const char*  shader,
 		const float* params);
 
+	int get_attachment_count () const { return attachments.size (); }
+
 	int get_id () const;
 
 	int get_loaded () const;
