@@ -84,13 +84,13 @@ TextureBuilder.build = function(clss, args)
 		-- Open the skin texture.
 		local skinspec = args.skin_style and Actorskinspec:find_by_name(args.skin_style)
 		local skin = skinspec and skinspec.textures[1] or basename
-		local base = Image(skin .. ".png")
+		local base = Main.images:copy_by_name(skin)
 		if base then
 			base:add_hsv(args.skin_color[1], -1 + 2 * args.skin_color[2], -1 + 2 * args.skin_color[3])
 			-- Blit the eye texture.
 			local eye = args.eye_style
 			if eye then
-				local blit = Image(eye .. ".png")
+				local blit = Main.images:copy_by_name(eye)
 				if blit then
 					if args.eye_color then
 						base:blit_hsv_add(blit, args.eye_color[1], -1 + 2 * args.eye_color[2], -1 + 2 * args.eye_color[3])
@@ -101,7 +101,7 @@ TextureBuilder.build = function(clss, args)
 			end
 			-- Blit equipment textures.
 			for k,blitname in ipairs(blits) do
-				local blit = Image(blitname .. ".png")
+				local blit = Main.images:copy_by_name(blitname)
 				if blit then
 					base:blit(blit)
 				end

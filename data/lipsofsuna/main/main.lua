@@ -13,6 +13,7 @@ local Class = require("system/class")
 local Eventhandler = require("system/eventhandler")
 local Hooks = require("system/hooks")
 local Game = require("core/server/game") --FIXME
+local ImageManager = require("main/image-manager")
 local ModelManager = require("main/model-manager")
 local Mod = require("main/mod")
 local Settings = require("main/settings")
@@ -27,6 +28,7 @@ local Main = Class("Main")
 -- @param clss Main class.
 Main.new = function(clss)
 	local self = Class.new(clss)
+	self.images = ImageManager()
 	self.models = ModelManager()
 	self.timing = Timing()
 	self.mods = Mod()
@@ -104,7 +106,8 @@ Main.main = function(self)
 			if Game.initialized then
 				Game.sectors:update(tick)
 			end
-			self.timing:start_action("models")
+			self.timing:start_action("resources")
+			self.images:update(tick)
 			self.models:update(tick)
 			-- Collect garbage.
 			self.timing:start_action("garbage")
@@ -135,7 +138,8 @@ Main.main = function(self)
 				Game.sectors:update(tick)
 			end
 			self.update_hooks:call(tick)
-			self.timing:start_action("models")
+			self.timing:start_action("resources")
+			self.images:update(tick)
 			self.models:update(tick)
 			-- Render the scene.
 			self.timing:start_action("render")
