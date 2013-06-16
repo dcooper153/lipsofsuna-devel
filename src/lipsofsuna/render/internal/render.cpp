@@ -50,69 +50,42 @@
 
 #define LIREN_RENDER_TEXTURE_UNLOAD_TIME 10
 
-static int private_count_resources (
-	LIRenRender*           self,
-	Ogre::ResourceManager& manager);
-
-static int private_count_resources_loaded (
-	LIRenRender*           self,
-	Ogre::ResourceManager& manager);
-
-static void private_garbage_collect_builders (
-	LIRenRender* self);
-
-static void private_load_plugin (
-	LIRenRender* self,
-	const char*  name);
-
-static int private_check_plugin (
-	LIRenRender* self,
-	const char*  name);
-
-static void private_unload_unused_resources (
-	LIRenRender*           self,
-	Ogre::ResourceManager& manager);
-
-static void private_update_mode (
-	LIRenRender*  self);
-
 /*****************************************************************************/
 
-int liren_internal_init (
-	LIRenRender*    self,
+int LIRenRender::init (
 	LIRenVideomode* mode)
 {
 	Ogre::Real w;
 	Ogre::Real h;
-	Ogre::String data1 (self->paths->module_data);
+	Ogre::String data1 (paths->module_data);
 
 	/* Initialize the private data. */
-	self->unload_timer = 0.0f;
-	self->container_factory = NULL;
-	self->image_factory = NULL;
-	self->scaled_factory = NULL;
-	self->text_factory = NULL;
-	self->mesh_builders = lialg_strdic_new ();
+	unload_timer = 0.0f;
+	container_factory = NULL;
+	image_factory = NULL;
+	scaled_factory = NULL;
+	text_factory = NULL;
+	mesh_builders = lialg_strdic_new ();
 
 	/* Disable console output. */
-	self->log = new Ogre::LogManager ();
-	self->log->createLog ("render.log", true, false, false);
+	log = new Ogre::LogManager ();
+	log->createLog ("render.log", true, false, false);
 
 	/* Initialize the Ogre root. */
-	self->root = new Ogre::Root("", "", "");
+	root = new Ogre::Root("", "", "");
 
 	/* Load plugins. */
-	private_load_plugin (self, "RenderSystem_GL");
-	private_load_plugin (self, "Plugin_OctreeSceneManager");
-	private_load_plugin (self, "Plugin_ParticleFX");
+	load_plugin ("RenderSystem_GL");
+	load_plugin ("Plugin_OctreeSceneManager");
+	load_plugin ("Plugin_ParticleFX");
 
 	/* Make sure that the required plugins were loaded. */
-	if (!private_check_plugin (self, "GL RenderSystem"))
+	if (!check_plugin ("GL RenderSystem"))
 		return 0;
 
 	/* Initialize the render system. */
-	self->render_system = self->root->getRenderSystemByName ("OpenGL Rendering Subsystem");
-	if (!(self->render_system->getName () == "OpenGL Rendering Subsystem"))
+	render_system = root->getRenderSystemByName ("OpenGL Rendering Subsystem");
+	if (!(render_system->getName () == "OpenGL Rendering Subsystem"))
 		return 0;
 
 	/* Choose the video mode. */
@@ -120,13 +93,13 @@ int liren_internal_init (
 	Ogre::String video_mode =
 		Ogre::StringConverter::toString (mode->width) + " x " +
 		Ogre::StringConverter::toString (mode->height);
-	self->render_system->setConfigOption ("Full Screen", mode->fullscreen? "Yes" : "No");
-	self->render_system->setConfigOption ("VSync", mode->sync? "Yes" : "No");
-	self->render_system->setConfigOption ("Video Mode", video_mode);
-	self->render_system->setConfigOption ("FSAA", fsaa);
+	render_system->setConfigOption ("Full Screen", mode->fullscreen? "Yes" : "No");
+	render_system->setConfigOption ("VSync", mode->sync? "Yes" : "No");
+	render_system->setConfigOption ("Video Mode", video_mode);
+	render_system->setConfigOption ("FSAA", fsaa);
 
 	/* Initialize the render window. */
-	self->root->setRenderSystem (self->render_system);
+	root->setRenderSystem (render_system);
 
 	/* Initialize custom render system capabilities. */
 	/* This is a debug feature that allows emulating older hardware by setting
@@ -140,7 +113,7 @@ int liren_internal_init (
 		Ogre::RenderSystemCapabilities* caps = rscm->loadParsedCapabilities (capsname);
 		if (caps != NULL)
 		{
-			self->root->useCustomRenderSystemCapabilities (caps);
+			root->useCustomRenderSystemCapabilities (caps);
 			printf ("NOTE: read rendercaps `%s'\n", capsname.c_str ());
 		}
 		else
@@ -151,16 +124,16 @@ int liren_internal_init (
 	}
 
 	/* Create the main window. */
-	self->render_window = self->root->initialise (true, "Lips of Suna");
-	self->mode = *mode;
-	private_update_mode (self);
+	render_window = root->initialise (true, "Lips of Suna");
+	this->mode = *mode;
+	update_mode ();
 
 	/* Dump the render system capabilities. */
 	/* The rendercaps files require all the fields to be present so we can't
 	   realistically expect anyone to write them manually. */
 	if (getenv ("LOS_WRITE_RENDERCAPS"))
 	{
-		const Ogre::RenderSystemCapabilities* caps = self->render_system->getCapabilities ();
+		const Ogre::RenderSystemCapabilities* caps = render_system->getCapabilities ();
 		Ogre::RenderSystemCapabilitiesSerializer s;
 		Ogre::String capsname = getenv ("LOS_WRITE_RENDERCAPS");
 		Ogre::String filename = data1 + "/debug/" + capsname + ".rendercaps";
@@ -169,40 +142,40 @@ int liren_internal_init (
 	}
 
 	/* Initialize the scene manager. */
-	self->scene_manager = self->root->createSceneManager("OctreeSceneManager", "DefaultSceneManager");
-	self->scene_manager->setAmbientLight (Ogre::ColourValue (0.5, 0.5, 0.5));
-	self->scene_manager->setShadowTechnique (Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
-	self->scene_manager->setShadowTextureSelfShadow (false);
-	self->scene_manager->setShadowCasterRenderBackFaces (false);
-	self->scene_manager->setShadowFarDistance (50.0f);
-	self->scene_manager->setShadowDirLightTextureOffset (0.6f);
+	scene_manager = root->createSceneManager("OctreeSceneManager", "DefaultSceneManager");
+	scene_manager->setAmbientLight (Ogre::ColourValue (0.5, 0.5, 0.5));
+	scene_manager->setShadowTechnique (Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+	scene_manager->setShadowTextureSelfShadow (false);
+	scene_manager->setShadowCasterRenderBackFaces (false);
+	scene_manager->setShadowFarDistance (50.0f);
+	scene_manager->setShadowDirLightTextureOffset (0.6f);
 	Ogre::LiSPSMShadowCameraSetup* shadow_camera = new Ogre::LiSPSMShadowCameraSetup ();
 	shadow_camera->setOptimalAdjustFactor (2.0f);
-	self->scene_manager->setShadowCameraSetup (Ogre::ShadowCameraSetupPtr (shadow_camera));
-	self->scene_manager->setShadowTextureCount (3);
-	self->scene_manager->setShadowTextureSize (1024);
-	self->scene_root = self->scene_manager->getRootSceneNode ();
+	scene_manager->setShadowCameraSetup (Ogre::ShadowCameraSetupPtr (shadow_camera));
+	scene_manager->setShadowTextureCount (3);
+	scene_manager->setShadowTextureSize (1024);
+	scene_root = scene_manager->getRootSceneNode ();
 
 	/* Initialize the camera. */
-	self->camera = self->scene_manager->createCamera ("Camera");
-	self->camera->setNearClipDistance (1);
-	self->camera->setFarClipDistance (75);
-	self->viewport = self->render_window->addViewport (self->camera);
-	self->viewport->setBackgroundColour (Ogre::ColourValue (0.0f, 0.0f, 0.0f));
-	w = Ogre::Real (self->viewport->getActualWidth ());
-	h = Ogre::Real (self->viewport->getActualHeight ());
-	self->camera->setAspectRatio (w / h);
+	camera = scene_manager->createCamera ("Camera");
+	camera->setNearClipDistance (1);
+	camera->setFarClipDistance (75);
+	viewport = render_window->addViewport (camera);
+	viewport->setBackgroundColour (Ogre::ColourValue (0.0f, 0.0f, 0.0f));
+	w = Ogre::Real (viewport->getActualWidth ());
+	h = Ogre::Real (viewport->getActualHeight ());
+	camera->setAspectRatio (w / h);
 
 	/* Initialize the user interface. */
-	self->overlay_manager = &(Ogre::OverlayManager::getSingleton ());
-	self->container_factory = new LIRenContainerFactory;
-	self->overlay_manager->addOverlayElementFactory (self->container_factory);
-	self->image_factory = new LIRenImageOverlayFactory;
-	self->overlay_manager->addOverlayElementFactory (self->image_factory);
-	self->scaled_factory = new LIRenScaledOverlayFactory;
-	self->overlay_manager->addOverlayElementFactory (self->scaled_factory);
-	self->text_factory = new LIRenTextOverlayFactory;
-	self->overlay_manager->addOverlayElementFactory (self->text_factory);
+	overlay_manager = &(Ogre::OverlayManager::getSingleton ());
+	container_factory = new LIRenContainerFactory;
+	overlay_manager->addOverlayElementFactory (container_factory);
+	image_factory = new LIRenImageOverlayFactory;
+	overlay_manager->addOverlayElementFactory (image_factory);
+	scaled_factory = new LIRenScaledOverlayFactory;
+	overlay_manager->addOverlayElementFactory (scaled_factory);
+	text_factory = new LIRenTextOverlayFactory;
+	overlay_manager->addOverlayElementFactory (text_factory);
 
 	/* Create the group for temporary resources. */
 	/* This group is used for temporary resources such as meshes or
@@ -212,91 +185,83 @@ int liren_internal_init (
 	mgr.createResourceGroup (LIREN_RESOURCES_TEMPORARY);
 
 	/* Allow overriding of resources. */
-	self->resource_loading_listener = new LIRenResourceLoadingListener (self->paths);
-	mgr.setLoadingListener (self->resource_loading_listener);
+	resource_loading_listener = new LIRenResourceLoadingListener (paths);
+	mgr.setLoadingListener (resource_loading_listener);
 
 	/* Inialize texture and material managers. */
-	self->texture_manager = &Ogre::TextureManager::getSingleton ();
-	self->texture_manager->setDefaultNumMipmaps (5);
-	self->material_manager = &Ogre::MaterialManager::getSingleton ();
-	self->material_utils = new LIRenMaterialUtils(self);
+	texture_manager = &Ogre::TextureManager::getSingleton ();
+	texture_manager->setDefaultNumMipmaps (5);
+	material_manager = &Ogre::MaterialManager::getSingleton ();
+	material_utils = new LIRenMaterialUtils(this);
 
 	return 1;
 }
 
-void liren_internal_deinit (
-	LIRenRender* self)
+void LIRenRender::deinit ()
 {
 	/* Free the mesh builders. */
 	/* Some meshes may be being loaded in other threads so the Ogre root
 	   needs to be shut down first to guarantee clean shutdown. */
-	self->root->shutdown ();
-	private_garbage_collect_builders (self);
-	lialg_strdic_free (self->mesh_builders);
+	root->shutdown ();
+	garbage_collect_builders ();
+	lialg_strdic_free (mesh_builders);
 
 	/* Free the Ogre root. */
-	delete self->root;
-	delete self->resource_loading_listener;
-	delete self->material_utils;
-	delete self->container_factory;
-	delete self->image_factory;
-	delete self->scaled_factory;
-	delete self->text_factory;
-	delete self->log;
+	delete root;
+	delete resource_loading_listener;
+	delete material_utils;
+	delete container_factory;
+	delete image_factory;
+	delete scaled_factory;
+	delete text_factory;
+	delete log;
 }
 
 /**
  * \brief Enables a compositor script.
- * \param self Renderer.
  * \param name Compositor script name.
  */
-void liren_internal_add_compositor (
-	LIRenRender* self,
-	const char*  name)
+void LIRenRender::add_compositor (
+	const char* name)
 {
-	Ogre::CompositorManager::getSingleton ().addCompositor (self->viewport, name);
-	Ogre::CompositorManager::getSingleton ().setCompositorEnabled (self->viewport, name, true);
+	Ogre::CompositorManager::getSingleton ().addCompositor (viewport, name);
+	Ogre::CompositorManager::getSingleton ().setCompositorEnabled (viewport, name, true);
 }
 
 /**
  * \brief Disables a compositor script.
- * \param self Renderer.
  * \param name Compositor script name.
  */
-void liren_internal_remove_compositor (
-	LIRenRender* self,
-	const char*  name)
+void LIRenRender::remove_compositor (
+	const char* name)
 {
-	Ogre::CompositorManager::getSingleton ().removeCompositor (self->viewport, name);
+	Ogre::CompositorManager::getSingleton ().removeCompositor (viewport, name);
 }
 
 /**
  * \brief Finds a model by ID.
- * \param self Renderer.
  * \param id Model ID.
  * \return Model.
  */
-LIRenModel* liren_internal_find_model (
-	LIRenRender* self,
-	int          id)
+LIRenModel* LIRenRender::find_model (
+	int id)
 {
-	return (LIRenModel*) lialg_u32dic_find (self->models, id);
+	return (LIRenModel*) lialg_u32dic_find (models, id);
 }
 
-int liren_internal_layout_text (
-	LIRenRender* self,
-	const char*  font,
-	const char*  text,
-	int          width_limit,
-	int**        result_glyphs,
-	int*         result_glyphs_num)
+int LIRenRender::layout_text (
+	const char* font,
+	const char* text,
+	int         width_limit,
+	int**       result_glyphs,
+	int*        result_glyphs_num)
 {
 	int i;
 	int h;
 	LIFntFont* font_;
 	LIFntLayout* layout;
 
-	font_ = (LIFntFont*) lialg_strdic_find (self->fonts, font);
+	font_ = (LIFntFont*) lialg_strdic_find (fonts, font);
 	if (font_ == NULL)
 		return 0;
 
@@ -331,16 +296,15 @@ int liren_internal_layout_text (
 	return 1;
 }
 
-int liren_internal_load_font (
-	LIRenRender* self,
-	const char*  name,
-	const char*  file,
-	int          size)
+int LIRenRender::load_font (
+	const char* name,
+	const char* file,
+	int         size)
 {
 	LIFntFont* font;
 
 	/* Check for existing. */
-	font = (LIFntFont*) lialg_strdic_find (self->fonts, name);
+	font = (LIFntFont*) lialg_strdic_find (fonts, name);
 	if (font != NULL)
 		return 1;
 
@@ -350,7 +314,7 @@ int liren_internal_load_font (
 		return 0;
 
 	/* Add to the dictionary. */
-	if (!lialg_strdic_insert (self->fonts, name, font))
+	if (!lialg_strdic_insert (fonts, name, font))
 	{
 		lifnt_font_free (font);
 		return 0;
@@ -359,8 +323,7 @@ int liren_internal_load_font (
 	return 1;
 }
 
-void liren_internal_load_resources (
-	LIRenRender* self)
+void LIRenRender::load_resources ()
 {
 	LIAlgList* ptr;
 
@@ -372,9 +335,9 @@ void liren_internal_load_resources (
 	   Out of these, we only want to unload textures and even for them
 	   we want to keep the resource info available at all times. */
 	Ogre::String group = LIREN_RESOURCES_PERMANENT;
-	if (self->paths->paths != NULL)
+	if (paths->paths != NULL)
 	{
-		for (ptr = self->paths->paths ; ptr->next != NULL ; ptr = ptr->next)
+		for (ptr = paths->paths ; ptr->next != NULL ; ptr = ptr->next)
 			{}
 		for ( ; ptr != NULL ; ptr = ptr->prev)
 		{
@@ -387,18 +350,17 @@ void liren_internal_load_resources (
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups ();
 }
 
-int liren_internal_measure_text (
-	LIRenRender* self,
-	const char*  font,
-	const char*  text,
-	int          width_limit,
-	int*         result_width,
-	int*         result_height)
+int LIRenRender::measure_text (
+	const char* font,
+	const char* text,
+	int         width_limit,
+	int*        result_width,
+	int*        result_height)
 {
 	LIFntFont* font_;
 	LIFntLayout* layout;
 
-	font_ = (LIFntFont*) lialg_strdic_find (self->fonts, font);
+	font_ = (LIFntFont*) lialg_strdic_find (fonts, font);
 	if (font_ == NULL)
 		return 0;
 
@@ -419,21 +381,19 @@ int liren_internal_measure_text (
 
 /**
  * \brief Projects a point in the world space to the screen space.
- * \param self Renderer.
  * \param world Point in the world space.
  * \param screen Return location for the point in the screen space.
  */
-void liren_internal_project (
-	LIRenRender*       self,
+void LIRenRender::project (
 	const LIMatVector* world,
 	LIMatVector*       screen)
 {
-	Ogre::Matrix4 proj = self->camera->getProjectionMatrix ();
-	Ogre::Matrix4 view = self->camera->getViewMatrix ();
+	Ogre::Matrix4 proj = camera->getProjectionMatrix ();
+	Ogre::Matrix4 view = camera->getViewMatrix ();
 	Ogre::Vector3 w (world->x, world->y, world->z);
 	Ogre::Vector3 s = proj * view * w;
-	screen->x = (0.5f + 0.5f * s.x) * self->mode.width;
-	screen->y = (0.5f - 0.5f * s.y) * self->mode.height;
+	screen->x = (0.5f + 0.5f * s.x) * mode.width;
+	screen->y = (0.5f - 0.5f * s.y) * mode.height;
 	screen->z = s.z;
 }
 
@@ -443,50 +403,43 @@ void liren_internal_project (
  * This function is called when the video mode changes in Windows. It
  * reloads all data that was lost when the context was erased.
  *
- * \param self Renderer.
  * \param pass Reload pass.
  */
-void liren_internal_reload (
-	LIRenRender* self,
-	int          pass)
+void LIRenRender::reload (
+	int pass)
 {
 }
 
 /**
  * \brief Renders the overlays.
- * \param self Renderer.
  */
-void liren_internal_render (
-	LIRenRender* self)
+void LIRenRender::render ()
 {
 	/* Render a frame. */
-	self->root->renderOneFrame ();
+	root->renderOneFrame ();
 }
 
-int liren_internal_screenshot (
-	LIRenRender* self,
-	const char*  path)
+int LIRenRender::screenshot (
+	const char* path)
 {
-	self->render_window->writeContentsToFile (path);
+	render_window->writeContentsToFile (path);
 
 	return 1;
 }
 
 /**
  * \brief Updates the renderer state.
- * \param self Renderer.
  * \param secs Number of seconds since the last update.
  * \return Nonzero when running, zero if the window was closed.
  */
-int liren_internal_update (
-	LIRenRender* self,
-	float        secs)
+int LIRenRender::update (
+	float secs)
 {
 	LIAlgU32dicIter iter1;
 	LIRenObject* object;
 
 	/* Update objects. */
-	LIALG_U32DIC_FOREACH (iter1, self->objects)
+	LIALG_U32DIC_FOREACH (iter1, objects)
 	{
 		object = (LIRenObject*) iter1.value;
 		object->update (secs);
@@ -494,14 +447,14 @@ int liren_internal_update (
 
 	/* Update the backend. */
 	Ogre::WindowEventUtilities::messagePump ();
-	if (self->render_window->isClosed ())
+	if (render_window->isClosed ())
 		return 0;
-	private_update_mode (self);
+	update_mode ();
 
 	/* Update the aspect ratio of the camera. */
-	Ogre::Real w (self->viewport->getActualWidth ());
-	Ogre::Real h (self->viewport->getActualHeight ());
-	self->camera->setAspectRatio (w / h);
+	Ogre::Real w (viewport->getActualWidth ());
+	Ogre::Real h (viewport->getActualHeight ());
+	camera->setAspectRatio (w / h);
 
 	/* Free unused resources. */
 	/* Ogre internals seem to be sloppy with using resource pointers. At
@@ -509,77 +462,69 @@ int liren_internal_update (
 	   resources. We need to limit unloading to our own resource group. */
 	/* Ogre seems to not have a function for removing unreferenced
 	   resources from a specific group so we need to do it manually. */
-	self->unload_timer += secs;
-	if (self->unload_timer > 5.0f)
+	unload_timer += secs;
+	if (unload_timer > 1.0f)
 	{
-		self->unload_timer = 0.0f;
-		private_unload_unused_resources (self, Ogre::MeshManager::getSingleton ());
-		private_unload_unused_resources (self, Ogre::SkeletonManager::getSingleton ());
-		private_unload_unused_resources (self, Ogre::MaterialManager::getSingleton ());
-		private_unload_unused_resources (self, Ogre::TextureManager::getSingleton ());
-		private_garbage_collect_builders (self);
+		unload_timer = 0.0f;
+		unload_unused_resources (Ogre::MeshManager::getSingleton ());
+		unload_unused_resources (Ogre::SkeletonManager::getSingleton ());
+		unload_unused_resources (Ogre::MaterialManager::getSingleton ());
+		unload_unused_resources (Ogre::TextureManager::getSingleton ());
+		garbage_collect_builders ();
 	}
 
 	return 1;
 }
 
-int liren_internal_get_anisotropy (
-	const LIRenRender* self)
+int LIRenRender::get_anisotropy () const
 {
-	return self->anisotropy;
+	return anisotropy;
 }
 
-void liren_internal_set_anisotropy (
-	LIRenRender* self,
-	int          value)
+void LIRenRender::set_anisotropy (
+	int value)
 {
-	if (value != self->anisotropy)
+	if (value != anisotropy)
 	{
-		self->anisotropy = value;
-		self->material_manager->setDefaultAnisotropy (value);
+		anisotropy = value;
+		material_manager->setDefaultAnisotropy (value);
 		if (value)
-			self->material_manager->setDefaultTextureFiltering (Ogre::TFO_ANISOTROPIC);
+			material_manager->setDefaultTextureFiltering (Ogre::TFO_ANISOTROPIC);
 		else
-			self->material_manager->setDefaultTextureFiltering (Ogre::TFO_BILINEAR);
+			material_manager->setDefaultTextureFiltering (Ogre::TFO_BILINEAR);
 		/* TODO: Update texture units? */
 	}
 }
 
 /**
  * \brief Sets the far plane distance of the camera.
- * \param self Renderer.
  * \param value Distance.
  */
-void liren_internal_set_camera_far (
-	LIRenRender* self,
-	float        value)
+void LIRenRender::set_camera_far (
+	float value)
 {
-	self->camera->setFarClipDistance (value);
+	camera->setFarClipDistance (value);
 }
 
 /**
  * \brief Sets the near plane distance of the camera.
- * \param self Renderer.
  * \param value Distance.
  */
-void liren_internal_set_camera_near (
-	LIRenRender* self,
-	float        value)
+void LIRenRender::set_camera_near (
+	float value)
 {
-	self->camera->setNearClipDistance (value);
+	camera->setNearClipDistance (value);
 }
 
 /**
  * \brief Sets the position and orientation of the camera.
- * \param self Renderer.
  * \param value Transformation.
  */
-void liren_internal_set_camera_transform (
-	LIRenRender*          self,
+void LIRenRender::set_camera_transform (
 	const LIMatTransform* value)
 {
-	self->camera->setPosition (value->position.x, value->position.y, value->position.z);
-	self->camera->setOrientation (Ogre::Quaternion (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z));
+	camera->setPosition (value->position.x, value->position.y, value->position.z);
+	camera->setOrientation (Ogre::Quaternion (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z));
 }
 
 /**
@@ -587,61 +532,56 @@ void liren_internal_set_camera_transform (
  * \param self Renderer.
  * \param value Material scheme name.
  */
-void liren_internal_set_material_scheme (
-	LIRenRender* self,
-	const char*  value)
+void LIRenRender::set_material_scheme (
+	const char* value)
 {
-	self->viewport->setMaterialScheme (value);
+	viewport->setMaterialScheme (value);
 }
 
-void liren_internal_set_scene_ambient (
-	LIRenRender* self,
+void LIRenRender::set_scene_ambient (
 	const float* value)
 {
-	self->scene_manager->setAmbientLight (Ogre::ColourValue (value[0], value[1], value[2]));
+	scene_manager->setAmbientLight (Ogre::ColourValue (value[0], value[1], value[2]));
 }
 
 /**
  * \brief Sets the skybox material.
- * \param self Renderer.
  * \param value Material name.
  */
-void liren_internal_set_skybox (
-	LIRenRender* self,
-	const char*  value)
+void LIRenRender::set_skybox (
+	const char* value)
 {
 	if (value != NULL)
 	{
 		try
 		{
-			self->scene_manager->setSkyBox (true, value, 10.0f, true);
+			scene_manager->setSkyBox (true, value, 10.0f, true);
 			return;
 		}
 		catch (...)
 		{
 		}
 	}
-	self->scene_manager->setSkyBox (false, "");
+	scene_manager->setSkyBox (false, "");
 }
 
-void liren_internal_get_stats (
-	LIRenRender* self,
-	LIRenStats*  result)
+void LIRenRender::get_stats (
+	LIRenStats* result) const
 {
-	result->batch_count = self->viewport->_getNumRenderedBatches ();
-	result->face_count = self->viewport->_getNumRenderedFaces ();
-	result->material_count = private_count_resources (self, Ogre::MaterialManager::getSingleton ());
-	result->material_count_loaded = private_count_resources_loaded (self, Ogre::MaterialManager::getSingleton ());
-	result->mesh_count = private_count_resources (self, Ogre::MeshManager::getSingleton ());
+	result->batch_count = viewport->_getNumRenderedBatches ();
+	result->face_count = viewport->_getNumRenderedFaces ();
+	result->material_count = count_resources (Ogre::MaterialManager::getSingleton ());
+	result->material_count_loaded = count_resources_loaded (Ogre::MaterialManager::getSingleton ());
+	result->mesh_count = count_resources (Ogre::MeshManager::getSingleton ());
 	result->mesh_memory = (int) Ogre::MeshManager::getSingleton ().getMemoryUsage ();
-	result->skeleton_count = private_count_resources (self, Ogre::SkeletonManager::getSingleton ());
-	result->texture_count = private_count_resources (self, Ogre::TextureManager::getSingleton ());
-	result->texture_count_loaded = private_count_resources_loaded (self, Ogre::TextureManager::getSingleton ());
+	result->skeleton_count = count_resources (Ogre::SkeletonManager::getSingleton ());
+	result->texture_count = count_resources (Ogre::TextureManager::getSingleton ());
+	result->texture_count_loaded = count_resources_loaded (Ogre::TextureManager::getSingleton ());
 	result->texture_memory = (int) Ogre::TextureManager::getSingleton ().getMemoryUsage ();
 
 	/* Count entities. */
 	result->entity_count = 0;
-	Ogre::SceneManager::MovableObjectIterator iterator = self->scene_manager->getMovableObjectIterator ("Entity");
+	Ogre::SceneManager::MovableObjectIterator iterator = scene_manager->getMovableObjectIterator ("Entity");
 	while (iterator.hasMoreElements ())
 	{
 		result->entity_count++;
@@ -651,50 +591,47 @@ void liren_internal_get_stats (
 	/* Count attachments. */
 	result->attachment_count = 0;
 	LIAlgU32dicIter iter;
-	LIALG_U32DIC_FOREACH (iter, self->objects)
+	LIALG_U32DIC_FOREACH (iter, objects)
 	{
 		LIRenObject* object = (LIRenObject*) iter.value;
 		result->attachment_count += object->get_attachment_count ();
 	}
 }
 
-void liren_internal_set_title (
-	LIRenRender* self,
-	const char*  value)
+void LIRenRender::set_title (
+	const char* value)
 {
 #ifdef HAVE_XLIB
 	Display* display;
 	Window window;
-	self->render_window->getCustomAttribute ("DISPLAY", &display);
-	self->render_window->getCustomAttribute ("WINDOW", &window);
+	render_window->getCustomAttribute ("DISPLAY", &display);
+	render_window->getCustomAttribute ("WINDOW", &window);
 	XStoreName (display, window, value);
 #elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 	HWND window;
-	self->render_window->getCustomAttribute ("WINDOW", &window);
+	render_window->getCustomAttribute ("WINDOW", &window);
 	SetWindowText (window, value);
 #else
 	/* TODO */
 #endif
 }
 
-int liren_internal_set_videomode (
-	LIRenRender*    self,
+int LIRenRender::set_videomode (
 	LIRenVideomode* mode)
 {
 	if (mode->fullscreen)
-		self->render_window->setFullscreen (true, mode->width, mode->height);
+		render_window->setFullscreen (true, mode->width, mode->height);
 	else
-		self->render_window->setFullscreen (false, mode->width, mode->height);
+		render_window->setFullscreen (false, mode->width, mode->height);
 	return 1;
 }
 
-int liren_internal_get_videomodes (
-	LIRenRender*     self,
+int LIRenRender::get_videomodes (
 	LIRenVideomode** modes,
-	int*             modes_num)
+	int*             modes_num) const
 {
 	/* Count modes. */
-	const Ogre::StringVector& list = self->render_system->
+	const Ogre::StringVector& list = render_system->
 		getConfigOptions()["Video Mode"].possibleValues;
 	if (!list.size ())
 		return 0;
@@ -714,8 +651,8 @@ int liren_internal_get_videomodes (
 			(*modes)[i].width = w;
 			(*modes)[i].height = h;
 			(*modes)[i].fullscreen = 1;
-			(*modes)[i].sync = self->mode.sync;
-			(*modes)[i].multisamples = self->mode.multisamples;
+			(*modes)[i].sync = mode.sync;
+			(*modes)[i].multisamples = mode.multisamples;
 		}
 	}
 
@@ -724,26 +661,24 @@ int liren_internal_get_videomodes (
 
 /*****************************************************************************/
 
-static int private_count_resources (
-	LIRenRender*           self,
-	Ogre::ResourceManager& manager)
+int LIRenRender::count_resources (
+	const Ogre::ResourceManager& manager) const
 {
 	int count;
 
-	Ogre::ResourceManager::ResourceMapIterator iter = manager.getResourceIterator ();
+	Ogre::ResourceManager::ResourceMapIterator iter = const_cast<Ogre::ResourceManager&>(manager).getResourceIterator ();
 	for (count = 0 ; iter.hasMoreElements () ; iter.moveNext ())
 		count++;
 
 	return count;
 }
 
-static int private_count_resources_loaded (
-	LIRenRender*           self,
-	Ogre::ResourceManager& manager)
+int LIRenRender::count_resources_loaded (
+	const Ogre::ResourceManager& manager) const
 {
 	int count;
 
-	Ogre::ResourceManager::ResourceMapIterator iter = manager.getResourceIterator ();
+	Ogre::ResourceManager::ResourceMapIterator iter = const_cast<Ogre::ResourceManager&>(manager).getResourceIterator ();
 	for (count = 0 ; iter.hasMoreElements () ; iter.moveNext ())
 	{
 		if (iter.peekNextValue ()->isLoaded ())
@@ -753,25 +688,24 @@ static int private_count_resources_loaded (
 	return count;
 }
 
-static void private_load_plugin (
-	LIRenRender* self,
-	const char*  name)
+void LIRenRender::load_plugin (
+	const char* name)
 {
 #ifdef OGRE_PLUGIN_DIR
 	Ogre::String path(OGRE_PLUGIN_DIR "/");
 #else
-	Ogre::String path(Ogre::String(self->paths->root) + "/plugins/");
+	Ogre::String path(Ogre::String(paths->root) + "/plugins/");
 #endif
 
 	try
 	{
-		self->root->loadPlugin (path + name);
+		root->loadPlugin (path + name);
 	}
 	catch (Ogre::InternalErrorException e)
 	{
 		try
 		{
-			self->root->loadPlugin (path + name + Ogre::String("_d"));
+			root->loadPlugin (path + name + Ogre::String("_d"));
 		}
 		catch (...)
 		{
@@ -780,11 +714,10 @@ static void private_load_plugin (
 	}
 }
 
-static int private_check_plugin (
-	LIRenRender* self,
-	const char*  name)
+int LIRenRender::check_plugin (
+	const char* name)
 {
-	Ogre::Root::PluginInstanceList ip = self->root->getInstalledPlugins ();
+	Ogre::Root::PluginInstanceList ip = root->getInstalledPlugins ();
 	for (Ogre::Root::PluginInstanceList::iterator k = ip.begin(); k != ip.end(); k++)
 	{
 		if ((*k)->getName () == name)
@@ -794,8 +727,7 @@ static int private_check_plugin (
 	return 0;
 }
 
-static void private_garbage_collect_builders (
-	LIRenRender* self)
+void LIRenRender::garbage_collect_builders ()
 {
 	LIAlgStrdicIter iter;
 
@@ -804,19 +736,18 @@ static void private_garbage_collect_builders (
 	/* Ogre will happily leak our manual resource loaders. To avoid them being
 	   permanently leaked, we have stored them a dictionary by mesh name. If
 	   the mesh no longer exists, we free the associated builder. */
-	LIALG_STRDIC_FOREACH (iter, self->mesh_builders)
+	LIALG_STRDIC_FOREACH (iter, mesh_builders)
 	{
 		Ogre::MeshPtr ptr = mgr.getByName (iter.key, LIREN_RESOURCES_TEMPORARY);
 		if (ptr.isNull ())
 		{
-			lialg_strdic_remove (self->mesh_builders, iter.key);
+			lialg_strdic_remove (mesh_builders, iter.key);
 			OGRE_DELETE ((LIRenMeshBuilder*) iter.value);
 		}
 	}
 }
 
-static void private_unload_unused_resources (
-	LIRenRender*           self,
+void LIRenRender::unload_unused_resources (
 	Ogre::ResourceManager& manager)
 {
 	Ogre::ResourceManager::ResourceMapIterator iter = manager.getResourceIterator ();
@@ -851,16 +782,15 @@ static void private_unload_unused_resources (
 	}
 }
 
-static void private_update_mode (
-	LIRenRender*  self)
+void LIRenRender::update_mode ()
 {
 	unsigned int w, h, d;
 	int x, y;
 
-	self->render_window->getMetrics (w, h, d, x, y);
-	self->mode.width = w;
-	self->mode.height = h;
-	self->mode.fullscreen = self->render_window->isFullScreen ();
+	render_window->getMetrics (w, h, d, x, y);
+	mode.width = w;
+	mode.height = h;
+	mode.fullscreen = render_window->isFullScreen ();
 }
 
 /** @} */

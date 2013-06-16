@@ -82,14 +82,14 @@ LIRenRender* liren_render_new (
 	}
 
 	/* Initialize the backend. */
-	if (!liren_internal_init (self, mode))
+	if (!self->init (mode))
 	{
 		liren_render_free (self);
 		return NULL;
 	}
 
 	/* Initialize the videomode. */
-	if (!liren_internal_set_videomode (self, mode))
+	if (!self->set_videomode (mode))
 	{
 		liren_render_free (self);
 		return NULL;
@@ -137,7 +137,7 @@ void liren_render_free (
 	}
 
 	/* Free the backend. */
-	liren_internal_deinit (self);
+	self->deinit ();
 
 	delete self;
 }
@@ -151,7 +151,7 @@ void liren_render_add_compositor (
 	LIRenRender* self,
 	const char*  name)
 {
-	liren_internal_add_compositor (self, name);
+	self->add_compositor (name);
 }
 
 /**
@@ -163,7 +163,7 @@ void liren_render_remove_compositor (
 	LIRenRender* self,
 	const char*  name)
 {
-	liren_internal_remove_compositor (self, name);
+	self->remove_compositor (name);
 }
 
 int liren_render_load_font (
@@ -172,13 +172,13 @@ int liren_render_load_font (
 	const char*  file,
 	int          size)
 {
-	return liren_internal_load_font (self, name, file, size);
+	return self->load_font (name, file, size);
 }
 
 void liren_render_load_resources (
 	LIRenRender* self)
 {
-	liren_internal_load_resources (self);
+	self->load_resources ();
 }
 
 int liren_render_measure_text (
@@ -189,7 +189,7 @@ int liren_render_measure_text (
 	int*         result_width,
 	int*         result_height)
 {
-	return liren_internal_measure_text (self, font, text, width_limit, result_width, result_height);
+	return self->measure_text (font, text, width_limit, result_width, result_height);
 }
 
 /**
@@ -203,7 +203,7 @@ void liren_render_project (
 	const LIMatVector* world,
 	LIMatVector*       screen)
 {
-	liren_internal_project (self, world, screen);
+	self->project (world, screen);
 }
 
 /**
@@ -213,14 +213,14 @@ void liren_render_project (
 void liren_render_render (
 	LIRenRender* self)
 {
-	liren_internal_render (self);
+	self->render ();
 }
 
 int liren_render_screenshot (
 	LIRenRender* self,
 	const char*  path)
 {
-	return liren_internal_screenshot (self, path);
+	return self->screenshot (path);
 }
 
 /**
@@ -233,7 +233,7 @@ int liren_render_update (
 	LIRenRender* self,
 	float        secs)
 {
-	return liren_internal_update (self, secs);
+	return self->update (secs);
 }
 
 int liren_render_layout_text (
@@ -244,20 +244,20 @@ int liren_render_layout_text (
 	int**        result_glyphs,
 	int*         result_glyphs_num)
 {
-	return liren_internal_layout_text (self, font, text, width_limit, result_glyphs, result_glyphs_num);
+	return self->layout_text (font, text, width_limit, result_glyphs, result_glyphs_num);
 }
 
 int liren_render_get_anisotropy (
 	const LIRenRender* self)
 {
-	return liren_internal_get_anisotropy (self);
+	return self->get_anisotropy ();
 }
 
 void liren_render_set_anisotropy (
 	LIRenRender* self,
 	int          value)
 {
-	liren_internal_set_anisotropy (self, value);
+	self->set_anisotropy (value);
 }
 
 /**
@@ -269,7 +269,7 @@ void liren_render_set_camera_far (
 	LIRenRender* self,
 	float        value)
 {
-	liren_internal_set_camera_far (self, value);
+	self->set_camera_far (value);
 }
 
 /**
@@ -281,7 +281,7 @@ void liren_render_set_camera_near (
 	LIRenRender* self,
 	float        value)
 {
-	liren_internal_set_camera_near (self, value);
+	self->set_camera_near (value);
 }
 
 /**
@@ -293,7 +293,7 @@ void liren_render_set_camera_transform (
 	LIRenRender*          self,
 	const LIMatTransform* value)
 {
-	liren_internal_set_camera_transform (self, value);
+	self->set_camera_transform (value);
 }
 
 /**
@@ -305,7 +305,7 @@ void liren_render_set_material_scheme (
 	LIRenRender* self,
 	const char*  value)
 {
-	liren_internal_set_material_scheme (self, value);
+	self->set_material_scheme (value);
 }
 
 float liren_render_get_opengl_version (
@@ -319,7 +319,7 @@ void liren_render_set_scene_ambient (
 	LIRenRender* self,
 	const float* value)
 {
-	liren_internal_set_scene_ambient (self, value);
+	self->set_scene_ambient (value);
 }
 
 /**
@@ -331,21 +331,21 @@ void liren_render_set_skybox (
 	LIRenRender* self,
 	const char*  value)
 {
-	liren_internal_set_skybox (self, value);
+	self->set_skybox (value);
 }
 
 void liren_render_get_stats (
 	LIRenRender* self,
 	LIRenStats*  result)
 {
-	liren_internal_get_stats (self, result);
+	self->get_stats (result);
 }
 
 void liren_render_set_title (
 	LIRenRender* self,
 	const char*  value)
 {
-	liren_internal_set_title (self, value);
+	self->set_title (value);
 }
 
 void liren_render_get_videomode (
@@ -359,7 +359,7 @@ int liren_render_set_videomode (
 	LIRenRender*    self,
 	LIRenVideomode* mode)
 {
-	return liren_internal_set_videomode (self, mode);
+	return self->set_videomode (mode);
 }
 
 int liren_render_get_videomodes (
@@ -367,7 +367,7 @@ int liren_render_get_videomodes (
 	LIRenVideomode** modes,
 	int*             modes_num)
 {
-	return liren_internal_get_videomodes (self, modes, modes_num);
+	return self->get_videomodes (modes, modes_num);
 }
 
 /** @} */
