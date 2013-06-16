@@ -244,8 +244,8 @@ Chargen.update = function(self, secs)
 	-- Build models and textures.
 	if self.data.update_needed then
 		local data = self:get_build_data()
-		ModelBuilder:build_with_merger(self.data.model_merger, data)
-		TextureBuilder:build_with_merger(self.data.image_merger, data)
+		self.data.model_build_hash = ModelBuilder:build_with_merger(self.data.model_merger, data, self.data.model_build_hash)
+		self.data.texture_build_hash = TextureBuilder:build_with_merger(self.data.image_merger, data, self.data.texture_build_hash)
 		self.data.update_needed = nil
 	end
 	-- Apply models.

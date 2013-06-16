@@ -12,6 +12,7 @@ local Class = require("system/class")
 local Color = require("system/color")
 local Model = require("system/model")
 local ModelMerger = require("system/model-merger")
+local Serialize = require("system/serialize")
 
 --- Builds multipart or morphed character models.
 -- @type ModelBuilder
@@ -36,8 +37,8 @@ ModelBuilder.build_for_actor = function(clss, object)
 		object.model_merger = merger
 	end
 	-- Build the character model in a separate thread.
-	-- The result is handled in the tick handler in event.lua.
-	clss:build_with_merger(merger, {
+	-- The result is handled in the update handler of Chargen.
+	object.model_build_hash = clss:build_with_merger(merger, {
 		beheaded = object:get_beheaded(),
 		body_scale = object.body_scale,
 		body_style = object.body_style,
@@ -51,14 +52,20 @@ ModelBuilder.build_for_actor = function(clss, object)
 		nudity = Client.options.nudity_enabled,
 		skin_color = Color:ubyte_to_float(object.skin_color),
 		skin_style = object.skin_style,
-		spec = object:get_spec()})
+		spec = object:get_spec()}, object.model_build_hash)
 end
 
 --- Builds the mesh for the given object.
+--
+-- If the hash argument is given, the texture building is skipped if the new
+-- texture has the given has.
+--
 -- @param clss ModelBuilder class.
 -- @param merger Model merger to use.
 -- @param args Model building arguments.
-ModelBuilder.build_with_merger = function(clss, merger, args)
+-- @param hash Hash of the old mesh, or nil.
+-- @return hash Hash of the new mesh.
+ModelBuilder.build_with_merger = function(clss, merger, args, hash)
 	-- Get the base meshes.
 	local meshes = {skeleton = args.spec.model}
 	for k,v in pairs(args.spec.models) do
@@ -117,6 +124,15 @@ ModelBuilder.build_with_merger = function(clss, merger, args)
 			meshes[v] = nil
 		end
 	end
+	-- Build and compare the hash.
+	local hash1 = Serialize:write{
+		args.body_style,
+		args.face_style,
+		args.hair_color,
+		meshes}
+	if hash1 == hash then
+		return hash
+	end
 	-- Morph and merge the submodels.
 	local model = Main.models:find_by_name(meshes["skeleton"])
 	if model then merger:add_model(model) end
@@ -128,6 +144,7 @@ ModelBuilder.build_with_merger = function(clss, merger, args)
 	merger:replace_material{match_material = "animhair1", diffuse = args.hair_color}
 	-- Queue the build.
 	merger:finish()
+	return hash1
 end
 
 --- Builds a submesh.

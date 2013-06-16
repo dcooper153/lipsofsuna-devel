@@ -12,6 +12,7 @@ local Class = require("system/class")
 local Color = require("system/color")
 local Image = require("system/image")
 local ImageMerger = require("system/image-merger")
+local Serialize = require("system/serialize")
 
 --- Builds character textures.
 -- @type TextureBuilder
@@ -37,8 +38,8 @@ TextureBuilder.build_for_actor = function(clss, object)
 		object.image_merger = merger
 	end
 	-- Build the character textures.
-	-- The result is handled in the tick handler in event.lua.
-	clss:build_with_merger(merger, {
+	-- The result is handled in the update handler of Chargen.
+	object.texture_build_hash = clss:build_with_merger(merger, {
 		beheaded = object:get_beheaded(),
 		body_scale = object.body_scale,
 		body_style = object.body_style,
@@ -52,14 +53,20 @@ TextureBuilder.build_for_actor = function(clss, object)
 		nudity = Client.options.nudity_enabled,
 		skin_color = Color:ubyte_to_float(object.skin_color),
 		skin_style = object.skin_style,
-		spec = object:get_spec()})
+		spec = object:get_spec()}, object.texture_build_hash)
 end
 
---- Builds the mesh for the given object.
+--- Builds the texture for the given object.
+--
+-- If the hash argument is given, the texture building is skipped if the new
+-- texture has the given has.
+--
 -- @param clss TextureBuilder class.
 -- @param merger Image merger to use.
 -- @param args Image building arguments.
-TextureBuilder.build_with_merger = function(clss, merger, args)
+-- @param hash Hash of the old texture, or nil.
+-- @return hash Hash of the new texture.
+TextureBuilder.build_with_merger = function(clss, merger, args, hash)
 	-- Sort equipment by priority.
 	local equipment = {}
 	if args.equipment then
@@ -84,6 +91,17 @@ TextureBuilder.build_with_merger = function(clss, merger, args)
 				end
 			end
 		end
+	end
+	-- Build and compare the hash.
+	local hash1 = Serialize:write{
+		args.skin_style,
+		args.skin_color,
+		args.face_texture,
+		args.eye_style,
+		args.eye_color,
+		textures}
+	if hash1 == hash then
+		return hash
 	end
 	-- Set the base texture.
 	local basename = "aer1" -- FIXME
@@ -126,6 +144,7 @@ TextureBuilder.build_with_merger = function(clss, merger, args)
 		end
 	end
 	merger:finish()
+	return hash1
 end
 
 return TextureBuilder
