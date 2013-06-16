@@ -25,8 +25,9 @@
  */
 
 #include "lipsofsuna/system.h"
-#include "render-mesh-builder.hpp"
 #include "render.hpp"
+#include "render-material-utils.hpp"
+#include "render-mesh-builder.hpp"
 #include "render-object.hpp"
 #include <OgreSubMesh.h>
 #include <OgreSkeletonManager.h>
@@ -121,7 +122,8 @@ LIMdlModel* LIRenMeshBuilder::get_model () const
  * Materials are also loaded here. They are loaded in yet another background
  * loader. The function waits for the background loading of the materials to
  * finish, but since this is done in a background thread, the main thread will
- * never stall.
+ * never stall.#include <OgreHardwareBufferManager.h>
+
  *
  * \param mesh Ogre mesh to prepare.
  */

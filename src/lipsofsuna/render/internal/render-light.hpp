@@ -20,6 +20,16 @@
 
 #include "render-types.hpp"
 
+class LIRenLight
+{
+public:
+	int id;
+	int directional;
+	LIMatTransform transform;
+	LIRenRender* render;
+	Ogre::Light* light;
+};
+
 LIAPICALL (LIRenLight*, liren_light_new, (
 	LIRenRender* render,
 	const float* ambient,

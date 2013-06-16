@@ -26,21 +26,25 @@
 
 #include "render-internal.h"
 #include "render-container-factory.hpp"
+#include "render-image-overlay-factory.hpp"
+#include "render-material-utils.hpp"
+#include "render-mesh-builder.hpp"
 #include "render-resource-loading-listener.hpp"
+#include "render-scaled-overlay-factory.hpp"
+#include "render-text-overlay-factory.hpp"
 #include "../render-overlay.h"
 #include "../font/font.h"
 #include "../font/font-layout.h"
 #include <OgreCompositorManager.h>
 #include <OgreEntity.h>
 #include <OgreFontManager.h>
-#include <OgreLogManager.h>
+#include <OgreMeshManager.h>
 #include <OgrePlugin.h>
 #include <OgreShadowCameraSetupLiSPSM.h>
 #include <OgreRenderSystemCapabilitiesManager.h>
 #include <OgreRenderSystemCapabilitiesSerializer.h>
 #include <OgreResourceBackgroundQueue.h>
 #include <OgreSkeletonManager.h>
-#include <OgreViewport.h>
 #include <OgreWindowEventUtilities.h>
 #ifdef HAVE_XLIB
 #include <X11/Xlib.h>

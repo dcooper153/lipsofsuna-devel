@@ -20,6 +20,27 @@
 
 #include "render-types.hpp"
 
+class LIRenContainer;
+
+class LIRenOverlay
+{
+public:
+	int id;
+	int depth;
+	int visible;
+	float alpha;
+	LIMatVector position;
+	LIRenOverlay* parent;
+	LIRenRender* render;
+	LIRenContainer* container;
+	Ogre::Overlay* overlay;
+	struct
+	{
+		int count;
+		LIRenOverlay** array;
+	} overlays;
+};
+
 LIAPICALL (LIRenOverlay*, liren_overlay_new, (
 	LIRenRender* render));
 

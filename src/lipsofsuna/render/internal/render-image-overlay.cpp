@@ -27,6 +27,7 @@
 #include "render-internal.h"
 #include "render-image-overlay.hpp"
 #include "render-tile-packer.hpp"
+#include <OgreHardwareBufferManager.h>
 
 Ogre::String LIRenImageOverlay::type_name ("LIRenImageOverlay");
 

@@ -54,7 +54,7 @@ LIRenOverlay* liren_overlay_new (
 	LIRenOverlay* self;
 
 	/* Allocate self. */
-	self = (LIRenOverlay*) lisys_calloc (1, sizeof (LIRenOverlay));
+	self = new LIRenOverlay ();
 	if (self == NULL)
 		return 0;
 	self->render = render;
@@ -109,7 +109,7 @@ void liren_overlay_free (
 	if (self->container != NULL)
 		self->render->overlay_manager->destroyOverlayElement (self->container);
 
-	lisys_free (self);
+	delete self;
 }
 
 /**

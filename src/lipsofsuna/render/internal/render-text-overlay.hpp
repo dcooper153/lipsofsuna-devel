@@ -22,6 +22,7 @@
 #include "render-types.hpp"
 #include "render-base-overlay.hpp"
 #include <OgreOverlayElement.h>
+#include <OgreTextAreaOverlayElement.h>
 
 class LIRenTextOverlay : public LIRenBaseOverlay, public Ogre::TextAreaOverlayElement
 {

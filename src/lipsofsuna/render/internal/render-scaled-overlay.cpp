@@ -27,6 +27,7 @@
 #include "render-internal.h"
 #include "render-scaled-overlay.hpp"
 #include "render-tile-packer.hpp"
+#include <OgreHardwareBufferManager.h>
 
 Ogre::String LIRenScaledOverlay::type_name ("LIRenScaledOverlay");
 

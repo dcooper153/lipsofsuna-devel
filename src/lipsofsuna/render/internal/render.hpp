@@ -20,6 +20,29 @@
 
 #include "lipsofsuna/paths.h"
 #include "render-types.hpp"
+#include "render-unique-id.hpp"
+#include <OgreRoot.h>
+#include <OgreCamera.h>
+#include <OgreMaterialManager.h>
+#include <OgreOverlayManager.h>
+#include <OgreRenderWindow.h>
+#include <OgreRenderSystem.h>
+#include <OgreSceneManager.h>
+#include <OgreSceneNode.h>
+#include <OgreTextureManager.h>
+#include <OgreViewport.h>
+#include <OgreLogManager.h>
+
+#define LIREN_RESOURCES_PERMANENT "permanent"
+#define LIREN_RESOURCES_TEMPORARY "temporary"
+
+class LIRenContainerFactory;
+class LIRenImageOverlayFactory;
+class LIRenMaterialUtils;
+class LIRenModel;
+class LIRenResourceLoadingListener;
+class LIRenScaledOverlayFactory;
+class LIRenTextOverlayFactory;
 
 class LIRenRender
 {

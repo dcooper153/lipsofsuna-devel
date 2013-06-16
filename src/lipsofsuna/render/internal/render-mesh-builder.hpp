@@ -22,6 +22,7 @@
 #include "lipsofsuna/model.h"
 #include "render-types.hpp"
 #include <OgreResource.h>
+#include <OgreHardwareBufferManager.h>
 
 class LIRenMeshBuilder : public Ogre::ManualResourceLoader
 {

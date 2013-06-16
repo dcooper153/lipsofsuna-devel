@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,68 +20,5 @@
 
 #include "lipsofsuna/math.h"
 #include "../render-types.h"
-
-#define LIREN_RESOURCES_PERMANENT "permanent"
-#define LIREN_RESOURCES_TEMPORARY "temporary"
-
-typedef struct _LIRenImage LIRenImage;
-typedef struct _LIRenLight LIRenLight;
-typedef struct _LIRenMessage LIRenMessage;
-typedef struct _LIRenOverlay LIRenOverlay;
-typedef struct _LIRenQueue LIRenQueue;
-typedef struct _LIRenRenderData LIRenRenderData;
-
-class LIRenAttachment;
-class LIRenMaterialUtils;
-class LIRenModel;
-class LIRenObject;
-#include <OgreBorderPanelOverlayElement.h>
-#include <OgreCamera.h>
-#include <OgreEntity.h>
-#include <OgreMesh.h>
-#include <OgreMeshManager.h>
-#include <OgreOverlay.h>
-#include <OgreOverlayContainer.h>
-#include <OgreOverlayManager.h>
-#include <OgreParticleSystem.h>
-#include <OgreRenderWindow.h>
-#include <OgreRoot.h>
-#include <OgreSceneManager.h>
-#include <OgreMaterialManager.h>
-#include <OgreTextAreaOverlayElement.h>
-#include "render-attachment.hpp"
-#include "render-container-factory.hpp"
-#include "render-image-overlay-factory.hpp"
-#include "render-scaled-overlay-factory.hpp"
-#include "render-text-overlay-factory.hpp"
-#include "render-material-utils.hpp"
-#include "render-mesh-builder.hpp"
-#include "render-resource-loading-listener.hpp"
-#include "render-unique-id.hpp"
-struct _LIRenLight
-{
-	int id;
-	int directional;
-	LIMatTransform transform;
-	LIRenRender* render;
-	Ogre::Light* light;
-};
-struct _LIRenOverlay
-{
-	int id;
-	int depth;
-	int visible;
-	float alpha;
-	LIMatVector position;
-	LIRenOverlay* parent;
-	LIRenRender* render;
-	LIRenContainer* container;
-	Ogre::Overlay* overlay;
-	struct
-	{
-		int count;
-		LIRenOverlay** array;
-	} overlays;
-};
 
 #endif

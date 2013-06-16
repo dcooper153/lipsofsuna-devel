@@ -20,6 +20,8 @@
 
 #include "render-types.hpp"
 
+class LIRenAttachment;
+
 class LIRenObject
 {
 public:

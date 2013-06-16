@@ -20,6 +20,7 @@
 
 #include "lipsofsuna/system.h"
 #include "render-types.hpp"
+#include <OgreString.h>
 
 class LIRenUniqueId
 {

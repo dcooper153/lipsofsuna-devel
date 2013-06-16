@@ -28,6 +28,7 @@
 #include "render.hpp"
 #include "render-attachment-particle.hpp"
 #include "render-object.hpp"
+#include <OgreParticleSystem.h>
 
 LIRenAttachmentParticle::LIRenAttachmentParticle (LIRenObject* object, const Ogre::String& particle) :
 	LIRenAttachment (object)

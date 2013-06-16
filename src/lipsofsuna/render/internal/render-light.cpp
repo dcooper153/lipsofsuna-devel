@@ -59,7 +59,7 @@ LIRenLight* liren_light_new (
 	LIRenLight* self;
 
 	/* Allocate self. */
-	self = (LIRenLight*) lisys_calloc (1, sizeof (LIRenLight));
+	self = new LIRenLight ();
 	if (self == NULL)
 		return 0;
 	self->render = render;
@@ -103,7 +103,7 @@ void liren_light_free (
 {
 	if (self->light != NULL)
 		self->render->scene_manager->destroyLight (self->light);
-	lisys_free (self);
+	delete self;
 }
 
 void liren_light_set_ambient (
