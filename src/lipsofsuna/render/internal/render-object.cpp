@@ -30,123 +30,81 @@
 #include "render-attachment-entity.hpp"
 #include "render-attachment-particle.hpp"
 #include "render-model.h"
-#include "render-object.h"
-
-static LIMdlPose* private_channel_animate (
-	LIRenObject*            self,
-	LIMdlPose*              pose,
-	int                     channel,
-	int                     keep,
-	const LIMdlPoseChannel* info);
-
-static void private_channel_fade (
-	LIRenObject* self,
-	LIMdlPose*   pose,
-	int          channel,
-	float        time);
-
-static void private_rebuild_skeleton (
-	LIRenObject* self);
-
-static void private_remove_entity (
-	LIRenObject* self,
-	int          index);
-
-static void private_update_entity_settings (
-	LIRenObject* self);
-
-/*****************************************************************************/
+#include "render-object.hpp"
 
 /**
  * \brief Creates a new render object and adds it to the scene.
  * \param render Renderer.
  * \param id Unique identifier.
- * \return Object or NULL on failure.
+ * \return Object.
  */
-LIRenObject* liren_object_new (
+LIRenObject::LIRenObject (
 	LIRenRender* render,
 	int          id)
 {
-	LIRenObject* self;
-
 	/* Allocate self. */
-	self = OGRE_NEW LIRenObject;
-	if (self == NULL)
-		return NULL;
-	self->id = id;
-	self->visible = 0;
-	self->shadow_casting = 0;
-	self->skeleton_rebuild_needed = 0;
-	self->render_distance = -1.0f;
-	self->transform = limat_transform_identity ();
-	self->pose = NULL;
-	self->pose_skeleton = NULL;
-	self->render = render;
-	self->node = NULL;
+	this->id = id;
+	visible = 0;
+	shadow_casting = 0;
+	skeleton_rebuild_needed = 0;
+	render_distance = -1.0f;
+	transform = limat_transform_identity ();
+	pose = NULL;
+	pose_skeleton = NULL;
+	this->render = render;
+	node = NULL;
 
 	/* Choose a unique ID. */
-	while (!self->id)
+	while (!this->id)
 	{
-		self->id = lialg_random_range (&render->random, 0x00000000, 0x7FFFFFFF);
-		if (lialg_u32dic_find (render->objects, self->id))
-			self->id = 0;
+		this->id = lialg_random_range (&render->random, 0x00000000, 0x7FFFFFFF);
+		if (lialg_u32dic_find (render->objects, this->id))
+			this->id = 0;
 	}
 
 	/* Create the scene node. */
-	self->node = render->data->scene_root->createChildSceneNode ();
-	self->node->setVisible (false);
+	node = render->data->scene_root->createChildSceneNode ();
+	node->setVisible (false);
 
 	/* Add self to the object dictionary. */
-	if (!lialg_u32dic_insert (render->objects, self->id, self))
-	{
-		OGRE_DELETE self;
-		return 0;
-	}
-
-	return self;
+	lialg_u32dic_insert (render->objects, this->id, this);
 }
 
 /**
  * \brief Frees the render object.
- * \param self Object.
  */
-void liren_object_free (
-	LIRenObject* self)
+LIRenObject::~LIRenObject ()
 {
 	/* Remove from the object dictionary. */
-	lialg_u32dic_remove (self->render->objects, self->id);
+	lialg_u32dic_remove (render->objects, id);
 
 	/* Free models and particles. */
-	liren_object_clear_models (self);
+	clear_models ();
 
 	/* Free the scene node. */
-	if (self->node != NULL)
-		self->render->data->scene_root->removeAndDestroyChild (self->node->getName ());
+	if (node != NULL)
+		render->data->scene_root->removeAndDestroyChild (node->getName ());
 
 	/* Free the pose. */
-	if (self->pose_skeleton != NULL)
-		limdl_pose_skeleton_free (self->pose_skeleton);
-	if (self->pose != NULL)
-		limdl_pose_free (self->pose);
-	OGRE_DELETE self;
+	if (pose_skeleton != NULL)
+		limdl_pose_skeleton_free (pose_skeleton);
+	if (pose != NULL)
+		limdl_pose_free (pose);
 }
 
 /**
  * \brief Adds a model to the object.
- * \param self Object.
  * \param model Model.
  */
-void liren_object_add_model (
-	LIRenObject* self,
+void LIRenObject::add_model (
 	LIRenModel*  model)
 {
 	/* Create the new entity. */
-	self->attachments.push_back (OGRE_NEW LIRenAttachmentEntity (self, model));
-	self->skeleton_rebuild_needed = 1;
+	attachments.push_back (OGRE_NEW LIRenAttachmentEntity (this, model));
+	skeleton_rebuild_needed = 1;
 }
 
-int liren_object_channel_animate (
-	LIRenObject*            self,
+int LIRenObject::channel_animate (
 	int                     channel,
 	int                     keep,
 	const LIMdlPoseChannel* info)
@@ -154,37 +112,35 @@ int liren_object_channel_animate (
 	LIMdlPose* pose1;
 
 	/* Update the reference pose. */
-	pose1 = private_channel_animate (self, self->pose, channel, keep, info);
+	pose1 = channel_animate (pose, channel, keep, info);
 	if (pose1 != NULL)
 	{
-		self->pose = pose1;
-		if (self->pose_skeleton == NULL)
+		pose = pose1;
+		if (pose_skeleton == NULL)
 		{
-			self->pose_skeleton = limdl_pose_skeleton_new (NULL, 0);
-			private_rebuild_skeleton (self);
+			pose_skeleton = limdl_pose_skeleton_new (NULL, 0);
+			rebuild_skeleton ();
 		}
 	}
 
 	return 1;
 }
 
-void liren_object_channel_fade (
-	LIRenObject* self,
-	int          channel,
-	float        time)
+void LIRenObject::channel_fade (
+	int   channel,
+	float time)
 {
-	private_channel_fade (self, self->pose, channel, time);
+	channel_fade (pose, channel, time);
 }
 
-LIMdlPoseChannel* liren_object_channel_get_state (
-	LIRenObject* self,
-	int          channel)
+LIMdlPoseChannel* LIRenObject::channel_get_state (
+	int channel) const
 {
 	LIMdlPoseChannel* chan;
 
-	if (self->pose == NULL)
+	if (pose == NULL)
 		return NULL;
-	chan = (LIMdlPoseChannel*) lialg_u32dic_find (self->pose->channels, channel);
+	chan = (LIMdlPoseChannel*) lialg_u32dic_find (pose->channels, channel);
 	if (chan == NULL)
 		return NULL;
 	chan = limdl_pose_channel_new_copy (chan);
@@ -194,59 +150,54 @@ LIMdlPoseChannel* liren_object_channel_get_state (
 
 /**
  * \brief Clears all animations from the object.
- * \param self Object.
  */
-void liren_object_clear_animations (
-	LIRenObject* self)
+void LIRenObject::clear_animations ()
 {
-	if (self->pose == NULL)
+	if (pose == NULL)
 		return;
-	limdl_pose_destroy_all (self->pose);
+	limdl_pose_destroy_all (pose);
 }
 
 /**
  * \brief Clears all models from the object.
- * \param self Object.
  */
-void liren_object_clear_models (
-	LIRenObject* self)
+void LIRenObject::clear_models ()
 {
 	/* Detach everything from the scene node. */
-	self->node->detachAllObjects ();
+	node->detachAllObjects ();
 
 	/* Remove entities. */
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
-		OGRE_DELETE self->attachments[i];
-	self->attachments.clear ();
+	for (size_t i = 0 ; i < attachments.size () ; i++)
+		OGRE_DELETE attachments[i];
+	attachments.clear ();
 
 	/* Remove the skeleton. */
-	if (self->pose == NULL && self->pose_skeleton != NULL)
+	if (pose == NULL && pose_skeleton != NULL)
 	{
-		limdl_pose_skeleton_free (self->pose_skeleton);
-		self->pose_skeleton = NULL;
+		limdl_pose_skeleton_free (pose_skeleton);
+		pose_skeleton = NULL;
 	}
 }
 
-int liren_object_find_node (
-	LIRenObject*    self,
+int LIRenObject::find_node (
 	const char*     name,
 	int             world,
-	LIMatTransform* result)
+	LIMatTransform* result) const
 {
 	float scale;
 	LIMatTransform transform;
 	LIMdlNode* node = NULL;
 
 	/* Search from the skeleton. */
-	if (self->pose_skeleton != NULL)
-		node = limdl_pose_skeleton_find_node (self->pose_skeleton, name);
+	if (pose_skeleton != NULL)
+		node = limdl_pose_skeleton_find_node (pose_skeleton, name);
 
 	/* Search from attachments. */
 	if (node == NULL)
 	{
-		for (size_t i = 0 ; i < self->attachments.size () ; i++)
+		for (size_t i = 0 ; i < attachments.size () ; i++)
 		{
-			node = self->attachments[i]->find_node (name);
+			node = attachments[i]->find_node (name);
 			if (node != NULL)
 				break;
 		}
@@ -257,7 +208,7 @@ int liren_object_find_node (
 	/* Get the transformation. */
 	limdl_node_get_world_transform (node, &scale, &transform);
 	if (world)
-		transform = limat_transform_multiply (self->transform, transform);
+		transform = limat_transform_multiply (this->transform, transform);
 	*result = transform;
 
 	return 1;
@@ -265,14 +216,12 @@ int liren_object_find_node (
 
 /**
  * \brief Sets the particle animation state of the object.
- * \param self Object.
  * \param start Animation offset in seconds.
  * \param loop Nonzero to enable looping.
  */
-void liren_object_particle_animation (
-	LIRenObject* self,
-	float        start,
-	int          loop)
+void LIRenObject::particle_animation (
+	float start,
+	int   loop)
 {
 	/* TODO */
 }
@@ -287,20 +236,18 @@ void liren_object_particle_animation (
  * entity to finish building. To avoid the object disappearing during the
  * build period, we keep the old model around until the build has finished.
  *
- * \param self Object.
  * \param model Model.
  */
-void liren_object_model_changed (
-	LIRenObject* self,
-	LIRenModel*  model)
+void LIRenObject::model_changed (
+	LIRenModel* model)
 {
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+	for (size_t i = 0 ; i < attachments.size () ; i++)
 	{
-		if (self->attachments[i]->has_model (model))
+		if (attachments[i]->has_model (model))
 		{
-			LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (self, model);
-			self->attachments[i]->set_replacer (attachment);
-			self->attachments.insert (self->attachments.begin () + i, attachment);
+			LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (this, model);
+			attachments[i]->set_replacer (attachment);
+			attachments.insert (attachments.begin () + i, attachment);
 			i++;
 		}
 	}
@@ -308,19 +255,17 @@ void liren_object_model_changed (
 
 /**
  * \brief Removes a model from the object.
- * \param self Object.
  * \param model Model.
  */
-void liren_object_remove_model (
-	LIRenObject* self,
-	LIRenModel*  model)
+void LIRenObject::remove_model (
+	LIRenModel* model)
 {
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+	for (size_t i = 0 ; i < attachments.size () ; i++)
 	{
-		if (self->attachments[i]->has_model (model))
+		if (attachments[i]->has_model (model))
 		{
-			private_remove_entity (self, i);
-			self->skeleton_rebuild_needed = 1;
+			remove_entity (i);
+			skeleton_rebuild_needed = 1;
 			break;
 		}
 	}
@@ -332,73 +277,68 @@ void liren_object_remove_model (
  * This performs a delayed replacement in such a way that the old model
  * won't be removed until the new model has been background loaded.
  *
- * \param self Object.
  * \param model_old Model to be removed.
  * \param model_new Model to be added.
  */
-void liren_object_replace_model (
-	LIRenObject* self,
-	LIRenModel*  model_old,
-	LIRenModel*  model_new)
+void LIRenObject::replace_model (
+	LIRenModel* model_old,
+	LIRenModel* model_new)
 {
 	/* Try to replace. */
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+	for (size_t i = 0 ; i < attachments.size () ; i++)
 	{
-		if (self->attachments[i]->has_model (model_old))
+		if (attachments[i]->has_model (model_old))
 		{
-			LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (self, model_new);
-			self->attachments[i]->set_replacer (attachment);
-			self->attachments.insert (self->attachments.begin () + i, attachment);
-			self->skeleton_rebuild_needed = 1;
+			LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (this, model_new);
+			attachments[i]->set_replacer (attachment);
+			attachments.insert (attachments.begin () + i, attachment);
+			skeleton_rebuild_needed = 1;
 			return;
 		}
 	}
 
 	/* Just add if there was nothing to replace. */
-	liren_object_add_model (self, model_new);
+	add_model (model_new);
 }
 
 /**
  * \brief Replaces a texture.
- * \param self Object.
  * \param name Name of the replaced texture.
  * \param width Width of the new texture.
  * \param height Height of the new texture.
  * \param pixels Pixels in the RGBA format.
  */
-void liren_object_replace_texture (
-	LIRenObject* self,
-	const char*  name,
-	int          width,
-	int          height,
-	const void*  pixels)
+void LIRenObject::replace_texture (
+	const char* name,
+	int         width,
+	int         height,
+	const void* pixels)
 {
 	// Create the new texture.
 	// FIXME: Why does the Ogre::PF_R8G8B8A8 format not work?
 	Ogre::Image img;
 	img.loadDynamicImage ((Ogre::uchar*) pixels, width, height, 1, Ogre::PF_A8B8G8R8);
-	Ogre::String unique_name = self->render->data->id.next ();
-	Ogre::TexturePtr texture = self->render->data->texture_manager->loadImage (unique_name, LIREN_RESOURCES_TEMPORARY, img);
+	Ogre::String unique_name = render->data->id.next ();
+	Ogre::TexturePtr texture = render->data->texture_manager->loadImage (unique_name, LIREN_RESOURCES_TEMPORARY, img);
 
 	// Replace in all non-deprecated entities.
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+	for (size_t i = 0 ; i < attachments.size () ; i++)
 	{
-		if (!self->attachments[i]->get_replacer ())
-			self->attachments[i]->replace_texture (name, texture);
+		if (!attachments[i]->get_replacer ())
+			attachments[i]->replace_texture (name, texture);
 	}
 }
 
-void liren_object_update (
-	LIRenObject* self,
-	float        secs)
+void LIRenObject::update (
+	float secs)
 {
 	/* Update attachments. */
 	/* This needs to be done before replacing attachments since an
 	   attachment may finish loading here. If replacing were done first,
 	   both the replaced attachment and the replacement would be shown
 	   during the same frame. */
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
-		self->attachments[i]->update (secs);
+	for (size_t i = 0 ; i < attachments.size () ; i++)
+		attachments[i]->update (secs);
 
 	/* Replace old attachments with built ones. */
 	/* Removing an attachment is a potentially recursive operation so there is no
@@ -408,13 +348,13 @@ void liren_object_update (
 	while (true)
 	{
 		bool found = false;
-		for (size_t i = 0 ; i < self->attachments.size () ; i++)
+		for (size_t i = 0 ; i < attachments.size () ; i++)
 		{
-			LIRenAttachment* repl = self->attachments[i]->get_replacer ();
+			LIRenAttachment* repl = attachments[i]->get_replacer ();
 			if (repl != NULL && repl->is_loaded ())
 			{
-				self->skeleton_rebuild_needed = 1;
-				private_remove_entity (self, i);
+				skeleton_rebuild_needed = 1;
+				remove_entity (i);
 				found = true;
 				break;
 			}
@@ -427,38 +367,36 @@ void liren_object_update (
 	/* Frustum culling cannot necessarily eliminate all desirable objects if the
 	   view distance is very low. Because of that, we allow the user to specify
 	   the render distance for the object. */
-	if (self->render_distance > 0)
+	if (render_distance > 0)
 	{
-		float dist2 = self->node->getSquaredViewDepth (self->render->data->camera);
-		if (dist2 > self->render_distance * self->render_distance)
-			self->node->setVisible (false);
+		float dist2 = node->getSquaredViewDepth (render->data->camera);
+		if (dist2 > render_distance * render_distance)
+			node->setVisible (false);
 		else
-			self->node->setVisible (self->visible);
+			node->setVisible (visible);
 	}
 	else
-		self->node->setVisible (self->visible);
+		node->setVisible (visible);
 
 	/* Update attachment poses. */
-	if (self->pose_skeleton != NULL)
+	if (pose_skeleton != NULL)
 	{
-		limdl_pose_update (self->pose, secs);
-		if (self->skeleton_rebuild_needed)
-			private_rebuild_skeleton (self);
-		limdl_pose_skeleton_update (self->pose_skeleton, self->pose);
-		for (size_t i = 0 ; i < self->attachments.size () ; i++)
-			self->attachments[i]->update_pose (self->pose_skeleton);
+		limdl_pose_update (pose, secs);
+		if (skeleton_rebuild_needed)
+			rebuild_skeleton ();
+		limdl_pose_skeleton_update (pose_skeleton, pose);
+		for (size_t i = 0 ; i < attachments.size () ; i++)
+			attachments[i]->update_pose (pose_skeleton);
 	}
 }
 
 /**
  * \brief Sets the effect layer of the object.
- * \param self Object.
  * \param shader Shader name or NULL to disable the effect.
  * \param params Effect parameters or NULL.
  * \return Nonzero on success.
  */
-int liren_object_set_effect (
-	LIRenObject* self,
+int LIRenObject::set_effect (
 	const char*  shader,
 	const float* params)
 {
@@ -469,28 +407,24 @@ int liren_object_set_effect (
 
 /**
  * \brief Gets the ID of the object.
- * \param self Object.
  * \return ID.
  */
-int liren_object_get_id (
-	LIRenObject* self)
+int LIRenObject::get_id () const
 {
-	return self->id;
+	return id;
 }
 
 /**
  * \brief Returns non-zero if the object has finished background loading.
- * \param self Object.
  * \return Non-zero if finished background loading.
  */
-int liren_object_get_loaded (
-	LIRenObject* self)
+int LIRenObject::get_loaded () const
 {
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+	for (size_t i = 0 ; i < attachments.size () ; i++)
 	{
-		if (!self->attachments[i]->is_loaded ())
+		if (!attachments[i]->is_loaded ())
 			return 0;
-		if (self->attachments[i]->get_replacer () != NULL)
+		if (attachments[i]->get_replacer () != NULL)
 			return 0;
 	}
 	return 1;
@@ -498,48 +432,44 @@ int liren_object_get_loaded (
 
 /**
  * \brief Sets the model of the object.
- * \param self Object.
  * \param model Model.
  * \return Nonzero on success.
  */
-int liren_object_set_model (
-	LIRenObject* self,
-	LIRenModel*  model)
+int LIRenObject::set_model (
+	LIRenModel* model)
 {
 	/* Simply clear everything if setting to NULL. */
 	if (model == NULL)
 	{
-		liren_object_clear_models (self);
+		clear_models ();
 		return 1;
 	}
 
 	/* Add the new model. */
-	LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (self, model);
-	self->skeleton_rebuild_needed = 1;
+	LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (this, model);
+	skeleton_rebuild_needed = 1;
 
 	/* Mark all the old entities for replacement. */
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
-		self->attachments[i]->set_replacer (attachment);
-	self->attachments.push_back (attachment);
+	for (size_t i = 0 ; i < attachments.size () ; i++)
+		attachments[i]->set_replacer (attachment);
+	attachments.push_back (attachment);
 
 	return 1;
 }
 
 /**
  * \brief Sets the particle effect of the object.
- * \param self Object.
  * \param name Particle effect name.
  * \return Nonzero on success.
  */
-int liren_object_set_particle (
-	LIRenObject* self,
-	const char*  name)
+int LIRenObject::set_particle (
+	const char* name)
 {
 	/* Remove the existing model or particle system. */
-	liren_object_clear_models (self);
+	clear_models ();
 
 	/* Add the new attachment. */
-	self->attachments.push_back (OGRE_NEW LIRenAttachmentParticle (self, name));
+	attachments.push_back (OGRE_NEW LIRenAttachmentParticle (this, name));
 
 	return 1;
 }
@@ -549,26 +479,23 @@ int liren_object_set_particle (
  * \param self Object.
  * \param value Nonzero to enable, zero to disable.
  */
-void liren_object_set_particle_emitting (
-	LIRenObject* self,
-	int          value)
+void LIRenObject::set_particle_emitting (
+	int value)
 {
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
-		self->attachments[i]->set_emitting (value);
+	for (size_t i = 0 ; i < attachments.size () ; i++)
+		attachments[i]->set_emitting (value);
 }
 
 /**
  * \brief Sets the realized flag of the object.
- * \param self Object.
  * \param value Flag value.
  * \return Nonzero if succeeded.
  */
-int liren_object_set_realized (
-	LIRenObject* self,
-	int          value)
+int LIRenObject::set_visible (
+	int value)
 {
-	self->visible = value;
-	self->node->setVisible (value);
+	visible = value;
+	node->setVisible (value);
 	return 1;
 }
 
@@ -577,45 +504,39 @@ int liren_object_set_realized (
  * \param self Object.
  * \param value Render distance.
  */
-void liren_object_set_render_distance (
-	LIRenObject* self,
-	float        value)
+void LIRenObject::set_render_distance (
+	float value)
 {
-	self->render_distance = value;
-	private_update_entity_settings (self);
+	render_distance = value;
+	update_entity_settings ();
 }
 
 /**
  * \brief Sets the shadow casting mode of the object.
- * \param self Object.
  * \param value Nonzero to allow shadow casting, zero to disable.
  */
-void liren_object_set_shadow (
-	LIRenObject* self,
-	int          value)
+void LIRenObject::set_shadow_casting (
+	int value)
 {
-	self->shadow_casting = value;
-	private_update_entity_settings (self);
+	shadow_casting = value;
+	update_entity_settings ();
 }
 
 /**
  * \brief Sets the transformation of the object.
- * \param self Object.
  * \param value Transformation.
  */
-void liren_object_set_transform (
-	LIRenObject*          self,
+void LIRenObject::set_transform (
 	const LIMatTransform* value)
 {
-	self->transform = *value;
-	self->node->setPosition (value->position.x, value->position.y, value->position.z);
-	self->node->setOrientation (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z);
+	transform = *value;
+	node->setPosition (value->position.x, value->position.y, value->position.z);
+	node->setOrientation (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z);
 }
 
 /*****************************************************************************/
 
-static LIMdlPose* private_channel_animate (
-	LIRenObject*            self,
+LIMdlPose* LIRenObject::channel_animate (
 	LIMdlPose*              pose,
 	int                     channel,
 	int                     keep,
@@ -645,46 +566,44 @@ static LIMdlPose* private_channel_animate (
 	return pose;
 }
 
-static void private_channel_fade (
-	LIRenObject* self,
-	LIMdlPose*   pose,
-	int          channel,
-	float        time)
+void LIRenObject::channel_fade (
+	LIMdlPose* pose,
+	int        channel,
+	float      time)
 {
 	if (pose != NULL)
 		limdl_pose_fade_channel (pose, channel, time);
 }
 
-static void private_rebuild_skeleton (
-	LIRenObject* self)
+void LIRenObject::rebuild_skeleton ()
 {
 	int count;
 	LIMdlModel** models;
 
 	/* Check if a skeleton exists. */
-	self->skeleton_rebuild_needed = 0;
-	if (self->pose_skeleton == NULL)
+	skeleton_rebuild_needed = 0;
+	if (pose_skeleton == NULL)
 		return;
 
 	/* Check for attachments. */
-	if (!self->attachments.size ())
+	if (!attachments.size ())
 	{
-		limdl_pose_skeleton_rebuild (self->pose_skeleton, NULL, 0);
+		limdl_pose_skeleton_rebuild (pose_skeleton, NULL, 0);
 		return;
 	}
 
 	/* Allocate space for models. */
 	count = 0;
-	models = (LIMdlModel**) lisys_calloc (self->attachments.size (), sizeof (LIMdlModel*));
+	models = (LIMdlModel**) lisys_calloc (attachments.size (), sizeof (LIMdlModel*));
 	if (models == NULL)
 		return;
 
 	/* Add each model to the list. */
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+	for (size_t i = 0 ; i < attachments.size () ; i++)
 	{
-		if (self->attachments[i]->get_replacer () == NULL)
+		if (attachments[i]->get_replacer () == NULL)
 		{
-			LIMdlModel* m = self->attachments[i]->get_model ();
+			LIMdlModel* m = attachments[i]->get_model ();
 			if (m != NULL && m->nodes.count)
 			{
 				models[count] = m;
@@ -694,18 +613,17 @@ static void private_rebuild_skeleton (
 	}
 
 	/* Rebuild the skeleton. */
-	limdl_pose_skeleton_rebuild (self->pose_skeleton, models, count);
+	limdl_pose_skeleton_rebuild (pose_skeleton, models, count);
 	lisys_free (models);
 }
 
-static void private_remove_entity (
-	LIRenObject* self,
-	int          index)
+void LIRenObject::remove_entity (
+	int index)
 {
 	/* Remove from the list. */
 	/* This must be done first to avoid potential double deletion. */
-	LIRenAttachment* attachment = self->attachments[index];
-	self->attachments.erase(self->attachments.begin () + index);
+	LIRenAttachment* attachment = attachments[index];
+	attachments.erase(attachments.begin () + index);
 
 	/* Free attachments waiting for the removal of this one. */
 	/* This is a potentially recursive operation so the list indices may change
@@ -714,11 +632,11 @@ static void private_remove_entity (
 	while (true)
 	{
 		bool found = false;
-		for (size_t i = 0 ; i < self->attachments.size () ; i++)
+		for (size_t i = 0 ; i < attachments.size () ; i++)
 		{
-			if (attachment == self->attachments[i]->get_replacer ())
+			if (attachment == attachments[i]->get_replacer ())
 			{
-				private_remove_entity (self, i);
+				remove_entity (i);
 				found = true;
 				break;
 			}
@@ -731,11 +649,10 @@ static void private_remove_entity (
 	OGRE_DELETE attachment;
 }
 
-static void private_update_entity_settings (
-	LIRenObject* self)
+void LIRenObject::update_entity_settings ()
 {
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
-		self->attachments[i]->update_settings ();
+	for (size_t i = 0 ; i < attachments.size () ; i++)
+		attachments[i]->update_settings ();
 }
 
 /** @} */

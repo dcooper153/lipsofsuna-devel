@@ -27,6 +27,7 @@
 #include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-attachment-particle.hpp"
+#include "render-object.hpp"
 
 LIRenAttachmentParticle::LIRenAttachmentParticle (LIRenObject* object, const Ogre::String& particle) :
 	LIRenAttachment (object)
@@ -40,7 +41,7 @@ LIRenAttachmentParticle::LIRenAttachmentParticle (LIRenObject* object, const Ogr
 		object->node->attachObject (particles);
 
 		/* Set particle effect visibility. */
-		particles->setVisible (object->visible);
+		particles->setVisible (object->get_visible ());
 	}
 	catch (...)
 	{

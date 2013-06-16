@@ -25,7 +25,7 @@
 #include "lipsofsuna/system.h"
 #include "render-object.h"
 #include "internal/render.h"
-#include "internal/render-object.h"
+#include "internal/render-object.hpp"
 
 /**
  * \brief Creates a new render object and adds it to the scene.
@@ -37,11 +37,11 @@ int liren_render_object_new (
 {
 	LIRenObject* self;
 
-	self = liren_object_new (render, 0);
+	self = new LIRenObject (render, 0);
 	if (self == NULL)
 		return 0;
 
-	return liren_object_get_id (self);
+	return self->get_id ();
 }
 
 /**
@@ -55,9 +55,9 @@ void liren_render_object_free (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
-		liren_object_free (object);
+		delete object;
 }
 
 /**
@@ -75,12 +75,12 @@ void liren_render_object_add_model (
 	LIRenObject* object;
 	LIRenModel* model_;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
 	{
-		model_ = lialg_u32dic_find (self->models, model);
+		model_ = (LIRenModel*) lialg_u32dic_find (self->models, model);
 		if (model_ != NULL)
-			liren_object_add_model (object, model_);
+			object->add_model (model_);
 	}
 }
 
@@ -93,11 +93,11 @@ void liren_render_object_channel_animate (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object == NULL)
 		return;
 
-	liren_object_channel_animate (object, channel, keep, info);
+	object->channel_animate (channel, keep, info);
 }
 
 void liren_render_object_channel_fade (
@@ -108,11 +108,11 @@ void liren_render_object_channel_fade (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object == NULL)
 		return;
 
-	liren_object_channel_fade (object, channel, time);
+	object->channel_fade (channel, time);
 }
 
 LIMdlPoseChannel* liren_render_object_channel_get_state (
@@ -122,11 +122,11 @@ LIMdlPoseChannel* liren_render_object_channel_get_state (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object == NULL)
 		return NULL;
 
-	return liren_object_channel_get_state (object, channel);
+	return object->channel_get_state (channel);
 }
 
 void liren_render_object_clear_animations (
@@ -135,11 +135,11 @@ void liren_render_object_clear_animations (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object == NULL)
 		return;
 
-	liren_object_clear_animations (object);
+	object->clear_animations ();
 }
 
 int liren_render_object_find_node (
@@ -151,11 +151,11 @@ int liren_render_object_find_node (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object == NULL)
 		return 0;
 
-	return liren_object_find_node (object, name, world, result);
+	return object->find_node (name, world, result);
 }
 
 /**
@@ -173,9 +173,9 @@ void liren_render_object_particle_animation (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
-		liren_object_particle_animation (object, start, loop);
+		object->particle_animation (start, loop);
 }
 
 /**
@@ -201,13 +201,13 @@ void liren_render_object_replace_model (
 	LIRenModel* model_old_;
 	LIRenModel* model_new_;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
 	{
-		model_old_ = lialg_u32dic_find (self->models, model_old);
-		model_new_ = lialg_u32dic_find (self->models, model_new);
+		model_old_ = (LIRenModel*) lialg_u32dic_find (self->models, model_old);
+		model_new_ = (LIRenModel*) lialg_u32dic_find (self->models, model_new);
 		if (model_new_ != NULL)
-			liren_object_replace_model (object, model_old_, model_new_);
+			object->replace_model (model_old_, model_new_);
 	}
 }
 
@@ -230,9 +230,9 @@ void liren_render_object_replace_texture (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
-		liren_object_replace_texture (object, name, width, height, pixels);
+		object->replace_texture (name, width, height, pixels);
 }
 
 /**
@@ -250,12 +250,12 @@ void liren_render_object_remove_model (
 	LIRenObject* object;
 	LIRenModel* model_;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
 	{
-		model_ = lialg_u32dic_find (self->models, model);
+		model_ = (LIRenModel*) lialg_u32dic_find (self->models, model);
 		if (model_ != NULL)
-			liren_object_remove_model (object, model_);
+			object->remove_model (model_);
 	}
 }
 
@@ -274,9 +274,9 @@ void liren_render_object_set_effect (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
-		liren_object_set_effect (object, shader, params);
+		object->set_effect (shader, params);
 }
 
 /**
@@ -291,9 +291,9 @@ int liren_render_object_get_loaded (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
-		return liren_object_get_loaded (object);
+		return object->get_loaded ();
 	else
 		return 1;
 }
@@ -312,11 +312,11 @@ void liren_render_object_set_model (
 	LIRenObject* object;
 	LIRenModel* model_;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
 	{
-		model_ = lialg_u32dic_find (self->models, model);
-		liren_object_set_model (object, model_);
+		model_ = (LIRenModel*) lialg_u32dic_find (self->models, model);
+		object->set_model (model_);
 	}
 }
 
@@ -333,9 +333,9 @@ void liren_render_object_set_particle (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
-		liren_object_set_particle (object, name);
+		object->set_particle (name);
 }
 
 /**
@@ -351,9 +351,9 @@ void liren_render_object_set_particle_emitting (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
-		liren_object_set_particle_emitting (object, value);
+		object->set_particle_emitting (value);
 }
 
 /**
@@ -369,9 +369,9 @@ void liren_render_object_set_realized (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
-		liren_object_set_realized (object, value);
+		object->set_visible (value);
 }
 
 /**
@@ -387,9 +387,9 @@ void liren_render_object_set_render_distance (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
-		liren_object_set_render_distance (object, value);
+		object->set_render_distance (value);
 }
 
 /**
@@ -405,9 +405,9 @@ void liren_render_object_set_shadow (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
-		liren_object_set_shadow (object, value);
+		object->set_shadow_casting (value);
 }
 
 /**
@@ -423,9 +423,9 @@ void liren_render_object_set_transform (
 {
 	LIRenObject* object;
 
-	object = lialg_u32dic_find (self->objects, id);
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
-		liren_object_set_transform (object, value);
+		object->set_transform (value);
 }
 
 /** @} */

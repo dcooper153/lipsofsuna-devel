@@ -27,6 +27,7 @@
 #include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-attachment-entity.hpp"
+#include "render-object.hpp"
 #include <OgreSubEntity.h>
 #include <OgreSubMesh.h>
 #include <OgreResourceBackgroundQueue.h>
@@ -233,13 +234,13 @@ void LIRenAttachmentEntity::update (float secs)
 	}
 
 	/* Set the entity flags. */
-	entity->setCastShadows (object->shadow_casting);
+	entity->setCastShadows (object->get_shadow_casting ());
 
 	/* Set entity visibility. */
 	/* If a visible entity is added to a hidden scene node, the entity is
 	   still rendered. Hence, newly added entities needs to be explicitly
 	   hidden or Ogre will render our invisible objects. */
-	entity->setVisible (object->visible);
+	entity->setVisible (object->get_visible ());
 
 	/* Clear the now useless dependency list. */
 	resources.clear ();
@@ -291,7 +292,7 @@ void LIRenAttachmentEntity::update_settings ()
 	if (entity == NULL)
 		return;
 
-	entity->setCastShadows (object->shadow_casting);
+	entity->setCastShadows (object->get_shadow_casting ());
 }
 
 bool LIRenAttachmentEntity::create_skeleton ()

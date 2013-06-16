@@ -22,7 +22,9 @@
 #include "render-light.h"
 #include "render-message.h"
 #include "render-model.h"
-#include "render-object.h"
+#ifdef __cplusplus
+#include "render-object.hpp"
+#endif
 #include "render-overlay.h"
 #include "render-queue.h"
 #include "render-types.h"

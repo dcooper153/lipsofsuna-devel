@@ -26,6 +26,7 @@
 
 #include "lipsofsuna/system.h"
 #include "render-attachment.hpp"
+#include "render-object.hpp"
 
 LIRenAttachment::LIRenAttachment (LIRenObject* object)
 {

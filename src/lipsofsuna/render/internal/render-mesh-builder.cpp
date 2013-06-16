@@ -27,7 +27,7 @@
 #include "lipsofsuna/system.h"
 #include "render-mesh-builder.hpp"
 #include "render.h"
-#include "render-object.h"
+#include "render-object.hpp"
 #include <OgreSubMesh.h>
 #include <OgreSkeletonManager.h>
 

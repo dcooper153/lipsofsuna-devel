@@ -27,7 +27,6 @@
 typedef struct _LIRenImage LIRenImage;
 typedef struct _LIRenLight LIRenLight;
 typedef struct _LIRenMessage LIRenMessage;
-typedef struct _LIRenObject LIRenObject;
 typedef struct _LIRenOverlay LIRenOverlay;
 typedef struct _LIRenQueue LIRenQueue;
 typedef struct _LIRenModel LIRenModel;
@@ -36,6 +35,7 @@ typedef struct _LIRenRenderData LIRenRenderData;
 #ifdef __cplusplus
 class LIRenAttachment;
 class LIRenMaterialUtils;
+class LIRenObject;
 #include <OgreBorderPanelOverlayElement.h>
 #include <OgreCamera.h>
 #include <OgreEntity.h>

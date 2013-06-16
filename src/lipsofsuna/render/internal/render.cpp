@@ -497,7 +497,7 @@ int liren_internal_update (
 	LIALG_U32DIC_FOREACH (iter1, self->objects)
 	{
 		object = (LIRenObject*) iter1.value;
-		liren_object_update (object, secs);
+		object->update (secs);
 	}
 
 	/* Update the backend. */
