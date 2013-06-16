@@ -43,10 +43,17 @@ Utils.get_file_type = function(self, name)
 	if string.match(name, ".*[.]h$") then return "C" end
 	if string.match(name, ".*[.]hpp$") then return "C++" end
 	if string.match(name, ".*[.]js$") then return "JavaScript" end
+	if string.match(name, ".*[.]json$") then return "JSON" end
 	if string.match(name, ".*[.]lua$") then return "Lua" end
 	if string.match(name, ".*[.]php$") then return "PHP" end
 	if string.match(name, ".*[.]py$") then return "Python" end
-	if string.match(name, ".*[.]vhd$") then return "VHDL" end
+	if string.match(name, ".*[.]compositor$") then return "OGRE" end
+	if string.match(name, ".*[.]material$") then return "OGRE" end
+	if string.match(name, ".*[.]particle$") then return "OGRE" end
+	if string.match(name, ".*[.]program$") then return "OGRE" end
+	if string.match(name, ".*[.]template$") then return "OGRE" end
+	if string.match(name, ".*[.]frag$") then return "GLSL" end
+	if string.match(name, ".*[.]vert$") then return "GLSL" end
 end
 
 Utils.find_files = function(self, path)
@@ -290,54 +297,6 @@ end
 
 ------------------------------------------------------------------------------
 
-local ReplaceXXX = Class("ReplaceXXX", ReplaceWhole)
-
-ReplaceXXX.new = function(clss, path, name)
-	local self = Replace.new(clss, path, name)
-	return self
-end
-
-ReplaceXXX.parse = function(self)
-	local file = self:start()
-	if not file then return end
-	local text = file:read("*a")
-	self:line(text)
-	self:done()
-	file:close()
-end
-
-ReplaceXXX.replace = function(self, line)
-	if string.find(line, "--@module ") then return end
-	local s1,e1 = string.find(line, "\nlocal ([a-zA-Z0-9]+) = Class%([^)]*%)")
-	local s2,e2 = string.find(line, "\n([a-zA-Z0-9]+) = Class%([^)]*%)")
-	local s,e = s1 or s2,e1 or e2
-	if not s then return end
-	local name = string.match(line, "([.a-zA-Z0-9]+) = Class%([^)]*%)")
-	if not name then return end
-
-	local x = string.gsub(self.path .. self.name, "^data/", "")
-	local x = string.gsub(x, "%.lua$", "")
-	local x = string.gsub(x, "/", ".")
-	local x = string.gsub(x, "-", "_")
-	return string.format(
-[[--- TODO:doc
---
--- Lips of Suna is free software: you can redistribute it and/or modify
--- it under the terms of the GNU Lesser General Public License as
--- published by the Free Software Foundation, either version 3 of the
--- License, or (at your option) any later version.
---
--- @module %s
--- @alias %s
-
-%s
---- TODO:doc
--- @type %s%s
-]], x, name, string.sub(line, 1, s - 1), name, string.sub(line, s))
-end
-
-------------------------------------------------------------------------------
-
 local CountLines = Class("CountLines")
 
 CountLines.new = function(clss)
@@ -386,9 +345,9 @@ elseif arg[1] == "-l" or arg[1] == "--lines" then
 		count:parse(path, name)
 	end
 	for k,v in pairs(count:get_list()) do
-		print(string.format("%6s: %d", v[1], v[2]))
+		print(string.format("%-10s: %d", v[1], v[2]))
 	end
-	print(string.format("\n%6s: %d", "Total", count:get_total()))
+	print(string.format("\n%-10s: %d", "Total", count:get_total()))
 elseif arg[1] == "-r" or arg[1] == "--replace" then
 	if #arg ~= 3 and #arg ~= 4 then return Utils:usage() end
 	for path,name in Utils:find_files(arg[4] or ".") do
@@ -418,10 +377,6 @@ elseif arg[1] == "-sw" or arg[1] == "--search-whole" then
 	if #arg ~= 2 and #arg ~= 3 then return Utils:usage() end
 	for path,name in Utils:find_files(arg[3] or ".") do
 		MatchWhole(path, name, arg[2]):parse()
-	end
-elseif arg[1] == "-X" then
-	for path,name in Utils:find_files(arg[2]) do
-		ReplaceXXX(path, name):parse()
 	end
 else
 	return Utils:usage()
