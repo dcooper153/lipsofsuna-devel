@@ -25,16 +25,12 @@
  */
 
 #include "render-internal.h"
-#include "render-container-factory.hpp"
-#include "render-image-overlay-factory.hpp"
 #include "render-material-utils.hpp"
 #include "render-mesh-builder.hpp"
 #include "render-resource-loading-listener.hpp"
-#include "render-scaled-overlay-factory.hpp"
-#include "render-text-overlay-factory.hpp"
-#include "../render-overlay.h"
 #include "../font/font.h"
 #include "../font/font-layout.h"
+#include "../overlay/render-overlay-manager.hpp"
 #include <OgreCompositorManager.h>
 #include <OgreEntity.h>
 #include <OgreFontManager.h>
@@ -84,21 +80,12 @@ LIRenRender::LIRenRender(
 	if (objects == NULL)
 		throw;
 
-	/* Allocate the overlay dictionary. */
-	overlays = lialg_u32dic_new ();
-	if (overlays == NULL)
-		throw;
-
 	Ogre::Real w;
 	Ogre::Real h;
 	Ogre::String data1 (paths->module_data);
 
 	/* Initialize the private data. */
 	unload_timer = 0.0f;
-	container_factory = NULL;
-	image_factory = NULL;
-	scaled_factory = NULL;
-	text_factory = NULL;
 	mesh_builders = lialg_strdic_new ();
 
 	/* Disable console output. */
@@ -201,15 +188,7 @@ LIRenRender::LIRenRender(
 	camera->setAspectRatio (w / h);
 
 	/* Initialize the user interface. */
-	overlay_manager = &(Ogre::OverlayManager::getSingleton ());
-	container_factory = new LIRenContainerFactory;
-	overlay_manager->addOverlayElementFactory (container_factory);
-	image_factory = new LIRenImageOverlayFactory;
-	overlay_manager->addOverlayElementFactory (image_factory);
-	scaled_factory = new LIRenScaledOverlayFactory;
-	overlay_manager->addOverlayElementFactory (scaled_factory);
-	text_factory = new LIRenTextOverlayFactory;
-	overlay_manager->addOverlayElementFactory (text_factory);
+	overlay_mgr = new LIRenOverlayManager ();
 
 	/* Create the group for temporary resources. */
 	/* This group is used for temporary resources such as meshes or
@@ -250,14 +229,6 @@ LIRenRender::~LIRenRender()
 		lialg_u32dic_free (models);
 	}
 
-	/* Free overlays. */
-	if (overlays != NULL)
-	{
-		LIALG_U32DIC_FOREACH (iter2, overlays)
-			liren_render_overlay_free (this, iter2.key);
-		lialg_u32dic_free (overlays);
-	}
-
 	/* Free fonts. */
 	if (fonts != NULL)
 	{
@@ -277,10 +248,7 @@ LIRenRender::~LIRenRender()
 	delete root;
 	delete resource_loading_listener;
 	delete material_utils;
-	delete container_factory;
-	delete image_factory;
-	delete scaled_factory;
-	delete text_factory;
+	delete overlay_mgr;
 	delete log;
 }
 

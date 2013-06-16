@@ -18,15 +18,15 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenInternal Internal
+ * \addtogroup LIRenOverlay Overlay
  * @{
  * \addtogroup LIRenContainer Container
  * @{
  */
 
-#include "render-internal.h"
 #include "render-container.hpp"
 #include <OgreHardwareBufferManager.h>
+#include <OgreOverlayManager.h>
 
 #define MAX_VERTEX_COUNT 1024
 

@@ -18,16 +18,17 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenInternal Internal
+ * \addtogroup LIRenOverlay Overlay
  * @{
  * \addtogroup LIRenImageOverlay ImageOverlay
  * @{
  */
 
-#include "render-internal.h"
+#include "lipsofsuna/math.h"
 #include "render-image-overlay.hpp"
 #include "render-tile-packer.hpp"
 #include <OgreHardwareBufferManager.h>
+#include <OgreRoot.h>
 
 Ogre::String LIRenImageOverlay::type_name ("LIRenImageOverlay");
 

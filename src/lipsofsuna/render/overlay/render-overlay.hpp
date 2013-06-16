@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,10 +15,15 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_OVERLAY_HPP__
-#define __RENDER_INTERNAL_OVERLAY_HPP__
+#ifndef __RENDER_OVERLAY_OVERLAY_HPP__
+#define __RENDER_OVERLAY_OVERLAY_HPP__
+
+#include "lipsofsuna/math.h"
+#include <OgreOverlay.h>
 
 class LIRenContainer;
+class LIRenOverlayManager;
+class LIRenRender;
 
 class LIRenOverlay
 {
@@ -28,8 +33,9 @@ public:
 	int visible;
 	float alpha;
 	LIMatVector position;
-	LIRenOverlay* parent;
 	LIRenRender* render;
+	LIRenOverlay* parent;
+	LIRenOverlayManager* manager;
 	LIRenContainer* container;
 	Ogre::Overlay* overlay;
 	struct

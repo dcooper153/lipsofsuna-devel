@@ -15,16 +15,31 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_INTERNAL_H__
-#define __RENDER_INTERNAL_INTERNAL_H__
+#ifndef __RENDER_OVERLAY_OVERLAY_MANAGER_HPP__
+#define __RENDER_OVERLAY_OVERLAY_MANAGER_HPP__
 
-#ifndef __cplusplus
-#error "Only usable from C++"
-#else
-#include "render.hpp"
-#include "render-light.hpp"
-#include "render-model.hpp"
-#include "render-object.hpp"
-#endif
+#include "lipsofsuna/algorithm.h"
+#include <OgreOverlayManager.h>
+
+class LIRenContainerFactory;
+class LIRenImageOverlayFactory;
+class LIRenScaledOverlayFactory;
+class LIRenTextOverlayFactory;
+
+class LIRenOverlayManager
+{
+public:
+	LIRenOverlayManager ();
+	~LIRenOverlayManager ();
+
+// FIXME
+public:
+	LIAlgU32dic* overlays;
+	Ogre::OverlayManager* overlay_manager;
+	LIRenContainerFactory* container_factory;
+	LIRenImageOverlayFactory* image_factory;
+	LIRenScaledOverlayFactory* scaled_factory;
+	LIRenTextOverlayFactory* text_factory;
+};
 
 #endif

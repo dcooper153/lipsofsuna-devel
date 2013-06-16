@@ -20,41 +20,42 @@
  * @{
  * \addtogroup LIRenInternal Internal
  * @{
- * \addtogroup LIRenTextOverlay TextOverlay
+ * \addtogroup LIRenTilePacker TilePacker
  * @{
  */
 
-#include "render-internal.h"
-#include "render-text-overlay.hpp"
+#ifndef __RENDER_INTERNAL_TILE_PACKER_HPP__
+#define __RENDER_INTERNAL_TILE_PACKER_HPP__
 
-Ogre::String LIRenTextOverlay::type_name ("LIRenTextOverlay");
+#include "lipsofsuna/system.h"
 
-/*****************************************************************************/
+#define VERTEX_SIZE 24
+#define VERTEX_COUNT_INIT 0
+#define VERTEX_COUNT_MAX 10240
 
-LIRenTextOverlay::LIRenTextOverlay (const Ogre::String& name) : Ogre::TextAreaOverlayElement (name)
+class LIRenTilePacker
 {
-}
+public:
+	LIRenTilePacker (float zv);
+	void set_color (const float* color);
+	void set_clipping (float* rect);
+	void set_rotation (float angle, float x, float y, float aspect);
+	void add_quad (float x0, float y0, float u0, float v0, float x1, float y1, float u1, float v1);
+protected:
+	void add_vertex (float x, float y, float u, float v);
+	void clip_coord (float& coord, float& tex, float tex_scale, float min, float max);
+public:
+	int pos;
+	float z;
+	float color[4];
+	float* clip;
+	float verts[VERTEX_COUNT_MAX * 6];
+	float rotation_angle;
+	float rotation_aspect;
+	float rotation_center[2];
+};
 
-LIRenTextOverlay::~LIRenTextOverlay ()
-{
-}
-
-void LIRenTextOverlay::set_alpha (float alpha)
-{
-	LIRenBaseOverlay::set_alpha (alpha);
-	setColour (Ogre::ColourValue (color[0], color[1], color[2], color[3] * alpha));
-/*	if (mInitialized)
-	{
-		updatePositionGeometry ();
-		updateTextureGeometry ();
-	}*/
-}
-
-void LIRenTextOverlay::set_color (const float* color)
-{
-	memcpy (this->color, color, 4 * sizeof (float));
-	setColour (Ogre::ColourValue (color[0], color[1], color[2], color[3] * alpha));
-}
+#endif
 
 /** @} */
 /** @} */

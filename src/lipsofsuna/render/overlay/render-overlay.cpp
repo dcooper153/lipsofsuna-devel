@@ -18,18 +18,20 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenInternal Internal
+ * \addtogroup LIRenOverlay Overlay
  * @{
  * \addtogroup LIRenOverlay Overlay
  * @{
  */
 
-#include "render-internal.h"
-#include "render-image-overlay.hpp"
 #include "render-container.hpp"
+#include "render-image-overlay.hpp"
+#include "render-overlay.hpp"
+#include "render-overlay-manager.hpp"
 #include "render-text-overlay.hpp"
 #include "../font/font.h"
 #include "../font/font-layout.h"
+#include "../internal/render.hpp"
 
 static bool private_create_material (
 	LIRenOverlay*      self,
@@ -61,25 +63,26 @@ LIRenOverlay* liren_overlay_new (
 	if (self == NULL)
 		return 0;
 	self->render = render;
+	self->manager = render->overlay_mgr;
 	self->alpha = 1.0f;
 
 	/* Choose a unique ID. */
 	while (!self->id)
 	{
 		self->id = lialg_random_range (&render->random, 0x00000000, 0x0FFFFFFF);
-		if (lialg_u32dic_find (render->overlays, self->id))
+		if (lialg_u32dic_find (render->overlay_mgr->overlays, self->id))
 			self->id = 0;
 	}
 
 	/* Add to the dictionary. */
-	if (!lialg_u32dic_insert (render->overlays, self->id, self))
+	if (!lialg_u32dic_insert (self->manager->overlays, self->id, self))
 	{
 		liren_overlay_free (self);
 		return 0;
 	}
 
 	/* Create the overlay element. */
-	self->container = (LIRenContainer*) render->overlay_manager->createOverlayElement ("LIRenContainer", self->render->id.next ());
+	self->container = (LIRenContainer*) self->manager->overlay_manager->createOverlayElement ("LIRenContainer", self->render->id.next ());
 	self->container->setMetricsMode (Ogre::GMM_PIXELS);
 
 	return self;
@@ -100,17 +103,17 @@ void liren_overlay_free (
 	/* Remove ourselves from our parent. */
 	if (self->parent != NULL)
 		private_remove_overlay (self->parent, self);
-	lialg_u32dic_remove (self->render->overlays, self->id);
+	lialg_u32dic_remove (self->render->overlay_mgr->overlays, self->id);
 
 	/* Free the overlay element. */
 	liren_overlay_clear (self);
 	if (self->overlay != NULL)
 	{
 		self->overlay->remove2D (self->container);
-		self->render->overlay_manager->destroy (self->overlay->getName ());
+		self->render->overlay_mgr->overlay_manager->destroy (self->overlay->getName ());
 	}
 	if (self->container != NULL)
-		self->render->overlay_manager->destroyOverlayElement (self->container);
+		self->render->overlay_mgr->overlay_manager->destroyOverlayElement (self->container);
 
 	delete self;
 }
@@ -199,7 +202,7 @@ void liren_overlay_add_text (
 
 		/* Create the element. */
 		Ogre::String id = self->render->id.next ();
-		LIRenTextOverlay* elem = (LIRenTextOverlay*) self->render->overlay_manager->createOverlayElement ("LIRenTextOverlay", id);
+		LIRenTextOverlay* elem = (LIRenTextOverlay*) self->manager->overlay_manager->createOverlayElement ("LIRenTextOverlay", id);
 		elem->setMetricsMode (Ogre::GMM_PIXELS);
 		elem->setPosition (x, y);
 		elem->setDimensions (size[0], size[1]);
@@ -255,7 +258,7 @@ void liren_overlay_add_tiled (
 
 	/* Create a new image overlay. */
 	Ogre::String id = self->render->id.next ();
-	LIRenImageOverlay* elem = (LIRenImageOverlay*) self->render->overlay_manager->createOverlayElement ("LIRenImageOverlay", id); 
+	LIRenImageOverlay* elem = (LIRenImageOverlay*) self->manager->overlay_manager->createOverlayElement ("LIRenImageOverlay", id); 
 	elem->setMetricsMode (Ogre::GMM_PIXELS);
 	elem->setPosition (dest_position[0], dest_position[1]);
 	elem->setDimensions (dest_size[0], dest_size[1]);
@@ -304,7 +307,7 @@ void liren_overlay_add_scaled (
 
 	/* Create a new scaled overlay. */
 	Ogre::String id = self->render->id.next ();
-	LIRenImageOverlay* elem = (LIRenImageOverlay*) self->render->overlay_manager->createOverlayElement ("LIRenScaledOverlay", id); 
+	LIRenImageOverlay* elem = (LIRenImageOverlay*) self->manager->overlay_manager->createOverlayElement ("LIRenScaledOverlay", id); 
 	elem->setMetricsMode (Ogre::GMM_PIXELS);
 	elem->setPosition (dest_position[0], dest_position[1]);
 	elem->setDimensions (dest_size[0], dest_size[1]);
@@ -339,7 +342,7 @@ void liren_overlay_add_overlay (
 	if (overlay->overlay != NULL)
 	{
 		overlay->overlay->remove2D (overlay->container);
-		overlay->render->overlay_manager->destroy (overlay->overlay->getName ());
+		overlay->manager->overlay_manager->destroy (overlay->overlay->getName ());
 		overlay->overlay = NULL;
 	}
 	if (overlay->parent != NULL)
@@ -414,7 +417,7 @@ void liren_overlay_set_floating (
 	{
 		if (self->parent != NULL)
 			private_remove_overlay (self->parent, self);
-		self->overlay = self->render->overlay_manager->create (id);
+		self->overlay = self->manager->overlay_manager->create (id);
 		self->overlay->add2D (self->container);
 		self->overlay->setZOrder (self->depth);
 		if (self->visible)
@@ -424,7 +427,7 @@ void liren_overlay_set_floating (
 	else if (!value && self->overlay != NULL)
 	{
 		self->overlay->remove2D (self->container);
-		self->render->overlay_manager->destroy (self->overlay->getName ());
+		self->manager->overlay_manager->destroy (self->overlay->getName ());
 		self->overlay = NULL;
 	}
 }

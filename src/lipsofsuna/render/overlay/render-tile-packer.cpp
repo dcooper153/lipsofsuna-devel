@@ -18,13 +18,13 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenInternal Internal
+ * \addtogroup LIRenOverlay Overlay
  * @{
  * \addtogroup LIRenTilePacker TilePacker
  * @{
  */
 
-#include "render-internal.h"
+#include "lipsofsuna/math.h"
 #include "render-tile-packer.hpp"
 
 LIRenTilePacker::LIRenTilePacker (float zv)

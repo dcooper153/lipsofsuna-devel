@@ -36,13 +36,10 @@
 #define LIREN_RESOURCES_PERMANENT "permanent"
 #define LIREN_RESOURCES_TEMPORARY "temporary"
 
-class LIRenContainerFactory;
-class LIRenImageOverlayFactory;
 class LIRenMaterialUtils;
 class LIRenModel;
+class LIRenOverlayManager;
 class LIRenResourceLoadingListener;
-class LIRenScaledOverlayFactory;
-class LIRenTextOverlayFactory;
 
 class LIRenRender
 {
@@ -164,7 +161,6 @@ public:
 	LIAlgU32dic* lights;
 	LIAlgU32dic* models;
 	LIAlgU32dic* objects;
-	LIAlgU32dic* overlays;
 	LIPthPaths* paths;
 	LIRenVideomode mode;
 
@@ -172,7 +168,7 @@ public:
 	Ogre::Root* root;
 	Ogre::Camera* camera;
 	Ogre::MaterialManager* material_manager;
-	Ogre::OverlayManager* overlay_manager;
+	LIRenOverlayManager* overlay_mgr;
 	Ogre::RenderWindow* render_window;
 	Ogre::RenderSystem* render_system;
 	Ogre::SceneManager* scene_manager;
@@ -180,10 +176,6 @@ public:
 	Ogre::TextureManager* texture_manager;
 	Ogre::Viewport* viewport;
 	Ogre::LogManager* log;
-	LIRenContainerFactory* container_factory;
-	LIRenImageOverlayFactory* image_factory;
-	LIRenScaledOverlayFactory* scaled_factory;
-	LIRenTextOverlayFactory* text_factory;
 	LIRenMaterialUtils* material_utils;
 	LIRenResourceLoadingListener* resource_loading_listener;
 	LIRenUniqueId id;
