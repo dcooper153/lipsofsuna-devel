@@ -26,7 +26,7 @@ Widgets.Uimap.add_marker = function(self, icon, name, pos, rot)
 	local loc = Vector(pos.x, pos.z) - Vector(center.x, center.z)
 	-- Calculate the pixel position.
 	local size = self.size
-	local scale = Voxel.tile_scale * Client.data.map.scale
+	local scale = Client.data.map.scale
 	local pix = loc * scale + size * 0.5 - Vector(icon.size) * 0.5
 	if pix.x < 0 or pix.y < 0 or pix.x >= size.x or pix.y >= size.y then return end
 	-- Create the widget.
