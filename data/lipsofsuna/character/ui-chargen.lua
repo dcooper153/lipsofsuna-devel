@@ -357,7 +357,7 @@ Ui:add_widget{
 		for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
 			local value = Client.chargen:get_face(v.field_index) or 0
 			local widget = Widgets.Uiscrollfloat(v.name, 0, 1, value, function(w)
-				Client.chargen:set_body(k, w.value)
+				Client.chargen:set_face(k, w.value)
 			end)
 			table.insert(widgets, widget)
 		end

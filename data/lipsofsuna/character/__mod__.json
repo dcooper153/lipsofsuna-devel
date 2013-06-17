@@ -10,5 +10,5 @@
 	],
 	"server": false,
 	"scripts": ["main", "ui-chargen"],
-	"specs": ["sliders-body"]
+	"specs": ["sliders-body", "sliders-face"]
 }

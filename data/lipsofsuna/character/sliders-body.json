@@ -87,21 +87,5 @@
 		"field_name": "body_style",
 		"field_index": 11,
 		"shape_keys": ["shoulder wide"]
-	},
-	{
-		"type": "ChargenSliderSpec",
-		"name": "Nipple length",
-		"categories": {"body": true},
-		"field_name": "body_style",
-		"field_index": 12,
-		"shape_keys": ["nipple long"]
-	},
-	{
-		"type": "ChargenSliderSpec",
-		"name": "Nipple puffiness",
-		"categories": {"body": true},
-		"field_name": "body_style",
-		"field_index": 13,
-		"shape_keys": ["nipple puffy"]
 	}
 ]
