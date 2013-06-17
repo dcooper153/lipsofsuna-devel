@@ -44,11 +44,10 @@ class LIRenResourceLoadingListener;
 class LIRenRender
 {
 public:
-	LIRenRender (
-		LIPthPaths*     paths,
+	int init (
 		LIRenVideomode* mode);
 
-	~LIRenRender ();
+	void deinit ();
 
 	void add_compositor (
 		const char* name);

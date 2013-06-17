@@ -27,6 +27,7 @@
 #include "render-overlay.h"
 #include "font/font.h"
 #include "internal/render.hpp"
+#include "internal/render-model.hpp"
 
 LIRenRender* liren_render_new (
 	LIPthPaths*     paths,
@@ -35,9 +36,50 @@ LIRenRender* liren_render_new (
 	LIRenRender* self;
 
 	/* Allocate self. */
-	self = new LIRenRender (paths, mode);
+	self = new LIRenRender ();
 	if (self == NULL)
 		return NULL;
+	self->paths = paths;
+	lialg_random_init (&self->random, lisys_time (NULL));
+
+	/* Initialize the font dictionary. */
+	self->fonts = lialg_strdic_new ();
+	if (self->fonts == NULL)
+	{
+		liren_render_free (self);
+		return NULL;
+	}
+
+	/* Allocate the light dictionary. */
+	self->lights = lialg_u32dic_new ();
+	if (self->lights == NULL)
+	{
+		liren_render_free (self);
+		return NULL;
+	}
+
+	/* Allocate the model dictionary. */
+	self->models = lialg_u32dic_new ();
+	if (self->models == NULL)
+	{
+		liren_render_free (self);
+		return NULL;
+	}
+
+	/* Allocate the object dictionary. */
+	self->objects = lialg_u32dic_new ();
+	if (self->objects == NULL)
+	{
+		liren_render_free (self);
+		return NULL;
+	}
+
+	/* Initialize the backend. */
+	if (!self->init (mode))
+	{
+		liren_render_free (self);
+		return NULL;
+	}
 
 	/* Initialize the videomode. */
 	if (!self->set_videomode (mode))
@@ -52,6 +94,36 @@ LIRenRender* liren_render_new (
 void liren_render_free (
 	LIRenRender* self)
 {
+	LIAlgStrdicIter iter1;
+	LIAlgU32dicIter iter2;
+
+	/* Free lights. */
+	if (self->lights != NULL)
+		lialg_u32dic_free (self->lights);
+
+	/* Free objects. */
+	if (self->objects != NULL)
+		lialg_u32dic_free (self->objects);
+
+	/* Free models. */
+	if (self->models != NULL)
+	{
+		LIALG_U32DIC_FOREACH (iter2, self->models)
+			delete (LIRenModel*) iter2.value;
+		lialg_u32dic_free (self->models);
+	}
+
+	/* Free fonts. */
+	if (self->fonts != NULL)
+	{
+		LIALG_STRDIC_FOREACH (iter1, self->fonts)
+			lifnt_font_free ((LIFntFont*) iter1.value);
+		lialg_strdic_free (self->fonts);
+	}
+
+	/* Free the backend. */
+	self->deinit ();
+
 	delete self;
 }
 

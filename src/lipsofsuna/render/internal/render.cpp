@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2013 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -56,33 +56,9 @@
 
 /*****************************************************************************/
 
-LIRenRender::LIRenRender(
-	LIPthPaths*     paths,
+int LIRenRender::init (
 	LIRenVideomode* mode)
 {
-	this->paths = paths;
-	lialg_random_init (&random, lisys_time (NULL));
-
-	/* Initialize the font dictionary. */
-	fonts = lialg_strdic_new ();
-	if (fonts == NULL)
-		throw;
-
-	/* Allocate the light dictionary. */
-	lights = lialg_u32dic_new ();
-	if (lights == NULL)
-		throw;
-
-	/* Allocate the model dictionary. */
-	models = lialg_u32dic_new ();
-	if (models == NULL)
-		throw;
-
-	/* Allocate the object dictionary. */
-	objects = lialg_u32dic_new ();
-	if (objects == NULL)
-		throw;
-
 	Ogre::Real w;
 	Ogre::Real h;
 	Ogre::String data1 (paths->module_data);
@@ -105,12 +81,12 @@ LIRenRender::LIRenRender(
 
 	/* Make sure that the required plugins were loaded. */
 	if (!check_plugin ("GL RenderSystem"))
-		throw;
+		return 0;
 
 	/* Initialize the render system. */
 	render_system = root->getRenderSystemByName ("OpenGL Rendering Subsystem");
 	if (!(render_system->getName () == "OpenGL Rendering Subsystem"))
-		throw;
+		return 0;
 
 	/* Choose the video mode. */
 	Ogre::String fsaa = Ogre::StringConverter::toString (mode->multisamples);
@@ -209,37 +185,12 @@ LIRenRender::LIRenRender(
 	texture_manager->setDefaultNumMipmaps (5);
 	material_manager = &Ogre::MaterialManager::getSingleton ();
 	material_utils = new LIRenMaterialUtils(this);
+
+	return 1;
 }
 
-LIRenRender::~LIRenRender()
+void LIRenRender::deinit ()
 {
-	LIAlgStrdicIter iter1;
-	LIAlgU32dicIter iter2;
-
-	/* Free lights. */
-	if (lights != NULL)
-		lialg_u32dic_free (lights);
-
-	/* Free objects. */
-	if (objects != NULL)
-		lialg_u32dic_free (objects);
-
-	/* Free models. */
-	if (models != NULL)
-	{
-		LIALG_U32DIC_FOREACH (iter2, models)
-			delete (LIRenModel*) iter2.value;
-		lialg_u32dic_free (models);
-	}
-
-	/* Free fonts. */
-	if (fonts != NULL)
-	{
-		LIALG_STRDIC_FOREACH (iter1, fonts)
-			lifnt_font_free ((LIFntFont*) iter1.value);
-		lialg_strdic_free (fonts);
-	}
-
 	/* Free the mesh builders. */
 	/* Some meshes may be being loaded in other threads so the Ogre root
 	   needs to be shut down first to guarantee clean shutdown. */
