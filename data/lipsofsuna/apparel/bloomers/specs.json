@@ -1,0 +1,52 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "bloomers",
+		"effect": "craftsewing1",
+		"materials": {"hide": 1}
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "bloomers top",
+		"effect": "craftsewing1",
+		"materials": {"hide": 1}
+	},
+	{
+		"type": "Itemspec",
+		"name": "bloomers",
+		"model": "bloomers1",
+		"icon": "leatherarmor1",
+		"armor_class": 0,
+		"categories": {"armor": true},
+		"equipment_models":
+		{
+			"aer": {"lower": "aerlowerclothed1", "lower1": "aerbloomers1"}
+		},
+		"equipment_textures":
+		{
+			"aer": {"aer1": "aerbloomers1"}
+		},
+		"equipment_priority": -5,
+		"equipment_slot": "panties",
+		"mass": 5
+	},
+	{
+		"type": "Itemspec",
+		"name": "bloomers top",
+		"model": "bloomerstop1",
+		"icon": "leatherarmor1",
+		"armor_class": 0,
+		"categories": {"armor": true},
+		"equipment_models":
+		{
+			"aer": {"upper": "aerupperclothed1", "upper1": "aerbloomerstop1"}
+		},
+		"equipment_textures":
+		{
+			"aer": {"aer1": "aerbloomerstop1"}
+		},
+		"equipment_priority": -5,
+		"equipment_slot": "bra",
+		"mass": 5
+	}
+]
