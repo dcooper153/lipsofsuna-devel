@@ -214,6 +214,7 @@ end
 -- @param target Point vector in world space.
 -- @return True if avoided successfully.
 NpcAi.avoid_wander_obstacles = function(self, target)
+	do return true end --FIXME
 	local src = self.object:get_position():add_xyz(0,0.5,0):floor()
 	local dst = (target * Voxel.tile_scale):add_xyz(0,0.5,0):floor()
 	local p = Vector(
