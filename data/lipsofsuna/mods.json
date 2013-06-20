@@ -14,7 +14,6 @@
 	["load", "core/camera/first"],
 	["load", "core/camera/third"],
 	["load", "core/effect"],
-	["load", "core/generator"],
 	["load", "core/input"],
 	["load", "core/messaging"],
 	["load", "core/multiplayer"],
@@ -148,6 +147,7 @@
 	["load", "character"],
 	["load", "character/celshading"],
 	["load", "landscape"],
+	["load", "landscape/generator"],
 
 	["# Custom"],
 	["load_optional", "custom"]

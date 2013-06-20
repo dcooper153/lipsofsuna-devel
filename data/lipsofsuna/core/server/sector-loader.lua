@@ -9,7 +9,6 @@
 -- @alias SectorLoader
 
 local Class = require("system/class")
-local SectorGenerator = require("core/generator/sector-generator")
 
 --- Loads sector data asynchronously.
 -- @type SectorLoader

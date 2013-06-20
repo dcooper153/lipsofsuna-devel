@@ -1,23 +1,23 @@
---- TODO:doc
+--- Landscape generator.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.generator.generator
+-- @module landscape.generator.generator
 -- @alias Generator
 
 local Class = require("system/class")
 local Material = require("system/material")
 local Marker = require("core/marker")
 local Network = require("system/network")
-local Region = require("core/generator/region")
+local Region = require("landscape/generator/region")
 local Sector = require("system/sector")
-local SectorGenerator = require("core/generator/sector-generator")
+local SectorGenerator = require("landscape/generator/sector-generator")
 local Staticobject = require("core/objects/static")
 
---- TODO:doc
+--- Landscape generator.
 -- @type Generator
 Generator = Class("Generator")
 Generator.map_size = Vector(1000, 1000, 1000)
