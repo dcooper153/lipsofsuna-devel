@@ -131,14 +131,22 @@ void LIRenImageOverlay::getRenderOperation (Ogre::RenderOperation& op)
 
 void LIRenImageOverlay::updatePositionGeometry ()
 {
-	/* Prevent divide by zero. */
+	// Prevent divide by zero.
 	if (!mPixelWidth || !mPixelHeight)
 	{
 		render_op.vertexData->vertexCount = 0;
 		return;
 	}
 
-	/* Calculate vertex coordinates. */
+	// Ogre seems to divide by zero for a during startup when the viewport
+	// hasn't been initialized. Refuse to do anything if that is the case.
+	if (mPixelScaleX == LIMAT_INFINITE)
+	{
+		render_op.vertexData->vertexCount = 0;
+		return;
+	}
+
+	// Calculate vertex coordinates.
 	float left = _getDerivedLeft() * 2.0f - 1.0f;
 	float top = 1.0f - _getDerivedTop() * 2.0f;
 	float xscale = 2.0f * mWidth / mPixelWidth;
