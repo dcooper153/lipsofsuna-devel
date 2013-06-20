@@ -8,6 +8,10 @@
 			"long": "--character"
 		}
 	],
+	"mods":
+	[
+		["load", "character/celshading"]
+	],
 	"server": false,
 	"scripts": ["main", "ui-chargen"],
 	"specs": ["sliders-body", "sliders-face"]

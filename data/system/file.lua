@@ -30,11 +30,15 @@ end
 
 --- Requires all the Lua files in the given directory.
 -- @param self File class.
--- @param name File name relative to the mod root.
-File.require_directory = function(self, name)
+-- @param name Filename relative to the mod root.
+-- @param ignore Filename to ignore, or nil for none.
+File.require_directory = function(self, name, ignore)
+	local i = ignore and ignore .. ".lua"
 	for k,v in pairs(File:scan_directory(name)) do
-		if string.match(v, "[.]lua$") then
-			require(name .. "/" .. string.gsub(v, "(.*)[.]lua$", "%1"))
+		if not i or v ~= i then
+			if string.match(v, "[.]lua$") then
+				require(name .. "/" .. string.gsub(v, "(.*)[.]lua$", "%1"))
+			end
 		end
 	end
 end

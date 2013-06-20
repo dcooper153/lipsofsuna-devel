@@ -8,6 +8,10 @@
 			"long": "--landscape"
 		}
 	],
+	"mods":
+	[
+		["load", "landscape/generator"]
+	],
 	"server": false,
 	"scripts": ["main"]
 }

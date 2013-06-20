@@ -1,3 +1,3 @@
 {
-	"resources": ["templates", "."]
+	"resources": ["templates", ".", "shadows"]
 }

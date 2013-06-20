@@ -77,7 +77,8 @@ end
 -- @param self Mod.
 -- @param name Mod name.
 -- @param optional True for optional.
-Mod.load = function(self, name, optional)
+-- @param nocompat True to not allow Lua only mods.
+Mod.load = function(self, name, optional, nocompat)
 	local load_spec = function(info, file)
 		-- Open the file.
 		local path = name .. "/" .. file .. ".json"
@@ -115,6 +116,9 @@ Mod.load = function(self, name, optional)
 			error("loading mod \"" .. name .. "\" failed: " .. err)
 		end
 		info = res
+	elseif nocompat then
+		if optional then return end
+		error("loading mod \"" .. name .. "\" failed: could not open __mod__.json")
 	else
 		if optional then return end
 		info = {scripts = {"init"}} -- Backwards compatibility.
@@ -156,6 +160,10 @@ Mod.load = function(self, name, optional)
 			table.insert(self.scripts, {name, path, name .. "/" .. v})
 		end
 	end
+	-- Load child mods.
+	if info.mods then
+		self:load_list_json(info.mods, true)
+	end
 end
 
 --- Loads a list of mods from a JSON file.
@@ -173,14 +181,22 @@ Mod.load_list = function(self, file)
 		error("loading mod list \"" .. file .. "\" failed: " .. err)
 	end
 	-- Load the listed mods.
-	for k,v in ipairs(res) do
+	self:load_list_json(res)
+end
+
+--- Loads a list of mods from decoded JSON data.
+-- @param self Mod.
+-- @param json Decoded JSON data.
+-- @param nocompat True to not allow Lua only mods.
+Mod.load_list_json = function(self, json, nocompat)
+	for k,v in ipairs(json) do
 		if type(v) == "table" then
 			if v[1] == "load" then
-				self:load(v[2])
+				self:load(v[2], false, nocompat)
 			elseif v[1] == "load_list" then
 				self:load_list(v[2] .. ".json")
 			elseif v[1] == "load_optional" then
-				self:load(v[2], true)
+				self:load(v[2], true, nocompat)
 			end
 		end
 	end

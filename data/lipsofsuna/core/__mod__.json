@@ -29,5 +29,26 @@
 			"long": "--version",
 		}
 	],
-	"resources": [".", "materials"]
+	"mods":
+	[
+		["load", "core/introspect"],
+		["load", "core/specs"],
+		["load", "core/ai"],
+		["load", "core/actions"],
+		["load", "core/chat"],
+		["load", "core/client"],
+		["load", "core/camera"],
+		["load", "core/camera/first"],
+		["load", "core/camera/third"],
+		["load", "core/effect"],
+		["load", "core/input"],
+		["load", "core/messaging"],
+		["load", "core/multiplayer"],
+		["load", "core/objects"],
+		["load", "core/quickslots"],
+		["load", "core/server"],
+		["load", "core/shaders"],
+		["load", "core/terrain"],
+		["load", "core/misc"]
+	]
 }
