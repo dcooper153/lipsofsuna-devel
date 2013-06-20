@@ -34,6 +34,7 @@
 	["load", "apparel/lizardarmor"],
 	["load", "apparel/panties"],
 	["load", "apparel/platearmor"],
+	["load", "apparel/underwear"],
 
 	["# Weapons and shields"],
 	["load", "weapons/bow"],

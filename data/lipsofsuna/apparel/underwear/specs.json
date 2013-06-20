@@ -1,0 +1,52 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "bra",
+		"effect": "craftsewing1",
+		"materials": {"hide": 1}
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "panties",
+		"effect": "craftsewing1",
+		"materials": {"hide": 1}
+	},
+	{
+		"type": "Itemspec",
+		"name": "bra",
+		"model": "leggings1",
+		"icon": "leatherarmor1",
+		"armor_class": 0,
+		"categories": {"armor": true},
+		"equipment_models":
+		{
+			"aer": {"upper": "aerupperunderwear1"}
+		},
+		"equipment_textures":
+		{
+			"aer": {"aer1": "aerbra1"}
+		},
+		"equipment_priority": -5,
+		"equipment_slot": "bra",
+		"mass": 5
+	},
+	{
+		"type": "Itemspec",
+		"name": "panties",
+		"model": "leggings1",
+		"icon": "leatherarmor1",
+		"armor_class": 0,
+		"categories": {"armor": true},
+		"equipment_models":
+		{
+			"aer": {"lower": "aerlowerunderwear1"}
+		},
+		"equipment_textures":
+		{
+			"aer": {"aer1": "aerpanties1"}
+		},
+		"equipment_priority": -5,
+		"equipment_slot": "panties",
+		"mass": 5
+	}
+]
