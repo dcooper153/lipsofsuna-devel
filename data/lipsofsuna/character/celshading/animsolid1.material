@@ -55,9 +55,6 @@ material animsolid1
 			ambient 0.3 0.3 0.3
 			diffuse 1.0 1.0 1.0
 			specular 0.0 0.0 0.0 1.0 1
-			texture_unit LOS1
-			{
-			}
 		}
 	}
 }

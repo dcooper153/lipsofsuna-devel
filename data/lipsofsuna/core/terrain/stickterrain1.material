@@ -57,13 +57,15 @@ material stickterrain1
 	technique
 	{
 		scheme fixed
-		pass LOS1
+		pass
 		{
 			ambient 0.3 0.3 0.3
 			diffuse 1.0 1.0 1.0
 			specular 0.0 0.0 0.0 1.0 1
 			texture_unit
 			{
+				texture stickterrainfixed1.png 2d
+				tex_address_mode clamp
 			}
 		}
 	}
