@@ -141,9 +141,13 @@
 	["load", "ui/states"],
 
 	["# Games"],
+	["load", "arena"],
 	["load", "benchmark"],
+	["load", "building"],
+	["load", "crafting"],
 	["load", "character"],
 	["load", "character/celshading"],
+	["load", "landscape"],
 
 	["# Custom"],
 	["load_optional", "custom"]

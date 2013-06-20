@@ -1,0 +1,13 @@
+{
+	"launchers":
+	[
+		{
+			"name": "arena",
+			"desc": "Run the arena subgame.",
+			"short": "-A",
+			"long": "--arena"
+		}
+	],
+	"server": false,
+	"scripts": ["main"]
+}

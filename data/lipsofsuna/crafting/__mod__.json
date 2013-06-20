@@ -1,0 +1,13 @@
+{
+	"launchers":
+	[
+		{
+			"name": "crafting",
+			"desc": "Run the crafting subgame.",
+			"short": "-R",
+			"long": "--crafting"
+		}
+	],
+	"server": false,
+	"scripts": ["main"]
+}

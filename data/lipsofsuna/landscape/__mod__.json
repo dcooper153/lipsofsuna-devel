@@ -1,0 +1,13 @@
+{
+	"launchers":
+	[
+		{
+			"name": "landscape",
+			"desc": "Run the landscape subgame.",
+			"short": "-L",
+			"long": "--landscape"
+		}
+	],
+	"server": false,
+	"scripts": ["main"]
+}
