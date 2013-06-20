@@ -353,7 +353,7 @@ Player.vision_cb = function(self, args)
 		["object-beheaded"] = function(args)
 			local o = args.object
 			if o:get_static() then return end
-			Game.messaging:server_event("object beheaded", self.client, o:get_id())
+			Game.messaging:server_event("object beheaded", self.client, o:get_id(), o:get_beheaded())
 		end,
 		["object-dead"] = function(args)
 			local o = args.object

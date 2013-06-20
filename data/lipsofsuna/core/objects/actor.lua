@@ -664,6 +664,7 @@ Actor.resurrect = function(self)
 	if not self.dead then return end
 	-- Enable controls.
 	self.dead = nil
+	self:set_beheaded(false)
 	self.physics:set_shape("default")
 	self.physics:set_physics("kinematic")
 	-- Enable stats.
@@ -1026,17 +1027,24 @@ Actor.get_beheaded = function(self)
 end
 
 Actor.set_beheaded = function(self, value)
-	-- TODO: Unbeheading?
-	if not value then return end
-	self.__beheaded = value
-	Server:object_event(self, "object-beheaded")
-	local hat = self.inventory:get_object_by_slot("head")
-	if hat then
-		local p = self:get_position()
-		hat:detach()
-		hat:set_position(p + self:get_rotation() * (self.dead and Vector(0,0.5,2) or Vector(0,2,0)))
-		hat:set_velocity(Vector(math.random(), math.random(), math.random()))
-		hat:set_visible(true)
+	if self.beheaded == value then return end
+	if value then
+		-- Behead.
+		self.__beheaded = true
+		Server:object_event(self, "object-beheaded")
+		-- Drop headwear.
+		local hat = self.inventory:get_object_by_slot("head")
+		if hat then
+			local p = self:get_position()
+			hat:detach()
+			hat:set_position(p + self:get_rotation() * (self.dead and Vector(0,0.5,2) or Vector(0,2,0)))
+			hat:set_velocity(Vector(math.random(), math.random(), math.random()))
+			hat:set_visible(true)
+		end
+	else
+		-- Unbehead.
+		self.__beheaded = nil
+		Server:object_event(self, "object-beheaded")
 	end
 end
 

@@ -7,6 +7,16 @@ local Physics = require("system/physics")
 local Staticobject = require("core/objects/static")
 
 ChatCommand{
+	name = "behead",
+	description = "Beheading or unbehead yourself.",
+	pattern = "^/behead$",
+	permission = "admin",
+	handler = "server",
+	func = function(player, matches)
+		player:set_beheaded(not player:get_beheaded())
+	end}
+
+ChatCommand{
 	name = "client_restart",
 	description = "Restart the client.",
 	pattern = "^/client_restart$",
