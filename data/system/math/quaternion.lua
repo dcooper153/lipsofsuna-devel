@@ -172,6 +172,37 @@ Quaternion.new = function(clss, x, y, z, w)
 	return Quaternion:new_from_handle(h)
 end
 
+--- Creates a new quaternion from an axis and angle.
+-- @param clss Quaternion class.
+-- @param axis Axis.
+-- @param angle Angle.
+-- @return New quaternion.
+Quaternion.new_from_axis = function(clss, axis, angle)
+	local h = Los.quaternion_new{axis = axis.handle, angle = angle}
+	return Quaternion:new_from_handle(h)
+end
+
+--- Creates a new quaternion from direction and up vectors.
+-- @param clss Quaternion class.
+-- @param dir Direction vector.
+-- @param up Up vector.
+-- @return New quaternion.
+Quaternion.new_from_dir = function(clss, dir, up)
+	local h = Los.quaternion_new{dir = dir.handle, up = up.handle}
+	return Quaternion:new_from_handle(h)
+end
+
+--- Creates a new quaternion from euler angles.
+-- @param clss Quaternion class.
+-- @param x First angle.
+-- @param y Second angle.
+-- @param z Third angle.
+-- @return New quaternion.
+Quaternion.new_from_euler = function(clss, x, y, z)
+	local h = Los.quaternion_new_euler{x, y, z}
+	return Quaternion:new_from_handle(h)
+end
+
 --- Creates a new quaternion from an internal handle.
 -- @param clss Quaternion class.
 -- @param h Handle.

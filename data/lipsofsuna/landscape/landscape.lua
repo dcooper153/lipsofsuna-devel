@@ -27,7 +27,6 @@ Landscape.new = function(clss)
 	Game.sectors.unload_time = nil
 	-- Initialize the terrain.
 	self.terrain = TerrainManager(8, 0.75, nil, false, true, true)
-	self.terrain:set_view_center(Vector(500, 0, 500))
 	self.terrain.generate_hooks:register(0, TerrainGenerator.generate)
 	return self
 end
@@ -45,7 +44,11 @@ Landscape.update = function(self, secs)
 	-- Update lighting.
 	Client.lighting:update(secs)
 	-- Update terrain.
-	self.terrain:refresh_chunks_by_point(Vector(500, 0, 500), 50)
+	local camera = Main.client.camera_manager:find_camera_by_type("landscape")
+	if not camera then return end
+	local center = camera:get_target_position()
+	self.terrain:set_view_center(center)
+	self.terrain:refresh_chunks_by_point(center, 50)
 	self.terrain:update(secs)
 end
 

@@ -27,6 +27,14 @@ CameraManager.new = function(clss)
 	return self
 end
 
+--- Finds a camera by type.
+-- @param self CameraManager.
+-- @param type String.
+-- @return Camera if found. Nil otherwise.
+CameraManager.find_camera_by_type = function(self, type)
+	return self.cameras[type]
+end
+
 --- Resets the camera.
 -- @param self CameraManager.
 CameraManager.reset = function(self)

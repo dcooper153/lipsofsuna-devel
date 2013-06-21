@@ -13,6 +13,12 @@ local Class = require("system/class")
 local Quaternion = require("system/math/quaternion")
 local Vector = require("system/math/vector")
 
+local radian_wrap = function(x)
+	if x < -math.pi then return x + 2 * math.pi
+	elseif x > math.pi then return x - 2 * math.pi
+	else return x end
+end
+
 --- Camera for the landscape subgame.
 -- @type LandscapeCamera
 LandscapeCamera = Class("LandscapeCamera", Camera)
@@ -25,23 +31,56 @@ LandscapeCamera.new = function(clss)
 	self:set_far(1000)
 	self:set_near(0.3)
 	self:set_mode("first-person")
+	self.position = Vector(525,170,510)
+	self.rotation = Quaternion:new_from_dir(Vector(-20,-70,-10), Vector(0,1,0))
+	self.turning = 0
+	self.tilting = 0
+	self.turn_speed = 0
+	self.tilt_speed = 0
 	return self
+end
+
+--- Flies forward or backward.
+-- @param self Camera.
+-- @param value Amount of motion.
+LandscapeCamera.fly = function(self, value)
+	self.movement = 50 * value
+end
+
+--- Flies sideward.
+-- @param self Camera.
+-- @param value Amount of motion.
+LandscapeCamera.strafe = function(self, value)
+	self.strafing = 50 * value
 end
 
 --- Updates the camera transformation.
 -- @param self Camera.
 -- @param secs Seconds since the last update.
 LandscapeCamera.update = function(self, secs)
-	if Main.landscape then
-		Main.client.camera_manager:set_camera_mode("landscape")
-		local camctr = Vector(505,100,500)
-		local campos = Vector(525,170,510)
-		local camrot = Quaternion{dir = camctr - campos, up = Vector(0,1,0)}
-		self:set_target_position(campos)
-		self:set_target_rotation(camrot)
-		Camera.update(self, secs)
-		self:warp()
+	if not Main.landscape then return end
+	-- Update the position.
+	local vel = Vector()
+	if self.lifting then vel = vel + Vector(0, self.lifting, 0) end
+	if self.movement then vel = vel + self.rotation * Vector(0, 0, self.movement) end
+	if self.strafing then vel = vel + self.rotation * Vector(self.strafing, 0, 0) end
+	self.position = self.position + vel * secs
+	self:set_target_position(self.position)
+	-- Update the rotation.
+	if self.turn_speed then
+		self.turning = radian_wrap(self.turning - 0.1 * self.turn_speed)
+		self.turn_speed = 0
 	end
+	if self.tilt_speed then
+		self.tilting = radian_wrap(self.tilting - 0.1 * self.tilt_speed)
+		self.tilt_speed = 0
+	end
+	self.rotation = Quaternion:new_from_euler(self.turning, 0, self.tilting)
+	self:set_target_rotation(self.rotation)
+	-- Warp to the destination.
+	Main.client.camera_manager:set_camera_mode("landscape")
+	Camera.update(self, secs)
+	self:warp()
 end
 
 return LandscapeCamera
