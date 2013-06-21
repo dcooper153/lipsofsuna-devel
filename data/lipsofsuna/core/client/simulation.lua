@@ -100,7 +100,7 @@ Simulation.pick_scene_by_ray = function(clss, ray1, ray2, ignore)
 	-- Pick from the scene.
 	local ret = Physics:cast_ray(ray1, ray2, Game.PHYSICS_MASK_PICK, ignore)
 	if not ret then return end
-	return ret.point, ret.object and Game.objects:find_by_id(ret.object), ret.tile
+	return ret.point, ret.object and Main.objects:find_by_id(ret.object), ret.tile
 end
 
 --- Updates the simulation.
@@ -114,7 +114,7 @@ Simulation.update = function(self, secs)
 	-- Hence, this needs not to be done in single player or when hosting
 	-- an embedded server.
 	if not Server.initialized then
-		Game.objects:update(secs)
+		Main.objects:update(secs)
 	end
 end
 

@@ -70,7 +70,7 @@ end
 -- @param self Benchmark.
 Benchmark.close = function(self)
 	-- Restore the normal map state.
-	Game.objects:detach_all()
+	Main.objects:detach_all()
 	Game.sectors:unload_all()
 	self.terrain:unload_all()
 	self.light:set_enabled(false)

@@ -5,11 +5,11 @@ local Timer = require("system/timer")
 local Vision = require("system/vision")
 
 local handle_vision = function(self, args)
-	Vision:dispatch_event(args, Game.objects)
+	Vision:dispatch_event(args, Main.objects)
 end
 
 local handle_motion = function(self, args)
-	local object = Game.objects:find_by_id(args.id)
+	local object = Main.objects:find_by_id(args.id)
 	if not object then return end
 	object:sync_transform()
 	args.object = object
@@ -58,11 +58,11 @@ end}
 
 Eventhandler{type = "object-contact", func = function(self, event)
 	if event.self then
-		event.self = Game.objects:find_by_id(event.self)
+		event.self = Main.objects:find_by_id(event.self)
 		if not event.self then return end
 	end
 	if event.object then
-		event.object = Game.objects:find_by_id(event.object)
+		event.object = Main.objects:find_by_id(event.object)
 		if not event.object then return end
 	end
 	if event.self.contact_cb then

@@ -12,7 +12,7 @@ Feateffectspec:extend{
 		-- Damage the actor.
 		mod.object:damaged{amount = 5, type = "disease"}
 		-- Infect nearby actors.
-		local near = Game.objects:find_by_point(mod.object:get_position(), 5)
+		local near = Main.objects:find_by_point(mod.object:get_position(), 5)
 		for k,v in pairs(near) do
 			if math.random() > 0.1 then
 				v:inflict_modifier("black haze", 10000)

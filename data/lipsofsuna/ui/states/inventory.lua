@@ -28,7 +28,7 @@ Ui:add_widget{
 	widget = function()
 		-- Get the active container.
 		if not Client.data.inventory.id then return end
-		local object = Game.objects:find_by_id(Client.data.inventory.id)
+		local object = Main.objects:find_by_id(Client.data.inventory.id)
 		if not object then return end
 		-- Get the active item.
 		local index = Client.data.inventory.index
@@ -50,7 +50,7 @@ Ui:add_widget{
 	state = "inventory/item",
 	widget = function()
 		-- Get the active container.
-		local object = Game.objects:find_by_id(Client.data.inventory.id)
+		local object = Main.objects:find_by_id(Client.data.inventory.id)
 		if not object then return end
 		-- Don't show the widget if the item isn't equipped.
 		local index = Client.data.inventory.index
@@ -67,7 +67,7 @@ Ui:add_widget{
 	widget = function()
 		-- Get the active container.
 		if not Client.data.inventory.id then return end
-		local object = Game.objects:find_by_id(Client.data.inventory.id)
+		local object = Main.objects:find_by_id(Client.data.inventory.id)
 		if not object then return end
 		-- Get the active item.
 		local index = Client.data.inventory.index

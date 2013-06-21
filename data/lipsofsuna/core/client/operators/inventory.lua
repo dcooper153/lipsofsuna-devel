@@ -43,7 +43,7 @@ end
 -- @returns Inventory, or nil.
 Operators.inventory.get_inventory_by_id = function(self, id)
 	if not self.containers[id] then return end
-	local object = Game.objects:find_by_id(id)
+	local object = Main.objects:find_by_id(id)
 	if not object then return end
 	return object.inventory
 end

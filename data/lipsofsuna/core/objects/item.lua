@@ -188,7 +188,7 @@ Item.write_db = function(self, db)
 		object:write_db(db)
 	end
 	-- Write the own inventory index.
-	local parent = self.parent and Game.objects:find_by_id(self.parent)
+	local parent = self.parent and Main.objects:find_by_id(self.parent)
 	if parent then
 		local index = parent.inventory:get_index_by_object(self)
 		local slot = parent.inventory:get_slot_by_index(index)
@@ -223,7 +223,7 @@ Item.set_count = function(self, v)
 	self.__count = v ~= 0 and v or nil
 	-- Update the inventory containing the object.
 	if self.parent then
-		local parent = Game.objects:find_by_id(self.parent)
+		local parent = Main.objects:find_by_id(self.parent)
 		if parent then
 			parent.inventory:update_object(s)
 		else

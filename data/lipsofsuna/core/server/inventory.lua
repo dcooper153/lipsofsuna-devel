@@ -87,7 +87,7 @@ end
 -- @param args Arguments.
 Inventory.equip_best_objects = function(self)
 	-- Get the owner object.
-	local owner = Game.objects:find_by_id(self.id)
+	local owner = Main.objects:find_by_id(self.id)
 	if not owner then return end
 	-- Loop through all available equipment slots.
 	for name in pairs(owner.spec.equipment_slots) do
@@ -312,7 +312,7 @@ Inventory.merge_or_drop_object = function(self, object)
 	if self:merge_object(object) then return true end
 	-- Find the owner.
 	if not Utils then return end
-	local o = Game.objects:find_by_id(self.id)
+	local o = Main.objects:find_by_id(self.id)
 	if not o then return end
 	-- Drop near the owner.
 	local pos0 = o:get_position()
@@ -510,7 +510,7 @@ Inventory.unequip_slot = function(self, slot)
 	end
 	-- Notify vision.
 	if Server.initialized then
-		local parent = Game.objects:find_by_id(self.id)
+		local parent = Main.objects:find_by_id(self.id)
 		Server:object_event_id(self.id, "object-unequip", {index = index, item = o, slot = slot})
 	end
 end

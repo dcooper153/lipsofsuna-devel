@@ -11,7 +11,7 @@ Message{
 	client_to_server_handle = function(self, client, id, text)
 		local player = Server:get_player_by_client(client)
 		if not player then return end
-		local object = Game.objects:find_by_id(id)
+		local object = Main.objects:find_by_id(id)
 		if not object then return end
 		if not player.vision.objects[object] then return end
 		local dialog = Server.dialogs:find_by_object(object)

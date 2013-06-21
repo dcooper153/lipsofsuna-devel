@@ -169,7 +169,7 @@ end
 Editor.load = function(self, name)
 	-- Make sure the old map is erased.
 	self:reset()
-	Game.objects:detach_all()
+	Main.objects:detach_all()
 	Game.sectors:unload_all()
 	-- Find or create the pattern.
 	local pattern = Patternspec:find{name = name}
@@ -340,7 +340,7 @@ Editor.save = function(self)
 	local actors = {}
 	local statics = {}
 	-- Collect objects.
-	for k,v in pairs(Game.objects.objects_by_id) do
+	for k,v in pairs(Main.objects.objects_by_id) do
 		if v:get_visible() and v.spec then
 			if v.spec.type == "item" then
 				table.insert(items, v)
@@ -434,7 +434,7 @@ Editor.pick_scene = function(self)
 	local r1,r2 = self.camera:picking_ray{cursor = cursor, far = 20, near = 0.1}
 	local ret = Physics:cast_ray(r1, r2)
 	if not ret then return end
-	r.object = r.object and Game.objects:find_by_id(r.object)
+	r.object = r.object and Main.objects:find_by_id(r.object)
 	return ret.point, ret.object, ret.tile
 end
 

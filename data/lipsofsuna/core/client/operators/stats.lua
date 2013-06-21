@@ -55,7 +55,7 @@ stats.texture_memory / 1000, stats.material_count_loaded, stats.material_count)
 		end
 		table.sort(listtype)
 		local numactive = 0
-		for k in pairs(Game.objects:get_active_objects()) do
+		for k in pairs(Main.objects:get_active_objects()) do
 			numactive = numactive + 1
 		end
 		local objects = ""

@@ -31,13 +31,13 @@ SimulationObject.new = function(clss, id)
 	local self = Object.new(clss)
 	-- Select a unique ID.
 	if id then
-		local old = Game.objects.objects_by_id[id]
+		local old = Main.objects.objects_by_id[id]
 		if old then old:detach() end
 		self:set_id(id)
 	else
-		self:set_id(Game.objects:get_free_id())
+		self:set_id(Main.objects:get_free_id())
 	end
-	Game.objects:add(self)
+	Main.objects:add(self)
 	-- Initialize the physics object.
 	self.physics = PhysicsObject()
 	self.physics:set_id(self:get_id())
@@ -124,7 +124,7 @@ end
 SimulationObject.can_reach_object = function(self, object)
 	-- Check for reachability of inventory items.
 	if object.parent then
-		local parent = Game.objects:find_by_id(object.parent)
+		local parent = Main.objects:find_by_id(object.parent)
 		if not parent then return end
 		if not parent.inventory:is_subscribed(self) then return end
 		return self:can_reach_object(parent)
@@ -162,7 +162,7 @@ SimulationObject.detach = function(self)
 	-- Detach from inventories.
 	if self:has_server_data() then
 		if self.parent then
-			local parent = Game.objects:find_by_id(self.parent)
+			local parent = Main.objects:find_by_id(self.parent)
 			if parent then
 				parent.inventory:remove_object(self)
 			end
@@ -195,7 +195,7 @@ end
 -- @param id Inventory ID.
 -- @return Inventory or nil.
 SimulationObject.find_open_inventory = function(self, id)
-	local obj = Game.objects:find_by_id(id)
+	local obj = Main.objects:find_by_id(id)
 	if not obj then return end
 	if not object.inv:is_subscribed(self) then return end
 	return object.inv
@@ -208,9 +208,9 @@ end
 -- @return Object or nil.
 SimulationObject.find_target = function(self, where, what)
 	if where == 0 then
-		return Game.objects:find_by_id_and_point(what, self:get_position(), 5)
+		return Main.objects:find_by_id_and_point(what, self:get_position(), 5)
 	else
-		local obj = Game.objects:find_by_id(id)
+		local obj = Main.objects:find_by_id(id)
 		if not obj then return end
 		if obj.inventory:is_subscribed(self) then
 			return obj.inventory:get_object_by_index(what)
@@ -779,7 +779,7 @@ SimulationObject.set_visible = function(self, v)
 	-- Set the visibilty of the physics object.
 	self.physics:set_visible(v)
 	-- Set the activation status.
-	Game.objects:activate_object(self, v)
+	Main.objects:activate_object(self, v)
 	-- Ensure that visible objects have their models loaded.
 	if v and not self:get_model() then
 		local name = self:get_model_name()

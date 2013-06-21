@@ -10,7 +10,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, id)
 		-- Get the object.
-		local obj = Game.objects:find_by_id(id)
+		local obj = Main.objects:find_by_id(id)
 		if not obj then return end
 		-- Hide the object.
 		if obj:get_static() then return end

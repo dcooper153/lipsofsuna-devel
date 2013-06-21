@@ -12,7 +12,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, id, index, name, count)
 		-- Find the object.
-		local object = Game.objects:find_by_id(id)
+		local object = Main.objects:find_by_id(id)
 		if not object then return end
 		-- Add to the inventory.
 		if not object:has_server_data() then

@@ -173,7 +173,7 @@ end
 Server.global_event = function(self, type, args)
 	local a = args or {}
 	a.type = type
-	Vision:dispatch_event(a, Game.objects)
+	Vision:dispatch_event(a, Main.objects)
 end
 
 Server.object_effect = function(self, object, name)
@@ -186,15 +186,15 @@ Server.object_event = function(self, object, type, args)
 	a.id = object:get_id()
 	a.object = object
 	a.type = type
-	Vision:dispatch_event(a, Game.objects)
+	Vision:dispatch_event(a, Main.objects)
 end
 
 Server.object_event_id = function(self, id, type, args)
 	local a = args or {}
 	a.id = id
-	a.object = Game.objects:find_by_id(id)
+	a.object = Main.objects:find_by_id(id)
 	a.type = type
-	Vision:dispatch_event(a, Game.objects)
+	Vision:dispatch_event(a, Main.objects)
 end
 
 Server.spawn_player = function(self, player, client, spawnpoint)
@@ -245,14 +245,14 @@ end
 Server.update = function(self, secs)
 	if not self.initialized then return end
 	-- Update objects.
-	Game.objects:update(secs)
+	Main.objects:update(secs)
 	-- Update markers.
 	self.marker_timer = self.marker_timer + secs
 	if self.marker_timer > 2 then
 		self.marker_timer = 0
 		for k,m in pairs(Marker.dict_name) do
 			if m.unlocked and m.target then
-				local o = Game.objects:find_by_id(m.target)
+				local o = Main.objects:find_by_id(m.target)
 				if o and (m.position - o:get_position()).length > 1 then
 					m.position = o:get_position()
 					for k,v in pairs(self.players_by_client) do
@@ -271,7 +271,7 @@ end
 Server.world_effect = function(self, point, name)
 	if not name then return end
 	local args = {type = "world-effect", point = point, effect = name}
-	Vision:dispatch_event(args, Game.objects)
+	Vision:dispatch_event(args, Main.objects)
 end
 
 Server.get_client_address = function(self, client)

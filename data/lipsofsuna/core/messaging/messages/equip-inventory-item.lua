@@ -10,7 +10,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, id, index, slot)
 		-- Find the object.
-		local object = Game.objects:find_by_id(id)
+		local object = Main.objects:find_by_id(id)
 		if not object then return end
 		-- Equip the index.
 		if not object:has_server_data() then

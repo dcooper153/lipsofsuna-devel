@@ -15,7 +15,7 @@ Message{
 		if player.dead then return end
 		-- Read the inventory id and index.
 		-- Get the item and validate the take.
-		local parent = Game.objects:find_by_id(id)
+		local parent = Main.objects:find_by_id(id)
 		if not parent then return end
 		if not parent.inventory:is_subscribed(player) then return end
 		if not player:can_reach_object(parent) then return end

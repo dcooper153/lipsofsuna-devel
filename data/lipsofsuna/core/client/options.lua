@@ -169,7 +169,7 @@ Options.apply = function(self)
 		Ui:restart_state()
 	end
 	-- Update the render properties of objects.
-	for k,v in pairs(Game.objects.objects_by_id) do
+	for k,v in pairs(Main.objects.objects_by_id) do
 		self:apply_object(v)
 	end
 end

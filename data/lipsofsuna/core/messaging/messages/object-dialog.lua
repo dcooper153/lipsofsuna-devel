@@ -10,7 +10,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, id)
 		-- Find the object.
-		local object = Game.objects:find_by_id(id)
+		local object = Main.objects:find_by_id(id)
 		if not object then return end
 		-- Enter the dialog state.
 		if Ui:get_state() == "play" or Ui:get_state() == "world/object" then

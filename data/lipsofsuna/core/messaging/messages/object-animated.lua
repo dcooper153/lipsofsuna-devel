@@ -10,7 +10,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, id, name, time, variant)
 		-- Get the object.
-		local o = Game.objects:find_by_id(id)
+		local o = Main.objects:find_by_id(id)
 		if not o then return end
 		-- Set the client side animation.
 		-- FIXME: Weapon slot assumption to hack functional charge attacks.

@@ -146,7 +146,7 @@ SectorManager.unload_sector = function(self, sector)
 	self.loaders[sector] = nil
 	self.loaders_iterator = nil
 	-- Unrealize all objects.
-	for k,v in pairs(Game.objects:find_by_sector(sector)) do
+	for k,v in pairs(Main.objects:find_by_sector(sector)) do
 		v:detach()
 	end
 	-- Unload the engine sector.

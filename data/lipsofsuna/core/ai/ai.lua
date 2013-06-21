@@ -231,7 +231,7 @@ Ai.scan_enemies = function(self)
 	local time = Program:get_time()
 	self.enemies = {}
 	-- Find new enemies.
-	local objs = Game.objects:find_by_point(self.object:get_position(), 15)
+	local objs = Main.objects:find_by_point(self.object:get_position(), 15)
 	for k,v in pairs(objs) do
 		if not v.dead then
 			local enemy = old[v]

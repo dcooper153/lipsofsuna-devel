@@ -20,7 +20,7 @@ Message{
 		-- Redundant in single player.
 		if Server.initialized then return end
 		-- Get the object.
-		local o = Game.objects:find_by_id(id)
+		local o = Main.objects:find_by_id(id)
 		if not o then return end
 		-- Set the target interpolation position.
 		o:set_position(position, true)

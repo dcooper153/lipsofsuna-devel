@@ -28,7 +28,7 @@ Utils = Class("Utils")
 -- @return True if there's room for the model.
 Utils.check_room = function(clss, point, model)
 	-- FIXME: Should rather do physics based testings.
-	for k,v in pairs(Game.objects.objects_by_id) do
+	for k,v in pairs(Main.objects.objects_by_id) do
 		local d = (v:get_position() - point).length
 		if d < 1.5 then return end
 	end
@@ -207,7 +207,7 @@ Utils.explosion = function(clss, point, radius)
 	local r2 = r1 + 3
 	Server:world_effect(point, "explosion1")
 	-- Damage nearby objects.
-	for k1,v1 in pairs(Game.objects:find_by_point(point, r2)) do
+	for k1,v1 in pairs(Main.objects:find_by_point(point, r2)) do
 		local diff = v1:get_position() - point
 		local frac = diff.length / r2
 		local mult = 10 * math.min(100, v1.physics:get_mass())

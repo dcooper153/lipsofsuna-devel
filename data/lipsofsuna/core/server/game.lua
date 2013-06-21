@@ -12,14 +12,12 @@ local Class = require("system/class")
 local Database = require("system/database")
 local Messaging = require("core/messaging/messaging")
 local Network = require("system/network")
-local ObjectManager = require("core/server/object-manager")
 local Physics = require("system/physics")
 local SectorManager = require("core/server/sector-manager")
 
 --- TODO:doc
 -- @type Game
 Game = Class("Game")
-Game.objects = ObjectManager() --FIXME
 Game.scene_nodes_by_ref = {}
 
 Game.PHYSICS_GROUP_ACTORS = 0x0001
@@ -74,7 +72,7 @@ Game.deinit = function(self)
 	end
 	-- Detach all objects.
 	self.sectors.database = nil
-	self.objects:detach_all()
+	Main.objects:detach_all()
 	self.sectors:unload_all()
 	self.static_objects_by_id = nil
 	-- Detach scene nodes.

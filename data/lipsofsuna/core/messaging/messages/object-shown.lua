@@ -371,7 +371,7 @@ Message{
 		-- Only set the render model in single player.
 		if args.class then
 			-- Find the object.
-			local o = Game.objects:find_by_id(args:get_id())
+			local o = Main.objects:find_by_id(args:get_id())
 			if not o then return end
 			-- Self.
 			if o.client == -1 then
@@ -394,7 +394,7 @@ Message{
 			return
 		end
 		-- Hide old objects.
-		local old = Game.objects:find_by_id(args.id)
+		local old = Main.objects:find_by_id(args.id)
 		if old then old:detach() end
 		-- Spec.
 		local spec

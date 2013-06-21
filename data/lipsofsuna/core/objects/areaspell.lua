@@ -46,7 +46,7 @@ AreaSpell.update = function(self, secs)
 		if self.timer < 1 then return end
 		self.timer = self.timer - 1
 		-- Apply the feat to each nearby object.
-		local objs = Game.objects:find_by_point(self:get_position():copy():add_xyz(0,1,0), self.radius)
+		local objs = Main.objects:find_by_point(self:get_position():copy():add_xyz(0,1,0), self.radius)
 		for k,v in pairs(objs) do
 			if v:get_visible() and v.class_name ~= "AreaSpell" then
 				self.feat:apply{

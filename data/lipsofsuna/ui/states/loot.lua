@@ -2,7 +2,7 @@ Ui:add_state{
 	state = "loot",
 	label = "Loot",
 	init = function()
-		local object = Game.objects:find_by_id(Client.data.inventory.id)
+		local object = Main.objects:find_by_id(Client.data.inventory.id)
 		if not object then return end
 		local widgets = {}
 		for index = 1,object.spec.inventory_size do

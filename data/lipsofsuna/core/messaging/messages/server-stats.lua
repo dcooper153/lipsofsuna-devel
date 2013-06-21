@@ -31,7 +31,7 @@ Message{
 		local num_objects_real = 0
 		local num_vision_miss = 0
 		local num_vision_real = 0
-		for k,v in pairs(Game.objects.objects_by_id) do
+		for k,v in pairs(Main.objects.objects_by_id) do
 			if v.class_name == "Player" then
 				if v:get_visible() then
 					num_players_real = num_players_real + 1

@@ -98,7 +98,7 @@ end
 
 Player.set_client = function(self, client)
 	self.client = client
-	self.vision = Vision(self:get_id(), Game.objects)
+	self.vision = Vision(self:get_id(), Main.objects)
 	self.vision:set_cone_factor(0.5)
 	self.vision:set_cone_angle(math.pi/2.5)
 	self.vision:set_enabled(true)
@@ -204,7 +204,7 @@ Player.handle_inventory_event = function(self, args)
 			Game.messaging:server_event("unequip inventory item", self.client, id, args.index)
 		end,
 		["inventory-subscribed"] = function()
-			local owner = Game.objects:find_by_id(id)
+			local owner = Main.objects:find_by_id(id)
 			local spec = owner.spec
 			if not self.inventory_subscriptions then self.inventory_subscriptions = {} end
 			self.inventory_subscriptions[id] = args.inventory
@@ -312,7 +312,7 @@ Player.update_inventory_subscriptions = function(self)
 		self.inventory:subscribe(self, function(args) self:handle_inventory_event(args) end)
 	end
 	for id,inv in pairs(self.inventory_subscriptions) do
-		local object = Game.objects:find_by_id(id)
+		local object = Main.objects:find_by_id(id)
 		if not object or not self:can_reach_object(object) then
 			inv:unsubscribe(self)
 		end

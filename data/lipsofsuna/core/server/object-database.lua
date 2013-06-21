@@ -296,7 +296,7 @@ end
 -- @param sector Sector number.
 ObjectDatabase.save_sector_objects = function(self, sector)
 	self.db:query([[DELETE FROM object_sectors WHERE sector=?;]], {sector})
-	local objs = Game.objects:find_by_sector(sector)
+	local objs = Main.objects:find_by_sector(sector)
 	for k,v in pairs(objs) do
 		v:write_db(self.db)
 	end

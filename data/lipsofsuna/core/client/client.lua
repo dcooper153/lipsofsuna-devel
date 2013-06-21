@@ -87,7 +87,7 @@ end
 -- @param self Client.
 Client.create_world = function(self)
 	if not Server.initialized then
-		Game.objects:detach_all()
+		Main.objects:detach_all()
 		Game.sectors:unload_all()
 	end
 end

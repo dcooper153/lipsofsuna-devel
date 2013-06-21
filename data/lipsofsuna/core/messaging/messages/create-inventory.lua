@@ -10,7 +10,7 @@ Message{
 	end,
 	server_to_client_handle = function(self, id, type, name, size, mine)
 		-- Find the object.
-		local object = Game.objects:find_by_id(id)
+		local object = Main.objects:find_by_id(id)
 		if not object then return end
 		-- Add the subscription.
 		Operators.inventory:add_inventory(id)
