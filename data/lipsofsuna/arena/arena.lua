@@ -10,7 +10,7 @@
 
 local Class = require("system/class")
 local Physics = require("system/physics")
-local Simulation = require("core/client/simulation")
+local Player = require("core/objects/player")
 local TerrainManager = require("core/terrain/terrain-manager")
 local Vector = require("system/math/vector")
 
@@ -61,7 +61,7 @@ end
 Arena.update = function(self, secs)
 	-- Initialize the player.
 	if not self.player then
-		self.player = Simulation:create_object_by_spec(Actorspec:find_by_name("aer"))
+		self.player = Player{spec = Actorspec:find_by_name("aer")}
 		self.player:set_position(Vector(500,130,500))
 		self.player.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYERS)
 		self.player:set_visible(true)

@@ -8,23 +8,23 @@
 -- @module arena.camera
 -- @alias ArenaCamera
 
-local Camera = require("system/camera")
+local ThirdPersonCamera = require("core/camera/third/third-person-camera")
 local Class = require("system/class")
 local Quaternion = require("system/math/quaternion")
 local Vector = require("system/math/vector")
 
 --- Camera for the arena subgame.
 -- @type ArenaCamera
-ArenaCamera = Class("ArenaCamera", Camera)
+ArenaCamera = Class("ArenaCamera", ThirdPersonCamera)
 
 --- Creates a new arena camera.
 -- @param clss ArenaCamera class.
 -- @return ArenaCamera.
 ArenaCamera.new = function(clss)
-	local self = Camera.new(clss)
+	local self = ThirdPersonCamera.new(clss)
 	self:set_far(1000)
 	self:set_near(0.3)
-	self:set_mode("first-person")
+	self:set_mode("third-person")
 	return self
 end
 
@@ -34,13 +34,7 @@ end
 ArenaCamera.update = function(self, secs)
 	if Main.arena then
 		Main.client.camera_manager:set_camera_mode("arena")
-		local camctr = Vector(505,100,500)
-		local campos = Vector(525,110,510)
-		local camrot = Quaternion{dir = camctr - campos, up = Vector(0,1,0)}
-		self:set_target_position(campos)
-		self:set_target_rotation(camrot)
-		Camera.update(self, secs)
-		self:warp()
+		ThirdPersonCamera.update(self, secs)
 	end
 end
 

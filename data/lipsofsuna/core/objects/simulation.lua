@@ -101,7 +101,7 @@ SimulationObject.animate = function(self, name, force_temporary)
 			local prev = self.animations[anim.channel]
 			if prev and prev[1] == name then return end
 			self.animations[anim.channel] = {name, Program:get_time()}
-		else
+		elseif self.animations then
 			self.animations[anim.channel] = nil
 		end
 	end
