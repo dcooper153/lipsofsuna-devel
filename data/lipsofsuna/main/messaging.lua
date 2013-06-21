@@ -19,14 +19,15 @@ local Messaging = Class("Messaging")
 
 --- Creates a new messaging system.
 -- @param clss Messaging class.
--- @param port Port number. Nil to not use networking.
 -- @return Messaging.
-Messaging.new = function(clss, port)
+Messaging.new = function(clss)
 	local self = Class.new(clss)
 	self.next_id = 1
 	self.dict_id = {}
 	self.dict_name = {}
-	self:set_network_port(port)
+	self.local_server = false
+	self.local_client = false
+	self.networking = false
 	return self
 end
 
@@ -46,9 +47,12 @@ Messaging.client_event = function(self, type, ...)
 	assert(handler.client_to_server_decode)
 	assert(handler.client_to_server_handle)
 	-- Handle the message.
-	if Server.initialized then
+	if self.local_server then
 		handler.client_to_server_handle(self, -1, ...)
 	else
+		if not self.networking then
+			error("tried to send remote event without remote server")
+		end
 		local args = handler.client_to_server_encode(self, ...)
 		if not args then return end
 		if handler.client_to_server_predict and not Server.initialized then
@@ -116,8 +120,14 @@ Messaging.server_event = function(self, type, client, ...)
 	assert(handler.server_to_client_handle)
 	-- Handle the message.
 	if client == -1 then
+		if not self.local_client then
+			error("tried to send local event without local client")
+		end
 		handler.server_to_client_handle(self, ...)
 	else
+		if not self.networking then
+			error("tried to send remote event without remote server")
+		end
 		local args = handler.server_to_client_encode(self, ...)
 		if not args then return end
 		if args.class == Packet then
@@ -133,7 +143,7 @@ end
 -- @param type Message name.
 -- @param ... Message arguments.
 Messaging.server_event_broadcast = function(self, type, ...)
-	if Client then
+	if self.local_client then
 		self:server_event(type, -1, ...)
 	end
 	if self.multiplayer then
@@ -153,6 +163,9 @@ Messaging.handle_packet = function(self, client, packet)
 	if not handler then return end
 	-- Handle the message.
 	if client then
+		if not self.local_server then
+			error("received unexpected server packet")
+		end
 		local args = handler.client_to_server_decode(self, packet)
 		if not args then
 			print(string.format("WARNING: Failed to decode message %s from client", handler.name))
@@ -160,6 +173,9 @@ Messaging.handle_packet = function(self, client, packet)
 		end
 		handler.client_to_server_handle(self, client, unpack(args))
 	else
+		if not self.local_client then
+			error("received unexpected client packet")
+		end
 		local args = handler.server_to_client_decode(self, packet)
 		if not args then
 			print(string.format("WARNING: Failed to decode message %s from server", handler.name))
@@ -179,10 +195,14 @@ Messaging.get_event_id = function(self, type)
 	return handler.id
 end
 
---- Sets the networking port.
+--- Sets the transmission mode.
 -- @param self Messaging.
--- @param port Port number. Nil to not use networking.
-Messaging.set_network_port = function(self, port)
+-- @param local_server True if a local server is running. False otherwise.
+-- @param local_client True if a local client is connected. False otherwise.
+-- @param port Port number if remote clients may connect. Nil otherwise.
+Messaging.set_transmit_mode = function(self, local_server, local_client, port)
+	self.local_server = local_server
+	self.local_client = local_client
 	if port then
 		self.multiplayer = true
 		Network:host{port = port}

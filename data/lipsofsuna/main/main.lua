@@ -160,6 +160,7 @@ Main.end_game = function(self)
 	if not self.game then return end
 	self.game:deinit()
 	self.game = nil
+	self.messaging:set_transmit_mode(false, false, nil)
 end
 
 --- Starts the game.
@@ -177,17 +178,22 @@ Main.start_game = function(self, mode, save, port)
 	-- FIXME
 	-- Initialize the server.
 	if mode == "server" then
+		-- Local server, remote players.
 		Server:init(true, false)
-		self.messaging:set_network_port(port or Server.config.server_port)
+		self.messaging:set_transmit_mode(true, false, port or Server.config.server_port)
 	elseif mode == "host" then
+		-- Local server, local player, remote players.
 		Server:init(true, true)
-		self.messaging:set_network_port(port or Server.config.server_port)
+		self.messaging:set_transmit_mode(true, true, port or Server.config.server_port)
 	elseif mode == "single" then
+		-- Local server, local player.
 		Server:init(false, true)
-		self.messaging:set_network_port(nil)
+		self.messaging:set_transmit_mode(true, true, nil)
 	else
-		self.messaging:set_network_port(nil)
+		-- Remote server, local player.
+		self.messaging:set_transmit_mode(false, true, nil)
 	end
+
 	-- Initialize terrain updates.
 	if Server.initialized then
 		-- TODO: Stick terrain

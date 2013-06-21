@@ -25,6 +25,7 @@ Arena.new = function(clss)
 	local self = Class.new(clss)
 	-- FIXME: Initialize the game.
 	Main:start_game("benchmark")
+	Main.messaging:set_transmit_mode(true, true)
 	Game.sectors.unload_time = nil
 	-- Initialize the terrain.
 	self.terrain = TerrainManager(8, 0.75, nil, false, true, true)
@@ -65,7 +66,10 @@ Arena.update = function(self, secs)
 		self.player.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYERS)
 		self.player:set_visible(true)
 		self.player.render:init(self.player)
+		self.player.client = -1
 		Client:set_player_object(self.player)
+		Server.players_by_client = {}
+		Server.players_by_client[-1] = self.player --FIXME
 	end
 	-- Update lighting.
 	Client.lighting:update(secs)
