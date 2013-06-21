@@ -138,21 +138,23 @@ void LIRenImageOverlay::updatePositionGeometry ()
 		return;
 	}
 
-	// Ogre seems to divide by zero for a during startup when the viewport
-	// hasn't been initialized. Refuse to do anything if that is the case.
-	if (mPixelScaleX == LIMAT_INFINITE)
-	{
-		render_op.vertexData->vertexCount = 0;
-		return;
-	}
-
-	// Calculate vertex coordinates.
+	// Calculate offset and dimensions.
 	float left = _getDerivedLeft() * 2.0f - 1.0f;
 	float top = 1.0f - _getDerivedTop() * 2.0f;
 	float xscale = 2.0f * mWidth / mPixelWidth;
 	float yscale = 2.0f * mHeight / mPixelHeight;
 	float xtile = xscale * src_tiling[1];
 	float ytile = yscale * src_tiling[4];
+
+	// Ogre seems to divide by zero during startup when the viewport
+	// hasn't been initialized. Refuse to do anything if it happed.
+	if (!limat_number_validate (left) || !limat_number_validate (top))
+	{
+		render_op.vertexData->vertexCount = 0;
+		return;
+	}
+
+	// Calculate vertex coordinates.
 	float x[4] =
 	{
 		left,
