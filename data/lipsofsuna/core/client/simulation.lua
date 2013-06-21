@@ -103,19 +103,4 @@ Simulation.pick_scene_by_ray = function(clss, ray1, ray2, ignore)
 	return ret.point, ret.object and Main.objects:find_by_id(ret.object), ret.tile
 end
 
---- Updates the simulation.
--- @param self Simulation.
--- @param secs Seconds since the last update.
-Simulation.update = function(self, secs)
-	-- Update objects.
-	--
-	-- When a local server is running, it already takes care of updating
-	-- the objects, and the update functions also do the client side work.
-	-- Hence, this needs not to be done in single player or when hosting
-	-- an embedded server.
-	if not Server.initialized then
-		Main.objects:update(secs)
-	end
-end
-
 return Simulation

@@ -9,6 +9,7 @@
 -- @alias ObjectManager
 
 local Class = require("system/class")
+local Hooks = require("system/hooks")
 
 --- Manages the objects of the game.
 -- @type ObjectManager
@@ -19,8 +20,11 @@ local ObjectManager = Class("ObjectManager")
 -- @return ObjectManager.
 ObjectManager.new = function(clss)
 	local self = Class.new(clss)
+	-- Initialize the object tables.
 	self.active_by_id = setmetatable({}, {__mode = "v"})
 	self.objects_by_id = setmetatable({}, {__mode = "v"})
+	-- Initialize the hooks.
+	self.object_created_hooks = Hooks()
 	return self
 end
 

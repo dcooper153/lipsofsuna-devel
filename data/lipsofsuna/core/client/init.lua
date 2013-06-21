@@ -41,10 +41,6 @@ Client:register_start_hook(10, function(secs)
 		Ui:set_state("mainmenu")
 	end
 end)
-Client:register_update_hook(10, function(secs)
-	-- Update the simulation.
-	Simulation:update(secs)
-end)
 Client:register_update_hook(12, function(secs)
 	-- Update the connection status.
 	if Client:get_connected() and not Network:get_connected() then
