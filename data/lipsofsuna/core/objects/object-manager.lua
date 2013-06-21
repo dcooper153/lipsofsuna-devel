@@ -25,6 +25,8 @@ ObjectManager.new = function(clss)
 	self.objects_by_id = setmetatable({}, {__mode = "v"})
 	-- Initialize the hooks.
 	self.object_created_hooks = Hooks()
+	self.object_detached_hooks = Hooks()
+	self.object_update_hooks = Hooks()
 	return self
 end
 

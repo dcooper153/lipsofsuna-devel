@@ -9,6 +9,7 @@
 -- @alias Arena
 
 local Class = require("system/class")
+local Simulation = require("core/client/simulation")
 local TerrainManager = require("core/terrain/terrain-manager")
 local Vector = require("system/math/vector")
 
@@ -54,6 +55,15 @@ end
 -- @param self Arena.
 -- @param secs Seconds since the last update.
 Arena.update = function(self, secs)
+	-- Initialize the player.
+	if not self.player then
+		self.player = Simulation:create_object_by_spec(Actorspec:find_by_name("aer"))
+		self.player:set_position(Vector(500,100,500))
+		self.player.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYERS)
+		self.player:set_visible(true)
+		self.player.render:init(self.player)
+		Client:set_player_object(self.player)
+	end
 	-- Update lighting.
 	Client.lighting:update(secs)
 	-- Update terrain.

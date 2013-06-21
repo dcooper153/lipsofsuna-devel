@@ -16,8 +16,6 @@ local Marker = require("core/marker")
 local Model = require("system/model")
 local PhysicsObject = require("system/physics-object")
 local Timer = require("system/timer")
-local ClientRenderObject = not Main.settings.server and require("core/client/client-render-object")
-local MovementPrediction = not Main.settings.server and require("core/client/movement-prediction")
 
 --- The base class for game objects.
 -- @type SimulationObject
@@ -41,14 +39,9 @@ SimulationObject.new = function(clss, id)
 	-- Initialize the physics object.
 	self.physics = PhysicsObject()
 	self.physics:set_id(self:get_id())
-	-- Initialize client and server data.
+	-- Initialize other data.
 	self.inventory = Inventory(self:get_id())
-	if Game.enable_graphics then
-		self.render = ClientRenderObject()
-	end
-	if Game.enable_prediction then
-		self.prediction = MovementPrediction()
-	end
+	Main.objects.object_created_hooks:call(self)
 	return self
 end
 
@@ -169,10 +162,8 @@ SimulationObject.detach = function(self)
 			self.parent = nil
 		end
 	end
-	-- Detach client data.
-	if self:has_client_data() then
-		self.render:clear()
-	end
+	-- Detach other data.
+	Main.objects.object_detached_hooks:call(self)
 end
 
 --- Hides the object and purges it from the database.
@@ -513,34 +504,7 @@ end
 -- @param secs Seconds since the last update.
 SimulationObject.update = function(self, secs)
 	if not self:get_visible() then return end
-	if self:has_server_data() then
-		-- Freeze until the terrain has been loaded.
-		if not Game.terrain:is_point_loaded(self:get_position()) then
-			self.physics:set_physics("static")
-		else
-			self.physics:set_physics(self:get_physics_mode())
-		end
-	end
-	if self:has_client_data() then
-		-- Update sound.
-		if self.animated then
-			self:update_sound(secs)
-		end
-		-- Interpolate the position.
-		if self.prediction and self.prediction.enabled then
-			self.prediction:update(secs)
-			self:set_position(self.prediction:get_predicted_position())
-			if self.dead or self ~= Client.player_object then
-				self:set_rotation(self.prediction:get_predicted_rotation())
-				self:set_tilt_angle(self.prediction:get_predicted_tilt())
-			end
-		end
-		-- Update the render object.
-		if self:has_server_data() then
-			self.render:set_position(self:get_position())
-			self.render:set_rotation(self:get_rotation())
-		end
-	end
+	Main.objects.object_update_hooks:call(self, secs)
 end
 
 --- Updates the environment of the object and tries to fix it if necessary.
