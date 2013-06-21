@@ -10,7 +10,7 @@ Widgets.Uiinvmove.new = function(clss, id, item, index, slot)
 end
 
 Widgets.Uiinvmove.apply = function(self)
-	Game.messaging:client_event("move in inventory", self.inventory_id, Client.data.inventory.index, self.index)
+	Main.messaging:client_event("move in inventory", self.inventory_id, Client.data.inventory.index, self.index)
 	Ui:pop_state()
 	Client.effects:play_global("uitransition1")
 end

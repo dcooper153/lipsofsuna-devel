@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local Database = require("system/database")
-local Messaging = require("core/messaging/messaging")
 local Network = require("system/network")
 local Physics = require("system/physics")
 local SectorManager = require("core/server/sector-manager")
@@ -85,7 +84,6 @@ Game.deinit = function(self)
 	-- Garbage collect everything.
 	self.database = nil
 	self.sectors = nil
-	self.messaging = nil
 	collectgarbage()
 end
 

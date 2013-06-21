@@ -1,6 +1,11 @@
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+
 local Database = require("system/database")
 
-Message{
+Main.messaging:register_message{
 	name = "server stats",
 	client_to_server_encode = function(self)
 		return {}
@@ -13,7 +18,7 @@ Message{
 		local player = Server:get_player_by_client(client)
 		if not player then return end
 		if not player:get_admin() then
-			Game.messaging:server_event("message", "You have no permission to do that.")
+			Main.messaging:server_event("message", "You have no permission to do that.")
 			return
 		end
 		-- Count objects.
@@ -108,7 +113,7 @@ Sectors: %d]],
 			num_objects_real, num_objects_miss,
 			num_vision_real, num_vision_miss,
 			num_sectors)
-		Game.messaging:server_event("server stats", client, response)
+		Main.messaging:server_event("server stats", client, response)
 	end,
 	server_to_client_encode = function(self, text)
 		return {"string", text}

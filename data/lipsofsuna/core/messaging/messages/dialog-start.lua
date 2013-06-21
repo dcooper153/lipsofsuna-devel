@@ -1,4 +1,9 @@
-Message{
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+
+Main.messaging:register_message{
 	name = "dialog start",
 	client_to_server_encode = function(self, id)
 		return {"uint32", id}
@@ -19,6 +24,6 @@ Message{
 		if not player:can_reach_object(object) then return end
 		-- Execute the dialog of the object.
 		if Server.dialogs:execute(object, player) then
-			Game.messaging:server_event("object dialog", player.client, id)
+			Main.messaging:server_event("object dialog", player.client, id)
 		end
 	end}

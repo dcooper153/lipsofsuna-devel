@@ -396,7 +396,7 @@ SimulationObject.loot = function(self, user)
 		self.inventory:subscribe(user, function(args) user:handle_inventory_event(args) end)
 		self:animate("loot")
 		self.looted = true
-		Game.messaging:server_event("inventory show", user.client, self:get_id())
+		Main.messaging:server_event("inventory show", user.client, self:get_id())
 	end
 end
 
@@ -441,7 +441,7 @@ end
 -- @param text Message text.
 SimulationObject.send_message = function(self, text)
 	if not self.client then return end
-	Game.messaging:server_event("message", self.client, text)
+	Main.messaging:server_event("message", self.client, text)
 end
 
 --- Fixes the position of a stuck object.

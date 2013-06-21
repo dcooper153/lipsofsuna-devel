@@ -41,7 +41,7 @@ Ui:add_widget{
 		if object.inventory:get_slot_by_index(index) then return end
 		-- Create the widget.
 		return Widgets.Uibutton("Equip in " .. slot, function()
-			Game.messaging:client_event("equip from inventory", index, slot)
+			Main.messaging:client_event("equip from inventory", index, slot)
 			Ui:pop_state()
 		end)
 	end}
@@ -57,7 +57,7 @@ Ui:add_widget{
 		if not object.inventory:get_slot_by_index(index) then return end
 		-- Create the widget.
 		return Widgets.Uibutton("Unequip", function()
-			Game.messaging:client_event("unequip", index)
+			Main.messaging:client_event("unequip", index)
 			Ui:pop_state()
 		end)
 	end}
@@ -79,7 +79,7 @@ Ui:add_widget{
 			local name = v.label or v.name
 			local action = v.name
 			table.insert(widgets, Widgets.Uibutton(name, function()
-				Game.messaging:client_event("use in inventory", Client.data.inventory.id, Client.data.inventory.index, action)
+				Main.messaging:client_event("use in inventory", Client.data.inventory.id, Client.data.inventory.index, action)
 				if Ui:get_state() == "inventory/item" then
 					Ui:pop_state()
 				end
@@ -91,7 +91,7 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "inventory/item",
 	widget = function() return Widgets.Uibutton("Drop", function()
-			Game.messaging:client_event("drop from inventory", Client.data.inventory.index, Client.data.inventory.count)
+			Main.messaging:client_event("drop from inventory", Client.data.inventory.index, Client.data.inventory.count)
 			Ui:pop_state()
 		end)
 	end}
@@ -144,7 +144,7 @@ Ui:add_widget{
 	state = "inventory/drop",
 	widget = function()
 		return Widgets.Uibutton("Drop", function()
-			Game.messaging:client_event("drop from inventory", Client.data.inventory.index, Client.data.inventory.count)
+			Main.messaging:client_event("drop from inventory", Client.data.inventory.index, Client.data.inventory.count)
 			Ui:pop_state()
 		end)
 	end}
@@ -170,7 +170,7 @@ Ui:add_widget{
 	state = "inventory/split",
 	widget = function()
 		return Widgets.Uibutton("Split", function()
-			Game.messaging:client_event("split in inventory", Client.data.inventory.id, Client.data.inventory.index, Client.data.inventory.count)
+			Main.messaging:client_event("split in inventory", Client.data.inventory.id, Client.data.inventory.index, Client.data.inventory.count)
 			Ui:pop_state()
 		end)
 	end}

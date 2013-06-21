@@ -1,6 +1,11 @@
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+
 local Network = require("system/network")
 
-Message{
+Main.messaging:register_message{
 	name = "login",
 	client_to_server_encode = function(self, login, pass)
 		return {"string", login, "string", pass}
@@ -12,7 +17,7 @@ Message{
 	end,
 	client_to_server_handle = function(self, client, login, pass)
 		if not login or not pass then
-			Game.messaging:server_event("login failed", client, "Protocol mismatch.")
+			Main.messaging:server_event("login failed", client, "Protocol mismatch.")
 			Network:disconnect(client)
 			return
 		end
@@ -25,5 +30,5 @@ Message{
 		return {}
 	end,
 	server_to_client_handle = function(self)
-		Game.messaging:client_event("login", Settings.account, Settings.password)
+		Main.messaging:client_event("login", Settings.account, Settings.password)
 	end}

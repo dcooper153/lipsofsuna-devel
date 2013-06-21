@@ -93,7 +93,7 @@ ChatCommand{
 			player:send_message("Admin privileges have been granted to " .. matches)
 			local affected = Server.accounts_by_name[matches]
 			if affected and affected.client then
-				Game.messaging:server_event("change privilege level", affected.client, true)
+				Main.messaging:server_event("change privilege level", affected.client, true)
 			end
 		else
 			player:send_message("Admin privileges have already been granted to " .. matches)
@@ -170,7 +170,7 @@ ChatCommand{
 			player:send_message("Admin privileges have been revoked from " .. matches)
 			local affected = Server.accounts_by_name[matches]
 			if affected and affected.client then
-				Game.messaging:server_event("change privilege level", affected.client, false)
+				Main.messaging:server_event("change privilege level", affected.client, false)
 			end
 		else
 			player:send_message("Admin privileges have already been revoked from " .. matches)
@@ -205,7 +205,7 @@ ChatCommand{
 	handler = "client",
 	func = function(player, matches)
 		-- Request stats from the server.
-		Game.messaging:client_event("server stats")
+		Main.messaging:client_event("server stats")
 	end}
 
 ChatCommand{
@@ -450,7 +450,7 @@ ChatCommand{
 	handler = "client",
 	permission = "player",
 	func = function(player, matches)
-		Game.messaging:client_event("player chat", matches[1])
+		Main.messaging:client_event("player chat", matches[1])
 	end}
 ChatCommand{
 	pattern = ".*",

@@ -75,7 +75,7 @@ PlayerState.update = function(self, secs)
 		self.tilt_speed = 0
 		-- Synchronize with the server.
 		if Game.initialized then
-			Game.messaging:client_event("rotate", self.turn_state, self.tilt_state)
+			Main.messaging:client_event("rotate", self.turn_state, self.tilt_state)
 		end
 	end
 end

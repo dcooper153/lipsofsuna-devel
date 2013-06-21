@@ -53,7 +53,7 @@ Host.update = function(self, secs)
 		-- Send the login event.
 		self.data.status = "Preparing the game..."
 		self.data.state = "connecting"
-		Game.messaging:client_event("login", "local", "")
+		Main.messaging:client_event("login", "local", "")
 		return true
 	end
 end

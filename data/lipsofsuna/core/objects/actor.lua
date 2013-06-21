@@ -828,7 +828,7 @@ Actor.update_burdening = function(self, secs)
 	if curr_weight ~= self.carried_weight or prev_limit ~= curr_limit then
 		self.carried_weight = curr_weight
 		self.burden_limit = curr_limit
-		Game.messaging:server_event("inventory weight", self.client, curr_weight, curr_limit)
+		Main.messaging:server_event("inventory weight", self.client, curr_weight, curr_limit)
 	end
 	local curr_burden = self:get_burdened()
 	if prev_burden ~= curr_burden then

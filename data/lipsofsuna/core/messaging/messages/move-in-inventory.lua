@@ -1,4 +1,9 @@
-Message{
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+
+Main.messaging:register_message{
 	name = "move in inventory",
 	client_to_server_encode = function(self, id, src, dst)
 		return {"uint32", id, "uint32", src, "uint32", dst}

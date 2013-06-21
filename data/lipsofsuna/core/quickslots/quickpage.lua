@@ -69,10 +69,10 @@ Quickpage.activate = function(self, index)
 			names[i] = feat.effects[i] and feat.effects[i][1] or ""
 			values[i] = feat.effects[i] and feat.effects[i][2] or 0
 		end
-		Game.messaging:client_event("cast spell", feat.animation or "",
+		Main.messaging:client_event("cast spell", feat.animation or "",
 			names[1], values[1], names[2], values[2],
 			names[3], values[3], true)
-		Game.messaging:client_event("cast spell", feat.animation or "",
+		Main.messaging:client_event("cast spell", feat.animation or "",
 			names[1], values[1], names[2], values[2],
 			names[3], values[3], false)
 	elseif item then

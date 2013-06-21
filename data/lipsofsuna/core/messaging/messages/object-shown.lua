@@ -1,3 +1,8 @@
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+
 local Bitwise = require("system/bitwise")
 local Item = require("core/objects/item")
 local Physics = require("system/physics")
@@ -18,7 +23,7 @@ local FlagType = make_flags{
 -- The number of fields is so high that an exception is made for message
 -- type: the server passes the object itself and the client accepts either
 -- the passed object or a table that contains the decoded object data.
-Message{
+Main.messaging:register_message{
 	name = "object shown",
 	server_to_client_encode = function(self, mine, o)
 		local add = function(data, type, value)

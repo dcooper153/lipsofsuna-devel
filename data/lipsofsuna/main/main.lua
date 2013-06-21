@@ -14,6 +14,7 @@ local Eventhandler = require("system/eventhandler")
 local Hooks = require("system/hooks")
 local Game = require("core/server/game") --FIXME
 local ImageManager = require("main/image-manager")
+local Messaging = require("main/messaging")
 local ModelManager = require("main/model-manager")
 local Mod = require("main/mod")
 local Settings = require("main/settings")
@@ -33,6 +34,7 @@ Main.new = function(clss)
 	self.timing = Timing()
 	self.mods = Mod()
 	self.settings = Settings(self.mods)
+	self.messaging = Messaging()
 	self.game_start_hooks = Hooks()
 	self.game_end_hooks = Hooks()
 	self.main_start_hooks = Hooks()
@@ -174,18 +176,17 @@ Main.start_game = function(self, mode, save, port)
 
 	-- FIXME
 	-- Initialize the server.
-	local Messaging = require("core/messaging/messaging")
 	if mode == "server" then
 		Server:init(true, false)
-		self.game.messaging = Messaging(port or Server.config.server_port)
+		self.messaging:set_network_port(port or Server.config.server_port)
 	elseif mode == "host" then
 		Server:init(true, true)
-		self.messaging = Messaging(port or Server.config.server_port)
+		self.messaging:set_network_port(port or Server.config.server_port)
 	elseif mode == "single" then
 		Server:init(false, true)
-		self.game.messaging = Messaging()
+		self.messaging:set_network_port(nil)
 	else
-		self.game.messaging = Messaging()
+		self.messaging:set_network_port(nil)
 	end
 	-- Initialize terrain updates.
 	if Server.initialized then

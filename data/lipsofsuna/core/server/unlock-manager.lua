@@ -46,9 +46,9 @@ end
 UnlockManager.changed = function(self, type, name, added)
 	if not self.db then return end
 	if added then
-		Game.messaging:server_event_broadcast("unlocks add", type, name)
+		Main.messaging:server_event_broadcast("unlocks add", type, name)
 	else
-		Game.messaging:server_event_broadcast("unlocks remove", type, name)
+		Main.messaging:server_event_broadcast("unlocks remove", type, name)
 	end
 end
 

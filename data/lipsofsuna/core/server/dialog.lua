@@ -437,7 +437,7 @@ Dialog.execute = function(self)
 		end,
 		notification = function(vm, c)
 			vm[1].pos = vm[1].pos + 1
-			Game.messaging:server_event("notification", self.user.client, c[2])
+			Main.messaging:server_event("notification", self.user.client, c[2])
 		end,
 		quest = function(vm, c)
 			local q = Server.quest_database:find_quest_by_name(c[2])

@@ -123,7 +123,7 @@ end
 -- @param self Chargen.
 Chargen.apply = function(self)
 	if self.data.standalone then return end
-	Game.messaging:client_event("create character", {
+	Main.messaging:client_event("create character", {
 		animation_profile = self.char.animation_profile,
 		body_style = scale255(self.char.body),
 		eye_color = scale255(self.char.eye_color),

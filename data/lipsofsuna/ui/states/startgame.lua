@@ -17,7 +17,7 @@ Ui:add_state{
 			Client.data.connection.text = "Preparing the game..."
 			Client.data.connection.connecting = true
 			Ui:restart_state()
-			Game.messaging:client_event("login", "local", "")
+			Main.messaging:client_event("login", "local", "")
 		end
 	end}
 

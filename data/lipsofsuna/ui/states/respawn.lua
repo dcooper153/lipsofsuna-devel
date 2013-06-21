@@ -11,6 +11,6 @@ Ui:add_widget{
 	state = "respawn",
 	widget = function()
 		return Widgets.Uibutton("Respawn", function()
-			Game.messaging:client_event("respawn")
+			Main.messaging:client_event("respawn")
 		end)
 	end}

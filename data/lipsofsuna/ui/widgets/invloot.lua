@@ -10,6 +10,6 @@ Widgets.Uiinvloot.new = function(clss, id, item, index, slot)
 end
 
 Widgets.Uiinvloot.apply = function(self)
-	Game.messaging:client_event("take from inventory", self.inventory_id, self.index)
+	Main.messaging:client_event("take from inventory", self.inventory_id, self.index)
 	Client.effects:play_global("uitransition1")
 end

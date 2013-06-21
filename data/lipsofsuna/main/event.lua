@@ -28,7 +28,7 @@ end}
 Eventhandler{type = "login", func = function(self, event)
 	Server.log:format("Client connect from %q.", Network:get_client_address(event.client) or "???")
 	-- Tell the client to authenticate.
-	Game.messaging:server_event("login", event.client)
+	Main.messaging:server_event("login", event.client)
 	-- Update lobby.
 	Lobby:set_players(Lobby:get_players() + 1)
 end}
@@ -71,7 +71,7 @@ Eventhandler{type = "object-contact", func = function(self, event)
 end}
 
 Eventhandler{type = "packet", func = function(self, args)
-	Game.messaging:handle_packet(args.client, args.packet)
+	Main.messaging:handle_packet(args.client, args.packet)
 end}
 
 Eventhandler{type = "sector-load", func = function(self, args)

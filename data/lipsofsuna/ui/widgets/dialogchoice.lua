@@ -12,7 +12,7 @@ Widgets.Uidialogchoice.new = function(clss, id, index, text)
 end
 
 Widgets.Uidialogchoice.apply = function(self)
-	Game.messaging:client_event("choose dialog answer", self.dialog_id, self.text)
+	Main.messaging:client_event("choose dialog answer", self.dialog_id, self.text)
 	Client.effects:play_global("transition1")
 end
 

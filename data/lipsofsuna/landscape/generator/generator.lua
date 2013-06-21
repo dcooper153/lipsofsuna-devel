@@ -78,7 +78,7 @@ Generator.generate = function(self, args)
 	-- Inform players of the generation being complete.
 	-- All accounts were erased so clients need to re-authenticate.
 	for k,v in pairs(Network:get_clients()) do
-		Game.messaging:server_event("login", v)
+		Main.messaging:server_event("login", v)
 	end
 end
 
@@ -90,10 +90,10 @@ Generator.inform_clients = function(self, client)
 	local msg = self.prev_message or ""
 	local prg = self.prev_fraction or 0
 	if client then
-		Game.messaging:server_event("generator status", client, msg, prg)
+		Main.messaging:server_event("generator status", client, msg, prg)
 	else
 		for k,v in pairs(Network:get_clients()) do
-			Game.messaging:server_event("generator status", v, msg, prg)
+			Main.messaging:server_event("generator status", v, msg, prg)
 		end
 	end
 end

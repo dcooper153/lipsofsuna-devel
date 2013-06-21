@@ -5,12 +5,12 @@ Client:register_init_hook(500, function()
 
 	Client.input:register_binding{name = "attack", mode = "toggle", key1 = "mouse1", func = function(v)
 		if not Client.player_object then return end
-		Game.messaging:client_event("attack", v)
+		Main.messaging:client_event("attack", v)
 	end}
 
 	Client.input:register_binding{name = "block", mode = "toggle", key1 = "mouse3", func = function(v)
 		if not Client.player_object then return end
-		Game.messaging:client_event("block", v)
+		Main.messaging:client_event("block", v)
 	end}
 
 	Client.input:register_binding{name = "chat", mode = "press", key1 = Keysym.t, func = function()
@@ -20,7 +20,7 @@ Client:register_init_hook(500, function()
 
 	Client.input:register_binding{name = "climb", mode = "press", key1 = Keysym.c, func = function()
 		if not Client.player_object then return end
-		Game.messaging:client_event("climb")
+		Main.messaging:client_event("climb")
 	end}
 
 	Client.input:register_binding{name = "feats", mode = "press", key1 = Keysym.u, func = function()
@@ -49,7 +49,7 @@ Client:register_init_hook(500, function()
 
 	Client.input:register_binding{name = "jump", mode = "toggle", key1 = Keysym.SPACE, func = function(v)
 		if not Client.player_object then return end
-		Game.messaging:client_event("jump", v)
+		Main.messaging:client_event("jump", v)
 	end}
 
 	Client.input:register_binding{name = "map", mode = "press", key1 = Keysym.m, func = function()
@@ -82,7 +82,7 @@ Client:register_init_hook(500, function()
 
 	Client.input:register_binding{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
 		if not Client.player_object then return end
-		Game.messaging:client_event("walk", math.max(-1, math.min(1, -v)))
+		Main.messaging:client_event("walk", math.max(-1, math.min(1, -v)))
 	end}
 
 	Client.input:register_binding{name = "options", mode = "press", key1 = Keysym.o, func = function()
@@ -110,7 +110,7 @@ Client:register_init_hook(500, function()
 
 	Client.input:register_binding{name = "run", mode = "toggle", key1 = Keysym.LSHIFT, func = function(v)
 		if not Client.player_object then return end
-		Game.messaging:client_event("run", not v)
+		Main.messaging:client_event("run", not v)
 	end}
 
 	Client.input:register_binding{name = "screenshot", mode = "press", key1 = Keysym.PRINT, func = function()
@@ -129,7 +129,7 @@ Client:register_init_hook(500, function()
 
 	Client.input:register_binding{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
 		if not Client.player_object then return end
-		Game.messaging:client_event("sidestep", v)
+		Main.messaging:client_event("sidestep", v)
 	end}
 
 	Client.input:register_binding{name = "use", mode = "press", key1 = Keysym.b, func = function()

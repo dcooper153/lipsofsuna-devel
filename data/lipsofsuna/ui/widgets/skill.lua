@@ -29,7 +29,7 @@ Widgets.Uiskill.apply = function(self)
 		Client.effects:play_global("uitoggle2")
 	end
 	-- Send an update.
-	Game.messaging:client_event("update skills", Client.data.skills:get_names())
+	Main.messaging:client_event("update skills", Client.data.skills:get_names())
 end
 
 Widgets.Uiskill.rebuild_size = function(self)

@@ -40,7 +40,7 @@ Trading.accept = function(self, player)
 	end
 	-- Close the trading screen.
 	player.trading = nil
-	Game.messaging:server_event("trading end", player.client)
+	Main.messaging:server_event("trading end", player.client)
 end
 
 --- Cancels the trade.
@@ -48,7 +48,7 @@ end
 -- @param player Player.
 Trading.cancel = function(self, player)
 	if not player.trading then return end
-	Game.messaging:server_event("trading end", player.client)
+	Main.messaging:server_event("trading end", player.client)
 	player.trading = nil
 end
 
@@ -105,14 +105,14 @@ Trading.start = function(self, player, merchant)
 		table.insert(player.trading.shop, s.name)
 	end
 	-- Send the trading start packet.
-	Game.messaging:server_event("trading start", player.client, player.trading.shop)
+	Main.messaging:server_event("trading start", player.client, player.trading.shop)
 end
 
 --- Sends a deal status update to the player.
 -- @param self Trading.
 -- @param player Player.
 Trading.update = function(self, player)
-	Game.messaging:server_event("trading accept", player.client, self:deal(player))
+	Main.messaging:server_event("trading accept", player.client, self:deal(player))
 end
 
 return Trading

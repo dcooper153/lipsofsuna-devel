@@ -8,7 +8,7 @@ Operators.trading = Client
 -- @param self Client.
 -- @return Table of shop items.
 Operators.trading.accept = function(self)
-	Game.messaging:client_event("trading accept")
+	Main.messaging:client_event("trading accept")
 end
 
 --- Gets the list of items selected for buying.<br/>
@@ -208,5 +208,5 @@ Operators.trading.notify_server = function(self)
 		end
 	end
 	-- Notify the server.
-	Game.messaging:client_event("update trading", buy, sell)
+	Main.messaging:client_event("update trading", buy, sell)
 end

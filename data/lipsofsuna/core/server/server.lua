@@ -128,7 +128,7 @@ Server.authenticate_client = function(self, client, login, pass)
 	account = self.accounts_by_name[login]
 	if account then
 		self.log:format("Client login from %q failed: account already in use.", self:get_client_address(client))
-		Game.messaging:server_event("login failed", client, "The account is already in use.")
+		Main.messaging:server_event("login failed", client, "The account is already in use.")
 		return
 	end
 	-- Load or create an account.
@@ -136,7 +136,7 @@ Server.authenticate_client = function(self, client, login, pass)
 	if not account then
 		if message then
 			self.log:format("Client login from %q failed: %s.", self:get_client_address(client), message)
-			Game.messaging:server_event("login failed", client, "Invalid account name or password.")
+			Main.messaging:server_event("login failed", client, "Invalid account name or password.")
 			return
 		end
 		account = self.account_database:create_account(login, pass)
@@ -163,10 +163,10 @@ Server.authenticate_client = function(self, client, login, pass)
 		admin = true
 	end
 	-- Inform about admin privileges.
-	Game.messaging:server_event("change privilege level", client, self.config.admins[login] or false)
+	Main.messaging:server_event("change privilege level", client, self.config.admins[login] or false)
 	-- Enter the character creation mode.
 	if not object then
-		Game.messaging:server_event("start character creation", client)
+		Main.messaging:server_event("start character creation", client)
 	end
 end
 
@@ -199,7 +199,7 @@ end
 
 Server.spawn_player = function(self, player, client, spawnpoint)
 	-- Notify the client of the game start.
-	Game.messaging:server_event("accept character", client)
+	Main.messaging:server_event("accept character", client)
 	-- Add to the map.
 	self.players_by_client[client] = player
 	local home = player:get_spawn_point()
@@ -211,15 +211,15 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 	player:set_visible(true)
 	player:set_client(client)
 	-- Transmit the home marker.
-	Game.messaging:server_event("create marker", client, "home", home)
+	Main.messaging:server_event("create marker", client, "home", home)
 	-- Transmit unlocked map markers.
 	for k,m in pairs(Marker.dict_name) do
 		if m.unlocked then
-			Game.messaging:server_event("create marker", client, m.name, m.position)
+			Main.messaging:server_event("create marker", client, m.name, m.position)
 		end
 	end
 	-- Transmit other unlocks.
-	Game.messaging:server_event("unlocks init", client, self.unlocks.unlocks)
+	Main.messaging:server_event("unlocks init", client, self.unlocks.unlocks)
 	-- Transmit skills.
 	player:update_skills()
 	-- Transmit active and completed quests.
@@ -231,7 +231,7 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 	for k,v in pairs(Game.static_objects_by_id) do
 		table.insert(objects, {v:get_id(), v.spec.name, v:get_position(), v:get_rotation()})
 	end
-	Game.messaging:server_event("create static objects", client, objects)
+	Main.messaging:server_event("create static objects", client, objects)
 	-- Transmit dialog states of static objects.
 	for k,v in pairs(self.dialogs.dialogs_by_object) do
 		if v.object and v.object.static and v.event then
@@ -254,7 +254,7 @@ Server.update = function(self, secs)
 				if o and (m.position - o:get_position()).length > 1 then
 					m.position = o:get_position()
 					for k,v in pairs(self.players_by_client) do
-						Game.messaging:server_event("create marker", v, m.name, m.position)
+						Main.messaging:server_event("create marker", v, m.name, m.position)
 					end
 				end
 			end

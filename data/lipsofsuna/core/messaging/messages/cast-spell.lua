@@ -1,6 +1,11 @@
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+
 local Feat = require("arena/feat")
 
-Message{
+Main.messaging:register_message{
 	name = "cast spell",
 	client_to_server_encode = function(self, anim, e1, v1, e2, v2, e3, v3, on)
 		return {"string", anim,

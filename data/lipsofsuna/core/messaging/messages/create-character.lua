@@ -1,6 +1,11 @@
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+
 local Player = require("core/objects/player")
 
-Message{
+Main.messaging:register_message{
 	name = "create character",
 	client_to_server_encode = function(self, char)
 		return {
@@ -113,7 +118,7 @@ Message{
 			skin_color = char.skin_color,
 			skin_style = char.skin_style,
 			spec = spec}
-		Game.messaging:server_event("accept character", client)
+		Main.messaging:server_event("accept character", client)
 		Server:spawn_player(player, client, char.spawn_point)
 		Server.object_database:save_object(player)
 	end}

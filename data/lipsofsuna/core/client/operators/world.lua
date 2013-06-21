@@ -93,7 +93,7 @@ Operators.world.use_object = function(self, object, action)
 		return
 	end
 	-- Send a normal use command otherwise.
-	Game.messaging:client_event("use in world", object:get_id(), action.name)
+	Main.messaging:client_event("use in world", object:get_id(), action.name)
 	if Ui:get_state() == "word/object" then
 		Ui:pop_state()
 	end

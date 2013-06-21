@@ -126,7 +126,7 @@ Player.disable = function(self, keep)
 		self.vision:set_enabled(false)
 	end
 	if not keep and self.client then
-		Game.messaging:server_event("start character creation", self.client)
+		Main.messaging:server_event("start character creation", self.client)
 		Server.players_by_client[self.client] = nil
 		self.client = nil
 	end
@@ -164,7 +164,7 @@ end
 -- @param name Modifier name.
 -- @param strength Modifier strength.
 Player.inflict_modifier = function(self, name, strength)
-	Game.messaging:server_event("add modifier", self.client, name, strength)
+	Main.messaging:server_event("add modifier", self.client, name, strength)
 	return Actor.inflict_modifier(self, name, strength)
 end
 
@@ -172,7 +172,7 @@ end
 -- @param self Object.
 -- @param name Modifier name.
 Player.removed_modifier = function(self, name)
-	Game.messaging:server_event("remove modifier", self.client, name)
+	Main.messaging:server_event("remove modifier", self.client, name)
 	return Actor.removed_modifier(self, name)
 end
 
@@ -189,31 +189,31 @@ Player.handle_inventory_event = function(self, args)
 			if args.object then
 				local name = args.object.spec.name
 				local slot = args.inventory:get_slot_by_index(args.index)
-				Game.messaging:server_event("add inventory item", self.client, id, args.index, name, args.object:get_count())
+				Main.messaging:server_event("add inventory item", self.client, id, args.index, name, args.object:get_count())
 				if slot then
-					Game.messaging:server_event("equip inventory item", self.client, id, args.index, slot)
+					Main.messaging:server_event("equip inventory item", self.client, id, args.index, slot)
 				end
 			else
-				Game.messaging:server_event("remove inventory item", self.client, id, args.index)
+				Main.messaging:server_event("remove inventory item", self.client, id, args.index)
 			end
 		end,
 		["inventory-equipped"] = function()
-			Game.messaging:server_event("equip inventory item", self.client, id, args.index, args.slot)
+			Main.messaging:server_event("equip inventory item", self.client, id, args.index, args.slot)
 		end,
 		["inventory-unequipped"] = function()
-			Game.messaging:server_event("unequip inventory item", self.client, id, args.index)
+			Main.messaging:server_event("unequip inventory item", self.client, id, args.index)
 		end,
 		["inventory-subscribed"] = function()
 			local owner = Main.objects:find_by_id(id)
 			local spec = owner.spec
 			if not self.inventory_subscriptions then self.inventory_subscriptions = {} end
 			self.inventory_subscriptions[id] = args.inventory
-			Game.messaging:server_event("create inventory", self.client, id, spec.type, spec.name, args.inventory.size, (id == self:get_id()))
+			Main.messaging:server_event("create inventory", self.client, id, spec.type, spec.name, args.inventory.size, (id == self:get_id()))
 		end,
 		["inventory-unsubscribed"] = function()
 			if not self.inventory_subscriptions then return end
 			self.inventory_subscriptions[id] = nil
-			Game.messaging:server_event("close inventory", self.client, id)
+			Main.messaging:server_event("close inventory", self.client, id)
 		end
 	}
 	local fun = funs[args.type]
@@ -228,7 +228,7 @@ end
 Player.set_crafting_device = function(self, object, mode)
 	self.crafting_mode = mode
 	self.crafting_device = object
-	Game.messaging:server_event("craft", self.client, mode or "default")
+	Main.messaging:server_event("craft", self.client, mode or "default")
 end
 
 --- Gets the spawn point of the player.
@@ -325,7 +325,7 @@ Player.update_skills = function(self)
 	-- Recalculate the skills.
 	Actor.update_skills(self)
 	-- Send an update to the client.
-	Game.messaging:server_event("update skills", self.client, self.skills:get_names())
+	Main.messaging:server_event("update skills", self.client, self.skills:get_names())
 end
 
 --- Updates the vision radius of the player.<br/>
@@ -344,58 +344,58 @@ Player.vision_cb = function(self, args)
 		["object-animated"] = function(args)
 			local o = args.object
 			if o:get_static() then return end
-			Game.messaging:server_event("object animated", self.client, o:get_id(), args.animation or "", args.time or 0.0, args.variant)
+			Main.messaging:server_event("object animated", self.client, o:get_id(), args.animation or "", args.time or 0.0, args.variant)
 		end,
 		["object attack"] = function(args)
 			local o = args.object
-			Game.messaging:server_event("object attack", self.client, o:get_id(), args.move, args.variant)
+			Main.messaging:server_event("object attack", self.client, o:get_id(), args.move, args.variant)
 		end,
 		["object-beheaded"] = function(args)
 			local o = args.object
 			if o:get_static() then return end
-			Game.messaging:server_event("object beheaded", self.client, o:get_id(), o:get_beheaded())
+			Main.messaging:server_event("object beheaded", self.client, o:get_id(), o:get_beheaded())
 		end,
 		["object-dead"] = function(args)
 			local o = args.object
 			if o:get_static() then return end
-			Game.messaging:server_event("object dead", self.client, o:get_id(), args.dead)
+			Main.messaging:server_event("object dead", self.client, o:get_id(), args.dead)
 		end,
 		["object-dialog"] = function(args)
 			local o = args.object
 			local mine = (o.dialog and o.dialog.user == self or false)
 			if args.choices then
-				Game.messaging:server_event("object dialog choice", self.client, o:get_id(), mine, args.choices)
+				Main.messaging:server_event("object dialog choice", self.client, o:get_id(), mine, args.choices)
 			elseif args.message then
-				Game.messaging:server_event("object dialog say", self.client, o:get_id(), mine, args.character or "", args.message)
+				Main.messaging:server_event("object dialog say", self.client, o:get_id(), mine, args.character or "", args.message)
 			else
-				Game.messaging:server_event("object dialog none", self.client, o:get_id())
+				Main.messaging:server_event("object dialog none", self.client, o:get_id())
 			end
 		end,
 		["object-effect"] = function(args)
 			local o = args.object
-			Game.messaging:server_event("object effect", self.client, o:get_id(), args.effect)
+			Main.messaging:server_event("object effect", self.client, o:get_id(), args.effect)
 		end,
 		["object-feat"] = function(args)
 			local o = args.object
 			if o:get_static() then return end
-			Game.messaging:server_event("object feat", self.client, o:get_id(), args.anim.name, args.move or 0)
+			Main.messaging:server_event("object feat", self.client, o:get_id(), args.anim.name, args.move or 0)
 		end,
 		["object-hidden"] = function(args)
 			local o = args.object
 			if o:get_static() then return end
-			Game.messaging:server_event("object hidden", self.client, o:get_id())
+			Main.messaging:server_event("object hidden", self.client, o:get_id())
 		end,
 		["object-motion"] = function(args)
 			local o = args.object
 			if o:get_static() then return end
-			Game.messaging:server_event("object moved", self.client, o:get_id(), o:get_position(), o:get_rotation(), o:get_tilt_angle(), o:get_velocity())
+			Main.messaging:server_event("object moved", self.client, o:get_id(), o:get_position(), o:get_rotation(), o:get_tilt_angle(), o:get_velocity())
 		end,
 		["object-shown"] = function(args)
 			-- Don't send static objects.
 			local o = args.object
 			if o:get_static() then return end
 			-- Notify the client.
-			Game.messaging:server_event("object shown", self.client, o == self, o)
+			Main.messaging:server_event("object shown", self.client, o == self, o)
 			-- Wake up the AI.
 			if o.ai then o.ai:refresh() end
 			local flags = o.flags or 0
@@ -404,7 +404,7 @@ Player.vision_cb = function(self, args)
 		end,
 		["object-speech"] = function(args)
 			local o = args.object
-			Game.messaging:server_event("object speech", self.client, o:get_id(), args.message)
+			Main.messaging:server_event("object speech", self.client, o:get_id(), args.message)
 		end,
 		["stat changed"] = function(args)
 			local o = args.object
@@ -413,7 +413,7 @@ Player.vision_cb = function(self, args)
 			local v = s:get_skill(args.name)
 			if not v then return end
 			if v.prot == "public" or self == o then
-				Game.messaging:server_event("object stat", self.client, o:get_id(), args.name, args.value, args.maximum, math.ceil(args.value - args.value_prev + 0.5))
+				Main.messaging:server_event("object stat", self.client, o:get_id(), args.name, args.value, args.maximum, math.ceil(args.value - args.value_prev + 0.5))
 			end
 		end,
 		["object-equip"] = function(args)
@@ -423,9 +423,9 @@ Player.vision_cb = function(self, args)
 			if args.object.inventory:is_subscribed(self) then return end
 			-- The contents of the inventory slot must be revealed to the client
 			-- since it would otherwise have no information on the equipped item.
-			Game.messaging:server_event("add inventory item", self.client, id, args.index, args.item.spec.name, args.item:get_count())
+			Main.messaging:server_event("add inventory item", self.client, id, args.index, args.item.spec.name, args.item:get_count())
 			-- Send the equip message.
-			Game.messaging:server_event("equip inventory item", self.client, id, args.index, args.slot)
+			Main.messaging:server_event("equip inventory item", self.client, id, args.index, args.slot)
 		end,
 		["object-unequip"] = function(args)
 			-- If the player is subscribed to the inventory of the object, the
@@ -433,22 +433,22 @@ Player.vision_cb = function(self, args)
 			local id = args.object:get_id()
 			if args.object.inventory:is_subscribed(self) then return end
 			-- Send the unequip message.
-			Game.messaging:server_event("unequip inventory item", self.client, id, args.index)
+			Main.messaging:server_event("unequip inventory item", self.client, id, args.index)
 			-- The client doesn't need the item information of the unsubscribed
 			-- inventory anymore so we can clear the item.
-			Game.messaging:server_event("remove inventory item", self.client, id, args.index)
+			Main.messaging:server_event("remove inventory item", self.client, id, args.index)
 		end,
 		["voxel-block-changed"] = function(args)
 			if self.client == -1 then return end
-			local id = Game.messaging:get_event_id("update terrain")
+			local id = Main.messaging:get_event_id("update terrain")
 			local x,y,z = Sector:get_block_offset_by_block_id(args.index)
 			local packet = Packet(id, "uint32", x, "uint32", y, "uint32", z)
 			-- FIXME
 			--Voxel:get_block(x, y, z, packet)
-			--Game.messaging:server_event("update terrain", self.client, packet)
+			--Main.messaging:server_event("update terrain", self.client, packet)
 		end,
 		["world-effect"] = function(args)
-			Game.messaging:server_event("world effect", self.client, args.point, args.effect)
+			Main.messaging:server_event("world effect", self.client, args.point, args.effect)
 		end
 	}
 	local fun = funs[args.type]

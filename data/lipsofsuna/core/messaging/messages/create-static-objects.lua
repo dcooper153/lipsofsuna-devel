@@ -1,6 +1,11 @@
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+
 local Simulation = not Settings.server and require("core/client/simulation")
 
-Message{
+Main.messaging:register_message{
 	name = "create static objects",
 	server_to_client_encode = function(self, objects)
 		local data = {}

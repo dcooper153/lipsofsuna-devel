@@ -29,7 +29,7 @@ Ui:add_state{
 				if v[1] == "dialog" then
 					table.insert(widgets, Widgets.Uibutton(v[2], function()
 						if not object.dialog then
-							Game.messaging:client_event("dialog start", object:get_id())
+							Main.messaging:client_event("dialog start", object:get_id())
 						else
 							Client.active_dialog_object = object
 							Ui:set_state("dialog")
@@ -38,7 +38,7 @@ Ui:add_state{
 				elseif v[1] == "loot" then
 					table.insert(widgets, Widgets.Uibutton(v[2], function()
 						if not Operators.inventory:get_inventory_by_id(object:get_id()) then
-							Game.messaging:client_event("loot in world", object:get_id())
+							Main.messaging:client_event("loot in world", object:get_id())
 						end
 						Client.data.inventory.id = object:get_id()
 						Ui:set_state("loot")
@@ -47,14 +47,14 @@ Ui:add_state{
 					table.insert(widgets, Widgets.Uibutton(v[2], function()
 						-- FIXME: Should use a different system.
 						if not Operators.inventory:get_inventory_by_id(object:get_id()) then
-							Game.messaging:client_event("pickpocket", object:get_id())
+							Main.messaging:client_event("pickpocket", object:get_id())
 						end
 						Client.data.inventory.id = object:get_id()
 						Ui:set_state("loot")
 					end))
 				elseif v[1] == "pick up" then
 					table.insert(widgets, Widgets.Uibutton(v[2], function()
-						Game.messaging:client_event("take from world", object:get_id())
+						Main.messaging:client_event("take from world", object:get_id())
 						Ui:pop_state()
 					end))
 				end

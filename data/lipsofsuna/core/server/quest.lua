@@ -38,10 +38,10 @@ end
 Quest.send_to_client = function(self, client, status, marker)
 	if self.status ~= "active" and self.status ~= "completed" then return end
 	if status then
-		Game.messaging:server_event("update quest status", client, self.name, self.status, self.text)
+		Main.messaging:server_event("update quest status", client, self.name, self.status, self.text)
 	end
 	if marker then
-		Game.messaging:server_event("update quest marker", client, self.name, self.marker)
+		Main.messaging:server_event("update quest marker", client, self.name, self.marker)
 	end
 end
 
