@@ -734,23 +734,23 @@ SimulationObject.set_strafing = function(self, value)
 	self.physics:set_strafing(value)
 end
 
---- Sets the visibility of the object.<br/>
+--- Sets the visibility of the object.
 -- @param self Object.
--- @param v True for visible, false for hidden.
-SimulationObject.set_visible = function(self, v)
+-- @param value True to make visible. False otherwise.
+SimulationObject.set_visible = function(self, value)
 	-- Call the base class.
-	Object.set_visible(self, v)
+	Object.set_visible(self, value)
 	-- Set the visibilty of the physics object.
-	self.physics:set_visible(v)
+	self.physics:set_visible(value)
 	-- Set the activation status.
-	Main.objects:activate_object(self, v)
+	Main.objects:activate_object(self, value)
 	-- Ensure that visible objects have their models loaded.
-	if v and not self:get_model() then
+	if value and not self:get_model() then
 		local name = self:get_model_name()
 		if name then self:set_model(Main.models:find_by_name(name)) end
 	end
 	-- Initialize prediction when shown.
-	if v and self.prediction then
+	if value and self.prediction then
 		self:set_position(self:get_position(), true)
 		self:set_rotation(self:get_rotation(), true)
 		self.prediction:warp()

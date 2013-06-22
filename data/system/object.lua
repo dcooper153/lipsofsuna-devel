@@ -99,11 +99,11 @@ end
 
 --- Sets the model of the object.
 -- @param self Object.
--- @param v Model.
-Object.set_model = function(self, v)
-	self.__model = v
+-- @param value Model.
+Object.set_model = function(self, value)
+	self.__model = value
 	self.__particle = nil
-	Los.object_set_model(self.handle, v and v.handle)
+	Los.object_set_model(self.handle, value and value.handle)
 end
 
 --- Gets the position of the object.
@@ -142,10 +142,10 @@ end
 
 --- Sets the rotation of the object.
 -- @param self Object.
--- @param v Quaternion.
-Object.set_rotation = function(self, v)
-	if not v then return end
-	Los.object_set_rotation(self.handle, v.handle)
+-- @param value Quaternion.
+Object.set_rotation = function(self, value)
+	if not value then return end
+	Los.object_set_rotation(self.handle, value.handle)
 end
 
 --- Gets the sector ID of the object.
