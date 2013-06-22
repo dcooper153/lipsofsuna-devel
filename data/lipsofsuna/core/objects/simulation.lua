@@ -275,15 +275,6 @@ SimulationObject.get_animation_profile = function(self)
 	return "default"
 end
 
-SimulationObject.get_equip_value = function(self, user)
-	local score = 50 * self:get_armor_class(user)
-	for k,v in pairs(self:get_weapon_influences(user)) do
-		if k ~= "hatchet" then
-			score = score + v
-		end
-	end
-end
-
 --- Gets the spell effects known by the object.
 -- @param self Object.
 -- @return List of strings.

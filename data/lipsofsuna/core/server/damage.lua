@@ -125,7 +125,7 @@ Damage.apply_defender_armor = function(self, object)
 	if object:get_spec().type ~= "actor" then return end
 	local reduce = {["cold damage"] = true, ["fire damage"] = true, ["physical damage"] = true}
 	-- Calculate the blocking bonus.
-	local armor = object:get_armor_class()
+	local armor = Main.combat_utils:get_actor_armor_class(object)
 	if object.blocking then
 		local delay = object.spec.blocking_delay
 		local elapsed = Program:get_time() - object.blocking

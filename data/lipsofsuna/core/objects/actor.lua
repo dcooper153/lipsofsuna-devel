@@ -877,15 +877,6 @@ Actor.write_preset = function(self)
 		skin_style = self.skin_style}
 end
 
-Actor.get_armor_class = function(self)
-	local value = 0
-	for slot in pairs(self.spec.equipment_slots) do
-		local item = self.inventory:get_object_by_slot(slot)
-		value = value + (item and item.spec.armor_class or 0)
-	end
-	return value
-end
-
 Actor.get_attack_charge = function(self)
 	if not self.attack_charge then return 0 end
 	return math.min(1, (Program:get_time() - self.attack_charge) / 2)

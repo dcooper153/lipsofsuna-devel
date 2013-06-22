@@ -133,13 +133,6 @@ Item.die = function(self)
 	SimulationObject.die(self)
 end
 
---- Called when the object is examined.
--- @param self Item.
--- @param user User.
-Item.examine_cb = function(self, user)
-	user:send_message(self.spec.name)
-end
-
 --- Reads the object from a database.
 -- @param self Item.
 -- @param db Database.
@@ -199,14 +192,6 @@ Item.write_db = function(self, db)
 	end
 end
 
---- Gets the armor class of the item.
--- @param self Item.
--- @param user Actor.
--- @return Armor rating.
-Item.get_armor_class = function(self, user)
-	return self.spec.armor_class
-end
-
 --- Gets the stack count of the item.
 -- @param self Item.
 -- @return Count.
@@ -216,11 +201,11 @@ end
 
 --- Sets the stack count of the item.
 -- @param self Item.
--- @param v Count.
-Item.set_count = function(self, v)
+-- @param value Count.
+Item.set_count = function(self, value)
 	-- Store the new count.
-	if self.__count == v then return end
-	self.__count = v ~= 0 and v or nil
+	if self.__count == value then return end
+	self.__count = value ~= 0 and value or nil
 	-- Update the inventory containing the object.
 	if self.parent then
 		local parent = Main.objects:find_by_id(self.parent)
@@ -230,25 +215,6 @@ Item.set_count = function(self, v)
 			self.parent = nil
 		end
 	end
-end
-
---- Gets the weapon damage types of the item.
--- @param self Item.
--- @param user Actor.
--- @return Array of influences.
-Item.get_weapon_influences = function(self, user)
-	if not self.spec.influences then return {} end
-	-- Calculate the damage multiplier.
-	local mult = 1
-	if user.skills then
-		mult = user.skills:calculate_damage_multiplier_for_item(self)
-	end
-	-- Calculate influences.
-	local influences = {}
-	for k,v in pairs(self.spec.influences) do
-		influences[k] = mult * v
-	end
-	return influences
 end
 
 --- Sets the itemspec of the object.

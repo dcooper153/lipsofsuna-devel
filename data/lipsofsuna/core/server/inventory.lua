@@ -96,7 +96,7 @@ Inventory.equip_best_objects = function(self)
 		local best_score = -1
 		for index,item in pairs(self.stored) do
 			if item.spec.equipment_slot == name then
-				local score = item:get_equip_value(owner)
+				local score = Main.combat_utils:get_item_equip_value(owner, item)
 				if not best or score < best_score then
 					best = index
 					best_score = score
