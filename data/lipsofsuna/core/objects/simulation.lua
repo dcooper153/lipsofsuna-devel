@@ -203,35 +203,6 @@ SimulationObject.effect = function(self, args)
 	Server:object_event(self, "object-effect", {effect = args.effect})
 end
 
---- Finds an open inventory.
--- @param self Object.
--- @param id Inventory ID.
--- @return Inventory or nil.
-SimulationObject.find_open_inventory = function(self, id)
-	local obj = Main.objects:find_by_id(id)
-	if not obj then return end
-	if not object.inv:is_subscribed(self) then return end
-	return object.inv
-end
-
---- Finds a targeted object.
--- @param self Object.
--- @param where Inventory number or zero for world.
--- @param what Inventory slot number or object number for world.
--- @return Object or nil.
-SimulationObject.find_target = function(self, where, what)
-	if where == 0 then
-		return Main.objects:find_by_id_and_point(what, self:get_position(), 5)
-	else
-		local obj = Main.objects:find_by_id(id)
-		if not obj then return end
-		if obj.inventory:is_subscribed(self) then
-			return obj.inventory:get_object_by_index(what)
-		end
-	end
-	return nil
-end
-
 --- Fires or throws the object.
 -- @param self Object.
 -- @param args Arguments.<ul>
