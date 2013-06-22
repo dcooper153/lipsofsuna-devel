@@ -30,10 +30,6 @@ Main.main_start_hooks:register(10, function(secs)
 		object.render:clear()
 	end)
 	Main.objects.object_update_hooks:register(10, function(object, secs)
-		-- Update sound.
-		if object.animated then
-			object:update_sound(secs)
-		end
 		-- Interpolate the position.
 		if object.prediction and object.prediction.enabled then
 			object.prediction:update(secs)

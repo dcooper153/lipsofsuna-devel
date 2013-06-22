@@ -1,6 +1,7 @@
 local Eventhandler = require("system/eventhandler")
 local Lobby = require("system/lobby")
 local Network = require("system/network")
+local Object = require("system/object")
 local Timer = require("system/timer")
 local Vision = require("system/vision")
 
@@ -9,9 +10,13 @@ local handle_vision = function(self, args)
 end
 
 local handle_motion = function(self, args)
+	-- Find the object.
 	local object = Main.objects:find_by_id(args.id)
 	if not object then return end
-	object:sync_transform()
+	-- Synchronize the transformation.
+	Object.set_position(object, object.physics:get_position())
+	Object.set_rotation(object, object.physics:get_rotation())
+	-- Emit a vision event.
 	args.object = object
 	handle_vision(self, args)
 end

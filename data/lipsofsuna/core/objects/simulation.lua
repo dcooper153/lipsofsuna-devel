@@ -525,18 +525,6 @@ SimulationObject.read_db = function(self, db)
 	Server.object_database:load_fields(self)
 end
 
---- Synchronizes the logical position and rotation with the physics state.
--- @param self Object.
-SimulationObject.sync_transform = function(self)
-	local p,r = self.physics:get_position(),self.physics:get_rotation()
-	Object.set_position(self, p)
-	Object.set_rotation(self, r)
-	if self.render then
-		self.render:set_position(p)
-		self.render:set_rotation(r)
-	end
-end
-
 --- Writes the object to a database.
 -- @param self Object.
 -- @param db Database.
@@ -593,13 +581,6 @@ end
 SimulationObject.find_node = function(self, ...)
 	if not self.render then return end
 	return self.render:find_node(...)
-end
-
---- Plays footstep sounds for actors.
--- @param self Object.
--- @param secs Seconds since the last update.
-SimulationObject.update_sound = function(self, secs)
-	assert(self:has_client_data())
 end
 
 --- Gets the stack count of the object.
