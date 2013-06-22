@@ -22,11 +22,14 @@ Main.messaging:register_message{
 		return {id, Vector(x,y,z), Quaternion(rx,ry,rz,rw), t, Vector(vx,vy,vz)}
 	end,
 	server_to_client_handle = function(self, id, position, rotation, tilt, velocity)
-		-- Redundant in single player.
-		if Server.initialized then return end
 		-- Get the object.
 		local o = Main.objects:find_by_id(id)
 		if not o then return end
+		-- Redundant in single player.
+		if o:has_server_data() then
+			o.render:set_position(position)
+			return
+		end
 		-- Set the target interpolation position.
 		o:set_position(position, true)
 		o:set_rotation(rotation, true)

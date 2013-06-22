@@ -44,6 +44,7 @@ Arena.new = function(clss)
 			end
 		end
 	end)
+	Game.terrain = self.terrain --FIXME
 	-- Enable the simulation.
 	Physics:set_enable_simulation(true)
 	return self
@@ -61,15 +62,17 @@ end
 Arena.update = function(self, secs)
 	-- Initialize the player.
 	if not self.player then
-		self.player = Player{spec = Actorspec:find_by_name("aer")}
-		self.player:set_position(Vector(500,130,500))
+		self.player = Player{spec = Actorspec:find_by_name("aer-player")}
+		self.player.has_server_data = function() return true end --FIXME
+		self.player:set_position(Vector(500,101,500))
 		self.player.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYERS)
 		self.player:set_visible(true)
 		self.player.render:init(self.player)
-		self.player.client = -1
+		self.player:set_client(-1)
 		Client:set_player_object(self.player)
 		Server.players_by_client = {}
 		Server.players_by_client[-1] = self.player --FIXME
+		self.player:calculate_animation()
 	end
 	-- Update lighting.
 	Client.lighting:update(secs)
