@@ -13,8 +13,8 @@ Dialogspec{name = "scapegoat death", commands = {
 			local quest = Questspec:find{name = quest_name}
 			if not quest then return end
 			-- Get information on the main quest actor.
-			local actor = self.object:get_dialog_variable(var_name .. "_mark_actor") or "the contact person"
-			local marker = self.object:get_dialog_variable(var_name .. "_mark_marker")
+			local actor = Server.quest_database:get_dialog_variable(self.object, var_name .. "_mark_actor") or "the contact person"
+			local marker = Server.quest_database:get_dialog_variable(self.object, var_name .. "_mark_marker")
 			-- Append a branch for this quest.
 			table.insert(branch,
 				{"branch", check = {{"quest active", quest_name}},
@@ -26,7 +26,7 @@ Dialogspec{name = "scapegoat death", commands = {
 				})
 		end
 		-- Create a branch for each quest involving the actor.
-		local vars = self.object:get_dialog_variables()
+		local vars = Server.quest_database:get_dialog_variables(self.object)
 		local branch = {"branch",
 			{"flag clear", "scapegoat_alive_" .. self.object.spec.name}}
 		for k,v in pairs(vars) do

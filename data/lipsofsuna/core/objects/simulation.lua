@@ -304,29 +304,6 @@ SimulationObject.get_animation_profile = function(self)
 	return "default"
 end
 
---- Gets a dialog variable by name.
--- @param self Object.
--- @param name Variable name.
--- @return Variable value, or nil.
-SimulationObject.get_dialog_variable = function(self, name)
-	return Server.quest_database:get_dialog_variable(self, name)
-end
-
---- Sets a dialog variable.
--- @param self Object.
--- @param name Variable name.
--- @param value Variable value.
-SimulationObject.set_dialog_variable = function(self, name, value)
-	return Server.quest_database:set_dialog_variable(self, name, value)
-end
-
---- Gets all dialog variable for the object.
--- @param self Object.
--- @return List of variables.
-SimulationObject.get_dialog_variables = function(self)
-	return Server.quest_database:get_dialog_variables(self)
-end
-
 SimulationObject.get_equip_value = function(self, user)
 	local score = 50 * self:get_armor_class(user)
 	for k,v in pairs(self:get_weapon_influences(user)) do

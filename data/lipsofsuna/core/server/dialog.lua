@@ -74,10 +74,10 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 	local npc_name = self.object.spec.name
 	local npc_marker = self.object.spec.marker
 	local var_name = string.gsub(string.lower(name), "[^A-Za-z]", "_")
-	local var_type = self.object:get_dialog_variable(var_name .. "_type")
-	local var_item = self.object:get_dialog_variable(var_name .. "_item")
-	local var_actor = self.object:get_dialog_variable(var_name .. "_actor")
-	local var_excuse = self.object:get_dialog_variable(var_name .. "_excuse")
+	local var_type = Server.quest_database:get_dialog_variable(self.object, var_name .. "_type")
+	local var_item = Server.quest_database:get_dialog_variable(self.object, var_name .. "_item")
+	local var_actor = Server.quest_database:get_dialog_variable(self.object, var_name .. "_actor")
+	local var_excuse = Server.quest_database:get_dialog_variable(self.object, var_name .. "_excuse")
 	-- Quest creation functions.
 	-- These implement quest initialization for each random quest type. They
 	-- select and create the necessary actors and set their variables.
@@ -112,10 +112,10 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 				"It just feels so good to use one."}
 			var_excuse = excuses[math.random(1, #excuses)]
 			-- Set the dialog variables.
-			self.object:set_dialog_variable(var_name .. "_init", nil)
-			self.object:set_dialog_variable(var_name .. "_type", var_type)
-			self.object:set_dialog_variable(var_name .. "_item", var_item)
-			self.object:set_dialog_variable(var_name .. "_excuse", var_excuse)
+			Server.quest_database:set_dialog_variable(self.object, var_name .. "_init", nil)
+			Server.quest_database:set_dialog_variable(self.object, var_name .. "_type", var_type)
+			Server.quest_database:set_dialog_variable(self.object, var_name .. "_item", var_item)
+			Server.quest_database:set_dialog_variable(self.object, var_name .. "_excuse", var_excuse)
 		end,
 		-- Kill an actor.
 		-- The player is asked to kill a randomly generated unique actor. The
@@ -166,13 +166,13 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			npc_marker = actor.spec.marker
 			Server.quest_database:set_dialog_flag("scapegoat_alive_" .. actor.spec.name, "true")
 			-- Set the dialog variables.
-			self.object:set_dialog_variable(var_name .. "_init", nil)
-			self.object:set_dialog_variable(var_name .. "_type", var_type)
-			self.object:set_dialog_variable(var_name .. "_actor", var_actor)
-			self.object:set_dialog_variable(var_name .. "_excuse", var_excuse)
-			actor:set_dialog_variable(var_name .. "_mark_actor", npc_name)
-			actor:set_dialog_variable(var_name .. "_mark_marker", self.object.spec.marker)
-			actor:set_dialog_variable(var_name .. "_mark_quest", name)
+			Server.quest_database:set_dialog_variable(self.object, var_name .. "_init", nil)
+			Server.quest_database:set_dialog_variable(self.object, var_name .. "_type", var_type)
+			Server.quest_database:set_dialog_variable(self.object, var_name .. "_actor", var_actor)
+			Server.quest_database:set_dialog_variable(self.object, var_name .. "_excuse", var_excuse)
+			Server.quest_database:set_dialog_variable(actor, var_name .. "_mark_actor", npc_name)
+			Server.quest_database:set_dialog_variable(actor, var_name .. "_mark_marker", self.object.spec.marker)
+			Server.quest_database:set_dialog_variable(actor, var_name .. "_mark_quest", name)
 		end}
 	if not var_type then
 		local func = random_quests[math.random(1, #random_quests)]
@@ -304,9 +304,9 @@ Dialog.execute = function(self)
 				if not quest then return end
 				if quest.status == "completed" then return end
 			elseif type == "var" then
-				if not self.object:get_dialog_variable(name) then return end
+				if not Server.quest_database:get_dialog_variable(self.object, name) then return end
 			elseif type == "!var" then
-				if self.object:get_dialog_variable(name) then return end
+				if Server.quest_database:get_dialog_variable(self.object, name) then return end
 			end
 		end
 		return true
@@ -552,11 +552,11 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["var"] = function(vm, c)
-			self.object:set_dialog_variable(c[2], "true")
+			Server.quest_database:set_dialog_variable(self.object, c[2], "true")
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["var clear"] = function(vm, c)
-			self.object:set_dialog_variable(c[2], nil)
+			Server.quest_database:set_dialog_variable(self.object, c[2], nil)
 			vm[1].pos = vm[1].pos + 1
 		end}
 	-- Execute commands until break or end.
