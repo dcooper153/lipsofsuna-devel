@@ -457,5 +457,5 @@ ChatCommand{
 	handler = "server",
 	permission = "player",
 	func = function(player, matches)
-		player:say(matches[1])
+		player:action("say", matches[1])
 	end}

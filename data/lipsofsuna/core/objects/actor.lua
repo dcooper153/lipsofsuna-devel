@@ -445,7 +445,7 @@ Actor.damaged = function(self, args)
 			for k,v in pairs(self.ai.enemies) do
 				local p = self.spec:get_personality()
 				local s = p and p:get_phrase("death")
-				if s then self:say(s) end
+				if s then self:action("say", s) end
 				break
 			end
 		end

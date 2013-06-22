@@ -389,14 +389,6 @@ SimulationObject.refresh = function(self, radius)
 	end
 end
 
---- Sends a chat message to all players near the object.
--- @param self Speaking object.
--- @param msg Message to send.
-SimulationObject.say = function(self, msg)
-	if not msg then return end
-	Server:object_event(self, "object-speech", {message = msg})
-end
-
 --- Sends a message to the client controlling the object.
 -- @param self Object.
 -- @param text Message text.

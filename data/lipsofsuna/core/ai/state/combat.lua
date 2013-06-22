@@ -10,7 +10,7 @@ Aistatespec{
 		if prev ~= "combat" then
 			local p = self.object.spec:get_personality()
 			local s = p and p:get_phrase("angered")
-			if s then self.object:say(s) end
+			if s then self.object:action("say", s) end
 			self.combat_taunt_timer = math.random(10, 30)
 		end
 	end,

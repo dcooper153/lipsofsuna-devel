@@ -94,7 +94,7 @@ Dialogspec{name = "celine", commands = {
 		{"choice", "[Poison potion] You look thirsty, have a drink.", check = {{"flag", "black-spotted parasite known"}},
 			{"remove player item", "poison potion",
 				{"branch",
-					{"func", [[q.object:say("Aaaahhhh!")
+					{"func", [[q.object:action("say", "Aaaahhhh!")
 						q.object:die()
 						q.object:damaged{amount = 200, type = "physical"}]]},
 					{"spawn object", "bloodworm", position_relative = Vector(0,3,0)},
