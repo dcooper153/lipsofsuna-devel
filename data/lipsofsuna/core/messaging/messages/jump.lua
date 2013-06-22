@@ -18,8 +18,8 @@ Main.messaging:register_message{
 		if not player then return end
 		if player.dead then return end
 		if value then
-			player:jump()
+			player:action("jump")
 		else
-			player:jump_stop()
+			player:action("jump stop")
 		end
 	end}

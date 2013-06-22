@@ -7,7 +7,7 @@ Aiactionspec{
 		return 1
 	end,
 	perform = function(self, args)
-		if args.allow_forward_jump then self.object:jump() end
+		if args.allow_forward_jump then self.object:action("jump") end
 		self.object:set_block(false)
 		self.object:set_movement(1)
 		self.object:set_strafing(0)

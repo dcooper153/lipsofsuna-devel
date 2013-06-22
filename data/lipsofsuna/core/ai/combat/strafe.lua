@@ -10,7 +10,7 @@ Aiactionspec{
 	perform = function(self, args)
 		local strafe_left = function()
 			if args.allow_strafe_left or args.allow_strafe_left_jump then
-				if args.allow_strafe_left_jump then self.object:jump() end
+				if args.allow_strafe_left_jump then self.object:action("jump") end
 				self.object:set_block(false)
 				self.object:set_strafing(-1)
 				self.object:set_movement(0)
@@ -20,7 +20,7 @@ Aiactionspec{
 		end
 		local strafe_right = function()
 			if allow_strafe_right or allow_strafe_right_jump then
-				if allow_strafe_right_jump then self.object:jump() end
+				if allow_strafe_right_jump then self.object:action("jump") end
 				self.object:set_block(false)
 				self.object:set_strafing(1)
 				self.object:set_movement(0)

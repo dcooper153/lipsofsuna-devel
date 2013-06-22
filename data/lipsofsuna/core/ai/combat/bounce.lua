@@ -10,5 +10,5 @@ Aiactionspec{
 		self.object:face_point{point = self.target:get_position(), secs = secs}
 		-- Jump towards the target.
 		self.object:set_movement(1)
-		self.object:jump()
+		self.object:action("jump")
 	end}

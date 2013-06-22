@@ -232,7 +232,7 @@ NpcAi.avoid_wander_obstacles = function(self, target)
 	-- FIXME: Stick terrain
 	local t3 = 0--Voxel:get_tile(p)
 	if t2 == 0 and t3 == 0 then
-		self.object:jump()
+		self.object:action("jump")
 		return true
 	end
 end

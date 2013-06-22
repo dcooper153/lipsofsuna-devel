@@ -568,18 +568,6 @@ Actor.inflict_modifier = function(self, name, strength, args)
 	end
 end
 
---- Causes the actor to jump.
--- @param self Actor.
-Actor.jump = function(self)
-	self:action("jump")
-end
-
---- Causes the actor to stop jumping, resulting to a lower jump.
--- @param self Actor.
-Actor.jump_stop = function(self)
-	self:action("jump stop")
-end
-
 --- Loots the object.
 -- @param self Actor.
 -- @param user Object doing the looting.
@@ -626,12 +614,6 @@ end
 -- @param name Modifier name.
 Actor.removed_modifier = function(self, name)
 	self:update_skills()
-end
-
---- Causes the actor to rise from death.
--- @param self Actor.
-Actor.resurrect = function(self)
-	self:action("resurrect")
 end
 
 --- Teleports the object.

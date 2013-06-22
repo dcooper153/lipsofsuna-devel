@@ -5,7 +5,7 @@ Feateffectspec:extend{
 		if args.object.class == Player and not args.object.client then
 			args.owner:send_message("The corpse is devoid of life force...")
 		else
-			args.object:resurrect()
+			args.object:action("resurrect")
 		end
 	end,
 	ranged = function(self, args)

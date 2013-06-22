@@ -30,7 +30,7 @@ Actionspec{
 		args.user.contact_cb = callback
 		args.user.physics:set_contact_events(true)
 		-- Initialize the tackle motion
-		args.user:jump()
+		args.user:action("jump")
 		local vel = args.user:get_rotation() * Vector(0,0.25,-1) * 10
 		args.user:set_velocity(vel)
 		feat:play_effects(args)

@@ -14,7 +14,7 @@ Aiactionspec{
 		if args.feat_melee then return 4 end
 	end,
 	perform = function(self, args)
-		if args.diff.y > 1 and args.spec.allow_jump then self.object:jump() end
+		if args.diff.y > 1 and args.spec.allow_jump then self.object:action("jump") end
 		self.object:set_block(false)
 		if args.spec.ai_enable_backstep and args.dist < 0.3 * args.hint then
 			self.object:set_movement(-1)

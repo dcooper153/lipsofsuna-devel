@@ -328,7 +328,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		player:resurrect()
+		player:action("resurrect")
 	end}
 
 ChatCommand{
