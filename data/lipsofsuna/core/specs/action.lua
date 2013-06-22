@@ -39,4 +39,5 @@ Actionspec.new = function(clss, args)
 	return self
 end
 
+return Actionspec
 

@@ -8,6 +8,8 @@
 -- @module core.objects.simulation
 -- @alias SimulationObject
 
+local Action = require("core/actions/action")
+local Actionspec = require("core/specs/action")
 local Actorpresetspec = require("core/specs/actorpreset")
 local Class = require("system/class")
 local Inventory = require("core/server/inventory")
@@ -43,6 +45,26 @@ SimulationObject.new = function(clss, id)
 	self.inventory = Inventory(self:get_id())
 	Main.objects.object_created_hooks:call(self)
 	return self
+end
+
+--- Performs an action.
+-- @param self Object.
+-- @param name Action name.
+-- @param ... Action specific arguments.
+SimulationObject.action = function(self, name, ...)
+	-- Find the action spec.
+	local spec = Actionspec:find_by_name(name)
+	if not spec then return end
+	if not spec.start then return end
+	-- Start the action.
+	local action = Action(spec, self)
+	if not spec.start(action, ...) then return end
+	-- Store actions that have effect over time.
+	if not self.actions then
+		self.actions = {[action] = true}
+	else
+		self.actions[action] = true
+	end
 end
 
 --- Handles physics contacts.
@@ -504,6 +526,15 @@ end
 -- @param secs Seconds since the last update.
 SimulationObject.update = function(self, secs)
 	if not self:get_visible() then return end
+	-- Update actions.
+	if self.actions then
+		for k,v in pairs(self.actions) do
+			if not v.spec.update(v) then
+				self.actions[k] = nil
+			end
+		end
+	end
+	-- Update hooks.
 	Main.objects.object_update_hooks:call(self, secs)
 end
 

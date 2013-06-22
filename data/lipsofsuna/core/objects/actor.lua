@@ -571,45 +571,13 @@ end
 --- Causes the actor to jump.
 -- @param self Actor.
 Actor.jump = function(self)
-	-- Check for preconditions.
-	if self.blocking then return end
-	if self.climbing then return end
-	local t = Program:get_time()
-	if t - self.jumped < 0.5 then return end
-	-- Jump or swim.
-	if self.submerged and self.submerged > 0.4 then
-		-- Swimming upwards.
-		if self:get_burdened() then return end
-		local v = self:get_velocity()
-		self.jumped = t - 0.3
-		self.jumping = true
-		if v.y < self.physics:get_speed() then
-			self.physics:jump(Vector(v.x, self.spec.swim_force * self.spec.mass, v.z))
-		end
-	else
-		-- Jumping.
-		if not self.physics:get_ground() or self:get_burdened() then return end
-		self.jumped = t
-		self.jumping = true
-		Server:object_effect(self, "jump1")
-		self:animate("jump")
-		local v = self:get_velocity()
-		local f = self.spec.mass * self.spec.jump_force * self.attributes.jump
-		self.physics:jump(Vector(v.x, f, v.z))
-	end
+	self:action("jump")
 end
 
 --- Causes the actor to stop jumping, resulting to a lower jump.
 -- @param self Actor.
 Actor.jump_stop = function(self)
-	if not self.jumping then return end
-	if self.submerged then return end
-	local init_y = self.spec.jump_force * self.spec.mass
-	local vel = self:get_velocity()
-	if vel.y > 0 and vel.y < init_y then
-		vel.y = 0
-		self:set_velocity(vel)
-	end
+	self:action("jump stop")
 end
 
 --- Loots the object.
@@ -663,19 +631,7 @@ end
 --- Causes the actor to rise from death.
 -- @param self Actor.
 Actor.resurrect = function(self)
-	if not self.dead then return end
-	-- Enable controls.
-	self.dead = nil
-	self:set_beheaded(false)
-	self.physics:set_shape("default")
-	self.physics:set_physics("kinematic")
-	-- Enable stats.
-	self.stats.enabled = true
-	self.stats:set_value("health", 1)
-	-- Restore the idle animation.
-	self:animate("idle")
-	-- Emit a vision event.
-	Server:object_event(self, "object-dead", {dead = false})
+	self:action("resurrect")
 end
 
 --- Teleports the object.
