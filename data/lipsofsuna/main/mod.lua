@@ -19,7 +19,7 @@ local Mod = Class("Mod")
 --- Creates new mod loader.
 -- @param clss Mod class.
 -- @return Mod.
-Mod.new = function(clss, mods)
+Mod.new = function(clss)
 	local self = Class.new(clss)
 	self.launchers = {}
 	self.mods = {}
@@ -32,6 +32,7 @@ end
 
 --- Initializes all the loaded mods.
 -- @param self Mod.
+-- @param settings Settings.
 Mod.init_all = function(self, settings)
 	local needed = function(name)
 		local m = self.mods[name]

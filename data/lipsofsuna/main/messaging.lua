@@ -67,6 +67,7 @@ Messaging.client_event = function(self, type, ...)
 end
 
 --- Registers a new message type.
+-- @param self Messaging.
 -- @param args Message arguments.
 Messaging.register_message = function(self, args)
 	-- Argument validation.
