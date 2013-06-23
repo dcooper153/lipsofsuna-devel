@@ -3,9 +3,6 @@ Ui:add_state{
 	root = "load",
 	label = "Loading",
 	hint = "Loading the map, please wait.",
-	grab = function()
-		return false
-	end,
 	background = function()
 		return Widgets.Uibackground("mainmenu1")
 	end,

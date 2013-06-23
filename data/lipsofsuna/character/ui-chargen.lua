@@ -14,9 +14,6 @@ Ui:add_state{
 	state = "chargen",
 	root = "chargen",
 	label = "Create character",
-	grab = function()
-		return false
-	end,
 	init = function() Client.lighting:set_dungeon_mode(false) end,
 	exit_root = function() Client.chargen:reset() end,
 	input_post = chargen_input,
@@ -76,9 +73,6 @@ Ui:add_widget{
 Ui:add_state{
 	state = "chargen/race",
 	label = "Select race",
-	grab = function()
-		return false
-	end,
 	init = function()
 		-- Create the race radio buttons.
 		local widgets = {}
@@ -103,9 +97,6 @@ Ui:add_state{
 Ui:add_state{
 	state = "chargen/presets",
 	label = "Select preset",
-	grab = function()
-		return false
-	end,
 	init = function()
 		-- Create the preset radio buttons.
 		local widgets = {}
@@ -134,9 +125,6 @@ Ui:add_widget{
 Ui:add_state{
 	state = "chargen/body",
 	label = "Customize body",
-	grab = function()
-		return false
-	end,
 	input_post = chargen_input,
 	update = chargen_update}
 
@@ -173,9 +161,6 @@ Ui:add_widget{
 Ui:add_state{
 	state = "chargen/body/skinstyle",
 	label = "Select skin style",
-	grab = function()
-		return false
-	end,
 	init = function()
 		local widgets = {}
 		local race = Client.chargen:get_race()
@@ -200,9 +185,6 @@ Ui:add_state{
 Ui:add_state{
 	state = "chargen/head",
 	label = "Customize head",
-	grab = function()
-		return false
-	end,
 	input_post = chargen_input,
 	update = chargen_update}
 
@@ -246,9 +228,6 @@ Ui:add_widget{
 Ui:add_state{
 	state = "chargen/head/hairstyle",
 	label = "Select hair style",
-	grab = function()
-		return false
-	end,
 	init = function()
 		local widgets = {}
 		local race = Client.chargen:get_race()
@@ -279,9 +258,6 @@ Ui:add_state{
 Ui:add_state{
 	state = "chargen/head/headstyle",
 	label = "Select head style",
-	grab = function()
-		return false
-	end,
 	init = function()
 		local widgets = {}
 		local race = Client.chargen:get_race()
@@ -312,9 +288,6 @@ Ui:add_state{
 Ui:add_state{
 	state = "chargen/face",
 	label = "Customize face",
-	grab = function()
-		return false
-	end,
 	input_post = chargen_input,
 	update = chargen_update}
 
@@ -369,9 +342,6 @@ Ui:add_widget{
 Ui:add_state{
 	state = "chargen/face/eyestyle",
 	label = "Select eye style",
-	grab = function()
-		return false
-	end,
 	init = function()
 		local widgets = {}
 		local race = Client.chargen:get_race()
@@ -402,9 +372,6 @@ Ui:add_state{
 Ui:add_state{
 	state = "chargen/misc",
 	label = "Customize other",
-	grab = function()
-		return false
-	end,
 	input_post = chargen_input,
 	update = chargen_update}
 
@@ -444,9 +411,6 @@ Ui:add_widget{
 Ui:add_state{
 	state = "chargen/misc/animation",
 	label = "Select animation",
-	grab = function()
-		return false
-	end,
 	init = function()
 		local widgets = {}
 		local race = Client.chargen:get_race()
@@ -477,9 +441,6 @@ Ui:add_state{
 Ui:add_state{
 	state = "chargen/spawnpoint",
 	label = "Select start point",
-	grab = function()
-		return false
-	end,
 	init = function()
 		-- Get the spawn point list.
 		local spawnpoints = {}

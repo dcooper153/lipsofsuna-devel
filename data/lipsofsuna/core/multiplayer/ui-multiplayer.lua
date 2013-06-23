@@ -2,9 +2,6 @@ Ui:add_state{
 	state = "multiplayer",
 	root = "mainmenu",
 	label = "Multiplayer",
-	grab = function()
-		return false
-	end,
 	background = function()
 		return Widgets.Uibackground("mainmenu1")
 	end}

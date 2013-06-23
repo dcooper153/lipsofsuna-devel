@@ -4,9 +4,6 @@ local Sound = require("system/sound")
 Ui:add_state{
 	state = "options",
 	label = "Options",
-	grab = function()
-		return Client.player_object ~= nil
-	end,
 	background = function()
 		if Client.player_object then return end
 		return Widgets.Uibackground("mainmenu1")
@@ -124,9 +121,6 @@ Ui:add_widget{
 Ui:add_state{
 	state = "options/videomode",
 	label = "Video mode",
-	grab = function()
-		return Client.player_object ~= nil
-	end,
 	background = function()
 		if Client.player_object then return end
 		return Widgets.Uibackground("mainmenu1")

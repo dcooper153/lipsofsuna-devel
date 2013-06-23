@@ -2,9 +2,6 @@ Ui:add_state{
 	state = "mainmenu",
 	root = "mainmenu",
 	label = "Main menu",
-	grab = function()
-		return false
-	end,
 	background = function()
 		return Widgets.Uibackground("mainmenu1")
 	end,

@@ -4,9 +4,6 @@ Ui:add_state{
 	state = "join",
 	root = "mainmenu",
 	label = "Join",
-	grab = function()
-		return false
-	end,
 	background = function()
 		return Widgets.Uibackground("mainmenu1")
 	end}
@@ -50,9 +47,6 @@ Ui:add_state{
 	state = "join/servers",
 	root = "mainmenu",
 	label = "Select server",
-	grab = function()
-		return false
-	end,
 	background = function()
 		return Widgets.Uibackground("mainmenu1")
 	end,

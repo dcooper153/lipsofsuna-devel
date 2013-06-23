@@ -61,25 +61,6 @@ Client:register_init_hook(500, function()
 		end
 	end}
 
-	Client.input:register_binding{name = "mouse_grab", mode = "press", key1 = Keysym.ESCAPE, func = function()
-		-- Toggle mouse grabbing.
-		local grab = not Ui:get_pointer_grab()
-		Client.options.grab_cursor = grab
-		Client.options:save()
-		Ui:set_pointer_grab(grab)
-		-- Open the in-game menu at ungrab.
-		if not grab then
-			if Ui:get_state() == "play" then
-				Ui:set_state("menu")
-			elseif Ui:get_state() == "editor" then
-				Ui:set_state("editor/menu")
-			end
-		-- Close the in-game menu at grab.
-		elseif Ui.root == "play" then
-			Ui:set_state("play")
-		end
-	end}
-
 	Client.input:register_binding{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
 		if not Client.player_object then return end
 		Main.messaging:client_event("walk", math.max(-1, math.min(1, -v)))

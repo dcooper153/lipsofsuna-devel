@@ -2,6 +2,9 @@ Ui:add_state{
 	state = "play",
 	root = "play",
 	hint = "",
+	grab = function()
+		return true
+	end,
 	init = function()
 		Client.effects:switch_music_track("game")
 		Client.camera_manager:set_camera_mode("third-person")

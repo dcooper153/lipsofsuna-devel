@@ -6,9 +6,6 @@ Ui:add_state{
 	state = "join/connect",
 	root = "join/connect",
 	label = "Connecting",
-	grab = function()
-		return false
-	end,
 	update = function(secs)
 		if Client.join:update(secs) then
 			Ui:restart_state()

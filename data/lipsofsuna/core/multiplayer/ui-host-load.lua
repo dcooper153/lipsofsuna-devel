@@ -4,9 +4,6 @@ Ui:add_state{
 	state = "host/load",
 	root = "mainmenu",
 	label = "Host",
-	grab = function()
-		return false
-	end,
 	background = function()
 		return Widgets.Uibackground("mainmenu1")
 	end}

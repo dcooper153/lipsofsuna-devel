@@ -4,9 +4,6 @@ Ui:add_state{
 	state = "host/wait",
 	root = "host/wait",
 	label = "Launching",
-	grab = function()
-		return false
-	end,
 	update = function(secs)
 		if Client.host:update(secs) then
 			Ui:restart_state()
