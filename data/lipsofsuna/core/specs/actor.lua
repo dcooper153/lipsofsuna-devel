@@ -251,10 +251,11 @@ Actorspec.get_random_eye_color = function(self)
 	if not self.eye_style then return end
 	local color = self.eye_color
 	if not color then
-		color = Color:hsv_to_rgb{math.random(), 0.2 + 0.8 * math.random(), math.random()}
+		color = {math.random(), 0.3 + 0.4 * math.random(), 0.3 + 0.4 * math.random()}
 		color[1] = math.floor(255 * color[1] + 0.5)
-		color[2] = math.floor(255 * color[1] + 0.5)
-		color[3] = math.floor(255 * color[1] + 0.5)
+		color[2] = math.floor(255 * color[2] + 0.5)
+		color[3] = math.floor(255 * color[3] + 0.5)
+		return color
 	end
 	return {color[1], color[2], color[3]}
 end
