@@ -68,7 +68,7 @@ MapUtils.place_item = function(clss, args)
 	local spec = Itemspec:random(args)
 	if not spec then return end
 	local clss_ = args.class or Item or Object
-	local obj = clss_()
+	local obj = clss_(Main.objects)
 	obj.random = true
 	obj:set_spec(spec)
 	obj:set_position(args.point)
@@ -87,7 +87,7 @@ MapUtils.place_obstacle = function(clss, args)
 	local spec = Obstaclespec:random(args)
 	if not spec then return end
 	local clss_ = args.class or Obstacle or Object
-	local obj = clss_()
+	local obj = clss_(Main.objects)
 	obj:set_spec(spec)
 	obj:set_position(args.point)
 	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
@@ -105,7 +105,7 @@ MapUtils.place_static = function(clss, args)
 	local spec = Staticspec:random(args)
 	if not spec then return end
 	local clss_ = args.class or Staticobject or Object
-	local obj = clss_()
+	local obj = clss_(Main.objects)
 	obj:set_spec(spec)
 	obj:set_position(args.point)
 	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
