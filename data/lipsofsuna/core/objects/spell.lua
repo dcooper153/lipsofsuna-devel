@@ -19,6 +19,7 @@ Spell.dict_id = setmetatable({}, {__mode = "kv"})
 
 --- Creates a new spell.
 -- @param clss Spell class.
+-- @param manager Object manager.
 -- @param args Arguments.<ul>
 --   <li>effect: Effect type.</li>
 --   <li>feat: Feat invoking the spell.</li>
@@ -28,8 +29,8 @@ Spell.dict_id = setmetatable({}, {__mode = "kv"})
 --   <li>power: Effect power</li>
 --   <li>spec: Spell spec.</li></ul>
 -- @return Spell.
-Spell.new = function(clss, args)
-	local self = SimulationObject.new(clss)
+Spell.new = function(clss, manager, args)
+	local self = SimulationObject.new(clss, manager)
 	self.dict_id[self:get_id()] = self
 	self.effect = args.effect
 	self.feat = args.feat

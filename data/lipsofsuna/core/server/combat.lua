@@ -205,7 +205,11 @@ Combat.destroy_terrain_sphere = function(self, attacker, point, tile, radius)
 			local spec = Actorspec:random{category = "mining"}
 			if spec then
 				local offset = (point + Vector(0.5,0.1,0.5)) * Voxel.tile_size
-				local object = Actor{random = true, spec = spec, position = offset, realized = true}
+				local object = Actor()
+				object:set_spec(spec)
+				object:set_position(offset)
+				object:randomize()
+				object:set_visible(true)
 			end
 		end
 		--]]
@@ -243,7 +247,8 @@ Combat.__create_terrain_mining_items = function(self, attacker, materials)
 		local mat = TerrainMaterialSpec:find_by_id(k)
 		if mat and mat.mining_item and v >= 0.5 then
 			local spec = Itemspec:find_by_name(mat.mining_item)
-			local item = Item{spec = spec}
+			local item = Item(Main.objects)
+			item:set_spec(spec)
 			item:set_count(math.floor(v + 0.5))
 			attacker.inventory:merge_or_drop_object(item)
 		end

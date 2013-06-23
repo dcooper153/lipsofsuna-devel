@@ -28,23 +28,22 @@ local Simulation = Class("Simulation")
 -- @param id Unique ID, or nil.
 -- @return Object.
 Simulation.create_object_by_spec = function(self, spec, id)
-	-- Prepare the arguments.
-	local a = {id = id, spec = spec}
 	-- Create the object.
 	local o
 	if spec.type == "actor" then
-		o = Actor(a)
+		o = Actor(Main.objects, id)
 	elseif spec.type == "item" then
-		o = Item(a)
+		o = Item(Main.objects, id)
 	elseif spec.type == "spell" then
-		o = Spell(a)
+		o = Spell(Main.objects, id)
 	elseif spec.type == "obstacle" then
-		o = Obstacle(a)
+		o = Obstacle(Main.objects, id)
 	elseif spec.type == "static" then
-		o = Staticobject(a)
+		o = Staticobject(Main.objects, id)
 	else
 		return
 	end
+	o:set_spec(spec)
 	-- Apply presets.
 	if spec.preset then
 		local preset = Actorpresetspec:find{name = spec.preset}

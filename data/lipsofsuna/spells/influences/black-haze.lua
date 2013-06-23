@@ -27,6 +27,10 @@ Feateffectspec:extend{
 			-1 + 2 * math.random(),
 			-1 + 2 * math.random(),
 			-1 + 2 * math.random())
-		local o = Actor{spec = s, position = p, random = true, realized = true}
+		local o = Actor(Main.objects)
+		o:set_spec(s)
+		o:set_position(p)
+		o:randomize()
+		o:set_visible(true)
 		o:inflict_modifier("black haze", 10000)
 	end}

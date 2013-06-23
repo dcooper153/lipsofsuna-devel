@@ -46,9 +46,11 @@ MapUtils.place_actor = function(clss, args)
 	-- This needs to support both the client and the server so the class
 	-- used varies depending on what's available.
 	local clss_ = args.class or Actor or Object
-	local obj = clss_()
-	obj.random = true
+	local obj = clss_(Main.objects)
 	obj:set_spec(spec)
+	if obj.randomize then
+		obj:randomize()
+	end
 	obj:set_position(args.point)
 	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
 	obj:set_visible(true)

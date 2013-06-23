@@ -10,11 +10,11 @@ Feateffectspec:extend{
 		-- Create the summon.
 		local spec = Actorspec:find{name = "fire elemental"}
 		if not spec then return end
-		local summon = Actor{
-			spec = spec,
-			position = ctr,
-			random = true,
-			realized = true}
+		local summon = Actor(args.owner)
+		summon:set_spec(spec)
+		summon:set_position(ctr)
+		summon:randomize()
+		summon:set_visible(true)
 		summon.summon_owner = args.owner
 		summon.summon_timer = args.value
 	end,

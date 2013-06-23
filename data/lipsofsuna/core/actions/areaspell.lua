@@ -16,10 +16,10 @@ Actionspec{
 				local spec = effect and Spellspec:find{name = effect.projectile}
 				if effect and spec then
 					local sub = Feat("area spell", {{v[1], v[2]}})
-					local spell = AreaSpell{
+					local spell = AreaSpell(args.user.manager, {
 						duration = effect.duration, radius = effect.radius,
 						feat = sub, owner = args.user, position = args.user:get_position(),
-						realized = true, spec = spec}
+						realized = true, spec = spec})
 				end
 			end
 		end)

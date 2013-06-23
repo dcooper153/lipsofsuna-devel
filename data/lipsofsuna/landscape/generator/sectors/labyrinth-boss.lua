@@ -23,19 +23,19 @@ Generator.sector_types.LabyrinthBoss.generate = function(self, pos, size, yield)
 	Voxel:fill_region{point = pos, size = size, tile = self.mats[2]:get_id()}
 	Voxel:fill_region{point = pos + Vector(0,c,0), size = Vector(a,d,a), tile = 0}
 	yield()
-	Actor{
-		spec = "dragon",
-		position = (pos + Vector(a/2,c,a/2)) * Voxel.tile_size,
-		random = true,
-		realized = true}
-	Item{
-		spec = "treasure chest",
-		position = (pos + Vector(3,c,3)) * Voxel.tile_size,
-		random = true,
-		realized = true}
-	Item{
-		spec = "treasure chest",
-		position = (pos + Vector(10,c,6)) * Voxel.tile_size,
-		random = true,
-		realized = true}
+	local o1 = Actor(Main.objects)
+	o1:set_spec(Actorspec:find_by_name("dragon"))
+	o1:set_position(pos + Vector(a/2,c,a/2))
+	o1:randomize()
+	o1:set_visible(true)
+	local o2 = Item(Main.objects)
+	o2:set_spec(Itemspec:find_by_name("treasure chest"))
+	o2:set_position(pos + Vector(3,c,3))
+	o2:randomize()
+	o2:set_visible(true)
+	local o3 = Item(Main.objects)
+	o3:set_spec(Itemspec:find_by_name("treasure chest"))
+	o3:set_position(pos + Vector(10,c,6))
+	o3:randomize()
+	o3:set_visible(true)
 end

@@ -178,32 +178,32 @@ end
 -- @param dead One for dead, zero for alive.
 -- @return Object.
 ObjectDatabase.load_object = function(self, id, type_, spec, dead)
-	-- Create arguments out of the queried row.
-	local args = {}
-	args.id = id
-	args.dead = (dead == 1) and true or nil
-	args.spec = spec
-	-- Create the object.
-	local init = function(args)
-		if type_ == "actor" then return Actor(args)
-		elseif type_ == "item" then return Item(args)
-		elseif type_ == "obstacle" then return Obstacle(args)
-		elseif type_ == "player" then return Player(args)
-		elseif type_ == "static" then return Staticobject(args)
-		else
-			error(string.format("invalid object type %q", type_))
-		end
+	-- Get the spec.
+	local objspec
+	if type_ == "actor" then objspec = Actorspec:find_by_name(spec)
+	elseif type_ == "item" then objspec = Itemspec:find_by_name(spec)
+	elseif type_ == "obstacle" then objspec = Obstaclespec:find_by_name(spec)
+	elseif type_ == "player" then objspec = Actorspec:find_by_name(spec)
+	elseif type_ == "static" then objspec = Staticspec:find_by_name(spec)
+	else
+		error(string.format("invalid object type %q", type_))
 	end
-	local ok1,object = pcall(init, args)
-	if not ok1 then
-		print("ERROR: " .. object)
-		return
-	end
-	if not object.spec or type(object.spec) == "string" then
+	if not objspec then
 		print("WARNING: missing spec \"" .. spec .. "\"")
 		return
 	end
-	-- Read additional data.
+	-- Create the object.
+	local object
+	if type_ == "actor" then object = Actor(Main.objects, id)
+	elseif type_ == "item" then object = Item(Main.objects, id)
+	elseif type_ == "obstacle" then object = Obstacle(Main.objects, id)
+	elseif type_ == "player" then object = Player(Main.objects, id)
+	elseif type_ == "static" then object = Staticobject(Main.objects, id) end
+	assert(object)
+	-- Set the mandatory fields.
+	object:set_spec(objspec)
+	if object.set_dead then object:set_dead(dead == 1) end
+	-- Read the additional fields.
 	object:read_db(self.db)
 	return object
 end

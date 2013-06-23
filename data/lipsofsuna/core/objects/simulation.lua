@@ -25,19 +25,22 @@ local SimulationObject = Class("SimulationObject", Object)
 
 --- Creates a new simulation object.
 -- @param clss SimulationObject class.
+-- @param manager Object manager.
 -- @param id Unique ID, or nil for automatically selected.
 -- @return SimulationObject.
-SimulationObject.new = function(clss, id)
+SimulationObject.new = function(clss, manager, id)
 	local self = Object.new(clss)
 	-- Select a unique ID.
 	if id then
-		local old = Main.objects.objects_by_id[id]
+		local old = manager:find_by_id(id)
 		if old then old:detach() end
 		self:set_id(id)
 	else
-		self:set_id(Main.objects:get_free_id())
+		self:set_id(manager:get_free_id())
 	end
-	Main.objects:add(self)
+	-- Add to the object manager.
+	self.manager = manager
+	manager:add(self)
 	-- Initialize the physics object.
 	self.physics = PhysicsObject()
 	self.physics:set_id(self:get_id())

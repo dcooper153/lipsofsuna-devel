@@ -52,28 +52,12 @@ Item.serializer = ObjectSerializer{
 
 --- Creates an item.
 -- @param clss Item class.
--- @param args Arguments.<ul>
---   <li>angular: Angular velocity.</li>
---   <li>id: Unique object ID or nil for a random free one.</li>
---   <li>physics: Physics mode.</li>
---   <li>position: Position vector of the item.</li>
---   <li>rotation: Rotation quaternion of the item.</li>
---   <li>realized: True to add the object to the simulation.</li></ul>
--- @return New item.
-Item.new = function(clss, args)
-	local self = SimulationObject.new(clss, args and args.id)
-	if args then
-		if args.angular then self.physics:set_angular(args.angular) end
-		if args.count then self:set_count(args.count) end
-		if args.looted then self.looted = args.looted end
-		if args.position then self:set_position(args.position) end
-		if args.random then self.random = args.random end
-		if args.rotation then self:set_rotation(args.rotation) end
-		if args.spec then self:set_spec(args.spec) end
-		if args.realized then self:set_visible(args.realized) end
-	end
+-- @param manager Object manager.
+-- @param id Unique object ID. Nil for a random free one.
+-- @return Item.
+Item.new = function(clss, manager, id)
+	local self = SimulationObject.new(clss, manager, id)
 	self.update_timer = 0.3 * math.random()
-	if self.looted then self:animate("looted") end
 	return self
 end
 
@@ -81,11 +65,12 @@ end
 -- @param self Item.
 -- @return Object.
 Item.clone = function(self)
-	return Item{
-		spec = self.spec,
-		angular = self.physics:get_angular(),
-		position = self:get_position(),
-		rotation = self:get_rotation()}
+	local o = Item(self.manager)
+	o:set_spec(self:get_spec())
+	o:set_position(self:get_position())
+	o:set_rotation(self:get_rotation())
+	o.physics:set_angular(self.physics:get_angular())
+	return o
 end
 
 --- Handles physics contacts.
@@ -131,6 +116,37 @@ Item.die = function(self)
 	end
 	-- Remove from the world.
 	SimulationObject.die(self)
+end
+
+--- Randomizes the item.
+-- @param self Item.
+Item.randomize = function(self)
+	-- Create static loot.
+	if self.inventory:get_size() > 0 then
+		for k,v in pairs(spec.inventory_items) do
+			local item = Item(self.manager)
+			item:set_spec(Itemspec:find_by_name(v))
+			self.inventory:merge_object(item)
+		end
+	end
+	-- Create random loot.
+	if self.inventory:get_size() > 0 and spec.loot_categories then
+		local num_cat = #spec.loot_categories
+		local num_item
+		if spec.loot_count_min or spec.loot_count_max then
+			local min = spec.loot_count_min or 0
+			local max = spec.loot_count_max or min
+			num_item = math.random(min, max)
+		else
+			num_item = math.random(0, self.inventory:get_size())
+		end
+		for i = 1,num_item do
+			local cat = spec.loot_categories[math.random(1, num_cat)]
+			local item = Item(self.manager)
+			item:set_spec(Itemspec:random{category = cat})
+			self.inventory:merge_object(item)
+		end
+	end
 end
 
 --- Reads the object from a database.
@@ -238,31 +254,6 @@ Item.set_spec = function(self, value)
 	self.physics:set_gravity_liquid(spec.water_gravity)
 	-- Set the inventory size.
 	self.inventory:set_size(spec.inventory_size)
-	-- Create server data.
-	if self:has_server_data() then
-		-- Create static loot.
-		if self.random and self.inventory:get_size() > 0 then
-			for k,v in pairs(spec.inventory_items) do
-				self.inventory:merge_object(Item{spec = Itemspec:find{name = v}})
-			end
-		end
-		-- Create random loot.
-		if self.random and self.inventory:get_size() > 0 and spec.loot_categories then
-			local num_cat = #spec.loot_categories
-			local num_item
-			if spec.loot_count_min or spec.loot_count_max then
-				local min = spec.loot_count_min or 0
-				local max = spec.loot_count_max or min
-				num_item = math.random(min, max)
-			else
-				num_item = math.random(0, self.inventory:get_size())
-			end
-			for i = 1,num_item do
-				local cat = spec.loot_categories[math.random(1, num_cat)]
-				self.inventory:merge_object(Item{spec = Itemspec:random{category = cat}})
-			end
-		end
-	end
 	-- Set the model.
 	self:set_model_name(spec.model)
 end

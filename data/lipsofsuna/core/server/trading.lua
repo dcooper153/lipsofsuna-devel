@@ -35,7 +35,9 @@ Trading.accept = function(self, player)
 	for k,v in pairs(player.trading.buy) do
 		local name = player.trading.shop[v[1]]
 		local spec = Itemspec:find{name = name}
-		local item = Item{spec = spec, count = v[2]}
+		local item = Item(player.manager)
+		item:set_spec(spec)
+		item:set_count(v[2])
 		player.inventory:merge_or_drop_object(item)
 	end
 	-- Close the trading screen.

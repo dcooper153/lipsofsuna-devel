@@ -21,34 +21,15 @@ local Player = Class("Player", Actor)
 
 --- Creates a new player object.
 -- @param clss Player class.
--- @param args Arguments.<ul>
---   <li>account: Account data.</li>
---   <li>angular: Angular velocity.</li>
---   <li>animation_profile: Animation preset name.</li>
---   <li>body_scale: Scale factor of the body.</li>
---   <li>body_style: Body style defined by an array of scalars.</li>
---   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
---   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
---   <li>head_style: Head style name.</li>
---   <li>id: Unique object ID or nil for a random free one.</li>
---   <li>jumped: Jump timer.</li>
---   <li>name: Name of the actor.</li>
---   <li>physics: Physics mode.</li>
---   <li>position: Position vector of the actor.</li>
---   <li>rotation: Rotation quaternion of the actor.</li>
---   <li>skin_style: Skin style defined by an array of {style, red, green, blue}.</li>
---   <li>spec: Actorspec of the actor.</li>
---   <li>realized: True to add the object to the simulation.</li></ul>
+-- @param manager Object manager.
+-- @param id Unique object ID. Nil for a random free one.
 -- @return Player.
-Player.new = function(clss, args)
-	local self = Actor.new(clss, args)
-	self.account = args.account
+Player.new = function(clss, manager, id)
+	local self = Actor.new(clss, manager, id)
+	self.inventory_subscriptions = {}
 	self.running = true
 	self.vision_timer = 0
 	self:calculate_speed()
-	if not self.inventory_subscriptions then
-		self.inventory_subscriptions = {}
-	end
 	return self
 end
 
@@ -98,7 +79,7 @@ end
 
 Player.set_client = function(self, client)
 	self.client = client
-	self.vision = Vision(self:get_id(), Main.objects)
+	self.vision = Vision(self:get_id(), self.manager)
 	self.vision:set_cone_factor(0.5)
 	self.vision:set_cone_angle(math.pi/2.5)
 	self.vision:set_enabled(true)

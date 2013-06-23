@@ -220,27 +220,27 @@ ChatCommand{
 		local spec3 = Obstaclespec:find{name = matches[1]}
 		local spec4 = Staticspec:find{name = matches[1]}
 		if spec1 then
-			Actor{
-				spec = spec1,
-				position = player:get_position(),
-				random = true,
-				realized = true}
+			local o = Actor(player.manager)
+			o:set_spec(spec1)
+			o:set_position(player:get_position())
+			o:randomize()
+			o:set_visible(true)
 		elseif spec2 then
-			Item{
-				spec = spec2,
-				position = player:get_position(),
-				random = true,
-				realized = true}
+			local o = Item(player.manager)
+			o:set_spec(spec2)
+			o:set_position(player:get_position())
+			o:randomize()
+			o:set_visible(true)
 		elseif spec3 then
-			Obstacle{
-				spec = spec3,
-				position = player:get_position(),
-				realized = true}
+			local o = Obstacle(player.manager)
+			o:set_spec(spec3)
+			o:set_position(player:get_position())
+			o:set_visible(true)
 		elseif spec4 then
-			Staticobject{
-				spec = spec4,
-				position = player:get_position(),
-				realized = true}
+			local o = Staticobject(player.manager)
+			o:set_spec(spec4)
+			o:set_position(player:get_position())
+			o:set_visible(true)
 		end
 	end}
 
@@ -253,11 +253,11 @@ ChatCommand{
 	func = function(player, matches)
 		local spec = Actorspec:find{name = matches[1]}
 		if not spec then return end
-		Actor{
-			spec = spec,
-			position = player:get_position(),
-			random = true,
-			realized = true}
+		local o = Actor(player.manager)
+		o:set_spec(spec)
+		o:set_position(player:get_position())
+		o:randomize()
+		o:set_visible(true)
 	end}
 
 ChatCommand{
@@ -269,11 +269,11 @@ ChatCommand{
 	func = function(player, matches)
 		local spec = Itemspec:find{name = matches[1]}
 		if not spec then return end
-		Item{
-			spec = spec,
-			position = player:get_position(),
-			random = true,
-			realized = true}
+		local o = Item(player.manager)
+		o:set_spec(spec)
+		o:set_position(player:get_position())
+		o:randomize()
+		o:set_visible(true)
 	end}
 
 ChatCommand{
@@ -285,10 +285,10 @@ ChatCommand{
 	func = function(player, matches)
 		local spec = Obstaclespec:find{name = matches[1]}
 		if not spec then return end
-		Obstacle{
-			spec = spec,
-			position = player:get_position(),
-			realized = true}
+		local o = Obstacle(player.manager)
+		o:set_spec(spec)
+		o:set_position(player:get_position())
+		o:set_visible(true)
 	end}
 
 ChatCommand{

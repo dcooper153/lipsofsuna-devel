@@ -50,8 +50,10 @@ Feateffectspec:extend{
 					if obstspec then
 						local pos = (p + Vector(0.5,0.5,0.5)) * Voxel.tile_size
 						if Utils:check_room(pos, obstspec.model) then
-							local o = Obstacle{position = pos, spec = obstspec,
-								random = true, realized = true}
+							local o = Obstacle(args.owner.manager)
+							o:set_position(pos)
+							o:set_spec(obstspec)
+							o:set_visible(true)
 						end
 					end
 				end

@@ -33,10 +33,11 @@ Staticobject.serializer = ObjectSerializer{
 
 --- Creates an static object.
 -- @param clss Staticobject class.
+-- @param manager Object manager.
 -- @param args Arguments.
 -- @return New static object.
-Staticobject.new = function(clss, args)
-	local self = SimulationObject.new(clss, args and args.id)
+Staticobject.new = function(clss, manager, args)
+	local self = SimulationObject.new(clss, manager, args and args.id)
 	self:set_static(true)
 	if args then
 		if args.position then self:set_position(args.position) end
@@ -52,10 +53,11 @@ end
 -- @param self Object.
 -- @return New object.
 Staticobject.clone = function(self)
-	return Staticobject{
-		position = self:get_position(),
-		rotation = self:get_rotation(),
-		spec = self.spec}
+	local o = Staticobject(self.manager)
+	o:set_spec(self:get_spec())
+	o:set_position(self:get_position())
+	o:set_rotation(self:get_rotation())
+	return o
 end
 
 --- Causes the object to take damage.

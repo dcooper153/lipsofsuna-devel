@@ -17,13 +17,14 @@ local MissileSpell = Class("MissileSpell", Spell)
 
 --- Creates a new missile spell.
 -- @param clss Missile spell class.
+-- @param manager Object manager.
 -- @param args Arguments.<ul>
 --   <li>feat: Feat invoking the spell.</li>
 --   <li>owner: Caster of the spell.</li>
 --   <li>spec: Spell spec.</li></ul>
 -- @return Spell.
-MissileSpell.new = function(clss, args)
-	local self = Spell.new(clss, {feat = args.feat, owner = args.owner, spec = args.spec})
+MissileSpell.new = function(clss, manager, args)
+	local self = Spell.new(clss, manager, {feat = args.feat, owner = args.owner, spec = args.spec})
 	self.speed = 3
 	return self
 end

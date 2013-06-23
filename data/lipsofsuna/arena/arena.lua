@@ -63,7 +63,9 @@ end
 Arena.update = function(self, secs)
 	-- Initialize the player.
 	if not self.player then
-		self.player = Player{spec = Actorspec:find_by_name("aer-player")}
+		self.player = Player(Main.objects)
+		self.player:set_spec(Actorspec:find_by_name("aer-player"))
+		self.player:randomize()
 		self.player.get_admin = function() return true end --FIXME
 		self.player:set_position(Vector(500,101,500))
 		self.player.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYERS)
@@ -75,7 +77,8 @@ Arena.update = function(self, secs)
 		Server.players_by_client[-1] = self.player --FIXME
 		self.player:calculate_animation()
 		
-		self.button = Obstacle{spec = Obstaclespec:find_by_name("arena button")}
+		self.button = Obstacle(Main.objects)
+		self.button:set_spec(Obstaclespec:find_by_name("arena button"))
 		self.button:set_position(Vector(505,100.5,500))
 		self.button:set_visible(true)
 		self.button.render:init(self.player)

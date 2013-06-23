@@ -404,13 +404,13 @@ Main.messaging:register_message{
 		-- Spec.
 		local spec
 		if args.type == "item" then
-			spec = Itemspec:find{name = args.spec}
+			spec = Itemspec:find_by_name(args.spec)
 		elseif args.type == "obstacle" then
-			spec = Obstaclespec:find{name = args.spec}
+			spec = Obstaclespec:find_by_name(args.spec)
 		elseif args.type == "actor" then
-			spec = Actorspec:find{name = args.spec}
+			spec = Actorspec:find_by_name(args.spec)
 		elseif args.type == "spell" then
-			spec = Spellspec:find{name = args.spec}
+			spec = Spellspec:find_by_name(args.spec)
 		end
 		local o = Simulation:create_object_by_spec(spec, args.id)
 		-- Self.
@@ -487,7 +487,10 @@ Main.messaging:register_message{
 			for k,v in ipairs(args.equipment) do
 				local spec = Itemspec:find{name = v[3]}
 				if spec then
-					o.inventory:set_object(v[1], Item{spec = spec, count = v[4]})
+					local item = Item(o.manager)
+					item:set_spec(spec)
+					item:set_count(v[4])
+					o.inventory:set_object(v[1], item)
 					o.inventory:equip_index(v[1], v[2])
 				end
 			end

@@ -208,8 +208,8 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 		player:teleport{position = home}
 		player:inflict_modifier("respawn", 1)
 	end
-	player:set_visible(true)
 	player:set_client(client)
+	player:set_visible(true)
 	-- Transmit the home marker.
 	Main.messaging:server_event("create marker", client, "home", home)
 	-- Transmit unlocked map markers.

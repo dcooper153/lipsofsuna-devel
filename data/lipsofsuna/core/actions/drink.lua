@@ -17,7 +17,9 @@ Actionspec{
 		end
 		-- Replace the potion with an empty bottle.
 		self:subtract(1)
-		user.inventory:merge_or_drop_object(Item{spec = Itemspec:find{name = "empty bottle"}})
+		local item = Item(user.manager)
+		item:set_spec(Itemspec:find_by_name("empty bottle"))
+		user.inventory:merge_or_drop_object(item)
 		-- Log the action.
 		Server.events:notify_action("eat", user)
 	end}

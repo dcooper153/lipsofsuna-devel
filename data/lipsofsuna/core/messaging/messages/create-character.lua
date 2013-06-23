@@ -102,23 +102,24 @@ Main.messaging:register_message{
 		local spec = Actorspec:find{name = char.race .. "-player"}
 		if not spec then return end
 		-- Create the character.
-		local player = Player{
-			account = account,
-			animation_profile = char.animation_profile,
-			body_scale = char.body_scale,
-			body_style = char.body_style,
-			eye_color = char.eye_color,
-			eye_style = char.eye_style,
-			face_style = char.face_style,
-			hair_color = char.hair_color,
-			hair_style = char.hair_style,
-			head_style = char.head_style,
-			name = (char.name ~= "" and char.name or "Player"),
-			random = true,
-			skin_color = char.skin_color,
-			skin_style = char.skin_style,
-			spec = spec}
-		Main.messaging:server_event("accept character", client)
+		local player = Player(Main.objects)
+		player:set_spec(spec)
+		player:randomize()
+		player.account = account
+		player.animation_profile = char.animation_profile
+		player.body_scale = char.body_scale
+		player.body_style = char.body_style
+		player.eye_color = char.eye_color
+		player.eye_style = char.eye_style
+		player.face_style = char.face_style
+		player.hair_color = char.hair_color
+		player.hair_style = char.hair_style
+		player.head_style = char.head_style
+		player.name = (char.name ~= "" and char.name or "Player")
+		player.skin_color = char.skin_color
+		player.skin_style = char.skin_style
+		-- Spawn the character.
+		print("SPAWN!!!!", player, client, char.spawn_point)
 		Server:spawn_player(player, client, char.spawn_point)
 		Server.object_database:save_object(player)
 	end}

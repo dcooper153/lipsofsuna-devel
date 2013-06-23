@@ -102,84 +102,18 @@ Actor.serializer = ObjectSerializer{
 
 --- Creates a new actor.
 -- @param clss Actor class.
--- @param args Arguments.<ul>
---   <li>angular: Angular velocity.</li>
---   <li>animation_profile: Animation preset name.</li>
---   <li>beheaded: True to spawn without a head.</li>
---   <li>body_scale: Scale factor of the body.</li>
---   <li>body_style: Body style defined by an array of scalars.</li>
---   <li>dead: True for a dead actor.</li>
---   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
---   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
---   <li>head_style: Head style name.</li>
---   <li>id: Unique object ID or nil for a random free one.</li>
---   <li>jumped: Jump timer.</li>
---   <li>name: Name of the actor.</li>
---   <li>physics: Physics mode.</li>
---   <li>position: Position vector of the actor.</li>
---   <li>rotation: Rotation quaternion of the actor.</li>
---   <li>skills: Skill table of the character.</li>
---   <li>skin_style: Skin style defined by an array of {style, red, green, blue}.</li>
---   <li>spec: Actorspec of the actor.</li>
---   <li>realized: True to add the object to the simulation.</li></ul>
-Actor.new = function(clss, args)
-	local self = SimulationObject.new(clss, args and args.id)
-	local copy = function(n, d)
-		if args[n] ~= nil or d then
-			self[n] = (args[n] ~= nil) and args[n] or d
-		end
-	end
-	self.update_timer = 0.1 * math.random()
+-- @param manager Object manager.
+-- @param id Unique object ID. Nil for a random free one.
+-- @return Actor.
+Actor.new = function(clss, manager, id)
+	local self = SimulationObject.new(clss, manager, id)
 	self.attributes = {}
+	self.carried_weight = 0
+	self.jumped = 0
 	self.skills = Skills(self:get_id())
 	self.stats = Stats(self:get_id())
-	if args then
-		if args.angular then self.physics:set_angular(args.angular) end
-		copy("animation_profile")
-		if args.beheaded then self:set_beheaded(true) end
-		copy("body_scale")
-		copy("body_style")
-		copy("eye_color")
-		copy("eye_style")
-		copy("face_style")
-		copy("hair_color")
-		copy("hair_style")
-		copy("head_style")
-		copy("home_point")
-		copy("jumped", 0)
-		copy("name")
-		self.physics:set_physics(args.physics or "kinematic")
-		copy("random")
-		if args.rotation then self:set_rotation(args.rotation) end
-		if args.position then self:set_position(args.position) end
-		copy("skin_color")
-		copy("skin_style")
-		copy("carried_weight", 0)
-		if args.spec then self:set_spec(args.spec) end
-		if args.dead then self:set_dead_state() end
-	else
-		self.physics:set_physics("kinematic")
-		self.jumped = 0
-		self.carried_weight = 0
-	end
-	-- Initialize skills.
-	if self:has_server_data() then
-		if args and args.skills then
-			self.skills:clear()
-			for k,v in pairs(args.skills) do
-				self.skills:add(k)
-			end
-		end
-		self:update_skills()
-	end
-	-- Set the visibility.
-	if args and args.realized then
-		self:set_visible(true)
-	end
-	-- Client data.
-	if self:has_client_data() then
-		self.inventory:subscribe(self, function(args) self:handle_inventory_event(args) end)
-	end
+	self.update_timer = 0.1 * math.random()
+	self.physics:set_physics("kinematic")
 	return self
 end
 
@@ -188,18 +122,19 @@ end
 -- @return New object.
 Actor.clone = function(self)
 	-- TODO: Copy dialog variables?
-	return Actor{
-		angular = self.physics:get_angular(),
-		beheaded = self:get_beheaded(),
-		dead = self.dead,
-		eye_style = self.eye_style,
-		face_style = self.face_style,
-		hair_style = self.hair_style,
-		head_style = self.head_style,
-		physics = self.physics:get_physics(),
-		position = self:get_position(),
-		rotation = self:get_rotation(),
-		spec = self.spec}
+	local o = Actor(self.manager)
+	o:set_spec(self:get_spec())
+	o:set_beheaded(self:get_beheaded())
+	o:set_dead(self.dead)
+	o:set_position(self:get_position())
+	o:set_rotation(self:get_rotation())
+	o.eye_style = self.eye_style
+	o.face_style = self.face_style
+	o.hair_style = self.hair_style
+	o.head_style = self.head_style
+	o.physics:set_angular(self.physics:get_angular())
+	o.physics:set_physics(self.physics:get_physics())
+	return o
 end
 
 --- Adds an object to the list of known enemies.<br/>
@@ -463,7 +398,9 @@ Actor.die = function(self)
 	for k,v in pairs(self.spec.inventory_items_death) do
 		local s = Itemspec:find{name = k}
 		if s then
-			local o = Item{spec = s, count = v}
+			local o = Item(self.manager)
+			o:set_spec(s)
+			o:set_count(v)
 			self.inventory:merge_or_drop_object(o)
 		end
 	end
@@ -543,6 +480,61 @@ Actor.pick_up = function(self, src_id, dst_id, dst_slot)
 		Actions:move_from_world_to_inv(self, src_id, dst_id, dst_slot)
 		timer:disable()
 	end}
+end
+
+--- Randomizes the actor.
+-- @param self Actor.
+Actor.randomize = function(self)
+	local spec = self:get_spec()
+	-- Set the appearance.
+	self.eye_color = self.eye_color or spec:get_random_eye_color()
+	self.eye_style = self.eye_style or spec:get_random_eye_style()
+	self.head_style = self.head_style or spec:get_random_head() 
+	self.hair_color = self.hair_color or spec:get_random_hair_color() 
+	self.hair_style = self.hair_style or spec:get_random_hair_style() 
+	-- Populate the stats.
+	self.stats:set_value("health", self.stats:get_maximum("health"))
+	self.stats:set_value("willpower", self.stats:get_maximum("willpower"))
+	-- Populate the inventory.
+	for k,v in pairs(spec.inventory_items) do
+		local itemspec = Itemspec:find{name = k}
+		if itemspec then
+			if itemspec.stacking then
+				local item = Item(self.manager)
+				item:set_spec(itemspec)
+				item:set_count(v)
+				self.inventory:merge_object(item)
+			else
+				for i = 1,v do
+					local item = Item(self.manager)
+					item:set_spec(itemspec)
+					self.inventory:merge_object(item)
+				end
+			end
+		end
+	end
+	self.inventory:equip_best_objects()
+	-- Create random loot.
+	if spec.loot_categories then
+		local num_cat = #spec.loot_categories
+		local num_item
+		if spec.loot_count_min or spec.loot_count_max then
+			local min = spec.loot_count_min or 0
+			local max = spec.loot_count_max or min
+			num_item = math.random(min, max)
+		else
+			num_item = math.random(0, self.inventory.size)
+		end
+		for i = 1,num_item do
+			local cat = spec.loot_categories[math.random(1, num_cat)]
+			local itemspec = Itemspec:random{category = cat}
+			if itemspec then
+				local item = Item(self.manager)
+				item:set_spec(itemspec)
+				self.inventory:merge_object(item)
+			end
+		end
+	end
 end
 
 --- Reads the object from a database.
@@ -1001,52 +993,6 @@ Actor.set_spec = function(self, v)
 	self.inventory:set_size(spec.inventory_size)
 	-- Create server data.
 	if self:has_server_data() then
-		-- Set the appearance.
-		if self.random then
-			self.eye_color = self.eye_color or spec:get_random_eye_color()
-			self.eye_style = self.eye_style or spec:get_random_eye_style()
-			self.head_style = self.head_style or spec:get_random_head() 
-			self.hair_color = self.hair_color or spec:get_random_hair_color() 
-			self.hair_style = self.hair_style or spec:get_random_hair_style() 
-		end
-		-- Populate the stats.
-		if self.random then
-			self.stats:set_value("health", self.stats:get_maximum("health"))
-			self.stats:set_value("willpower", self.stats:get_maximum("willpower"))
-		end
-		-- Populate the inventory.
-		if self.random then
-			for k,v in pairs(spec.inventory_items) do
-				local itemspec = Itemspec:find{name = k}
-				if itemspec then
-					if itemspec.stacking then
-						self.inventory:merge_object(Item{spec = itemspec, count = v})
-					else
-						for i = 1,v do self.inventory:merge_object(Item{spec = itemspec}) end
-					end
-				end
-			end
-			self.inventory:equip_best_objects()
-		end
-		-- Create random loot.
-		if self.random and spec.loot_categories then
-			local num_cat = #spec.loot_categories
-			local num_item
-			if spec.loot_count_min or spec.loot_count_max then
-				local min = spec.loot_count_min or 0
-				local max = spec.loot_count_max or min
-				num_item = math.random(min, max)
-			else
-				num_item = math.random(0, self.inventory.size)
-			end
-			for i = 1,num_item do
-				local cat = spec.loot_categories[math.random(1, num_cat)]
-				local itemspec = Itemspec:random{category = cat}
-				if itemspec then
-					self.inventory:merge_object(Item{spec = itemspec})
-				end
-			end
-		end
 		-- Create the map marker.
 		if spec.marker then
 			self.marker = Marker:find{name = spec.marker}
@@ -1070,6 +1016,10 @@ Actor.set_spec = function(self, v)
 	-- Set the model.
 	self:set_model_name(spec.model)
 	self.animated = true
+	-- FIXME: Client data.
+	if self:has_client_data() then
+		self.inventory:subscribe(self, function(args) self:handle_inventory_event(args) end)
+	end
 end
 
 Actor.set_stat = function(self, s, v, m, diff)

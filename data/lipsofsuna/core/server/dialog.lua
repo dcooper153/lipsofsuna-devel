@@ -147,11 +147,11 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			for k,spec in ipairs(actors) do
 				if not Server.quest_database:get_dialog_flag("scapegoat_alive_" .. spec.name) then
 					var_actor = spec.name
-					actor = Actor{
-						spec = spec,
-						position = Utils:find_random_overworld_point(),
-						random = true,
-						realized = true}
+					actor = Actor(self.object.manager)
+					actor:set_spec(spec)
+					actor:set_position(Utils:find_random_overworld_point())
+					actor:randomize()
+					actor:set_visible(true)
 					break
 				end
 			end
@@ -418,7 +418,9 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 			local s = Itemspec:find{name = c[2]}
 			if not s then return end
-			local o = Item{spec = s, count = c.count}
+			local o = Item(self.user.manager)
+			o:set_spec(s)
+			o:set_count(c.count)
 			if self.user.inventory:merge_or_drop_object(o) then
 				self.user:send_message("Received " .. c[2])
 			else
@@ -490,16 +492,21 @@ Dialog.execute = function(self)
 		end,
 		["spawn object"] = function(vm, c)
 			-- Spawn the object.
-			local spec1 = Actorspec:find{name = c[2]}
-			local spec2 = Itemspec:find{name = c[2]}
-			local spec3 = Obstaclespec:find{name = c[2]}
+			local spec1 = Actorspec:find_by_name(c[2])
+			local spec2 = Itemspec:find_by_name(c[2])
+			local spec3 = Obstaclespec:find_by_name(c[2])
 			local object
 			if spec1 then
-				object = Actor{spec = spec1, random = true}
+				object = Actor(self.object.manager)
+				object:set_spec(spec1)
+				object:randomize()
 			elseif spec2 then
-				object = Item{spec = spec2, random = true}
+				object = Item(self.object.manager)
+				object:set_spec(spec2)
+				object:randomize()
 			elseif spec3 then
-				object = Obstacle{spec = spec3, random = true}
+				object = Obstacle(self.object.manager)
+				object:set_spec(spec3)
 			end
 			-- Set the position.
 			if object then

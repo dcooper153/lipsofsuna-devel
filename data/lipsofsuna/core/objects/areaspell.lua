@@ -17,6 +17,7 @@ local AreaSpell = Class("AreaSpell", Spell)
 
 --- Creates a new area spell.
 -- @param clss Area spell class.
+-- @param manager Object manager.
 -- @param args Arguments.<ul>
 --   <li>duration: Duration of the spell.</li>
 --   <li>feat: Feat invoking the spell.</li>
@@ -24,8 +25,8 @@ local AreaSpell = Class("AreaSpell", Spell)
 --   <li>position: Position in world space.</li>
 --   <li>spec: Spell spec.</li></ul>
 -- @return Spell.
-AreaSpell.new = function(clss, args)
-	local self = Spell.new(clss, {feat = args.feat, owner = args.owner, spec = args.spec})
+AreaSpell.new = function(clss, manager, args)
+	local self = Spell.new(clss, manager, {feat = args.feat, owner = args.owner, spec = args.spec})
 	self.physics:set_collision_mask(0)
 	self.timer = 1
 	self.physics:set_physics("static")

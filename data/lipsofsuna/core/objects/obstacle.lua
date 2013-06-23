@@ -44,23 +44,11 @@ Obstacle.serializer = ObjectSerializer{
 
 --- Creates an obstacle.
 -- @param clss Mover class.
--- @param args Arguments.
+-- @param manager Object manager.
+-- @param id Unique object ID. Nil for a random free one.
 -- @return New obstacle.
-Obstacle.new = function(clss, args)
-	local self = SimulationObject.new(clss, args and args.id)
-	local copy = function(n, d)
-		if args[n] ~= nil or d then
-			self[n] = (args[n] ~= nil) and args[n] or d
-		end
-	end
-	if args then
-		if args.angular then self.physics:set_angular(args.angular) end
-		if args.health then self.health = args.health end
-		if args.position then self:set_position(args.position) end
-		if args.rotation then self:set_rotation(args.rotation) end
-		if args.spec then self:set_spec(args.spec) end
-		if args.realized then self:set_visible(args.realized) end
-	end
+Obstacle.new = function(clss, manager, id)
+	local self = SimulationObject.new(clss, manager, id)
 	return self
 end
 
@@ -69,12 +57,13 @@ end
 -- @return New object.
 Obstacle.clone = function(self)
 	-- TODO: Clone dialog variables?
-	return Obstacle{
-		angular = self.physics:get_angular(),
-		health = self.health,
-		position = self:get_position(),
-		rotation = self:get_rotation(),
-		spec = self.spec}
+	local o = Obstacle(self.manager)
+	o:set_spec(self.spec)
+	o:set_position(self:get_position())
+	o:set_rotation(self:get_rotation())
+	o.health = self.health
+	o.physics:set_angular(self.physics:get_angular())
+	return o
 end
 
 --- Causes the object to take damage.
@@ -103,7 +92,12 @@ Obstacle.die = function(self)
 		if spec then
 			local p = self:transform_local_to_global(v[2])
 			local r = self:get_rotation() * (v[3] or Quaternion())
-			local o = Item{random = true, spec = spec, position = p, rotation = r, realized = true}
+			local item = Item(self.manager)
+			item:set_spec(spec)
+			item:set_position(p)
+			item:set_rotation(r)
+			item:randomize()
+			item:set_visible(true)
 		end
 	end
 	SimulationObject.die(self)

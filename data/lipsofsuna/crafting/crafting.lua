@@ -68,7 +68,10 @@ Crafting.craft = function(clss, user, name, mode)
 	-- Play the crafting effect.
 	Server:object_effect(user, craftspec.effect)
 	-- Create item.
-	return Item{count = craftspec.count, spec = itemspec}
+	local item = Item(user.manager)
+	item:set_spec(itemspec)
+	item:set_count(craftspec.count)
+	return item
 end
 
 --- Gets the names of all craftable items.

@@ -61,16 +61,16 @@ Generator.sector_types.Labyrinth.generate = function(self, pos, size, yield)
 	yield()
 	local rnd = math.random()
 	if rnd > 0.8 then
-		Item{
-			spec = "treasure chest",
-			position = (pos + Vector(b,c,b)) * Voxel.tile_size,
-			random = true,
-			realized = true}
+		local item = Item(Main.objects)
+		item:set_spec(Itemspec:find_by_name("treasure chest"))
+		item:set_position(pos + Vector(b,c,b))
+		item:randomize()
+		item:set_visible(true)
 	elseif rnd > 0.6 then
-		Item{
-			spec = "chest",
-			position = (pos + Vector(b,c,b)) * Voxel.tile_size,
-			random = true,
-			realized = true}
+		local item = Item(Main.objects)
+		item:set_spec(Itemspec:find_by_name("chest"))
+		item:set_position(pos + Vector(b,c,b))
+		item:randomize()
+		item:set_visible(true)
 	end
 end

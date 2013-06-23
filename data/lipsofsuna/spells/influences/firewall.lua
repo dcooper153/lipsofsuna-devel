@@ -17,8 +17,8 @@ Feateffectspec:extend{
 			if Voxel:get_tile(t) == 0 and Voxel:get_tile(t - Vector(0,1)) ~= 0 then
 				local feat = Feat("area spell", {{"burning", 1}})
 				local spec = Spellspec:find{name = "firewall1"}
-				AreaSpell{duration = 15, radius = 1.3, feat = feat, owner = args.owner,
-					position = w, realized = true, spec = spec}
+				AreaSpell(args.owner.manager, {duration = 15, radius = 1.3, feat = feat, owner = args.owner,
+					position = w, realized = true, spec = spec})
 			end
 		end
 	end}

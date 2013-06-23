@@ -23,7 +23,10 @@ Main.messaging:register_message{
 		if not object:has_server_data() then
 			local spec = Itemspec:find{name = name}
 			if not spec then return end
-			object.inventory:set_object(index, Item{spec = spec, count = count})
+			local item = Item(object.manager)
+			item:set_spec(spec)
+			item:set_count(count)
+			object.inventory:set_object(index, item)
 		end
 		-- Update the user interface.
 		if Ui:get_state() == "crafting" and object == Client.player_object then
