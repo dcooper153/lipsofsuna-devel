@@ -8,18 +8,10 @@
 -- @module character.chargen
 -- @alias Chargen
 
-local Camera = require("system/camera")
+local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Color = require("system/color")
 local Json = require("system/json")
-local ImageMerger = require("system/image-merger")
-local Model = require("system/model")
-local ModelBuilder = require("character/model-builder")
-local ModelMerger = require("system/model-merger")
-local RenderObject = require("system/render-object")
-local RenderModel = require("system/render-model")
-local RenderUtils = require("lipsofsuna/core/client/render-utils")
-local TextureBuilder = require("character/texture-builder")
 
 local scale255 = function(t)
 	local res = {}
@@ -58,11 +50,12 @@ Chargen.init = function(self, standalone)
 	self.data.rotation = 0
 	self.data.translation = Vector(0.3, 1.8, -2)
 	-- Create the object.
-	self.data.model_merger = ModelMerger()
-	self.data.image_merger = ImageMerger()
-	self.data.render = RenderObject()
-	self.data.render:set_position(Vector(1, 1, 1))
-	self.data.render:set_visible(true)
+	self.data.object = Actor(Main.objects)
+	self.data.object:set_spec(Actorspec:find_by_name("aer-player"))
+	self.data.object:set_position(Vector(1, 1, 1))
+	self.data.object:set_visible(true)
+	self.data.object.render:init(self.data.object)
+	self.data.object.render:add_animation("idle")
 	self:set_race("aer")
 	self.data.update_needed = true
 	-- Change the music track.
@@ -75,7 +68,7 @@ end
 --
 -- @param self Chargen.
 Chargen.reset = function(self)
-	if self.data.render then self.data.render:set_visible(false) end
+	if self.data.object then self.data.object:set_visible(false) end
 	self.data = {}
 	self.char = {
 		animation_profile = "default",
@@ -183,7 +176,7 @@ Chargen.rotate = function(self, value)
 	local rad = math.pi * value / 300
 	self.data.rotation = self.data.rotation + rad
 	local rot = Quaternion{axis = Vector(0, 1, 0), angle = self.data.rotation}
-	self.data.render:set_rotation(rot)
+	self.data.object:set_rotation(rot)
 end
 
 --- Saves the current character.
@@ -240,41 +233,25 @@ end
 Chargen.update = function(self, secs)
 	if not self.data.active then return end
 	Client.camera_manager:set_camera_mode("chargen")
-	local spec = Actorspec:find{name = self.char.race .. "-player"}
 	-- Build models and textures.
 	if self.data.update_needed then
-		local data = self:get_build_data()
-		self.data.model_build_hash = ModelBuilder:build_with_merger(self.data.model_merger, data, self.data.model_build_hash)
-		self.data.texture_build_hash = TextureBuilder:build_with_merger(self.data.image_merger, data, self.data.texture_build_hash)
 		self.data.update_needed = nil
+		local spec = Actorspec:find_by_name(self.char.race .. "-player")
+		local data = self:get_build_data()
+		self.data.object:set_spec(spec)
+		self.data.object.body_scale = self.char.height
+		self.data.object.body_style = scale255(self.char.body)
+		--self.data.object.equipment = {"bloomers", "bloomers top"}
+		self.data.object.eye_color = scale255(self.char.eye_color)
+		self.data.object.eye_style = self.char.eye_style
+		self.data.object.face_style = scale255(self.char.face)
+		self.data.object.hair_color = scale255(self.char.hair_color)
+		self.data.object.hair_style = self.char.hair_style
+		self.data.object.head_style = self.char.head_style
+		self.data.object.skin_color = scale255(self.char.skin_color)
+		self.data.object.skin_style = self.char.skin_style
+		self.data.object.render:request_model_rebuild()
 	end
-	-- Apply models.
-	local model = self.data.model_merger:pop_model()
-	if model then
-		-- Set the new model.
-		local r = RenderModel(model)
-		if self.data.render.model then
-			self.data.render:replace_model(self.data.render.model, r)
-		else
-			self.data.render:add_model(r)
-		end
-		self.data.render.model = r
-		-- Reset the animation.
-		local args = spec:get_animation_arguments("idle", self.char.animation_profile)
-		self.data.render:animate(args)
-		-- Set the body scale.
-		local args = RenderUtils:create_scale_animation(spec, self.char.height)
-		if args then self.data.render:animate(args) end
-	end
-	-- Apply textures.
-	if self.data.render then
-		local image = self.data.image_merger:pop_image()
-		if image then
-			self.data.render:add_texture_alias("aer1", image) -- FIXME
-		end
-	end
-	-- Update lighting.
-	Client.lighting:update(secs)
 end
 
 --- Gets the animation profile of the character.
@@ -295,7 +272,8 @@ end
 -- @param value Profile name.
 Chargen.set_animation_profile = function(self, value)
 	self.char.animation_profile = value
-	self.data.update_needed = true
+	self.data.object.animation_profile = value
+	self.data.object.render:add_animation("idle")
 end
 
 --- Gets the value of a body slider.
@@ -348,7 +326,7 @@ end
 -- @return Vector if active. Nil otherwise.
 Chargen.get_camera_focus = function(self)
 	if not self.data.active then return end
-	return self.data.render:get_position() + self.data.translation
+	return self.data.object:get_position() + self.data.translation
 end
 
 --- Gets the eye style of the character.
@@ -541,9 +519,13 @@ Chargen.set_preset = function(self, spec)
 			self.char[k] = v
 		end
 	end
-	if not spec.animation_profile then
+	if spec.animation_profile then
+		self.data.object.animation_profile = spec.animation_profile
+	else
 		self.char.animation_profile = "default"
+		self.data.object.animation_profile = nil
 	end
+	self.data.object.render:add_animation("idle")
 	self.data.update_needed = true
 end
 

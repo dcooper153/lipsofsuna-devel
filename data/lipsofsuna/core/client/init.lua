@@ -18,8 +18,6 @@ local Network = require("system/network")
 local Simulation = require("core/client/simulation")
 
 Main.main_start_hooks:register(10, function(secs)
-	Main.client = Client --FIXME
-	Main.client:init()
 	Main.objects.object_created_hooks:register(10, function(object)
 		object.render = ClientRenderObject()
 		if Game.enable_prediction then
@@ -43,6 +41,8 @@ Main.main_start_hooks:register(10, function(secs)
 		object.render:set_position(object:get_position())
 		object.render:set_rotation(object:get_rotation())
 	end)
+	Main.client = Client --FIXME
+	Main.client:init()
 end)
 
 Main.main_end_hooks:register(10, function(secs)

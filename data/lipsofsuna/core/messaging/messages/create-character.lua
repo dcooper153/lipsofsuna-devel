@@ -119,7 +119,6 @@ Main.messaging:register_message{
 		player.skin_color = char.skin_color
 		player.skin_style = char.skin_style
 		-- Spawn the character.
-		print("SPAWN!!!!", player, client, char.spawn_point)
 		Server:spawn_player(player, client, char.spawn_point)
 		Server.object_database:save_object(player)
 	end}
