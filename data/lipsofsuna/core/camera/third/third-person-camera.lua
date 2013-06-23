@@ -125,6 +125,10 @@ ThirdPersonCamera.get_transform = function(self)
 		displ_pos = p
 		displ_rot = self:get_rotation_displacement(p:copy():transform(turn1, pos), rot, r)
 	end
+	-- Add the extra displacement.
+	if self.displacement then
+		displ_pos = displ_pos + self.displacement
+	end
 	-- Return the final transformation.
 	return pos,rot,turn1,displ_pos,displ_rot
 end

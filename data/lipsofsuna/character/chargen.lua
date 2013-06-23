@@ -9,6 +9,7 @@
 -- @alias Chargen
 
 local Actor = require("core/objects/actor")
+local ChargenCamera = require("character/camera")
 local Class = require("system/class")
 local Color = require("system/color")
 local Json = require("system/json")
@@ -30,6 +31,7 @@ Chargen.new = function(clss)
 	local self = Class.new(clss)
 	self.char = {}
 	self.data = {}
+	self.camera = ChargenCamera()
 	-- FIXME: Should not be here.
 	self.list_races = {
 		{"Aer", "aer"},
@@ -47,8 +49,6 @@ Chargen.init = function(self, standalone)
 	-- Initialize the state.
 	self.data.standalone = standalone
 	self.data.active = true
-	self.data.rotation = 0
-	self.data.translation = Vector(0.3, 1.8, -2)
 	-- Create the object.
 	self.data.object = Actor(Main.objects)
 	self.data.object:set_spec(Actorspec:find_by_name("aer-player"))
@@ -56,6 +56,7 @@ Chargen.init = function(self, standalone)
 	self.data.object:set_visible(true)
 	self.data.object.render:init(self.data.object)
 	self.data.object.render:add_animation("idle")
+	self.camera.object = self.data.object
 	self:set_race("aer")
 	self.data.update_needed = true
 	-- Change the music track.
@@ -148,9 +149,13 @@ Chargen.input = function(self, args)
 		self.data.drag = nil
 		return false
 	elseif args.type == "mousemotion" and self.data.drag then
-		self:rotate(args.dx)
-		self:translate(args.dy)
+		local sens = Client.options.mouse_sensitivity
+		Client.camera_manager:turn(args.dx * sens)
+		if Client.options.invert_mouse then sens = -sens end
+		Client.camera_manager:tilt(args.dy * sens)
 		return false
+	elseif args.type == "mousescroll" then
+		Client.camera_manager:zoom(args.rel < 0 and -1 or 1)
 	end
 	return true
 end
@@ -164,19 +169,6 @@ Chargen.randomize = function(self)
 	local index = math.random(1, #self.list_races)
 	self:set_race(self.list_races[index][2])
 	self.data.update_needed = true
-end
-
---- Rotates the model of the character creator.
---
--- Context: The character creator must have been initialized.
---
--- @param self Chargen.
--- @return value Rotation amount.
-Chargen.rotate = function(self, value)
-	local rad = math.pi * value / 300
-	self.data.rotation = self.data.rotation + rad
-	local rot = Quaternion{axis = Vector(0, 1, 0), angle = self.data.rotation}
-	self.data.object:set_rotation(rot)
 end
 
 --- Saves the current character.
@@ -213,17 +205,6 @@ Chargen.save = function(self)
 	print(Json:encode(preset))
 end
 
---- Translates the model of the character creator.
---
--- Context: The character creator must have been initialized.
---
--- @param self Chargen.
--- @return value Translation amount.
-Chargen.translate = function(self, value)
-	local y = self.data.translation.y + value / 300
-	self.data.translation.y = math.min(math.max(y, 1), 2)
-end
-
 --- Updates the character generator.
 --
 -- Context: The character creator must have been initialized.
@@ -232,6 +213,7 @@ end
 -- @param secs Seconds since the last update.
 Chargen.update = function(self, secs)
 	if not self.data.active then return end
+	self.data.object:refresh(10)
 	Client.camera_manager:set_camera_mode("chargen")
 	-- Build models and textures.
 	if self.data.update_needed then
@@ -239,6 +221,7 @@ Chargen.update = function(self, secs)
 		local spec = Actorspec:find_by_name(self.char.race .. "-player")
 		local data = self:get_build_data()
 		self.data.object:set_spec(spec)
+		self.data.object.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYERS)
 		self.data.object.body_scale = self.char.height
 		self.data.object.body_style = scale255(self.char.body)
 		--self.data.object.equipment = {"bloomers", "bloomers top"}
@@ -326,7 +309,7 @@ end
 -- @return Vector if active. Nil otherwise.
 Chargen.get_camera_focus = function(self)
 	if not self.data.active then return end
-	return self.data.object:get_position() + self.data.translation
+	return self.data.object:get_position()
 end
 
 --- Gets the eye style of the character.

@@ -8,10 +8,8 @@
 -- @module arena.camera
 -- @alias ArenaCamera
 
-local ThirdPersonCamera = require("core/camera/third/third-person-camera")
 local Class = require("system/class")
-local Quaternion = require("system/math/quaternion")
-local Vector = require("system/math/vector")
+local ThirdPersonCamera = require("core/camera/third/third-person-camera")
 
 --- Camera for the arena subgame.
 -- @type ArenaCamera

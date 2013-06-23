@@ -8,24 +8,27 @@
 -- @module character.camera
 -- @alias ChargenCamera
 
-local Camera = require("system/camera")
 local Class = require("system/class")
 local Client = require("core/client/client")
 local Quaternion = require("system/math/quaternion")
-local Vector = require("system/math/vector")
+local ThirdPersonCamera = require("core/camera/third/third-person-camera")
 
 --- Camera for the character creator.
 -- @type ChargenCamera
-ChargenCamera = Class("ChargenCamera", Camera)
+ChargenCamera = Class("ChargenCamera", ThirdPersonCamera)
 
 --- Creates a new character creation camera.
 -- @param clss ChargenCamera class.
 -- @return ChargenCamera.
 ChargenCamera.new = function(clss)
-	local self = Camera.new(clss)
+	local self = ThirdPersonCamera.new(clss)
 	self:set_far(60)
 	self:set_near(0.3)
-	self:set_mode("first-person")
+	self:set_mode("third-person")
+	self:set_collision_group(0)
+	self:set_collision_mask(0)
+	self.displacement = Vector(-0.5,0,0)
+	self.turn_state = math.pi
 	return self
 end
 
@@ -33,11 +36,11 @@ end
 -- @param self Camera.
 -- @param secs Seconds since the last update.
 ChargenCamera.update = function(self, secs)
-	local pos = Client.chargen:get_camera_focus()
-	if pos then
-		self:set_target_position(pos)
-		self:set_target_rotation(Quaternion{axis = Vector(0, 1, 0), angle = math.pi})
-		Camera.update(self, secs)
+	if Client.chargen.data.active then
+		self.rotation_mode = true
+		self:set_position_smoothing(1)
+		self:set_rotation_smoothing(1)
+		ThirdPersonCamera.update(self, secs)
 	end
 end
 
