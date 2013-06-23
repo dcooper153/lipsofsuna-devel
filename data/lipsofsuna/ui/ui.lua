@@ -259,8 +259,11 @@ Ui.command = function(self, cmd, press)
 	if not press then
 		if cmd == "up" then self.repeat_up = nil end
 		if cmd == "down" then self.repeat_down = nil end
+		if cmd == "left" then self.repeat_left = nil end
+		if cmd == "right" then self.repeat_right = nil end
 		return
 	end
+	self.repeat_timer = 0
 	if cmd == "back" then
 		local state = self:get_state()
 		local widget = self.widgets[self.focused_item]
@@ -315,11 +318,13 @@ Ui.command = function(self, cmd, press)
 			Client.effects:play_global("uimove1")
 		end
 	elseif cmd == "left" then
+		self.repeat_left = true
 		if self.focused_item then
 			local widget = self.widgets[self.focused_item]
 			if widget and widget.left then widget:left() end
 		end
 	elseif cmd == "right" then
+		self.repeat_right = true
 		if self.focused_item then
 			local widget = self.widgets[self.focused_item]
 			if widget and widget.right then widget:right() end
@@ -717,6 +722,14 @@ Ui.update = function(self, secs)
 		local action2 = Client.bindings:find_by_name("menu_down")
 		if action2 and action2:is_pressed() and self.repeat_down then
 			self:command("down", true)
+		end
+		local action3 = Client.bindings:find_by_name("menu_left")
+		if action3 and action3:is_pressed() and self.repeat_left then
+			self:command("left", true)
+		end
+		local action4 = Client.bindings:find_by_name("menu_right")
+		if action4 and action4:is_pressed() and self.repeat_right then
+			self:command("right", true)
 		end
 	end
 	-- Update mouse focus.
