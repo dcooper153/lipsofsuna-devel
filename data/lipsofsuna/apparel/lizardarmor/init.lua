@@ -27,7 +27,7 @@ Itemspec{
 	categories = {["armor"] = true},
 	armor_class = 0.1,
 	equipment_models = {
-		["aer"] = {dress1 = "aerlizarddress1", panties = "panties2", upper_safe = ""},
+		["aer"] = {dress1 = "aerlizarddress1", upper_safe = ""},
 		["kraken"] = {dress1 = "aerlizarddress1"}},
 	equipment_slot = "upperbody",
 	icon = "lizardarmor1",
