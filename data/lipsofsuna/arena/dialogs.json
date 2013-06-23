@@ -1,0 +1,11 @@
+[
+	{
+		"type": "Dialogspec",
+		"name": "arena button",
+		"commands":
+		[
+			["info", "Spawned a monster."],
+			["spawn object", "lizardman"]
+		]
+	}
+]

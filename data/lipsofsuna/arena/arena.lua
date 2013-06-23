@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Physics = require("system/physics")
+local Obstacle = require("core/objects/obstacle")
 local Player = require("core/objects/player")
 local TerrainManager = require("core/terrain/terrain-manager")
 local Vector = require("system/math/vector")
@@ -63,7 +64,7 @@ Arena.update = function(self, secs)
 	-- Initialize the player.
 	if not self.player then
 		self.player = Player{spec = Actorspec:find_by_name("aer-player")}
-		self.player.has_server_data = function() return true end --FIXME
+		self.player.get_admin = function() return true end --FIXME
 		self.player:set_position(Vector(500,101,500))
 		self.player.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYERS)
 		self.player:set_visible(true)
@@ -73,6 +74,11 @@ Arena.update = function(self, secs)
 		Server.players_by_client = {}
 		Server.players_by_client[-1] = self.player --FIXME
 		self.player:calculate_animation()
+		
+		self.button = Obstacle{spec = Obstaclespec:find_by_name("arena button")}
+		self.button:set_position(Vector(505,100.5,500))
+		self.button:set_visible(true)
+		self.button.render:init(self.player)
 	end
 	-- Update lighting.
 	Client.lighting:update(secs)

@@ -446,11 +446,11 @@ Actor.die = function(self)
 		return
 	end
 	-- Death dialog.
-	if Server.dialogs then
-		Server.dialogs:cancel(self)
+	if Main.dialogs then
+		Main.dialogs:cancel(self)
 		if self.spec.dialog then
-			Server.dialogs:execute(self, self, "death")
-			Server.dialogs:cancel(self)
+			Main.dialogs:execute(self, self, "death")
+			Main.dialogs:cancel(self)
 		end
 	end
 	-- Disable controls etc.

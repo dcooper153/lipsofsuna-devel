@@ -51,14 +51,18 @@ Dialog.answer = function(self, user, answer)
 		self.choices = nil
 		table.insert(self.vm, 1, {exe = sel, off = 2, pos = 1, len = #sel - 2})
 		self:execute()
-		Server.events:notify_action("dialog", user)
+		if Server.events then
+			Server.events:notify_action("dialog", user)
+		end
 	elseif self.choices == "info" or self.choices == "line" then
 		-- Info or say.
 		self.vm[1].pos = self.vm[1].pos + 1
 		self.user = user
 		self.choices = nil
 		self:execute()
-		Server.events:notify_action("dialog", user)
+		if Server.events then
+			Server.events:notify_action("dialog", user)
+		end
 	end
 end
 
@@ -572,7 +576,7 @@ Dialog.execute = function(self)
 		end
 	end
 	-- Reset at end.
-	Server.dialogs:cancel(self.object)
+	Main.dialogs:cancel(self.object)
 end
 
 return Dialog

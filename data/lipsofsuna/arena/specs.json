@@ -1,0 +1,9 @@
+[
+	{
+		"type": "Obstaclespec",
+		"name": "arena button",
+		"model": "chest1",
+		"dialog": "arena button",
+		"usages": {"examine": true}
+	}
+]

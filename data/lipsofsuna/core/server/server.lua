@@ -32,7 +32,7 @@ Server = Class("Server")
 Server.init = function(self, multiplayer, client)
 	self.log = Log()
 	self.config = ServerConfig()
-	self.dialogs = DialogManager()
+	Main.dialogs = DialogManager()
 	self.marker_timer = 0
 	self.initialized = true
 	self.multiplayer = multiplayer
@@ -76,7 +76,7 @@ Server.deinit = function(self)
 	-- client starts a new server.
 	self.log = nil
 	self.config = nil
-	self.dialogs = nil
+	Main.dialogs = nil
 	self.accounts_by_client = nil
 	self.accounts_by_name = nil
 	self.players_by_client = nil
@@ -233,7 +233,7 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 	end
 	Main.messaging:server_event("create static objects", client, objects)
 	-- Transmit dialog states of static objects.
-	for k,v in pairs(self.dialogs.dialogs_by_object) do
+	for k,v in pairs(Main.dialogs.dialogs_by_object) do
 		if v.object and v.object.static and v.event then
 			player:vision_cb(v.event)
 		end

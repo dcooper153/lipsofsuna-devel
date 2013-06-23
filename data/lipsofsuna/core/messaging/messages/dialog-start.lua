@@ -23,7 +23,7 @@ Main.messaging:register_message{
 		if not object then return end
 		if not player:can_reach_object(object) then return end
 		-- Execute the dialog of the object.
-		if Server.dialogs:execute(object, player) then
+		if Main.dialogs:execute(object, player) then
 			Main.messaging:server_event("object dialog", player.client, id)
 		end
 	end}

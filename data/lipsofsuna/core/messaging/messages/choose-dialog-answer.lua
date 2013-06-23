@@ -19,7 +19,7 @@ Main.messaging:register_message{
 		local object = Main.objects:find_by_id(id)
 		if not object then return end
 		if not player.vision.objects[object] then return end
-		local dialog = Server.dialogs:find_by_object(object)
+		local dialog = Main.dialogs:find_by_object(object)
 		if not dialog then return end
 		if not dialog.choices then return end
 		dialog:answer(player, text)
