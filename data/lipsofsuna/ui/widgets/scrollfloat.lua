@@ -11,32 +11,11 @@ Widgets.Uiscrollfloat.new = function(clss, label, min, max, value, changed)
 	self.value = value
 	self.changed = changed
 	self.step = (max - min) / 10
-	self.hint = "$A: Edit\n$$B\n$$U\n$$D"
+	self.hint = "$R: Increment\n$L: Decrement\n$$U\n$$D"
 	return self
 end
 
-Widgets.Uiscrollfloat.apply = function(self)
-	if not self.input_mode then
-		self.input_mode = true
-		self.hint = "$A: Increment\n$B: Decrement\n$$U\n$$D"
-		self.need_repaint = true
-		Client.effects:play_global("uislider1")
-		return
-	end
-	if self.value == self.max then return end
-	self.value = math.min(self.value + self.step, self.max)
-	self.need_repaint = true
-	self:update_text()
-	self:changed()
-	Client.effects:play_global("uislider1")
-end
-
-Widgets.Uiscrollfloat.apply_back = function(self)
-	if not self.input_mode then
-		self.need_repaint = true
-		Client.effects:play_global("uislider1")
-		return Widgets.Uiwidget.apply_back(self)
-	end
+Widgets.Uiscrollfloat.left = function(self)
 	if self.value == self.min then return true end
 	self.value = math.max(self.value - self.step, self.min)
 	self.need_repaint = true
@@ -45,66 +24,16 @@ Widgets.Uiscrollfloat.apply_back = function(self)
 	Client.effects:play_global("uislider1")
 end
 
-Widgets.Uiscrollfloat.changed = function(self)
+Widgets.Uiscrollfloat.right = function(self)
+	if self.value == self.max then return end
+	self.value = math.min(self.value + self.step, self.max)
+	self.need_repaint = true
+	self:update_text()
+	self:changed()
+	Client.effects:play_global("uislider1")
 end
 
-Widgets.Uiscrollfloat.handle_event = function(self, args)
-	local handled
-	if self.input_mode then
-		-- Scroll if a horizontal menu key was pressed.
-		if args.type ~= "keyrelease" then
-			local a = {}
-			for k,v in pairs(args) do a[k] = v end
-			if args.type == "keyrepeat" then
-				a.type = "keypress"
-			end
-			local action1 = Client.bindings:find_by_name("menu_apply")
-			local action2 = Client.bindings:find_by_name("menu_back")
-			if (action1 and action1:get_event_response(a) ~= nil) then
-				self:apply()
-				handled = true
-			elseif (action2 and action2:get_event_response(a) ~= nil) then
-				self:apply_back()
-				handled = true
-			end
-		end
-		-- Stop editing if a vertical menu key.
-		local action3 = Client.bindings:find_by_name("menu_up")
-		local action4 = Client.bindings:find_by_name("menu_down")
-		if (action3 and action3:get_event_response(args) ~= nil) or
-		   (action4 and action4:get_event_response(args) ~= nil) then
-			self.hint = "$A: Edit\n$$B\n$$U\n$$D"
-			self.input_mode = nil
-		end
-	end
-	if not Ui:get_pointer_grab() then
-		if args.type == "mousepress" then
-			local cx = Input:get_pointer_position().x
-			if args.button == 1 then
-				if cx < self:get_x() + Theme.width_label_1 + Theme.width_slider_button_1 then
-					self.value = math.max(self.value - self.step, self.min)
-					self.need_repaint = true
-					self:update_text()
-					self:changed()
-				elseif cx >= self:get_x() + self.size.x - Theme.width_slider_button_1 then
-					self.value = math.min(self.value + self.step, self.max)
-					self.need_repaint = true
-					self:update_text()
-					self:changed()
-				else
-					self:set_value_at(cx)
-				end
-			end
-			return
-		elseif args.type == "mousemotion" then
-			if Input:get_mouse_button_state() % 2 == 1 then
-				self:set_value_at(args.x)
-			end
-			return
-		end
-	end
-	if handled then return end
-	return Widgets.Uiwidget.handle_event(self, args)
+Widgets.Uiscrollfloat.changed = function(self)
 end
 
 Widgets.Uiscrollfloat.rebuild_canvas = function(self)
@@ -116,7 +45,7 @@ Widgets.Uiscrollfloat.rebuild_canvas = function(self)
 	-- Add the background.
 	Theme:draw_slider(self, v,
 		Theme.width_label_1, 5, w, h,
-		self.focused, self.input_mode)
+		self.focused, self.focused)
 	-- Add the label of the bar.
 	if self.text then
 		self:canvas_text{

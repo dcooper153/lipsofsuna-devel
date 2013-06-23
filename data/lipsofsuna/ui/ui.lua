@@ -314,6 +314,16 @@ Ui.command = function(self, cmd, press)
 			self.history[self:get_history_state()] = self.focused_item
 			Client.effects:play_global("uimove1")
 		end
+	elseif cmd == "left" then
+		if self.focused_item then
+			local widget = self.widgets[self.focused_item]
+			if widget and widget.left then widget:left() end
+		end
+	elseif cmd == "right" then
+		if self.focused_item then
+			local widget = self.widgets[self.focused_item]
+			if widget and widget.right then widget:right() end
+		end
 	end
 end
 
@@ -796,6 +806,8 @@ Ui.update_help = function(self)
 	hint = string.gsub(hint, "$A", Client.bindings:get_control_name("menu_apply") or "[---]")
 	hint = string.gsub(hint, "$B", Client.bindings:get_control_name("menu_back") or "[---]")
 	hint = string.gsub(hint, "$D", Client.bindings:get_control_name("menu_down") or "[---]")
+	hint = string.gsub(hint, "$L", Client.bindings:get_control_name("menu_left") or "[---]")
+	hint = string.gsub(hint, "$R", Client.bindings:get_control_name("menu_right") or "[---]")
 	hint = string.gsub(hint, "$U", Client.bindings:get_control_name("menu_up") or "[---]")
 	hint = string.gsub(hint, "$M", Client.bindings:get_control_name("menu") or "[---]")
 	-- Get the detailed help string.
