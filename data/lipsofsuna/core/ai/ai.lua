@@ -1,4 +1,4 @@
---- TODO:doc
+--- Artificial intelligence.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -10,17 +10,20 @@
 
 local Class = require("system/class")
 local Feat = require("arena/feat")
+local Physics = require("system/physics")
 
---- TODO:doc
+--- Artificial intelligence.
 -- @type Ai
 Ai = Class("Ai")
 Ai.dict_name = {}
 
 --- Creates a new actor AI.<br/>
+--
 -- The AI is inactive when created. It's only activated when the controlled
 -- actor enters the vision radius of the player. This allows us to save lots
 -- of computing time since player motion often triggers loading of sectors whose
 -- actors are never seen.
+--
 -- @param clss AI class.
 -- @param object Controlled actor.
 -- @return AI.
@@ -183,8 +186,31 @@ Ai.calculate_weapon_ratings = function(self, weapon)
 	return math.max(a,b,c), a, b, c
 end
 
+--- Checks line of sight to the target point or object.
+-- @param self AI.
+-- @param target Object being looked for.
+-- @return True if seen.
+Ai.check_line_of_sight = function(self, target)
+	local object = self.object
+	-- Get the vision ray.
+	-- TODO: Take stealth into account.
+	-- TODO: Take bounding box into account.
+	local src = object:get_position() + Vector(0,1,0)
+	local dst = target:get_position() + Vector(0,1,0)
+	-- Check for view cone.
+	local ray = (src - dst):normalize()
+	local look = Vector(0,0,-1):transform(object:get_rotation())
+	if math.acos(ray:dot(look)) > object.spec.view_cone then
+		return
+	end
+	-- Check for ray cast success.
+	-- TODO: Shoot multiple rays?
+	local ret = Physics:cast_ray(src, dst, object)
+	return ret and ret.object == target:get_id()
+end
+
 --- Finds the best feat to use in combat.
--- @param self Object.
+-- @param self AI.
 -- @param args Arguments.<ul>
 --   <li>category: Feat category.</li>
 --   <li>target: Object to be attacked.</li>
@@ -245,7 +271,7 @@ Ai.scan_enemies = function(self)
 				-- If a new enemy was within the scan radius, a line of sight check
 				-- is performed to cull enemies behind walls. If the LOS check
 				-- succeeds, the enemy is considered found.
-				if self.object:check_line_of_sight{object = v} then
+				if self:check_line_of_sight(v) then
 					self.enemies[v] = {v, time}
 				end
 			end
@@ -260,5 +286,3 @@ Ai.update = function(self, secs)
 end
 
 return Ai
-
-

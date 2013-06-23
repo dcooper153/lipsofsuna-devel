@@ -490,5 +490,3 @@ Player.get_storage_type = function(self)
 end
 
 return Player
-
-

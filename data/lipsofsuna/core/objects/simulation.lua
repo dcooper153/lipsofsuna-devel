@@ -469,38 +469,6 @@ SimulationObject.update = function(self, secs)
 	Main.objects.object_update_hooks:call(self, secs)
 end
 
---- Updates the environment of the object and tries to fix it if necessary.
--- @param self Object.
--- @param secs Seconds since the last update.
--- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
-SimulationObject.update_environment = function(self, secs)
-	if not self.env_timer then self.env_timer = 0 end
-	self.env_timer = self.env_timer + secs
-	if self.env_timer < 2 then return true end
-	-- Count tiles affecting us.
-	if not self:get_visible() then return true end
-	local src,dst = self:get_tile_range()
-	local res = Voxel:check_range(src, dst)
-	-- Stuck handling.
---[[	if res.solid > 0 then
-		self.stuck = (self.stuck or 0) + 2
-		if self.stuck < 10 then
-			self:stuck_fix()
-		else
-			print("Warning: " .. (self.spec.name or "an object") .. " was deleted because it was permanently stuck!")
-			self:detach()
-			return nil, res
-		end
-	elseif self.stuck then
-		if self.stuck > 1 then
-			self.stuck = self.stuck -1
-		else
-			self.stuck = nil
-		end
-	end--]]
-	return true, res
-end
-
 --- Reads the object from a database.
 -- @param self Object.
 -- @param db Database.

@@ -288,42 +288,6 @@ Actor.can_climb_high = function(self)
 	return f1 ~= 0 and f2 == 0 and f3 == 0
 end
 
---- Checks line of sight to the target point or object.
--- @param self Actor.
--- @param args Arguments.<ul>
---   <li>object: Object being looked for.</li>
---   <li>point: Point being looked for.</li></ul>
--- @return True if seen.
-Actor.check_line_of_sight = function(self, args)
-	-- TODO: Take stealth into account.
-	local src
-	local dst
-	-- Get the vision ray.
-	-- TODO: Take bounding box into account.
-	if args.point then
-		src = self:get_position() + Vector(0,1,0)
-		dst = args.point
-	elseif args.object then
-		src = self:get_position() + Vector(0,1,0)
-		dst = args.object:get_position() + Vector(0,1,0)
-	end
-	-- Check for view cone.
-	local ray = (src - dst):normalize()
-	local look = Vector(0,0,-1):transform(self:get_rotation())
-	if math.acos(ray:dot(look)) > self.spec.view_cone then
-		return
-	end
-	-- Check for ray cast success.
-	-- TODO: Shoot multiple rays?
-	if args.point then
-		local ret = Physics:cast_ray(src, dst, self)
-		return not ret or (ret.point - dst).length < 0.5
-	elseif args.object then
-		local ret = Physics:cast_ray(src, dst, self)
-		if not ret or ret.object == args.object:get_id() then return true end
-	end
-end
-
 --- Checks if the given object is an enemy of the actor.
 -- @param self Actor.
 -- @param object Object.
@@ -568,13 +532,6 @@ Actor.inflict_modifier = function(self, name, strength, args)
 	end
 end
 
---- Loots the object.
--- @param self Actor.
--- @param user Object doing the looting.
-Actor.loot = function(self, user)
-	return SimulationObject.loot(self, user)
-end
-
 --- Picks up an object.
 -- @param self Actor.
 -- @param src_id ID of the picked up object.
@@ -654,7 +611,6 @@ Actor.update = function(self, secs)
 			self.stats:update(tick)
 			self:update_actions(tick)
 			self:update_burdening(tick)
-			self:update_environment(tick)
 			self:update_summon(tick)
 			self.update_timer = 0
 		end
@@ -784,15 +740,6 @@ Actor.update_burdening = function(self, secs)
 	self:calculate_speed()
 end
 
---- Updates the environment of the object and tries to fix it if necessary.
--- @param self Actor.
--- @param secs Seconds since the last update.
--- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
-Actor.update_environment = function(self, secs)
-	-- TODO: Count water submerging once water is implemented again.
-	return true
-end
-
 --- Updates the skills and related attributes of the actor.
 -- @param self Actor.
 Actor.update_skills = function(self)
@@ -857,24 +804,6 @@ Actor.write_db = function(self, db)
 	for name,args in pairs(self.stats.stats) do
 		db:query([[REPLACE INTO object_stats (id,name,value) VALUES (?,?,?);]], {id, name, args.value})
 	end
-end
-
---- Writes the appearance preset of the object to a string.
--- @param self Actor.
--- @return String.
-Actor.write_preset = function(self)
-	assert(self:has_client_data())
-	return Serialize:write{
-		animation_profile = self.animation_profile,
-		body_scale = self.body_scale,
-		body_style = self.body_style,
-		eye_color = self.eye_color,
-		eye_style = self.eye_style,
-		face_style = self.face_style,
-		hair_color = self.hair_color,
-		hair_style = self.hair_style,
-		skin_color = self.skin_color,
-		skin_style = self.skin_style}
 end
 
 Actor.get_attack_charge = function(self)
