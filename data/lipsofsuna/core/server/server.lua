@@ -18,7 +18,7 @@ local Marker = require("core/marker")
 local Network = require("system/network")
 local ObjectDatabase = require(Mod.path .. "object-database")
 local Physics = require("system/physics")
-local QuestDatabase = require(Mod.path .. "quest-database")
+local QuestDatabase = require("core/quest/quest-database")
 local Serialize = require(Mod.path .. "serialize")
 local ServerConfig = require(Mod.path .. "server-config")
 local Trading = require(Mod.path .. "trading")
@@ -49,10 +49,10 @@ Server.init = function(self, multiplayer, client)
 	self.unlocks = UnlockManager(Game.database)
 	self.account_database = AccountDatabase(account_database)
 	self.object_database = ObjectDatabase(Game.database)
-	self.quest_database = QuestDatabase(Game.database)
+	Main.quests = QuestDatabase(Game.database)
 	if self.serialize:get_value("game_version") ~= self.serialize.game_version then
 		self.unlocks:reset()
-		self.quest_database:reset()
+		Main.quests:reset()
 		self.serialize:set_value("game_version", self.serialize.game_version)
 	end
 	if self.serialize:get_value("object_version") ~= self.serialize.object_version then
@@ -86,7 +86,7 @@ Server.deinit = function(self)
 	self.unlocks = nil
 	self.account_database = nil
 	self.object_database = nil
-	self.quest_database = nil
+	Main.quests = nil
 	self.generator = nil
 	self.events = nil
 	collectgarbage()
@@ -106,7 +106,7 @@ Server.load = function(self)
 	else
 		self.serialize:load()
 		self.unlocks:load()
-		self.quest_database:load_quests()
+		Main.quests:load_quests()
 		self.object_database:load_static_objects()
 	end
 	-- Initialize default unlocks.
@@ -223,7 +223,7 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 	-- Transmit skills.
 	player:update_skills()
 	-- Transmit active and completed quests.
-	for k,q in pairs(self.quest_database:get_all_quests()) do
+	for k,q in pairs(Main.quests:get_all_quests()) do
 		q:send_to_client(client, true, true)
 	end
 	-- Transmit static objects.

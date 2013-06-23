@@ -65,7 +65,7 @@ Generator.generate = function(self, args)
 	self:update_status(0, "Saving quests")
 	Server.serialize:save_generator(true)
 	Server.serialize:save_markers(true)
-	Server.quest_database:reset()
+	Main.quests:reset()
 	Server.account_database:save_accounts(true)
 	Server.object_database:clear_world_decay()
 	-- Discard events emitted during map generation so that they

@@ -78,10 +78,10 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 	local npc_name = self.object.spec.name
 	local npc_marker = self.object.spec.marker
 	local var_name = string.gsub(string.lower(name), "[^A-Za-z]", "_")
-	local var_type = Server.quest_database:get_dialog_variable(self.object, var_name .. "_type")
-	local var_item = Server.quest_database:get_dialog_variable(self.object, var_name .. "_item")
-	local var_actor = Server.quest_database:get_dialog_variable(self.object, var_name .. "_actor")
-	local var_excuse = Server.quest_database:get_dialog_variable(self.object, var_name .. "_excuse")
+	local var_type = Main.quests:get_dialog_variable(self.object, var_name .. "_type")
+	local var_item = Main.quests:get_dialog_variable(self.object, var_name .. "_item")
+	local var_actor = Main.quests:get_dialog_variable(self.object, var_name .. "_actor")
+	local var_excuse = Main.quests:get_dialog_variable(self.object, var_name .. "_excuse")
 	-- Quest creation functions.
 	-- These implement quest initialization for each random quest type. They
 	-- select and create the necessary actors and set their variables.
@@ -116,10 +116,10 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 				"It just feels so good to use one."}
 			var_excuse = excuses[math.random(1, #excuses)]
 			-- Set the dialog variables.
-			Server.quest_database:set_dialog_variable(self.object, var_name .. "_init", nil)
-			Server.quest_database:set_dialog_variable(self.object, var_name .. "_type", var_type)
-			Server.quest_database:set_dialog_variable(self.object, var_name .. "_item", var_item)
-			Server.quest_database:set_dialog_variable(self.object, var_name .. "_excuse", var_excuse)
+			Main.quests:set_dialog_variable(self.object, var_name .. "_init", nil)
+			Main.quests:set_dialog_variable(self.object, var_name .. "_type", var_type)
+			Main.quests:set_dialog_variable(self.object, var_name .. "_item", var_item)
+			Main.quests:set_dialog_variable(self.object, var_name .. "_excuse", var_excuse)
 		end,
 		-- Kill an actor.
 		-- The player is asked to kill a randomly generated unique actor. The
@@ -145,7 +145,7 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			-- Create the target actor.
 			local actor
 			for k,spec in ipairs(actors) do
-				if not Server.quest_database:get_dialog_flag("scapegoat_alive_" .. spec.name) then
+				if not Main.quests:get_dialog_flag("scapegoat_alive_" .. spec.name) then
 					var_actor = spec.name
 					actor = Actor(self.object.manager)
 					actor:set_spec(spec)
@@ -168,15 +168,15 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			var_excuse = excuses[math.random(1, #excuses)]
 			-- Reserve the actor for this quest.
 			npc_marker = actor.spec.marker
-			Server.quest_database:set_dialog_flag("scapegoat_alive_" .. actor.spec.name, "true")
+			Main.quests:set_dialog_flag("scapegoat_alive_" .. actor.spec.name, "true")
 			-- Set the dialog variables.
-			Server.quest_database:set_dialog_variable(self.object, var_name .. "_init", nil)
-			Server.quest_database:set_dialog_variable(self.object, var_name .. "_type", var_type)
-			Server.quest_database:set_dialog_variable(self.object, var_name .. "_actor", var_actor)
-			Server.quest_database:set_dialog_variable(self.object, var_name .. "_excuse", var_excuse)
-			Server.quest_database:set_dialog_variable(actor, var_name .. "_mark_actor", npc_name)
-			Server.quest_database:set_dialog_variable(actor, var_name .. "_mark_marker", self.object.spec.marker)
-			Server.quest_database:set_dialog_variable(actor, var_name .. "_mark_quest", name)
+			Main.quests:set_dialog_variable(self.object, var_name .. "_init", nil)
+			Main.quests:set_dialog_variable(self.object, var_name .. "_type", var_type)
+			Main.quests:set_dialog_variable(self.object, var_name .. "_actor", var_actor)
+			Main.quests:set_dialog_variable(self.object, var_name .. "_excuse", var_excuse)
+			Main.quests:set_dialog_variable(actor, var_name .. "_mark_actor", npc_name)
+			Main.quests:set_dialog_variable(actor, var_name .. "_mark_marker", self.object.spec.marker)
+			Main.quests:set_dialog_variable(actor, var_name .. "_mark_quest", name)
 		end}
 	if not var_type then
 		local func = random_quests[math.random(1, #random_quests)]
@@ -276,9 +276,9 @@ Dialog.execute = function(self)
 	-- Utility functions.
 	local check_cond = function(c)
 		-- Backward compatibility.
-		if c.cond and not Server.quest_database:get_dialog_flag(c.cond) then return end
+		if c.cond and not Main.quests:get_dialog_flag(c.cond) then return end
 		if c.cond_dead and not self.object.dead then return end
-		if c.cond_not and Server.quest_database:get_dialog_flag(c.cond_not) then return end
+		if c.cond_not and Main.quests:get_dialog_flag(c.cond_not) then return end
 		-- New condition string.
 		if not c.check then return true end
 		for _,cond in ipairs(c.check) do
@@ -288,29 +288,29 @@ Dialog.execute = function(self)
 			elseif type == "!dead" then
 				if self.object.dead then return end
 			elseif type == "flag" then
-				if not Server.quest_database:get_dialog_flag(name) then return end
+				if not Main.quests:get_dialog_flag(name) then return end
 			elseif type == "!flag" then
-				if Server.quest_database:get_dialog_flag(name) then return end
+				if Main.quests:get_dialog_flag(name) then return end
 			elseif type == "quest active" then
-				local quest = Server.quest_database:find_quest_by_name(name)
+				local quest = Main.quests:find_quest_by_name(name)
 				if not quest then return end
 				if quest.status ~= "active" then return end
 			elseif type == "quest not active" then
-				local quest = Server.quest_database:find_quest_by_name(name)
+				local quest = Main.quests:find_quest_by_name(name)
 				if not quest then return end
 				if quest.status == "active" then return end
 			elseif type == "quest completed" then
-				local quest = Server.quest_database:find_quest_by_name(name)
+				local quest = Main.quests:find_quest_by_name(name)
 				if not quest then return end
 				if quest.status ~= "completed" then return end
 			elseif type == "quest not completed" then
-				local quest = Server.quest_database:find_quest_by_name(name)
+				local quest = Main.quests:find_quest_by_name(name)
 				if not quest then return end
 				if quest.status == "completed" then return end
 			elseif type == "var" then
-				if not Server.quest_database:get_dialog_variable(self.object, name) then return end
+				if not Main.quests:get_dialog_variable(self.object, name) then return end
 			elseif type == "!var" then
-				if Server.quest_database:get_dialog_variable(self.object, name) then return end
+				if Main.quests:get_dialog_variable(self.object, name) then return end
 			end
 		end
 		return true
@@ -399,11 +399,11 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["flag"] = function(vm, c)
-			Server.quest_database:set_dialog_flag(c[2], "true")
+			Main.quests:set_dialog_flag(c[2], "true")
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["flag clear"] = function(vm, c)
-			Server.quest_database:set_dialog_flag(c[2], nil)
+			Main.quests:set_dialog_flag(c[2], nil)
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["func"] = function(vm, c)
@@ -446,7 +446,7 @@ Dialog.execute = function(self)
 			Main.messaging:server_event("notification", self.user.client, c[2])
 		end,
 		quest = function(vm, c)
-			local q = Server.quest_database:find_quest_by_name(c[2])
+			local q = Main.quests:find_quest_by_name(c[2])
 			if q then q:update(c) end
 			vm[1].pos = vm[1].pos + 1
 		end,
@@ -563,11 +563,11 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["var"] = function(vm, c)
-			Server.quest_database:set_dialog_variable(self.object, c[2], "true")
+			Main.quests:set_dialog_variable(self.object, c[2], "true")
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["var clear"] = function(vm, c)
-			Server.quest_database:set_dialog_variable(self.object, c[2], nil)
+			Main.quests:set_dialog_variable(self.object, c[2], nil)
 			vm[1].pos = vm[1].pos + 1
 		end}
 	-- Execute commands until break or end.

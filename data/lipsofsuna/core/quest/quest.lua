@@ -1,28 +1,31 @@
---- TODO:doc
+--- Stores the status of an individual quest.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.server.quest
+-- @module core.quest.quest
 -- @alias Quest
 
 local Class = require("system/class")
 local Marker = require("core/marker")
 
---- TODO:doc
+--- Stores the status of an individual quest
 -- @type Quest
 local Quest = Class("Quest")
 
 --- Creates a new quest.
 -- @param clss Quest class.
+-- @param manager Quest manager.
 -- @param name Quest name.
--- @param status Status string, or nil.
--- @param text Description text, or nil.
--- @param marker Marker name, or nil.
-Quest.new = function(clss, name, status, text, marker)
+-- @param status Status string. Nil for inactive.
+-- @param text Description text. Nil for none.
+-- @param marker Marker name. Nil for none.
+-- @return Quest.
+Quest.new = function(clss, manager, name, status, text, marker)
 	local self = Class.new(clss)
+	self.manager = manager
 	self.name = name
 	self.status = status or "inactive"
 	self.text = text
@@ -86,10 +89,8 @@ Quest.update = function(self, args)
 	end
 	-- Save changes.
 	if ch_m or ch_p or ch_s or ch_t then
-		Server.quest_database:save_quest(self)
+		self.manager:save_quest(self)
 	end
 end
 
 return Quest
-
-

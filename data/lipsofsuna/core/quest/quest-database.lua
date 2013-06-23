@@ -1,4 +1,4 @@
---- TODO:doc
+--- Database-backed quest manager.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -9,27 +9,27 @@
 -- @alias QuestDatabase
 
 local Class = require("system/class")
-local Quest = require(Mod.path .. "quest")
+local Quest = require("core/quest/quest")
+local QuestManager = require("core/quest/quest-manager")
 
---- TODO:doc
+--- Database-backed quest manager.
 -- @type QuestDatabase
-local QuestDatabase = Class("QuestDatabase")
+local QuestDatabase = Class("QuestDatabase", QuestManager)
 
 --- Creates a new quest database.
 -- @param clss QuestDatabase class.
 -- @param db Database.
 -- @return QuestDatabase.
 QuestDatabase.new = function(clss, db)
-	local self = Class.new(clss)
+	local self = QuestManager.new(clss)
 	self.db = db
-	self.quests_by_name = {}
 	return self
 end
 
---- Resets the quest database.
+--- Resets the quests.
 -- @param self QuestDatabase.
 QuestDatabase.reset = function(self)
-	self.quests_by_name = {}
+	QuestManager.reset(self)
 	self.db:query([[DROP TABLE IF EXISTS dialog_flags;]])
 	self.db:query([[DROP TABLE IF EXISTS dialog_variables;]])
 	self.db:query([[DROP TABLE IF EXISTS quests;]])
@@ -48,20 +48,12 @@ QuestDatabase.reset = function(self)
 		marker TEXT);]])
 end
 
---- Finds a quest by name.
--- @param self QuestDatabase.
--- @param name Quest name.
--- @return Quest, or nil.
-QuestDatabase.find_quest_by_name = function(self, name)
-	return self.quests_by_name[name]
-end
-
---- Loads all quests from the database.
+--- Loads all quests.
 -- @param self QuestDatabase.
 QuestDatabase.load_quests = function(self)
 	local r = self.db:query([[SELECT name,status,desc,marker FROM quests;]])
 	for k,v in ipairs(r) do
-		local quest = Quest(unpack(v))
+		local quest = Quest(self, unpack(v))
 		self.quests_by_name[quest.name] = quest
 	end
 end
@@ -139,13 +131,4 @@ QuestDatabase.get_dialog_variables = function(self, object)
 	return res
 end
 
---- Returns the dictionary of all quests in the database.
--- @param self QuestDatabase.
--- @return Dictionary.
-QuestDatabase.get_all_quests = function(self)
-	return self.quests_by_name
-end
-
 return QuestDatabase
-
-
