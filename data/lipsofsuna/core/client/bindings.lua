@@ -5,11 +5,13 @@ Client:register_init_hook(500, function()
 
 	Client.input:register_binding{name = "attack", mode = "toggle", key1 = "mouse1", func = function(v)
 		if not Client.player_object then return end
+		if not Ui:get_pointer_grab() then return end
 		Main.messaging:client_event("attack", v)
 	end}
 
 	Client.input:register_binding{name = "block", mode = "toggle", key1 = "mouse3", func = function(v)
 		if not Client.player_object then return end
+		if not Ui:get_pointer_grab() then return end
 		Main.messaging:client_event("block", v)
 	end}
 
@@ -20,6 +22,7 @@ Client:register_init_hook(500, function()
 
 	Client.input:register_binding{name = "climb", mode = "press", key1 = Keysym.c, func = function()
 		if not Client.player_object then return end
+		if not Ui:get_pointer_grab() then return end
 		Main.messaging:client_event("climb")
 	end}
 
@@ -49,6 +52,7 @@ Client:register_init_hook(500, function()
 
 	Client.input:register_binding{name = "jump", mode = "toggle", key1 = Keysym.SPACE, func = function(v)
 		if not Client.player_object then return end
+		if not Ui:get_pointer_grab() then return end
 		Main.messaging:client_event("jump", v)
 	end}
 
@@ -63,6 +67,7 @@ Client:register_init_hook(500, function()
 
 	Client.input:register_binding{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
 		if not Client.player_object then return end
+		if not Ui:get_pointer_grab() then return end
 		Main.messaging:client_event("walk", math.max(-1, math.min(1, -v)))
 	end}
 
@@ -77,6 +82,7 @@ Client:register_init_hook(500, function()
 
 	Client.input:register_binding{name = "pick_up", mode = "press", key1 = Keysym.COMMA, func = function()
 		if not Client.player_object then return end
+		if not Ui:get_pointer_grab() then return end
 		-- TODO
 	end}
 
@@ -91,6 +97,7 @@ Client:register_init_hook(500, function()
 
 	Client.input:register_binding{name = "run", mode = "toggle", key1 = Keysym.LSHIFT, func = function(v)
 		if not Client.player_object then return end
+		if not Ui:get_pointer_grab() then return end
 		Main.messaging:client_event("run", not v)
 	end}
 
@@ -109,12 +116,14 @@ Client:register_init_hook(500, function()
 	end}
 
 	Client.input:register_binding{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
+		if not Ui:get_pointer_grab() then return end
 		if not Client.player_object then return end
 		Main.messaging:client_event("sidestep", v)
 	end}
 
 	Client.input:register_binding{name = "use", mode = "press", key1 = Keysym.b, func = function()
 		if not Client.player_object then return end
+		if not Ui:get_pointer_grab() then return end
 		Ui:set_state("world/object")
 	end}
 

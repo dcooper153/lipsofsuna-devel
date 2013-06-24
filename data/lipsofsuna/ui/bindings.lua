@@ -29,27 +29,33 @@ Client:register_init_hook(500, function()
 		end
 	end}
 
-	Client.input:register_binding{name = "menu_up", mode = "toggle", key1 = Keysym.UP, func = function(v)
+	Client.input:register_binding{name = "menu_up", mode = "toggle", key1 = Keysym.w, func = function(v)
+		if Ui:get_pointer_grab() then return end
 		Ui:command("up", v)
 	end}
 
-	Client.input:register_binding{name = "menu_down", mode = "toggle", key1 = Keysym.DOWN, func = function(v)
+	Client.input:register_binding{name = "menu_down", mode = "toggle", key1 = Keysym.s, func = function(v)
+		if Ui:get_pointer_grab() then return end
 		Ui:command("down", v)
 	end}
 
-	Client.input:register_binding{name = "menu_left", mode = "toggle", key1 = Keysym.LEFT, func = function(v)
+	Client.input:register_binding{name = "menu_left", mode = "toggle", key1 = Keysym.a, func = function(v)
+		if Ui:get_pointer_grab() then return end
 		Ui:command("left", v)
 	end}
 
-	Client.input:register_binding{name = "menu_right", mode = "toggle", key1 = Keysym.RIGHT, func = function(v)
+	Client.input:register_binding{name = "menu_right", mode = "toggle", key1 = Keysym.d, func = function(v)
+		if Ui:get_pointer_grab() then return end
 		Ui:command("right", v)
 	end}
 
-	Client.input:register_binding{name = "menu_back", mode = "toggle", key1 = Keysym.BACKSPACE, func = function(v)
+	Client.input:register_binding{name = "menu_back", mode = "toggle", key1 = Keysym.q, func = function(v)
+		if Ui:get_pointer_grab() then return end
 		Ui:command("back", v)
 	end}
 
-	Client.input:register_binding{name = "menu_apply", mode = "toggle", key1 = Keysym.ENTER, func = function(v)
+	Client.input:register_binding{name = "menu_apply", mode = "toggle", key1 = Keysym.e, func = function(v)
+		if Ui:get_pointer_grab() then return end
 		Ui:command("apply", v)
 	end}
 

@@ -24,7 +24,7 @@ ControlsSerializer.new = function(clss)
 	local self = Class.new(clss)
 	self.data = {}
 	self.data.controls = ConfigFile{name = "controls.cfg"}
-	self.data.version = "A"
+	self.data.version = "B"
 	return self
 end
 
