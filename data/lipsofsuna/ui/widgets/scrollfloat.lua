@@ -36,6 +36,36 @@ end
 Widgets.Uiscrollfloat.changed = function(self)
 end
 
+Widgets.Uiscrollfloat.handle_event = function(self, args)
+	if not Ui:get_pointer_grab() then
+	   if args.type == "mousepress" then
+		   local cx = Input:get_pointer_position().x
+		   if args.button == 1 then
+			   if cx < self:get_x() + Theme.width_label_1 + Theme.width_slider_button_1 then
+				   self.value = math.max(self.value - self.step, self.min)
+				   self.need_repaint = true
+				   self:update_text()
+				   self:changed()
+			   elseif cx >= self:get_x() + self.size.x - Theme.width_slider_button_1 then
+				   self.value = math.min(self.value + self.step, self.max)
+				   self.need_repaint = true
+				   self:update_text()
+				   self:changed()
+			   else
+				   self:set_value_at(cx)
+			   end
+		   end
+		   return
+	   elseif args.type == "mousemotion" then
+		   if Input:get_mouse_button_state() % 2 == 1 then
+			   self:set_value_at(args.x)
+		   end
+		   return
+	   end
+	end
+	return Widgets.Uiwidget.handle_event(self, args)
+end
+
 Widgets.Uiscrollfloat.rebuild_canvas = function(self)
 	local w = self.size.x - Theme.width_label_1 - 5
 	local h = self.size.y - 10
