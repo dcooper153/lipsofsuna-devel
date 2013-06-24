@@ -11,7 +11,7 @@
 local Class = require("system/class")
 local AccountDatabase = require(Mod.path .. "account-database")
 local Database = require("system/database")
-local DialogManager = require(Mod.path .. "dialog-manager")
+local DialogManager = require("core/dialog/dialog-manager")
 local GlobalEventManager = require(Mod.path .. "global-event-manager")
 local Log = require(Mod.path .. "log")
 local Marker = require("core/marker")

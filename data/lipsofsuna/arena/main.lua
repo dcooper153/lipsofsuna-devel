@@ -2,7 +2,7 @@ local Arena = require("arena/arena")
 local ArenaCamera = require("arena/camera")
 local Client = require("core/client/client")
 local CombatUtils = require("arena/combat-utils")
-local DialogManager = require("core/server/dialog-manager")
+local DialogManager = require("core/dialog/dialog-manager")
 local Hooks = require("system/hooks")
 local Ui = require("ui/ui")
 

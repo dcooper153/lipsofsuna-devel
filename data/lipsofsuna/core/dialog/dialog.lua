@@ -1,11 +1,11 @@
---- TODO:doc
+--- Holds the dialog state of an individual NPC.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.server.dialog
+-- @module core.dialog.dialog
 -- @alias Dialog
 
 local Actor = require("core/objects/actor")
@@ -13,9 +13,9 @@ local Class = require("system/class")
 local Item = require("core/objects/item")
 local Marker = require("core/marker")
 local Obstacle = require("core/objects/obstacle")
-local Trading = require(Mod.path .. "trading")
+local Trading = require("core/server/trading") --FIXME
 
---- TODO:doc
+--- Holds the dialog state of an individual NPC.
 -- @type Dialog
 local Dialog = Class("Dialog")
 
@@ -587,5 +587,3 @@ Dialog.execute = function(self)
 end
 
 return Dialog
-
-
