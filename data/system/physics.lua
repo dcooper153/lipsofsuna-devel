@@ -26,10 +26,15 @@ local Physics = Class("Physics")
 -- @param src Start point vector in world space.
 -- @param dst End point vector in world space.
 -- @param mask Collision mask.
--- @param ignore Object or table of objects to ignore.
+-- @param ignore Table of physics objects to ignore. Nil to not ignore any.
 -- @return Table with point, normal, object and tile. Nil if no collision occurred.
 Physics.cast_ray = function(self, src, dst, mask, ignore)
-	local r = Los.physics_cast_ray(src.handle, dst.handle, mask, ignore)
+	local ignore_
+	if ignore then
+		ignore_ = {}
+		for k,v in pairs(ignore) do ignore_[k] = v.handle end
+	end
+	local r = Los.physics_cast_ray(src.handle, dst.handle, mask, ignore_)
 	if not r then return end
 	r.point = Vector:new_from_handle(r.point)
 	r.normal = Vector:new_from_handle(r.normal)
@@ -43,10 +48,15 @@ end
 -- @param dst End point vector in world space.
 -- @param radius Radius in world units.
 -- @param mask Collision mask.
--- @param ignore Object or table of objects to ignore.
+-- @param ignore Table of physics objects to ignore. Nil to not ignore any.
 -- @return Table with point, normal, object and tile. Nil if no collision occurred.
 Physics.cast_sphere = function(self, src, dst, radius, mask, ignore)
-	local r = Los.physics_cast_sphere(src.handle, dst.handle, radius, mask, ignore)
+	local ignore_
+	if ignore then
+		ignore_ = {}
+		for k,v in pairs(ignore) do ignore_[k] = v.handle end
+	end
+	local r = Los.physics_cast_sphere(src.handle, dst.handle, radius, mask, ignore_)
 	if not r then return end
 	r.point = Vector:new_from_handle(r.point)
 	r.normal = Vector:new_from_handle(r.normal)
