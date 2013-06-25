@@ -9,6 +9,6 @@
 		}
 	],
 	"server": false,
-	"scripts": ["main"],
+	"scripts": ["main", "action-melee"],
 	"specs": ["dialogs", "specs"]
 }

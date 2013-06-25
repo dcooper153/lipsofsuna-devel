@@ -462,8 +462,8 @@ SimulationObject.update = function(self, secs)
 	if not self:get_visible() then return end
 	-- Update actions.
 	if self.actions then
-		for k,v in pairs(self.actions) do
-			if not v.spec.update(v) then
+		for k in pairs(self.actions) do
+			if not k.spec.update(k, secs) then
 				self.actions[k] = nil
 			end
 		end

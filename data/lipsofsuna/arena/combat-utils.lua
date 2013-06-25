@@ -44,6 +44,24 @@ CombatUtils.get_actor_armor_class = function(self, actor)
 	return value
 end
 
+--- Gets the world space position of the weapon of the actor.
+-- @param self CombatUtils.
+-- @param actor Actor.
+-- @param position Relative displacement vector. Nil for default displacement.
+-- @return Vector in world space.
+CombatUtils.get_actor_attack_point = function(self, actor, position)
+	local ctr = actor.spec.aim_ray_center
+	local tip
+	if position then
+		tip = Vector(0, 0, -actor.spec.aim_ray_start)
+		tip:add(position)
+	else
+		tip = Vector(0, 0, -actor.spec.aim_ray_end)
+	end
+	if actor.tilt then tip = actor.tilt * tip end
+	return actor:transform_local_to_global(ctr + tip)
+end
+
 --- Calculates the armor class of the item.
 -- @param self CombatUtils.
 -- @param item Item.
