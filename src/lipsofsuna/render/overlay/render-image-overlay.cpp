@@ -147,8 +147,8 @@ void LIRenImageOverlay::updatePositionGeometry ()
 	float ytile = yscale * src_tiling[4];
 
 	// Ogre seems to divide by zero during startup when the viewport
-	// hasn't been initialized. Refuse to do anything if it happed.
-	if (!limat_number_validate (left) || !limat_number_validate (top))
+	// hasn't been initialized. Refuse to do anything if that happened.
+	if (!limat_number_is_finite (left) || !limat_number_is_finite (top))
 	{
 		render_op.vertexData->vertexCount = 0;
 		return;

@@ -70,6 +70,18 @@ static inline float limat_quantize (
 }
 
 /**
+ * \brief Returns one if the number is finite.
+ * \return One if finite. Zero otherwise.
+ */
+static inline float limat_number_is_finite (
+	float value)
+{
+	if (finite (value))
+		return 1;
+	return 0;
+}
+
+/**
  * \brief Replaces non-finite numbers with zero.
  * \return Finite number.
  */
