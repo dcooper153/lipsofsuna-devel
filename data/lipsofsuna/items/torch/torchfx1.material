@@ -1,16 +1,37 @@
+pass torchfx1/alpha
+{
+	lighting off
+	scene_blend add
+	depth_write off
+	texture_unit
+	{
+		texture particle5.dds
+	}
+}
+
 material torchfx1
 {
+	receive_shadows off
 	technique
 	{
-		pass
+		scheme mrt
+	}
+	technique
+	{
+		scheme srt_color
+		pass : torchfx1/alpha
 		{
-			lighting off
-			scene_blend add
-			depth_write off
-			texture_unit
-			{
-				texture particle5.dds
-			}
+		}
+	}
+	technique
+	{
+		scheme srt_depth
+	}
+	technique
+	{
+		scheme fixed
+		pass : torchfx1/alpha
+		{
 		}
 	}
 }

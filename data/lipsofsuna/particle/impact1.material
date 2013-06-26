@@ -1,16 +1,36 @@
+pass impact1/alpha
+{
+	lighting off
+	scene_blend alpha_blend
+	alpha_rejection greater_equal 128
+	texture_unit
+	{
+		texture star1.png
+	}
+}
+
 material impact1
 {
 	technique
 	{
-		pass
+		scheme mrt
+	}
+	technique
+	{
+		scheme srt_color
+		pass : impact1/alpha
 		{
-			lighting off
-			scene_blend alpha_blend
-			alpha_rejection greater_equal 128
-			texture_unit
-			{
-				texture star1.png
-			}
+		}
+	}
+	technique
+	{
+		scheme srt_depth
+	}
+	technique
+	{
+		scheme fixed
+		pass : impact1/alpha
+		{
 		}
 	}
 }

@@ -1,4 +1,4 @@
-vertex_program speedline1_vert glsl
+vertex_program speedline1/vert glsl
 {
 	source speedline1.vert
 	default_params
@@ -7,7 +7,7 @@ vertex_program speedline1_vert glsl
 	}
 }
 
-fragment_program speedline1_frag glsl
+fragment_program speedline1/frag glsl
 {
 	source speedline1.frag
 	default_params

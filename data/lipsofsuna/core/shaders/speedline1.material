@@ -1,27 +1,38 @@
+pass speedline1/alpha
+{
+	diffuse 1.0 1.0 1.0
+	depth_write off
+	cull_hardware none
+	scene_blend alpha_blend
+	vertex_program_ref speedline1/vert
+	{
+	}
+	fragment_program_ref speedline1/frag
+	{
+	}
+}
+
 material speedline1
 {
+	receive_shadows off
 	technique
 	{
-		pass
+		scheme mrt
+	}
+	technique
+	{
+		scheme srt_color
+		pass : speedline1/alpha
 		{
-			ambient 0.7 0.7 0.7
-			diffuse 1.0 1.0 1.0
-			specular 0.0 0.0 0.0 0.0 64
-			lighting off
-			depth_write off
-			cull_hardware none
-			scene_blend alpha_blend
-			vertex_program_ref speedline1_vert
-			{
-			}
-			fragment_program_ref speedline1_frag
-			{
-			}
 		}
 	}
 	technique
 	{
-		scheme quality1
+		scheme srt_depth
+	}
+	technique
+	{
+		scheme fixed
 		pass
 		{
 			ambient 1.0 1.0 1.0
