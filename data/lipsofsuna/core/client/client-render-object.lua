@@ -33,7 +33,7 @@ ClientRenderObject.init = function(self, object)
 	self.initialized = true
 	-- Store the object.
 	self.object = object
-	--Client.options:apply_object(object)
+	Client.options:apply_object(object)
 	-- Set the render model.
 	if object.spec.models then
 		self:request_model_rebuild()
