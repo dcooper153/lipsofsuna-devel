@@ -22,6 +22,36 @@ CombatUtils.new = function(clss)
 	return self
 end
 
+--- Checks if the actor is wielding a ranged weapon.
+-- @param self CombatUtils.
+-- @param actor Actor.
+-- @return Weapon and ammo count if wielding. Nil otherwise.
+CombatUtils.count_ranged_ammo_of_actor = function(self, actor, ammo)
+	-- Check for weapon.
+	local weapon = actor:get_weapon()
+	if not weapon then return end
+	if not weapon.spec.ammo_type then return end
+	-- Split the ammo.
+	local ammo = actor.inventory:count_objects_by_name(weapon.spec.ammo_type, 1)
+	if ammo < 1 then return weapon end
+	return weapon,ammo
+end
+
+--- Splits a projectile for the currenly wielded ranged weapon.
+-- @param self CombatUtils.
+-- @param actor Actor.
+-- @return Weapon and ammo items if succeeded. Weapon and nil if not enough ammo. Nil otherwise.
+CombatUtils.split_ranged_ammo_of_actor = function(self, actor)
+	-- Check for weapon.
+	local weapon = actor:get_weapon()
+	if not weapon then return end
+	if not weapon.spec.ammo_type then return end
+	-- Split the ammo.
+	local ammo = actor.inventory:split_object_by_name(weapon.spec.ammo_type, 1)
+	if not ammo then return weapon end
+	return weapon,ammo
+end
+
 --- Calculates the armor class of the actor.
 -- @param self CombatUtils.
 -- @param actor Actor.
