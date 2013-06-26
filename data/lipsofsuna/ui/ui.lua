@@ -391,6 +391,40 @@ Ui.get_widget = function(self, id)
 	end
 end
 
+--- Finds the widget under the cursor.<br/>
+--
+-- Returns the first widget whose rectangle encloses the tip of the cursor.
+-- If the filter funtion is given, the first matching widget for which the
+-- filter returns true will be returned. Other widgets are skipped.
+--
+-- @param self Ui class.
+-- @param filter Optional filter function.
+-- @return Widget if found. Nil otherwise.
+Ui.get_widget_under_cursor = function(self, filter)
+	local handle = function(cursor, widget)
+		if not widget:get_visible() then return end
+		local x,w = widget:get_x(),widget:get_width()
+		if cursor.x < x or x + w <= cursor.x then return end
+		local y,h = widget:get_y(),widget:get_height()
+		if cursor.y < y or y + h <= cursor.y then return end
+		if not filter or filter(widget) then return true end
+	end
+	local c = Input:get_pointer_position()
+	-- Try system widgets.
+	if handle(c, self.back) then return self.back end
+	if handle(c, self.scrollbar) then return self.scrollbar end
+	-- Try UI widgets.
+	for k,v in pairs(self.widgets) do
+		if handle(c, v) then return v end
+	end
+	-- Try HUD widgets.
+	for k,hud in pairs(self.huds) do
+		if hud.widget then
+			if handle(c, hud.widget) then return hud.widget end
+		end
+	end
+end
+
 --- Handles an input event.
 -- @param self Ui class.
 -- @param args Event arguments.
@@ -425,10 +459,11 @@ Ui.handle_event = function(self, args)
 		return
 	end
 	-- Call the event handler of the widget under the cursor.
-	local widget = Widgets:find_handler_widget("handle_event")
-	if widget and not widget:handle_event(args) then
-		return
-	end
+	local widget = self:get_widget_under_cursor(function(widget)
+		if not widget.handle_event then return end
+		return widget:handle_event(args)
+	end)
+	if widget then return end
 	-- Call the post event handler functions of the state.
 	for k,v in pairs(state_.input_post) do
 		if not v(args) then return end
@@ -734,7 +769,7 @@ Ui.update = function(self, secs)
 	end
 	-- Update mouse focus.
 	if not self:get_pointer_grab() then
-		local focus = Widgets:get_widget_under_cursor()
+		local focus = self:get_widget_under_cursor()
 		if focus then
 			-- Focus a UI widget.
 			local found = false
