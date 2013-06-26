@@ -1,12 +1,24 @@
+--- HUD compass widget.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module ui.hud.compass
+-- @alias Hudcompass
+
 local Class = require("system/class")
 local Widget = require("system/widget")
 
-Widgets.Hudcompass = Class("Hudcompass", Widget)
+--- HUD compass widget.
+-- @type Hudcompass
+local Hudcompass = Class("Hudcompass", Widget)
 
 --- Creates a new compass widget.
 -- @param clss Compass class.
 -- @return Compass widget.
-Widgets.Hudcompass.new = function(clss)
+Hudcompass.new = function(clss)
 	local self = Widget.new(clss)
 	self.timer = 0
 	return self
@@ -15,7 +27,7 @@ end
 --- Updates the compass.
 -- @param self Compass widget.
 -- @param secs Seconds since the last update.
-Widgets.Hudcompass.update = function(self, secs)
+Hudcompass.update = function(self, secs)
 	self.timer = self.timer + secs
 	if self.timer < 0.03 then return end
 	self.timer = 0
@@ -26,7 +38,7 @@ Widgets.Hudcompass.update = function(self, secs)
 	self:reshaped()
 end
 
-Widgets.Hudcompass.reshaped = function(self)
+Hudcompass.reshaped = function(self)
 	local w = self:get_width()
 	local h = self:get_height()
 	local mode = Program:get_video_mode()
@@ -64,3 +76,5 @@ Widgets.Hudcompass.reshaped = function(self)
 			text_font = "tiny"}
 	end
 end
+
+return Hudcompass

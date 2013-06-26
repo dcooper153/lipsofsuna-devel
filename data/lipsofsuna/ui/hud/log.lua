@@ -1,20 +1,32 @@
+--- HUD message log widget.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module ui.hud.log
+-- @alias Hudlog
+
 local Class = require("system/class")
 local Widget = require("system/widget")
 
-Widgets.Uilog = Class("Uilog", Widget)
+--- HUD message log widget.
+-- @type Hudlog
+local Hudlog = Class("Hudlog", Widget)
 
-Widgets.Uilog.new = function(clss)
+Hudlog.new = function(clss)
 	local self = Widget.new(clss)
 	self.lines = {}
 	return self
 end
 
-Widgets.Uilog.append = function(self, text)
+Hudlog.append = function(self, text)
 	table.insert(self.lines, 1, {text, 0, 1})
 	self.need_relayout = true
 end
 
-Widgets.Uilog.reshaped = function(self)
+Hudlog.reshaped = function(self)
 	self:canvas_clear()
 	local w = self:get_width()
 	local h = self:get_height()
@@ -26,7 +38,7 @@ Widgets.Uilog.reshaped = function(self)
 	end
 end
 
-Widgets.Uilog.update = function(self, secs)
+Hudlog.update = function(self, secs)
 	-- Check for a relayout.
 	local changed = self.need_relayout
 	self.need_relayout = true
@@ -58,3 +70,5 @@ Widgets.Uilog.update = function(self, secs)
 		self:reshaped()
 	end
 end
+
+return Hudlog

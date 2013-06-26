@@ -1,12 +1,12 @@
 if not Settings then return end
 if Settings.server then return end
 
-require(Mod.path .. "compass")
-require(Mod.path .. "fps")
-require(Mod.path .. "log")
-require(Mod.path .. "modifiers")
-require(Mod.path .. "notification")
-require(Mod.path .. "target")
+local Hudcompass = require("ui/hud/compass")
+local Hudfps = require("ui/hud/fps")
+local Hudlog = require("ui/hud/log")
+local Hudmodifiers = require("ui/hud/modifiers")
+local Hudnotification = require("ui/hud/notification")
+local Hudtarget = require("ui/hud/target")
 
 Ui:add_hud{
 	id = "health",
@@ -21,12 +21,12 @@ Ui:add_hud{
 Ui:add_hud{
 	id = "chat",
 	active = function() return Ui.root == "play" end,
-	init = function() return Widgets.Uilog() end}
+	init = function() return Hudlog() end}
 
 Ui:add_hud{
 	id = "compass",
 	active = function() return Ui.root == "play" end,
-	init = function() return Widgets.Hudcompass() end}
+	init = function() return Hudcompass() end}
 
 Ui:add_hud{
 	id = "crosshair",
@@ -45,19 +45,19 @@ Ui:add_hud{
 Ui:add_hud{
 	id = "fps",
 	active = function() return true end,
-	init = function() return Widgets.Hudfps() end}
+	init = function() return Hudfps() end}
 
 Ui:add_hud{
 	id = "modifier",
 	active = function() return Ui.root == "play" end,
-	init = function() return Widgets.Hudmodifiers() end}
+	init = function() return Hudmodifiers() end}
 
 Ui:add_hud{
 	id = "notification",
 	active = function() return Ui.root == "play" end,
-	init = function() return Widgets.Hudnotification() end}
+	init = function() return Hudnotification() end}
 
 Ui:add_hud{
 	id = "target",
 	active = function() return Ui:get_state() == "play" end,
-	init = function() return Widgets.Hudtarget() end}
+	init = function() return Hudtarget() end}

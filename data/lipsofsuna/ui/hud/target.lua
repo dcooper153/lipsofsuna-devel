@@ -1,22 +1,34 @@
+--- HUD target action display widget.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module ui.hud.target
+-- @alias Hudtarget
+
 local Class = require("system/class")
 local Widget = require("system/widget")
 
-Widgets.Hudtarget = Class("Hudtarget", Widget)
+--- HUD target action display widget.
+-- @type Hudtarget
+local Hudtarget = Class("Hudtarget", Widget)
 
-Widgets.Hudtarget.new = function(clss)
+Hudtarget.new = function(clss)
 	local self = Widget.new(clss)
 	self.update_timer = 0
 	return self
 end
 
-Widgets.Hudtarget.reshaped = function(self)
+Hudtarget.reshaped = function(self)
 	local w = self:get_width()
 	local h = self:get_height()
 	self:canvas_clear()
 	Theme:draw_scene_text(self, self.text, 0, 0, w, h, 1)
 end
 
-Widgets.Hudtarget.update = function(self, secs)
+Hudtarget.update = function(self, secs)
 	-- Update periodically.
 	self.update_timer = self.update_timer + secs
 	if self.update_timer < 0.1 then return end
@@ -42,3 +54,5 @@ Widgets.Hudtarget.update = function(self, secs)
 	self:reshaped()
 	self:set_visible(true)
 end
+
+return Hudtarget

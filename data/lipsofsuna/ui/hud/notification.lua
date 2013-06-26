@@ -1,14 +1,26 @@
+--- HUD notification widget.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module ui.hud.notification
+-- @alias Hudnotification
+
 local Class = require("system/class")
 local Widget = require("system/widget")
 
-Widgets.Hudnotification = Class("Hudnotification", Widget)
+--- HUD notification widget.
+-- @type Hudnotification
+local Hudnotification = Class("Hudnotification", Widget)
 
-Widgets.Hudnotification.new = function(clss)
+Hudnotification.new = function(clss)
 	local self = Widget.new(clss)
 	return self
 end
 
-Widgets.Hudnotification.reshaped = function(self)
+Hudnotification.reshaped = function(self)
 	local w = Theme.text_height_1*10
 	self:calculate_request{
 		font = Theme.text_font_1,
@@ -32,7 +44,7 @@ Widgets.Hudnotification.reshaped = function(self)
 		text_font = Theme.text_font_1}
 end
 
-Widgets.Hudnotification.update = function(self, secs)
+Hudnotification.update = function(self, secs)
 	if not self:get_visible() then return end
 	if self.__text and self.timer < 5 then
 		-- Show.
@@ -49,14 +61,16 @@ Widgets.Hudnotification.update = function(self, secs)
 	end
 end
 
-Widgets.Hudnotification.get_text = function(self)
+Hudnotification.get_text = function(self)
 	return self.__text
 end
 
-Widgets.Hudnotification.set_text = function(self, v)
+Hudnotification.set_text = function(self, v)
 	if self.__text == v then return end
 	self.__text = v
 	self.timer = 0
 	self:reshaped()
 	self:set_visible(true)
 end
+
+return Hudnotification

@@ -1,12 +1,24 @@
+--- HUD status modifier list widget.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module ui.hud.modifiers
+-- @alias Hudmodifiers
+
 local Class = require("system/class")
 local Widget = require("system/widget")
 
-Widgets.Hudmodifiers = Class("Hudmodifiers", Widget)
+--- HUD status modifier list widget.
+-- @type Hudmodifiers
+local Hudmodifiers = Class("Hudmodifiers", Widget)
 
 --- Creates a new modifiers widget.
 -- @param clss Modifiers class.
 -- @return Modifiers widget.
-Widgets.Hudmodifiers.new = function(clss)
+Hudmodifiers.new = function(clss)
 	local self = Widget.new(clss)
 	self.dict_id = {}
 	self.dict_name = {}
@@ -18,7 +30,7 @@ end
 -- @param self Modifiers widget.
 -- @param name Modifier name.
 -- @param time Modifier duration.
-Widgets.Hudmodifiers.add = function(self, name, time)
+Hudmodifiers.add = function(self, name, time)
 	-- Special handling for light and plague.
 	if name == "light" then Client.lighting:set_light_spell(true) end
 	if name == "black haze" and not self.dict_name[name] then Client.effects:play("disease1") end
@@ -39,7 +51,7 @@ end
 --- Removes a modifier.
 -- @param self Modifiers widget.
 -- @param name Modifier name.
-Widgets.Hudmodifiers.remove = function(self, name)
+Hudmodifiers.remove = function(self, name)
 	local icon = self.dict_name[name]
 	if not icon then return end
 	-- Remove from dictionaries.
@@ -53,7 +65,7 @@ Widgets.Hudmodifiers.remove = function(self, name)
 	if name == "light" then Client.lighting:set_light_spell(false) end
 end
 
-Widgets.Hudmodifiers.reshaped = function(self)
+Hudmodifiers.reshaped = function(self)
 	local x = 0
 	local w = Theme.width_icon_1
 	local h = Theme.width_icon_1 + Theme.text_height_1
@@ -70,7 +82,7 @@ end
 --- Updates the modifiers.
 -- @param self Modifiers widget.
 -- @param secs Seconds since the last update.
-Widgets.Hudmodifiers.update = function(self, secs)
+Hudmodifiers.update = function(self, secs)
 	local len = #self.dict_id
 	if len == 0 then
 		self:set_visible(false)
@@ -90,3 +102,5 @@ Widgets.Hudmodifiers.update = function(self, secs)
 		self:reshaped()
 	end
 end
+
+return Hudmodifiers
