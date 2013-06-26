@@ -93,7 +93,7 @@ end
 Obstaclespec.get_use_actions = function(self)
 	local res = {}
 	for k,v in pairs(self.usages) do
-		local a = Actionspec:find{name = k}
+		local a = Actionspec:find_by_name(k)
 		if a then table.insert(res, a) end
 	end
 	return res

@@ -49,22 +49,10 @@ end
 Staticspec.get_use_actions = function(self)
 	local res = {}
 	for k,v in pairs(self.usages) do
-		local a = Actionspec:find{name = k}
+		local a = Actionspec:find_by_name(k)
 		if a then table.insert(res, a) end
 	end
 	return res
 end
 
---- Gets the use actions applicable to the static.
--- @param self Static spec.
--- @return List of actions specs.
-Staticspec.get_use_actions = function(self)
-	local res = {}
-	for k,v in pairs(self.usages) do
-		local a = Actionspec:find{name = k}
-		if a then table.insert(res, a) end
-	end
-	return res
-end
-
-
+return Staticspec

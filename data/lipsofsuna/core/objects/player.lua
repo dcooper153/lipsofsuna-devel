@@ -36,7 +36,7 @@ end
 Player.attack_charge_start = function(self, left)
 	-- Cancel the existing charge.
 	if self.attack_charge_anim then
-		local action = Actionspec:find{name = self.attack_charge_anim}
+		local action = Actionspec:find_by_name(self.attack_charge_anim)
 		if action and action.charge_cancel then
 			action.charge_cancel(self)
 		else
@@ -53,7 +53,7 @@ Player.attack_charge_start = function(self, left)
 		if not name then return end
 	end
 	-- Start charging the action.
-	local action = Actionspec:find{name = name}
+	local action = Actionspec:find_by_name(name)
 	if not action then return end
 	if not action.charge_start then return end
 	action.charge_start(self)
@@ -64,7 +64,7 @@ Player.attack_charge_end = function(self)
 	local name = self.attack_charge_anim
 	if not name then return end
 	-- Finish charging the action.
-	local action = Actionspec:find{name = name}
+	local action = Actionspec:find_by_name(name)
 	if not action then return self:attack_charge_cancel() end
 	if not action.charge_end then return self:attack_charge_cancel() end
 	action.charge_end(self)

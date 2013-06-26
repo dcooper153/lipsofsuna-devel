@@ -24,7 +24,7 @@ Main.messaging:register_message{
 		if not player:can_reach_object(object) then return end
 		-- Validate the action.
 		if not object.spec.usages[action] then return end
-		action = Actionspec:find{name = action}
+		action = Actionspec:find_by_name(action)
 		if not action then return end
 		if not action.func then return end
 		-- Perform the action.
