@@ -84,7 +84,6 @@ Player.set_client = function(self, client)
 	self.vision:set_cone_angle(math.pi/2.5)
 	self.vision:set_enabled(true)
 	self.vision.object = self
-	self.vision:set_radius(10)
 	self.vision.callback = function(args) self:vision_cb(args) end
 	self.vision.terrain = {}
 	self:update_vision_radius()
@@ -316,6 +315,7 @@ end
 Player.update_vision_radius = function(self)
 	self.vision:set_direction(Vector(0,0,-1):transform(self:get_rotation()))
 	self.vision:set_position(self:get_position())
+	self.vision:set_radius(50)
 end
 
 Player.vision_cb = function(self, args)

@@ -18,7 +18,7 @@ Itemspec{
 	name = "arrow",
 	categories = {["arrow"] = true},
 	influences = {["physical damage"] = 5},
-	gravity_projectile = Vector(0,-8,0),
+	gravity_projectile = Vector(0,-1,0),
 	icon = "arrow1",
 	mass = 1,
 	mass_inventory = 0.1,

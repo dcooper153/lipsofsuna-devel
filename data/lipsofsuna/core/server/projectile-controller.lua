@@ -39,7 +39,7 @@ ProjectileController.attach = function(self)
 	-- Set the projectile controls.
 	self.projectile.controller = self
 	self.projectile.physics:set_gravity(self.projectile.spec.gravity_projectile)
-	self.projectile.speedline = speedline
+	self.projectile.speedline = self.speedline
 	-- Add the projectile to the world.
 	local src,dst = self.attacker:get_attack_ray()
 	self.projectile:detach()
