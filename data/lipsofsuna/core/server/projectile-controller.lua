@@ -44,11 +44,9 @@ ProjectileController.attach = function(self)
 	local src,dst = self.attacker:get_attack_ray()
 	self.projectile:detach()
 	self.projectile:set_position(src)
-	if self.attacker.tilt then
-		self.projectile:set_rotation(self.attacker:get_rotation() * self.attacker.tilt)
-	else
-		self.projectile:set_rotation(self.attacker:get_rotation():copy())
-	end
+	local rot = self.attacker:get_rotation():copy()
+	if self.attacker.tilt then rot:concat(self.attacker.tilt) end
+	self.projectile:set_rotation(rot)
 	self.projectile:set_velocity(dst:subtract(src):normalize():multiply(self.speed))
 	self.projectile:set_visible(true)
 	-- Enable the destruction timer or contact events.
