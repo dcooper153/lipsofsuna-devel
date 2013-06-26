@@ -9,6 +9,7 @@
 -- @alias Arena
 
 local Class = require("system/class")
+local Item = require("core/objects/item")
 local Physics = require("system/physics")
 local Obstacle = require("core/objects/obstacle")
 local Player = require("core/objects/player")
@@ -81,7 +82,14 @@ Arena.update = function(self, secs)
 		self.button:set_spec(Obstaclespec:find_by_name("arena button"))
 		self.button:set_position(Vector(505,100.5,500))
 		self.button:set_visible(true)
-		self.button.render:init(self.player)
+		self.button.render:init(self.button)
+
+		local chest = Item(Main.objects)
+		chest:set_spec(Itemspec:find_by_name("arena chest"))
+		chest:set_position(Vector(500,100.1,505))
+		chest:randomize()
+		chest:set_visible(true)
+		chest.render:init(chest)
 	end
 	-- Update lighting.
 	Client.lighting:update(secs)

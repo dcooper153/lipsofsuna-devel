@@ -5,5 +5,24 @@
 		"model": "chest1",
 		"dialog": "arena button",
 		"usages": {"examine": true}
+	},
+	{
+		"type": "Itemspec",
+		"name": "arena chest",
+		"model": "chest1",
+		"inventory_size": 10,
+		"inventory_type": "chest",
+		"inventory_items":
+		{
+			"arrow": 100,
+			"iron sword": 1,
+			"wooden bow": 1,
+			"wooden crossbow": 1,
+		},
+		"stacking": false,
+		"usages":
+		{
+			"loot": true
+		}
 	}
 ]

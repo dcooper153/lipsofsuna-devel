@@ -121,12 +121,19 @@ end
 --- Randomizes the item.
 -- @param self Item.
 Item.randomize = function(self)
+	-- Get the item spec.
+	local spec = self:get_spec()
+	if not spec then return end
 	-- Create static loot.
 	if self.inventory:get_size() > 0 then
 		for k,v in pairs(spec.inventory_items) do
-			local item = Item(self.manager)
-			item:set_spec(Itemspec:find_by_name(v))
-			self.inventory:merge_object(item)
+			local ispec = Itemspec:find_by_name(k)
+			if ispec then
+				local item = Item(self.manager)
+				item:set_spec(ispec)
+				item:set_count(v)
+				self.inventory:merge_object(item)
+			end
 		end
 	end
 	-- Create random loot.
