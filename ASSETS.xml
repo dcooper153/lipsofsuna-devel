@@ -1462,6 +1462,7 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
   </asset>
 
   <asset>
+    <file>data/lipsofsuna/arena/spelltable1.lmdl</file>
     <file>data/lipsofsuna/environment/furniture/shelf1.lmdl</file>
     <file>data/lipsofsuna/environment/furniture/shelf1.png</file>
     <file>data/lipsofsuna/environment/obelisk/obelisk1.lmdl</file>
@@ -1499,38 +1500,39 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
     <file>data/lipsofsuna/regions/keepersofknowledge/turret1.lmdl</file>
     <file>data/lipsofsuna/regions/keepersofknowledge/turret1.png</file>
     <file>data/lipsofsuna/regions/keepersofknowledge/turret1-*.lani</file>
-    <file>import/obelisk1.blend</file>
-    <file>import/obelisk1.png</file>
     <file>import/apple1.blend</file>
     <file>import/apple1.png</file>
     <file>import/bread1.blend</file>
     <file>import/bread1.png</file>
     <file>import/bread2.blend</file>
     <file>import/bread2.png</file>
+    <file>import/bowl1.png</file>
     <file>import/cheese1.blend</file>
     <file>import/cheese1.png</file>
+    <file>import/cookedmeat1.png</file>
+    <file>import/egg1.blend</file>
+    <file>import/lantern1.blend</file>
+    <file>import/lantern1.png</file>
+    <file>import/meat1.blend</file>
+    <file>import/meat2.blend</file>
+    <file>import/milkypowder1.blend</file>
+    <file>import/milkypowder1.png</file>
+    <file>import/obelisk1.blend</file>
+    <file>import/obelisk1.png</file>
     <file>import/orange1.blend</file>
     <file>import/orange1.png</file>
     <file>import/orange1n.png</file>
-    <file>import/ricebowl1.blend</file>
-    <file>import/bowl1.png</file>
-    <file>import/rice1.png</file>
-    <file>import/meat1.blend</file>
-    <file>import/meat2.blend</file>
-    <file>import/cookedmeat1.png</file>
     <file>import/rawmeat1.png</file>
-    <file>import/egg1.blend</file>
+    <file>import/rice1.png</file>
+    <file>import/ricebowl1.blend</file>
+    <file>import/shelf1.blend</file>
+    <file>import/shelf1.png</file>
+    <file>import/spelltable1.blend</file>
+    <file>import/turret1.blend</file>
+    <file>import/turret1.png</file>
     <file>import/watermelon1.blend</file>
     <file>import/watermelon1.png</file>
     <file>import/watermelonleaf1.png</file>
-    <file>import/milkypowder1.blend</file>
-    <file>import/milkypowder1.png</file>
-    <file>import/shelf1.blend</file>
-    <file>import/shelf1.png</file>
-    <file>import/lantern1.blend</file>
-    <file>import/lantern1.png</file>
-    <file>import/turret1.blend</file>
-    <file>import/turret1.png</file>
     <author>Renoki</author>
     <license>Creative Commons BY-SA 3.0</license>
   </asset>

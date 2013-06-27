@@ -90,6 +90,12 @@ Arena.update = function(self, secs)
 		chest:randomize()
 		chest:set_visible(true)
 		chest.render:init(chest)
+
+		local spelltable = Obstacle(Main.objects)
+		spelltable:set_spec(Obstaclespec:find_by_name("spell table"))
+		spelltable:set_position(Vector(500,100.1,495))
+		spelltable:set_visible(true)
+		spelltable.render:init(chest)
 	end
 	-- Update lighting.
 	Client.lighting:update(secs)

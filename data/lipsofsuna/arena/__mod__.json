@@ -8,6 +8,10 @@
 			"long": "--arena"
 		}
 	],
+	"mods":
+	[
+		["load", "arena/spelltable"]
+	],
 	"server": false,
 	"scripts": ["main", "action-melee"],
 	"specs": ["dialogs", "specs"]
