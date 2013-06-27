@@ -9,6 +9,9 @@ Actionspec{
 		action.time = 0
 		action.duration = action.object.spec.timing_attack_melee * 0.02
 		-- Choose the weapon sweep path.
+		if not move then
+			move = Main.combat_utils:get_melee_move_of_actor(action.object)
+		end
 		local paths = {
 			["stand"] = {Vector(0.1, 0, 0.75), Vector(-0.1, 0, 0.5), Vector(0.05, 0, 0.25), Vector(-0.05, 0, 0)},
 			["left"] = {Vector(0.5, 0.1, 1), Vector(0.25, 0.05, 0.7), Vector(0, 0, 0.5), Vector(-0.25, 0, 0.7)},

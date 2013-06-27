@@ -1,11 +1,3 @@
-local choose_move = function(attacker)
-	if attacker:get_strafing() < -0.2 then return "left"
-	elseif attacker:get_strafing() > 0.2 then return "right"
-	elseif attacker:get_movement() < -0.2 then return "back"
-	elseif attacker:get_movement() > 0.2 then return "front"
-	else return "stand" end
-end
-
 Actionspec{
 	name = "attack",
 	start = function(action)
@@ -24,7 +16,7 @@ Actionspec{
 		local finish = Actionspec:find_by_name("melee")
 		if not finish then return end
 		-- Start the charge animation.
-		local move = choose_move(action.object)
+		local move = Main.combat_utils:get_melee_move_of_actor(action.object)
 		action.object:animate("charge " .. move, true)
 		-- Enable effect-over-time updates.
 		action.finish_action = finish

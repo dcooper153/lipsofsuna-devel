@@ -269,8 +269,10 @@ Feat.perform = function(self, args)
 	if not info or anim.toggle or not args.stop then
 		args.weapon = weapon
 		if anim then
-			local a = Actionspec:find_by_name(anim.action)
-			if a then move = a.func(self, info, args) end
+			local a = args.user:action(anim.action)
+			if a then
+				a.finish = true
+			end
 		end
 		if self.func then self:func(args) end
 	end

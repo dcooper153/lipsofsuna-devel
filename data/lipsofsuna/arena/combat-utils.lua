@@ -140,4 +140,22 @@ CombatUtils.get_item_equip_value = function(self, actor, item)
 	return score
 end
 
+--- Gets the name of the directional melee move for the actor.
+-- @param self CombatUtils.
+-- @param actor Actor.
+-- @return String.
+CombatUtils.get_melee_move_of_actor = function(self, actor)
+	if actor:get_strafing() < -0.2 then
+		return "left"
+	elseif actor:get_strafing() > 0.2 then
+		return "right"
+	elseif actor:get_movement() < -0.2 then
+		return "back"
+	elseif actor:get_movement() > 0.2 then
+		return "front"
+	else
+		return "stand"
+	end
+end
+
 return CombatUtils

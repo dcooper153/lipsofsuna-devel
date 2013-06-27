@@ -54,6 +54,7 @@ end
 -- @param self Object.
 -- @param name Action name.
 -- @param ... Action specific arguments.
+-- @return Action if created an effect-over-time one. Nil otherwise.
 SimulationObject.action = function(self, name, ...)
 	-- Find the action spec.
 	local spec = Actionspec:find_by_name(name)
@@ -68,6 +69,7 @@ SimulationObject.action = function(self, name, ...)
 	else
 		self.actions[action] = true
 	end
+	return action
 end
 
 --- Handles physics contacts.
