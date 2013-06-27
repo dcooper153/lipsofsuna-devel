@@ -1,4 +1,5 @@
 {
 	"resources": ["."],
+	"scripts": ["action"],
 	"specs": ["specs"]
 }

@@ -14,12 +14,17 @@ Main.messaging:register_message{
 		return {value}
 	end,
 	client_to_server_handle = function(self, client, value)
+		-- Find the player.
 		local player = Server:get_player_by_client(client)
 		if not player then return end
 		if player.dead then return end
+		-- Perform the action.
 		if value then
-			player:attack_charge_start(true)
+			player:action("block")
 		else
-			player:attack_charge_end(true)
+			local action = player:find_action_by_name("block")
+			if action then
+				action.finish = true
+			end
 		end
 	end}

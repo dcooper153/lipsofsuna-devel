@@ -13,6 +13,6 @@
 		["load", "arena/spelltable"]
 	],
 	"server": false,
-	"scripts": ["main", "action-melee"],
+	"scripts": ["main", "action-attack", "action-melee", "action-ranged-spell"],
 	"specs": ["dialogs", "specs"]
 }

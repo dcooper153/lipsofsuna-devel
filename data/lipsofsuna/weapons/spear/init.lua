@@ -8,7 +8,7 @@ CraftingRecipeSpec{
 
 Itemspec{
 	name = "iron spear",
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	categories = {["melee"] = true, ["weapon"] = true},
 	effect_attack_speedline = true,
 	icon = "staff1", --FIXME

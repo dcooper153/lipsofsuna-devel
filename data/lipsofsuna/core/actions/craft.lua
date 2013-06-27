@@ -1,20 +1,20 @@
 Actionspec{
 	name = "craft alchemy",
 	label = "Alchemy",
-	func = function(self, user)
-		user:set_crafting_device(self, "alchemy")
+	start = function(action, device)
+		action.object:set_crafting_device(device, "alchemy")
 	end}
 
 Actionspec{
 	name = "craft metal",
 	label = "Blacksmith",
-	func = function(self, user)
-		user:set_crafting_device(self, "metal")
+	start = function(action, device)
+		action.object:set_crafting_device(device, "metal")
 	end}
 
 Actionspec{
 	name = "craft wood",
 	label = "Woodcraft",
-	func = function(self, user)
-		user:set_crafting_device(self, "wood")
+	start = function(action, device)
+		action.object:set_crafting_device(device, "wood")
 	end}

@@ -9,7 +9,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "adamantium sword",
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default two-handed equipped"},
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
@@ -28,7 +28,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "aquanite sword",
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default sword equipped"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
@@ -49,7 +49,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "crimson sword",
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default sword equipped"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
@@ -70,7 +70,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "iron sword",
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default sword equipped"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
@@ -91,7 +91,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "stone sword",
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default sword equipped"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
@@ -112,7 +112,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "wooden sword",
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default sword equipped"},
 	damage_mining = 1,
 	effect_attack_speedline = true,

@@ -9,7 +9,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "adamantium mattock",
 	categories = {["mattock"] = true, ["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default axe equipped"},
 	description = "A high quality mattock used to mine ores",
 	icon = "mattock1",
@@ -29,7 +29,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "aquanite mattock",
 	categories = {["mattock"] = true, ["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default axe equipped"},
 	description = "A high quality mattock used to mine ores",
 	damage_mining = 1,
@@ -50,7 +50,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "crimson mattock",
 	categories = {["mattock"] = true, ["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default axe equipped"},
 	description = "A high quality mattock used to mine ores",
 	damage_mining = 1,
@@ -71,7 +71,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "iron mattock",
 	categories = {["mattock"] = true, ["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default axe equipped"},
 	description = "A medium quality mattock used to mine ores",
 	damage_mining = 1,
@@ -92,7 +92,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "stone mattock",
 	categories = {["mattock"] = true, ["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default axe equipped"},
 	description = "A low quality mattock used to mine ores",
 	damage_mining = 1,
@@ -113,7 +113,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "wooden mattock",
 	categories = {["mattock"] = true, ["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default axe equipped"},
 	damage_mining = 1,
 	description = "A low quality mattock used to mine ores",

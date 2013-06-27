@@ -1,9 +1,9 @@
 Actionspec{
 	name = "teleport",
 	label = "Teleport",
-	func = function(self, user)
+	start = function(action, object)
 		if not Main.dialogs then return end
-		if Main.dialogs:execute(self, user) then
-			Main.messaging:server_event("object dialog", user.client, self:get_id())
+		if Main.dialogs:execute(object, action.object) then
+			Main.messaging:server_event("object dialog", action.object.client, object:get_id())
 		end
 	end}

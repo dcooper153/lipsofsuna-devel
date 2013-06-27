@@ -17,6 +17,6 @@ end
 
 Actionspec{
 	name = "turret fire",
-	func = function(feat, info, args)
-		perform_attack(args.user)
+	start = function(action)
+		perform_attack(action.object)
 	end}

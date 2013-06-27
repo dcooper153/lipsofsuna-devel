@@ -206,6 +206,19 @@ SimulationObject.effect = function(self, args)
 	Server:object_event(self, "object-effect", {effect = args.effect})
 end
 
+--- Finds an action by name.
+-- @param self Object.
+-- @param name Action name.
+-- @return Action if found. Nil otherwise.
+SimulationObject.find_action_by_name = function(self, name)
+	if not self.actions then return end
+	for k in pairs(self.actions) do
+		if k.spec.name == name then
+			return k
+		end
+	end
+end
+
 --- Fires or throws the object.
 -- @param self Object.
 -- @param args Arguments.<ul>
@@ -377,6 +390,7 @@ SimulationObject.merge = function(self, object)
 end
 
 SimulationObject.purge = function(self)
+	if not Server.object_database then return end
 	Server.object_database:delete_object(self)
 end
 

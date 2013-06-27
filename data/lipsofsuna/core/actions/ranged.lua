@@ -4,48 +4,24 @@ local ProjectileController = require("core/server/projectile-controller")
 
 Actionspec{
 	name = "ranged",
-	charge_start = function(user)
-		-- Check for weapon and ammo.
-		local weapon,ammo = Main.combat_utils:count_ranged_ammo_of_actor(user)
-		if not ammo or ammo == 0 then
-			if weapon then user:send_message("You have no ammo left.") end
-			return
-		end
-		-- Start charging.
-		user:animate("charge stand", true)
-		user.attack_charge = Program:get_time()
-		user.attack_charge_anim = "ranged"
-	end,
-	charge_end = function(user)
-		user:attack_charge_cancel()
-		user:action("ranged")
-		user.auto_attack = nil
-		user.cooldown = (user.cooldown or 0) + 1
-	end,
-	charge_cancel = function(user)
-		user:attack_charge_cancel(true)
-		user.auto_attack = nil
-		user.cooldown = math.max(user.cooldown or 0, 0.3)
-	end,
-	func = function(feat, info, args)
-		args.user:action("ranged")
-	end,
-
 	start = function(action)
 		-- Check for weapon and ammo.
 		local weapon,ammo = Main.combat_utils:count_ranged_ammo_of_actor(action.object)
 		if not ammo or ammo == 0 then
 			if weapon then action.object:send_message("You have no ammo left.") end
-			action.object:attack_charge_cancel(true)
+			action.object.cooldown = 0.4
+			action.object:animate("charge cancel")
 			return
 		end
-		-- Enable effect-over-time.
+		-- Enable effect-over-time updates.
 		action.weapon = weapon
 		action.delay = (weapon.spec.timings["fire"] or 0) * 0.02
 		action.time = 0
 		return true
 	end,
 	update = function(action, secs)
+		-- TODO: Wait for charge end.
+		action.object.cooldown = 1
 		-- Wait for the launch.
 		action.time = action.time + secs
 		if action.time < action.delay then return true end
@@ -53,7 +29,8 @@ Actionspec{
 		local weapon,ammo = Main.combat_utils:split_ranged_ammo_of_actor(action.object)
 		if not ammo then
 			if weapon then action.object:send_message("You have no ammo left.") end
-			action.object:attack_charge_cancel(true)
+			action.object.cooldown = 0.4
+			action.object:animate("charge cancel")
 			return
 		end
 		-- Play the attack effect.

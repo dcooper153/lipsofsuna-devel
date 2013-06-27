@@ -1,6 +1,7 @@
 Actionspec{
 	name = "loot",
 	label = "Loot",
-	func = function(self, user)
-		self:loot(user)
+	start = function(action, item)
+		if not item then return end
+		item:loot(action.object)
 	end}

@@ -18,18 +18,13 @@ Main.messaging:register_message{
 		local player = Server:get_player_by_client(client)
 		if not player then return end
 		if player.dead then return end
-		-- Handle auto-attack.
+		-- Perform the action.
 		if value then
-			player.auto_attack = true
+			player:action("attack")
 		else
-			player.auto_attack = nil
-		end
-		-- Handle attack start and stop.
-		if value and player.attack_charge then return end
-		if not value and not player.attack_charge then return end
-		if value then
-			player:attack_charge_start()
-		else
-			player:attack_charge_end()
+			local action = player:find_action_by_name("attack")
+			if action then
+				action.finish = true
+			end
 		end
 	end}

@@ -33,50 +33,6 @@ Player.new = function(clss, manager, id)
 	return self
 end
 
-Player.attack_charge_start = function(self, left)
-	-- Cancel the existing charge.
-	if self.attack_charge_anim then
-		local action = Actionspec:find_by_name(self.attack_charge_anim)
-		if action and action.charge_cancel then
-			action.charge_cancel(self)
-		else
-			self:attack_charge_cancel()
-		end
-	end
-	-- Prevent during the cooldown.
-	if self.cooldown then return end
-	-- Get the action name.
-	local name = left and "block" or "right melee"
-	local weapon = self:get_weapon()
-	if weapon then
-		name = weapon.spec.actions[left and "left" or "right"]
-		if not name then return end
-	end
-	-- Start charging the action.
-	local action = Actionspec:find_by_name(name)
-	if not action then return end
-	if not action.charge_start then return end
-	action.charge_start(self)
-end
-
-Player.attack_charge_end = function(self)
-	-- Get the action name.
-	local name = self.attack_charge_anim
-	if not name then return end
-	-- Finish charging the action.
-	local action = Actionspec:find_by_name(name)
-	if not action then return self:attack_charge_cancel() end
-	if not action.charge_end then return self:attack_charge_cancel() end
-	action.charge_end(self)
-end
-
-Player.attack_charge_cancel = function(self, animate)
-	if animate then self:animate("charge cancel") end
-	self.attack_charge = nil
-	self.attack_charge_anim = nil
-	self.attack_charge_move = nil
-end
-
 Player.set_client = function(self, client)
 	self.client = client
 	self.vision = Vision(self:get_id(), self.manager)

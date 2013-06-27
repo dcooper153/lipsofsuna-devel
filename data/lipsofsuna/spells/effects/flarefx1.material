@@ -1,16 +1,37 @@
+pass flarefx1/alpha
+{
+	lighting off
+	scene_blend add
+	depth_write off
+	texture_unit
+	{
+		texture flare1.png
+	}
+}
+
 material flarefx1
 {
+	receive_shadows off
 	technique
 	{
-		pass
+		scheme mrt
+	}
+	technique
+	{
+		scheme srt_color
+		pass : flarefx1/alpha
 		{
-			lighting off
-			scene_blend add
-			depth_write off
-			texture_unit
-			{
-				texture flare1.png
-			}
+		}
+	}
+	technique
+	{
+		scheme srt_depth
+	}
+	technique
+	{
+		scheme fixed
+		pass : flarefx1/alpha
+		{
 		}
 	}
 }

@@ -9,7 +9,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "adamantium dagger",
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	effect_attack_speedline = true,
 	icon = "dagger1",
 	influences = {["physical damage"] = 10},
@@ -28,7 +28,7 @@ Itemspec{
 	name = "aquanite dagger",
 	model = "dagger1", -- FIXME
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
@@ -47,7 +47,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "crimson dagger",
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
@@ -67,7 +67,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "iron dagger",
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
@@ -87,7 +87,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "stone dagger",
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
@@ -107,7 +107,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "wooden dagger",
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",

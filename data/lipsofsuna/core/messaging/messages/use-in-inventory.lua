@@ -26,9 +26,6 @@ Main.messaging:register_message{
 		if not object then return end
 		-- Validate the action.
 		if not object.spec.usages[action] then return end
-		action = Actionspec:find_by_name(action)
-		if not action then return end
-		if not action.func then return end
 		-- Perform the action.
-		action.func(object, player)
+		player:action(action, object)
 	end}

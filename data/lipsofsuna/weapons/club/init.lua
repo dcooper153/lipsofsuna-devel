@@ -9,7 +9,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "wooden club",
 	categories = {["melee"] = true, ["weapon"] = true},
-	actions = {["right"] = "right melee", ["left"] = "block weapon"},
+	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 100,
