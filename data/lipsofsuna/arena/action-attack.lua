@@ -48,9 +48,6 @@ Actionspec{
 		return true
 	end,
 	update = function(action, secs)
-		-- Increase the charge.
-		action.charge_value = action.charge_value + secs
-		action.object.cooldown = 1
 		-- Check for cancel.
 		if action.cancel then
 			action.object.cooldown = 0.4
@@ -64,5 +61,7 @@ Actionspec{
 			return
 		end
 		-- Continue charging.
+		action.charge_value = action.charge_value + secs
+		action.object.cooldown = 1
 		return true
 	end}

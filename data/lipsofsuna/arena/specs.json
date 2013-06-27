@@ -18,7 +18,8 @@
 			"iron sword": 1,
 			"wooden bow": 1,
 			"wooden crossbow": 1,
-			"spellbook of fireball": 1
+			"spellbook of fireball": 1,
+			"crimson grenade": 100
 		},
 		"stacking": false,
 		"usages":

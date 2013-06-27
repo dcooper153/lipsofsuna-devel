@@ -22,7 +22,10 @@ Main.messaging:register_message{
 		if value then
 			player:action("attack")
 		else
-			local action = player:find_action_by_name("attack")
+			-- FIXME: Ugly
+			local action =
+				player:find_action_by_name("attack") or
+				player:find_action_by_name("throw")
 			if action then
 				action.finish = true
 			end
