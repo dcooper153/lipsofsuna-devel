@@ -6,21 +6,6 @@ local choose_move = function(attacker)
 	else return "stand" end
 end
 
---[[
-Actionspec{
-	name = "block",
-	start = function(action)
-		-- Prevent during cooldown.
-		if action.object.cooldown then return end
-		-- Get the action name.
-		local name = left and "block" or "attack"
-		local weapon = self:get_weapon()
-		if weapon then
-			name = weapon.spec.actions[left and "left" or "right"]
-			if not name then return end
-		end
-]]
-
 Actionspec{
 	name = "attack",
 	start = function(action)
