@@ -13,6 +13,11 @@
 		"type": "Actorspec",
 		"name": "aer",
 		"base": "race",
+		"actions":
+		{
+			"left": "block",
+			"right": "attack"
+		},
 		"effect_falling_damage": "aerhurt1",
 		"equipment_class": "aer",
 		"eye_style": "random",

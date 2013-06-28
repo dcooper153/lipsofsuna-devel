@@ -31,7 +31,7 @@ Actionspec{
 			return
 		end
 		-- Check for charge finish.
-		if action.finish then
+		if not action.object.control_right then
 			-- Wait for the release delay.
 			action.timer = action.timer + secs
 			if action.timer < action.delay then return true end

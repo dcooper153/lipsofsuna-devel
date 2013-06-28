@@ -634,17 +634,11 @@ Actor.update_actions = function(self, secs)
 		end
 	end
 	-- Update feat cooldown.
-	if self.blocking then self.cooldown = self.spec.blocking_cooldown end
 	if self.cooldown then
 		self.cooldown = self.cooldown - secs
 		if self.cooldown <= 0 then
 			self.cooldown = nil
 		end
-	end
-	-- Update auto-attack.
-	if self.auto_attack and not self.cooldown and not self.attack_charge then
-		self:attack_charge_start()
-		self:attack_charge_end()
 	end
 	-- Check for falling damage.
 	-- Don't update every frame.

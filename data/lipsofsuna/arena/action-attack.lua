@@ -3,14 +3,11 @@ Actionspec{
 	start = function(action)
 		-- Prevent during cooldown.
 		if action.object.cooldown then return end
-		-- Trigger special weapon actions.
-		local weapon = action.object:get_weapon()
-		if weapon then
-			name = weapon.spec.actions["right"]
-			if name and name ~= "attack" then
-				action.object:action(name)
-				return
-			end
+		-- Trigger special actions.
+		local special = Main.combat_utils:get_combat_action_for_actor(action.object, "right")
+		if special and special.name ~= "attack" then
+			action.object:action(special.name)
+			return
 		end
 		-- Find the finish action.
 		local finish = Actionspec:find_by_name("melee")
@@ -32,7 +29,7 @@ Actionspec{
 			return
 		end
 		-- Check for charge finish.
-		if action.finish then
+		if not action.object.control_right then
 			action.object.cooldown = 0.8
 			action.object:action(action.finish_action.name, action.charge_move, action.charge_value)
 			return

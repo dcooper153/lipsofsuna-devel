@@ -3,22 +3,19 @@ Actionspec{
 	start = function(action)
 		-- Prevent during cooldown.
 		if action.object.cooldown then return end
-		-- Trigger special weapon actions.
-		local weapon = action.object:get_weapon()
-		if weapon then
-			local name = weapon.spec.actions["right"]
-			if name then
-				action.object:action(name)
-				return
-			end
+		-- Trigger special actions.
+		local special = Main.combat_utils:get_combat_action_for_actor(action.object, "left")
+		if special and special.name ~= "block" then
+			action.object:action(special.name)
+			return
 		end
 		-- Enable the blocking mode.
 		action.object:set_block(true)
 		return true
 	end,
 	update = function(action, secs)
-		action.object.cooldown = 0.3
-		if action.cancel or action.finish then
+		action.object.cooldown = action.object.spec.blocking_cooldown
+		if action.cancel or not action.object.control_left then
 			action.object:set_block(false)
 			return
 		end

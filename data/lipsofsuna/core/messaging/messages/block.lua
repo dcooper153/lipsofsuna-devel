@@ -18,13 +18,13 @@ Main.messaging:register_message{
 		local player = Server:get_player_by_client(client)
 		if not player then return end
 		if player.dead then return end
+		-- Store the control state.
+		player.control_left = value and true or nil
 		-- Perform the action.
 		if value then
-			player:action("block")
-		else
-			local action = player:find_action_by_name("block")
+			local action = Main.combat_utils:get_combat_action_for_actor(player, "left")
 			if action then
-				action.finish = true
+				player:action(action.name)
 			end
 		end
 	end}

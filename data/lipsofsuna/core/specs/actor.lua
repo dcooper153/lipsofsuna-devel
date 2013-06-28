@@ -48,6 +48,7 @@ Actorspec.introspect = Introspect{
 		{name = "aim_ray_center", type = "vector", default = Vector(0,1), description = "Center vector of the aim ray."},
 		{name = "aim_ray_end", type = "number", default = 5, description = "Aim ray end distance."},
 		{name = "aim_ray_start", type = "number", default = 0.1, description = "Aim ray start distance."},
+		{name = "actions", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of actions the object performs when wielded.", details = {values = {spec = "Actionspec"}}},
 		{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation profiles.", details = {values = {spec = "AnimationProfileSpec"}}},
 		{name = "blocking_armor", type = "number", default = 0.5, description = "How much armor class blocking offsers."},
 		{name = "blocking_cooldown", type = "number", default = 0.4, description = "Time in seconds how long it takes to leave the blocking stance."},

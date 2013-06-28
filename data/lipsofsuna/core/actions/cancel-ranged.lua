@@ -1,5 +1,8 @@
 Actionspec{
 	name = "cancel ranged",
-	charge_start = function(user)
-		user:attack_charge_cancel(true)
+	start = function(action)
+		local ranged = action.object:find_action_by_name("ranged")
+		if ranged then
+			ranged.cancel = true
+		end
 	end}

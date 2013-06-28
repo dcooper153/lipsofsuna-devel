@@ -92,6 +92,34 @@ CombatUtils.get_actor_attack_point = function(self, actor, position)
 	return actor:transform_local_to_global(ctr + tip)
 end
 
+--- Gets the combat action for the weapon of the actor or the actor itself.
+-- @param self CombatUtils.
+-- @param actor Actor.
+-- @param hand Hand name.
+-- @return Action spec if found. Nil otherwise.
+CombatUtils.get_combat_action_for_actor = function(self, actor, hand)
+	-- Check for weapon actions.
+	local action = self:get_weapon_action_for_actor(actor, hand)
+	if action then return action end
+	-- Check for actor actions.
+	local name = actor.spec.actions[hand]
+	if not name then return end
+	return Actionspec:find_by_name(name)
+end
+
+--- Gets the combat action for the weapon of the actor.
+-- @param self CombatUtils.
+-- @param actor Actor.
+-- @param hand Hand name.
+-- @return Action spec if found. Nil otherwise.
+CombatUtils.get_weapon_action_for_actor = function(self, actor, hand)
+	local weapon = actor:get_weapon()
+	if not weapon then return end
+	local name = weapon.spec.actions[hand]
+	if not name then return end
+	return Actionspec:find_by_name(name)
+end
+
 --- Calculates the armor class of the item.
 -- @param self CombatUtils.
 -- @param item Item.
