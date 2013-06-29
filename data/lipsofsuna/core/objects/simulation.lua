@@ -226,7 +226,6 @@ end
 -- @param args Arguments.<ul>
 --   <li>charge: Charge time of the attack.</li>
 --   <li>collision: Trigger at collision.</li>
---   <li>feat: Feat.</li>
 --   <li>owner: Object firing the projectile.</li>
 --   <li>speed: Initial speed.</li>
 --   <li>speedline: True if the object should have a speed line effect.</li>
@@ -234,7 +233,7 @@ end
 --   <li>weapon: Used weapon.</ul>
 -- @return True on success.
 SimulationObject.fire = function(self, args)
-	if not args.owner or not args.feat then return end
+	if not args.owner then return end
 	-- Enable collision callback.
 	if args.collision then
 		self.contact_args = args

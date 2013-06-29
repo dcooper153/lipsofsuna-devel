@@ -66,6 +66,7 @@ Skills.calculate_attributes = function(self)
 		melee = 1,
 		ranged = 1,
 		speed = 0.5,
+		spell_damage = 1,
 		view_distance = 32}
 	for k,v in pairs(self.skills) do
 		local skill = Skillspec:find{name = k}
@@ -106,6 +107,18 @@ Skills.calculate_damage_multiplier_for_itemspec = function(self, spec)
 	return mult
 end
 
+-- Calculates the damage multiplier for spells.<br/>
+--
+-- The damage multiplier depends on the active skills only. More specifically,
+-- the value of the "spell_damage" attribute determines it.
+--
+-- @param self Skills.
+-- @return Number.
+Skills.calculate_damage_multiplier_for_spells = function(self)
+	local attr = self:calculate_attributes()
+	return attr["spell_damage"] or 1
+end
+
 -- Calculates the damage multiplier for unarmed attacks.<br/>
 --
 -- The damage multiplier depends on the active skills only. More specifically,
@@ -113,7 +126,7 @@ end
 --
 -- @param self Skills.
 -- @return Number.
-Skills.calculate_damage_multiplier_for_unarmed = function(self, item)
+Skills.calculate_damage_multiplier_for_unarmed = function(self)
 	local attr = self:calculate_attributes()
 	return attr["unarmed"] or 1
 end

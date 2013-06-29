@@ -9,7 +9,7 @@
 -- @alias Combat
 
 local Class = require("system/class")
-local Damage = require("core/server/damage")
+local Damage = require("arena/damage") --FIXME
 local Item = require("core/objects/item")
 
 --- Damage calculation and applying helpers.
@@ -140,11 +140,9 @@ end
 -- @param tile Hit tile, or nil.
 -- @return True if the effect is still alive.
 Combat.apply_ranged_spell_impact = function(self, attacker, projectile, effect, point, defender, tile)
-	-- Find the effect spec.
-	local espec = Feateffectspec:find{name = effect}
-	if not espec then return end
 	-- Calculate the damage.
-	local damage = Damage(espec.influences)
+	local damage = Damage()
+	damage:add_spell_influences(projectile.influences)
 	damage:apply_defender_vulnerabilities(defender)
 	-- Play impact effects.
 	for name in pairs(damage:get_impact_effects()) do

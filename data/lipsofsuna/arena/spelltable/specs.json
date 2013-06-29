@@ -21,7 +21,11 @@
 		"actions":
 		{
 			"right": "ranged spell"
-		}
+		},
+		"influences":
+		{
+			"fire damage": 10
+		},
 		"usages":
 		{
 			"ranged spell": true

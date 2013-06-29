@@ -9,7 +9,7 @@
 -- @alias Feat
 
 local Class = require("system/class")
-local Damage = require("core/server/damage")
+local Damage = require("arena/damage")
 local Serialize = require("system/serialize")
 
 --- Generic combat action.

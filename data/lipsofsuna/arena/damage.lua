@@ -1,16 +1,16 @@
---- TODO:doc
+--- Damage calculator.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.server.damage
+-- @module arena.damage
 -- @alias Damage
 
 local Class = require("system/class")
 
---- TODO:doc
+--- Damage calculator.
 -- @type Damage
 local Damage = Class("Damage")
 
@@ -30,7 +30,7 @@ end
 -- the skills of the attacker.
 --
 -- @param self Damage.
--- @param skills Attacker's skills, or nil.
+-- @param skills Attacker's skills. Nil if not available.
 Damage.add_barehanded_influences = function(self, skills)
 	-- Calculate the damage multiplier.
 	local mult = 1
@@ -47,7 +47,7 @@ end
 --- Adds influences for the given item.
 -- @param self Damage.
 -- @param weapon Item.
--- @param skills Attacker's skills, or nil.
+-- @param skills Attacker's skills. Nil if not available.
 Damage.add_item_influences = function(self, weapon, skills)
 	if not weapon then return end
 	self:add_itemspec_influences(weapon.spec, skills)
@@ -61,7 +61,7 @@ end
 --
 -- @param self Damage.
 -- @param spec Itemspec.
--- @param skills Attacker's skills, or nil.
+-- @param skills Attacker's skills. Nil if not available.
 Damage.add_itemspec_influences = function(self, spec, skills)
 	if not spec then return end
 	if not spec.influences then return end
@@ -76,6 +76,23 @@ Damage.add_itemspec_influences = function(self, spec, skills)
 	end
 end
 
+--- Adds influences for a spell.
+-- @param self Damage.
+-- @param influences Dictionary of influences and their values.
+-- @param skills Attacker's skills. Nil if not available.
+Damage.add_spell_influences = function(self, influences, skills)
+	if not influences then return end
+	-- Calculate the damage multiplier.
+	local mult = 1
+	if skills then
+		mult = skills:calculate_damage_multiplier_for_spells()
+	end
+	-- Add the multiplied influences.
+	for k,v in pairs(influences) do
+		self.influences[k] = (self.influences[k] or 0) + mult * v
+	end
+end
+
 --- Modifies the damage based on the charging of the attacker.<br/>
 --
 -- Holding the attack button down allows players to perform more powerful attacks.
@@ -83,7 +100,7 @@ end
 -- it will be doubled.
 --
 -- @param self Damage.
--- @param charge Charge time in seconds, or nil.
+-- @param charge Charge time in seconds. Nil for no charge.
 Damage.apply_attacker_charge = function(self, charge)
 	local p = self.influences["physical damage"]
 	if p and p > 0 then
@@ -191,5 +208,3 @@ Damage.get_total_health_influence = function(self)
 end
 
 return Damage
-
-

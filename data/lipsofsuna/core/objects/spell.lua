@@ -20,26 +20,10 @@ Spell.dict_id = setmetatable({}, {__mode = "kv"})
 --- Creates a new spell.
 -- @param clss Spell class.
 -- @param manager Object manager.
--- @param args Arguments.<ul>
---   <li>effect: Effect type.</li>
---   <li>feat: Feat invoking the spell.</li>
---   <li>model: Model name.</li>
---   <li>owner: Caster of the spell.</li>
---   <li>position: Position in world space.</li>
---   <li>power: Effect power</li>
---   <li>spec: Spell spec.</li></ul>
 -- @return Spell.
-Spell.new = function(clss, manager, args)
+Spell.new = function(clss, manager)
 	local self = SimulationObject.new(clss, manager)
 	self.dict_id[self:get_id()] = self
-	self.effect = args.effect
-	self.feat = args.feat
-	self.owner = args.owner
-	self.power = args.power
-	self:set_spec(args.spec)
-	self.physics:set_gravity(Vector())
-	self:set_model_name(args.spec.model)
-	self.physics:set_physics("rigid")
 	return self
 end
 
@@ -53,10 +37,9 @@ Spell.contact_cb = function(self, result)
 	-- Call the collision callback of each effect.
 	-- Effects can remove themselves from the feat by returning false.
 	local left = 0
-	for k,v in pairs(self.feat.effects) do
-		local effect = Feateffectspec:find{name = v[1]}
-		if not Combat:apply_ranged_spell_impact(self.owner, self, v[1], result.point, result.object, result.tile) then
-			self.feat.effects[k] = nil
+	for k,v in pairs(self.influences) do
+		if not Combat:apply_ranged_spell_impact(self.owner, self, k.name, result.point, result.object, result.tile) then
+			self.influences[k] = nil
 		else
 			left = left + 1
 		end
@@ -69,15 +52,17 @@ end
 
 --- Fires the spell.
 -- @param self Spell.
--- @param args Arguments.
-Spell.fire = function(self, args)
-	local a = args or {}
-	a.collision = true
-	a.feat = self.feat
-	a.owner = self.owner
-	local ret = SimulationObject.fire(self, a)
+Spell.fire = function(self)
+	local args = {collision = true, owner = self.owner}
+	local ret = SimulationObject.fire(self, args)
 	self.orig_rotation = self:get_rotation():copy()
 	self.orig_velocity = self:get_velocity():copy()
+	-- Play the effects.
+	for k,v in pairs(self.influences) do
+		if k.effect then
+			Server:object_effect(self, k.effect)
+		end
+	end
 	return ret
 end
 
@@ -98,6 +83,33 @@ end
 --- Prevents spell from being saved.
 -- @param self Spell.
 Spell.write_db = function(self)
+end
+
+--- Sets the influences of the spell.
+-- @param self Spell.
+-- @param value Dictionary of influences and their values.
+Spell.set_influences = function(self, value)
+	self.influences = value
+end
+
+--- Sets the owner of the spell.
+-- @param self Spell.
+-- @param value Object.
+Spell.set_owner = function(self, value)
+	self.owner = value
+end
+
+--- Sets the spec of the object.
+-- @param self Actor.
+-- @param value Spellspec.
+Spell.set_spec = function(self, value)
+	if self.spec == value then return end
+	SimulationObject.set_spec(self, value)
+	-- Set the model.
+	self:set_model_name(value.model)
+	-- Configure physics.
+	self.physics:set_gravity(Vector())
+	self.physics:set_physics("rigid")
 end
 
 return Spell
