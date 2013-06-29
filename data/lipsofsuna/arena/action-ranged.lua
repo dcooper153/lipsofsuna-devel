@@ -25,6 +25,10 @@ Actionspec{
 	end,
 	update = function(action, secs)
 		-- Check for cancel.
+		local weapon = action.object:get_weapon()
+		if weapon ~= action.weapon then
+			action.cancel = true
+		end
 		if action.cancel then
 			action.object.cooldown = 0.4
 			action.object:animate("charge cancel")
@@ -47,8 +51,8 @@ Actionspec{
 				return
 			end
 			-- Play the attack effect.
-			if weapon.effect_attack then
-				Server:object_effect(action.object, weapon.effect_attack)
+			if weapon.spec.effect_attack then
+				Server:object_effect(action.object, weapon.spec.effect_attack)
 			end
 			Server:object_event(action.object, "object attack", {move = "stand", variant = math.random(0, 255)})
 			-- Fire the projectile.
