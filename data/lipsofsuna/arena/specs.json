@@ -1,5 +1,19 @@
 [
 	{
+		"type": "Actorspec",
+		"name": "arena player",
+		"base": "aer-player",
+		"inventory_items":
+		{
+			"iron sword": 1,
+			"iron crossbow": 1,
+			"arrow": 50,
+			"dress": 1,
+			"leather leggings": 1,
+			"health potion": 5
+		}
+	},
+	{
 		"type": "Obstaclespec",
 		"name": "arena button",
 		"model": "chest1",

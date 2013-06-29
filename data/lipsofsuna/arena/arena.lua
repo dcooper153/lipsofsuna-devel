@@ -65,7 +65,7 @@ Arena.update = function(self, secs)
 	-- Initialize the player.
 	if not self.player then
 		self.player = Player(Main.objects)
-		self.player:set_spec(Actorspec:find_by_name("aer-player"))
+		self.player:set_spec(Actorspec:find_by_name("arena player"))
 		self.player:randomize()
 		self.player.get_admin = function() return true end --FIXME
 		self.player:set_position(Vector(500,101,500))
