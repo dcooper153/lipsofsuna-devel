@@ -22,6 +22,38 @@ CombatUtils.new = function(clss)
 	return self
 end
 
+--- Applies the damage to the actor.
+-- @param self CombatUtils.
+-- @param caster Actor.
+-- @param target Actor.
+-- @param damage Damage.
+-- @param point Hit point in world space. Nil for target position.
+-- @return True if all the influences were absorbed.
+CombatUtils.apply_damage_to_actor = function(self, caster, target, damage, point)
+	-- Play impact effects.
+	if not point then
+		point = target:get_position()
+	end
+	for name in pairs(damage:get_impact_effects()) do
+		Server:world_effect(point, name)
+	end
+	-- Apply the damage.
+	local absorb
+	local args = {owner = caster, object = target}
+	for name,value in pairs(damage.influences) do
+		local effect = Feateffectspec:find_by_name(name)
+		if effect and effect.touch then
+			args.value = value
+			if not effect:touch(args) then
+				absorb = true
+			elseif absorb == nil then
+				absorb = false
+			end
+		end
+	end
+	return not absorb
+end
+
 --- Checks if the actor is wielding a ranged weapon.
 -- @param self CombatUtils.
 -- @param actor Actor.

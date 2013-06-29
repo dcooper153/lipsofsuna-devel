@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Combat = require("core/server/combat")
+local Damage = require("arena/damage") --FIXME
 local SimulationObject = require("core/objects/simulation")
 
 --- Base class for spell objects.
@@ -36,16 +37,24 @@ Spell.contact_cb = function(self, result)
 	if result.object == self.owner then return end
 	-- Call the collision callback of each effect.
 	-- Effects can remove themselves from the feat by returning false.
-	local left = 0
-	for k,v in pairs(self.influences) do
-		if not Combat:apply_ranged_spell_impact(self.owner, self, k.name, result.point, result.object, result.tile) then
-			self.influences[k] = nil
-		else
-			left = left + 1
+	local more
+	if result.object then
+		local damage = Damage()
+		damage:add_spell_influences(self.influences)
+		damage:apply_defender_vulnerabilities(result.object)
+		more = Main.combat_utils:apply_damage_to_actor(self.owner, result.object, damage, result.point)
+	else
+		-- TODO: Move to CombatUtils.
+		for k,v in pairs(self.influences) do
+			if not Combat:apply_ranged_spell_impact(self.owner, self, k.name, result.point, nil, result.tile) then
+				self.influences[k] = nil
+			else
+				more = true
+			end
 		end
 	end
 	-- Detach if no effects were left.
-	if left == 0 then
+	if not more then
 		self:detach()
 	end
 end

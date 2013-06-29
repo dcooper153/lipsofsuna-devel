@@ -1,4 +1,4 @@
-local Feat = require("arena/feat")
+local Damage = require("arena/damage")
 local Item = require("core/objects/item")
 
 Actionspec{
@@ -7,15 +7,12 @@ Actionspec{
 	start = function(action, item)
 		if not item then return end
 		-- Play the use effect.
-		-- FIXME: This is sort of redundant due to spell effects making noise already.
 		Server:object_effect(action.object, item.spec.effect_use)
 		-- Apply the spell effects.
-		local args = {object = action.object, owner = action.object, point = action.object:get_position()}
-		local feat = Feat("spell on touch", {{nil,1}})
-		for k,v in pairs(item.spec.potion_effects) do
-			feat.effects[1][1] = k
-			feat:apply(args)
-		end
+		local damage = Damage()
+		damage:add_spell_influences(item.spec.potion_effects)
+		damage:apply_defender_vulnerabilities(action.object)
+		Main.combat_utils:apply_damage_to_actor(action.object, action.object, damage)
 		-- Replace the potion with an empty bottle.
 		item:subtract(1)
 		local item1 = Item(action.object.manager)

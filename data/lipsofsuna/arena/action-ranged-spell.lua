@@ -1,4 +1,3 @@
-local Feat = require("arena/feat")
 local Spell = require("core/objects/spell")
 
 Actionspec{
