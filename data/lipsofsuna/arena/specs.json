@@ -29,10 +29,11 @@
 		"inventory_items":
 		{
 			"arrow": 100,
-			"iron sword": 1,
+			"adamantium sword": 1,
+			"adamantium crossbow": 1,
 			"wooden bow": 1,
-			"wooden crossbow": 1,
 			"spellbook of fireball": 1,
+			"spellbook of healing": 1,
 			"crimson grenade": 100
 		},
 		"stacking": false,

@@ -25,15 +25,40 @@
 		"influences":
 		{
 			"fire damage": 10
-		},
-		"usages":
+		}
+	},
+	{
+		"type": "Itemspec",
+		"name": "spellbook of healing",
+		"icon": "scroll1",
+		"model": "book-000",
+		"mass": 2,
+		"equipment_slot": "hand.R",
+		"actions":
 		{
-			"ranged spell": true
+			"right": "self spell"
+		},
+		"influences":
+		{
+			"restore health": 10
 		}
 	},
 	{
 		"type": "CraftingRecipeSpec",
 		"name": "spellbook of fireball",
+		"effect": "craftmetal1",
+		"materials":
+		{
+			"log": 1
+		},
+		"modes":
+		{
+			"spells": true
+		}
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "spellbook of healing",
 		"effect": "craftmetal1",
 		"materials":
 		{
