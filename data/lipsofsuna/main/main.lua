@@ -65,24 +65,6 @@ Main.main = function(self)
 		print(self.settings:usage())
 		return
 	end
-	-- Validate specs.
-	Actorspec:validate_all()
-	Actorpresetspec:validate_all()
-	Animationspec:validate_all()
-	AnimationProfileSpec:validate_all()
-	CraftingRecipeSpec:validate_all()
-	Dialogspec:validate_all()
-	Factionspec:validate_all()
-	Feattypespec:validate_all()
-	Feateffectspec:validate_all()
-	Iconspec:validate_all()
-	Itemspec:validate_all()
-	Obstaclespec:validate_all()
-	Patternspec:validate_all()
-	Questspec:validate_all()
-	Skillspec:validate_all()
-	Spellspec:validate_all()
-	Staticspec:validate_all()
 	-- Enter the main loop.
 	if self.settings.quit then
 		Program:set_quit(true)
