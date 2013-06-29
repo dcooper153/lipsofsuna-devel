@@ -3,6 +3,7 @@ local Physics = require("system/physics")
 
 Actionspec{
 	name = "melee",
+	categories = { ["melee"] = true },
 	start = function(action, move)
 		-- Initialize timing.
 		action.frame = 1
@@ -48,4 +49,7 @@ Actionspec{
 		local src,dst = action.object:get_attack_ray()
 		local r = Physics:cast_ray(src, dst, nil, {action.object.physics})
 		if r then apply(r) end
+	end,
+	get_score = function(action)
+		return 1
 	end}

@@ -2,6 +2,7 @@ local Spell = require("core/objects/spell")
 
 Actionspec{
 	name = "ranged spell",
+	categories = { ["ranged spell"] = true },
 	start = function(action, item)
 		if action.object.cooldown then return end
 		action.timer = 0
@@ -27,4 +28,7 @@ Actionspec{
 		spell:set_influences(influences)
 		spell:set_owner(action.object)
 		spell:fire()
+	end,
+	get_score = function(action)
+		return 1
 	end}

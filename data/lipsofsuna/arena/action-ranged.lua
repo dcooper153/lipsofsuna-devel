@@ -3,6 +3,7 @@ local ProjectileController = require("core/server/projectile-controller")
 
 Actionspec{
 	name = "ranged",
+	categories = { ["ranged"] = true },
 	start = function(action)
 		-- Prevent during cooldown.
 		if action.object.cooldown then return end
@@ -66,4 +67,7 @@ Actionspec{
 		action.charge_value = action.charge_value + secs
 		action.object.cooldown = 1
 		return true
+	end,
+	get_score = function(action)
+		return 1
 	end}

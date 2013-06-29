@@ -21,9 +21,34 @@ local Action = Class("Action")
 -- @return New action.
 Action.new = function(clss, spec, object)
 	local self = Class.new(clss)
+	self.name = spec.name
 	self.spec = spec
 	self.object = object
 	return self
+end
+
+--- Gets the range of the action.
+-- @param self Action.
+-- @return Range in world units.
+Action.get_range = function(self)
+	if not self.spec.get_range then return self.object.spec.aim_ray_end * 0.7 end
+	return self.spec.get_range(self)
+end
+
+--- Gets the AI score of the action.
+-- @param self Action.
+-- @return Range in world units.
+Action.get_score = function(self)
+	if not self.spec.get_score then return -1 end
+	return self.spec.get_score(self)
+end
+
+--- Checks if the action is usable.
+-- @param self Action.
+-- @return True if usable. False otherwise.
+Action.get_usable = function(self)
+	if not self.spec.get_usable then return true end
+	return self.spec.get_usable(self)
 end
 
 return Action

@@ -9,7 +9,7 @@
 -- @alias Ai
 
 local Class = require("system/class")
-local Feat = require("arena/feat")
+local Action = require("core/actions/action")
 local Physics = require("system/physics")
 
 --- Artificial intelligence.
@@ -209,45 +209,40 @@ Ai.check_line_of_sight = function(self, target)
 	return ret and ret.object == target:get_id()
 end
 
---- Finds the best feat to use in combat.
+--- Finds the best action to use in combat.
 -- @param self AI.
 -- @param args Arguments.<ul>
 --   <li>category: Feat category.</li>
 --   <li>target: Object to be attacked.</li>
 --   <li>weapon: Weapon to be used.</li></ul>
--- @return New feat.
-Ai.find_best_feat = function(self, args)
-	local effect = (self.object == args.target and "beneficial" or "harmful")
-	local best_feat = nil
+-- @return Action spec if found. Nil otherwise.
+Ai.find_best_action = function(self, args)
+	local beneficial = (self.object == args.target)
+	local best_action = nil
 	local best_score = -1
-	local process_anim = function(anim)
-		-- Check if the feat type is usable.
-		local feat = Feat(anim.name)
-		if not feat:usable{user = self.object} then return end
-		-- Make sure that the feat can reach the target.
-		local range = anim.range or self.object.spec.aim_ray_end * 0.7
+	local process_action = function(spec)
+		-- Check that the category is correct.
+		local b = (spec.categories["beneficial"] ~= nil)
+		if beneficial ~= b then return end
+		-- Check if the action is usable.
+		local action = Action(spec, self.object)
+		if not action:get_usable() then return end
+		-- Make sure that the action can reach the target.
+		local range = action:get_range()
 		local dist = (self.object:get_position() - args.target:get_position()).length
 		if dist > range then return end
-		-- Add best feat effects.
-		feat:add_best_effects{category = effect, user = self.object}
-		-- Calculate the score.
-		-- TODO: Support influences other than health.
-		local info = feat:get_info{owner = self.object, object = args.target, weapon = args.weapon}
-		local score = (info.influences.health or 0)
-		if args.target ~= self then score = score end
-		if score < 1 then return end
-		score = score + 100 * math.random()
-		-- Maintain the best feat.
+		-- Check if this is the best action.
+		local score = action:get_score()
 		if score <= best_score then return end
-		best_feat = feat
+		best_action = action
 		best_score = score
 	end
-	-- Score each feat type and choose the best one.
-	for anim_name in pairs(self.object.spec.feat_types) do
-		local anim = Feattypespec:find{name = anim_name}
-		if anim and anim.categories[args.category] then process_anim(anim) end
+	-- Score each action and choose the best one.
+	for k,action_name in pairs(self.object.spec.actions) do
+		local spec = Actionspec:find_by_name(action_name)
+		if spec and spec.categories[args.category] then process_action(spec) end
 	end
-	return best_feat
+	return best_action
 end
 
 --- Updates the enemy list of the AI.

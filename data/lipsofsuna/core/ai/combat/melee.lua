@@ -10,8 +10,8 @@ Aiactionspec{
 		-- Check for a melee weapon or bare-handed.
 		if args.weapon and not args.weapon.spec.categories["melee"] then return end
 		-- Check for an applicable feat.
-		args.feat_melee = self:find_best_feat{category = "melee", target = self.target, weapon = args.weapon}
-		if args.feat_melee then return 4 end
+		args.action_melee = self:find_best_action{category = "melee", target = self.target, weapon = args.weapon}
+		if args.action_melee then return 4 end
 	end,
 	perform = function(self, args)
 		if args.diff.y > 1 and args.spec.allow_jump then self.object:action("jump") end
@@ -25,6 +25,6 @@ Aiactionspec{
 		end
 		self.object.tilt = self:calculate_melee_tilt()
 		self.object:set_strafing(0)
-		args.feat_melee:perform{user = self.object}
+		self.object:action(args.action_melee.name)
 		self.action_timer = 0.5
 	end}

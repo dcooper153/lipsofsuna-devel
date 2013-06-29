@@ -108,6 +108,9 @@ Actorspec{
 	categories = {["enemy"] = true},
 	ai_enable_block = false,
 	ai_offense_factor = 0.9,
+	actions = {
+		["left"] = "melee",
+		["right"] = "block"},
 	animations = {["default"] = "lizardman"},
 	difficulty = 0.3,
 	effect_physical_damage = "fleshimpact1",

@@ -5,7 +5,7 @@ Actionspec{
 		if action.object.cooldown then return end
 		-- Trigger special actions.
 		local special = Main.combat_utils:get_combat_action_for_actor(action.object, "left")
-		if special and special.name ~= "block" then
+		if special and special.name ~= "block" and special.name ~= "block weapon" and special.name ~= "block shield" then
 			action.object:action(special.name)
 			return
 		end

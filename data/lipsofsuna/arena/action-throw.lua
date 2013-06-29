@@ -4,6 +4,7 @@ local ProjectileController = require("core/server/projectile-controller")
 
 Actionspec{
 	name = "throw",
+	categories = { ["throw"] = true },
 	start = function(action)
 		-- Prevent during cooldown.
 		if action.object.cooldown then return end
