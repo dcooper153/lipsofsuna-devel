@@ -107,6 +107,33 @@ CombatUtils.get_combat_action_for_actor = function(self, actor, hand)
 	return Actionspec:find_by_name(name)
 end
 
+--- Gets the spell influences for the item.
+-- @param self CombatUtils.
+-- @param item item.
+-- @return Dictionary of influence names and values. Nil if none existed.
+CombatUtils.get_spell_influences_for_item = function(self, item)
+	local names = {}
+	if item.influences then
+		for k,v in pairs(item.influences) do
+			names[k] = (names[k] or 0) + v
+		end
+	else
+		for k,v in pairs(item.spec.influences) do
+			names[k] = (names[k] or 0) + v
+		end
+	end
+	local found
+	local influences = {}
+	for k,v in pairs(names) do
+		local spec = Feateffectspec:find_by_name(k)
+		if spec then
+			influences[k] = v
+			found = true
+		end
+	end
+	return found and influences or nil
+end
+
 --- Gets the combat action for the weapon of the actor.
 -- @param self CombatUtils.
 -- @param actor Actor.

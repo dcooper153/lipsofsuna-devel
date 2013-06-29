@@ -13,27 +13,13 @@ Actionspec{
 	end,
 	update = function(action, secs)
 		-- Apply the casting delay.
-		action.object.cooldown = 1
+		action.object.cooldown = 0.4
 		action.timer = action.timer + secs
 		if action.timer < action.delay then return true end
 		-- Get the influences.
-		local names = {}
-		if action.weapon.influences then
-			for k,v in pairs(action.weapon.influences) do
-				names[k] = (names[k] or 0) + v
-			end
-		else
-			for k,v in pairs(action.weapon.spec.influences) do
-				names[k] = (names[k] or 0) + v
-			end
-		end
-		local influences = {}
-		for k,v in pairs(names) do
-			local spec = Feateffectspec:find_by_name(k)
-			if spec then
-				influences[k] = v
-			end
-		end
+		local influences = Main.combat_utils:get_spell_influences_for_item(action.weapon)
+		if not influences then return end
+		-- TODO: Subtract stats.
 		-- Fire the spell.
 		local spec = Spellspec:find_by_name("fireball1") --FIXME
 		if not spec then return end
