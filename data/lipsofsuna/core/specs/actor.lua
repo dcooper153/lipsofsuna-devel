@@ -160,17 +160,21 @@ Actorspec.new = function(clss, args)
 	self.can_cast_ranged = false
 	self.can_cast_self = false
 	self.can_cast_touch = false
-	for k,v in pairs(self.feat_types) do
-		local feat = Feattypespec:find{name = k}
-		if self.ai_enable_attack then
-			if feat.categories["melee"] then self.can_melee = true end
-			if feat.categories["ranged"] then self.can_ranged = true end
-			if feat.categories["throw"] then self.can_throw = true end
-		end
-		if self.ai_enable_spells then
-			if feat.categories["ranged spell"] then self.can_cast_ranged = true end
-			if feat.categories["spell on self"] then self.can_cast_self = true end
-			if feat.categories["spell on touch"] then self.can_cast_touch = true end
+	for k,v in pairs(self.actions) do
+		local action = Actionspec:find_by_name(v)
+		if not action then
+			print(string.format("WARNING: missing action %q while initializing actor %q", v, self.name))
+		else
+			if self.ai_enable_attack then
+				if action.categories["melee"] then self.can_melee = true end
+				if action.categories["ranged"] then self.can_ranged = true end
+				if action.categories["throw"] then self.can_throw = true end
+			end
+			if self.ai_enable_spells then
+				if action.categories["ranged spell"] then self.can_cast_ranged = true end
+				if action.categories["spell on self"] then self.can_cast_self = true end
+				if action.categories["spell on touch"] then self.can_cast_touch = true end
+			end
 		end
 	end
 	return self

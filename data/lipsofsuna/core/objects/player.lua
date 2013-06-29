@@ -312,11 +312,6 @@ Player.vision_cb = function(self, args)
 			local o = args.object
 			Main.messaging:server_event("object effect", self.client, o:get_id(), args.effect)
 		end,
-		["object-feat"] = function(args)
-			local o = args.object
-			if o:get_static() then return end
-			Main.messaging:server_event("object feat", self.client, o:get_id(), args.anim.name, args.move or 0)
-		end,
 		["object-hidden"] = function(args)
 			local o = args.object
 			if o:get_static() then return end

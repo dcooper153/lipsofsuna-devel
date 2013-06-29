@@ -427,11 +427,11 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local spec = Feattypespec:find{name = matches[1]}
+		local spec = Actionspec:find_by_name(matches[1])
 		if spec then
-			Server.unlocks:unlock("spell type", matches[1])
+			Server.unlocks:unlock("action", matches[1])
 		else
-			player:send_message(string.format("No such spell type %q.", matches[1]))
+			player:send_message(string.format("No such action %q.", matches[1]))
 		end
 	end}
 

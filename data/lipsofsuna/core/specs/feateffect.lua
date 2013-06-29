@@ -51,11 +51,6 @@ Feateffectspec.introspect = Introspect{
 Feateffectspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
-	-- Store the effect to the compatible animations.
-	for k,v in pairs(self.animations) do
-		local a = Feattypespec:find{name = k}
-		if a then a.effects[self.name] = self end
-	end
 	return self
 end
 

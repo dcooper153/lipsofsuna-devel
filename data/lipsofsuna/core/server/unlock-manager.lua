@@ -136,12 +136,12 @@ UnlockManager.unlock_random = function(self)
 			end
 		end
 	end
-	-- Find the unlockable spell types.
+	-- Find the unlockable actions.
 	-- All spell types that have a description are assumed to be used by
 	-- players. Out of those, we choose ones not yet unlocked.
-	for k,v in pairs(Feattypespec.dict_name) do
-		if v.description and not self:get("spell type", k) then
-			table.insert(choices, {"spell type", k})
+	for k,v in pairs(Actionsspec.dict_name) do
+		if v.description and not self:get("action", k) then
+			table.insert(choices, {"action", k})
 		end
 	end
 	-- Find the unlockable spell effects.
