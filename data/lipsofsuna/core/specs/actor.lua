@@ -73,7 +73,6 @@ Actorspec.introspect = Introspect{
 		{name = "factions", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of factions.", details = {keys = {spec = "Factionspec"}}},
 		{name = "falling_damage_rate", type = "number", default = 10, description = "Number of points of damage per every meters per second exceeding the falling damage speed."},
 		{name = "falling_damage_speed", type = "number", default = 10, description = "Speed in meters per seconds after which the actor starts taking falling damage."},
-		{name = "feat_types", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of know feat types.", details = {keys = {spec = "Feattypespec"}}},
 		{name = "feat_effects", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of know feat effects.", details = {keys = {spec = "Feateffectspec"}}},
 		{name = "footstep_height", type = "number", description = "Footstep height."},
 		{name = "footstep_sound", type = "string", description = "Name of the footstep sound effect."},
@@ -153,7 +152,30 @@ Actorspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.args = args
 	self.introspect:read_table(self, args)
-	-- Precalculate combat abilities.
+	return self
+end
+
+--- Checks if the object is an enemy of the actor.
+-- @param self Actor spec.
+-- @param object Object.
+-- @return True if an enemy.
+Actorspec.check_enemy = function(self, object)
+	if object.spec.type ~= "actor" then return end
+	for name1 in pairs(self.factions) do
+		local spec1 = Factionspec:find{name = name1}
+		if spec1 then
+			for name2 in pairs(object.spec.factions) do
+				if spec1.enemies[name2] then
+					return true
+				end
+			end
+		end
+	end
+end
+
+--- Precalculate combat abilities for AI.
+-- @param self Actorspec.
+Actorspec.calculate_abilities = function(self)
 	self.can_melee = false
 	self.can_ranged = false
 	self.can_throw = false
@@ -174,25 +196,6 @@ Actorspec.new = function(clss, args)
 				if action.categories["ranged spell"] then self.can_cast_ranged = true end
 				if action.categories["spell on self"] then self.can_cast_self = true end
 				if action.categories["spell on touch"] then self.can_cast_touch = true end
-			end
-		end
-	end
-	return self
-end
-
---- Checks if the object is an enemy of the actor.
--- @param self Actor spec.
--- @param object Object.
--- @return True if an enemy.
-Actorspec.check_enemy = function(self, object)
-	if object.spec.type ~= "actor" then return end
-	for name1 in pairs(self.factions) do
-		local spec1 = Factionspec:find{name = name1}
-		if spec1 then
-			for name2 in pairs(object.spec.factions) do
-				if spec1.enemies[name2] then
-					return true
-				end
 			end
 		end
 	end

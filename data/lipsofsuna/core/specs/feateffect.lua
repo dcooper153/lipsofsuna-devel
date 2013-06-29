@@ -23,7 +23,7 @@ Feateffectspec.introspect = Introspect{
 	fields = {
 		{name = "name", type = "string", description = "Name of the spec."},
 		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "animations", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of compatible feat types.", details = {keys = {spec = "Feattypespec"}}},
+		{name = "actions", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of compatible actions.", details = {keys = {spec = "Actionspec"}}},
 		{name = "affects_allies", type = "boolean", description = "True if the effect is applicable to allied actors."},
 		{name = "affects_enemies", type = "boolean", description = "True if the effect is applicable to enemy actors."},
 		{name = "affects_items", type = "boolean", description = "True if the effect is applicable to items."},

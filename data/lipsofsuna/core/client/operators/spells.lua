@@ -1,5 +1,5 @@
 local Class = require("system/class")
-local Feat = require("arena/feat")
+local Feat = FIXME
 local Quickslots = require("core/quickslots/quickslots")
 
 Operators.spells = Class("SpellsOperator")

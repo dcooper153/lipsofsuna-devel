@@ -21,3 +21,9 @@ Main.main_start_hooks:register(0, function()
 	Spellspec:validate_all()
 	Staticspec:validate_all()
 end)
+
+Main.main_start_hooks:register(1000, function()
+	for k,v in pairs(Actorspec.dict_id) do
+		v:calculate_abilities()
+	end
+end)

@@ -1,6 +1,6 @@
 local AreaSpell = require("core/objects/areaspell")
 local Coroutine = require("system/coroutine")
-local Feat = require("arena/feat")
+local Feat = FIXME
 
 Actionspec{
 	name = "area spell",

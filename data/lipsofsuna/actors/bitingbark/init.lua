@@ -79,7 +79,7 @@ Actorspec{
 	difficulty = 0.3,
 	effect_physical_damage = "fleshimpact1",
 	factions = {["evil"] = true},
-	feat_types = {["left claw"] = true, ["right claw"] = true},
+	actions = {["left"] = "left claw", ["right"] = "right claw"},
 	feat_effects = {["physical damage"] = true},
 	inventory_size = 3,
 	inventory_items = {["log"] = 2},

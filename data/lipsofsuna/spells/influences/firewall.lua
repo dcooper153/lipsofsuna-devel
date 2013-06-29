@@ -1,5 +1,5 @@
 local AreaSpell = require("core/objects/areaspell")
-local Feat = require("arena/feat")
+local Feat = FIXME
 
 Feateffectspec:extend{
 	name = "firewall",

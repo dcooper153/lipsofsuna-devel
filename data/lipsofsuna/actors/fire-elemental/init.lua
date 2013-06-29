@@ -7,7 +7,7 @@ Actorspec{
 	animations = {["default"] = "lizardman"}, --FIXME
 	difficulty = 0.5,
 	effect_physical_damage = "fleshimpact1",
-	feat_types = {["ranged spell"] = true, ["spell on touch"] = true},
+	actions = {["right"] = "ranged spell", ["left"] = "touch spell"},
 	feat_effects = {["fire damage"] = true},
 	mass = 100,
 	model = "lizardman2", --FIXME
