@@ -1,6 +1,23 @@
 -- Increase sanctuary duration.
-Feateffectspec:extend{
+Feateffectspec{
 	name = "regeneration",
+	categories =
+	{
+		["beneficial"] = true,
+		["spell"] = true
+	},
+	actions =
+	{
+		["missile spell"] = true,
+		["ranged spell"] = true,
+		["self spell"] = true,
+		["touch spell"] = true
+	},
+	description = "Regenerate health every second",
+	effect = "berserk1",
+	icon = "modifier-heal",
+	influences = {["regeneration"] = 60},
+	required_stats = {["willpower"] = 15},
 	modifier = function(self, mod, secs)
 		-- Update the timer.
 		mod.timer = mod.timer + secs
@@ -16,7 +33,4 @@ Feateffectspec:extend{
 	touch = function(self, args)
 		if not args.object then return end
 		args.object:inflict_modifier("regeneration", args.value)
-	end,
-	ranged = function(self, args)
-		self:touch(args)
 	end}

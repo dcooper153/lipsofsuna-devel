@@ -2,8 +2,27 @@ local Material = require("system/material")
 local Obstacle = require("core/objects/obstacle")
 
 -- Spawn trees and plants.
-Feateffectspec:extend{
+Feateffectspec{
 	name = "wilderness",
+	actions =
+	{
+		["self spell"] = true
+	},
+	categories =
+	{
+		["spell"] = true
+	},
+	description = "Grow plants from soil",
+	effect = "wilderness1",
+	icon = "modifier-nature",
+	influences =
+	{
+		["wilderness"] = 5
+	},
+	required_stats =
+	{
+		["willpower"] = 5
+	},
 	touch = function(self, args)
 		-- Calculate spell radius.
 		local s = math.min(args.value, 100) / 100

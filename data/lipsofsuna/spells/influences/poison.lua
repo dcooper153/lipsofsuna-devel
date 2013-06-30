@@ -1,5 +1,22 @@
-Feateffectspec:extend{
+Feateffectspec{
 	name = "poison",
+	categories =
+	{
+		["harmful"] = true,
+		["plague"] = true,
+		["spell"] = true
+	},
+	actions =
+	{
+		["missile spell"] = true,
+		["ranged spell"] = true
+	},
+	description = "The target takes poison damage over time",
+	effect = "spell1",
+	icon = "modifier-black haze", --FIXME
+	influences = {["poison"] = 10},
+	projectile = "fireball1",
+	required_stats = {["willpower"] = 10},
 	modifier = function(self, mod, secs)
 		-- Update the timer.
 		mod.timer = mod.timer + secs
@@ -15,7 +32,4 @@ Feateffectspec:extend{
 	touch = function(self, args)
 		if not args.object then return end
 		args.object:inflict_modifier("poison", args.value)
-	end,
-	ranged = function(self, args)
-		self:touch(args)
 	end}

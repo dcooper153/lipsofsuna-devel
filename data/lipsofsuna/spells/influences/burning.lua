@@ -1,6 +1,22 @@
--- Sets the target on fire.
-Feateffectspec:extend{
+Feateffectspec{
 	name = "burning",
+	categories =
+	{
+		["harmful"] = true,
+		["spell"] = true
+	},
+	actions =
+	{
+		["missile spell"] = true,
+		["ranged spell"] = true,
+		["self spell"] = true,
+		["touch spell"] = true
+	},
+	description = "Inflict damage over time by putting the target on fire",
+	effect = "berserk1",
+	icon = "firewall", -- FIXME
+	influences = {["burning"] = 10},
+	required_stats = {["willpower"] = 5},
 	modifier = function(self, mod, secs)
 		-- Update the burning timer.
 		mod.timer = mod.timer + secs
@@ -16,7 +32,4 @@ Feateffectspec:extend{
 	touch = function(self, args)
 		if not args.object then return end
 		args.object:inflict_modifier("burning", args.value)
-	end,
-	ranged = function(self, args)
-		self:touch(args)
 	end}

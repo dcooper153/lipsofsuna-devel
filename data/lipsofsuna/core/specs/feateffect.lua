@@ -40,7 +40,7 @@ Feateffectspec.introspect = Introspect{
 		{name = "required_reagents", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of required reagents.", details = {keys = {spec = "Itemspec"}}},
 		{name = "required_stats", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of required stats."},
 		{name = "modifier", type = "ignore"},
-		{name = "ranged", type = "ignore"},
+		{name = "modifier_attributes", type = "ignore"},
 		{name = "touch", type = "ignore"},
 	}}
 

@@ -1,7 +1,21 @@
 local Actor = require("core/objects/actor")
 
-Feateffectspec:extend{
+Feateffectspec{
 	name = "fire elemental",
+	categories =
+	{
+		["spell"] = true,
+		["summon"] = true
+	},
+	actions =
+	{
+		["self spell"] = true
+	},
+	description = "Conjure a fire elemental",
+	effect = "spell1", --FIXME
+	icon = "firewall", --FIXME
+	influences = {["fire elemental"] = 60},
+	required_stats = {["willpower"] = 10},
 	touch = function(self, args)
 		-- Find an empty ground spot.
 		if not args.object then return end
@@ -17,7 +31,4 @@ Feateffectspec:extend{
 		summon:set_visible(true)
 		summon.summon_owner = args.owner
 		summon.summon_timer = args.value
-	end,
-	ranged = function(self, args)
-		self:touch(args)
 	end}

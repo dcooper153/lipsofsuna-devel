@@ -1,8 +1,25 @@
 local Actor = require("core/objects/actor")
 
 -- Summon plagued beasts.
-Feateffectspec:extend{
+Feateffectspec{
 	name = "black haze",
+	categories =
+	{
+		["harmful"] = true,
+		["plague"] = true,
+		["spell"] = true
+	},
+	actions =
+	{
+		["missile spell"] = true,
+		["ranged spell"] = true
+	},
+	description = "Conjure infectious plagued monsters",
+	effect = "spell1",
+	icon = "modifier-black haze",
+	influences = {["black haze"] = 1},
+	projectile = "fireball1",
+	required_stats = {["willpower"] = 20},
 	modifier = function(self, mod, secs)
 		-- Wait five seconds.
 		mod.strength = 10000
@@ -20,7 +37,7 @@ Feateffectspec:extend{
 		end
 		return true
 	end,
-	ranged = function(self, args)
+	touch = function(self, args)
 		local s = Actorspec:random{category = "plague"}
 		if not s then return end
 		local p = args.point + Vector(

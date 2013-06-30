@@ -1,6 +1,26 @@
 -- Decrease health.
-Feateffectspec:extend{
+Feateffectspec{
 	name = "fire damage",
+	categories =
+	{
+		["fire"] = true,
+		["harmful"] = true,
+		["melee"] = true,
+		["spell"] = true
+	},
+	actions =
+	{
+		["missile spell"] = true,
+		["ranged spell"] = true,
+		["self spell"] = true,
+		["touch spell"] = true
+	},
+	description = "Inflict fire damage",
+	effect = "explosion1",
+	icon = "modifier-fireball",
+	influences = {["fire damage"] = 5},
+	projectile = "fireball1",
+	required_stats = {["willpower"] = 1},
 	touch = function(self, args)
 		if not args.object then return end
 		-- Randomize the amount.
@@ -14,7 +34,4 @@ Feateffectspec:extend{
 		if val > 0 then
 			args.object:add_enemy(args.owner)
 		end
-	end,
-	ranged = function(self, args)
-		self:touch(args)
 	end}

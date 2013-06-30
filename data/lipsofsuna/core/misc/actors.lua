@@ -1,5 +1,3 @@
-require(Mod.path .. "feats")
-
 Actorspec{
 	name = "race",
 	aim_ray_center = Vector(0, 1.5, 0),

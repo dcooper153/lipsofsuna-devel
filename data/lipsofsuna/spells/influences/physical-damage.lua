@@ -1,6 +1,26 @@
 -- Increase or decrease health.
-Feateffectspec:extend{
+Feateffectspec{
 	name = "physical damage",
+	categories =
+	{
+		["harmful"] = true,
+		["melee"] = true,
+		["physical"] = true
+	},
+	actions =
+	{
+		["bite"] = true,
+		["dragon bite"] = true,
+		["explode"] = true,
+		["left claw"] = true,
+		["ranged"] = true,
+		["right hand"] = true,
+		["right claw"] = true,
+		["tackle"] = true
+	},
+	effect = "impact1",
+	icon = "missing1", --FIXME
+	influences = {["physical damage"] = 1},
 	touch = function(self, args)
 		if not args.object then return end
 		-- Randomize the amount.
@@ -18,7 +38,4 @@ Feateffectspec:extend{
 		if val > 0 then
 			args.object:add_enemy(args.owner)
 		end
-	end,
-	ranged = function(self, args)
-		self:touch(args)
 	end}

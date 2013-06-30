@@ -1,6 +1,9 @@
 Feateffectspec{
 	name = "respawn",
-	influences = {["respawn"] = 1},
+	influences =
+	{
+		["respawn"] = 1
+	},
 	modifier = function(self, mod, secs)
 		-- Wait for the sector to load.
 		if not Game.terrain:is_point_loaded(mod.object:get_position()) then
@@ -21,7 +24,4 @@ Feateffectspec{
 	touch = function(self, args)
 		if not args.object then return end
 		args.object:inflict_modifier("respawn", args.value)
-	end,
-	ranged = function(self, args)
-		self:touch(args)
 	end}

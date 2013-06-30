@@ -1,9 +1,26 @@
 local AreaSpell = require("core/objects/areaspell")
 local Feat = FIXME
 
-Feateffectspec:extend{
+Feateffectspec{
 	name = "firewall",
-	ranged = function(self, args)
+	categories =
+	{
+		["fire"] = true,
+		["harmful"] = true,
+		["spell"] = true
+	},
+	actions =
+	{
+		["missile spell"] = true,
+		["ranged spell"] = true
+	},
+	description = "Conjure a wall of fire",
+	effect = "firewall1",
+	icon = "firewall",
+	influences = {["firewall"] = 5},
+	projectile = "fireball1", -- FIXME
+	required_stats = {["willpower"] = 1},
+	touch = function(self, args)
 		-- Find an empty ground spot.
 		local ctr = Utils:find_empty_ground(args.point)
 		if not ctr then return end
