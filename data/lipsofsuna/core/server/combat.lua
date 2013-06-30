@@ -41,25 +41,9 @@ Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, ti
 	end
 	-- Apply object damage.
 	if defender then
-		Main.combat_utils:apply_damage_to_actor(attacker, defender, damage)
-	end
-	-- Apply tile damage.
-	if tile and weapon then
-		-- Play impact effects.
-		for name in pairs(damage:get_impact_effects()) do
-			Main.vision:world_effect(point, name)
-		end
-		-- Break the tile.
-		if weapon.spec.categories["mattock"] then
-			self:destroy_terrain_sphere(attacker, point, tile, 1.5)
-			return
-		end
-		-- Damage the weapon.
-		if weapon.spec.damage_mining then
-			if not weapon:damaged{amount = 2 * weapon.spec.damage_mining * math.random(), type = "mining"} then
-				attacker:send_message("The " .. weapon.spec.name .. " broke!")
-			end
-		end
+		Main.combat_utils:apply_damage_to_actor(attacker, defender, damage, point)
+	else
+		Main.combat_utils:apply_damage_to_terrain(attacker, tile, damage, point)
 	end
 end
 
