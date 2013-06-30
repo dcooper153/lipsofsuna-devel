@@ -4,7 +4,7 @@
 Feateffectspec{
 	name = "berserk",
 	categories = {["beneficial"] = true, ["berserk"] = true, ["spell"] = true},
-	actions = {["missile spell"] = true, ["ranged spell"] = true, ["spell on self"] = true, ["spell on touch"] = true},
+	actions = {["missile spell"] = true, ["ranged spell"] = true, ["self spell"] = true, ["touch spell"] = true},
 	description = "Inflict additional damage when in low health",
 	effect = "berserk1",
 	icon = "modifier-berserk",
@@ -27,7 +27,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "bless",
 	categories = {["beneficial"] = true, ["spell"] = true},
-	actions = {["missile spell"] = true, ["ranged spell"] = true, ["spell on self"] = true, ["spell on touch"] = true},
+	actions = {["missile spell"] = true, ["ranged spell"] = true, ["self spell"] = true, ["touch spell"] = true},
 	description = "Boost the maximum health and willpower of the target",
 	effect = "spell1",
 	icon = "modifier-heal", --FIXME
@@ -39,7 +39,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "curse",
 	categories = {["harmful"] = true, ["spell"] = true},
-	actions = {["missile spell"] = true, ["ranged spell"] = true, ["spell on self"] = true, ["spell on touch"] = true},
+	actions = {["missile spell"] = true, ["ranged spell"] = true, ["self spell"] = true, ["touch spell"] = true},
 	description = "Damages the maximum health and willpower of the target",
 	effect = "spell1",
 	icon = "firewall", --FIXME
@@ -51,7 +51,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "burning",
 	categories = {["harmful"] = true, ["spell"] = true},
-	actions = {["missile spell"] = true, ["ranged spell"] = true, ["spell on self"] = true, ["spell on touch"] = true},
+	actions = {["missile spell"] = true, ["ranged spell"] = true, ["self spell"] = true, ["touch spell"] = true},
 	description = "Inflict damage over time by putting the target on fire",
 	effect = "berserk1",
 	icon = "firewall", -- FIXME
@@ -62,7 +62,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "cold damage",
 	categories = {["cold"] = true, ["harmful"] = true, ["melee"] = true, ["spell"] = true},
-	actions = {["missile spell"] = true, ["ranged spell"] = true, ["spell on self"] = true, ["spell on touch"] = true},
+	actions = {["missile spell"] = true, ["ranged spell"] = true, ["self spell"] = true, ["touch spell"] = true},
 	description = "Inflict cold damage",
 	effect = "explosion1", -- FIXME
 	icon = "modifier-ice",
@@ -74,7 +74,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "cure disease",
 	categories = {["beneficial"] = true, ["spell"] = true},
-	actions = {["missile spell"] = true, ["ranged spell"] = true, ["spell on self"] = true, ["spell on touch"] = true},
+	actions = {["missile spell"] = true, ["ranged spell"] = true, ["self spell"] = true, ["touch spell"] = true},
 	description = "Cure the target of poison and diseases",
 	effect = "spell1",
 	icon = "modifier-heal", --FIXME
@@ -98,7 +98,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "fire damage",
 	categories = {["fire"] = true, ["harmful"] = true, ["melee"] = true, ["spell"] = true},
-	actions = {["missile spell"] = true, ["ranged spell"] = true, ["spell on self"] = true, ["spell on touch"] = true},
+	actions = {["missile spell"] = true, ["ranged spell"] = true, ["self spell"] = true, ["touch spell"] = true},
 	description = "Inflict fire damage",
 	effect = "explosion1",
 	icon = "modifier-fireball",
@@ -110,7 +110,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "fire elemental",
 	categories = {["spell"] = true, ["summon"] = true},
-	actions = {["spell on self"] = true},
+	actions = {["self spell"] = true},
 	description = "Conjure a fire elemental",
 	effect = "spell1", --FIXME
 	icon = "firewall", --FIXME
@@ -147,7 +147,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "light",
 	categories = {["beneficial"] = true, ["light"] = true, ["spell"] = true},
-	actions = {["spell on self"] = true},
+	actions = {["self spell"] = true},
 	description = "Illuminate your surroundings",
 	effect = "light1",
 	icon = "modifier-light",
@@ -158,7 +158,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "mindless march",
 	categories = {["harmful"] = true, ["push"] = true, ["spell"] = true},
-	actions = {["missile spell"] = true, ["ranged spell"] = true, ["spell on touch"] = true},
+	actions = {["missile spell"] = true, ["ranged spell"] = true, ["touch spell"] = true},
 	description = "Forces the target to march forward",
 	effect = "light1",
 	icon = "modifier-light",
@@ -170,7 +170,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "follow",
 	categories = {["follow"] = true, ["spell"] = true},
-	actions = {["missile spell"] = true, ["ranged spell"] = true, ["spell on touch"] = true},
+	actions = {["missile spell"] = true, ["ranged spell"] = true, ["touch spell"] = true},
 	description = "Forces the target to follow you",
 	effect = "light1",
 	icon = "modifier-light",
@@ -182,7 +182,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "home",
 	categories = {["follow"] = true, ["spell"] = true},
-	actions = {["spell on self"] = true},
+	actions = {["self spell"] = true},
 	description = "Creates a home location where you can respawn from",
 	effect = "light1",
 	icon = "sanctuary1",
@@ -213,7 +213,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "regeneration",
 	categories = {["beneficial"] = true, ["spell"] = true},
-	actions = {["missile spell"] = true, ["ranged spell"] = true, ["spell on self"] = true, ["spell on touch"] = true},
+	actions = {["missile spell"] = true, ["ranged spell"] = true, ["self spell"] = true, ["touch spell"] = true},
 	description = "Regenerate health every second",
 	effect = "berserk1",
 	icon = "modifier-heal",
@@ -224,7 +224,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "restore health",
 	categories = {["beneficial"] = true, ["heal"] = true, ["spell"] = true},
-	actions = {["spell on self"] = true, ["spell on touch"] = true},
+	actions = {["self spell"] = true, ["touch spell"] = true},
 	description = "Restore health",
 	effect = "heal1",
 	icon = "modifier-heal",
@@ -235,7 +235,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "resurrect",
 	categories = {["beneficial"] = true, ["spell"] = true},
-	actions = {["missile spell"] = true, ["ranged spell"] = true, ["spell on touch"] = true},
+	actions = {["missile spell"] = true, ["ranged spell"] = true, ["touch spell"] = true},
 	description = "Resurrect the targeted creature",
 	effect = "heal1",
 	icon = "modifier-heal",
@@ -246,7 +246,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "restore willpower",
 	categories = {["beneficial"] = true, ["spell"] = true},
-	actions = {["spell on self"] = true, ["spell on touch"] = true},
+	actions = {["self spell"] = true, ["touch spell"] = true},
 	description = "Restore health",
 	effect = "heal1",
 	icon = "modifier-heal", --FIXME
@@ -256,7 +256,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "sanctuary",
-	actions = {["spell on self"] = true, ["spell on touch"] = true},
+	actions = {["self spell"] = true, ["touch spell"] = true},
 	categories = {["beneficial"] = true, ["spell"] = true},
 	description = "Protect from death",
 	effect = "sanctuary1",
@@ -267,7 +267,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "travel",
-	actions = {["spell on self"] = true},
+	actions = {["self spell"] = true},
 	categories = {["spell"] = true},
 	description = "Fast travel to Lips",
 	effect = "sanctuary1", -- FIXME
@@ -278,7 +278,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "wilderness",
-	actions = {["spell on self"] = true},
+	actions = {["self spell"] = true},
 	categories = {["spell"] = true},
 	description = "Grow plants from soil",
 	effect = "wilderness1",

@@ -44,6 +44,22 @@
 		}
 	},
 	{
+		"type": "Itemspec",
+		"name": "spellbook of poison",
+		"icon": "scroll1",
+		"model": "book-000",
+		"mass": 2,
+		"equipment_slot": "hand.R",
+		"actions":
+		{
+			"right": "touch spell"
+		},
+		"influences":
+		{
+			"poison": 20
+		}
+	},
+	{
 		"type": "CraftingRecipeSpec",
 		"name": "spellbook of fireball",
 		"effect": "craftmetal1",
@@ -59,6 +75,19 @@
 	{
 		"type": "CraftingRecipeSpec",
 		"name": "spellbook of healing",
+		"effect": "craftmetal1",
+		"materials":
+		{
+			"log": 1
+		},
+		"modes":
+		{
+			"spells": true
+		}
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "spellbook of poison",
 		"effect": "craftmetal1",
 		"materials":
 		{

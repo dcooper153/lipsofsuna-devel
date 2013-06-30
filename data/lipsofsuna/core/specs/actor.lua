@@ -26,7 +26,7 @@ Actorspec.introspect = Introspect{
 		{name = "name", type = "string", description = "Name of the spec."},
 		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 		{name = "base", type = "string", description = "Base actor spec.", details = {spec = "Actorspec"}},
-		{name = "ai_combat_actions", type = "dict", dict = {type = "boolean"}, default = {["block"] = true, ["idle"] = true, ["melee"] = true, ["move backward"] = true, ["move forward"] = true, ["ranged"] = true, ["ranged spell"] = true, ["spell on self"] = true, ["strafe"] = true, ["switch weapon"] = true, ["throw"] = true, ["touch spell"] = true}, description = "Dictionary of allowed combat actions", details = {keys = {spec = "Aiactionspec"}}},
+		{name = "ai_combat_actions", type = "dict", dict = {type = "boolean"}, default = {["block"] = true, ["idle"] = true, ["melee"] = true, ["move backward"] = true, ["move forward"] = true, ["ranged"] = true, ["ranged spell"] = true, ["self spell"] = true, ["strafe"] = true, ["switch weapon"] = true, ["throw"] = true, ["touch spell"] = true}, description = "Dictionary of allowed combat actions", details = {keys = {spec = "Aiactionspec"}}},
 		{name = "ai_enable_attack", type = "boolean", default = true, description = "False to prohibit attacking."},
 		{name = "ai_enable_backstep", type = "boolean", default = true, description = "False to prohibit backstep."},
 		{name = "ai_enable_block", type = "boolean", default = true, description = "False to prohibit blocking."},
@@ -122,8 +122,8 @@ Actorspec.introspect = Introspect{
 		{name = "timing_jump", type = "number", default = 20, description = "Timing of lifting off when jumping, in frames."},
 		{name = "timing_pickup", type = "number", default = 40, description = "Timing of picking up an item, in frames."},
 		{name = "timing_spell_ranged", type = "number", default = 40, description = "Timing of casting a ranged spell projectile, in frames."},
-		{name = "timing_spell_self", type = "number", default = 40, description = "Timing of casting a spell on self, in frames."},
-		{name = "timing_spell_touch", type = "number", default = 40, description = "Timing of casting a spell on touch, in frames."},
+		{name = "timing_spell_self", type = "number", default = 40, description = "Timing of casting a self spell, in frames."},
+		{name = "timing_spell_touch", type = "number", default = 40, description = "Timing of casting a touch spell, in frames."},
 		{name = "view_cone", type = "number", default = 0.8 * math.pi, description = "View cone angle in radians."},
 		{name = "vulnerabilities", type = "dict", dict = {type = "number"}, description = "Dictionary of damage vulnerabilities."},
 		{name = "weapon_slot", type = "string", default = "hand.R", description = "Name of the weapon slot."},
@@ -194,8 +194,8 @@ Actorspec.calculate_abilities = function(self)
 			end
 			if self.ai_enable_spells then
 				if action.categories["ranged spell"] then self.can_cast_ranged = true end
-				if action.categories["spell on self"] then self.can_cast_self = true end
-				if action.categories["spell on touch"] then self.can_cast_touch = true end
+				if action.categories["self spell"] then self.can_cast_self = true end
+				if action.categories["touch spell"] then self.can_cast_touch = true end
 			end
 		end
 	end

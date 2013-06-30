@@ -9,7 +9,7 @@ Actionspec{
 	start = function(action, item)
 		if action.object.cooldown then return end
 		action.timer = 0
-		action.delay = action.object.spec.timing_spell_ranged * 0.02
+		action.delay = action.object.spec.timing_spell_self * 0.02
 		action.weapon = item or action.object:get_weapon()
 		action.object:animate("spell self", true)
 		return true

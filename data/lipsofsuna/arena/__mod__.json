@@ -23,7 +23,8 @@
 		"action-ranged",
 		"action-ranged-spell",
 		"action-self-spell",
-		"action-throw"
+		"action-throw",
+		"action-touch-spell"
 	],
 	"specs":
 	[
