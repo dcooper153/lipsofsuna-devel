@@ -916,13 +916,6 @@ Actor.get_burdened = function(self)
 	return self.carried_weight > self:get_burden_limit()
 end
 
---- Gets the spell effects known by the object.
--- @param self Actor.
--- @return Dictionary of booleans.
-Actor.get_known_spell_effects = function(self)
-	return self.spec.feat_effects
-end
-
 Actor.set_dead_state = function(self, drop)
 	-- Playback animation.
 	-- This needs to be done first because setting the 'dead' member will
@@ -957,13 +950,6 @@ Actor.set_dead_state = function(self, drop)
 	end
 	-- Emit a vision event.
 	Main.vision:object_event(self, "object-dead", {dead = true})
-end
-
---- Gets the spell types known by the object.
--- @param self Actor.
--- @return Dictionary of booleans.
-Actor.get_known_spell_types = function(self)
-	return self.spec.feat_types
 end
 
 --- Gets a modifier by name.

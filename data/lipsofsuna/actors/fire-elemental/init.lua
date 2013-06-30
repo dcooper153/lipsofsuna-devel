@@ -8,7 +8,6 @@ Actorspec{
 	difficulty = 0.5,
 	effect_physical_damage = "fleshimpact1",
 	actions = {["right"] = "ranged spell", ["left"] = "touch spell"},
-	feat_effects = {["fire damage"] = true},
 	mass = 100,
 	model = "lizardman2", --FIXME
 	reagentless_spells = true,

@@ -100,7 +100,6 @@ Actorspec{
 	effect_physical_damage = "fleshimpact1",
 	factions = {["evil"] = true},
 	actions = {["head"] = "dragon bite", ["left"] = "dragon left claw", ["right"] = "dragon right claw"},
-	feat_effects = {["fire damage"] = true, ["physical damage"] = true},
 	important = true,
 	inventory_size = 10,
 	inventory_items = {["dragon scale"] = 5, ["adamantium"] = 4, ["crimson stone"] = 2},

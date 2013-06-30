@@ -51,7 +51,6 @@ Actorspec{
 	equipment_slots = {["robotarm.L"] = "#hand.L", ["robotarm.R"] = "#hand.R"},
 	factions = {["keepers of knowledge"] = true},
 	actions = {["right"] = "ranged"},
-	feat_effects = {["physical damage"] = true},
 	inventory_size = 4,
 	inventory_items = {["bullet"] = 100, ["security robot arm"] = 1},
 	important = true,
@@ -68,7 +67,6 @@ Actorspec{
 	equipment_slots = {["robotarm.L"] = "#hand.L", ["robotarm.R"] = "#hand.R"},
 	factions = {["sealed library"] = true},
 	actions = {["right"] = "ranged"},
-	feat_effects = {["physical damage"] = true},
 	important = true,
 	inventory_size = 4,
 	inventory_items = {["bullet"] = 100, ["security robot arm"] = 1},
@@ -103,7 +101,6 @@ Actorspec{
 	-- TODO: Should have no gravity, shouldn't be pushable
 	factions = {["sealed library"] = true},
 	actions = {["right"] = "turret fire"},
-	feat_effects = {["physical damage"] = true},
 	important = true,
 	inventory_size = 2,
 	inventory_items = {["bullet"] = 100},

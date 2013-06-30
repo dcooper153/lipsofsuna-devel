@@ -298,20 +298,6 @@ SimulationObject.get_animation_profile = function(self)
 	return "default"
 end
 
---- Gets the spell effects known by the object.
--- @param self Object.
--- @return List of strings.
-SimulationObject.get_known_spell_effects = function(self)
-	return {}
-end
-
---- Gets the spell types known by the object.
--- @param self Object.
--- @return Dictionary of booleans.
-SimulationObject.get_known_spell_types = function(self)
-	return {}
-end
-
 --- Gets a full name string for the object.
 -- @param self Object.
 -- @return String.

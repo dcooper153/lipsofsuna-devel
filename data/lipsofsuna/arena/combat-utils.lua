@@ -199,8 +199,15 @@ end
 -- @param hand Hand name.
 -- @return Action spec if found. Nil otherwise.
 CombatUtils.get_weapon_action_for_actor = function(self, actor, hand)
+	-- Get the weapon.
 	local weapon = actor:get_weapon()
 	if not weapon then return end
+	-- Check for enchanted actions.
+	if weapon.spell_action then
+		local spec = Actionspec:find_by_name(weapon.spell_action)
+		if spec then return spec end
+	end
+	-- Check for weapon actions.
 	local name = weapon.spec.actions[hand]
 	if not name then return end
 	return Actionspec:find_by_name(name)

@@ -115,7 +115,6 @@ Actorspec{
 	difficulty = 0.3,
 	effect_physical_damage = "fleshimpact1",
 	factions = {["evil"] = true},
-	feat_effects = {["physical damage"] = true},
 	inventory_size = 10,
 	inventory_items = {["wooden club"] = 1},
 	inventory_items_death = {["lizard scale"] = 3, ["raw meat"] = 3},
