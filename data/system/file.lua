@@ -33,11 +33,15 @@ end
 -- @param name Filename relative to the mod root.
 -- @param ignore Filename to ignore, or nil for none.
 File.require_directory = function(self, name, ignore)
+	local n = name
+	while string.sub(n, #n) == "/" do
+		n = string.sub(n, 0, #n - 1)
+	end
 	local i = ignore and ignore .. ".lua"
 	for k,v in pairs(File:scan_directory(name)) do
 		if not i or v ~= i then
 			if string.match(v, "[.]lua$") then
-				require(name .. "/" .. string.gsub(v, "(.*)[.]lua$", "%1"))
+				require(n .. "/" .. string.gsub(v, "(.*)[.]lua$", "%1"))
 			end
 		end
 	end
