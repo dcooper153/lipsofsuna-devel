@@ -5,6 +5,7 @@ Actionspec{
 	name = "melee",
 	categories = { ["melee"] = true },
 	start = function(action, move)
+		if action.object.cooldown then return end
 		-- Initialize timing.
 		action.frame = 1
 		action.time = 0
@@ -35,6 +36,7 @@ Actionspec{
 			Combat:apply_melee_impact(action.object, action.weapon, r.point, target, r.tile)
 		end
 		-- Wait for the next sweep.
+		action.object.cooldown = 0.3
 		action.time = action.time + secs
 		local frame = action.time / action.duration * #action.path + 1
 		if frame <= action.frame then return true end

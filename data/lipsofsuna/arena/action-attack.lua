@@ -30,7 +30,7 @@ Actionspec{
 		end
 		-- Check for charge finish.
 		if not action.object.control_right then
-			action.object.cooldown = 0.8
+			action.object.cooldown = nil
 			action.object:action(action.finish_action.name, action.charge_move, action.charge_value)
 			return
 		end
