@@ -35,7 +35,7 @@ CombatUtils.apply_damage_to_actor = function(self, caster, target, damage, point
 		point = target:get_position()
 	end
 	for name in pairs(damage:get_impact_effects()) do
-		Server:world_effect(point, name)
+		Main.vision:world_effect(point, name)
 	end
 	-- Apply the damage.
 	local absorb

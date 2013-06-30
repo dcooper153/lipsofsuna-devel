@@ -53,9 +53,9 @@ Actionspec{
 			end
 			-- Play the attack effect.
 			if weapon.spec.effect_attack then
-				Server:object_effect(action.object, weapon.spec.effect_attack)
+				Main.vision:object_effect(action.object, weapon.spec.effect_attack)
 			end
-			Server:object_event(action.object, "object attack", {move = "stand", variant = math.random(0, 255)})
+			Main.vision:object_event(action.object, "object attack", {move = "stand", variant = math.random(0, 255)})
 			-- Fire the projectile.
 			local projectile = ammo:split()
 			local damage = Combat:calculate_ranged_damage(action.object, projectile)

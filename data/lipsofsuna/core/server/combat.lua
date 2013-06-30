@@ -39,7 +39,7 @@ Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, ti
 	end
 	-- Play impact effects.
 	for name in pairs(damage:get_impact_effects()) do
-		Server:world_effect(point, name)
+		Main.vision:world_effect(point, name)
 	end
 	-- Apply object damage.
 	if defender then
@@ -94,7 +94,7 @@ Combat.apply_ranged_impact = function(self, attacker, projectile, damage, point,
 	end
 	-- Play impact effects.
 	for name in pairs(damage:get_impact_effects()) do
-		Server:world_effect(point, name)
+		Main.vision:world_effect(point, name)
 	end
 	-- Apply object damage.
 	if defender then
@@ -146,7 +146,7 @@ Combat.apply_ranged_spell_impact = function(self, attacker, projectile, effect, 
 	damage:apply_defender_vulnerabilities(defender)
 	-- Play impact effects.
 	for name in pairs(damage:get_impact_effects()) do
-		Server:world_effect(point, name)
+		Main.vision:world_effect(point, name)
 	end
 	-- Knockback the defender.
 	if defender then
@@ -271,7 +271,7 @@ Combat.__play_terrain_destruction_effect = function(self, point, materials)
 			effect = mat.effect_collapse
 		end
 	end
-	Server:world_effect(point, effect)
+	Main.vision:world_effect(point, effect)
 end
 
 return Combat

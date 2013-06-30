@@ -48,7 +48,7 @@ end
 -- @param point Position in world space, or nil.
 -- @param damage Damage amount.
 EffectManager.create_damage_text = function(self, object, point, damage)
-	if math.abs(damage) <= 2 then return end
+	if damage > -1 and damage <= 2 then return end
 	local effect = DamageLabelEffect(object, point, damage)
 	self.speech_bubble_dict[effect] = effect
 end

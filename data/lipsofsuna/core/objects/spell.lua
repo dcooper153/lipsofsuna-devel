@@ -69,7 +69,7 @@ Spell.fire = function(self)
 	-- Play the effects.
 	for k,v in pairs(self.influences) do
 		if k.effect then
-			Server:object_effect(self, k.effect)
+			Main.vision:object_effect(self, k.effect)
 		end
 	end
 	return ret

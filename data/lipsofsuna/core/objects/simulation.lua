@@ -133,7 +133,7 @@ SimulationObject.animate = function(self, name, force_temporary)
 		end
 	end
 	-- Emit a vision event.
-	Server:object_event(self, "object-animated", {animation = name, variant = math.random(0, 255)})
+	Main.vision:object_event(self, "object-animated", {animation = name, variant = math.random(0, 255)})
 	return true
 end
 
@@ -205,7 +205,7 @@ end
 -- @param args Effect arguments.
 SimulationObject.effect = function(self, args)
 	if not args.effect then return end
-	Server:object_event(self, "object-effect", {effect = args.effect})
+	Main.vision:object_event(self, "object-effect", {effect = args.effect})
 end
 
 --- Finds an action by name.

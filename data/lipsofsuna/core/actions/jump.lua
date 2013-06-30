@@ -23,7 +23,7 @@ Actionspec{
 			if not self.physics:get_ground() or self:get_burdened() then return end
 			self.jumped = t
 			self.jumping = true
-			Server:object_effect(self, "jump1")
+			Main.vision:object_effect(self, "jump1")
 			self:animate("jump")
 			local v = self:get_velocity()
 			local f = self.spec.mass * self.spec.jump_force * self.attributes.jump

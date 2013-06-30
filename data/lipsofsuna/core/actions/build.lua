@@ -7,8 +7,8 @@ local perform_attack = function(attacker)
 	if not weapon then return end
 	Coroutine(function(t)
 		-- Play the attack effect.
-		Server:object_effect(attacker, "swing1")
-		Server:object_event(attacker, "object attack", {move = "stand", variant = math.random(0, 255)})
+		Main.vision:object_effect(attacker, "swing1")
+		Main.vision:object_event(attacker, "object attack", {move = "stand", variant = math.random(0, 255)})
 		Coroutine:sleep(attacker.spec.timing_build * 0.02)
 		-- Check for a correct weapon.
 		if not weapon.spec.construct_tile then return end
@@ -33,7 +33,7 @@ local perform_attack = function(attacker)
 			p = Vector(0,radius/4,0):add(r.point)
 		end
 		Game.terrain.terrain:add_sphere_filter_id(p, radius, material.id, 0)
-		Server:world_effect(r.point, material.effect_build)
+		Main.vision:world_effect(r.point, material.effect_build)
 	end)
 end
 

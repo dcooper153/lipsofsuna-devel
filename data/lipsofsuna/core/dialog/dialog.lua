@@ -256,7 +256,7 @@ end
 -- @param event Dialog event.
 Dialog.emit_event = function(self, object, event)
 	if self.object.spec.type ~= "static" then
-		Server:object_event(object, "object-dialog", event)
+		Main.vision:object_event(object, "object-dialog", event)
 	else
 		event.type = "object-dialog"
 		event.id = object:get_id()
@@ -391,11 +391,11 @@ Dialog.execute = function(self)
 			for i = #vm,1,-1 do vm[i] = nil end
 		end,
 		effect = function(vm, c)
-			Server:object_effect(self.object, c[2])
+			Main.vision:object_effect(self.object, c[2])
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["effect player"] = function(vm, c)
-			Server:object_effect(self.user, c[2])
+			Main.vision:object_effect(self.user, c[2])
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["flag"] = function(vm, c)

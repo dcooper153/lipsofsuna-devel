@@ -9,7 +9,7 @@ Actionspec{
 		action.time = 0
 		action.delay = action.object.spec.timing_attack_melee * 0.02
 		-- Play the start effect.
-		Server:object_effect(action.object, "swing1")
+		Main.vision:object_effect(action.object, "swing1")
 		action.object:animate("attack bite", true)
 		-- Enable effect-over-time updates.
 		return true

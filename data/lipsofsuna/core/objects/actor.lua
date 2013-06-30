@@ -357,9 +357,9 @@ Actor.damaged = function(self, args)
 	-- TODO: Should depend on the damage magnitude.
 	if args.type == "physical" and args.amount > 0 then
 		if args.point then
-			Server:world_effect(args.point, self.spec.effect_physical_damage)
+			Main.vision:world_effect(args.point, self.spec.effect_physical_damage)
 		else
-			Server:object_effect(self, self.spec.effect_physical_damage)
+			Main.vision:object_effect(self, self.spec.effect_physical_damage)
 		end
 	end
 	-- Play the flinch animation.
@@ -652,7 +652,7 @@ Actor.update_actions = function(self, secs)
 				local damage = (diffy - limity) * self.spec.falling_damage_rate * self.attributes.falling_damage
 				if damage > 2 then
 					self:damaged{amount = damage, type = "falling"}
-					Server:object_effect(self, self.spec.effect_falling_damage)
+					Main.vision:object_effect(self, self.spec.effect_falling_damage)
 				end
 			end
 		end
@@ -671,7 +671,7 @@ Actor.update_actions = function(self, secs)
 		if self.jump_timer > 0.2 and Program:get_time() - self.jumped > 0.8 and self.physics:get_ground() then
 			if not self.submerged or self.submerged < 0.3 then
 				self:animate("land ground")
-				Server:object_effect(self, self.spec.effect_landing)
+				Main.vision:object_effect(self, self.spec.effect_landing)
 			else
 				self:animate("land water")
 			end
@@ -830,7 +830,7 @@ Actor.set_beheaded = function(self, value)
 	if value then
 		-- Behead.
 		self.__beheaded = true
-		Server:object_event(self, "object-beheaded")
+		Main.vision:object_event(self, "object-beheaded")
 		-- Drop headwear.
 		local hat = self.inventory:get_object_by_slot("head")
 		if hat then
@@ -843,7 +843,7 @@ Actor.set_beheaded = function(self, value)
 	else
 		-- Unbehead.
 		self.__beheaded = nil
-		Server:object_event(self, "object-beheaded")
+		Main.vision:object_event(self, "object-beheaded")
 	end
 end
 
@@ -920,7 +920,7 @@ Actor.set_dead_state = function(self, drop)
 		end
 	end
 	-- Emit a vision event.
-	Server:object_event(self, "object-dead", {dead = true})
+	Main.vision:object_event(self, "object-dead", {dead = true})
 end
 
 --- Gets the spell types known by the object.

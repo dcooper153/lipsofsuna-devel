@@ -205,7 +205,7 @@ end
 Utils.explosion = function(clss, point, radius)
 	local r1 = radius or 1
 	local r2 = r1 + 3
-	Server:world_effect(point, "explosion1")
+	Main.vision:world_effect(point, "explosion1")
 	-- Damage nearby objects.
 	for k1,v1 in pairs(Main.objects:find_by_point(point, r2)) do
 		local diff = v1:get_position() - point

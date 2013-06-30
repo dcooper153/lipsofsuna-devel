@@ -23,7 +23,6 @@ local Serialize = require(Mod.path .. "serialize")
 local ServerConfig = require(Mod.path .. "server-config")
 local Trading = require(Mod.path .. "trading")
 local UnlockManager = require(Mod.path .. "unlock-manager")
-local Vision = require("system/vision")
 
 --- TODO:doc
 -- @type Server
@@ -170,33 +169,6 @@ Server.authenticate_client = function(self, client, login, pass)
 	end
 end
 
-Server.global_event = function(self, type, args)
-	local a = args or {}
-	a.type = type
-	Vision:dispatch_event(a, Main.objects)
-end
-
-Server.object_effect = function(self, object, name)
-	if not name then return end
-	self:object_event(object, "object-effect", {effect = name})
-end
-
-Server.object_event = function(self, object, type, args)
-	local a = args or {}
-	a.id = object:get_id()
-	a.object = object
-	a.type = type
-	Vision:dispatch_event(a, Main.objects)
-end
-
-Server.object_event_id = function(self, id, type, args)
-	local a = args or {}
-	a.id = id
-	a.object = Main.objects:find_by_id(id)
-	a.type = type
-	Vision:dispatch_event(a, Main.objects)
-end
-
 Server.spawn_player = function(self, player, client, spawnpoint)
 	-- Notify the client of the game start.
 	Main.messaging:server_event("accept character", client)
@@ -264,12 +236,6 @@ Server.update = function(self, secs)
 	self.events:update(secs)
 	-- Update world object decay.
 	self.object_database:update_world_decay(secs)
-end
-
-Server.world_effect = function(self, point, name)
-	if not name then return end
-	local args = {type = "world-effect", point = point, effect = name}
-	Vision:dispatch_event(args, Main.objects)
 end
 
 Server.get_client_address = function(self, client)

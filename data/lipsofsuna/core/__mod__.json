@@ -49,6 +49,7 @@
 		["load", "core/server"],
 		["load", "core/shaders"],
 		["load", "core/terrain"],
+		["load", "core/vision"],
 		["load", "core/misc"]
 	]
 }

@@ -40,8 +40,8 @@ Actionspec{
 			local projectile = action.item:split()
 			local damage = Combat:calculate_ranged_damage(action.object, projectile)
 			-- Play the attack effect.
-			Server:object_effect(action.object, "swing1")
-			Server:object_event(action.object, "object attack", {move = "stand", variant = math.random(0, 255)})
+			Main.vision:object_effect(action.object, "swing1")
+			Main.vision:object_event(action.object, "object attack", {move = "stand", variant = math.random(0, 255)})
 			-- Fire the projectile.
 			if projectile.spec.categories["boomerang"] then
 				local controller = BoomerangController(action.object, projectile, damage)

@@ -1,4 +1,4 @@
---- TODO:doc
+--- Create and synchronize stats.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -132,10 +132,10 @@ end
 -- @param self Stats.
 -- @param stat Stat table.
 Stats.notify_change = function(self, stat)
-	if not Server.initialized then return end
+	if not Main.vision then return end
 	if not stat.value_prev then return end
 	if math.floor(stat.value) == math.floor(stat.value_prev) then return end
-	Server:object_event_id(self.id, "stat changed", {name = stat.name,
+	Main.vision:object_event_id(self.id, "stat changed", {name = stat.name,
 		maximum = stat.maximum, value = stat.value, value_prev = stat.value_prev})
 end
 
@@ -233,5 +233,3 @@ Stats.set_value = function(self, name, value)
 end
 
 return Stats
-
-

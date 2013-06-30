@@ -6,7 +6,7 @@ Actionspec{
 	start = function(action, item)
 		if not item then return end
 		-- Play the use effect.
-		Server:object_effect(action.object, item.spec.effect_use)
+		Main.vision:object_effect(action.object, item.spec.effect_use)
 		-- Apply the spell effects.
 		local damage = Damage()
 		damage:add_spell_influences(item.spec.potion_effects)

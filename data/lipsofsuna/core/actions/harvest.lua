@@ -9,7 +9,7 @@ Actionspec{
 		for k,v in pairs(object.spec.harvest_materials) do table.insert(mats, k) end
 		if #mats == 0 then return end
 		-- Play the harvesting effect.
-		Server:world_effect(object:get_position(), object.spec.harvest_effect)
+		Main.vision:world_effect(object:get_position(), object.spec.harvest_effect)
 		-- Choose a random item from the list.
 		local item = Item(action.object.manager)
 		item:set_spec(Itemspec:find_by_name(mats[math.random(1, #mats)]))

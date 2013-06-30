@@ -23,8 +23,8 @@ Actionspec{
 		if not action.path then return end
 		action.prev = Main.combat_utils:get_actor_attack_point(action.object, action.path[1])
 		-- Play the start effect.
-		Server:object_effect(action.object, "swing1")
-		Server:object_event(action.object, "object attack", {move = move, variant = math.random(0, 255)})
+		Main.vision:object_effect(action.object, "swing1")
+		Main.vision:object_event(action.object, "object attack", {move = move, variant = math.random(0, 255)})
 		-- Enable effect-over-time updates.
 		return true
 	end,

@@ -66,7 +66,7 @@ Crafting.craft = function(clss, user, name, mode)
 		user.inventory:subtract_objects_by_name(name1, req)
 	end
 	-- Play the crafting effect.
-	Server:object_effect(user, craftspec.effect)
+	Main.vision:object_effect(user, craftspec.effect)
 	-- Create item.
 	local item = Item(user.manager)
 	item:set_spec(itemspec)

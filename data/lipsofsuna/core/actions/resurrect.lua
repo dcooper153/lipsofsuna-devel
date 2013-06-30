@@ -15,5 +15,5 @@ Actionspec{
 		-- Restore the idle animation.
 		self:animate("idle")
 		-- Emit a vision event.
-		Server:object_event(self, "object-dead", {dead = false})
+		Main.vision:object_event(self, "object-dead", {dead = false})
 	end}

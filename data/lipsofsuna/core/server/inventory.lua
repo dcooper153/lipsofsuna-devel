@@ -132,7 +132,7 @@ Inventory.equip_index = function(self, index, slot)
 	end
 	-- Notify vision.
 	if Server.initialized then
-		Server:object_event_id(self.id, "object-equip", {index = index, item = o, slot = slot})
+		Main.vision:object_event_id(self.id, "object-equip", {index = index, item = o, slot = slot})
 	end
 end
 
@@ -491,7 +491,7 @@ Inventory.unequip_index = function(self, index)
 	end
 	-- Notify vision.
 	if Server.initialized then
-		Server:object_event_id(self.id, "object-unequip", {index = index, item = o, slot = slot})
+		Main.vision:object_event_id(self.id, "object-unequip", {index = index, item = o, slot = slot})
 	end
 end
 
@@ -511,7 +511,7 @@ Inventory.unequip_slot = function(self, slot)
 	-- Notify vision.
 	if Server.initialized then
 		local parent = Main.objects:find_by_id(self.id)
-		Server:object_event_id(self.id, "object-unequip", {index = index, item = o, slot = slot})
+		Main.vision:object_event_id(self.id, "object-unequip", {index = index, item = o, slot = slot})
 	end
 end
 

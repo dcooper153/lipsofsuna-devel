@@ -30,5 +30,5 @@ Main.messaging:register_message{
 		tilt = math.max(-player.spec.tilt_limit, tilt)
 		player:set_tilt_angle(tilt)
 		player:set_rotation(Quaternion{euler = {turn, 0, 0}})
-		Server:object_event(player, "object-motion")
+		Main.vision:object_event(player, "object-motion")
 	end}
