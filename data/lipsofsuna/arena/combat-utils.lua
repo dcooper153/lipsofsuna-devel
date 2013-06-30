@@ -214,9 +214,10 @@ end
 -- @param item item.
 -- @return Dictionary of modifier names and values. Nil if none existed.
 CombatUtils.get_spell_modifiers_for_item = function(self, item)
+	-- Get the modifier names.
 	local names = {}
-	if item.modifiers then
-		for k,v in pairs(item.modifiers) do
+	if item.spell_modifiers then
+		for k,v in pairs(item.spell_modifiers) do
 			names[k] = (names[k] or 0) + v
 		end
 	else
@@ -224,6 +225,7 @@ CombatUtils.get_spell_modifiers_for_item = function(self, item)
 			names[k] = (names[k] or 0) + v
 		end
 	end
+	-- Filter out invalid modifiers.
 	local found
 	local modifiers = {}
 	for k,v in pairs(names) do
