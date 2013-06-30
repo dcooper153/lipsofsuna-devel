@@ -9,24 +9,17 @@
 -- @alias TerrainMaterialSpec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- Specifies the behavior of terrain materials.
 -- @type TerrainMaterial
-TerrainMaterialSpec = Class("TerrainMaterialSpec", Spec)
-TerrainMaterialSpec.type = "terrain material"
-TerrainMaterialSpec.dict_id = {}
-TerrainMaterialSpec.dict_cat = {}
-TerrainMaterialSpec.dict_name = {}
-TerrainMaterialSpec.introspect = Introspect{
-	name = "TerrainMaterialSpec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "effect_build", type = "string", description = "Building effect.", details = {spec = "Effectspec"}},
-		{name = "effect_collapse", type = "string", description = "Collapsing effect.", details = {spec = "Effectspec"}},
-		{name = "mining_item", type = "string", description = "Item name obtained by mining.", details = {spec = "Itemspec"}}
-	}}
+TerrainMaterialSpec = Spec:register("TerrainMaterialSpec", "terrain material", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+	{name = "effect_build", type = "string", description = "Building effect.", details = {spec = "Effectspec"}},
+	{name = "effect_collapse", type = "string", description = "Collapsing effect.", details = {spec = "Effectspec"}},
+	{name = "mining_item", type = "string", description = "Item name obtained by mining.", details = {spec = "Itemspec"}}
+})
 
 --- Creates a new terrain material specification.
 -- @param clss TerrainMaterialSpec class.

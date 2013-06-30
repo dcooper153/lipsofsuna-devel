@@ -9,22 +9,15 @@
 -- @alias AnimationProfileSpec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type AnimationProfileSpec
-AnimationProfileSpec = Class("AnimationProfileSpec", Spec)
-AnimationProfileSpec.type = "animation profile"
-AnimationProfileSpec.dict_id = {}
-AnimationProfileSpec.dict_cat = {}
-AnimationProfileSpec.dict_name = {}
-AnimationProfileSpec.introspect = Introspect{
-	name = "AnimationProfileSpec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation specs.", details = {values = {spec = "Animationspec"}}},
-		{name = "inherit", type = "list", list = {type = "string", details = {value = {spec = "AnimationProfileSpec"}}}, default = {}, description = "List of inherited profiles."}
-	}}
+AnimationProfileSpec = Spec:register("AnimationProfileSpec", "animation profile", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation specs.", details = {values = {spec = "Animationspec"}}},
+	{name = "inherit", type = "list", list = {type = "string", details = {value = {spec = "AnimationProfileSpec"}}}, default = {}, description = "List of inherited profiles."}
+})
 
 --- Creates a new animation profile spec.
 -- @param clss AnimationProfileSpec class.

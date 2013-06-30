@@ -9,22 +9,15 @@
 -- @alias Dialogspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Dialogspec
-Dialogspec = Class("Dialogspec", Spec)
-Dialogspec.type = "dialog"
-Dialogspec.dict_id = {}
-Dialogspec.dict_cat = {}
-Dialogspec.dict_name = {}
-Dialogspec.introspect = Introspect{
-	name = "Dialogspec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "commands", type = "dialog tree", default = {}, description = "Dialog commands"}
-	}}
+Dialogspec = Spec:register("Dialogspec", "dialog", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+	{name = "commands", type = "dialog tree", default = {}, description = "Dialog commands"}
+})
 
 --- Creates a new dialog specification.
 -- @param clss Dialogspec class.

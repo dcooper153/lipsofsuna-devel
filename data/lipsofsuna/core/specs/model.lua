@@ -13,11 +13,7 @@ local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Modelspec
-Modelspec = Class("Modelspec", Spec)
-Modelspec.type = "model"
-Modelspec.dict_id = {}
-Modelspec.dict_cat = {}
-Modelspec.dict_name = {}
+Modelspec = Spec:register("Modelspec", "model")
 
 --- Creates a new model specification.
 -- @param clss Modelspec class.
@@ -32,5 +28,3 @@ Modelspec.new = function(clss, args)
 end
 
 return ModelSpec
-
-

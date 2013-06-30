@@ -9,23 +9,16 @@
 -- @alias Helpspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Helpspec
-Helpspec = Class("Helpspec", Spec)
-Helpspec.type = "helpspec"
-Helpspec.dict_id = {}
-Helpspec.dict_cat = {}
-Helpspec.dict_name = {}
-Helpspec.introspect = Introspect{
-	name = "Helpspec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "text", type = "string", description = "Help text."},
-		{name = "title", type = "string", description = "Help page title."}
-	}}
+Helpspec = Spec:register("Helpspec", "help", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+	{name = "text", type = "string", description = "Help text."},
+	{name = "title", type = "string", description = "Help page title."}
+})
 
 --- Registers a help specifification.
 -- @param clss Helpspec class.

@@ -9,24 +9,17 @@
 -- @alias Personalityspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Personalityspec
-Personalityspec = Class("Personalityspec", Spec)
-Personalityspec.type = "personality"
-Personalityspec.dict_id = {}
-Personalityspec.dict_cat = {}
-Personalityspec.dict_name = {}
-Personalityspec.introspect = Introspect{
-	name = "Personalityspec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "phrases_angered", type = "list", list = {type = "string"}, description = "List of angered phrases."},
-		{name = "phrases_combat", type = "list", list = {type = "string"}, description = "List of combat phrases."},
-		{name = "phrases_death", type = "list", list = {type = "string"}, description = "List of death phrases."}
-	}}
+Personalityspec = Spec:register("Personalityspec", "personality", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+	{name = "phrases_angered", type = "list", list = {type = "string"}, description = "List of angered phrases."},
+	{name = "phrases_combat", type = "list", list = {type = "string"}, description = "List of combat phrases."},
+	{name = "phrases_death", type = "list", list = {type = "string"}, description = "List of death phrases."}
+})
 
 --- Registers an actor personality.
 -- @param clss Personalityspec class.

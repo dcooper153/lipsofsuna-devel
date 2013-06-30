@@ -9,23 +9,16 @@
 -- @alias Actionspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Actionspec
-Actionspec = Class("Actionspec", Spec)
-Actionspec.type = "action"
-Actionspec.dict_id = {}
-Actionspec.dict_cat = {}
-Actionspec.dict_name = {}
-Actionspec.introspect = Introspect{
-	name = "Actionspec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "func", type = "ignore"},
-		{name = "label", type = "string", description = "Human readable name of the action."}
-	}}
+Actionspec = Spec:register("Actionspec", "action", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+	{name = "func", type = "ignore"},
+	{name = "label", type = "string", description = "Human readable name of the action."}
+})
 
 --- Creates a new action specification.
 -- @param clss Actionspec class.

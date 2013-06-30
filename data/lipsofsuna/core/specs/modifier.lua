@@ -13,8 +13,7 @@ local Spec = require("core/specs/spec")
 
 --- Spec for modifiers.
 -- @type ModifierSpec
-local ModifierSpec = Class("ModifierSpec", Spec)
-Spec:register("modifier", ModifierSpec, {
+local ModifierSpec = Spec:register("ModifierSpec", "modifier", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "actions", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of compatible actions.", details = {keys = {spec = "Actionspec"}}},

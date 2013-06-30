@@ -9,23 +9,16 @@
 -- @alias Questspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Questspec
-Questspec = Class("Questspec", Spec)
-Questspec.type = "quest"
-Questspec.dict_id = {}
-Questspec.dict_cat = {}
-Questspec.dict_name = {}
-Questspec.introspect = Introspect{
-	name = "Questspec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "status", type = "string", default = "unused", description = "Quest status. (unused/inactive/active/completed)"},
-		{name = "text", type = "string", default = "", description = "Textual description of the quest status."}
-	}}
+Questspec = Spec:register("Questspec", "quest", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+	{name = "status", type = "string", default = "unused", description = "Quest status. (unused/inactive/active/completed)"},
+	{name = "text", type = "string", default = "", description = "Textual description of the quest status."}
+})
 
 --- Creates a new quest specification.
 -- @param clss Quest class.

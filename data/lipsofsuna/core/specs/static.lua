@@ -9,29 +9,22 @@
 -- @alias Staticspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Staticspec
-Staticspec = Class("Staticspec", Spec)
-Staticspec.type = "static"
-Staticspec.dict_id = {}
-Staticspec.dict_cat = {}
-Staticspec.dict_name = {}
-Staticspec.introspect = Introspect{
-	name = "Staticspec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "collision_group", type = "number", default = 0x2000, description = "Collision group."},
-		{name = "collision_mask", type = "number", default = 0xFF, description = "Collision mask."},
-		{name = "dialog", type = "string", description = "Dialog name.", details = {spec = "Dialogspec"}},
-		{name = "marker", type = "string", description = "Map marker name."},
-		{name = "model", type = "string", description = "Model to use for the obstacle."},
-		{name = "position", type = "vector", default = Vector(), description = "Position vector."},
-		{name = "rotation", type = "quaternion", default = Quaternion(), description = "Rotation quaternion."},
-		{name = "usages", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of ways how the object can be used.", details = {keys = {spec = "Actionspec"}}}
-	}}
+Staticspec = Spec:register("Staticspec", "static", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+	{name = "collision_group", type = "number", default = 0x2000, description = "Collision group."},
+	{name = "collision_mask", type = "number", default = 0xFF, description = "Collision mask."},
+	{name = "dialog", type = "string", description = "Dialog name.", details = {spec = "Dialogspec"}},
+	{name = "marker", type = "string", description = "Map marker name."},
+	{name = "model", type = "string", description = "Model to use for the obstacle."},
+	{name = "position", type = "vector", default = Vector(), description = "Position vector."},
+	{name = "rotation", type = "quaternion", default = Quaternion(), description = "Rotation quaternion."},
+	{name = "usages", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of ways how the object can be used.", details = {keys = {spec = "Actionspec"}}}
+})
 
 --- Creates a new static map object specification.
 -- @param clss Staticspec class.

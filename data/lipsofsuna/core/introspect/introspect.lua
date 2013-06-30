@@ -102,7 +102,6 @@ Introspect.validate = function(self, data)
 		-- Validate spec relations.
 		if details.spec then
 			local specclss = Spec.dict_spec[details.spec]
-			if not specclss then specclss = _G[details.spec] end --FIXME: Backwards compatiblity
 			assert(specclss)
 			if not specclss:find{name = value} then
 				error(value .. " not in " .. details.spec, 0)

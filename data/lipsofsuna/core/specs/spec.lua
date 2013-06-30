@@ -23,17 +23,20 @@ Spec.dict_spec = {}
 --- Registers a spec class.
 -- @param clss Spec class.
 -- @param name Spec name.
--- @param spec Spec child class.
+-- @param type Spec type.
 -- @param fields Introspection fields.
-Spec.register = function(clss, name, spec, fields)
-	clss.dict_spec[spec.class_name] = spec
-	spec.type = name
+-- @return New spec class.
+Spec.register = function(clss, name, type, fields)
+	local spec = Class(name, clss)
+	spec.type = type
 	spec.dict_id = {}
 	spec.dict_cat = {}
 	spec.dict_name = {}
-	spec.introspect = Introspect{
-		name = spec.class_name,
-		fields = fields}
+	if fields then
+		spec.introspect = Introspect{name = name, fields = fields}
+	end
+	clss.dict_spec[name] = spec
+	return spec
 end
 
 --- Extends a spec with the values in the table.

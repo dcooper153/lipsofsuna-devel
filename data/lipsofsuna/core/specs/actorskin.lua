@@ -9,24 +9,17 @@
 -- @alias Actorskinspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Actorskinspec
-Actorskinspec = Class("Actorskinspec", Spec)
-Actorskinspec.type = "actorskinspec"
-Actorskinspec.dict_id = {}
-Actorskinspec.dict_cat = {}
-Actorskinspec.dict_name = {}
-Actorskinspec.introspect = Introspect{
-	name = "Actorskinspec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "actors", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of actor spec names.", details = {keys = {spec = "Actorspec"}}},
-		{name = "material", type = "string", default = "animskin1", description = "Material name."},
-		{name = "textures", type = "list", list = {type = "string"}, description = "List of texture names."}
-	}}
+Actorskinspec = Spec:register("Actorskinspec", "actor skin", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+	{name = "actors", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of actor spec names.", details = {keys = {spec = "Actorspec"}}},
+	{name = "material", type = "string", default = "animskin1", description = "Material name."},
+	{name = "textures", type = "list", list = {type = "string"}, description = "List of texture names."}
+})
 
 --- Registers an actor skin.
 -- @param clss Actorskinspec class.

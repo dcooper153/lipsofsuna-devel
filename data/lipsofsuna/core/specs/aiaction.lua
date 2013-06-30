@@ -9,15 +9,11 @@
 -- @alias Aiactionspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Aiactionspec
-Aiactionspec = Class("Aiactionspec", Spec)
-Aiactionspec.type = "aiaction"
-Aiactionspec.dict_id = {}
-Aiactionspec.dict_cat = {}
-Aiactionspec.dict_name = {}
+Aiactionspec = Spec:register("Aiactionspec", "ai action")
 
 --- Registers an AI action.
 -- @param clss Aiactionspec class.

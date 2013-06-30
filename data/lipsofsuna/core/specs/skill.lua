@@ -9,25 +9,18 @@
 -- @alias Skillspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Skillspec
-Skillspec = Class("Skillspec", Spec)
-Skillspec.type = "skillspec"
-Skillspec.dict_id = {}
-Skillspec.dict_cat = {}
-Skillspec.dict_name = {}
-Skillspec.introspect = Introspect{
-	name = "Skillspec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "assign", type = "ignore"},
-		{name = "description", type = "string", description = "Description string."},
-		{name = "icon", type = "string", description = "Icon name."},
-		{name = "requires", type = "list", list = {type = "string"}, default = {}, description = "List of required skills."}
-	}}
+Skillspec = Spec:register("Skillspec", "skill", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+	{name = "assign", type = "ignore"},
+	{name = "description", type = "string", description = "Description string."},
+	{name = "icon", type = "string", description = "Icon name."},
+	{name = "requires", type = "list", list = {type = "string"}, default = {}, description = "List of required skills."}
+})
 
 --- Registers a skill specifification.
 -- @param clss Skillspec class.

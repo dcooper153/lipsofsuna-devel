@@ -9,15 +9,11 @@
 -- @alias Aistatespec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Aistatespec
-Aistatespec = Class("Aistatespec", Spec)
-Aistatespec.type = "aistate"
-Aistatespec.dict_id = {}
-Aistatespec.dict_cat = {}
-Aistatespec.dict_name = {}
+Aistatespec = Spec:register("Aistatespec", "ai state")
 
 --- Registers an AI state.
 -- @param clss Aistatespec class.

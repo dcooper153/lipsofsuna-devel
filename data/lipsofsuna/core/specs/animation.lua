@@ -9,34 +9,27 @@
 -- @alias Animationspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Animationspec
-Animationspec = Class("Animationspec", Spec)
-Animationspec.type = "animation"
-Animationspec.dict_id = {}
-Animationspec.dict_cat = {}
-Animationspec.dict_name = {}
-Animationspec.introspect = Introspect{
-	name = "Animationspec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "animation", type = "string", description = "Animation file name."},
-		{name = "animations", type = "list", list = {type = "string"}, description = "List of animation file names."},
-		{name = "channel", type = "number", description = "Channel number.", details = {integer = true, min = 0, max = 255}},
-		{name = "fade_in", type = "number", description = "Fade in duration."},
-		{name = "fade_out", type = "number", description = "Fade out duration."},
-		{name = "permanent", type = "boolean", description = "Enables looping of the animation."},
-		{name = "repeat_end", type = "number", description = "Repeat range end offset."},
-		{name = "repeat_start", type = "number", description = "Repeat range start offset."},
-		{name = "replace", type = "boolean", description = "True to replace the old animation, false to inherit it when possible."},
-		{name = "time", type = "number", description = "Starting time offset."},
-		{name = "time_scale", type = "number", description = "Time scale multiplier."},
-		{name = "weight", type = "number", description = "Blending weight."},
-		{name = "node_weights", type = "dict", dict = {type = "number"}, description = "Blending weight for individual bones."},
-	}}
+Animationspec = Spec:register("Animationspec", "animation", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+	{name = "animation", type = "string", description = "Animation file name."},
+	{name = "animations", type = "list", list = {type = "string"}, description = "List of animation file names."},
+	{name = "channel", type = "number", description = "Channel number.", details = {integer = true, min = 0, max = 255}},
+	{name = "fade_in", type = "number", description = "Fade in duration."},
+	{name = "fade_out", type = "number", description = "Fade out duration."},
+	{name = "permanent", type = "boolean", description = "Enables looping of the animation."},
+	{name = "repeat_end", type = "number", description = "Repeat range end offset."},
+	{name = "repeat_start", type = "number", description = "Repeat range start offset."},
+	{name = "replace", type = "boolean", description = "True to replace the old animation, false to inherit it when possible."},
+	{name = "time", type = "number", description = "Starting time offset."},
+	{name = "time_scale", type = "number", description = "Time scale multiplier."},
+	{name = "weight", type = "number", description = "Blending weight."},
+	{name = "node_weights", type = "dict", dict = {type = "number"}, description = "Blending weight for individual bones."},
+})
 
 --- Creates a new animation spec.
 -- @param clss Animationspec class.

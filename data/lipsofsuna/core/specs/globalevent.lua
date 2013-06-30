@@ -9,27 +9,20 @@
 -- @alias Globaleventspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Globaleventspec
-Globaleventspec = Class("Globaleventspec", Spec)
-Globaleventspec.type = "quest"
-Globaleventspec.dict_id = {}
-Globaleventspec.dict_cat = {}
-Globaleventspec.dict_name = {}
-Globaleventspec.introspect = Introspect{
-	name = "Globaleventspec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "duration", type = "number", description = "Duration of the event, in seconds."},
-		{name = "sector_created", type = "ignore"},
-		{name = "sector_loaded", type = "ignore"},
-		{name = "started", type = "ignore"},
-		{name = "stopped", type = "ignore"},
-		{name = "update", type = "ignore"},
-	}}
+Globaleventspec = Spec:register("Globaleventspec", "global event", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+	{name = "duration", type = "number", description = "Duration of the event, in seconds."},
+	{name = "sector_created", type = "ignore"},
+	{name = "sector_loaded", type = "ignore"},
+	{name = "started", type = "ignore"},
+	{name = "stopped", type = "ignore"},
+	{name = "update", type = "ignore"},
+})
 
 --- Creates a new global event specification.
 -- @param clss Globaleventspec class.

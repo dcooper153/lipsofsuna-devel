@@ -9,22 +9,15 @@
 -- @alias Factionspec
 
 local Class = require("system/class")
-require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Factionspec
-Factionspec = Class("Factionspec", Spec)
-Factionspec.type = "faction"
-Factionspec.dict_id = {}
-Factionspec.dict_cat = {}
-Factionspec.dict_name = {}
-Factionspec.introspect = Introspect{
-	name = "Factionspec",
-	fields = {
-		{name = "name", type = "string", description = "Name of the spec."},
-		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "enemies", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of enemy faction names.", details = {keys = {spec = "Factionspec"}}}
-	}}
+Factionspec = Spec:register("Factionspec", "faction", {
+	{name = "name", type = "string", description = "Name of the spec."},
+	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+	{name = "enemies", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of enemy faction names.", details = {keys = {spec = "Factionspec"}}}
+})
 
 --- Creates a new faction.
 -- @param clss Factionspec class.
