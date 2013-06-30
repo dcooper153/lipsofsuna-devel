@@ -22,7 +22,7 @@ local PhysicalDamageModifier = ModifierSpec{
 	},
 	effect = "impact1",
 	icon = "missing1", --FIXME
-	influences =
+	modifiers =
 	{
 		["physical damage"] = 1
 	}}

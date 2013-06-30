@@ -98,10 +98,10 @@ end
 -- @param spec Itemspec.
 -- @return Number.
 Skills.calculate_damage_multiplier_for_itemspec = function(self, spec)
-	if not spec.influences_bonus then return 1 end
+	if not spec.modifiers_bonus then return 1 end
 	local mult = 1
 	local attr = self:calculate_attributes()
-	for name in pairs(spec.influences_bonus) do
+	for name in pairs(spec.modifiers_bonus) do
 		if attr[name] then mult = mult * attr[name] end
 	end
 	return mult

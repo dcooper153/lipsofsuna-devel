@@ -12,8 +12,8 @@ Itemspec{
 	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	effect_attack_speedline = true,
 	icon = "dagger1",
-	influences = {["physical damage"] = 10},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 10},
+	modifiers_bonus = {"melee"},
 	equipment_slot = "hand.R",
 	mass = 15,
 	model = "dagger1"} -- FIXME
@@ -34,8 +34,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 500,
 	icon = "dagger1",
-	influences = {["cold damage"] = 4, ["physical damage"] = 4},
-	influences_bonus = {"melee"},
+	modifiers = {["cold damage"] = 4, ["physical damage"] = 4},
+	modifiers_bonus = {"melee"},
 	mass = 15}
 
 CraftingRecipeSpec{
@@ -53,8 +53,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 500,
 	icon = "dagger1",
-	influences = {["fire damage"] = 4, ["physical damage"] = 4},
-	influences_bonus = {"melee"},
+	modifiers = {["fire damage"] = 4, ["physical damage"] = 4},
+	modifiers_bonus = {"melee"},
 	mass = 15,
 	model = "dagger1"} -- FIXME
 
@@ -73,8 +73,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 220,
 	icon = "dagger1",
-	influences = {["physical damage"] = 5},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 5},
+	modifiers_bonus = {"melee"},
 	mass = 5,
 	model = "dagger1"} -- FIXME
 
@@ -92,8 +92,8 @@ Itemspec{
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
 	icon = "dagger1",
-	influences = {["physical damage"] = 3},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 3},
+	modifiers_bonus = {"melee"},
 	health = 130,
 	mass = 6,
 	model = "dagger1"} -- FIXME
@@ -113,8 +113,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 100,
 	icon = "dagger1",
-	influences = {["physical damage"] = 3},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 3},
+	modifiers_bonus = {"melee"},
 	mass = 7,
 	model = "woodshortsword", -- FIXME
 	water_gravity = Vector(0,6,0)}

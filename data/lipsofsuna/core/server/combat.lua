@@ -27,9 +27,9 @@ Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, ti
 	-- Calculate the damage.
 	local damage = Damage()
 	if weapon then
-		damage:add_item_influences(weapon, attacker.skills)
+		damage:add_item_modifiers(weapon, attacker.skills)
 	else
-		damage:add_barehanded_influences(attacker.skills)
+		damage:add_barehanded_modifiers(attacker.skills)
 	end
 	damage:add_knockback()
 	damage:apply_attacker_physical_modifiers(attacker)
@@ -94,10 +94,10 @@ end
 Combat.calculate_ranged_damage = function(self, attacker, weapon, projectile)
 	local damage = Damage()
 	if weapon then
-		damage:add_item_influences(weapon, attacker.skills)
+		damage:add_item_modifiers(weapon, attacker.skills)
 	end
 	if projectile then
-		damage:add_item_influences(projectile, attacker.skills)
+		damage:add_item_modifiers(projectile, attacker.skills)
 	end
 	damage:add_knockback()
 	damage:apply_attacker_charge(attacker:get_attack_charge())
@@ -116,7 +116,7 @@ end
 Combat.apply_ranged_spell_impact = function(self, attacker, projectile, effect, point, defender, tile)
 	-- Calculate the damage.
 	local damage = Damage()
-	damage:add_spell_influences(projectile.influences)
+	damage:add_spell_modifiers(projectile.modifiers)
 	damage:apply_defender_vulnerabilities(defender)
 	-- Knockback the defender.
 	if defender then

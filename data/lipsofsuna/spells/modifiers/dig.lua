@@ -16,7 +16,7 @@ local DigModifier = ModifierSpec{
 	description = "Fire a digging ray",
 	effect = "spell1",
 	icon = "modifier-earthmove",
-	influences = {["dig"] = 1},
+	modifiers = {["dig"] = 1},
 	projectile = "fireball1", -- FIXME
 	required_stats =
 	{

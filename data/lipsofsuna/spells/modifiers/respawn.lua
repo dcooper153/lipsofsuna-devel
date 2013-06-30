@@ -2,7 +2,7 @@ local ModifierSpec = require("core/specs/modifier")
 
 local RespawnModifier = ModifierSpec{
 	name = "respawn",
-	influences =
+	modifiers =
 	{
 		["respawn"] = 1
 	}}

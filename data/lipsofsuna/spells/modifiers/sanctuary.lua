@@ -16,7 +16,7 @@ local SanctuaryModifier = ModifierSpec{
 	description = "Protect from death",
 	effect = "sanctuary1",
 	icon = "sanctuary1",
-	influences = {["sanctuary"] = 30},
+	modifiers = {["sanctuary"] = 30},
 	required_stats =
 	{
 		["willpower"] = 20

@@ -15,7 +15,7 @@ local RestoreWillpowerModifier = ModifierSpec{
 	description = "Restore health",
 	effect = "heal1",
 	icon = "modifier-heal", --FIXME
-	influences = {["restore willpower"] = 15},
+	modifiers = {["restore willpower"] = 15},
 	required_stats =
 	{
 		["willpower"] = 5

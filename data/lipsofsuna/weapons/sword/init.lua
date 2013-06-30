@@ -14,8 +14,8 @@ Itemspec{
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
 	icon = "sword3",
-	influences = {["physical damage"] = 20},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 20},
+	modifiers_bonus = {"melee"},
 	mass = 15,
 	model = "sword6"}
 
@@ -35,8 +35,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 500,
 	icon = "sword2",
-	influences = {["cold damage"] = 8, ["physical damage"] = 8},
-	influences_bonus = {"melee"},
+	modifiers = {["cold damage"] = 8, ["physical damage"] = 8},
+	modifiers_bonus = {"melee"},
 	mass = 15,
 	model = "sword5"}
 
@@ -56,8 +56,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 500,
 	icon = "sword2",
-	influences = {["fire damage"] = 8, ["physical damage"] = 8},
-	influences_bonus = {"melee"},
+	modifiers = {["fire damage"] = 8, ["physical damage"] = 8},
+	modifiers_bonus = {"melee"},
 	mass = 15,
 	model = "sword5"}
 
@@ -77,8 +77,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 220,
 	icon = "sword2",
-	influences = {["physical damage"] = 5},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 5},
+	modifiers_bonus = {"melee"},
 	mass = 15,
 	model = "sword1"}
 
@@ -98,8 +98,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 130,
 	icon = "sword1",
-	influences = {["physical damage"] = 5},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 5},
+	modifiers_bonus = {"melee"},
 	mass = 15,
 	model = "sword1"}
 
@@ -119,8 +119,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 100,
 	icon = "sword1",
-	influences = {["physical damage"] = 5},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 5},
+	modifiers_bonus = {"melee"},
 	mass = 7,
 	model = "woodsword",
 	water_gravity = Vector(0,6,0)}

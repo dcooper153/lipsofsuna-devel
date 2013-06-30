@@ -16,7 +16,7 @@ local FollowModifier = ModifierSpec{
 	description = "Forces the target to follow you",
 	effect = "light1",
 	icon = "modifier-light",
-	influences = {["follow"] = 30},
+	modifiers = {["follow"] = 30},
 	required_stats = {["willpower"] = 5},
 	projectile = "magicmissile1"}
 

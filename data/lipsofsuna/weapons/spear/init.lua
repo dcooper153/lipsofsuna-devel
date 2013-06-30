@@ -12,8 +12,8 @@ Itemspec{
 	categories = {["melee"] = true, ["weapon"] = true},
 	effect_attack_speedline = true,
 	icon = "staff1", --FIXME
-	influences = {["physical damage"] = 10},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 10},
+	modifiers_bonus = {"melee"},
 	equipment_slot = "hand.R",
 	mass = 15,
 	model = "spear1"}

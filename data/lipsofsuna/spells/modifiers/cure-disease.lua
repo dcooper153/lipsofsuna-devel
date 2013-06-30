@@ -17,7 +17,7 @@ local CureDiseaseModifier = ModifierSpec{
 	description = "Cure the target of poison and diseases",
 	effect = "spell1",
 	icon = "modifier-heal", --FIXME
-	influences = {["cure disease"] = 1},
+	modifiers = {["cure disease"] = 1},
 	projectile = "fireball1",
 	required_stats =
 	{

@@ -16,7 +16,7 @@ local WildernessModifier = ModifierSpec{
 	description = "Grow plants from soil",
 	effect = "wilderness1",
 	icon = "modifier-nature",
-	influences =
+	modifiers =
 	{
 		["wilderness"] = 5
 	},

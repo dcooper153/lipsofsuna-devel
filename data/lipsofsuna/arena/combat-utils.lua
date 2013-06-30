@@ -30,7 +30,7 @@ end
 -- @param target Actor.
 -- @param damage Damage.
 -- @param point Hit point in world space. Nil for target position.
--- @return True if all the influences were absorbed.
+-- @return True if all the modifiers were absorbed.
 CombatUtils.apply_damage_to_actor = function(self, caster, target, damage, point)
 	-- Play impact effects.
 	if not point then
@@ -52,12 +52,12 @@ CombatUtils.apply_damage_to_actor = function(self, caster, target, damage, point
 	end
 	-- Apply the damage.
 	--
-	-- For each influence type in the damage, we create a new modifier and
+	-- For each modifier type in the damage, we create a new modifier and
 	-- let it modifier the target object. Modifiers may either apply their
 	-- effects immediately or request us to add them to the target object so
 	-- that they can perform effect-over-time updates.
 	local absorb = true
-	for name,value in pairs(damage.influences) do
+	for name,value in pairs(damage.modifiers) do
 		local spec = ModifierSpec:find_by_name(name)
 		if spec then
 			local modifier = Modifier(spec, target, caster, point)
@@ -197,31 +197,31 @@ CombatUtils.get_combat_action_for_actor = function(self, actor, hand)
 	return Actionspec:find_by_name(name)
 end
 
---- Gets the spell influences for the item.
+--- Gets the spell modifiers for the item.
 -- @param self CombatUtils.
 -- @param item item.
--- @return Dictionary of influence names and values. Nil if none existed.
-CombatUtils.get_spell_influences_for_item = function(self, item)
+-- @return Dictionary of modifier names and values. Nil if none existed.
+CombatUtils.get_spell_modifiers_for_item = function(self, item)
 	local names = {}
-	if item.influences then
-		for k,v in pairs(item.influences) do
+	if item.modifiers then
+		for k,v in pairs(item.modifiers) do
 			names[k] = (names[k] or 0) + v
 		end
 	else
-		for k,v in pairs(item.spec.influences) do
+		for k,v in pairs(item.spec.modifiers) do
 			names[k] = (names[k] or 0) + v
 		end
 	end
 	local found
-	local influences = {}
+	local modifiers = {}
 	for k,v in pairs(names) do
 		local spec = ModifierSpec:find_by_name(k)
 		if spec then
-			influences[k] = v
+			modifiers[k] = v
 			found = true
 		end
 	end
-	return found and influences or nil
+	return found and modifiers or nil
 end
 
 --- Gets the combat action for the weapon of the actor.
@@ -258,23 +258,23 @@ end
 -- @param self CombatUtils.
 -- @param actor Actor.
 -- @param self Item.
--- @return Array of influences.
-CombatUtils.get_item_attack_influences = function(self, actor, item)
+-- @return Array of modifiers.
+CombatUtils.get_item_attack_modifiers = function(self, actor, item)
 	-- Get the item spec.
 	local spec = item:get_spec()
 	if not spec then return {} end
-	if not spec.influences then return {} end
+	if not spec.modifiers then return {} end
 	-- Calculate the damage multiplier.
 	local mult = 1
 	if actor.skills then
 		mult = actor.skills:calculate_damage_multiplier_for_item(item)
 	end
-	-- Calculate influences.
-	local influences = {}
-	for k,v in pairs(spec.influences) do
-		influences[k] = mult * v
+	-- Calculate modifiers.
+	local modifiers = {}
+	for k,v in pairs(spec.modifiers) do
+		modifiers[k] = mult * v
 	end
-	return influences
+	return modifiers
 end
 
 --- Calculates the usefulness rating of the item for the given actor.
@@ -284,7 +284,7 @@ end
 -- @return Number
 CombatUtils.get_item_equip_value = function(self, actor, item)
 	local score = 50 * self:get_item_armor_class(actor, item)
-	for k,v in pairs(self:get_item_attack_influences(actor, item)) do
+	for k,v in pairs(self:get_item_attack_modifiers(actor, item)) do
 		if k ~= "hatchet" then
 			score = score + v
 		end

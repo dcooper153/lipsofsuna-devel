@@ -19,7 +19,7 @@ local BlackHazeModifier = ModifierSpec{
 	description = "Conjure infectious plagued monsters",
 	effect = "spell1",
 	icon = "modifier-black haze",
-	influences = {["black haze"] = 1},
+	modifiers = {["black haze"] = 1},
 	projectile = "fireball1",
 	required_stats =
 	{

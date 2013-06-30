@@ -17,7 +17,7 @@ local MindlessMarchModifier = ModifierSpec{
 	description = "Forces the target to march forward",
 	effect = "light1",
 	icon = "modifier-light",
-	influences = {["mindless march"] = 30},
+	modifiers = {["mindless march"] = 30},
 	projectile = "magicmissile1",
 	required_stats =
 	{

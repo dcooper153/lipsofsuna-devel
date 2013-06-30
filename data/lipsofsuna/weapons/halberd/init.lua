@@ -19,7 +19,7 @@ Itemspec{
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
 	icon = "staff1", --FIXME
-	influences = {["physical damage"] = 10},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 10},
+	modifiers_bonus = {"melee"},
 	mass = 15,
 	model = "halberd1"}

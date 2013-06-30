@@ -16,7 +16,7 @@ local LightModifier = ModifierSpec{
 	description = "Illuminate your surroundings",
 	effect = "light1",
 	icon = "modifier-light",
-	influences = {["light"] = 60},
+	modifiers = {["light"] = 60},
 	required_stats =
 	{
 		["willpower"] = 5

@@ -32,8 +32,8 @@ Itemspec{
 	model = "boomerang1",
 	icon = "boomerang1",
 	gravity_projectile = Vector(0,2,0),
-	influences = {["physical damage"] = 5},
-	influences_bonus = {"ranged"},
+	modifiers = {["physical damage"] = 5},
+	modifiers_bonus = {"ranged"},
 	equipment_slot = "hand.R",
 	stacking = true,
 	water_gravity = Vector(0,6,0)}

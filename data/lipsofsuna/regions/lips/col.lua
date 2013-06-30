@@ -7,8 +7,8 @@ Itemspec{
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
 	important = true,
-	influences = {["physical damage"] = 5},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 5},
+	modifiers_bonus = {"melee"},
 	mass = 15}
 
 Actorspec{

@@ -17,8 +17,8 @@ Itemspec{
 	animations_equipped = {["default"] = "default axe equipped"},
 	equipment_slot = "hand.R",
 	icon = "axe3",
-	influences = {hatchet = 10, ["physical damage"] = 10},
-	influences_bonus = {"melee"},
+	modifiers = {hatchet = 10, ["physical damage"] = 10},
+	modifiers_bonus = {"melee"},
 	mass = 15,
 	model = "axe1"}
 
@@ -36,8 +36,8 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	icon = "axe2",
-	influences = {["cold damage"] = 4, ["hatchet"] = 7, ["physical damage"] = 4},
-	influences_bonus = {"melee"},
+	modifiers = {["cold damage"] = 4, ["hatchet"] = 7, ["physical damage"] = 4},
+	modifiers_bonus = {"melee"},
 	health = 500,
 	mass = 15,
 	model = "axe1"}
@@ -57,8 +57,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 500,
 	icon = "axe2",
-	influences = {["fire damage"] = 4, ["hatchet"] = 7, ["physical damage"] = 4},
-	influences_bonus = {"melee"},
+	modifiers = {["fire damage"] = 4, ["hatchet"] = 7, ["physical damage"] = 4},
+	modifiers_bonus = {"melee"},
 	mass = 15,
 	model = "axe1"}
 
@@ -77,8 +77,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 220,
 	icon = "axe2",
-	influences = {["hatchet"] = 5, ["physical damage"] = 5},
-	influences_bonus = {"melee"},
+	modifiers = {["hatchet"] = 5, ["physical damage"] = 5},
+	modifiers_bonus = {"melee"},
 	mass = 10,
 	model = "axe1"}
 
@@ -97,8 +97,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 130,
 	icon = "axe1",
-	influences = {["hatchet"] = 3, ["physical damage"] = 3},
-	influences_bonus = {"melee"},
+	modifiers = {["hatchet"] = 3, ["physical damage"] = 3},
+	modifiers_bonus = {"melee"},
 	mass = 9,
 	model = "stoneaxe1",}
 
@@ -118,8 +118,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 100,
 	icon = "axe1",
-	influences = {["hatchet"] = 3, ["physical damage"] = 3},
-	influences_bonus = {"melee"},
+	modifiers = {["hatchet"] = 3, ["physical damage"] = 3},
+	modifiers_bonus = {"melee"},
 	mass = 7,
 	model = "woodhatchet",
 	water_gravity = Vector(0,6,0)}

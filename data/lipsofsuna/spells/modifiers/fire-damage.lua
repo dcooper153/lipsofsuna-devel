@@ -20,7 +20,7 @@ local FireDamageModifier = ModifierSpec{
 	description = "Inflict fire damage",
 	effect = "explosion1",
 	icon = "modifier-fireball",
-	influences = {["fire damage"] = 5},
+	modifiers = {["fire damage"] = 5},
 	projectile = "fireball1",
 	required_stats =
 	{

@@ -20,7 +20,7 @@ local ColdDamageModifier = ModifierSpec{
 	description = "Inflict cold damage",
 	effect = "explosion1", -- FIXME
 	icon = "modifier-ice",
-	influences = {["cold damage"] = 5},
+	modifiers = {["cold damage"] = 5},
 	projectile = "fireball1", -- FIXME
 	required_stats =
 	{

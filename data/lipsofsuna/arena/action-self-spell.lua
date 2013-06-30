@@ -19,18 +19,18 @@ Actionspec{
 		action.object.cooldown = 0.4
 		action.timer = action.timer + secs
 		if action.timer < action.delay then return true end
-		-- Get the influences.
-		local influences = Main.combat_utils:get_spell_influences_for_item(action.weapon)
-		if not influences then return end
+		-- Get the modifiers.
+		local modifiers = Main.combat_utils:get_spell_modifiers_for_item(action.weapon)
+		if not modifiers then return end
 		-- Subtract stats.
-		local ok,stat = Main.combat_utils:subtract_modifier_stats_for_actor(action.object, influences)
+		local ok,stat = Main.combat_utils:subtract_modifier_stats_for_actor(action.object, modifiers)
 		if not ok then
 			action.object:send_message("You do not have have enough " .. stat .. ".")
 			return
 		end
-		-- Apply the influences.
+		-- Apply the modifiers.
 		local damage = Damage()
-		damage:add_spell_influences(influences)
+		damage:add_spell_modifiers(modifiers)
 		damage:apply_defender_vulnerabilities(action.object)
 		Main.combat_utils:apply_damage_to_actor(action.object, action.object, damage)
 	end,

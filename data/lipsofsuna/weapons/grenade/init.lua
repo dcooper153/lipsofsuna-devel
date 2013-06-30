@@ -21,8 +21,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 1,
 	icon = "grenade1",
-	influences = {["cold damage"] = 15, ["physical damage"] = 5},
-	influences_bonus = {"explosives"},
+	modifiers = {["cold damage"] = 15, ["physical damage"] = 5},
+	modifiers_bonus = {"explosives"},
 	mass = 3,
 	model = "grenade1",
 	stacking = true}
@@ -43,8 +43,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 1,
 	icon = "grenade1",
-	influences = {["fire damage"] = 15, ["physical damage"] = 5},
-	influences_bonus = {"explosives"},
+	modifiers = {["fire damage"] = 15, ["physical damage"] = 5},
+	modifiers_bonus = {"explosives"},
 	mass = 3,
 	model = "grenade1",
 	stacking = true}

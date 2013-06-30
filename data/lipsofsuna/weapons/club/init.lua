@@ -14,8 +14,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 100,
 	icon = "mace1",
-	influences = {["physical damage"] = 4},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 4},
+	modifiers_bonus = {"melee"},
 	mass = 7,
 	model = "woodenclub1",
 	water_gravity = Vector(0,6,0)}

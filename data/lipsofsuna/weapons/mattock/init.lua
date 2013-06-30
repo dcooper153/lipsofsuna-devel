@@ -13,8 +13,8 @@ Itemspec{
 	animations_equipped = {["default"] = "default axe equipped"},
 	description = "A high quality mattock used to mine ores",
 	icon = "mattock1",
-	influences = {["physical damage"] = 10},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 10},
+	modifiers_bonus = {"melee"},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {["hand.L"] = true},
 	mass = 15,
@@ -36,8 +36,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 500,
 	icon = "mattock1",
-	influences = {["cold damage"] = 3, ["physical damage"] = 4},
-	influences_bonus = {"melee"},
+	modifiers = {["cold damage"] = 3, ["physical damage"] = 4},
+	modifiers_bonus = {"melee"},
 	mass = 15,
 	model = "mattock-000"}
 
@@ -57,8 +57,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 500,
 	icon = "mattock1",
-	influences = {["fire damage"] = 4, ["physical damage"] = 4},
-	influences_bonus = {"melee"},
+	modifiers = {["fire damage"] = 4, ["physical damage"] = 4},
+	modifiers_bonus = {"melee"},
 	mass = 15,
 	model = "mattock-000"}
 
@@ -78,8 +78,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 220,
 	icon = "mattock1",
-	influences = {["physical damage"] = 5},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 5},
+	modifiers_bonus = {"melee"},
 	mass = 15,
 	model = "mattock-000"}
 
@@ -99,8 +99,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 130,
 	icon = "mattock1",
-	influences = {["physical damage"] = 3},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 3},
+	modifiers_bonus = {"melee"},
 	mass = 12,
 	model = "mattock-000"}
 
@@ -120,8 +120,8 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 100,
 	icon = "mattock1",
-	influences = {["physical damage"] = 3},
-	influences_bonus = {"melee"},
+	modifiers = {["physical damage"] = 3},
+	modifiers_bonus = {"melee"},
 	mass = 7,
 	model = "mattock-000",
 	water_gravity = Vector(0,6,0)}

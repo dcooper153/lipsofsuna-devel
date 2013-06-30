@@ -51,7 +51,7 @@ Itemspec{
 	categories = {["bullet"] = true},
 	gravity_projectile = Vector(0,-4,0),
 	icon = "arrow1",
-	influences = {["physical damage"] = 1},
+	modifiers = {["physical damage"] = 1},
 	mass = 1,
 	mass_inventory = 0.1,
 	model = "arrow-000", -- FIXME

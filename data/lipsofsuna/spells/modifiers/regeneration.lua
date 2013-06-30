@@ -18,7 +18,7 @@ local RegenerationModifier = ModifierSpec{
 	description = "Regenerate health every second",
 	effect = "berserk1",
 	icon = "modifier-heal",
-	influences = {["regeneration"] = 60},
+	modifiers = {["regeneration"] = 60},
 	required_stats =
 	{
 		["willpower"] = 15

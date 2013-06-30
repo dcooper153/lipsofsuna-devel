@@ -22,7 +22,7 @@
 		{
 			"right": "ranged spell"
 		},
-		"influences":
+		"modifiers":
 		{
 			"fire damage": 10
 		}
@@ -38,7 +38,7 @@
 		{
 			"right": "self spell"
 		},
-		"influences":
+		"modifiers":
 		{
 			"restore health": 10
 		}
@@ -54,7 +54,7 @@
 		{
 			"right": "touch spell"
 		},
-		"influences":
+		"modifiers":
 		{
 			"poison": 20
 		}

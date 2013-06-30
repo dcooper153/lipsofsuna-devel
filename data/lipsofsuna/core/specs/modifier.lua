@@ -26,7 +26,7 @@ local ModifierSpec = Spec:register("ModifierSpec", "modifier", {
 	{name = "duration", type = "number", default = 0, description = "Duration of the created spell object, in seconds."},
 	{name = "effect", type = "string", description = "Named of the sound effect to play."},
 	{name = "icon", type = "string", description = "Icon name.", default = "missing1", details = {spec = "Iconspec"}},
-	{name = "influences", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of influences and their strengths.", details = {keys = {spec = "ModifierSpec"}}},
+	{name = "modifiers", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of modifiers and their strengths.", details = {keys = {spec = "ModifierSpec"}}},
 	{name = "projectile", type = "string", description = "Spell object to use as a projectile.", details = {spec = "Spellspec"}},
 	{name = "radius", type = "number", default = 0, description = "Area of effect radius."},
 	{name = "range", type = "number", default = 0, description = "Maximum firing range for bullet and ray targeting modes."},
@@ -52,7 +52,7 @@ ModifierSpec.get_casting_info = function(self, result)
 	self.cooldown = self:get_cooldown(info.cooldown)
 	self.stats = self:get_required_stats(info.stats)
 	self.reagents = self:get_required_reagents(info.reagents)
-	self.influences = self:get_influences(info.influences)
+	self.modifiers = self:get_modifiers(info.modifiers)
 	return info
 end
 
@@ -60,15 +60,15 @@ ModifierSpec.get_cooldown = function(self, result)
 	return (cooldown or 0) + self.cooldown
 end
 
-ModifierSpec.get_influences = function(self, result)
-	local influences = result or {}
-	for name,value in pairs(self.influences) do
-		influences[name] = (influences[name] or 0) + value
-		if influences[name] == 0 then
-			influences[name] = nil
+ModifierSpec.get_modifiers = function(self, result)
+	local modifiers = result or {}
+	for name,value in pairs(self.modifiers) do
+		modifiers[name] = (modifiers[name] or 0) + value
+		if modifiers[name] == 0 then
+			modifiers[name] = nil
 		end
 	end
-	return influences
+	return modifiers
 end
 
 ModifierSpec.get_required_stats = function(self, result)

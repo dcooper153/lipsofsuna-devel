@@ -17,7 +17,7 @@ local CurseModifier = ModifierSpec{
 	description = "Damages the maximum health and willpower of the target",
 	effect = "spell1",
 	icon = "firewall", --FIXME
-	influences = {["curse"] = 60},
+	modifiers = {["curse"] = 60},
 	projectile = "fireball1",
 	required_stats =
 	{

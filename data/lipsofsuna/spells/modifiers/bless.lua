@@ -17,7 +17,7 @@ local BlessModifier = ModifierSpec{
 	description = "Boost the maximum health and willpower of the target",
 	effect = "spell1",
 	icon = "modifier-heal", --FIXME
-	influences = {["bless"] = 60},
+	modifiers = {["bless"] = 60},
 	projectile = "fireball1",
 	required_stats =
 	{

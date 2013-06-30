@@ -153,7 +153,7 @@ Ai.calculate_weapon_ratings = function(self, weapon)
 	local spec = self.object.spec
 	-- Calculate total damage.
 	local score = 0
-	local infl = Main.combat_utils:get_item_attack_influences(self.object, weapon)
+	local infl = Main.combat_utils:get_item_attack_modifiers(self.object, weapon)
 	for k,v in pairs(infl) do
 		if k ~= "hatchet" then
 			score = score + v

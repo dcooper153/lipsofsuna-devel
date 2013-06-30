@@ -38,14 +38,14 @@ Spell.contact_cb = function(self, result)
 	-- Apply the modifiers.
 	if result.object then
 		local damage = Damage()
-		damage:add_spell_influences(self.influences)
+		damage:add_spell_modifiers(self.modifiers)
 		damage:apply_defender_vulnerabilities(result.object)
 		Main.combat_utils:apply_damage_to_actor(self.owner, result.object, damage, result.point)
 	else
 		-- TODO: Move to CombatUtils.
-		for k,v in pairs(self.influences) do
+		for k,v in pairs(self.modifiers) do
 			if not Combat:apply_ranged_spell_impact(self.owner, self, k.name, result.point, nil, result.tile) then
-				self.influences[k] = nil
+				self.modifiers[k] = nil
 			else
 				more = true
 			end
@@ -63,7 +63,7 @@ Spell.fire = function(self)
 	self.orig_rotation = self:get_rotation():copy()
 	self.orig_velocity = self:get_velocity():copy()
 	-- Play the effects.
-	for k,v in pairs(self.influences) do
+	for k,v in pairs(self.modifiers) do
 		if k.effect then
 			Main.vision:object_effect(self, k.effect)
 		end
@@ -90,11 +90,11 @@ end
 Spell.write_db = function(self)
 end
 
---- Sets the influences of the spell.
+--- Sets the modifiers of the spell.
 -- @param self Spell.
--- @param value Dictionary of influences and their values.
-Spell.set_influences = function(self, value)
-	self.influences = value
+-- @param value Dictionary of modifiers and their values.
+Spell.set_modifiers = function(self, value)
+	self.modifiers = value
 end
 
 --- Sets the owner of the spell.

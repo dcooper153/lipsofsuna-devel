@@ -16,7 +16,7 @@ local RestoreHealthModifier = ModifierSpec{
 	description = "Restore health",
 	effect = "heal1",
 	icon = "modifier-heal",
-	influences = {["restore health"] = 15},
+	modifiers = {["restore health"] = 15},
 	required_stats =
 	{
 		["willpower"] = 5

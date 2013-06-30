@@ -18,7 +18,7 @@ local FirewallModifier = ModifierSpec{
 	description = "Conjure a wall of fire",
 	effect = "firewall1",
 	icon = "firewall",
-	influences = {["firewall"] = 5},
+	modifiers = {["firewall"] = 5},
 	projectile = "fireball1", -- FIXME
 	required_stats =
 	{
