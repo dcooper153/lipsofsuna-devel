@@ -8,6 +8,15 @@
 			"long": "--crafting"
 		}
 	],
+	"mods":
+	[
+		["load", "crafting/ui"]
+	],
 	"server": false,
-	"scripts": ["main"]
+	"scripts":
+	[
+		"main",
+		"message-disenchant",
+		"message-enchant"
+	]
 }

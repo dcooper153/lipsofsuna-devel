@@ -33,8 +33,13 @@ Main.messaging:register_message{
 		return {mode}
 	end,
 	server_to_client_handle = function(self, mode)
-		Operators.crafting:set_mode(mode)
-		if mode ~= "default" or Ui:get_state() == "crafting" then
-			Ui:set_state("crafting")
+		-- FIXME: Hack.
+		if mode == "spell" then
+			Ui:set_state("enchant")
+		else
+			Operators.crafting:set_mode(mode)
+			if mode ~= "default" or Ui:get_state() == "crafting" then
+				Ui:set_state("crafting")
+			end
 		end
 	end}
