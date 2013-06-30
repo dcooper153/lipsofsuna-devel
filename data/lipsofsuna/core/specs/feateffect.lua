@@ -39,9 +39,9 @@ Feateffectspec.introspect = Introspect{
 		{name = "range", type = "number", default = 0, description = "Maximum firing range for bullet and ray targeting modes."},
 		{name = "required_reagents", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of required reagents.", details = {keys = {spec = "Itemspec"}}},
 		{name = "required_stats", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of required stats."},
-		{name = "modifier", type = "ignore"},
-		{name = "modifier_attributes", type = "ignore"},
-		{name = "touch", type = "ignore"},
+		{name = "attributes", type = "ignore"},
+		{name = "start", type = "ignore"},
+		{name = "update", type = "ignore"},
 	}}
 
 --- Registers a feat effect.

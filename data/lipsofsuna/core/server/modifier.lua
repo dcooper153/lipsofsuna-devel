@@ -1,4 +1,4 @@
---- TODO:doc
+--- Instant or effect-over-time modification of objects.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -10,58 +10,51 @@
 
 local Class = require("system/class")
 
---- TODO:doc
+--- Instant or effect-over-time modification of objects.
 -- @type Modifier
-Modifier = Class("Modifier")
+local Modifier = Class("Modifier")
 
 --- Creates a new modifier.
 -- @param clss Modifier class.
--- @param args Arguments.<ul>
---   <li>object: Target object.</li>
---   <li>spec: Feat effect spec.</li>
---   <li>strength: Strength value.</li></ul>
+-- @param spec Modifier spec.
+-- @param object Modified object.
+-- @param owner Caster object. Nil for none.
+-- @param point Point in world space. Nil for object position.
 -- @return Modifier.
-Modifier.new = function(clss, args)
+Modifier.new = function(clss, spec, object, owner, point)
 	local self = Class.new(clss)
-	for k,v in pairs(args) do self[k] = v end
-	self.timer = 0
+	self.spec = spec
+	self.name = spec.name
+	self.object = object
+	self.owner = owner
+	self.point = point or self.object:get_position():copy()
 	return self
 end
 
---- Updates the modifiers of the object.
--- @param clss Modifier class.
--- @param object Object whose modifiers to update.
--- @param secs Seconds since the last update.
-Modifier.update = function(clss, object, secs)
-	local num = 0
-	-- Update each modifier.
-	for k,v in pairs(object.modifiers) do
-		-- Update the modifier.
-		local remove
-		local effect = Feateffectspec:find{name = k}
-		if effect and effect.modifier then
-			remove = not effect:modifier(v, secs)
-		else
-			remove = true
-		end
-		-- Handle removal.
-		if remove then
-			object.modifiers[k] = nil
-			object:removed_modifier(k)
-		else
-			num = num + 1
-		end
-	end
-	-- Remove unused modifier lists.
-	if object.dead then
-		for k,v in pairs(object.modifiers) do
-			object.modifiers[k] = nil
-			object:removed_modifier(k)
-		end
-		object.modifiers = nil
-	elseif num == 0 then
-		object.modifiers = nil
-	end
+--- Starts the modifier
+-- @param self Modifier.
+-- @param value Strength of the modifier.
+-- @return True to enable effect-over-time updates. False otherwise.
+Modifier.start = function(self, value)
+	if not self.spec.start then return end
+	return self.spec.start(self, value)
 end
 
+--- Updates the modifier
+-- @param self Modifier.
+-- @param secs Seconds since the last update..
+-- @return True to continue effect-over-time updates. False otherwise.
+Modifier.update = function(self, secs)
+	if not self.spec.update then return end
+	return self.spec.update(self, secs)
+end
 
+--- Gets the attribute modifications caused by the modifier.
+-- @param self Modifier.
+-- @param attr Dictionary of attributes.
+Modifier.get_attributes = function(self, attr)
+	if not self.spec.attributes then return end
+	self.spec.attributes(self, attr)
+end
+
+return Modifier

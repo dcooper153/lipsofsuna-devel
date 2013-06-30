@@ -1,4 +1,4 @@
-Feateffectspec{
+local FollowModifier = Feateffectspec{
 	name = "follow",
 	categories =
 	{
@@ -16,19 +16,30 @@ Feateffectspec{
 	icon = "modifier-light",
 	influences = {["follow"] = 30},
 	required_stats = {["willpower"] = 5},
-	projectile = "magicmissile1",
-	modifier = function(self, mod, secs)
-		mod.timer = mod.timer + secs
-		if mod.timer > 1 then
-			mod.object:face_point{point = mod.args.position}
-			mod.object:set_movement(10)
-			mod.object:climb()
-			mod.timer = mod.timer - 1
-		end
-		mod.strength = mod.strength - secs
-		return mod.strength > 0
-	end,
-	touch = function(self, args)
-		if not args.object then return end
-		args.object:inflict_modifier("follow", args.value, args.owner)
-	end}
+	projectile = "magicmissile1"}
+
+--- Applies the modifier.
+-- @param modifier Modifier.
+-- @param value Strength of the modifier.
+-- @return True to enable effect-over-time updates. False otherwise.
+FollowModifier.start = function(modifier, value)
+	if not modifier.object then return end
+	modifier.strength = value
+	return true
+end
+
+--- Updates the modifier for effect-over-time.
+-- @param modifier Modifier.
+-- @param secs Seconds since the last update.
+-- @return True to continue effect-over-time updates. False otherwise.
+FollowModifier.update = function(modifier, secs)
+	modifier.timer = modifier.timer + secs
+	if modifier.timer > 1 then
+		modifier.object:face_point{point = modifier.owner:get_position()}
+		modifier.object:set_movement(10)
+		modifier.object:climb()
+		modifier.timer = modifier.timer - 1
+	end
+	modifier.strength = modifier.strength - secs
+	return modifier.strength > 0
+end

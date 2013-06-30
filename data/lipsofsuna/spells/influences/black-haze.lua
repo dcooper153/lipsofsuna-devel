@@ -1,7 +1,8 @@
 local Actor = require("core/objects/actor")
+local Modifier = require("core/server/modifier")
 
 -- Summon plagued beasts.
-Feateffectspec{
+local BlackHazeModifier = Feateffectspec{
 	name = "black haze",
 	categories =
 	{
@@ -19,35 +20,54 @@ Feateffectspec{
 	icon = "modifier-black haze",
 	influences = {["black haze"] = 1},
 	projectile = "fireball1",
-	required_stats = {["willpower"] = 20},
-	modifier = function(self, mod, secs)
-		-- Wait five seconds.
-		mod.strength = 10000
-		mod.timer = mod.timer + secs
-		if mod.timer < 5 then return true end
-		mod.timer = mod.timer - 5
-		-- Damage the actor.
-		mod.object:damaged{amount = 5, type = "disease"}
-		-- Infect nearby actors.
-		local near = Main.objects:find_by_point(mod.object:get_position(), 5)
-		for k,v in pairs(near) do
-			if math.random() > 0.1 then
-				v:inflict_modifier("black haze", 10000)
-			end
+	required_stats =
+	{
+		["willpower"] = 20
+	}}
+
+--- Applies the modifier.
+-- @param modifier Modifier.
+-- @param value Strength of the modifier.
+-- @return True to enable effect-over-time updates. False otherwise.
+BlackHazeModifier.start = function(modifier)
+	-- Choose a random plague monster.
+	local s = Actorspec:random{category = "plague"}
+	if not s then return end
+	-- Spawn the monster.
+	local p = modifier.owner:get_position() + Vector(
+		-1 + 2 * math.random(),
+		-1 + 2 * math.random(),
+		-1 + 2 * math.random())
+	local o = Actor(modifier.owner.manager)
+	o:set_spec(s)
+	o:set_position(p)
+	o:randomize()
+	o:set_visible(true)
+	-- Add the plague modifier to the monster.
+	local m = Modifier(modifier.spec, o)
+	m.timer = 0
+	o:add_modifier(m)
+end
+
+--- Updates the modifier for effect-over-time.
+-- @param modifier Modifier.
+-- @param secs Seconds since the last update.
+-- @return True to continue effect-over-time updates. False otherwise.
+BlackHazeModifier.update = function(modifier, secs)
+	-- Wait five seconds.
+	modifier.timer = modifier.timer + secs
+	if modifier.timer < 5 then return true end
+	modifier.timer = modifier.timer - 5
+	-- Damage the actor.
+	modifier.object:damaged{amount = 5, type = "disease"}
+	-- Infect nearby actors.
+	local near = modifier.object.manager:find_by_point(modifier.object:get_position(), 5)
+	for k,v in pairs(near) do
+		if math.random() > 0.1 then
+			local m = Modifier(modifier.spec, v)
+			m.timer = 0
+			v:add_modifier(m)
 		end
-		return true
-	end,
-	touch = function(self, args)
-		local s = Actorspec:random{category = "plague"}
-		if not s then return end
-		local p = args.point + Vector(
-			-1 + 2 * math.random(),
-			-1 + 2 * math.random(),
-			-1 + 2 * math.random())
-		local o = Actor(Main.objects)
-		o:set_spec(s)
-		o:set_position(p)
-		o:randomize()
-		o:set_visible(true)
-		o:inflict_modifier("black haze", 10000)
-	end}
+	end
+	return true
+end

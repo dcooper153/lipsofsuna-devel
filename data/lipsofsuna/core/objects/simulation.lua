@@ -105,6 +105,12 @@ end
 SimulationObject.add_enemy = function(self, object)
 end
 
+--- Adds a modifier to the object.
+-- @param self Object.
+-- @param modifier Modifier.
+SimulationObject.add_modifier = function(self, modifier)
+end
+
 --- Plays an animation.
 -- @param self Object.
 -- @param name Animation name.

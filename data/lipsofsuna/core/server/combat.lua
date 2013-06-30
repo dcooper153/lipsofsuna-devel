@@ -31,39 +31,24 @@ Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, ti
 	else
 		damage:add_barehanded_influences(attacker.skills)
 	end
+	damage:add_knockback()
 	damage:apply_attacker_physical_modifiers(attacker)
 	damage:apply_attacker_charge(attacker:get_attack_charge())
 	if defender then
 		damage:apply_defender_armor(defender)
+		damage:apply_defender_blocking(defender)
 		damage:apply_defender_vulnerabilities(defender)
-	end
-	-- Play impact effects.
-	for name in pairs(damage:get_impact_effects()) do
-		Main.vision:world_effect(point, name)
 	end
 	-- Apply object damage.
 	if defender then
-		-- Knockback the defender.
-		defender.physics:impulse(Vector(0,0,-100):transform(attacker:get_rotation()))
-		-- Stagger the attacker.
-		if defender.blocking then
-			if Program:get_time() - defender.blocking > defender.spec.blocking_delay then
-				attacker.cooldown = (attacker.cooldown or 0) + 1
-				attacker:animate("stagger")
-			end
-		end
-		-- Damage the defender.
-		local args = {owner = attacker, object = defender}
-		for name,value in pairs(damage.influences) do
-			local effect = Feateffectspec:find{name = name}
-			if effect and effect.touch then
-				args.value = value
-				effect:touch(args)
-			end
-		end
+		Main.combat_utils:apply_damage_to_actor(attacker, defender, damage)
 	end
 	-- Apply tile damage.
 	if tile and weapon then
+		-- Play impact effects.
+		for name in pairs(damage:get_impact_effects()) do
+			Main.vision:world_effect(point, name)
+		end
 		-- Break the tile.
 		if weapon.spec.categories["mattock"] then
 			self:destroy_terrain_sphere(attacker, point, tile, 1.5)
@@ -92,23 +77,11 @@ Combat.apply_ranged_impact = function(self, attacker, projectile, damage, point,
 		damage:apply_defender_armor(defender)
 		damage:apply_defender_vulnerabilities(defender)
 	end
-	-- Play impact effects.
-	for name in pairs(damage:get_impact_effects()) do
-		Main.vision:world_effect(point, name)
-	end
 	-- Apply object damage.
 	if defender then
-		-- Knockback the defender.
-		defender.physics:impulse(Vector(0,0,-100):transform(projectile:get_rotation()))
-		-- Damage the defender.
-		local args = {owner = attacker, object = defender}
-		for name,value in pairs(damage.influences) do
-			local effect = Feateffectspec:find{name = name}
-			if effect and effect.touch then
-				args.value = value
-				effect:touch(args)
-			end
-		end
+		Main.combat_utils:apply_damage_to_actor(attacker, defender, damage, point)
+	else
+		Main.combat_utils:apply_damage_to_terrain(attacker, tile, damage, point)
 	end
 end
 
@@ -126,6 +99,7 @@ Combat.calculate_ranged_damage = function(self, attacker, weapon, projectile)
 	if projectile then
 		damage:add_item_influences(projectile, attacker.skills)
 	end
+	damage:add_knockback()
 	damage:apply_attacker_charge(attacker:get_attack_charge())
 	return damage
 end
@@ -144,27 +118,15 @@ Combat.apply_ranged_spell_impact = function(self, attacker, projectile, effect, 
 	local damage = Damage()
 	damage:add_spell_influences(projectile.influences)
 	damage:apply_defender_vulnerabilities(defender)
-	-- Play impact effects.
-	for name in pairs(damage:get_impact_effects()) do
-		Main.vision:world_effect(point, name)
-	end
 	-- Knockback the defender.
 	if defender then
 		defender.physics:impulse(Vector(0,0,-100):transform(projectile:get_rotation()))
 	end
 	-- Apply the damage.
-	local absorb
-	local args = {owner = attacker, object = defender, tile = tile}
-	for name,value in pairs(damage.influences) do
-		local effect = Feateffectspec:find{name = name}
-		if effect and effect.ranged then
-			args.value = value
-			if not effect:ranged(args) then
-				absorb = true
-			elseif absorb == nil then
-				absorb = false
-			end
-		end
+	if defender then
+		Main.combat_utils:apply_damage_to_actor(attacker, defender, damage, point)
+	else
+		Main.combat_utils:apply_damage_to_terrain(attacker, tile, damage, point)
 	end
 	return not absorb
 end

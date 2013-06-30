@@ -1,20 +1,22 @@
--- Increase light duration.
-local LightModifier = Feateffectspec{
-	name = "light",
+local MindlessMarchModifier = Feateffectspec{
+	name = "mindless march",
 	categories =
 	{
-		["beneficial"] = true,
-		["light"] = true,
+		["harmful"] = true,
+		["push"] = true,
 		["spell"] = true
 	},
 	actions =
 	{
-		["self spell"] = true
+		["missile spell"] = true,
+		["ranged spell"] = true,
+		["touch spell"] = true
 	},
-	description = "Illuminate your surroundings",
+	description = "Forces the target to march forward",
 	effect = "light1",
 	icon = "modifier-light",
-	influences = {["light"] = 60},
+	influences = {["mindless march"] = 30},
+	projectile = "magicmissile1",
 	required_stats =
 	{
 		["willpower"] = 5
@@ -24,8 +26,10 @@ local LightModifier = Feateffectspec{
 -- @param modifier Modifier.
 -- @param value Strength of the modifier.
 -- @return True to enable effect-over-time updates. False otherwise.
-LightModifier.start = function(modifier, value)
+MindlessMarchModifier.start = function(modifier, value)
 	if not modifier.object then return end
+	if modifier.object.spec.type ~= "actor" then return end
+	modifier.timer = 0
 	modifier.strength = value
 	return true
 end
@@ -34,7 +38,8 @@ end
 -- @param modifier Modifier.
 -- @param secs Seconds since the last update.
 -- @return True to continue effect-over-time updates. False otherwise.
-LightModifier.update = function(modifier, secs)
+MindlessMarchModifier.update = function(modifier, secs)
+	modifier.object:set_movement(1)
 	modifier.strength = modifier.strength - secs
 	return modifier.strength > 0
 end

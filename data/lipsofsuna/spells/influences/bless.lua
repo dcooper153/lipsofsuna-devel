@@ -1,4 +1,4 @@
-Feateffectspec{
+local BlessModifier = Feateffectspec{
 	name = "bless",
 	categories =
 	{
@@ -17,16 +17,34 @@ Feateffectspec{
 	icon = "modifier-heal", --FIXME
 	influences = {["bless"] = 60},
 	projectile = "fireball1",
-	required_stats = {["willpower"] = 10},
-	modifier = function(self, mod, secs)
-		mod.strength = mod.strength - secs
-		return mod.strength > 0
-	end,
-	modifier_attributes = function(self, mod, attr)
-		attr.max_health = attr.max_health + 20
-		attr.max_willpower = attr.max_willpower + 20
-	end,
-	touch = function(self, args)
-		if not args.object then return end
-		args.object:inflict_modifier("bless", args.value)
-	end}
+	required_stats =
+	{
+		["willpower"] = 10
+	}}
+
+--- Gets the attribute modifications of the modifier.
+-- @param modifier Modifier.
+-- @param attr Dictionary of attributes.
+BlessModifier.attributes = function(modifier, attr)
+	attr.max_health = attr.max_health + 20
+	attr.max_willpower = attr.max_willpower + 20
+end
+
+--- Applies the modifier.
+-- @param modifier Modifier.
+-- @param value Strength of the modifier.
+-- @return True to enable effect-over-time updates. False otherwise.
+BlessModifier.start = function(modifier, value)
+	if not modifier.object then return end
+	modifier.strength = value
+	return true
+end
+
+--- Updates the modifier for effect-over-time.
+-- @param modifier Modifier.
+-- @param secs Seconds since the last update.
+-- @return True to continue effect-over-time updates. False otherwise.
+BlessModifier.update = function(modifier, secs)
+	modifier.strength = modifier.strength - secs
+	return modifier.strength > 0
+end

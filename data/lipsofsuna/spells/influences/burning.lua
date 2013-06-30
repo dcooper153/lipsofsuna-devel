@@ -1,4 +1,4 @@
-Feateffectspec{
+local BurningModifier = Feateffectspec{
 	name = "burning",
 	categories =
 	{
@@ -16,20 +16,34 @@ Feateffectspec{
 	effect = "berserk1",
 	icon = "firewall", -- FIXME
 	influences = {["burning"] = 10},
-	required_stats = {["willpower"] = 5},
-	modifier = function(self, mod, secs)
-		-- Update the burning timer.
-		mod.timer = mod.timer + secs
-		-- Damage the object every second.
-		if mod.timer > 1 then
-			mod.object:damaged{amount = math.random(4,7), type = "burning"}
-			mod.timer = mod.timer - 1
-		end
-		-- End after the timeout.
-		mod.strength = mod.strength - secs
-		return mod.strength > 0
-	end,
-	touch = function(self, args)
-		if not args.object then return end
-		args.object:inflict_modifier("burning", args.value)
-	end}
+	required_stats =
+	{
+		["willpower"] = 5
+	}}
+
+--- Applies the modifier.
+-- @param modifier Modifier.
+-- @param value Strength of the modifier.
+-- @return True to enable effect-over-time updates. False otherwise.
+BurningModifier.start = function(modifier, value)
+	if not modifier.object then return end
+	modifier.strength = value
+	return true
+end
+
+--- Updates the modifier for effect-over-time.
+-- @param modifier Modifier.
+-- @param secs Seconds since the last update.
+-- @return True to continue effect-over-time updates. False otherwise.
+BurningModifier.update = function(modifier, secs)
+	-- Update the burning timer.
+	modifier.timer = modifier.timer + secs
+	-- Damage the object every second.
+	if modifier.timer > 1 then
+		modifier.object:damaged{amount = math.random(4,7), type = "burning"}
+		modifier.timer = mod.timer - 1
+	end
+	-- End after the timeout.
+	modifier.strength = modifier.strength - secs
+	return modifier.strength > 0
+end

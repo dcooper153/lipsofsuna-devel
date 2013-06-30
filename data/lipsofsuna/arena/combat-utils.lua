@@ -9,6 +9,7 @@
 -- @alias CombatUtils
 
 local Class = require("system/class")
+local Modifier = require("core/server/modifier")
 
 --- Combat utils.
 -- @type CombatUtils
@@ -37,21 +38,46 @@ CombatUtils.apply_damage_to_actor = function(self, caster, target, damage, point
 	for name in pairs(damage:get_impact_effects()) do
 		Main.vision:world_effect(point, name)
 	end
+	-- Knockback the defender.
+	if damage.knockback then
+		target.physics:impulse(Vector(0,0,-100):transform(caster:get_rotation()))
+	end
+	-- Stagger the attacker.
+	if damage.blocking then
+		if Program:get_time() - target.blocking > target.spec.blocking_delay then
+			caster.cooldown = (caster.cooldown or 0) + 1
+			caster:animate("stagger")
+		end
+	end
 	-- Apply the damage.
-	local absorb
-	local args = {owner = caster, object = target}
+	--
+	-- For each influence type in the damage, we create a new modifier and
+	-- let it modifier the target object. Modifiers may either apply their
+	-- effects immediately or request us to add them to the target object so
+	-- that they can perform effect-over-time updates.
+	local absorb = true
 	for name,value in pairs(damage.influences) do
-		local effect = Feateffectspec:find_by_name(name)
-		if effect and effect.touch then
-			args.value = value
-			if not effect:touch(args) then
-				absorb = true
-			elseif absorb == nil then
+		local spec = Feateffectspec:find_by_name(name)
+		if spec then
+			local modifier = Modifier(spec, target, caster, point)
+			local ret = modifier:start(value)
+			if ret then
 				absorb = false
+				if ret == true then
+					target:add_modifier(modifier)
+				end
 			end
 		end
 	end
 	return not absorb
+end
+
+--- FIXME
+CombatUtils.apply_damage_to_terrain = function(self, caster, tile, damage, point)
+	-- Play impact effects.
+	for name in pairs(damage:get_impact_effects()) do
+		Main.vision:world_effect(point, name)
+	end
 end
 
 --- Checks if the actor is wielding a ranged weapon.

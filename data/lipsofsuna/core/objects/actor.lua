@@ -149,6 +149,18 @@ Actor.add_enemy = function(self, object)
 	self.ai:add_enemy(object)
 end
 
+--- Adds a modifier to the object.
+-- @param self Actor.
+-- @param modifier Modifier.
+Actor.add_modifier = function(self, modifier)
+	if not self.modifiers then self.modifiers = {} end
+	local old = self.modifiers[name]
+	if not old or old.strength < modifier.strength then
+		self.modifiers[modifier.name] = modifier
+		self:update_skills()
+	end
+end
+
 --- Calculates the animation state based on the active controls.
 -- @param self Actor.
 Actor.calculate_animation = function(self)
@@ -599,7 +611,7 @@ Actor.update = function(self, secs)
 		self.update_timer = self.update_timer + secs
 		if self.update_timer > 0.3 then
 			local tick = self.update_timer
-			if self.modifiers then Modifier:update(self, tick) end
+			self:update_modifiers(tick)
 			self.stats:update(tick)
 			self:update_actions(tick)
 			self:update_burdening(tick)
@@ -726,6 +738,33 @@ Actor.update_burdening = function(self, secs)
 	self:calculate_speed()
 end
 
+Actor.update_modifiers = function(self, secs)
+	if not self.modifiers then return end
+	-- Remove all modifiers if dead.
+	if self.dead then
+		for k,v in pairs(self.modifiers) do
+			self.modifiers[k] = nil
+			self:removed_modifier(k)
+		end
+		self.modifiers = nil
+		return
+	end
+	-- Update each modifier.
+	local remain
+	for k,v in pairs(self.modifiers) do
+		if not v:update(secs) then
+			self.modifiers[k] = nil
+			self:removed_modifier(k)
+		else
+			remain = true
+		end
+	end
+	-- Remove empty modifier lists.
+	if not remain then
+		self.modifiers = nil
+	end
+end
+
 --- Updates the skills and related attributes of the actor.
 -- @param self Actor.
 Actor.update_skills = function(self)
@@ -733,10 +772,7 @@ Actor.update_skills = function(self)
 	local attr = self.skills:calculate_attributes()
 	if self.modifiers then
 		for k,v in pairs(self.modifiers) do
-			local effect = Feateffectspec:find{name = k}
-			if effect and effect.modifier_attributes then
-				effect:modifier_attributes(v, attr)
-			end
+			v:get_attributes(attr)
 		end
 	end
 	attr.max_health = math.max(1, attr.max_health)

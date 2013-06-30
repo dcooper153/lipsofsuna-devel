@@ -1,4 +1,4 @@
-Feateffectspec{
+local PoisonModifier = Feateffectspec{
 	name = "poison",
 	categories =
 	{
@@ -16,20 +16,35 @@ Feateffectspec{
 	icon = "modifier-black haze", --FIXME
 	influences = {["poison"] = 10},
 	projectile = "fireball1",
-	required_stats = {["willpower"] = 10},
-	modifier = function(self, mod, secs)
-		-- Update the timer.
-		mod.timer = mod.timer + secs
-		-- Damage the object every second.
-		if mod.timer > 2 then
-			mod.object:damaged{amount = math.random(2,4), type = "poison"}
-			mod.timer = mod.timer - 2
-		end
-		-- End after the timeout.
-		mod.strength = mod.strength - secs
-		return mod.strength > 0
-	end,
-	touch = function(self, args)
-		if not args.object then return end
-		args.object:inflict_modifier("poison", args.value)
-	end}
+	required_stats =
+	{
+		["willpower"] = 10
+	}}
+
+--- Applies the modifier.
+-- @param modifier Modifier.
+-- @param value Strength of the modifier.
+-- @return True to enable effect-over-time updates. False otherwise.
+PoisonModifier.start = function(modifier, value)
+	if not modifier.object then return end
+	modifier.strength = value
+	modifier.timer = 0
+	return true
+end
+
+--- Updates the modifier for effect-over-time.
+-- @param modifier Modifier.
+-- @param secs Seconds since the last update.
+-- @return True to continue effect-over-time updates. False otherwise.
+PoisonModifier.update = function(modifier, secs)
+	-- Update the burning timer.
+	modifier.timer = modifier.timer + secs
+	-- Damage the object every second.
+	if modifier.timer > 2 then
+		modifier.object:damaged{amount = math.random(2,4), type = "poison"}
+		modifier.timer = modifier.timer - 2
+	end
+	-- End after the timeout.
+	modifier.strength = modifier.strength - secs
+	return modifier.strength > 0
+end

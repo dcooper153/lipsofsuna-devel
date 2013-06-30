@@ -1,5 +1,5 @@
 -- Teleport to Lips.
-Feateffectspec{
+local TravelModifier = Feateffectspec{
 	name = "travel",
 	actions =
 	{
@@ -13,8 +13,16 @@ Feateffectspec{
 	effect = "sanctuary1", -- FIXME
 	icon = "sanctuary1", -- FIXME
 	influences = {["travel"] = 30},
-	required_stats = {["willpower"] = 10},
-	touch = function(self, args)
-		if not args.object then return end
-		args.object:teleport{region = "Lips"}
-	end}
+	required_stats =
+	{
+		["willpower"] = 10
+	}}
+
+--- Applies the modifier.
+-- @param modifier Modifier.
+-- @param value Strength of the modifier.
+-- @return True to enable effect-over-time updates. False otherwise.
+TravelModifier.start = function(modifier, value)
+	if not modifier.object then return end
+	modifier.object:teleport{region = "Lips"}
+end

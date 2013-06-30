@@ -76,6 +76,12 @@ Damage.add_itemspec_influences = function(self, spec, skills)
 	end
 end
 
+--- Enables the knockback effect.
+-- @param self Damage.
+Damage.add_knockback = function(self)
+	self.knockback = true
+end
+
 --- Adds influences for a spell.
 -- @param self Damage.
 -- @param influences Dictionary of influences and their values.
@@ -158,6 +164,19 @@ Damage.apply_defender_armor = function(self, object)
 				self.influences[k] = prev * mult
 			end
 		end
+	end
+end
+
+--- Applies the effects of the defender blocking to the attacker.<br/>
+--
+-- The attacker may stagger and suffer an extended cooldown if the
+-- defender was blocking.
+--
+-- @param self Damage.
+-- @param object Defender object.
+Damage.apply_defender_blocking = function(self, object)
+	if object.blocking then
+		self.blocking = true
 	end
 end
 
