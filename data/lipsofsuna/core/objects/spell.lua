@@ -35,14 +35,12 @@ Spell.contact_cb = function(self, result)
 	-- Make sure that applicable.
 	if not self:get_visible() then return end
 	if result.object == self.owner then return end
-	-- Call the collision callback of each effect.
-	-- Effects can remove themselves from the feat by returning false.
-	local more
+	-- Apply the modifiers.
 	if result.object then
 		local damage = Damage()
 		damage:add_spell_influences(self.influences)
 		damage:apply_defender_vulnerabilities(result.object)
-		more = Main.combat_utils:apply_damage_to_actor(self.owner, result.object, damage, result.point)
+		Main.combat_utils:apply_damage_to_actor(self.owner, result.object, damage, result.point)
 	else
 		-- TODO: Move to CombatUtils.
 		for k,v in pairs(self.influences) do
@@ -53,10 +51,8 @@ Spell.contact_cb = function(self, result)
 			end
 		end
 	end
-	-- Detach if no effects were left.
-	if not more then
-		self:detach()
-	end
+	-- Remove from the world.
+	self:detach()
 end
 
 --- Fires the spell.

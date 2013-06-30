@@ -22,7 +22,12 @@ Actionspec{
 		-- Get the influences.
 		local influences = Main.combat_utils:get_spell_influences_for_item(action.weapon)
 		if not influences then return end
-		-- TODO: Subtract stats.
+		-- Subtract stats.
+		local ok,stat = Main.combat_utils:subtract_modifier_stats_for_actor(action.object, influences)
+		if not ok then
+			action.object:send_message("You do not have have enough " .. stat .. ".")
+			return
+		end
 		-- Apply the influences.
 		local damage = Damage()
 		damage:add_spell_influences(influences)

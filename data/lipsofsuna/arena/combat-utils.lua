@@ -111,6 +111,37 @@ CombatUtils.split_ranged_ammo_of_actor = function(self, actor)
 	return weapon,ammo
 end
 
+--- Subtracts the stats of the actor.
+-- @param self CombatUtils.
+-- @param actor Actor.
+-- @param modifiers Modifiers.
+-- @return True if subtracted successfully. False and stat name if not enough stats.
+CombatUtils.subtract_modifier_stats_for_actor = function(self, actor, modifiers)
+	-- Get the actor stats.
+	local stats = actor.stats
+	if not stats then return true end
+	-- Get the require stats.
+	local required = {}
+	for k,v in pairs(modifiers) do
+		local spec = ModifierSpec:find_by_name(k)
+		if spec then
+			spec:get_required_stats(required)
+		end
+	end
+	-- Check that all requirements are met.
+	for k,v in pairs(required) do
+		local val = stats:get_value(k)
+		if not val or val < v then
+			return false,k
+		end
+	end
+	-- Subtract the actor stats.
+	for k,v in pairs(required) do
+		stats:subtract(k, v)
+	end
+	return true
+end
+
 --- Calculates the armor class of the actor.
 -- @param self CombatUtils.
 -- @param actor Actor.

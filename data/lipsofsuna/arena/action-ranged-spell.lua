@@ -19,7 +19,12 @@ Actionspec{
 		-- Get the influences.
 		local influences = Main.combat_utils:get_spell_influences_for_item(action.weapon)
 		if not influences then return end
-		-- TODO: Subtract stats.
+		-- Subtract stats.
+		local ok,stat = Main.combat_utils:subtract_modifier_stats_for_actor(action.object, influences)
+		if not ok then
+			action.object:send_message("You do not have have enough " .. stat .. ".")
+			return
+		end
 		-- Fire the spell.
 		local spec = Spellspec:find_by_name("fireball1") --FIXME
 		if not spec then return end
