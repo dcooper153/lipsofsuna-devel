@@ -13,7 +13,21 @@
 		["load", "arena/spelltable"]
 	],
 	"server": false,
-	"scripts": ["main", "action-attack", "action-block", "action-melee", "action-ranged",
-		"action-ranged-spell", "action-self-spell", "action-throw"],
-	"specs": ["dialogs", "specs"]
+	"scripts":
+	[
+		"main",
+		"action-attack",
+		"action-bite",
+		"action-block",
+		"action-melee",
+		"action-ranged",
+		"action-ranged-spell",
+		"action-self-spell",
+		"action-throw"
+	],
+	"specs":
+	[
+		"dialogs",
+		"specs"
+	]
 }
