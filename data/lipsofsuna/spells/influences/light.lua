@@ -1,5 +1,7 @@
+local ModifierSpec = require("core/specs/modifier")
+
 -- Increase light duration.
-local LightModifier = Feateffectspec{
+local LightModifier = ModifierSpec{
 	name = "light",
 	categories =
 	{

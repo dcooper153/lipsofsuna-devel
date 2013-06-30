@@ -1,4 +1,6 @@
-local HomeModifier = Feateffectspec{
+local ModifierSpec = require("core/specs/modifier")
+
+local HomeModifier = ModifierSpec{
 	name = "home",
 	categories =
 	{

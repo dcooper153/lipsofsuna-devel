@@ -1,4 +1,6 @@
-local RestoreHealthModifier = Feateffectspec{
+local ModifierSpec = require("core/specs/modifier")
+
+local RestoreHealthModifier = ModifierSpec{
 	name = "restore health",
 	categories =
 	{

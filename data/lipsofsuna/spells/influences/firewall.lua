@@ -1,7 +1,8 @@
 local AreaSpell = require("core/objects/areaspell")
 local Feat = FIXME
+local ModifierSpec = require("core/specs/modifier")
 
-local FirewallModifier = Feateffectspec{
+local FirewallModifier = ModifierSpec{
 	name = "firewall",
 	categories =
 	{

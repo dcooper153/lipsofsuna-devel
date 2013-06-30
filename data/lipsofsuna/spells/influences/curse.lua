@@ -1,4 +1,6 @@
-local CurseModifier = Feateffectspec{
+local ModifierSpec = require("core/specs/modifier")
+
+local CurseModifier = ModifierSpec{
 	name = "curse",
 	categories =
 	{

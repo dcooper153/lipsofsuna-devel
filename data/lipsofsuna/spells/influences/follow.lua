@@ -1,4 +1,6 @@
-local FollowModifier = Feateffectspec{
+local ModifierSpec = require("core/specs/modifier")
+
+local FollowModifier = ModifierSpec{
 	name = "follow",
 	categories =
 	{

@@ -1,4 +1,6 @@
-local BurningModifier = Feateffectspec{
+local ModifierSpec = require("core/specs/modifier")
+
+local BurningModifier = ModifierSpec{
 	name = "burning",
 	categories =
 	{

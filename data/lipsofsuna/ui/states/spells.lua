@@ -1,3 +1,5 @@
+local ModifierSpec = require("core/specs/modifier")
+
 Ui:add_state{
 	state = "spells",
 	label = "Spells",
@@ -92,7 +94,7 @@ Ui:add_state{
 		if not anim then return end
 		-- Create the list of effects.
 		local effects = {}
-		for name in pairs(Feateffectspec.dict_name) do
+		for name in pairs(ModifierSpec.dict_name) do
 			if Client.data.unlocks:get("spell effect", name) then
 				table.insert(effects, name)
 			end

@@ -1,4 +1,6 @@
-local MindlessMarchModifier = Feateffectspec{
+local ModifierSpec = require("core/specs/modifier")
+
+local MindlessMarchModifier = ModifierSpec{
 	name = "mindless march",
 	categories =
 	{

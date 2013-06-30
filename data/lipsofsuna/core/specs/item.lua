@@ -66,7 +66,7 @@ Itemspec.introspect = Introspect{
 		{name = "mass", type = "number", default = 10, description = "Mass in the physics simulation, in kilograms."},
 		{name = "mass_inventory", type = "number", default = 10, description = "Mass in the inventory, in kilograms."},
 		{name = "model", type = "string", description = "Model to use for the item."},
-		{name = "potion_effects", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of potion effects.", details = {keys = {spec = "Feateffectspec"}}},
+		{name = "potion_effects", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of potion effects.", details = {keys = {spec = "ModifierSpec"}}},
 		{name = "special_effects", type = "list", list = {type = "string", details = {value = {spec = "Effectspec"}}}, default = {}, description = "List of special effects to render."},
 		{name = "stacking", type = "boolean", description = "True to allow the item to stack in the inventory."},
 		{name = "timings", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of timings."},

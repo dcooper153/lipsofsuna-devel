@@ -1,5 +1,7 @@
+local ModifierSpec = require("core/specs/modifier")
+
 -- Dig terrain.
-local DigModifier = Feateffectspec{
+local DigModifier = ModifierSpec{
 	name = "dig",
 	categories =
 	{

@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local ModifierSpec = require("core/specs/modifier")
 require(Mod.path .. "widget")
 
 Widgets.Uispell = Class("Uispell", Widgets.Uiwidget)
@@ -8,7 +9,7 @@ Widgets.Uispell.new = function(clss, mode, name, active)
 	if mode == "type" then
 		self.spec = Feattypespec:find{name = name}
 	else
-		self.spec = Feateffectspec:find{name = name}
+		self.spec = ModifierSpec:find{name = name}
 	end
 	self.mode = mode
 	self.active = active

@@ -9,6 +9,7 @@
 -- @alias UnlockManager
 
 local Class = require("system/class")
+local ModifierSpec = require("core/specs/modifier")
 
 --- TODO:doc
 -- @type UnlockManager
@@ -148,7 +149,7 @@ UnlockManager.unlock_random = function(self)
 	-- All spell effects that have a description are assumed to be used by
 	-- players. Out of those, we choose ones that are not yet unlocked but
 	-- have at least one of the allowed spell types unlocked.
-	for k,v in pairs(Feateffectspec.dict_name) do
+	for k,v in pairs(ModifierSpec.dict_name) do
 		if v.description and not self:get("spell effect", k) then
 			local pass = false
 			for name in pairs(v.animations) do

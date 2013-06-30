@@ -1,4 +1,6 @@
-local RestoreWillpowerModifier = Feateffectspec{
+local ModifierSpec = require("core/specs/modifier")
+
+local RestoreWillpowerModifier = ModifierSpec{
 	name = "restore willpower",
 	categories =
 	{

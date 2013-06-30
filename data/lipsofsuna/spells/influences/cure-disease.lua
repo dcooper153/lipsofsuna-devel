@@ -1,4 +1,6 @@
-local CureDiseaseModifier = Feateffectspec{
+local ModifierSpec = require("core/specs/modifier")
+
+local CureDiseaseModifier = ModifierSpec{
 	name = "cure disease",
 	categories =
 	{

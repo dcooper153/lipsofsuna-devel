@@ -2,6 +2,7 @@ local Actor = require("core/objects/actor")
 local Debug = require( "system/debug")
 local Item = require("core/objects/item")
 local Marker = require("core/marker")
+local ModifierSpec = require("core/specs/modifier")
 local Obstacle = require("core/objects/obstacle")
 local Physics = require("system/physics")
 local Staticobject = require("core/objects/static")
@@ -412,7 +413,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local spec = Feateffectspec:find{name = matches[1]}
+		local spec = ModifierSpec:find{name = matches[1]}
 		if spec then
 			Server.unlocks:unlock("spell effect", matches[1])
 		else

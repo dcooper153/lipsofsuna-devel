@@ -1,8 +1,9 @@
 local Material = require("system/material")
+local ModifierSpec = require("core/specs/modifier")
 local Obstacle = require("core/objects/obstacle")
 
 -- Spawn trees and plants.
-local WildernessModifier = Feateffectspec{
+local WildernessModifier = ModifierSpec{
 	name = "wilderness",
 	actions =
 	{

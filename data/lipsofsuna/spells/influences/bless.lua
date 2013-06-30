@@ -1,4 +1,6 @@
-local BlessModifier = Feateffectspec{
+local ModifierSpec = require("core/specs/modifier")
+
+local BlessModifier = ModifierSpec{
 	name = "bless",
 	categories =
 	{

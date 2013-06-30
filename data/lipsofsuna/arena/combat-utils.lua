@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Modifier = require("core/server/modifier")
+local ModifierSpec = require("core/specs/modifier")
 
 --- Combat utils.
 -- @type CombatUtils
@@ -57,7 +58,7 @@ CombatUtils.apply_damage_to_actor = function(self, caster, target, damage, point
 	-- that they can perform effect-over-time updates.
 	local absorb = true
 	for name,value in pairs(damage.influences) do
-		local spec = Feateffectspec:find_by_name(name)
+		local spec = ModifierSpec:find_by_name(name)
 		if spec then
 			local modifier = Modifier(spec, target, caster, point)
 			local ret = modifier:start(value)
@@ -183,7 +184,7 @@ CombatUtils.get_spell_influences_for_item = function(self, item)
 	local found
 	local influences = {}
 	for k,v in pairs(names) do
-		local spec = Feateffectspec:find_by_name(k)
+		local spec = ModifierSpec:find_by_name(k)
 		if spec then
 			influences[k] = v
 			found = true

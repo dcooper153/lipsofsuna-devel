@@ -1,8 +1,9 @@
 local Actor = require("core/objects/actor")
 local Modifier = require("core/server/modifier")
+local ModifierSpec = require("core/specs/modifier")
 
 -- Summon plagued beasts.
-local BlackHazeModifier = Feateffectspec{
+local BlackHazeModifier = ModifierSpec{
 	name = "black haze",
 	categories =
 	{

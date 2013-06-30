@@ -1,5 +1,7 @@
+local ModifierSpec = require("core/specs/modifier")
+
 -- Increase or decrease health.
-local PhysicalDamageModifier = Feateffectspec{
+local PhysicalDamageModifier = ModifierSpec{
 	name = "physical damage",
 	categories =
 	{

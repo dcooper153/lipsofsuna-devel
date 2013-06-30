@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local ModifierSpec = require("core/specs/modifier")
 require(Mod.path .. "widget")
 
 Widgets.Uispellpreview = Class("Uispellpreview", Widgets.Uiwidget)
@@ -47,9 +48,9 @@ Widgets.Uispellpreview.rebuild_canvas = function(self)
 		local e2 = self.spell.effects[2]
 		local e3 = self.spell.effects[3]
 		local spec1 = Feattypespec:find{name = self.spell.animation}
-		local spec2 = e1 and Feateffectspec:find{name = e1[1]}
-		local spec3 = e2 and Feateffectspec:find{name = e2[1]}
-		local spec4 = e3 and Feateffectspec:find{name = e3[1]}
+		local spec2 = e1 and ModifierSpec:find{name = e1[1]}
+		local spec3 = e2 and ModifierSpec:find{name = e2[1]}
+		local spec4 = e3 and ModifierSpec:find{name = e3[1]}
 		if spec1 then
 			Theme:draw_icon_scaled(self, spec1.icon,
 				x1, 5, Theme.width_icon_1, Theme.width_icon_1)

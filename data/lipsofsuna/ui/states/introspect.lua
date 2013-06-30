@@ -1,3 +1,5 @@
+local ModifierSpec = require("core/specs/modifier")
+
 Ui:add_state{
 	state = "introspect",
 	label = "Introspect",
@@ -50,7 +52,7 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "introspect",
 	widget = function() return Widgets.Uitransition("Feat effect", "introspect/specs",
-		function() Operators.introspect:set_spec_type("Feateffectspec") end)
+		function() Operators.introspect:set_spec_type("ModifierSpec") end)
 	end}
 
 Ui:add_widget{

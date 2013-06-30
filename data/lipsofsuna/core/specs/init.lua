@@ -1,4 +1,5 @@
 local File = require("system/file")
+local ModifierSpec = require("core/specs/modifier")
 
 File:require_directory(Mod.path, "init")
 
@@ -11,7 +12,7 @@ Main.main_start_hooks:register(0, function()
 	CraftingRecipeSpec:validate_all()
 	Dialogspec:validate_all()
 	Factionspec:validate_all()
-	Feateffectspec:validate_all()
+	ModifierSpec:validate_all()
 	Iconspec:validate_all()
 	Itemspec:validate_all()
 	Obstaclespec:validate_all()

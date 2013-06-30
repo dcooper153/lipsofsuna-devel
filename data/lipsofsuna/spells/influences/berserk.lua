@@ -1,5 +1,7 @@
+local ModifierSpec = require("core/specs/modifier")
+
 -- Increase berserk duration.
-local BerserkModifier = Feateffectspec{
+local BerserkModifier = ModifierSpec{
 	name = "berserk",
 	categories =
 	{

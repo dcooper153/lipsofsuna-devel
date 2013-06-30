@@ -1,5 +1,7 @@
+local ModifierSpec = require("core/specs/modifier")
+
 -- Teleport to Lips.
-local TravelModifier = Feateffectspec{
+local TravelModifier = ModifierSpec{
 	name = "travel",
 	actions =
 	{

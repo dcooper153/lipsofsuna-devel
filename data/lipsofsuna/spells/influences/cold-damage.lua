@@ -1,5 +1,7 @@
+local ModifierSpec = require("core/specs/modifier")
+
 -- Decrease health.
-local ColdDamageModifier = Feateffectspec{
+local ColdDamageModifier = ModifierSpec{
 	name = "cold damage",
 	categories =
 	{

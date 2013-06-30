@@ -1,4 +1,6 @@
-local PoisonModifier = Feateffectspec{
+local ModifierSpec = require("core/specs/modifier")
+
+local PoisonModifier = ModifierSpec{
 	name = "poison",
 	categories =
 	{

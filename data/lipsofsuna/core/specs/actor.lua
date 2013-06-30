@@ -73,7 +73,7 @@ Actorspec.introspect = Introspect{
 		{name = "factions", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of factions.", details = {keys = {spec = "Factionspec"}}},
 		{name = "falling_damage_rate", type = "number", default = 10, description = "Number of points of damage per every meters per second exceeding the falling damage speed."},
 		{name = "falling_damage_speed", type = "number", default = 10, description = "Speed in meters per seconds after which the actor starts taking falling damage."},
-		{name = "feat_effects", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of know feat effects.", details = {keys = {spec = "Feateffectspec"}}},
+		{name = "feat_effects", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of know feat effects.", details = {keys = {spec = "ModifierSpec"}}},
 		{name = "footstep_height", type = "number", description = "Footstep height."},
 		{name = "footstep_sound", type = "string", description = "Name of the footstep sound effect."},
 		{name = "gravity", type = "vector", default = Vector(0,-15), description = "Gravity vector."},

@@ -1,5 +1,7 @@
+local ModifierSpec = require("core/specs/modifier")
+
 -- Increase sanctuary duration.
-local RegenerationModifier = Feateffectspec{
+local RegenerationModifier = ModifierSpec{
 	name = "regeneration",
 	categories =
 	{

@@ -1,6 +1,7 @@
 local AreaSpell = require("core/objects/areaspell")
 local Coroutine = require("system/coroutine")
 local Feat = FIXME
+local ModifierSpec = require("core/specs/modifier")
 
 Actionspec{
 	name = "area spell",
@@ -12,7 +13,7 @@ Actionspec{
 			-- Area spells may have different durations so a combination of them
 			-- cannot generally be represented as one object.
 			for k,v in pairs(feat.effects) do
-				local effect = Feateffectspec:find{name = v[1]}
+				local effect = ModifierSpec:find{name = v[1]}
 				local spec = effect and Spellspec:find{name = effect.projectile}
 				if effect and spec then
 					local sub = Feat("area spell", {{v[1], v[2]}})

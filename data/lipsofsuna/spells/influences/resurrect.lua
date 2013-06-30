@@ -1,4 +1,6 @@
-local ResurrectModifier = Feateffectspec{
+local ModifierSpec = require("core/specs/modifier")
+
+local ResurrectModifier = ModifierSpec{
 	name = "resurrect",
 	categories =
 	{

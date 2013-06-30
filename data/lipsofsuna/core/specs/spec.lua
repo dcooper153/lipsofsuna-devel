@@ -18,6 +18,23 @@ Spec.dict_id = {}
 Spec.dict_cat = {}
 Spec.dict_name = {}
 Spec.dict_file = {}
+Spec.dict_spec = {}
+
+--- Registers a spec class.
+-- @param clss Spec class.
+-- @param name Spec name.
+-- @param spec Spec child class.
+-- @param fields Introspection fields.
+Spec.register = function(clss, name, spec, fields)
+	clss.dict_spec[spec.class_name] = spec
+	spec.type = name
+	spec.dict_id = {}
+	spec.dict_cat = {}
+	spec.dict_name = {}
+	spec.introspect = Introspect{
+		name = spec.class_name,
+		fields = fields}
+end
 
 --- Extends a spec with the values in the table.
 -- @param clss Spec class.

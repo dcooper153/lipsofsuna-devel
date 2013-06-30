@@ -9,6 +9,7 @@
 -- @alias Damage
 
 local Class = require("system/class")
+local ModifierSpec = require("core/specs/modifier")
 
 --- Damage calculator.
 -- @type Damage
@@ -204,7 +205,7 @@ end
 Damage.get_impact_effects = function(self)
 	local res = {}
 	for name,value in pairs(self.influences) do
-		local effect = Feateffectspec:find{name = name}
+		local effect = ModifierSpec:find{name = name}
 		if effect and effect.effect then
 			res[effect.effect] = true
 		end

@@ -1,4 +1,4 @@
---- TODO:doc
+--- Introspection and validation for specs and other custom types.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -9,8 +9,9 @@
 -- @alias Introspect
 
 local Class = require("system/class")
+local Spec = require("core/specs/spec")
 
---- TODO:doc
+--- Introspection and validation for specs and other custom types.
 -- @type Introspect
 Introspect = Class("Introspect")
 Introspect.types_dict = {}
@@ -100,7 +101,8 @@ Introspect.validate = function(self, data)
 		end
 		-- Validate spec relations.
 		if details.spec then
-			local specclss = _G[details.spec]
+			local specclss = Spec.dict_spec[details.spec]
+			if not specclss then specclss = _G[details.spec] end --FIXME: Backwards compatiblity
 			assert(specclss)
 			if not specclss:find{name = value} then
 				error(value .. " not in " .. details.spec, 0)
@@ -169,4 +171,4 @@ Introspect.write_str = function(self, data)
 	return str .. "}"
 end
 
-
+return Introspect

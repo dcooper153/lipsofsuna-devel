@@ -1,6 +1,7 @@
 local Actor = require("core/objects/actor")
+local ModifierSpec = require("core/specs/modifier")
 
-local FireElementalModifier = Feateffectspec{
+local FireElementalModifier = ModifierSpec{
 	name = "fire elemental",
 	categories =
 	{
