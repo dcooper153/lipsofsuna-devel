@@ -467,20 +467,6 @@ Actor.handle_inventory_event = function(self, args)
 	end
 end
 
---- Inflicts a modifier on the object.
--- @param self Actor.
--- @param name Modifier name.
--- @param strength Modifier strength.
--- @param args Arguments passed to the modifier
-Actor.inflict_modifier = function(self, name, strength, args)
-	if not self.modifiers then self.modifiers = {} end
-	local mod = self.modifiers[name]
-	if not mod or mod.strength < strength then
-		self.modifiers[name] = Modifier{object = self, strength = strength, args = args}
-		self:update_skills()
-	end
-end
-
 --- Picks up an object.
 -- @param self Actor.
 -- @param src_id ID of the picked up object.

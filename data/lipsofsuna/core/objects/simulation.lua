@@ -350,14 +350,6 @@ SimulationObject.get_turn_angle = function(self)
 	return self:get_rotation().euler[1]
 end
 
---- Inflicts a modifier on the object.
--- @param self Object.
--- @param name Modifier name.
--- @param strength Modifier strength.
--- @param args Args passed to modifier
-SimulationObject.inflict_modifier = function(self, name, strength, args)
-end
-
 --- Loots the object.
 -- @param self Object.
 -- @param user Object doing the looting.

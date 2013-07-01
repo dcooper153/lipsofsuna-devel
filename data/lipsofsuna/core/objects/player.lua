@@ -33,6 +33,14 @@ Player.new = function(clss, manager, id)
 	return self
 end
 
+--- Adds a modifier to the object.
+-- @param self Object.
+-- @param modifier Modifier.
+Player.add_modifier = function(self, modifier)
+	Main.messaging:server_event("add modifier", self.client, modifier.name, modifier.strength or -1)
+	return Actor.add_modifier(self, modifier)
+end
+
 Player.set_client = function(self, client)
 	self.client = client
 	self.vision = Vision(self:get_id(), self.manager)
@@ -72,15 +80,6 @@ end
 Player.detach = function(self, keep)
 	self:disable()
 	Actor.detach(self)
-end
-
---- Inflicts a modifier on the object.
--- @param self Object.
--- @param name Modifier name.
--- @param strength Modifier strength.
-Player.inflict_modifier = function(self, name, strength)
-	Main.messaging:server_event("add modifier", self.client, name, strength)
-	return Actor.inflict_modifier(self, name, strength)
 end
 
 --- Called when a modifier is removed.
