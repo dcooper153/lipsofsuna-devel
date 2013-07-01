@@ -71,7 +71,6 @@ Arena.update = function(self, secs)
 		self.player:set_position(Vector(500,101,500))
 		self.player.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYERS)
 		self.player:set_visible(true)
-		self.player.render:init(self.player)
 		self.player:set_client(-1)
 		Client:set_player_object(self.player)
 		Server.players_by_client = {}
@@ -82,20 +81,17 @@ Arena.update = function(self, secs)
 		self.button:set_spec(Obstaclespec:find_by_name("arena button"))
 		self.button:set_position(Vector(505,100.5,500))
 		self.button:set_visible(true)
-		self.button.render:init(self.button)
 
 		local chest = Item(Main.objects)
 		chest:set_spec(Itemspec:find_by_name("arena chest"))
 		chest:set_position(Vector(500,100.1,505))
 		chest:randomize()
 		chest:set_visible(true)
-		chest.render:init(chest)
 
 		local spelltable = Obstacle(Main.objects)
 		spelltable:set_spec(Obstaclespec:find_by_name("spell table"))
 		spelltable:set_position(Vector(500,100.1,495))
 		spelltable:set_visible(true)
-		spelltable.render:init(chest)
 	end
 	-- Update lighting.
 	Client.lighting:update(secs)

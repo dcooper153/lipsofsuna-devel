@@ -3,8 +3,6 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 
-local Crafting = require("crafting/crafting")
-
 Main.messaging:register_message{
 	name = "craft",
 	client_to_server_encode = function(self, id, name)
@@ -20,7 +18,7 @@ Main.messaging:register_message{
 		if not player then return end
 		if player.dead then return end
 		if player:get_id() ~= id then return end
-		local o = Crafting:craft(player, name, player.crafting_mode)
+		local o = Main.crafting_utils:craft(player, name, player.crafting_mode)
 		if not o then return end
 		player.inventory:merge_or_drop_object(o)
 	end,

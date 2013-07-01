@@ -632,7 +632,7 @@ function makeGridSelect(parent,items)
 		craftable = {}
 		for k,v in ipairs(items) do
 			local spec = Itemspec:find{name = v}
-			--if Crafting:can_craft(spec) then print("can") end
+			--if Main.crafting_utils:can_craft(spec) then print("can") end
 			local widget = Widgets.ItemButton{enabled = true, id = id,
 				index = k, icon = spec and spec.icon, spec = spec, text = v,
 				pressed = pressed, scrolled = scrolled}

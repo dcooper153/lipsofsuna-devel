@@ -1,5 +1,4 @@
 local Class = require("system/class")
-local Crafting = require("crafting/crafting")
 
 Operators.crafting = Class("CraftingOperator")
 Operators.crafting.data = {}
@@ -21,7 +20,7 @@ end
 Operators.crafting.get_craftable = function(self)
 	-- TODO: Take the crafting mode into account.
 	local player = Client.player_object
-	local recipes = Crafting:get_craftable(player, self.data.mode)
+	local recipes = Main.crafting_utils:get_craftable(player, self.data.mode)
 	table.sort(recipes)
 	return recipes
 end
@@ -36,7 +35,7 @@ Operators.crafting.update_craftability = function(self)
 	for k,v in pairs(Ui.widgets) do
 		if v.class_name == "Widgets.Uiinvcraft" then
 			local spec = CraftingRecipeSpec:find{name = v.name}
-			v:set_enabled(Crafting:can_craft(spec, object, self.data.mode))
+			v:set_enabled(Main.crafting_utils:can_craft(spec, object, self.data.mode))
 		end
 	end
 end

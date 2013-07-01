@@ -9,7 +9,6 @@
 -- @alias Itemspec
 
 local Class = require("system/class")
-local Crafting = require("crafting/crafting")
 local Spec = require("core/specs/spec")
 
 --- TODO:doc
@@ -210,14 +209,14 @@ Itemspec.get_trading_value = function(self)
 			value = value + 100
 		end
 	end
-	local craft = CraftingRecipeSpec:find{name = self.name}
+	local craft = CraftingRecipeSpec:find_by_name(self.name)
 	if craft then
-		local req = Crafting:get_requiring_items(craft)
+		local req = Main.crafting_utils:get_requiring_items(craft)
 		if #req > 0 then
 			self.value = value
 			local awg = 0
 			for k,v in pairs(req) do
-				local spec = Itemspec:find{name = v}
+				local spec = Itemspec:find_by_name(v)
 				if spec then awg = awg + spec:get_trading_value() end
 			end
 			awg = awg / #req

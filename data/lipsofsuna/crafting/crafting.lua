@@ -1,4 +1,4 @@
---- Provides crafting related utility functions.
+--- Crafting subgame.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -9,98 +9,98 @@
 -- @alias Crafting
 
 local Class = require("system/class")
-local Item = require("lipsofsuna/core/objects/item")
+local Item = require("core/objects/item")
+local Physics = require("system/physics")
+local Obstacle = require("core/objects/obstacle")
+local Player = require("core/objects/player")
+local TerrainManager = require("core/terrain/terrain-manager")
+local Vector = require("system/math/vector")
 
---- Provides crafting related utility functions.
+--- Crafting subgame.
 -- @type Crafting
 local Crafting = Class("Crafting")
 
---- Checks if a specific item can be crafted by the user.
+--- Creates the crafting subgame.
 -- @param clss Crafting class.
--- @param spec Crafting recipe specification.
--- @param user User object, or nil to get all craftable items.
--- @param mode Crafting mode, or nil for default.
--- @return True if can craft.
-Crafting.can_craft = function(clss, spec, user, mode)
-	-- Check for the mode.
-	--
-	-- Generally, items that do not require a crafting device cannot be
-	-- crafted while using a crafting device. This is the case so that,
-	-- for example, easy foods do not appear in the blacksmithing list.
-	if not spec then return end
-	if not spec.modes[mode or "default"] then return end
-	-- Check for required materials.
-	for name,req in pairs(spec.materials) do
-		if user then
-			if not user.inventory then return end
-			local cnt = user.inventory:count_objects_by_name(name)
-			if not cnt or cnt < req then return end
+-- @return Crafting.
+Crafting.new = function(clss)
+	local self = Class.new(clss)
+	-- FIXME: Initialize the game.
+	Main:start_game("benchmark")
+	Main.messaging:set_transmit_mode(true, true)
+	Game.sectors.unload_time = nil
+	-- Initialize the terrain.
+	self.terrain = TerrainManager(8, 0.75, nil, false, true, true)
+	self.terrain:set_view_center(Vector(500, 0, 500))
+	self.terrain.generate_hooks:register(0, function(self)
+		local w = self.manager.chunk_size
+		local t = self.manager.terrain
+		for z = 0,w-1 do
+			for x = 0,w-1 do
+				t:add_stick_corners(self.x + x, self.z + z, 0, 0, 0, 0, 100, 100, 100, 100, 3)
+			end
 		end
-	end
-	return true
+		for x = self.x-1,self.x+w do
+			for z = self.z-1,self.z+w do
+				t:calculate_smooth_normals(x, z)
+			end
+		end
+	end)
+	Main.terrain = self.terrain --FIXME
+	-- Enable the simulation.
+	Physics:set_enable_simulation(true)
+	return self
 end
 
---- Crafts an item and returns it.
--- @param clss Crafting class.
--- @param user Actor performing the crafting.
--- @param name Item name.
--- @param mode Crafting mode, or nil for default.
--- @return Object or nil.
-Crafting.craft = function(clss, user, name, mode)
-	-- Get the specs.
-	local craftspec = CraftingRecipeSpec:find{name = name}
-	if not craftspec then return end
-	local itemspec = Itemspec:find{name = name}
-	if not itemspec then return end
-	-- Check for requirements.
-	--
-	-- This allows crafting items without a device even if the player has
-	-- a device open in server side. In client side, the device might have
-	-- been closed, but we do not want to track that on the server.
-	if not clss:can_craft(craftspec, user, mode) and
-	   not clss:can_craft(craftspec, user, "default") then
-		return
-	end
-	-- Consume materials.
-	for name1,req in pairs(craftspec.materials) do
-		user.inventory:subtract_objects_by_name(name1, req)
-	end
-	-- Play the crafting effect.
-	Main.vision:object_effect(user, craftspec.effect)
-	-- Create item.
-	local item = Item(user.manager)
-	item:set_spec(itemspec)
-	item:set_count(craftspec.count)
-	return item
+--- Closes the subgame.
+-- @param self Crafting.
+Crafting.close = function(self)
+	-- TODO
 end
 
---- Gets the names of all craftable items.
--- @param clss Crafting class.
--- @param user User object, or nil to get all craftable items.
--- @param mode Crafting mode, or nil for default.
--- @return Table of item names.
-Crafting.get_craftable = function(clss, user, mode)
-	local items = {}
-	for name,spec in pairs(CraftingRecipeSpec.dict_name) do
-		if clss:can_craft(spec, user, mode) then
-			table.insert(items, name)
-		end
-	end
-	return items
-end
+--- Updates the subgame state.
+-- @param self Crafting.
+-- @param secs Seconds since the last update.
+Crafting.update = function(self, secs)
+	-- Initialize the player.
+	if not self.player then
+		self.player = Player(Main.objects)
+		self.player:set_spec(Actorspec:find_by_name("aer-player"))
+		self.player:randomize()
+		self.player.get_admin = function() return true end --FIXME
+		self.player:set_position(Vector(500,101,500))
+		self.player.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYERS)
+		self.player:set_visible(true)
+		self.player:set_client(-1)
+		Client:set_player_object(self.player)
+		Server.players_by_client = {}
+		Server.players_by_client[-1] = self.player --FIXME
+		self.player:calculate_animation()
 
---- Gets the names of items that require the required itemspec for crafting.
--- @param clss Crafting class.
--- @param spec Crafting recipe specification.
--- @return Table of item names.
-Crafting.get_requiring_items = function(clss, spec)
-	local items = {}
-	for k,v in pairs(CraftingRecipeSpec.dict_name) do
-		if v.materials[spec.name] then
-			table.insert(items, k)
-		end
+		local alchemy = Obstacle(Main.objects)
+		alchemy:set_spec(Obstaclespec:find_by_name("alchemy table"))
+		alchemy:set_position(Vector(495,100.1,500))
+		alchemy:set_visible(true)
+
+		local anvil = Obstacle(Main.objects)
+		anvil:set_spec(Obstaclespec:find_by_name("anvil"))
+		anvil:set_position(Vector(500,100.1,495))
+		anvil:set_visible(true)
+
+		local spelltable = Obstacle(Main.objects)
+		spelltable:set_spec(Obstaclespec:find_by_name("spell table"))
+		spelltable:set_position(Vector(500,100.1,505))
+		spelltable:set_visible(true)
+
+		local workbench = Obstacle(Main.objects)
+		workbench:set_spec(Obstaclespec:find_by_name("workbench"))
+		workbench:set_position(Vector(505,100.1,500))
+		workbench:set_visible(true)
 	end
-	return items
+	-- Update lighting.
+	Client.lighting:update(secs)
+	-- Update terrain.
+	self.terrain:refresh_chunks_by_point(Vector(500, 0, 500), 20)
 end
 
 return Crafting
