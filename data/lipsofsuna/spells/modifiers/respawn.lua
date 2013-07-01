@@ -1,4 +1,5 @@
 local ModifierSpec = require("core/specs/modifier")
+local Vector = require("system/math/vector")
 
 local RespawnModifier = ModifierSpec{
 	name = "respawn",
@@ -21,18 +22,22 @@ end
 -- @param modifier Modifier.
 -- @param secs Seconds since the last update.
 -- @return True to continue effect-over-time updates. False otherwise.
-RespawnModifier.update = function(self, mod, secs)
+RespawnModifier.update = function(modifier, secs)
 	-- Wait for the sector to load.
-	if not Main.terrain:is_point_loaded(modifier.object:get_position()) then
+	local src = modifier.object:get_position()
+	if not Main.terrain:is_point_loaded(src) then
 		return true
 	end
 	-- Find the terrain surface.
-	local src = modifier.object:get_position()
 	local dst = Vector(src.x, 0, src.z)
 	local p = Main.terrain.terrain:cast_ray(src, dst)
 	-- Try another position if failed.
 	if not p then
-		modifier.object:set_position(src.x + 10 * math.random(), 1000, src.z + 10 * math.random())
+		dst.x = src.x + 10 * math.random()
+		dst.y = 1000
+		dst.z = src.z + 10 * math.random()
+		modifier.object:set_position(dst)
+		modifier.object.physics:set_velocity(Vector())
 		return true
 	end
 	-- Snap to the terrain surface.

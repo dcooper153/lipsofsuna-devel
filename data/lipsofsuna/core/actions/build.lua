@@ -20,7 +20,7 @@ local perform_attack = function(attacker)
 		if not r or r.object then return end
 		-- Check for sufficient materials.
 		local radius = 1.2
-		local materials = Game.terrain.terrain:count_materials_in_sphere(r.point, radius)
+		local materials = Main.terrain.terrain:count_materials_in_sphere(r.point, radius)
 		local need = materials[0]
 		if not need then return end
 		if need > weapon:get_count() then return end
@@ -32,7 +32,7 @@ local perform_attack = function(attacker)
 		else
 			p = Vector(0,radius/4,0):add(r.point)
 		end
-		Game.terrain.terrain:add_sphere_filter_id(p, radius, material.id, 0)
+		Main.terrain.terrain:add_sphere_filter_id(p, radius, material.id, 0)
 		Main.vision:world_effect(r.point, material.effect_build)
 	end)
 end

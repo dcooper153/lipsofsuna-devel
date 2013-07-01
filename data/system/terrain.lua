@@ -44,7 +44,7 @@ end
 Terrain.add_sphere = function(self, point, radius, mat)
 	local materials = t or {}
 	for x,z,y,y0,y1,y2,y3 in self:get_sticks_in_sphere(point, radius) do
-		Game.terrain.terrain:add_stick_corners(x, z,
+		self:add_stick_corners(x, z,
 			y - y0, y - y1, y - y2, y - y3,
 			y + y0, y + y1, y + y2, y + y3, mat)
 	end
@@ -60,7 +60,7 @@ end
 Terrain.add_sphere_filter_id = function(self, point, radius, mat, id)
 	local materials = t or {}
 	for x,z,y,y0,y1,y2,y3 in self:get_sticks_in_sphere(point, radius) do
-		Game.terrain.terrain:add_stick_corners_filter_id(x, z,
+		self:add_stick_corners_filter_id(x, z,
 			y - y0, y - y1, y - y2, y - y3,
 			y + y0, y + y1, y + y2, y + y3, mat, id)
 	end
@@ -76,7 +76,7 @@ end
 Terrain.add_sphere_filter_mask = function(self, point, radius, mat, mask)
 	local materials = t or {}
 	for x,z,y,y0,y1,y2,y3 in self:get_sticks_in_sphere(point, radius) do
-		Game.terrain.terrain:add_stick_corners_filter_mask(x, z,
+		self:add_stick_corners_filter_mask(x, z,
 			y - y0, y - y1, y - y2, y - y3,
 			y + y0, y + y1, y + y2, y + y3, mat, mask)
 	end

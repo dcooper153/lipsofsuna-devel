@@ -129,15 +129,15 @@ Combat.destroy_terrain_sphere = function(self, attacker, point, tile, radius)
 	end
 	-- Erase sticks.
 	local materials = {}
-	for x,z,y,y00,y10,y01,y11 in Game.terrain.terrain:get_sticks_in_sphere(point, radius) do
+	for x,z,y,y00,y10,y01,y11 in Main.terrain.terrain:get_sticks_in_sphere(point, radius) do
 		local yavg = (y00 + y10 + y01 + y11) / 4
-		Game.terrain.terrain:count_column_materials(x, z, y - yavg, yavg * 2, materials)
-		Game.terrain.terrain:add_stick_corners(x, z,
+		Main.terrain.terrain:count_column_materials(x, z, y - yavg, yavg * 2, materials)
+		Main.terrain.terrain:add_stick_corners(x, z,
 			y - y00, y - y10, y - y01, y - y11,
 			y + y00, y + y10, y + y01, y + y11, 0)
 	end
 	-- Smoothen the modified columns.
-	Game.terrain.terrain:calculate_smooth_normals_in_sphere(point, radius)
+	Main.terrain.terrain:calculate_smooth_normals_in_sphere(point, radius)
 	-- Play the collapse effect.
 	self:__play_terrain_destruction_effect(point, materials)
 	-- Create items.
@@ -167,12 +167,12 @@ end
 -- @param tile Grid coordinates of the hit tile.
 Combat.destroy_terrain_stick = function(self, attacker, point, tile, height)
 	-- Erase sticks.
-	local materials = Game.terrain.terrain:count_column_materials(tile.x, tile.z, point.y - height / 2, height)
-	Game.terrain.terrain:add_stick(tile.x, tile.z, point.y - height / 2, height, 0)
+	local materials = Main.terrain.terrain:count_column_materials(tile.x, tile.z, point.y - height / 2, height)
+	Main.terrain.terrain:add_stick(tile.x, tile.z, point.y - height / 2, height, 0)
 	-- Smoothen the modified columns.
 	for z = tile.z-1,tile.z+1 do
 		for x = tile.x-1,tile.x+1 do
-			Game.terrain.terrain:calculate_smooth_normals(x, z)
+			Main.terrain.terrain:calculate_smooth_normals(x, z)
 		end
 	end
 	-- Play the collapse effect.

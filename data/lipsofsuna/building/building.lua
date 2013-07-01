@@ -58,7 +58,6 @@ Building.update = function(self, secs)
 	Client.lighting:update(secs)
 	-- Update terrain.
 	self.terrain:refresh_chunks_by_point(Vector(500, 0, 500), 20)
-	self.terrain:update(secs)
 end
 
 return Building

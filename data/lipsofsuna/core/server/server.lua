@@ -15,6 +15,8 @@ local DialogManager = require("core/dialog/dialog-manager")
 local GlobalEventManager = require(Mod.path .. "global-event-manager")
 local Log = require(Mod.path .. "log")
 local Marker = require("core/marker")
+local Modifier = require("core/server/modifier")
+local ModifierSpec = require("core/specs/modifier")
 local Network = require("system/network")
 local ObjectDatabase = require(Mod.path .. "object-database")
 local Physics = require("system/physics")
@@ -176,9 +178,16 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 	self.players_by_client[client] = player
 	local home = player:get_spawn_point()
 	if not home or spawnpoint then
+		-- Teleport the player.
 		home = player:set_spawn_point(spawnpoint)
 		player:teleport{position = home}
-		player:inflict_modifier("respawn", 1)
+		-- Spawn the player.
+		local spec = ModifierSpec:find_by_name("respawn")
+		if not spec then return end
+		local modifier = Modifier(spec, player, player)
+		if modifier:start(1) then
+			player:add_modifier(modifier)
+		end
 	end
 	player:set_client(client)
 	player:set_visible(true)

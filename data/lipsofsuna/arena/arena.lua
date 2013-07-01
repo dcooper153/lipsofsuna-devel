@@ -46,7 +46,7 @@ Arena.new = function(clss)
 			end
 		end
 	end)
-	Game.terrain = self.terrain --FIXME
+	Main.terrain = self.terrain --FIXME
 	-- Enable the simulation.
 	Physics:set_enable_simulation(true)
 	return self
@@ -101,7 +101,6 @@ Arena.update = function(self, secs)
 	Client.lighting:update(secs)
 	-- Update terrain.
 	self.terrain:refresh_chunks_by_point(Vector(500, 0, 500), 20)
-	self.terrain:update(secs)
 end
 
 return Arena

@@ -95,7 +95,6 @@ Benchmark.update = function(self, secs)
 	end
 	-- Modify terrain.
 	-- TODO
-	self.terrain:update(secs)
 	-- Update the terrain timer.
 	self.terrain_timer1 = self.terrain_timer1 + 1
 	if self.terrain_timer1 > 400 then

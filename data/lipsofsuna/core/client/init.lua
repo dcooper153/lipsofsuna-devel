@@ -86,7 +86,7 @@ Client:register_update_hook(20, function(secs)
 		-- Refresh the active portion of the map.
 		Client.player_object:refresh()
 		-- Notify the terrain manager of the view center.
-		Game.terrain:set_view_center(Client.player_object:get_position())
+		Main.terrain:set_view_center(Client.player_object:get_position())
 	end
 	-- Update effects.
 	-- Must be done after objects to ensure correct anchoring.

@@ -6,7 +6,7 @@ for k,v in pairs(File:scan_directory(Mod.path .. "sectors")) do
 end
 
 Main.game_start_hooks:register(5, function()
-	if Main.game.terrain then
-		Main.game.terrain.generate_hooks:register(20, TerrainGenerator.generate)
+	if Main.terrain then
+		Main.terrain.generate_hooks:register(20, TerrainGenerator.generate)
 	end
 end)

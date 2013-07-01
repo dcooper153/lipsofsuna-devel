@@ -132,7 +132,7 @@ Utils.find_spawn_point = function(clss, point)
 	-- FIXME: Only works when above surface.
 	local src = Vector(point.x, point.y + 10, point.z)
 	local dst = Vector(src.x, 0, src.z)
-	local p = Game.terrain.terrain:cast_ray(src, dst)
+	local p = Main.terrain.terrain:cast_ray(src, dst)
 	if not p then return end
 	-- Check that there's enough room above.
 	local p2 = Vector(p.x, p.y + 5, p.z)

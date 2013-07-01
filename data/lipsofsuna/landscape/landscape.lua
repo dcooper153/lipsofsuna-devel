@@ -28,6 +28,7 @@ Landscape.new = function(clss)
 	-- Initialize the terrain.
 	self.terrain = TerrainManager(8, 0.75, nil, false, true, true)
 	self.terrain.generate_hooks:register(0, TerrainGenerator.generate)
+	Main.terrain = self.terrain --FIXME
 	return self
 end
 
@@ -49,7 +50,6 @@ Landscape.update = function(self, secs)
 	local center = camera:get_target_position()
 	self.terrain:set_view_center(center)
 	self.terrain:refresh_chunks_by_point(center, 50)
-	self.terrain:update(secs)
 end
 
 return Landscape
