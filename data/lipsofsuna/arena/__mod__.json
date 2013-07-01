@@ -8,10 +8,6 @@
 			"long": "--arena"
 		}
 	],
-	"mods":
-	[
-		["load", "arena/spelltable"]
-	],
 	"server": false,
 	"scripts":
 	[

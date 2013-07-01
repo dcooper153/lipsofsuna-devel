@@ -10,6 +10,7 @@
 	],
 	"mods":
 	[
+		["load", "crafting/spelltable"],
 		["load", "crafting/ui"]
 	],
 	"server": false,
