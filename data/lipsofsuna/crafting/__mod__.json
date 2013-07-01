@@ -11,7 +11,8 @@
 	"mods":
 	[
 		["load", "crafting/spelltable"],
-		["load", "crafting/ui"]
+		["load", "crafting/ui"],
+		["load", "crafting/workbench"]
 	],
 	"server": false,
 	"scripts":

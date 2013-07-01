@@ -77,7 +77,6 @@
 	["# Environment"],
 	["load", "environment/bricks"],
 	["load", "environment/building"],
-	["load", "environment/crafting"],
 	["load", "environment/door"],
 	["load", "environment/furnace"],
 	["load", "environment/furniture"],
