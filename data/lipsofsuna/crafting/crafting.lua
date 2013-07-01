@@ -65,7 +65,7 @@ Crafting.update = function(self, secs)
 	-- Initialize the player.
 	if not self.player then
 		self.player = Player(Main.objects)
-		self.player:set_spec(Actorspec:find_by_name("aer-player"))
+		self.player:set_spec(Actorspec:find_by_name("crafting player"))
 		self.player:randomize()
 		self.player.get_admin = function() return true end --FIXME
 		self.player:set_position(Vector(500,101,500))
@@ -96,6 +96,11 @@ Crafting.update = function(self, secs)
 		workbench:set_spec(Obstaclespec:find_by_name("workbench"))
 		workbench:set_position(Vector(505,100.1,500))
 		workbench:set_visible(true)
+
+		local chest = Item(Main.objects)
+		chest:set_spec(Itemspec:find_by_name("crafting chest"))
+		chest:set_position(Vector(505,100.1,510))
+		chest:set_visible(true)
 	end
 	-- Update lighting.
 	Client.lighting:update(secs)

@@ -20,5 +20,9 @@
 		"main",
 		"message-disenchant",
 		"message-enchant"
+	],
+	"specs":
+	[
+		"specs"
 	]
 }
