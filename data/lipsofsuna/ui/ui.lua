@@ -14,6 +14,7 @@ local Cursor = require("system/widgets/cursor")
 local Input = require("system/input")
 local Label = require("system/widgets/label")
 local Scrollbar = require("system/widgets/scrollbar")
+local UiVBox = require("ui/widgets/vbox")
 local Widget = require("system/widget")
 
 --- TODO:doc
@@ -30,7 +31,7 @@ Ui.init = function(self)
 	self.history = {}
 	self.size = Vector()
 	self.stack = {}
-	self.widgets = {}
+	self.widgets = UiVBox()
 	self.window = Widget()
 	self.window:set_floating(true)
 	self.window:set_fullscreen(true)
@@ -183,6 +184,21 @@ Ui.add_state = function(self, args)
 	return state
 end
 
+--- Adds a temporary widget to the current UI state.
+-- @param self Ui.
+-- @param x X position.
+-- @param y Y position.
+-- @param widget Widget.
+Ui.add_temporary = function(self, x, y, widget)
+	-- Fix the screen position.
+	widget.temporary = Vector(x, y - self.__scroll_offset)
+	-- Add to the widget list.
+	self.widgets:add_child(widget)
+	-- Add to the view.
+	local root = self.background or self.window
+	root:add_child(widget)
+end
+
 --- Adds a widget to a state.
 -- @param self Ui class.
 -- @param args Arguments.<ul>
@@ -236,7 +252,8 @@ Ui.autoscroll = function(self)
 	local w = self:get_focused_widget()
 	if not w then return end
 	-- Get the relative screen position.
-	local start = self.widgets[1]:get_y()
+	local widget = self.widgets:get_widget_by_index(1)
+	local start = widget and widget:get_y() or 0
 	local height = self.size.y
 	-- Scroll up until the top of the widget is visible.
 	local top = w:get_offset().y
@@ -266,7 +283,7 @@ Ui.command = function(self, cmd, press)
 	self.repeat_timer = 0
 	if cmd == "back" then
 		local state = self:get_state()
-		local widget = self.widgets[self.focused_item]
+		local widget = self:get_focused_widget()
 		if not widget or not widget.apply_back then return self:pop_state() end
 		if widget:apply_back() then self:pop_state() end
 		if state ~= self:get_state() then
@@ -274,59 +291,39 @@ Ui.command = function(self, cmd, press)
 		end
 	elseif cmd == "apply" then
 		if self.focused_item then
-			local widget = self.widgets[self.focused_item]
+			local widget = self:get_focused_widget()
 			if widget and widget.apply then widget:apply() end
 		end
 	elseif cmd == "up" then
 		self.repeat_timer = 0
 		self.repeat_up = true
-		if self.focused_item then
-			if self.focused_item > 1 then
-				self.widgets[self.focused_item]:set_focused(false)
-				self.focused_item = self.focused_item - 1
-				self.widgets[self.focused_item]:set_focused(true)
-				self:update_help()
-				self:autoscroll()
-			elseif #self.widgets > 1 then
-				self.widgets[self.focused_item]:set_focused(false)
-				self.focused_item = #self.widgets
-				self.widgets[self.focused_item]:set_focused(true)
-				self:update_help()
-				self:autoscroll()
-			end
+		if self.widgets:focus_up() then
+			self.focused_item = self.widgets.focused_item
+			self:update_help()
+			self:autoscroll()
 			self.history[self:get_history_state()] = self.focused_item
 			Client.effects:play_global("uimove1")
 		end
 	elseif cmd == "down" then
 		self.repeat_timer = 0
 		self.repeat_down = true
-		if self.focused_item then
-			if self.focused_item < #self.widgets then
-				self.widgets[self.focused_item]:set_focused(false)
-				self.focused_item = self.focused_item + 1
-				self.widgets[self.focused_item]:set_focused(true)
-				self:update_help()
-				self:autoscroll()
-			elseif #self.widgets > 1 then
-				self.widgets[self.focused_item]:set_focused(false)
-				self.focused_item = 1
-				self.widgets[self.focused_item]:set_focused(true)
-				self:update_help()
-				self:autoscroll()
-			end
+		if self.widgets:focus_down() then
+			self.focused_item = self.widgets.focused_item
+			self:update_help()
+			self:autoscroll()
 			self.history[self:get_history_state()] = self.focused_item
 			Client.effects:play_global("uimove1")
 		end
 	elseif cmd == "left" then
 		self.repeat_left = true
 		if self.focused_item then
-			local widget = self.widgets[self.focused_item]
+			local widget = self:get_focused_widget()
 			if widget and widget.left then widget:left() end
 		end
 	elseif cmd == "right" then
 		self.repeat_right = true
 		if self.focused_item then
-			local widget = self.widgets[self.focused_item]
+			local widget = self:get_focused_widget()
 			if widget and widget.right then widget:right() end
 		end
 	end
@@ -384,11 +381,7 @@ end
 -- @return Widget or nil.
 Ui.get_widget = function(self, id)
 	if not id then return end
-	for _,widget in pairs(self.widgets) do
-		if widget.id == id then
-			return widget
-		end
-	end
+	self.widgets:get_widget_by_id(id)
 end
 
 --- Finds the widget under the cursor.<br/>
@@ -414,9 +407,8 @@ Ui.get_widget_under_cursor = function(self, filter)
 	if handle(c, self.back) then return self.back end
 	if handle(c, self.scrollbar) then return self.scrollbar end
 	-- Try UI widgets.
-	for k,v in pairs(self.widgets) do
-		if handle(c, v) then return v end
-	end
+	local w = self.widgets:get_widget_by_point(c, filter)
+	if w then return w end
 	-- Try HUD widgets.
 	for k,hud in pairs(self.huds) do
 		if hud.widget then
@@ -442,7 +434,7 @@ Ui.handle_event = function(self, args)
 	end
 	-- Call the event handler of the active widget.
 	if self.focused_item and (not mouse_mode or not mouse_event) then
-		local widget = self.widgets[self.focused_item]
+		local widget = self:get_focused_widget()
 		if widget and not widget:handle_event(args) then return end
 	end
 	-- Call the event handler functions of the state.
@@ -504,9 +496,7 @@ end
 --- Repaints all the widgets of the state.
 -- @param self Ui class.
 Ui.repaint_state = function(self)
-	for k,v in pairs(self.widgets) do
-		v.need_repaint = true
-	end
+	self.widgets:queue_repaint()
 end
 
 --- Recreates and shows the current state.
@@ -538,15 +528,8 @@ end
 -- @param state State name.
 -- @param focus Focused widget index, nil for first.
 Ui.show_state = function(self, state, focus)
-	local y = 0
-	local root = self.window
-	local add = function(widget)
-		table.insert(self.widgets, widget)
-		y = y + widget.size.y
-	end
 	-- Detach the widgets.
 	self:show_state_detach()
-	self.widgets = {}
 	-- Remove the old background.
 	if self.background then
 		self.background:detach()
@@ -569,7 +552,6 @@ Ui.show_state = function(self, state, focus)
 			widget:set_request(self.window:get_width(), self.window:get_height())
 			self.window:add_child(widget)
 			self.background = widget
-			root = widget
 		end
 	end
 	-- Call the initializers.
@@ -578,7 +560,7 @@ Ui.show_state = function(self, state, focus)
 			print(debug.traceback("ERROR: " .. err))
 		end)
 		if ret and widgets then
-			for k,widget in ipairs(widgets) do add(widget) end
+			for k,widget in ipairs(widgets) do self.widgets:add_child(widget) end
 		end
 	end
 	-- Create the widgets.
@@ -593,9 +575,9 @@ Ui.show_state = function(self, state, focus)
 				if spec.input then widget.handle_input = spec.input end
 				if spec.update then widget.update = spec.update end
 				if not widget.id then widget.id = spec.id or id end
-				add(widget)
+				self.widgets:add_child(widget)
 			else
-				for k,v in ipairs(widget) do add(v) end
+				for k,v in ipairs(widget) do self.widgets:add_child(v) end
 			end
 		end
 	end
@@ -619,17 +601,12 @@ Ui.show_state = function(self, state, focus)
 	-- Attach the widgets.
 	self:show_state_attach()
 	-- Focus the first or previously focused widget.
-	local f = math.min(focus or self.history[self:get_history_state()] or 1, #self.widgets)
-	if self.widgets[f] then
-		self.focused_item = f
-		self.widgets[f]:set_focused(true)
-	else
-		self.focused_item = nil
-	end
+	self.widgets:focus_index(focus or self.history[self:get_history_state()] or 1)
+	self.focused_item = self.widgets.focused_item
 	self.history[self:get_history_state()] = self.focused_item
 	-- Initialize the interpolation animations.
-	for k,v in ipairs(self.widgets) do
-		v:set_show_priority(math.abs(k - f))
+	for k,v in self.widgets:get_children() do
+		v:set_show_priority(math.abs(k - self.focused_item))
 	end
 	-- Position the widgets.
 	self:set_scroll_offset(0)
@@ -653,7 +630,7 @@ Ui.show_state_attach = function(self)
 		if v.widget then root:add_child(v.widget) end
 	end
 	-- Attach the navigation widgets.
-	if self.widgets[1] then
+	if not self.widgets:is_empty() then
 		root:add_child(self.back)
 	end
 	if Client.options.help_messages then
@@ -662,12 +639,12 @@ Ui.show_state_attach = function(self)
 			root:add_child(self.label)
 		end
 	end
-	if self.widgets[1] then
+	if not self.widgets:is_empty() then
 		root:add_child(self.scrollbar)
 	end
 	-- Attach the state widgets.
-	for k,v in pairs(self.widgets) do
-		root:add_child(v)
+	if not self.widgets:is_empty() then
+		root:add_child(self.widgets)
 	end
 	-- Mark repacking as done.
 	self.need_repack = nil
@@ -685,9 +662,8 @@ Ui.show_state_detach = function(self)
 		if v.widget then v.widget:detach() end
 	end
 	-- Detach the state widgets.
-	for k,v in pairs(self.widgets) do
-		v:detach()
-	end
+	self.widgets:detach()
+	self.widgets:clear()
 	-- Detach the navigation widgets.
 	self.back:detach()
 	self.hint:detach()
@@ -724,9 +700,7 @@ Ui.update = function(self, secs)
 		end
 	end
 	-- Call the update functions of the widgets.
-	for k,v in pairs(self.widgets) do
-		if v.update then v:update(secs) end
-	end
+	self.widgets:update(secs)
 	-- Call the update functions of the HUD.
 	for k,v in pairs(self.huds) do
 		if v.widget and v.widget.update then v.widget:update(secs) end
@@ -772,23 +746,15 @@ Ui.update = function(self, secs)
 		local focus = self:get_widget_under_cursor()
 		if focus then
 			-- Focus a UI widget.
-			local found = false
-			for k,v in pairs(self.widgets) do
-				if v == focus then
-					if self.focused_item ~= k then
-						self.widgets[self.focused_item]:set_focused(false)
-						self.focused_item = k
-						self.widgets[self.focused_item]:set_focused(true)
-						self:update_help()
-						self:autoscroll()
-					end
-					if self.prev_custom_focus then
-						self.prev_custom_focus:set_focused(false)
-						self.prev_custom_focus = nil
-					end
-					found = true
-					break
-				end
+			local found,changed = self.widgets:focus_widget(focus)
+			if changed then
+				self.focused_item = self.widgets.focused_item
+				self:update_help()
+				self:autoscroll()
+			end
+			if found and self.prev_custom_focus then
+				self.prev_custom_focus:set_focused(false)
+				self.prev_custom_focus = nil
 			end
 			-- Focus a custom widget.
 			if not found then
@@ -881,9 +847,11 @@ Ui.update_help = function(self)
 	end
 end
 
+--- Gets the currently focused widget.
+-- @param self Ui class.
+-- @return Widget is found. Nil otherwise.
 Ui.get_focused_widget = function(self)
-	if not self.focused_item then return end
-	return self.widgets[self.focused_item]
+	return self.widgets:get_focused_widget()
 end
 
 Ui.get_history_state = function(self)
@@ -928,10 +896,7 @@ end
 
 Ui.set_scroll_offset = function(self, v)
 	-- Decide if a scrollbar is needed.
-	local h = 0
-	for k,widget in ipairs(self.widgets) do
-		h = h + widget.size.y
-	end
+	local h = self.widgets:get_height()
 	local x = (h < self.size.y) and 32 or 53
 	-- Update system widget positions.
 	if h < self.size.y then
@@ -944,15 +909,7 @@ Ui.set_scroll_offset = function(self, v)
 		self.back:set_request(32, self.size.y)
 	end
 	-- Update state widget positions.
-	local y = 0
-	local sh = self.size.y
-	for k,widget in ipairs(self.widgets) do
-		local wy = y - v
-		local wh = widget.size.y
-		widget:set_offset(Vector(x, wy))
-		widget:set_visible(wy > -wh and wy < sh)
-		y = y + wh
-	end
+	self.widgets:set_offset(Vector(x, v))
 	-- Store the scrolling state.
 	self.__scroll_offset = v
 	self.__scroll_range = {h, v, self.size.y}

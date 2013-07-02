@@ -14,7 +14,7 @@ Widgets.Uiradio.apply = function(self)
 	-- Reactivation does nothing.
 	if self.value then return end
 	-- Deactivate other toggles in the group.
-	for k,v in pairs(Ui.widgets) do
+	for k,v in Ui.widgets:get_children() do
 		if v.radio_group == self.radio_group then
 			if v ~= self and v.value then
 				v.value = false

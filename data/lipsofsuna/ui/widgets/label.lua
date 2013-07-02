@@ -37,3 +37,5 @@ Widgets.Uilabel.rebuild_canvas = function(self)
 		text_color = Theme.text_color_1,
 		text_font = Theme.text_font_1}
 end
+
+return Widgets.Uilabel

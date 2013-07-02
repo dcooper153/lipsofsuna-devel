@@ -156,3 +156,5 @@ Widgets.Uiwidget.set_offset = function(self, v)
 	self.__offset = v
 	self.__need_reoffset = true
 end
+
+return Widgets.Uiwidget
