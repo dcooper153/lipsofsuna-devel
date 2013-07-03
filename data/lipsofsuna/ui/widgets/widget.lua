@@ -6,9 +6,12 @@ local ipol_time = 0.2
 local ipol_path_a = {0,0.1,0.2,0.5,0.8,1,1}
 local ipol_path_x = {-1,-0.5,-0.25,-0.0125,0,0,0}
 
-Widgets.Uiwidget = Class("Uiwidget", Widget)
+local UiWidget = Class("Uiwidget", Widget)
 
-Widgets.Uiwidget.new = function(clss, label)
+-- FIXME
+Widgets.Uiwidget = UiWidget
+
+UiWidget.new = function(clss, label)
 	-- Create the widget.
 	local self = Widget.new(clss)
 	self.__life = 0
@@ -20,23 +23,23 @@ Widgets.Uiwidget.new = function(clss, label)
 	return self
 end
 
-Widgets.Uiwidget.apply = function(self)
+UiWidget.apply = function(self)
 	if self.child and self.child.pressed then
 		self.child:pressed()
 	end
 end
 
-Widgets.Uiwidget.apply_back = function(self)
+UiWidget.apply_back = function(self)
 	return true
 end
 
-Widgets.Uiwidget.handle_event = function(self, args)
+UiWidget.handle_event = function(self, args)
 	if Ui:get_pointer_grab() then return true end
 	if args.type ~= "mousepress" then return true end
 	self:apply()
 end
 
-Widgets.Uiwidget.update = function(self, secs)
+UiWidget.update = function(self, secs)
 	-- Update the size.
 	if self.need_reshape then
 		self.need_reshape = nil
@@ -73,7 +76,7 @@ Widgets.Uiwidget.update = function(self, secs)
 	end
 end
 
-Widgets.Uiwidget.rebuild_size = function(self)
+UiWidget.rebuild_size = function(self)
 	-- Set the default size.
 	local size = Vector(Theme.width_widget_1, Theme.height_widget_1)
 	-- Resize to fit the label.
@@ -89,7 +92,7 @@ Widgets.Uiwidget.rebuild_size = function(self)
 	return size
 end
 
-Widgets.Uiwidget.rebuild_canvas = function(self)
+UiWidget.rebuild_canvas = function(self)
 	-- Add the background.
 	self:canvas_image{
 		dest_position = {0,0},
@@ -109,27 +112,27 @@ Widgets.Uiwidget.rebuild_canvas = function(self)
 	end
 end
 
-Widgets.Uiwidget.set_focused = function(self, v)
+UiWidget.set_focused = function(self, v)
 	if self.focused == v then return end
 	self.focused = v
 	self.need_repaint = true
 end
 
-Widgets.Uiwidget.get_help = function(self)
+UiWidget.get_help = function(self)
 	return self.help
 end
 
-Widgets.Uiwidget.set_help = function(self, v)
+UiWidget.set_help = function(self, v)
 	if self.help == v then return end
 	self.help = v
 	if self.focused then Ui:update_help() end
 end
 
-Widgets.Uiwidget.get_hint = function(self)
+UiWidget.get_hint = function(self)
 	return self.hint or "$$A\n$$B\n$$U\n$$D"
 end
 
-Widgets.Uiwidget.set_hint = function(self, v)
+UiWidget.set_hint = function(self, v)
 	if self.hint == v then return end
 	self.hint = v
 	if self.focused then Ui:update_help() end
@@ -138,7 +141,7 @@ end
 --- Sets the interpolation priority of the widget.
 -- @param self Uiwidget.
 -- @param v Number.
-Widgets.Uiwidget.set_show_priority = function(self, v)
+UiWidget.set_show_priority = function(self, v)
 	if not self.__life then return end
 	if Client.options.ui_animations then
 		self.__life = -0.05 * math.log(v + 0.2)
@@ -148,13 +151,36 @@ Widgets.Uiwidget.set_show_priority = function(self, v)
 	self.__need_reoffset = true
 end
 
-Widgets.Uiwidget.get_offset = function(self)
+UiWidget.get_offset = function(self)
 	return self.__offset
 end
 
-Widgets.Uiwidget.set_offset = function(self, v)
+UiWidget.set_offset = function(self, v)
 	self.__offset = v
 	self.__need_reoffset = true
 end
 
-return Widgets.Uiwidget
+--- Finds the widget that encloses the point.<br/>
+--
+-- Returns the first widget whose rectangle encloses the given point.
+-- If the filter funtion is given, the first matching widget for which the
+-- filter returns true will be returned. Other widgets are skipped.
+--
+-- @param self UiWidget.
+-- @param point Point in screen space.
+-- @param filter Optional filter function.
+-- @return Widget if found. Nil otherwise.
+UiWidget.get_widget_by_point = function(self, point, filter)
+	-- Check for visibility.
+	if not self:get_visible() then return end
+	-- Check for X coordinate.
+	local x,w = self:get_x(),self:get_width()
+	if point.x < x or x + w <= point.x then return end
+	-- Check for Y coordinate.
+	local y,h = self:get_y(),self:get_height()
+	if point.y < y or y + h <= point.y then return end
+	-- Apply filtering.
+	if not filter or filter(self) then return self end
+end
+
+return UiWidget

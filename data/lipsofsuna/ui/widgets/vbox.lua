@@ -251,16 +251,9 @@ end
 -- @param filter Optional filter function.
 -- @return Widget if found. Nil otherwise.
 UiVBox.get_widget_by_point = function(self, point, filter)
-	local handle = function(point, widget)
-		if not widget:get_visible() then return end
-		local x,w = widget:get_x(),widget:get_width()
-		if point.x < x or x + w <= point.x then return end
-		local y,h = widget:get_y(),widget:get_height()
-		if point.y < y or y + h <= point.y then return end
-		if not filter or filter(widget) then return true end
-	end
 	for k,v in pairs(self.__widgets) do
-		if handle(point, v) then return v end
+		local w = v:get_widget_by_point(point, filter)
+		if w then return w end
 	end
 end
 
