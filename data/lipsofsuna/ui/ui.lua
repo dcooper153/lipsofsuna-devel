@@ -12,6 +12,7 @@ local Button = require("system/widgets/button")
 local Class = require("system/class")
 local Cursor = require("system/widgets/cursor")
 local Input = require("system/input")
+local InputHandler = require("ui/input-handler")
 local Label = require("system/widgets/label")
 local Scrollbar = require("system/widgets/scrollbar")
 local UiVBox = require("ui/widgets/vbox")
@@ -52,6 +53,15 @@ Ui.init = function(self)
 	-- Initialize the cursor.
 	self.cursor = Cursor(Iconspec:find{name = "cursor1"})
 	self:set_pointer_grab(Client.options.grab_cursor)
+	-- Initialize input.
+	self.input = InputHandler(Client.bindings, self.widgets)
+	self.input.focus_changed = function(w)
+		self.focused_item = self.widgets.focused_item
+		self:update_help()
+		self:autoscroll()
+		self.history[self:get_history_state()] = self.focused_item
+	end
+	self.input:set_enabled(true)
 end
 
 --- Adds a heads over display widget to the user interface.
@@ -273,59 +283,22 @@ end
 -- @param cmd Command string.
 -- @param press True for start, false for end.
 Ui.command = function(self, cmd, press)
-	if not press then
-		if cmd == "up" then self.repeat_up = nil end
-		if cmd == "down" then self.repeat_down = nil end
-		if cmd == "left" then self.repeat_left = nil end
-		if cmd == "right" then self.repeat_right = nil end
-		return
-	end
-	self.repeat_timer = 0
+	if not self.input:get_enabled() then return end
 	if cmd == "back" then
-		local state = self:get_state()
-		local widget = self:get_focused_widget()
-		if not widget or not widget.apply_back then return self:pop_state() end
-		if widget:apply_back() then self:pop_state() end
-		if state ~= self:get_state() then
+		if self.input:handle_back() and press then
+			self:pop_state()
 			Client.effects:play_global("uitransition1")
 		end
 	elseif cmd == "apply" then
-		if self.focused_item then
-			local widget = self:get_focused_widget()
-			if widget and widget.apply then widget:apply() end
-		end
+		self.input:handle_apply(press)
 	elseif cmd == "up" then
-		self.repeat_timer = 0
-		self.repeat_up = true
-		if self.widgets:focus_up() then
-			self.focused_item = self.widgets.focused_item
-			self:update_help()
-			self:autoscroll()
-			self.history[self:get_history_state()] = self.focused_item
-			Client.effects:play_global("uimove1")
-		end
+		self.input:handle_up(press)
 	elseif cmd == "down" then
-		self.repeat_timer = 0
-		self.repeat_down = true
-		if self.widgets:focus_down() then
-			self.focused_item = self.widgets.focused_item
-			self:update_help()
-			self:autoscroll()
-			self.history[self:get_history_state()] = self.focused_item
-			Client.effects:play_global("uimove1")
-		end
+		self.input:handle_down(press)
 	elseif cmd == "left" then
-		self.repeat_left = true
-		if self.focused_item then
-			local widget = self:get_focused_widget()
-			if widget and widget.left then widget:left() end
-		end
+		self.input:handle_left(press)
 	elseif cmd == "right" then
-		self.repeat_right = true
-		if self.focused_item then
-			local widget = self:get_focused_widget()
-			if widget and widget.right then widget:right() end
-		end
+		self.input:handle_right(press)
 	end
 end
 
@@ -432,8 +405,13 @@ Ui.handle_event = function(self, args)
 	   args.type == "mousescroll" or args.type == "mousemotion" then
 		mouse_event = true
 	end
+	-- Call the event handlers of the navigation widgets.
+	local widget = self:get_widget_under_cursor(function(widget)
+		return widget == self.scrollbar or widget == self.back
+	end)
+	if widget and not widget:handle_event(args) then return end
 	-- Call the event handler of the active widget.
-	if self.focused_item and (not mouse_mode or not mouse_event) then
+	if self.focused_item then
 		local widget = self:get_focused_widget()
 		if widget and not widget:handle_event(args) then return end
 	end
@@ -491,6 +469,17 @@ end
 -- @param self Ui class.
 Ui.queue_relayout = function(self)
 	self.need_repack = true
+end
+
+--- Removes a temporary widget.
+-- @param self Ui class.
+-- @param widget Widget.
+Ui.remove_temporary = function(self, widget)
+	for k,v in self.widgets:get_children() do
+		if v == widget then
+			self.widgets:remove_child_by_index(k)
+		end
+	end
 end
 
 --- Repaints all the widgets of the state.
@@ -720,52 +709,8 @@ Ui.update = function(self, secs)
 		self:show_state_detach()
 		self:show_state_attach()
 	end
-	-- Implement key repeat for browsing.
-	self.repeat_timer = self.repeat_timer + secs
-	if self.repeat_timer >= 0.15 then
-		self.repeat_timer = 0
-		local action1 = Client.bindings:find_by_name("menu_up")
-		if action1 and action1:is_pressed() and self.repeat_up then
-			self:command("up", true)
-		end
-		local action2 = Client.bindings:find_by_name("menu_down")
-		if action2 and action2:is_pressed() and self.repeat_down then
-			self:command("down", true)
-		end
-		local action3 = Client.bindings:find_by_name("menu_left")
-		if action3 and action3:is_pressed() and self.repeat_left then
-			self:command("left", true)
-		end
-		local action4 = Client.bindings:find_by_name("menu_right")
-		if action4 and action4:is_pressed() and self.repeat_right then
-			self:command("right", true)
-		end
-	end
-	-- Update mouse focus.
-	if not self:get_pointer_grab() then
-		local focus = self:get_widget_under_cursor()
-		if focus then
-			-- Focus a UI widget.
-			local found,changed = self.widgets:focus_widget(focus)
-			if changed then
-				self.focused_item = self.widgets.focused_item
-				self:update_help()
-				self:autoscroll()
-			end
-			if found and self.prev_custom_focus then
-				self.prev_custom_focus:set_focused(false)
-				self.prev_custom_focus = nil
-			end
-			-- Focus a custom widget.
-			if not found then
-				if self.prev_custom_focus then
-					self.prev_custom_focus:set_focused(false)
-				end
-				self.prev_custom_focus = focus
-				focus:set_focused(true)
-			end
-		end
-	end
+	-- Update input.
+	self.input:update(secs)
 end
 
 --- Called when the state has been changed.

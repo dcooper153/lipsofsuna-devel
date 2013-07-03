@@ -112,10 +112,15 @@ UiWidget.rebuild_canvas = function(self)
 	end
 end
 
+--- Sets the focus state of the widget.
+-- @param self UiSelector.
+-- @param value True to focus. False otherwise.
+-- @return True if the focus changed. False if the widget rejected the change.
 UiWidget.set_focused = function(self, v)
-	if self.focused == v then return end
+	if self.focused == v then return true end
 	self.focused = v
 	self.need_repaint = true
+	return true
 end
 
 UiWidget.get_help = function(self)

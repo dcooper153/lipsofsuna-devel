@@ -49,16 +49,20 @@ end
 -- @param self UiVBox.
 -- @return True if moved. False otherwise.
 UiVBox.focus_down = function(self)
-	if not self.focused_item then return end
+	if not self.focused_item then self.focused_item = 1 end
 	if self.focused_item < #self.__widgets then
-		self.__widgets[self.focused_item]:set_focused(false)
+		local old = self.__widgets[self.focused_item]
+		if old then old:set_focused(false) end
 		self.focused_item = self.focused_item + 1
 		self.__widgets[self.focused_item]:set_focused(true)
+		Client.effects:play_global("uimove1")
 		return true
 	elseif #self.__widgets > 1 then
-		self.__widgets[self.focused_item]:set_focused(false)
+		local old = self.__widgets[self.focused_item]
+		if old then old:set_focused(false) end
 		self.focused_item = 1
 		self.__widgets[self.focused_item]:set_focused(true)
+		Client.effects:play_global("uimove1")
 		return true
 	end
 end
@@ -84,16 +88,18 @@ end
 -- @param self UiVBox.
 -- @return True if moved. False otherwise.
 UiVBox.focus_up = function(self)
-	if not self.focused_item then return end
+	if not self.focused_item then self.focused_item = 1 end
 	if self.focused_item > 1 then
 		self.__widgets[self.focused_item]:set_focused(false)
 		self.focused_item = self.focused_item - 1
 		self.__widgets[self.focused_item]:set_focused(true)
+		Client.effects:play_global("uimove1")
 		return true
 	elseif #self.__widgets > 1 then
 		self.__widgets[self.focused_item]:set_focused(false)
 		self.focused_item = #self.__widgets
 		self.__widgets[self.focused_item]:set_focused(true)
+		Client.effects:play_global("uimove1")
 		return true
 	end
 end
@@ -109,9 +115,10 @@ UiVBox.focus_widget = function(self, widget)
 			if self.focused_item == k then
 				return true,false
 			end
-			-- Unfocus the old widget.
+			-- Try to unfocus the old widget.
 			if self.focused_item then
-				self.__widgets[self.focused_item]:set_focused(false)
+				local old = self.__widgets[self.focused_item]
+				if old and not old:set_focused(false) then return end
 			end
 			-- Focus the new widget.
 			v:set_focused(true)
@@ -145,6 +152,18 @@ UiVBox.queue_repaint = function(self)
 	end
 end
 
+--- Removes a child widget.
+-- @param self UiVBox.
+-- @param index Number.
+-- @return True if removed. False otherwise.
+UiVBox.remove_child_by_index = function(self, index)
+	local widget = self.__widgets[index]
+	if not widget then return end
+	widget:detach()
+	table.remove(self.__widgets, index)
+	return true
+end
+
 --- Updates the box.
 -- @param self UiVBox.
 -- @param secs Seconds since the last update.
@@ -168,10 +187,10 @@ UiVBox.update = function(self, secs)
 			local wx = widget.temporary.x
 			local wy = widget.temporary.y + y0
 			widget:set_offset(Vector(wx, wy))
-			widget:set_visible(wy > -wh and wy < sh)
+			widget:set_visible(true)--wy > -wh and wy < sh)
 		else
 			widget:set_offset(Vector(x, y))
-			widget:set_visible(y > -wh and y < sh)
+			widget:set_visible(true)--y > -wh and y < sh)
 			y = y + wh
 		end
 	end
