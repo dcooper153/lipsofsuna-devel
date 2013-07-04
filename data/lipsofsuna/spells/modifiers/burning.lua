@@ -30,6 +30,7 @@ local BurningModifier = ModifierSpec{
 BurningModifier.start = function(modifier, value)
 	if not modifier.object then return end
 	modifier.strength = value
+	modifier.timer = 0
 	return true
 end
 
@@ -43,7 +44,7 @@ BurningModifier.update = function(modifier, secs)
 	-- Damage the object every second.
 	if modifier.timer > 1 then
 		modifier.object:damaged{amount = math.random(4,7), type = "burning"}
-		modifier.timer = mod.timer - 1
+		modifier.timer = modifier.timer - 1
 	end
 	-- End after the timeout.
 	modifier.strength = modifier.strength - secs
