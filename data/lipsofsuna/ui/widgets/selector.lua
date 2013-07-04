@@ -9,16 +9,12 @@
 -- @alias UiSelector
 
 local Class = require("system/class")
-local Input = require("system/input")
-local InputHandler = require("ui/input-handler")
-local Keysym = require("system/keysym")
 local UiLabel = require("ui/widgets/label")
-local UiVBox = require("ui/widgets/vbox")
-local UiWidget = require("ui/widgets/widget")
+local UiMenu = require("ui/widgets/menu")
 
 --- Selector widget.
--- @type UiVBox
-local UiSelector = Class("UiSelector", UiWidget)
+-- @type UiSelector
+local UiSelector = Class("UiSelector", UiMenu)
 
 --- Creates a new selector widget.
 -- @param clss UiSelector class.
@@ -26,14 +22,14 @@ local UiSelector = Class("UiSelector", UiWidget)
 -- @param choices List of choices.
 -- @return UiSelector.
 UiSelector.new = function(clss, label, choices)
-	local self = Widgets.Uiwidget.new(clss)
+	local self = UiMenu.new(clss)
 	self.hint = "$A: Select\n$$B\n$$U\n$$D"
 	self.label = label
 	self.text = ""
 	self.choice = nil
 	self.choices = choices
-	-- Create the popup menu.
-	self.box = UiVBox()
+	-- Create the menu widgets.
+	local widgets = {}
 	for k,v in ipairs(self.choices) do
 		local index = k
 		local widget = UiLabel(v[1])
@@ -41,56 +37,12 @@ UiSelector.new = function(clss, label, choices)
 		widget.apply = function()
 			func()
 			self:select(index)
-			self:stop_grabbing()
+			self:set_menu_opened(false)
 		end
-		self.box:add_child(widget)
+		table.insert(widgets, widget)
 	end
-	-- Create the input handler.
-	self.input = InputHandler(Client.bindings, self.box)
-	self.input.focus_changed = function()
-		Ui:update_help()
-		Ui:autoscroll()
-	end
-	self.input.handle_back = function()
-		self:stop_grabbing()
-	end
-	self.input.handle_left = self.input.handle_back
-	self.input.handle_menu = self.input.handle_back
-	self.input:set_enabled(false)
+	self:set_menu_widgets(widgets)
 	return self
-end
-
-UiSelector.apply = function(self)
-	-- Add the box to the UI.
-	local x = self:get_x() + self:get_width() + 5
-	local y = -self:get_y()
-	Ui:add_temporary(x, y, self.box)
-	-- Grab input.
-	self.selecting = true
-	self.input:set_enabled(true)
-	Ui.input:set_enabled(false)
-	-- Play the effect.
-	Client.effects:play_global("uitransition1")
-end
-
-UiSelector.handle_event = function(self, args)
-	if not self.selecting then
-		return UiWidget.handle_event(self, args)
-	end
-	self.input:handle_event(args)
-end
-
-UiSelector.stop_grabbing = function(self)
-	self.selecting = nil
-	self.input:set_enabled(false)
-	Ui.input:set_enabled(true)
-	Ui:remove_temporary(self.box)
-	Client.effects:play_global("uitransition1")
-end
-
-UiSelector.update = function(self, secs)
-	UiWidget.update(self, secs)
-	self.input:update(secs)
 end
 
 --- Selects one of the options.
@@ -104,7 +56,7 @@ end
 
 UiSelector.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiwidget.rebuild_size(self)
+	local size = UiMenu.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.text then
 		local w,h = Program:measure_text(Theme.text_font_1, self.text, size.x - 10)
@@ -118,7 +70,7 @@ UiSelector.rebuild_canvas = function(self)
 	local w = self.size.x - Theme.width_label_1 - 5
 	local w1 = self.size.x - Theme.width_label_1 - 15
 	local h = self.size.y - 10
-	Widgets.Uiwidget.rebuild_canvas(self)
+	UiMenu.rebuild_canvas(self)
 	-- Add the text.
 	-- FIXME
 	self:canvas_text{
@@ -128,16 +80,6 @@ UiSelector.rebuild_canvas = function(self)
 		text_alignment = {0,0.5},
 		text_color = Theme.text_color_1,
 		text_font = Theme.text_font_1}
-end
-
---- Sets the focus state of the widget.
--- @param self UiSelector.
--- @param value True to focus. False otherwise.
--- @return True if the focus changed. False if the widget rejected the change.
-UiSelector.set_focused = function(self, value)
-	if self.focused == value then return true end
-	if self.selecting and not value then return end
-	return UiWidget.set_focused(self, value)
 end
 
 return UiSelector

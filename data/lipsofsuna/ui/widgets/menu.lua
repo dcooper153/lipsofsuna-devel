@@ -5,7 +5,7 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module ui.widgets.selector
+-- @module ui.widgets.menu
 -- @alias UiMenu
 
 local Class = require("system/class")
@@ -14,7 +14,7 @@ local UiVBox = require("ui/widgets/vbox")
 local UiWidget = require("ui/widgets/widget")
 
 --- Menu widget.
--- @type UiVBox
+-- @type UiMenu
 local UiMenu = Class("UiMenu", UiWidget)
 
 --- Creates a new selector widget.
