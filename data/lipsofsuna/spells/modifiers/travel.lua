@@ -14,7 +14,7 @@ local TravelModifier = ModifierSpec{
 	description = "Fast travel to Lips",
 	effect = "sanctuary1", -- FIXME
 	icon = "sanctuary1", -- FIXME
-	modifiers = {["travel"] = 30},
+	spell_strength = 30,
 	required_stats =
 	{
 		["willpower"] = 10

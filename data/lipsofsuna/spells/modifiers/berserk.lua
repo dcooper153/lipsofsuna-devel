@@ -19,7 +19,7 @@ local BerserkModifier = ModifierSpec{
 	description = "Inflict additional damage when in low health",
 	effect = "berserk1",
 	icon = "modifier-berserk",
-	modifiers = {["berserk"] = 60},
+	spell_strength = 60,
 	required_stats =
 	{
 		["willpower"] = 5

@@ -18,8 +18,8 @@ local FirewallModifier = ModifierSpec{
 	description = "Conjure a wall of fire",
 	effect = "firewall1",
 	icon = "firewall",
-	modifiers = {["firewall"] = 5},
 	projectile = "fireball1", -- FIXME
+	spell_strength = 5,
 	required_stats =
 	{
 		["willpower"] = 1

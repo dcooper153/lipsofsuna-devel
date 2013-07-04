@@ -19,8 +19,8 @@ local BlackHazeModifier = ModifierSpec{
 	description = "Conjure infectious plagued monsters",
 	effect = "spell1",
 	icon = "modifier-black haze",
-	modifiers = {["black haze"] = 1},
 	projectile = "fireball1",
+	spell_strength = 1,
 	required_stats =
 	{
 		["willpower"] = 20

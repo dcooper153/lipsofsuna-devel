@@ -32,6 +32,7 @@ local ModifierSpec = Spec:register("ModifierSpec", "modifier", {
 	{name = "range", type = "number", default = 0, description = "Maximum firing range for bullet and ray targeting modes."},
 	{name = "required_reagents", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of required reagents.", details = {keys = {spec = "Itemspec"}}},
 	{name = "required_stats", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of required stats."},
+	{name = "spell_strength", type = "number", default = 0, description = "Default strength when used in spells."},
 	{name = "attributes", type = "ignore"},
 	{name = "start", type = "ignore"},
 	{name = "update", type = "ignore"},

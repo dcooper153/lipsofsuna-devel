@@ -16,8 +16,8 @@ local DigModifier = ModifierSpec{
 	description = "Fire a digging ray",
 	effect = "spell1",
 	icon = "modifier-earthmove",
-	modifiers = {["dig"] = 1},
 	projectile = "fireball1", -- FIXME
+	spell_strength = 1,
 	required_stats =
 	{
 		["willpower"] = 3

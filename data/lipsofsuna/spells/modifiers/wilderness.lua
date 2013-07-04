@@ -16,10 +16,7 @@ local WildernessModifier = ModifierSpec{
 	description = "Grow plants from soil",
 	effect = "wilderness1",
 	icon = "modifier-nature",
-	modifiers =
-	{
-		["wilderness"] = 5
-	},
+	spell_strength = 5,
 	required_stats =
 	{
 		["willpower"] = 5

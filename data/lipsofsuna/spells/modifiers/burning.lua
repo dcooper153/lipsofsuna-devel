@@ -17,7 +17,7 @@ local BurningModifier = ModifierSpec{
 	description = "Inflict damage over time by putting the target on fire",
 	effect = "berserk1",
 	icon = "firewall", -- FIXME
-	modifiers = {["burning"] = 10},
+	spell_strength = 10,
 	required_stats =
 	{
 		["willpower"] = 5

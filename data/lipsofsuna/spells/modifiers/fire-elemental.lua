@@ -15,7 +15,7 @@ local FireElementalModifier = ModifierSpec{
 	description = "Conjure a fire elemental",
 	effect = "spell1", --FIXME
 	icon = "firewall", --FIXME
-	modifiers = {["fire elemental"] = 60},
+	spell_strength = 60,
 	required_stats =
 	{
 		["willpower"] = 10

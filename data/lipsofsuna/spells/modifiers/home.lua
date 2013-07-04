@@ -14,7 +14,7 @@ local HomeModifier = ModifierSpec{
 	description = "Creates a home location where you can respawn from",
 	effect = "light1",
 	icon = "sanctuary1",
-	modifiers = {["home"] = 1},
+	spell_strength = 1,
 	required_stats =
 	{
 		["willpower"] = 1

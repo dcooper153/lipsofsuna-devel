@@ -16,8 +16,8 @@ local PoisonModifier = ModifierSpec{
 	description = "The target takes poison damage over time",
 	effect = "spell1",
 	icon = "modifier-black haze", --FIXME
-	modifiers = {["poison"] = 10},
 	projectile = "fireball1",
+	spell_strength = 10,
 	required_stats =
 	{
 		["willpower"] = 10

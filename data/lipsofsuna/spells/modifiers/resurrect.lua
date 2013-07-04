@@ -16,7 +16,7 @@ local ResurrectModifier = ModifierSpec{
 	description = "Resurrect the targeted creature",
 	effect = "heal1",
 	icon = "modifier-heal",
-	modifiers = {["resurrect"] = 1},
+	spell_strength = 1,
 	required_stats =
 	{
 		["willpower"] = 20

@@ -56,7 +56,7 @@ end
 EnchantState.enchant = function(self)
 	local modifiers = {}
 	for k,v in pairs(self.__modifiers) do
-		modifiers[v.name] = 1
+		modifiers[v.name] = v.spell_strength
 	end
 	Main.messaging:client_event("enchant", self.__action.name, modifiers)
 	Ui:pop_state()

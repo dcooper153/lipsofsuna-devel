@@ -17,8 +17,8 @@ local CureDiseaseModifier = ModifierSpec{
 	description = "Cure the target of poison and diseases",
 	effect = "spell1",
 	icon = "modifier-heal", --FIXME
-	modifiers = {["cure disease"] = 1},
 	projectile = "fireball1",
+	spell_strength = 1,
 	required_stats =
 	{
 		["willpower"] = 10
