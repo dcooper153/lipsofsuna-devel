@@ -1,10 +1,10 @@
 local Class = require("system/class")
-require(Mod.path .. "widget")
+local UiMenu = require("ui/widgets/menu")
 
-Widgets.Uiinvitem = Class("Uiinvitem", Widgets.Uiwidget)
+Widgets.Uiinvitem = Class("Uiinvitem", UiMenu)
 
 Widgets.Uiinvitem.new = function(clss, id, item, index, slot)
-	local self = Widgets.Uiwidget.new(clss)
+	local self = UiMenu.new(clss)
 	self.enabled = true
 	self.inventory_id = id
 	self.item = item
@@ -19,13 +19,114 @@ Widgets.Uiinvitem.apply = function(self)
 	Client.data.inventory.id = self.inventory_id
 	Client.data.inventory.index = self.index
 	Client.data.inventory.count = self.item.count or 1
-	Ui:push_state("inventory/item")
 	Client.effects:play_global("uitransition1")
+	-- Create the selector widgets.
+	local id = self.inventory_id
+	local index = self.index
+	local count = self.item.count or 1
+	local parent = self
+	local creators =
+	{
+		function()
+			-- Get the active container.
+			if not id then return end
+			local object = Main.objects:find_by_id(id)
+			if not object then return end
+			-- Get the active item.
+			local item = object.inventory:get_object_by_index(index)
+			if not item then return end
+			-- Get the equipment slot.
+			local slot = item.spec.equipment_slot
+			if not slot then return end
+			-- Don't show the widget if the item is already equipped.
+			if object.inventory:get_slot_by_index(index) then return end
+			-- Create the widget.
+			return Widgets.Uibutton("Equip in " .. slot, function()
+				Main.messaging:client_event("equip from inventory", index, slot)
+				parent:set_menu_opened(false)
+			end)
+		end,
+		function()
+			-- Get the active container.
+			local object = Main.objects:find_by_id(id)
+			if not object then return end
+			-- Don't show the widget if the item isn't equipped.
+			if not object.inventory:get_slot_by_index(index) then return end
+			-- Create the widget.
+			return Widgets.Uibutton("Unequip", function()
+				Main.messaging:client_event("unequip", index)
+				parent:set_menu_opened(false)
+			end)
+		end,
+		function()
+			-- Get the active container.
+			if not id then return end
+			local object = Main.objects:find_by_id(id)
+			if not object then return end
+			-- Get the active item.
+			local item = object.inventory:get_object_by_index(index)
+			if not item then return end
+			-- Add a widget for each special usage.
+			local widgets = {}
+			for k,v in pairs(item.spec:get_use_actions()) do
+				local name = v.label or v.name
+				local action = v.name
+				table.insert(widgets, Widgets.Uibutton(name, function()
+					Main.messaging:client_event("use in inventory", id, index, action)
+					parent:set_menu_opened(false)
+				end))
+			end
+			return widgets
+		end,
+		function()
+			return Widgets.Uibutton("Drop", function()
+				Main.messaging:client_event("drop from inventory", index, count)
+				parent:set_menu_opened(false)
+			end)
+		end,
+		function()
+			-- Don't show the widget if the count isn't at least two.
+			if count < 2 then return end
+			-- Create the widget.
+			return Widgets.Uitransition("Drop stack", "inventory/drop",
+				function() parent:set_menu_opened(false) end)
+		end,
+		function()
+			-- Don't show the widget if the count isn't at least two.
+			if count < 2 then return end
+			-- Create the widget.
+			return Widgets.Uitransition("Split stack", "inventory/split",
+				function() parent:set_menu_opened(false) end)
+		end,
+		function()
+			return Widgets.Uitransition("Move", "inventory/move",
+				function() parent:set_menu_opened(false) end)
+		end
+	}
+	widgets = {}
+	for k,v in ipairs(creators) do
+		local widget = v()
+		if widget then
+			if not widget.class then
+				for k1,v1 in ipairs(widget) do
+					table.insert(widgets, v1)
+				end
+			else
+				table.insert(widgets, widget)
+			end
+		end
+	end
+	self:set_menu_widgets(widgets)
+	self:set_menu_opened(true)
+end
+
+Widgets.Uiinvitem.right = function(self)
+	self:apply()
 end
 
 Widgets.Uiinvitem.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiwidget.rebuild_size(self)
+	local size = UiMenu.rebuild_size(self)
 	-- Resize to fit the description.
 	local name = self:get_pretty_name()
 	if name then
@@ -39,7 +140,7 @@ Widgets.Uiinvitem.rebuild_canvas = function(self)
 	local w = self.size.x
 	local h = self.size.y
 	-- Add the base.
-	Widgets.Uiwidget.rebuild_canvas(self)
+	UiMenu.rebuild_canvas(self)
 	if not self.item then return end
 	-- Add the icon.
 	local icon = Iconspec:find{name = self.item.icon}

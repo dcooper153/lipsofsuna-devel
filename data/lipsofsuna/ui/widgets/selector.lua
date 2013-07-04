@@ -32,7 +32,6 @@ UiSelector.new = function(clss, label, choices)
 	self.text = ""
 	self.choice = nil
 	self.choices = choices
-	self.repeat_timer = 0
 	-- Create the popup menu.
 	self.box = UiVBox()
 	for k,v in ipairs(self.choices) do
@@ -57,7 +56,6 @@ UiSelector.new = function(clss, label, choices)
 	end
 	self.input.handle_left = self.input.handle_back
 	self.input.handle_menu = self.input.handle_back
-	self.input.DEBUG = true
 	self.input:set_enabled(false)
 	return self
 end
