@@ -1,38 +1,41 @@
+--- Spell widget.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module ui.widgets.spell
+-- @alias UiSpell
+
+local Actionspec = require("core/specs/action")
 local Class = require("system/class")
 local ModifierSpec = require("core/specs/modifier")
-require(Mod.path .. "widget")
+local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uispell = Class("Uispell", Widgets.Uiwidget)
+--- Spell widget.
+-- @type UiSpell
+local UiSpell = Class("UiSpell", UiWidget)
 
-Widgets.Uispell.new = function(clss, mode, name, active)
-	local self = Widgets.Uiwidget.new(clss)
-	if mode == "type" then
-		self.spec = Feattypespec:find{name = name}
-	else
-		self.spec = ModifierSpec:find{name = name}
-	end
-	self.mode = mode
+--- Creates a new spell widget.
+-- @param spec Action or modifier spec.
+-- @param active True for active. False for grayed out.
+-- @return UiSpell
+UiSpell.new = function(clss, spec, active)
+	local self = UiWidget.new(clss)
+	self.spec = spec
+	self.mode = spec and spec.type or "modifier"
 	self.active = active
 	self.hint = active and "$A: Select\n$$B\n$$U\n$$D" or "$$B\n$$U\n$$D"
-	self.icon = self.spec and Iconspec:find{name = self.spec.icon}
+	self.icon = self.spec and Iconspec:find_by_name(self.spec.icon or "missing")
 	return self
 end
 
-Widgets.Uispell.apply = function(self)
-	if not self.active then return end
-	if self.mode == "type" then
-		Operators.spells:set_spell(self.spec.name)
-	else
-		local spell = Operators.spells:get_spell()
-		Operators.spells:set_effect{self.spec.name, 1}
-	end
-	Ui:pop_state()
-	Client.effects:play_global("uitransition1")
-end
-
-Widgets.Uispell.rebuild_size = function(self)
+--- Recalculates the size of the widget.
+-- @param self UiSpell.
+UiSpell.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiwidget.rebuild_size(self)
+	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the description.
 	if self.spec then
 		local w1,h1 = Program:measure_text(Theme.text_font_2, self:get_pretty_name(), size.x-5-Theme.width_icon_1)
@@ -45,12 +48,13 @@ Widgets.Uispell.rebuild_size = function(self)
 	return size
 end
 
-Widgets.Uispell.rebuild_canvas = function(self)
+--- Redraws the canvas.
+-- @param self UiSpell.
+UiSpell.rebuild_canvas = function(self)
 	local w = self.size.x
 	local h = self.size.y
 	-- Add the base.
-	Widgets.Uiwidget.rebuild_canvas(self)
-	-- Add the icon.
+	UiWidget.rebuild_canvas(self)
 	-- Add the icon.
 	if self.spec then
 		Theme:draw_icon_scaled(self, self.spec.icon,
@@ -80,7 +84,11 @@ Widgets.Uispell.rebuild_canvas = function(self)
 	end
 end
 
-Widgets.Uispell.get_pretty_name = function(self)
+--- Gets the human readable name of the displayed spell.
+-- @param self UiSpell.
+UiSpell.get_pretty_name = function(self)
 	if not self.spec then return end
 	return string.gsub(self.spec.name, "(.)(.*)", function(a,b) return string.upper(a) .. b end)
 end
+
+return UiSpell

@@ -32,3 +32,5 @@ Widgets.Uibutton.rebuild_canvas = function(self)
 		5, 3, self.size.x-10, self.size.y-6,
 		self.focused, false)
 end
+
+return Widgets.Uibutton

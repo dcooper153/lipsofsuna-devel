@@ -3,7 +3,11 @@ local Physics = require("system/physics")
 
 Actionspec{
 	name = "touch spell",
-	categories = { ["touch spell"] = true },
+	categories =
+	{
+		["enchantment"] = true,
+		["touch spell"] = true
+	},
 	start = function(action, item)
 		if action.object.cooldown then return end
 		action.timer = 0

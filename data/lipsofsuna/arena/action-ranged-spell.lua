@@ -2,7 +2,11 @@ local Spell = require("core/objects/spell")
 
 Actionspec{
 	name = "ranged spell",
-	categories = { ["ranged spell"] = true },
+	categories =
+	{
+		["enchantment"] = true,
+		["ranged spell"] = true
+	},
 	start = function(action, item)
 		if action.object.cooldown then return end
 		action.timer = 0

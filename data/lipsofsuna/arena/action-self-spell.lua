@@ -5,7 +5,11 @@ local Damage = require("arena/damage")
 -- feat are applied to the attacker herself.
 Actionspec{
 	name = "self spell",
-	categories = { ["self spell"] = true },
+	categories =
+	{
+		["enchantment"] = true,
+		["self spell"] = true
+	},
 	start = function(action, item)
 		if action.object.cooldown then return end
 		action.timer = 0
