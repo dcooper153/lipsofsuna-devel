@@ -39,12 +39,18 @@ Main.messaging:register_message{
 		Main.crafting_utils:enchant_item(weapon, action, modifiers)
 		Main.messaging:server_event("message", client, "You have enchanted your " .. weapon.spec.name .. ".")
 	end,
-	server_to_client_encode = function(self)
-		return {}
+	server_to_client_encode = function(self, enable)
+		return {"uint8", enable and 1 or 0}
 	end,
 	server_to_client_decode = function(self, packet)
-		return {}
+		local ok,enable = packet:read("uint8")
+		if not ok then return end
+		return {enable == 1}
 	end,
-	server_to_client_handle = function(self)
-		Ui:set_state("enchant")
+	server_to_client_handle = function(self, enable)
+		if enable then
+			Ui:set_state("enchant")
+		else
+			Ui:set_state("play")
+		end
 	end}
