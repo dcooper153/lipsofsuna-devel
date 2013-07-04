@@ -1,10 +1,10 @@
 local Class = require("system/class")
-require(Mod.path .. "widget")
+local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uibinding = Class("Uibinding", Widgets.Uiwidget)
+local UiBinding = Class("UiBinding", UiWidget)
 
-Widgets.Uibinding.new = function(clss, action)
-	local self = Widgets.Uiwidget.new(clss)
+UiBinding.new = function(clss, action)
+	local self = UiWidget.new(clss)
 	self.action = action
 	self.hint = "$A: Change the control\n$$B\n$$U\n$$D"
 	self.name = string.gsub(action.name, "_", " ")
@@ -12,7 +12,7 @@ Widgets.Uibinding.new = function(clss, action)
 	return self
 end
 
-Widgets.Uibinding.apply = function(self)
+UiBinding.apply = function(self)
 	Client.effects:play_global("uitoggle1")
 	self.input_mode = true
 	self.input_key = "key1"
@@ -23,9 +23,9 @@ Widgets.Uibinding.apply = function(self)
 	end
 end
 
-Widgets.Uibinding.handle_event = function(self, args)
+UiBinding.handle_event = function(self, args)
 	if not self.input_mode then
-		return Widgets.Uiwidget.handle_event(self, args)
+		return UiWidget.handle_event(self, args)
 	end
 	local accept
 	local a = self.action
@@ -80,11 +80,11 @@ Widgets.Uibinding.handle_event = function(self, args)
 	end
 end
 
-Widgets.Uibinding.rebuild_canvas = function(self)
+UiBinding.rebuild_canvas = function(self)
 	local w = self.size.x
 	local h = self.size.y
 	-- Add the base.
-	Widgets.Uiwidget.rebuild_canvas(self)
+	UiWidget.rebuild_canvas(self)
 	-- Add the action name.
 	self:canvas_text{
 		dest_position = {10,0},
@@ -118,3 +118,5 @@ Widgets.Uibinding.rebuild_canvas = function(self)
 			text_font = Theme.text_font_1}
 	end
 end
+
+return UiBinding

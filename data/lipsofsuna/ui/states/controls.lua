@@ -1,3 +1,5 @@
+local UiBinding = require("ui/widgets/binding")
+
 Ui:add_state{
 	state = "controls",
 	label = "Controls",
@@ -15,7 +17,7 @@ Ui:add_state{
 		-- Create the binding widgets.
 		local widgets = {}
 		for k,v in pairs(actions) do
-			table.insert(widgets, Widgets.Uibinding(v))
+			table.insert(widgets, UiBinding(v))
 		end
 		return widgets
 	end}
