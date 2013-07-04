@@ -1,10 +1,10 @@
 local Class = require("system/class")
-require(Mod.path .. "widget")
+local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uistat = Class("Uistat", Widgets.Uiwidget)
+local UiStat = Class("UiStat", UiWidget)
 
-Widgets.Uistat.new = function(clss, skill, index)
-	local self = Widgets.Uiwidget.new(clss)
+UiStat.new = function(clss, skill, index)
+	local self = UiWidget.new(clss)
 	self.skill = skill
 	self.index = index
 	self.cap = 1
@@ -13,11 +13,11 @@ Widgets.Uistat.new = function(clss, skill, index)
 	return self
 end
 
-Widgets.Uistat.rebuild_size = function(self)
+UiStat.rebuild_size = function(self)
 	return Vector(300, Theme.text_height_1)
 end
 
-Widgets.Uistat.rebuild_canvas = function(self)
+UiStat.rebuild_canvas = function(self)
 	local w = self.size.x
 	local h = self.size.y
 	-- Add the background.
@@ -49,9 +49,9 @@ Widgets.Uistat.rebuild_canvas = function(self)
 	end
 end
 
-Widgets.Uistat.update = function(self, secs)
+UiStat.update = function(self, secs)
 	-- Call the base class update.
-	Widgets.Uiwidget.update(self, secs)
+	UiWidget.update(self, secs)
 	-- Update the stat values.
 	local object = Client.player_object
 	if not object then return end
@@ -82,3 +82,5 @@ Widgets.Uistat.update = function(self, secs)
 		self:set_visible(false)
 	end
 end
+
+return UiStat

@@ -7,16 +7,17 @@ local Hudlog = require("ui/hud/log")
 local Hudmodifiers = require("ui/hud/modifiers")
 local Hudnotification = require("ui/hud/notification")
 local Hudtarget = require("ui/hud/target")
+local UiStat = require("ui/widgets/stat")
 
 Ui:add_hud{
 	id = "health",
 	active = function() return Ui.root == "play" end,
-	init = function() return Widgets.Uistat("health", 2) end}
+	init = function() return UiStat("health", 2) end}
 
 Ui:add_hud{
 	id = "willpower",
 	active = function() return Ui.root == "play" end,
-	init = function() return Widgets.Uistat("willpower", 1) end}
+	init = function() return UiStat("willpower", 1) end}
 
 Ui:add_hud{
 	id = "chat",
