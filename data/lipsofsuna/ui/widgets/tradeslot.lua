@@ -1,10 +1,10 @@
 local Class = require("system/class")
-require(Mod.path .. "invitem")
+local UiInvItem = require("ui/widgets/invitem")
 
-Widgets.Uitradeslot = Class("Uitradeslot", Widgets.Uiinvitem)
+Widgets.Uitradeslot = Class("Uitradeslot", UiInvItem)
 
 Widgets.Uitradeslot.new = function(clss, item, index, buy)
-	local self = Widgets.Uiinvitem.new(clss, nil, item, index, item and item.slot)
+	local self = UiInvItem.new(clss, nil, item, index, item and item.slot)
 	self.buy = buy
 	if item then
 		self.hint = "$A: Remove item\n$$B\n$$U\n$$D"

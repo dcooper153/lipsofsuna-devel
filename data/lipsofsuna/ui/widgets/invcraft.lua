@@ -1,11 +1,11 @@
 local Class = require("system/class")
-require(Mod.path .. "invitem")
+local UiInvItem = require("ui/widgets/invitem")
 
-Widgets.Uiinvcraft = Class("Uiinvcraft", Widgets.Uiinvitem)
+Widgets.Uiinvcraft = Class("Uiinvcraft", UiInvItem)
 
 Widgets.Uiinvcraft.new = function(clss, id, name)
-	local spec = Itemspec:find{name = name}
-	local self = Widgets.Uiinvitem.new(clss, id, {text = name, icon = spec.icon})
+	local spec = Itemspec:find_by_name(name)
+	local self = UiInvItem.new(clss, id, {text = name, icon = spec.icon})
 	self.name = name
 	self.hint = "$A: Craft\n$$B\n$$U\n$$D"
 	return self

@@ -1,9 +1,9 @@
 local Class = require("system/class")
 local UiMenu = require("ui/widgets/menu")
 
-Widgets.Uiinvitem = Class("Uiinvitem", UiMenu)
+local UiInvItem = Class("UiInvItem", UiMenu)
 
-Widgets.Uiinvitem.new = function(clss, id, item, index, slot)
+UiInvItem.new = function(clss, id, item, index, slot)
 	local self = UiMenu.new(clss)
 	self.enabled = true
 	self.inventory_id = id
@@ -14,7 +14,7 @@ Widgets.Uiinvitem.new = function(clss, id, item, index, slot)
 	return self
 end
 
-Widgets.Uiinvitem.apply = function(self)
+UiInvItem.apply = function(self)
 	if not self.item then return end
 	Client.data.inventory.id = self.inventory_id
 	Client.data.inventory.index = self.index
@@ -120,11 +120,11 @@ Widgets.Uiinvitem.apply = function(self)
 	self:set_menu_opened(true)
 end
 
-Widgets.Uiinvitem.right = function(self)
+UiInvItem.right = function(self)
 	self:apply()
 end
 
-Widgets.Uiinvitem.rebuild_size = function(self)
+UiInvItem.rebuild_size = function(self)
 	-- Get the base size.
 	local size = UiMenu.rebuild_size(self)
 	-- Resize to fit the description.
@@ -136,7 +136,7 @@ Widgets.Uiinvitem.rebuild_size = function(self)
 	return size
 end
 
-Widgets.Uiinvitem.rebuild_canvas = function(self)
+UiInvItem.rebuild_canvas = function(self)
 	local w = self.size.x
 	local h = self.size.y
 	-- Add the base.
@@ -187,15 +187,17 @@ Widgets.Uiinvitem.rebuild_canvas = function(self)
 	end
 end
 
-Widgets.Uiinvitem.get_pretty_count = function(self)
+UiInvItem.get_pretty_count = function(self)
 	if not self.item then return end
 	if not self.item.count or self.item.count <= 1 then return end
 	return tostring(self.item.count)
 end
 
-Widgets.Uiinvitem.get_pretty_name = function(self)
+UiInvItem.get_pretty_name = function(self)
 	if not self.item then return end
 	if not self.item.text then return end
 	local subs = function(a,b) return string.upper(a) .. b end
 	return string.gsub(self.item.text, "(.)(.*)", subs)
 end
+
+return UiInvItem

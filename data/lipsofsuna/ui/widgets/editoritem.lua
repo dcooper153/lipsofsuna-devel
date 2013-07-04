@@ -1,11 +1,11 @@
 local Class = require("system/class")
-require(Mod.path .. "invitem")
+local UiInvItem = require("ui/widgets/invitem")
 
-Widgets.Uieditoritem = Class("Uieditoritem", Widgets.Uiinvitem)
+Widgets.Uieditoritem = Class("Uieditoritem", UiInvItem)
 
 Widgets.Uieditoritem.new = function(clss, name)
-	local spec = Itemspec:find{name = name}
-	local self = Widgets.Uiinvitem.new(clss, nil, {text = name, icon = spec.icon})
+	local spec = Itemspec:find_by_name(name)
+	local self = UiInvItem.new(clss, nil, {text = name, icon = spec.icon})
 	self.name = name
 	self.hint = "$A: Create\n$$B\n$$U\n$$D"
 	return self

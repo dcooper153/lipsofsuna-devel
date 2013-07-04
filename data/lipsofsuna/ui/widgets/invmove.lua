@@ -1,10 +1,10 @@
 local Class = require("system/class")
-require(Mod.path .. "invitem")
+local UiInvItem = require("ui/widgets/invitem")
 
-Widgets.Uiinvmove = Class("Uiinvmove", Widgets.Uiinvitem)
+Widgets.Uiinvmove = Class("Uiinvmove", UiInvItem)
 
 Widgets.Uiinvmove.new = function(clss, id, item, index, slot)
-	local self = Widgets.Uiinvitem.new(clss, id, item, index, slot)
+	local self = UiInvItem.new(clss, id, item, index, slot)
 	self.hint = "$A: Place\n$$B\n$$U\n$$D"
 	return self
 end

@@ -1,3 +1,5 @@
+local UiInvItem = require("ui/widgets/invitem")
+
 Ui:add_state{
 	state = "inventory",
 	label = "Inventory",
@@ -12,7 +14,7 @@ Ui:add_state{
 				text = item.spec.name,
 				count = item:get_count(),
 				icon = item.spec.icon}
-			table.insert(widgets, Widgets.Uiinvitem(object:get_id(), data, index, slot))
+			table.insert(widgets, UiInvItem(object:get_id(), data, index, slot))
 		end
 		return widgets
 	end}
