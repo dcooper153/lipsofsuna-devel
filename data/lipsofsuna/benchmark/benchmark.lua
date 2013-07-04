@@ -27,9 +27,6 @@ Benchmark = Class("Benchmark")
 -- @return Benchmark.
 Benchmark.new = function(clss)
 	local self = Class.new(clss)
-	-- Initialize the game.
-	Main:start_game("benchmark")
-	Game.sectors.unload_time = nil
 	-- Create the objects.
 	self.objects = setmetatable({}, {__mode = "kv"})
 	local anims = {"idle", "walk", "strafe left"}

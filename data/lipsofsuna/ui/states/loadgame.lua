@@ -19,7 +19,7 @@ Ui:add_widget{
 				table.insert(widgets, Widgets.Uibutton(name, function()
 					Settings.file = file
 					Settings.generate = false
-					Client:start_single_player()
+					Main:start_game("Normal")
 				end))
 			end
 		end

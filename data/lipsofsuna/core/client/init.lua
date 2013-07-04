@@ -17,6 +17,10 @@ local MovementPrediction = require("core/client/movement-prediction")
 local Network = require("system/network")
 local Simulation = require("core/client/simulation")
 
+Main.game_modes:register("Normal", function()
+	Client:start_single_player()
+end)
+
 Main.main_start_hooks:register(10, function(secs)
 	Main.objects.object_created_hooks:register(10, function(object)
 		object.render = ClientRenderObject()

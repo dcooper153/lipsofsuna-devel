@@ -9,6 +9,7 @@
 -- @alias Crafting
 
 local Class = require("system/class")
+local Hooks = require("system/hooks")
 local Item = require("core/objects/item")
 local Physics = require("system/physics")
 local Obstacle = require("core/objects/obstacle")
@@ -25,10 +26,6 @@ local Crafting = Class("Crafting")
 -- @return Crafting.
 Crafting.new = function(clss)
 	local self = Class.new(clss)
-	-- FIXME: Initialize the game.
-	Main:start_game("benchmark")
-	Main.messaging:set_transmit_mode(true, true)
-	Game.sectors.unload_time = nil
 	-- Initialize the terrain.
 	self.terrain = TerrainManager(8, 0.75, nil, false, true, true)
 	self.terrain:set_view_center(Vector(500, 0, 500))
@@ -45,6 +42,7 @@ Crafting.new = function(clss)
 				t:calculate_smooth_normals(x, z)
 			end
 		end
+		return Hooks.STOP
 	end)
 	Main.terrain = self.terrain --FIXME
 	-- Enable the simulation.

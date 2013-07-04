@@ -12,6 +12,7 @@ local Actor = require("core/objects/actor")
 local ChargenCamera = require("character/camera")
 local Class = require("system/class")
 local Color = require("system/color")
+local Hooks = require("system/hooks")
 local Json = require("system/json")
 
 local scale255 = function(t)

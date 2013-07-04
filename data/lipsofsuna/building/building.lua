@@ -9,6 +9,7 @@
 -- @alias Building
 
 local Class = require("system/class")
+local Hooks = require("system/hooks")
 local TerrainManager = require("core/terrain/terrain-manager")
 local Vector = require("system/math/vector")
 
@@ -21,9 +22,6 @@ Building = Class("Building")
 -- @return Building.
 Building.new = function(clss)
 	local self = Class.new(clss)
-	-- FIXME: Initialize the game.
-	Main:start_game("benchmark")
-	Game.sectors.unload_time = nil
 	-- Initialize the terrain.
 	self.terrain = TerrainManager(8, 0.75, nil, false, true, true)
 	self.terrain:set_view_center(Vector(500, 0, 500))
@@ -40,6 +38,7 @@ Building.new = function(clss)
 				t:calculate_smooth_normals(x, z)
 			end
 		end
+		return Hooks.STOP
 	end)
 	return self
 end

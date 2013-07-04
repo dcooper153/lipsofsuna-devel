@@ -6,17 +6,17 @@ local DialogManager = require("core/dialog/dialog-manager")
 local Hooks = require("system/hooks")
 local Ui = require("ui/ui")
 
-Client:register_init_hook(26, function()
-	Client.camera_manager:register_camera("crafting", CraftingCamera())
-end)
-
-Client:register_start_hook(0, function()
-	if Main.settings.crafting then
-		Main.crafting = Crafting()
-		Main.dialogs = DialogManager()
-		Ui:set_state("crafting")
-		return Hooks.STOP
-	end
+Main.game_modes:register("Crafting", function()
+	-- Configure messaging.
+	Main.messaging:set_transmit_mode(true, true)
+	-- FIXME: Initialize the game.
+	Main.game = Game
+	Main.game:init("benchmark")
+	Main.game.sectors.unload_time = nil
+	-- Start the subsystems.
+	Main.crafting = Crafting()
+	Main.dialogs = DialogManager()
+	Ui:set_state("crafting")
 end)
 
 Main.main_start_hooks:register(0, function(secs)
@@ -29,9 +29,20 @@ Main.main_start_hooks:register(0, function(secs)
 	end)
 end)
 
+Main.main_start_hooks:register(1000, function()
+	if Main.settings.crafting then
+		Main:start_game("Crafting")
+		return Hooks.STOP
+	end
+end)
+
 Main.update_hooks:register(0, function(secs)
 	if Main.crafting then
 		Main.timing:start_action("crafting")
 		Main.crafting:update()
 	end
+end)
+
+Client:register_init_hook(26, function()
+	Client.camera_manager:register_camera("crafting", CraftingCamera())
 end)

@@ -4,16 +4,27 @@ local Client = require("core/client/client")
 local Hooks = require("system/hooks")
 local Ui = require("ui/ui")
 
-Client:register_init_hook(26, function()
-	Client.camera_manager:register_camera("benchmark", BenchmarkCamera())
+Main.game_modes:register("Benchmark", function()
+	-- Configure messaging.
+	Main.messaging:set_transmit_mode(true, true)
+	-- FIXME: Initialize the game.
+	Main.game = Game
+	Main.game:init("benchmark")
+	Main.game.sectors.unload_time = nil
+	-- Start the subsystems.
+	Client.benchmark = Benchmark()
+	Ui:set_state("benchmark")
 end)
 
-Client:register_start_hook(0, function()
+Main.main_start_hooks:register(1000, function()
 	if Settings.benchmark then
-		Ui:set_state("benchmark")
-		Client.benchmark = Benchmark()
+		Main:start_game("Benchmark")
 		return Hooks.STOP
 	end
+end)
+
+Client:register_init_hook(26, function()
+	Client.camera_manager:register_camera("benchmark", BenchmarkCamera())
 end)
 
 Client:register_update_hook(11, function()

@@ -13,6 +13,7 @@ local Class = require("system/class")
 local Eventhandler = require("system/eventhandler")
 local Hooks = require("system/hooks")
 local Game = require("core/server/game") --FIXME
+local GameModeManager = require("main/game-mode-manager")
 local ImageManager = require("main/image-manager")
 local Messaging = require("main/messaging")
 local ModelManager = require("main/model-manager")
@@ -35,6 +36,7 @@ Main.new = function(clss)
 	self.mods = Mod()
 	self.settings = Settings(self.mods)
 	self.messaging = Messaging()
+	self.game_modes = GameModeManager()
 	self.game_start_hooks = Hooks()
 	self.game_end_hooks = Hooks()
 	self.main_start_hooks = Hooks()
@@ -151,35 +153,10 @@ end
 -- @param save Save file name, or nil when not using local I/O.
 -- @param port Server port number, or nil if not hosting.
 Main.start_game = function(self, mode, save, port)
-	-- Initialize the game.
-	self.game = Game --FIXME
-	self.game:init(mode, save, port)
+	-- Call the mode start function.
+	self.game_modes:start(mode)
 	-- Call the game start hooks.
 	self.game_start_hooks:call()
-
-	-- FIXME
-	-- Initialize the server.
-	if mode == "server" then
-		-- Local server, remote players.
-		Server:init(true, false)
-		self.messaging:set_transmit_mode(true, false, port or Server.config.server_port)
-	elseif mode == "host" then
-		-- Local server, local player, remote players.
-		Server:init(true, true)
-		self.messaging:set_transmit_mode(true, true, port or Server.config.server_port)
-	elseif mode == "single" then
-		-- Local server, local player.
-		Server:init(false, true)
-		self.messaging:set_transmit_mode(true, true, nil)
-	else
-		-- Remote server, local player.
-		self.messaging:set_transmit_mode(false, true, nil)
-	end
-
-	-- Initialize terrain updates.
-	if Server.initialized then
-		-- TODO: Stick terrain
-	end
 end
 
 --- Enables manual garbage collection.

@@ -202,7 +202,10 @@ end
 Client.start_single_player = function(self)
 	-- Start the server.
 	Sectors:unload_all()
-	Main:start_game("single", Main.settings.file)
+	Main.messaging:set_transmit_mode(true, true, nil)
+	Main.game = Game
+	Main.game:init("single", Main.settings.file)
+	Server:init(false, true)
 	-- Set information for the UI.
 	Client.data.connection.mode = "single"
 	Client.data.connection.text = "Starting the single player mode..."

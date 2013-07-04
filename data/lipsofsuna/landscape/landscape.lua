@@ -22,9 +22,6 @@ Landscape = Class("Landscape")
 -- @return Landscape.
 Landscape.new = function(clss)
 	local self = Class.new(clss)
-	-- FIXME: Initialize the game.
-	Main:start_game("benchmark")
-	Game.sectors.unload_time = nil
 	-- Initialize the terrain.
 	self.terrain = TerrainManager(8, 0.75, nil, false, true, true)
 	self.terrain.generate_hooks:register(0, TerrainGenerator.generate)

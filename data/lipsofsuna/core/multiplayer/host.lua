@@ -40,7 +40,11 @@ Host.host_game = function(self, file, port)
 	self.data.status = "Starting the server on " .. self.data.port .. "..."
 	-- Start the server.
 	Sectors:unload_all()
-	Main:start_game("host", self.data.file, self.data.port)
+	Main.game = Game
+	Main.game:init("host", self.data.file, self.data.port)
+	Server:init(true, true)
+	Main.messaging:set_transmit_mode(true, true, port or Server.config.server_port)
+	Main:start_game("Host")
 	-- Enter the waiting state.
 	Ui:set_state("host/wait")
 end
