@@ -54,14 +54,16 @@ UiVBox.focus_down = function(self)
 		local old = self.__widgets[self.focused_item]
 		if old then old:set_focused(false) end
 		self.focused_item = self.focused_item + 1
-		self.__widgets[self.focused_item]:set_focused(true)
+		local new = self.__widgets[self.focused_item]
+		if new then new:set_focused(true) end
 		Client.effects:play_global("uimove1")
 		return true
 	elseif #self.__widgets > 1 then
 		local old = self.__widgets[self.focused_item]
 		if old then old:set_focused(false) end
 		self.focused_item = 1
-		self.__widgets[self.focused_item]:set_focused(true)
+		local new = self.__widgets[self.focused_item]
+		if new then new:set_focused(true) end
 		Client.effects:play_global("uimove1")
 		return true
 	end
@@ -90,15 +92,19 @@ end
 UiVBox.focus_up = function(self)
 	if not self.focused_item then self.focused_item = 1 end
 	if self.focused_item > 1 then
-		self.__widgets[self.focused_item]:set_focused(false)
+		local old = self.__widgets[self.focused_item]
+		if old then old:set_focused(false) end
 		self.focused_item = self.focused_item - 1
-		self.__widgets[self.focused_item]:set_focused(true)
+		local new = self.__widgets[self.focused_item]
+		if new then new:set_focused(true) end
 		Client.effects:play_global("uimove1")
 		return true
 	elseif #self.__widgets > 1 then
-		self.__widgets[self.focused_item]:set_focused(false)
+		local old = self.__widgets[self.focused_item]
+		if old then old:set_focused(false) end
 		self.focused_item = #self.__widgets
-		self.__widgets[self.focused_item]:set_focused(true)
+		local new = self.__widgets[self.focused_item]
+		if new then new:set_focused(true) end
 		Client.effects:play_global("uimove1")
 		return true
 	end
