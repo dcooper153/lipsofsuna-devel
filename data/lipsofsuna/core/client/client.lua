@@ -97,7 +97,6 @@ Client.reset_data = function(self)
 	self.reset_hooks:call(secs)
 
 	Operators.inventory:reset()
-	Operators.spells:reset()
 	Operators.quests:reset()
 	--self.editor:reset()
 	self.data = {}

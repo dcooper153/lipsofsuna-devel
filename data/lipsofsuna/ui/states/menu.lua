@@ -22,10 +22,6 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "menu",
-	widget = function() return Widgets.Uitransition("Spells", "spells") end}
-
-Ui:add_widget{
-	state = "menu",
 	widget = function() return Widgets.Uitransition("Map", "map") end}
 
 Ui:add_widget{
