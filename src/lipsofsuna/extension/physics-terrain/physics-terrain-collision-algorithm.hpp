@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,8 +26,30 @@
 class LIExtPhysicsTerrainCollisionAlgorithm : public btConvexConvexAlgorithm
 {
 public:
-	LIExtPhysicsTerrainCollisionAlgorithm (btPersistentManifold* mf, const btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0, btCollisionObject* body1, btSimplexSolverInterface* simplexSolver, btConvexPenetrationDepthSolver* pdSolver, int numPerturbationIterations, int minimumPointsPerturbationThreshold);
-	virtual void processCollision (btCollisionObject* body0, btCollisionObject* body1, const btDispatcherInfo& dispatchInfo, btManifoldResult* resultOut);
+	LIExtPhysicsTerrainCollisionAlgorithm (
+		btPersistentManifold* mf,
+		const btCollisionAlgorithmConstructionInfo& ci,
+#if BT_BULLET_VERSION >= 280
+		const btCollisionObjectWrapper* body0,
+		const btCollisionObjectWrapper* body1,
+#else
+		btCollisionObject* body0,
+		btCollisionObject* body1,
+#endif
+		btSimplexSolverInterface* simplexSolver,
+		btConvexPenetrationDepthSolver* pdSolver,
+		int numPerturbationIterations,
+		int minimumPointsPerturbationThreshold);
+	virtual void processCollision (
+#if BT_BULLET_VERSION >= 280
+		const btCollisionObjectWrapper* wrapper0,
+		const btCollisionObjectWrapper* wrapper1,
+#else
+		btCollisionObject* body0,
+		btCollisionObject* body1,
+#endif
+		const btDispatcherInfo& dispatchInfo,
+		btManifoldResult* resultOut);
 };
 
 class LIExtPhysicsTerrainCollisionAlgorithmCreator : public LIPhyCollisionAlgorithmCreator
@@ -35,21 +57,34 @@ class LIExtPhysicsTerrainCollisionAlgorithmCreator : public LIPhyCollisionAlgori
 public:
 	virtual btCollisionAlgorithm* create (
 		btCollisionAlgorithmConstructionInfo& ci,
-		btCollisionObject*                    body0,
-		btCollisionObject*                    body1,
-		btSimplexSolverInterface*             simplex_solver,
-		btConvexPenetrationDepthSolver*       depth_solver,
-		int                                   perturbation_iterations,
-		int                                   perturbation_threshold)
+#if BT_BULLET_VERSION >= 280
+		const btCollisionObjectWrapper* body0,
+		const btCollisionObjectWrapper* body1,
+#else
+		btCollisionObject* body0,
+		btCollisionObject* body1,
+#endif
+		btSimplexSolverInterface* simplex_solver,
+		btConvexPenetrationDepthSolver* depth_solver,
+		int perturbation_iterations,
+		int perturbation_threshold)
 	{
 		LIPhyPointer* pointer;
 
+#if BT_BULLET_VERSION >= 280
+		pointer = (LIPhyPointer*) body0->getCollisionObject ()->getUserPointer ();
+#else
 		pointer = (LIPhyPointer*) body0->getUserPointer ();
+#endif
 		if (pointer->type != LIPHY_POINTER_TYPE_TERRAIN)
 			return NULL;
 
 		void* mem = ci.m_dispatcher1->allocateCollisionAlgorithm (sizeof (LIExtPhysicsTerrainCollisionAlgorithm));
+#if BT_BULLET_VERSION >= 280
 		return new(mem) LIExtPhysicsTerrainCollisionAlgorithm (ci.m_manifold, ci, body0, body1, simplex_solver, depth_solver, perturbation_iterations, perturbation_threshold);
+#else
+		return new(mem) LIExtPhysicsTerrainCollisionAlgorithm (ci.m_manifold, ci, body0, body1, simplex_solver, depth_solver, perturbation_iterations, perturbation_threshold);
+#endif
 	}
 };
 

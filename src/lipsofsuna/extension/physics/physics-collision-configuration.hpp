@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,8 +29,13 @@ public:
 	virtual ~LIPhyCollisionAlgorithmCreator () {}
 	virtual btCollisionAlgorithm* create (
 		btCollisionAlgorithmConstructionInfo& ci,
+#if BT_BULLET_VERSION >= 280
+		const btCollisionObjectWrapper* body0,
+		const btCollisionObjectWrapper* body1,
+#else
 		btCollisionObject*                    body0,
 		btCollisionObject*                    body1,
+#endif
 		btSimplexSolverInterface*             simplex_solver,
 		btConvexPenetrationDepthSolver*       depth_solver,
 		int                                   perturbation_iterations,
@@ -67,7 +72,16 @@ public:
 	{
 		this->configuration = configuration;
 	}
-	virtual btCollisionAlgorithm* CreateCollisionAlgorithm (btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0, btCollisionObject* body1)
+	virtual btCollisionAlgorithm* CreateCollisionAlgorithm (
+		btCollisionAlgorithmConstructionInfo& ci,
+#if BT_BULLET_VERSION >= 280
+		const btCollisionObjectWrapper* body0,
+		const btCollisionObjectWrapper* body1
+#else
+		btCollisionObject* body0,
+		btCollisionObject* body1
+#endif
+		)
 	{
 		LIPhyCollisionAlgorithmCreator* ptr;
 		for (ptr = configuration->algorithms ; ptr != NULL ; ptr = ptr->next)

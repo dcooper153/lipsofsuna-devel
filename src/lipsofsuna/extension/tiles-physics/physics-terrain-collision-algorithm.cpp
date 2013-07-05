@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,12 +24,34 @@ float LIExtPhysicsVoxelCollisionAlgorithm::tile_size = -1.0f;
 btConvexHullShape* LIExtPhysicsVoxelCollisionAlgorithm::slopes_above[16];
 btConvexHullShape* LIExtPhysicsVoxelCollisionAlgorithm::slopes_below[16];
 
-LIExtPhysicsVoxelCollisionAlgorithm::LIExtPhysicsVoxelCollisionAlgorithm (btPersistentManifold* mf, const btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0, btCollisionObject* body1, btSimplexSolverInterface* simplexSolver, btConvexPenetrationDepthSolver* pdSolver, int numPerturbationIterations, int minimumPointsPerturbationThreshold) :
-	btConvexConvexAlgorithm (mf, ci, body0, body1, simplexSolver, pdSolver, numPerturbationIterations, minimumPointsPerturbationThreshold)
+LIExtPhysicsVoxelCollisionAlgorithm::LIExtPhysicsVoxelCollisionAlgorithm (
+	btPersistentManifold* mf,
+	const btCollisionAlgorithmConstructionInfo& ci,
+#if BT_BULLET_VERSION >= 280
+	const btCollisionObjectWrapper* body0,
+	const btCollisionObjectWrapper* body1,
+#else
+	btCollisionObject* body0,
+	btCollisionObject* body1,
+#endif
+	btSimplexSolverInterface* simplexSolver,
+	btConvexPenetrationDepthSolver* pdSolver,
+	int numPerturbationIterations,
+	int minimumPointsPerturbationThreshold) :
+		btConvexConvexAlgorithm (mf, ci, body0, body1, simplexSolver, pdSolver, numPerturbationIterations, minimumPointsPerturbationThreshold)
 {
 }
 
-void LIExtPhysicsVoxelCollisionAlgorithm::processCollision (btCollisionObject* body0, btCollisionObject* body1, const btDispatcherInfo& dispatchInfo, btManifoldResult* resultOut)
+void LIExtPhysicsVoxelCollisionAlgorithm::processCollision (
+#if BT_BULLET_VERSION >= 280
+	const btCollisionObjectWrapper* wrapper0,
+	const btCollisionObjectWrapper* wrapper1,
+#else
+	btCollisionObject* body0,
+	btCollisionObject* body1,
+#endif
+	const btDispatcherInfo& dispatchInfo,
+	btManifoldResult* resultOut)
 {
 	int i;
 	int x;
@@ -53,6 +75,11 @@ void LIExtPhysicsVoxelCollisionAlgorithm::processCollision (btCollisionObject* b
 	LIVoxMaterial* material;
 	LIVoxVoxel* tile;
 	LIVoxVoxel* tiles;
+
+#if BT_BULLET_VERSION >= 280
+	btCollisionObject* body0 = (btCollisionObject*) wrapper0->getCollisionObject();
+	btCollisionObject* body1 = (btCollisionObject*) wrapper1->getCollisionObject();
+#endif
 
 	/* Filter collisions. */
 	btBroadphaseProxy* proxy0 = body0->getBroadphaseHandle ();
@@ -145,7 +172,13 @@ void LIExtPhysicsVoxelCollisionAlgorithm::processCollision (btCollisionObject* b
 		pointer_terrain->tile[0] = min[0] + x;
 		pointer_terrain->tile[1] = min[1] + y;
 		pointer_terrain->tile[2] = min[2] + z;
+#if BT_BULLET_VERSION >= 280
+		btCollisionObjectWrapper ob0(0, object_terrain->getCollisionShape(), object_terrain, object_terrain->getWorldTransform());
+		btCollisionObjectWrapper ob1(0, object_convex->getCollisionShape(), object_convex, object_convex->getWorldTransform());
+		btConvexConvexAlgorithm::processCollision (&ob0, &ob1, dispatchInfo, resultOut);
+#else
 		btConvexConvexAlgorithm::processCollision (object_terrain, object_convex, dispatchInfo, resultOut);
+#endif
 	}
 
 	/* Calculate liquid percentage. */
