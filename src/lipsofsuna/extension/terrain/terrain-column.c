@@ -245,13 +245,10 @@ int liext_terrain_column_add_stick (
 				else if (stick->next != NULL && stick->next->material == material)
 				{
 					DEBUGPRINT ("   Join up.\n");
-					/* Extend the next stick. */
-					stick->next->height += stick->height;
-					/* Delete the current stick. */
-					private_remove_stick (self, stick_prev, stick);
-					/* Advance to the next stick. */
-					stick_prev = stick;
-					stick = stick->next;
+					/* Extend the current stick. */
+					stick->height += stick->next->height;
+					/* Delete the next stick. */
+					private_remove_stick (self, stick, stick->next);
 				}
 				else if (stick->next == NULL && material == 0)
 				{
@@ -512,6 +509,8 @@ int liext_terrain_column_add_stick (
 			private_insert_stick (self, stick_prev, stick);
 		}
 	}
+	else
+		DEBUGPRINT (" No append.\n");
 
 	return 1;
 }
