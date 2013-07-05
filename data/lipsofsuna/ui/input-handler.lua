@@ -109,6 +109,7 @@ end
 --- Handles the back event.
 -- @param self InputHandler.
 -- @param press True if pressed. False otherwise.
+-- @return True to bubble the event. False otherwise.
 InputHandler.handle_back = function(self, press)
 	if press then
 		local widget = self.__box:get_focused_widget()
@@ -116,6 +117,7 @@ InputHandler.handle_back = function(self, press)
 			return widget:apply_back()
 		end
 	end
+	return true
 end
 
 --- Handles the down browsing event.
