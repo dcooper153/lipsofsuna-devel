@@ -94,12 +94,7 @@ end
 
 UiWidget.rebuild_canvas = function(self)
 	-- Add the background.
-	self:canvas_image{
-		dest_position = {0,0},
-		dest_size = {self.size.x,self.size.y},
-		source_image = "widgets2",
-		source_position = self.focused and {0,100} or {0,0},
-		source_tiling = {7,86,7,7,86,7}}
+	Theme:draw_base(self, 0, 0, self.size.x, self.size.y, self.focused)
 	-- Add the label.
 	if self.label then
 		self:canvas_text{

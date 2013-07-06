@@ -4,8 +4,9 @@
 		"name": "arena button",
 		"commands":
 		[
-			["info", "Spawned a monster."],
-			["spawn object", "lizardman"]
+			["info", "Spawning a monster."],
+			["spawn object", "lizardman"],
+			["notification", "Let the fight begin!"]
 		]
 	}
 ]

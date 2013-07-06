@@ -47,8 +47,8 @@ Cursor.reshaped = function(self)
 	local icon = self.icon
 	local cursor = self.cursor
 	self:set_request(
-		cursor and cursor.size[2] or 16,
-		cursor and cursor.size[1] or 16, true)
+		cursor and cursor.size[1] or 16,
+		cursor and cursor.size[2] or 16, true)
 	self:canvas_clear()
 	if self.cursor then
 		self:canvas_image{
@@ -56,7 +56,7 @@ Cursor.reshaped = function(self)
 			dest_size = cursor.size,
 			source_image = cursor.image,
 			source_position = cursor.offset,
-			source_tiling = {0,cursor.size[1],0,0,cursor.size[1],0}}
+			source_tiling = {-1,cursor.size[1],-1,-1,cursor.size[2],-1}}
 	end
 end
 

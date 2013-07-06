@@ -16,6 +16,7 @@ Theme = Class("Theme")
 Theme.themes = {
 	{
 		scale = 1,
+		spacing = 1,
 		help_text_width = 175,
 		help_title_height = 20,
 		text_color_1 = {0,0,0,1},
@@ -34,6 +35,7 @@ Theme.themes = {
 	},
 	{
 		scale = 1.5,
+		spacing = 2,
 		help_text_width = 235,
 		help_title_height = 26,
 		text_color_1 = {0,0,0,1},
@@ -52,6 +54,7 @@ Theme.themes = {
 	},
 	{
 		scale = 2,
+		spacing = 3,
 		help_text_width = 295,
 		help_title_height = 32,
 		text_color_1 = {0,0,0,1},
@@ -82,20 +85,29 @@ Theme.init = function(self)
 	Widgets:add_font_style("tiny", "serif", 9)
 end
 
+Theme.draw_base = function(self, widget, x, y, w, h, focused)
+	widget:canvas_image{
+		dest_position = {x,y},
+		dest_size = {w,h},
+		source_image = "widgets3",
+		source_position = focused and {0,40} or {0,0},
+		source_tiling = {-1,600,-1,-1,40,-1}}
+end
+
 Theme.draw_button = function(self, widget, text, x, y, w, h, focused, pressed)
 	local position
 	if pressed then
-		position = focused and {100,300} or {100,200}
+		position = focused and {0,160} or {0,200}
 	else
-		position = focused and {100,100} or {100,0}
+		position = focused and {0,200} or {0,160}
 	end
 	-- Add the background.
 	widget:canvas_image{
 		dest_position = {x,y},
 		dest_size = {w,h},
-		source_image = "widgets2",
+		source_image = "widgets3",
 		source_position = position,
-		source_tiling = {7,86,7,7,86,7}}
+		source_tiling = {-1,600,-1,-1,40,-1}}
 	-- Add the text.
 	if text then
 		widget:canvas_text{
@@ -111,17 +123,17 @@ end
 Theme.draw_entry = function(self, widget, x, y, w, h, focused, editing)
 	local position
 	if editing then
-		position = {300,200}
+		position = {0,120}
 	else
-		position = focused and {300,100} or {300,0}
+		position = {0,80}
 	end
 	-- Add the background.
 	widget:canvas_image{
 		dest_position = {x,y},
 		dest_size = {w,h},
-		source_image = "widgets2",
+		source_image = "widgets3",
 		source_position = position,
-		source_tiling = {7,86,7,7,86,7}}
+		source_tiling = {-1,600,-1,-1,40,-1}}
 end
 
 Theme.draw_icon_scaled = function(self, widget, name, x, y, w, h, color)
@@ -161,22 +173,15 @@ end
 
 Theme.draw_slider = function(self, widget, value, x, y, w, h, focused, editing)
 	local bw = self.width_slider_button_1
-	local position1
-	local position2
-	if editing then
-		position1 = {200,200}
-		position2 = {200,300}
-	else
-		position1 = focused and {200,0} or {200,0}
-		position2 = focused and {200,100} or {200,100}
-	end
+	local position1 = {0,240}
+	local position2 = {0,280}
 	-- Add the left button.
 	widget:canvas_image{
 		dest_position = {x,y},
 		dest_size = {bw,h},
-		source_image = "widgets2",
-		source_position = focused and {400,100} or {400,0},
-		source_tiling = {7,86,7,7,86,7}}
+		source_image = "widgets3",
+		source_position = {640,0},
+		source_tiling = {-1,20,-1,-1,40,-1}}
 	widget:canvas_text{
 		dest_position = {x,y+self.text_pad_1},
 		dest_size = {bw,h},
@@ -188,9 +193,9 @@ Theme.draw_slider = function(self, widget, value, x, y, w, h, focused, editing)
 	widget:canvas_image{
 		dest_position = {x+w-bw,y},
 		dest_size = {bw,h},
-		source_image = "widgets2",
-		source_position = focused and {500,100} or {500,0},
-		source_tiling = {7,86,7,7,86,7}}
+		source_image = "widgets3",
+		source_position = {680,0},
+		source_tiling = {-1,20,-1,-1,40,-1}}
 	widget:canvas_text{
 		dest_position = {x+w-bw,y+self.text_pad_1},
 		dest_size = {bw,h},
@@ -202,18 +207,18 @@ Theme.draw_slider = function(self, widget, value, x, y, w, h, focused, editing)
 	widget:canvas_image{
 		dest_position = {x+bw,y},
 		dest_size = {w-bw*2,h},
-		source_image = "widgets2",
+		source_image = "widgets3",
 		source_position = position1,
-		source_tiling = {7,86,7,7,86,7}}
+		source_tiling = {-1,600,-1,-1,40,-1}}
 	-- Add the highlighted area.
 	if value > 0 then
 		widget:canvas_image{
 			dest_clip = {0,0,value*(w-bw*2),h},
 			dest_position = {x+bw,y},
-			dest_size = {w-bw*2,h},
-			source_image = "widgets2",
+			dest_size = {value*(w-bw*2),h},
+			source_image = "widgets3",
 			source_position = position2,
-			source_tiling = {7,86,7,7,86,7}}
+			source_tiling = {-1,600,-1,-1,40,-1}}
 	end
 end
 

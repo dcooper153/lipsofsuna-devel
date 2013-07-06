@@ -41,7 +41,7 @@ Ui.init = function(self)
 	self.hint = Label()
 	self.label = Label()
 	-- Initialize the cursor.
-	self.cursor = Cursor(Iconspec:find{name = "cursor1"})
+	self.cursor = Cursor(Iconspec:find_by_name("cursor1"))
 	self:set_pointer_grab(Client.options.grab_cursor)
 	-- Initialize input.
 	self.input = InputHandler(Client.bindings, self.widgets)

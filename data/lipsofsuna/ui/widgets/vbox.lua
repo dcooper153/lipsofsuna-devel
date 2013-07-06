@@ -197,7 +197,7 @@ UiVBox.update = function(self, secs)
 		else
 			widget:set_offset(Vector(x, y))
 			widget:set_visible(true)--y > -wh and y < sh)
-			y = y + wh
+			y = y + wh + Theme.spacing
 		end
 	end
 end
@@ -231,6 +231,9 @@ UiVBox.get_height = function(self)
 			h = math.max(h, widget.temporary.y + widget.size.y)
 		else
 			h = h + widget.size.y
+			if self.__widgets[k + 1] then
+				h = h + Theme.spacing
+			end
 		end
 	end
 	return h

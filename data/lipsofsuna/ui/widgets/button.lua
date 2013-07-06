@@ -25,11 +25,8 @@ Widgets.Uibutton.rebuild_size = function(self)
 end
 
 Widgets.Uibutton.rebuild_canvas = function(self)
-	-- Add the base.
-	Widgets.Uiwidget.rebuild_canvas(self)
-	-- Add the button.
 	Theme:draw_button(self, self.text,
-		5, 3, self.size.x-10, self.size.y-6,
+		0, 0, self.size.x, self.size.y,
 		self.focused, false)
 end
 

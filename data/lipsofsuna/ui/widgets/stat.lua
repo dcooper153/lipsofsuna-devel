@@ -24,9 +24,9 @@ UiStat.rebuild_canvas = function(self)
 	self:canvas_image{
 		dest_position = {0,0},
 		dest_size = {w,h},
-		source_image = "widgets2",
-		source_position = {800,0},
-		source_tiling = {7,86,7,7,86,7}}
+		source_image = "widgets3",
+		source_position = {0,320},
+		source_tiling = {-1,600,-1,-1,40,-1}}
 	-- Make sure that initialized.
 	if self.value > 0 and self.cap > 0 then
 		-- Add the bar.
@@ -34,10 +34,10 @@ UiStat.rebuild_canvas = function(self)
 		self:canvas_image{
 			dest_clip = {0,0,v*w,h},
 			dest_position = {0,0},
-			dest_size = {w,h},
-			source_image = "widgets2",
-			source_position = (self.skill == "health") and {800,100} or {800,200},
-			source_tiling = {7,86,7,7,86,7}}
+			dest_size = {v*w,h},
+			source_image = "widgets3",
+			source_position = (self.skill == "health") and {0,360} or {0,400},
+			source_tiling = {-1,600*v,-1,-1,40,-1}}
 		-- Add the label.
 		self:canvas_text{
 			dest_position = {0,Theme.text_pad_1},

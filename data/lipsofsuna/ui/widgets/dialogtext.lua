@@ -27,7 +27,7 @@ Widgets.Uidialogtext.rebuild_size = function(self)
 		local w2,h2 = Program:measure_text(Theme.text_font_1, self.text, size.x - 10)
 		if h1 and h2 then size.y = math.max(size.y, h1 + h2 + 15) end
 		self.title_width = w1
-		self.title_height = (h1 or 0) + 5
+		self.title_height = math.max(20, (h1 or 0) + 5)
 	end
 	return size
 end
@@ -38,19 +38,19 @@ Widgets.Uidialogtext.rebuild_canvas = function(self)
 	self:canvas_clear()
 	self:canvas_image{
 		dest_position = {0,self.title_height},
-		dest_size = {self.size.x,self.size.y-self.title_height},
-		source_image = "widgets2",
-		source_position = {900,100},
-		source_tiling = {7,86,7,7,86,7}}
+		dest_size = {self.size.x, math.max(80, self.size.y-self.title_height)},
+		source_image = "widgets3",
+		source_position = {0,480},
+		source_tiling = {-1,600,-1,-1,80,-1}}
 	self:canvas_image{
-		dest_position = {10,0},
-		dest_size = {self.title_width+15,self.title_height+5},
-		source_image = "widgets2",
-		source_position = {900,0},
-		source_tiling = {7,86,7,7,86,7}}
+		dest_position = {0,0},
+		dest_size = {self.size.x, self.title_height},
+		source_image = "widgets3",
+		source_position = {0,440},
+		source_tiling = {-1,600,-1,-1,40,-1}}
 	-- Add the character name.
 	self:canvas_text{
-		dest_position = {15,5},
+		dest_position = {20,5},
 		dest_size = {self.size.x-25,self.size.y-10},
 		text = self.char,
 		text_alignment = {0,0},
@@ -58,7 +58,7 @@ Widgets.Uidialogtext.rebuild_canvas = function(self)
 		text_font = Theme.text_font_1}
 	-- Add the text.
 	self:canvas_text{
-		dest_position = {5,self.title_height + 5},
+		dest_position = {5,self.title_height + 10},
 		dest_size = {self.size.x-10,self.size.y-self.title_height-20},
 		text = self.text,
 		text_alignment = {0,0},

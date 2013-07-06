@@ -32,9 +32,9 @@ Hudnotification.reshaped = function(self)
 	self:canvas_image{
 		dest_position = {0,0},
 		dest_size = {w,self:get_height()},
-		source_image = "widgets2",
-		source_position = {300,0},
-		source_tiling = {7,86,7,7,86,7}}
+		source_image = "widgets3",
+		source_position = {640,80},
+		source_tiling = {-1,320,-1,-1,80,-1}}
 	self:canvas_text{
 		dest_position = {7,7},
 		dest_size = {w-14,self:get_height()-10},

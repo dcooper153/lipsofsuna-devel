@@ -535,14 +535,14 @@ Iconspec{
 
 Iconspec{
 	name = "cursor1",
-	image = "icons1",
-	offset = {222,222},
-	size = {32,32}}
+	image = "widgets3",
+	offset = {720,0},
+	size = {40,40}}
 
 Iconspec{
 	name = "crosshair1",
-	image = "widgets1",
-	offset = {800,70},
+	image = "widgets3",
+	offset = {760,0},
 	size = {20,20}}
 
 Iconspec{

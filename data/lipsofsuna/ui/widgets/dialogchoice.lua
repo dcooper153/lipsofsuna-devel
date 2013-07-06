@@ -18,12 +18,9 @@ end
 
 Widgets.Uidialogchoice.rebuild_canvas = function(self)
 	-- Add the background.
-	self:canvas_image{
-		dest_position = {0,0},
-		dest_size = {self.size.x,self.size.y},
-		source_image = "widgets2",
-		source_position = self.focused and {900,100} or {900,200},
-		source_tiling = {7,86,7,7,86,7}}
+	Theme:draw_button(self, nil,
+		0, 0, self.size.x, self.size.y,
+		self.focused, false)
 	-- Add the text.
 	self:canvas_text{
 		dest_position = {5,5},
