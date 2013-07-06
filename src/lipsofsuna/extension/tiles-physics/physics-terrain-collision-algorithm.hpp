@@ -27,7 +27,7 @@ public:
 	LIExtPhysicsVoxelCollisionAlgorithm (
 		btPersistentManifold* mf,
 		const btCollisionAlgorithmConstructionInfo& ci,
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 		const btCollisionObjectWrapper* body0,
 		const btCollisionObjectWrapper* body1,
 #else
@@ -39,7 +39,7 @@ public:
 		int numPerturbationIterations,
 		int minimumPointsPerturbationThreshold);
 	virtual void processCollision (
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 		const btCollisionObjectWrapper* wrapper0,
 		const btCollisionObjectWrapper* wrapper1,
 #else
@@ -60,7 +60,7 @@ class LIExtPhysicsVoxelCollisionAlgorithmCreator : public LIPhyCollisionAlgorith
 public:
 	virtual btCollisionAlgorithm* create (
 		btCollisionAlgorithmConstructionInfo& ci,
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 		const btCollisionObjectWrapper* body0,
 		const btCollisionObjectWrapper* body1,
 #else
@@ -74,7 +74,7 @@ public:
 	{
 		LIPhyPointer* pointer;
 
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 		pointer = (LIPhyPointer*) body0->getCollisionObject ()->getUserPointer ();
 #else
 		pointer = (LIPhyPointer*) body0->getUserPointer ();

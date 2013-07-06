@@ -27,7 +27,7 @@ btConvexHullShape* LIExtPhysicsVoxelCollisionAlgorithm::slopes_below[16];
 LIExtPhysicsVoxelCollisionAlgorithm::LIExtPhysicsVoxelCollisionAlgorithm (
 	btPersistentManifold* mf,
 	const btCollisionAlgorithmConstructionInfo& ci,
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 	const btCollisionObjectWrapper* body0,
 	const btCollisionObjectWrapper* body1,
 #else
@@ -43,7 +43,7 @@ LIExtPhysicsVoxelCollisionAlgorithm::LIExtPhysicsVoxelCollisionAlgorithm (
 }
 
 void LIExtPhysicsVoxelCollisionAlgorithm::processCollision (
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 	const btCollisionObjectWrapper* wrapper0,
 	const btCollisionObjectWrapper* wrapper1,
 #else
@@ -76,7 +76,7 @@ void LIExtPhysicsVoxelCollisionAlgorithm::processCollision (
 	LIVoxVoxel* tile;
 	LIVoxVoxel* tiles;
 
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 	btCollisionObject* body0 = (btCollisionObject*) wrapper0->getCollisionObject();
 	btCollisionObject* body1 = (btCollisionObject*) wrapper1->getCollisionObject();
 #endif
@@ -172,7 +172,7 @@ void LIExtPhysicsVoxelCollisionAlgorithm::processCollision (
 		pointer_terrain->tile[0] = min[0] + x;
 		pointer_terrain->tile[1] = min[1] + y;
 		pointer_terrain->tile[2] = min[2] + z;
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 		btCollisionObjectWrapper ob0(0, object_terrain->getCollisionShape(), object_terrain, object_terrain->getWorldTransform());
 		btCollisionObjectWrapper ob1(0, object_convex->getCollisionShape(), object_convex, object_convex->getWorldTransform());
 		btConvexConvexAlgorithm::processCollision (&ob0, &ob1, dispatchInfo, resultOut);

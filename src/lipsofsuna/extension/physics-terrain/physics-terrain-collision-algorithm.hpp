@@ -29,7 +29,7 @@ public:
 	LIExtPhysicsTerrainCollisionAlgorithm (
 		btPersistentManifold* mf,
 		const btCollisionAlgorithmConstructionInfo& ci,
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 		const btCollisionObjectWrapper* body0,
 		const btCollisionObjectWrapper* body1,
 #else
@@ -41,7 +41,7 @@ public:
 		int numPerturbationIterations,
 		int minimumPointsPerturbationThreshold);
 	virtual void processCollision (
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 		const btCollisionObjectWrapper* wrapper0,
 		const btCollisionObjectWrapper* wrapper1,
 #else
@@ -57,7 +57,7 @@ class LIExtPhysicsTerrainCollisionAlgorithmCreator : public LIPhyCollisionAlgori
 public:
 	virtual btCollisionAlgorithm* create (
 		btCollisionAlgorithmConstructionInfo& ci,
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 		const btCollisionObjectWrapper* body0,
 		const btCollisionObjectWrapper* body1,
 #else
@@ -71,7 +71,7 @@ public:
 	{
 		LIPhyPointer* pointer;
 
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 		pointer = (LIPhyPointer*) body0->getCollisionObject ()->getUserPointer ();
 #else
 		pointer = (LIPhyPointer*) body0->getUserPointer ();
@@ -80,11 +80,7 @@ public:
 			return NULL;
 
 		void* mem = ci.m_dispatcher1->allocateCollisionAlgorithm (sizeof (LIExtPhysicsTerrainCollisionAlgorithm));
-#if BT_BULLET_VERSION >= 280
 		return new(mem) LIExtPhysicsTerrainCollisionAlgorithm (ci.m_manifold, ci, body0, body1, simplex_solver, depth_solver, perturbation_iterations, perturbation_threshold);
-#else
-		return new(mem) LIExtPhysicsTerrainCollisionAlgorithm (ci.m_manifold, ci, body0, body1, simplex_solver, depth_solver, perturbation_iterations, perturbation_threshold);
-#endif
 	}
 };
 

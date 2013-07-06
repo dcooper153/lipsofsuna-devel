@@ -29,7 +29,7 @@ public:
 	virtual ~LIPhyCollisionAlgorithmCreator () {}
 	virtual btCollisionAlgorithm* create (
 		btCollisionAlgorithmConstructionInfo& ci,
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 		const btCollisionObjectWrapper* body0,
 		const btCollisionObjectWrapper* body1,
 #else
@@ -74,7 +74,7 @@ public:
 	}
 	virtual btCollisionAlgorithm* CreateCollisionAlgorithm (
 		btCollisionAlgorithmConstructionInfo& ci,
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 		const btCollisionObjectWrapper* body0,
 		const btCollisionObjectWrapper* body1
 #else

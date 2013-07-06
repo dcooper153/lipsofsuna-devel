@@ -47,7 +47,7 @@ void liext_physics_terrain_collision_algorithm_free (
 LIExtPhysicsTerrainCollisionAlgorithm::LIExtPhysicsTerrainCollisionAlgorithm (
 	btPersistentManifold* mf,
 	const btCollisionAlgorithmConstructionInfo& ci,
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 	const btCollisionObjectWrapper* body0,
 	const btCollisionObjectWrapper* body1,
 #else
@@ -63,7 +63,7 @@ LIExtPhysicsTerrainCollisionAlgorithm::LIExtPhysicsTerrainCollisionAlgorithm (
 }
 
 void LIExtPhysicsTerrainCollisionAlgorithm::processCollision (
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 	const btCollisionObjectWrapper* wrapper0,
 	const btCollisionObjectWrapper* wrapper1,
 #else
@@ -77,7 +77,7 @@ void LIExtPhysicsTerrainCollisionAlgorithm::processCollision (
 	int z;
 
 	// Get the objects and shapes.
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 	const btCollisionObject* body0 = wrapper0->getCollisionObject();
 	const btCollisionObject* body1 = wrapper1->getCollisionObject();
 	const btCollisionShape* shape0 = wrapper0->getCollisionShape();
@@ -195,7 +195,7 @@ void LIExtPhysicsTerrainCollisionAlgorithm::processCollision (
 				pointer_terrain->tile[0] = x;
 				pointer_terrain->tile[1] = 0;
 				pointer_terrain->tile[2] = z;
-#if BT_BULLET_VERSION >= 280
+#if BT_BULLET_VERSION >= 281
 				btCollisionObjectWrapper ob0(0, &shape, object_terrain, xform_terrain);
 				btCollisionObjectWrapper ob1(0, shape_convex, object_convex, xform_convex);
 				btConvexConvexAlgorithm::processCollision (&ob0, &ob1, dispatchInfo, resultOut);
