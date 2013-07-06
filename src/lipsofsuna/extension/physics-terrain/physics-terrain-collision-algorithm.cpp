@@ -137,11 +137,11 @@ void LIExtPhysicsTerrainCollisionAlgorithm::processCollision (
 	btVector3 aabb_max;
 	shape_convex->getAabb (xform_convex, aabb_min, aabb_max);
 	float grid_size = shape_terrain->terrain->terrain->grid_size;
-	int min_x = (int)(aabb_min[0] / grid_size);
+	int min_x = LIMAT_MAX(0, (int)(aabb_min[0] / grid_size));
 	int max_x = (int)(aabb_max[0] / grid_size);
 	float min_y = aabb_min[1];
 	float max_y = aabb_max[1];
-	int min_z = (int)(aabb_min[2] / grid_size);
+	int min_z = LIMAT_MAX(0, (int)(aabb_min[2] / grid_size));
 	int max_z = (int)(aabb_max[2] / grid_size);
 
 	// Process collisions with each tile.
