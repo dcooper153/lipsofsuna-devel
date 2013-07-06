@@ -37,6 +37,7 @@ end
 --- Handles an input event.
 -- @param self InputHandler.
 -- @param args Event arguments.
+-- @return True to bubble the event. False otherwise.
 InputHandler.handle_event = function(self, args)
 	-- Copy the event just in case.
 	local a = {}
@@ -100,6 +101,10 @@ InputHandler.handle_event = function(self, args)
 		if widget and widget.handle_event then
 			if not widget:handle_event(args) then return end
 		end
+	end
+	-- Let other key presses bubble so that screenshots work.
+	if args.type == "keypress" or args.type == "keyrelease" then
+		return true
 	end
 end
 

@@ -60,7 +60,7 @@ UiMenu.handle_event = function(self, args)
 	if not self.__opened then
 		return UiWidget.handle_event(self, args)
 	end
-	self.__input:handle_event(args)
+	return self.__input:handle_event(args)
 end
 
 --- Updates the widget.
