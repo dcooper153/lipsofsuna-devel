@@ -55,10 +55,10 @@ Ui.init = function(self)
 	self:set_pointer_grab(Client.options.grab_cursor)
 	-- Initialize input.
 	self.input = InputHandler(Client.bindings, self.widgets)
-	self.input.focus_changed = function(w)
+	self.input.focus_changed = function(w, mouse)
 		self.focused_item = self.widgets.focused_item
 		self:update_help()
-		self:autoscroll()
+		if not mouse then self:autoscroll() end
 		self.history[self:get_history_state()] = self.focused_item
 	end
 	self.input:set_enabled(true)
@@ -500,7 +500,7 @@ end
 
 --- Scrolls the screen.
 -- @param self Ui class.
--- @param dir Scrolling direction, either "up" or "down".
+-- @param dir Scrolling direction, either "up", "down" or value in pixels.
 Ui.scroll = function(self, dir)
 	if not self.scrollbar:get_visible() then return end
 	local range = self.__scroll_range
@@ -509,6 +509,11 @@ Ui.scroll = function(self, dir)
 		self:set_scroll_offset(math.max(range[2] - 50, 0))
 	elseif dir == "down" then
 		self:set_scroll_offset(math.min(range[2] + 50, range[1] - range[3]))
+	else
+		local offset = self.__scroll_offset + dir
+		offset = math.min(offset, range[1] - self.size.y)
+		offset = math.max(offset, 0)
+		self:set_scroll_offset(offset)
 	end
 end
 

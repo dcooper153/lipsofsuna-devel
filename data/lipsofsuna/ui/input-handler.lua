@@ -30,7 +30,8 @@ end
 
 --- Called when the focused widget changes.
 -- @param self InputHandler.
-InputHandler.focus_changed = function(self)
+-- @param mouse True if changed by mouse. False otherwise.
+InputHandler.focus_changed = function(self, mouse)
 end
 
 --- Handles an input event.
@@ -237,14 +238,21 @@ InputHandler.update = function(self, secs)
 			end
 		end
 	end
+	-- Scroll at vertical edges.
+	local cursor = Input:get_pointer_position()
+	local speed = 50 * secs
+	if cursor.y < 20 then
+		Ui:scroll(speed * (cursor.y - 20))
+	elseif cursor.y >= Ui.size.y - 20 then
+		Ui:scroll(speed * (20 + cursor.y - Ui.size.y))
+	end
 	-- Update mouse focus.
 	if self.__box then
-		local cursor = Input:get_pointer_position()
 		local focus = self.__box:get_widget_by_point(cursor)
 		if focus then
 			local found,changed = self.__box:focus_widget(focus)
 			if changed then
-				self:focus_changed()
+				self:focus_changed(true)
 			end
 		end
 	end
