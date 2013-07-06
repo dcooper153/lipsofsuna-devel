@@ -1,5 +1,6 @@
 local Render = require("system/render")
 local Sound = require("system/sound")
+local UiMenu = require("ui/widgets/menu")
 
 Ui:add_state{
 	state = "options",
@@ -11,7 +12,70 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "options",
-	widget = function() return Widgets.Uitransition("Video mode", "options/videomode") end}
+	widget = function()
+		-- Create the video mode selector widget.
+		local widget = UiMenu(widgets)
+		widget.label = "Video mode"
+		widget.apply = function(self)
+			-- Get the sorted list of video modes.
+			local modes = {}
+			for k,v in ipairs(Program:get_video_modes()) do
+				if v[2] >= 480 then
+					local name = string.format("%sx%s", v[1], v[2])
+					table.insert(modes, {name, v[1], v[2], true})
+				end
+			end
+			table.sort(modes, function(a, b)
+				if a[3] < b[3] then return true end
+				if a[3] > b[3] then return false end
+				if a[2] < b[2] then return true end
+				return false
+			end)
+			-- Create the windowed mode button.
+			local widgets = {
+				Widgets.Uiradio("Windowed", "mode", function(w)
+					local s = Program:get_video_mode()
+					Program:set_video_mode(s[1], s[2], false, Client.options.vsync)
+					self:set_menu_opened(false)
+				end)}
+			-- Create the fullscreen mode buttons.
+			for k,v in ipairs(modes) do
+				local widget = Widgets.Uiradio(v[1], "mode", function(w)
+					Program:set_video_mode(w.mode[2], w.mode[3], w.mode[4], Client.options.vsync)
+					self:set_menu_opened(false)
+				end)
+				widget.mode = v
+				table.insert(widgets, widget)
+			end
+			-- Set the widgets.
+			self:set_menu_widgets(widgets)
+			-- Activate the button of the current mode.
+			local mode = Program:get_video_mode()
+			for k,v in pairs(widgets) do
+				if not v.mode then
+					-- Windowed.
+					if not mode[3] then
+						v.value = true
+						break
+					end
+				else
+					-- Fullscreen.
+					if v.mode[2] == mode[1] and v.mode[3] == mode[2] then
+						v.value = true
+						break
+					end
+				end
+			end
+			-- Popup the widgets.
+			UiMenu.apply(self)
+		end
+		widget.rebuild_canvas = function(self)
+			Theme:draw_button(self, self.label,
+				0, 0, self.size.x, self.size.y,
+				self.focused, false)
+		end
+		return widget
+	end}
 
 Ui:add_widget{
 	state = "options",
