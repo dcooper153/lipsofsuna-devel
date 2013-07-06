@@ -410,6 +410,14 @@ Ui.handle_event = function(self, args)
 		return widget == self.scrollbar or widget == self.back
 	end)
 	if widget and not widget:handle_event(args) then return end
+	-- Trigger the back action if the cursor hit the left edge.
+	local snapped = (args.x == 0)
+	local snapped_prev = self.__snapped_left
+	self.__snapped_left = snapped
+	if snapped and not snapped_prev then
+		self:command("back", true)
+		return
+	end
 	-- Call the event handler of the active widget.
 	if self.focused_item then
 		local widget = self:get_focused_widget()

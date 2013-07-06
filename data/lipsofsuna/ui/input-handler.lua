@@ -85,6 +85,14 @@ InputHandler.handle_event = function(self, args)
 		self:handle_menu(control7)
 		return
 	end
+	-- Trigger the back action if the cursor hit the left edge.
+	local snapped = (args.x == 0)
+	local snapped_prev = self.__snapped_left
+	self.__snapped_left = snapped
+	if snapped and not snapped_prev then
+		self:handle_back(true)
+		return
+	end
 	-- Trigger widget specific actions.
 	if self.__box then
 		local c = Input:get_pointer_position()
