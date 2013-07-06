@@ -37,19 +37,9 @@ Ui.init = function(self)
 	self.window:set_floating(true)
 	self.window:set_fullscreen(true)
 	self.repeat_timer = 0
-	-- Create the back button.
-	self.back = Button()
-	self.back:set_text("<")
-	self.back.pressed = function() self:pop_state() end
 	-- Create the help labels.
 	self.hint = Label()
 	self.label = Label()
-	-- Create the scrollbar.
-	self.scrollbar = Scrollbar()
-	self.scrollbar:set_offset(Vector(32, 0))
-	self.scrollbar.changed = function(w, p) self:set_scroll_offset(p) end
-	self.scrollbar.grabbed = function(w, v) self.scroll_active = v end
-	self.scrollbar.step = 50
 	-- Initialize the cursor.
 	self.cursor = Cursor(Iconspec:find{name = "cursor1"})
 	self:set_pointer_grab(Client.options.grab_cursor)
@@ -376,9 +366,6 @@ Ui.get_widget_under_cursor = function(self, filter)
 		if not filter or filter(widget) then return true end
 	end
 	local c = Input:get_pointer_position()
-	-- Try system widgets.
-	if handle(c, self.back) then return self.back end
-	if handle(c, self.scrollbar) then return self.scrollbar end
 	-- Try UI widgets.
 	local w = self.widgets:get_widget_by_point(c, filter)
 	if w then return w end
@@ -405,18 +392,15 @@ Ui.handle_event = function(self, args)
 	   args.type == "mousescroll" or args.type == "mousemotion" then
 		mouse_event = true
 	end
-	-- Call the event handlers of the navigation widgets.
-	local widget = self:get_widget_under_cursor(function(widget)
-		return widget == self.scrollbar or widget == self.back
-	end)
-	if widget and not widget:handle_event(args) then return end
 	-- Trigger the back action if the cursor hit the left edge.
-	local snapped = (args.x == 0)
-	local snapped_prev = self.__snapped_left
-	self.__snapped_left = snapped
-	if snapped and not snapped_prev then
-		self:command("back", true)
-		return
+	if mouse_mode then
+		local snapped = (args.x == 0)
+		local snapped_prev = self.__snapped_left
+		self.__snapped_left = snapped
+		if snapped and not snapped_prev then
+			self:command("back", true)
+			return
+		end
 	end
 	-- Call the event handler of the active widget.
 	if self.focused_item then
@@ -431,11 +415,6 @@ Ui.handle_event = function(self, args)
 	if not mouse_mode or not mouse_event then
 		return true
 	end
-	-- Hijack input when the scrollbar is grabbed.
-	if self.scroll_active then
-		self.scrollbar:handle_event(args)
-		return
-	end
 	-- Call the event handler of the widget under the cursor.
 	local widget = self:get_widget_under_cursor(function(widget)
 		if not widget.handle_event then return end
@@ -448,7 +427,6 @@ Ui.handle_event = function(self, args)
 	end
 	-- Scroll with remaining mouse wheel events.
 	if args.type == "mousescroll" then
-		if not self.scroll_active then return true end
 		self:scroll(args.rel > 0 and "up" or "down")
 	end
 end
@@ -510,7 +488,6 @@ end
 -- @param self Ui class.
 -- @param dir Scrolling direction, either "up", "down" or value in pixels.
 Ui.scroll = function(self, dir)
-	if not self.scrollbar:get_visible() then return end
 	local range = self.__scroll_range
 	if not range then return end
 	if dir == "up" then
@@ -632,17 +609,11 @@ Ui.show_state_attach = function(self)
 		if v.widget then root:add_child(v.widget) end
 	end
 	-- Attach the navigation widgets.
-	if not self.widgets:is_empty() then
-		root:add_child(self.back)
-	end
 	if Client.options.help_messages then
 		root:add_child(self.hint)
 		if self.label.text ~= "" then
 			root:add_child(self.label)
 		end
-	end
-	if not self.widgets:is_empty() then
-		root:add_child(self.scrollbar)
 	end
 	-- Attach the state widgets.
 	if not self.widgets:is_empty() then
@@ -667,10 +638,8 @@ Ui.show_state_detach = function(self)
 	self.widgets:detach()
 	self.widgets:clear()
 	-- Detach the navigation widgets.
-	self.back:detach()
 	self.hint:detach()
 	self.label:detach()
-	self.scrollbar:detach()
 end
 
 --- Updates the user interface system.
@@ -853,22 +822,11 @@ Ui.set_state = function(self, v)
 end
 
 Ui.set_scroll_offset = function(self, v)
-	-- Decide if a scrollbar is needed.
-	local h = self.widgets:get_height()
-	local x = (h < self.size.y) and 32 or 53
-	-- Update system widget positions.
-	if h < self.size.y then
-		self.scrollbar:set_visible(false)
-		self.back:set_request(32, h)
-	else
-		self.scrollbar:set_range(h, v, self.size.y)
-		self.scrollbar:set_request(nil, self.size.y)
-		self.scrollbar:set_visible(true)
-		self.back:set_request(32, self.size.y)
-	end
 	-- Update state widget positions.
+	local x = 0
 	self.widgets:set_offset(Vector(x, v))
 	-- Store the scrolling state.
+	local h = self.widgets:get_height()
 	self.__scroll_offset = v
 	self.__scroll_range = {h, v, self.size.y}
 end
