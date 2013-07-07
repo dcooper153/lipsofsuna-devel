@@ -45,9 +45,9 @@
 		["load", "core/messaging"],
 		["load", "core/multiplayer"],
 		["load", "core/objects"],
-		["load", "core/quickslots"],
 		["load", "core/server"],
 		["load", "core/shaders"],
+		["load", "core/shortcut"],
 		["load", "core/terrain"],
 		["load", "core/vision"],
 		["load", "core/misc"]
