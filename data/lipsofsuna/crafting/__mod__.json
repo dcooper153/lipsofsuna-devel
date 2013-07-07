@@ -23,6 +23,6 @@
 	],
 	"specs":
 	[
-		"specs"
+		"items", "specs"
 	]
 }

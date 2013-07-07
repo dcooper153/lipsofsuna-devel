@@ -14,28 +14,6 @@
 
 -- non generating admin items: "weapons", "logs", "health jar", "magic jar"
 
-Itemspec{
-	name = "flax",
-	model = "book-000", -- FIXME
-	mass = 1,
-	categories = {["material"] = true},
-	stacking = true}
-
-Itemspec{
-	name = "hide",
-	model = "book-000", -- FIXME
-	icon = "hide1",
-	mass = 1,
-	categories = {["material"] = true},
-	stacking = true}
-
-Itemspec{
-	name = "wheat",
-	model = "book-000", -- FIXME
-	mass = 1,
-	categories = {["material"] = true},
-	stacking = true}
-
 ------------------------------------------------------------------------------
 -- Ammo.
 

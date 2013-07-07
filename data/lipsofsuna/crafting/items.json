@@ -1,0 +1,36 @@
+[
+	{
+		"type": "Itemspec",
+		"name": "flax",
+		"model": "book-000",
+		"mass": 1,
+		"categories":
+		{
+			"material": true
+		},
+		"stacking": true
+	},
+	{
+		"type": "Itemspec",
+		"name": "hide",
+		"model": "book-000",
+		"icon": "hide1",
+		"mass": 1,
+		"categories":
+		{
+			"material": true
+		},
+		"stacking": true
+	},
+	{
+		"type": "Itemspec",
+		"name": "wheat",
+		"model": "book-000",
+		"mass": 1,
+		"categories":
+		{
+			"material": true
+		},
+		"stacking": true
+	}
+]
