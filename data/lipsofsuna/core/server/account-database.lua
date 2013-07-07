@@ -8,14 +8,16 @@
 -- @module core.server.account_database
 -- @alias AccountDatabase
 
-local Account = require(Mod.path .. "account")
+local Account = require("core/server/account")
 local Class = require("system/class") 
 local Password = require("system/password")
+local Serializer = require("system/serializer")
 
 --- TODO:doc
 -- @type AccountDatabase
 local AccountDatabase = Class("AccountDatabase")
-AccountDatabase.account_version = "1"
+AccountDatabase.account_version = "2"
+AccountDatabase.serializer = Serializer{}
 
 --- Creates a new account database.
 -- @param clss AccountDatabase class.
@@ -39,6 +41,7 @@ end
 AccountDatabase.reset = function(self)
 	-- Initialize tables.
 	self.db:query([[DROP TABLE IF EXISTS accounts;]])
+	self.db:query([[DROP TABLE IF EXISTS account_fields;]])
 	self.db:query([[DROP TABLE IF EXISTS options;]])
 	self.db:query(
 		[[CREATE TABLE accounts (
@@ -47,6 +50,11 @@ AccountDatabase.reset = function(self)
 		permissions INTEGER,
 		character TEXT,
 		spawn_point TEXT);]])
+	self.db:query([[CREATE TABLE account_fields (
+		account TEXT,
+		name TEXT,
+		value TEXT,
+		PRIMARY KEY(account,name));]])
 	self.db:query(
 		[[CREATE TABLE options (
 		key TEXT PRIMARY KEY,
@@ -85,14 +93,23 @@ end
 -- @param password Password.
 -- @return Account or nil, status message or nil.
 AccountDatabase.load_account = function(self, login, password)
+	-- Load the account data.
 	local r = self.db:query(
 		[[SELECT login,password,permissions,character,spawn_point
 		FROM accounts WHERE login=?;]], {login})
-	for k,v in ipairs(r) do
-		local hash = self:hash_password(login, password)
-		if v[2] ~= hash then return nil, "authentication failed" end
-		return Account(login, hash, v[3], v[4], v[5]), "login successful"
-	end
+	local v = r[1]
+	if not v then return nil end
+	-- Validate the password.
+	local hash = self:hash_password(login, password)
+	if v[2] ~= hash then return nil, "authentication failed" end
+	-- Create the account.
+	local account = Account(login, hash, v[3], v[4], v[5])
+	-- Load the fields.
+	local rows = self.db:query(
+		[[SELECT name,value FROM account_fields WHERE account=?]], {login})
+	self.serializer:read(account, rows)
+	-- Return the account and the status message.
+	return account, "login successful"
 end
 
 --- Saves a player account.
@@ -100,11 +117,21 @@ end
 -- @param account Account.
 -- @param object Player object, or nil.
 AccountDatabase.save_account = function(self, account, object)
+	-- Save the account.
 	self.db:query(
 		[[REPLACE INTO accounts
 		(login,password,permissions,character,spawn_point)
 		VALUES (?,?,?,?,?);]],
 		{account.login, account.password, account.permissions, object and object:get_id(), account.spawn_point and tostring(account.spawn_point)})
+	-- Save the fields.
+	self.db:query([[DELETE FROM account_fields WHERE account=?;]], {account.login})
+	self.serializer:write(account, function(name, value)
+		self.db:query(
+			[[REPLACE INTO account_fields
+			(account,name,value)
+			VALUES (?,?,?);]],
+			{account.login, name, value})
+	end)
 end
 
 --- Saves all active player accounts.
@@ -152,5 +179,3 @@ AccountDatabase.set_account_option = function(self, key, value)
 end
 
 return AccountDatabase
-
-
