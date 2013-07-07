@@ -22,7 +22,6 @@
  * @{
  */
 
-#include "lipsofsuna/voxel.h"
 #include "main-event.h"
 #include "main-extension.h"
 #include "main-program.h"
@@ -643,7 +642,6 @@ void limai_program_unittest (
 	LIMaiProgram* self)
 {
 	limat_math_unittest ();
-	livox_unittest ();
 }
 
 /**

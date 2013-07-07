@@ -25,7 +25,6 @@
 #include <string.h>
 #include "main-extension.h"
 
-extern LIMaiExtensionInfo liext_ai_info;
 extern LIMaiExtensionInfo liext_animation_info;
 extern LIMaiExtensionInfo liext_camera_info;
 extern LIMaiExtensionInfo liext_config_file_info;
@@ -60,9 +59,6 @@ extern LIMaiExtensionInfo liext_sound_info;
 extern LIMaiExtensionInfo liext_string_info;
 extern LIMaiExtensionInfo liext_terrain_info;
 extern LIMaiExtensionInfo liext_thread_info;
-extern LIMaiExtensionInfo liext_tiles_info;
-extern LIMaiExtensionInfo liext_tiles_physics_info;
-extern LIMaiExtensionInfo liext_tiles_render_info;
 extern LIMaiExtensionInfo liext_time_info;
 extern LIMaiExtensionInfo liext_vision_info;
 extern LIMaiExtensionInfo liext_watchdog_info;
@@ -84,7 +80,6 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 	}
 	info[] =
 	{
-		{ "ai", &liext_ai_info },
 		{ "animation", &liext_animation_info },
 		{ "config-file", &liext_config_file_info },
 		{ "database", &liext_database_info },
@@ -112,8 +107,6 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "string", &liext_string_info },
 		{ "terrain", &liext_terrain_info },
 		{ "thread", &liext_thread_info },
-		{ "tiles", &liext_tiles_info },
-		{ "tiles-physics", &liext_tiles_physics_info },
 		{ "time", &liext_time_info },
 		{ "vision", &liext_vision_info },
 		{ "watchdog", &liext_watchdog_info },
@@ -125,7 +118,6 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "render-object", &liext_object_render_info },
 		{ "render", &liext_render_info },
 		{ "render-model", &liext_render_model_info },
-		{ "tiles-render", &liext_tiles_render_info },
 		{ "widgets", &liext_widgets_info },
 		{ "wireframe", &liext_wireframe_info },
 #endif

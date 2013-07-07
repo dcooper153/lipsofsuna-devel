@@ -17,16 +17,11 @@
 
 #include "lipsofsuna/extension.h"
 #include "lipsofsuna/extension/object/object.h"
-#include "lipsofsuna/voxel.h"
 #include "ext-vision-listener.h"
 
 static float private_cone_factor (
 	LIExtVisionListener* self,
 	const LIMatVector*   pos);
-
-static void private_update_terrain (
-	LIExtVisionListener* self,
-	LIVoxManager*        voxels);
 
 /*****************************************************************************/
 
@@ -103,7 +98,6 @@ void liext_vision_listener_update (
 	LIObjManager* objects;
 	LIObjObject* object;
 	LIMatVector diff;
-	LIVoxManager* voxels;
 
 	/* Get the object manager. */
 	objects = limai_program_find_component (self->module->program, "object");
@@ -159,11 +153,6 @@ void liext_vision_listener_update (
 	}
 
 	/* TODO: Silently remove garbage collected objects. */
-
-	/* Update terrain blocks. */
-	voxels = limai_program_find_component (self->module->program, "voxels");
-	if (voxels != NULL)
-		private_update_terrain (self, voxels);
 }
 
 /*****************************************************************************/
@@ -182,97 +171,4 @@ static float private_cone_factor (
 	mult = (1.0f - mult) * self->cone_factor + mult;
 
 	return mult;
-}
-
-static void private_update_terrain (
-	LIExtVisionListener* self,
-	LIVoxManager*        voxels)
-{
-	int sx;
-	int sy;
-	int sz;
-	int index;
-	int line;
-	int stamp;
-	float block_size;
-	float dist;
-	float mult;
-	float radius;
-	LIAlgRange sectors;
-	LIAlgRange blocks;
-	LIAlgRange range;
-	LIAlgRangeIter iter0;
-	LIAlgRangeIter iter1;
-	LIMatVector min;
-	LIMatVector max;
-	LIMatVector point;
-	LIMatVector point1;
-	LIMatVector diff;
-	LIMatVector size;
-	LIVoxBlock* block;
-	LIVoxSector* sector;
-
-	block_size = voxels->sectors->width / voxels->blocks_per_line;
-	line = voxels->blocks_per_line * voxels->sectors->count;
-	radius = self->scan_radius;
-	point = self->position;
-
-	/* Calculate the sight volume. */
-	size = limat_vector_init (radius, radius, radius);
-	min = limat_vector_subtract (point, size);
-	max = limat_vector_add (point, size);
-	sectors = lialg_range_new_from_aabb (&min, &max, voxels->sectors->width);
-	sectors = lialg_range_clamp (sectors, 0, voxels->sectors->count - 1);
-	blocks = lialg_range_new_from_aabb (&min, &max, block_size);
-	blocks = lialg_range_clamp (blocks, 0, voxels->blocks_per_line * voxels->sectors->count - 1);
-
-	/* Loop through nearby sectors. */
-	LIALG_RANGE_FOREACH (iter0, sectors)
-	{
-		/* Get voxel sector. */
-		sector = lialg_sectors_data_index (voxels->sectors, LIALG_SECTORS_CONTENT_VOXEL, iter0.index, 0);
-		if (sector == NULL)
-			continue;
-
-		/* Calculate the block range in the sector. */
-		livox_sector_get_offset (sector, &sx, &sy, &sz);
-		sx *= voxels->blocks_per_line;
-		sy *= voxels->blocks_per_line;
-		sz *= voxels->blocks_per_line;
-		range.min = 0;
-		range.max = voxels->blocks_per_line;
-		range.minx = LIMAT_MAX (blocks.minx - sx, 0);
-		range.miny = LIMAT_MAX (blocks.miny - sy, 0);
-		range.minz = LIMAT_MAX (blocks.minz - sz, 0);
-		range.maxx = LIMAT_MIN (blocks.maxx - sx, voxels->blocks_per_line - 1);
-		range.maxy = LIMAT_MIN (blocks.maxy - sy, voxels->blocks_per_line - 1);
-		range.maxz = LIMAT_MIN (blocks.maxz - sz, voxels->blocks_per_line - 1);
-
-		/* Loop through nearby blocks. */
-		LIALG_RANGE_FOREACH (iter1, range)
-		{
-			/* Vision cone check. */
-			point1 = limat_vector_init (sx + iter1.x + 0.5f, sy + iter1.y + 0.5f, sz + iter1.z + 0.5f);
-			point1 = limat_vector_multiply (point1, block_size);
-			diff = limat_vector_subtract (point1, point);
-			dist = limat_vector_get_length (diff);
-			mult = private_cone_factor (self, &diff);
-			if (dist - 0.3f * block_size > radius * mult)
-				continue;
-
-			/* Check for changes. */
-			block = livox_sector_get_block (sector, iter1.x, iter1.y, iter1.z);
-			stamp = livox_block_get_stamp (block);
-			index = (sx + iter1.x) + (sy + iter1.y) * line + (sz + iter1.z) * line * line;
-			if (lialg_u32dic_find (self->terrain, index) == (void*)(intptr_t)(stamp + 1))
-				continue;
-
-			/* Store the new block stamp. */
-			if (!lialg_u32dic_insert (self->terrain, index, (void*)(intptr_t)(stamp + 1)))
-				continue;
-
-			/* Create an event. */
-			limai_program_event (self->module->program, "vision-voxel-block-changed", "vision", LIMAI_FIELD_INT, self->external_id, "index", LIMAI_FIELD_INT, index, "stamp", LIMAI_FIELD_INT, stamp, NULL);
-		}
-	}
 }
