@@ -1,4 +1,4 @@
---- TODO:doc
+--- Client options.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -11,9 +11,8 @@
 local Class = require("system/class")
 local ConfigFile = require("system/config-file")
 local Render = require("system/render")
-local Staticobject = require("core/objects/static")
 
---- TODO:doc
+--- Client options.
 -- @type Options
 local Options = Class("Options")
 
@@ -53,6 +52,9 @@ Options.config_keys = {
 	window_height = {"Window height", "int", 32, 65536},
 	window_width = {"Window width", "int", 32, 65536}}
 
+--- Creates the options.
+-- @param clss Options class.
+-- @return Options.
 Options.new = function(clss)
 	-- Initialize defaults.
 	local self = Class.new(clss)
@@ -138,6 +140,8 @@ Options.new = function(clss)
 	return self
 end
 
+--- Applies the options.
+-- @param self Options.
 Options.apply = function(self)
 	-- Set the anisotropic filter.
 	Render:set_anisotrophy(self.anisotropic_filter)
@@ -174,23 +178,30 @@ Options.apply = function(self)
 	end
 end
 
+--- Applies rendering settings to an object.
+-- @param self Options.
+-- @param object Object.
 Options.apply_object = function(self, object)
-	if object.class == Staticobject then
+	local spec = object.spec
+	if not spec then return end
+	if spec.type == "static" then
 		if self.landmark_view_distance < 10 then
 			object.render:set_render_distance(self.landmark_view_distance * 50)
 		else
 			object.render:set_render_distance(nil)
 		end
 		object.render:set_shadow_casting(self.shadow_casting_obstacles)
-	elseif object.class == Obstacle then
+	elseif spec.type == "obstacle" then
 		object.render:set_shadow_casting(self.shadow_casting_obstacles)
-	elseif object.class == Actor then
+	elseif spec.type == "actor" then
 		object.render:set_shadow_casting(self.shadow_casting_actors)
 	else
 		object.render:set_shadow_casting(self.shadow_casting_items)
 	end
 end
 
+--- Saves the options.
+-- @param self Options.
 Options.save = function(self)
 	-- Get the sorted list of options.
 	local options = {}
@@ -206,5 +217,3 @@ Options.save = function(self)
 end
 
 return Options
-
-
