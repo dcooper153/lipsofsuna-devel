@@ -66,7 +66,8 @@ Generator.generate = function(self, args)
 	Server.serialize:save_generator(true)
 	Server.serialize:save_markers(true)
 	Main.quests:reset()
-	Server.account_database:save_accounts(true)
+	Server.account_database:reset_characters()
+	Server.account_database:save_accounts()
 	Server.object_database:clear_world_decay()
 	-- Discard events emitted during map generation so that they
 	-- don't trigger when the game starts.

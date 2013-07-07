@@ -9,7 +9,7 @@
 -- @alias Server
 
 local Class = require("system/class")
-local AccountDatabase = require(Mod.path .. "account-database")
+local AccountDatabase = require("core/account/account-database")
 local Database = require("system/database")
 local DialogManager = require("core/dialog/dialog-manager")
 local GlobalEventManager = require(Mod.path .. "global-event-manager")

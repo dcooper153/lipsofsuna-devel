@@ -1,17 +1,16 @@
---- TODO:doc
+--- Player account.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.server.account
+-- @module core.account.account
 -- @alias Account
 
 local Class = require("system/class")
-local Password = require("system/password")
 
---- TODO:doc
+--- Player account.
 -- @type Account
 local Account = Class("Account")
 
@@ -37,5 +36,3 @@ Account.new = function(clss, login, password, permissions, character, spawnpoint
 end
 
 return Account
-
-
