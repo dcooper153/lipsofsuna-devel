@@ -13,6 +13,7 @@ local AccountDatabase = require(Mod.path .. "account-database")
 local Database = require("system/database")
 local DialogManager = require("core/dialog/dialog-manager")
 local GlobalEventManager = require(Mod.path .. "global-event-manager")
+local Hooks = require("system/hooks")
 local Log = require(Mod.path .. "log")
 local Marker = require("core/marker")
 local Modifier = require("core/server/modifier")
@@ -31,6 +32,7 @@ local UnlockManager = require(Mod.path .. "unlock-manager")
 Server = Class("Server")
 
 Server.init = function(self, multiplayer, client)
+	self.login_hooks = Hooks()
 	self.log = Log()
 	self.config = ServerConfig()
 	Main.dialogs = DialogManager()
@@ -169,6 +171,8 @@ Server.authenticate_client = function(self, client, login, pass)
 	if not object then
 		Main.messaging:server_event("start character creation", client)
 	end
+	-- Invoke login hooks.
+	self.login_hooks:call(account)
 end
 
 Server.spawn_player = function(self, player, client, spawnpoint)

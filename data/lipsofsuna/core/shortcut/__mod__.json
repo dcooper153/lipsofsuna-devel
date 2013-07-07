@@ -1,4 +1,4 @@
 {
 	"server": false,
-	"scripts": ["main", "bindings"]
+	"scripts": ["main", "bindings", "message-shortcut"]
 }

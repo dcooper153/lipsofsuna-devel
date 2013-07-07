@@ -56,7 +56,17 @@ end
 -- @param index Shortcut index.
 ShortcutManager.clear_shortcut = function(self, index)
 	self.__shortcuts[index] = nil
-	-- TODO: Sync with server.
+	Main.messaging:client_event("shortcut", index)
+end
+
+--- Loads the shortcuts from data obtained from the server.
+-- @param self ShortcutManager.
+-- @param shortcuts Table of shortcuts.
+ShortcutManager.load_shortcuts = function(self, shortcuts)
+	self.__shortcuts = {}
+	for k,v in pairs(shortcuts) do
+		self.__shortcuts[k] = {v[1], v[2]}
+	end
 end
 
 --- Invokes a shortcut.
@@ -111,7 +121,7 @@ end
 -- @param action ActionSpec name.
 ShortcutManager.record_shortcut = function(self, index, item, action)
 	self.__shortcuts[index] = {item, action}
-	-- TODO: Sync with server.
+	Main.messaging:client_event("shortcut", index, item, action)
 end
 
 --- Updates the shortcuts after an inventory item move.
