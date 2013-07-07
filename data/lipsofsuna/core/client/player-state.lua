@@ -53,11 +53,11 @@ PlayerState.update = function(self, secs)
 	if Client.player_object and not Client.player_object.dead then
 		local spec = Client.player_object.spec
 		-- Update turning.
-		self.turn_state = self.turn_state + self.turn_speed * secs
+		self.turn_state = self.turn_state + self.turn_speed
 		self.turn_state = MathUtils:radian_wrap(self.turn_state)
 		self.turn_speed = 0
 		-- Update tilting.
-		self.tilt_state = self.tilt_state + self.tilt_speed * secs
+		self.tilt_state = self.tilt_state + self.tilt_speed
 		if spec then
 			self.tilt_state = math.min(spec.tilt_limit, self.tilt_state)
 			self.tilt_state = math.max(-spec.tilt_limit, self.tilt_state)

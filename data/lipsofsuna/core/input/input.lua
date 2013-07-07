@@ -24,6 +24,7 @@ local Input = Class("Input")
 Input.new = function(clss)
 	local self = Class.new(clss)
 	self.mods = 0
+	self.mouse_motion_max = 150
 	self.mouse_sensitivity_x = 0.5
 	self.mouse_sensitivity_y = 0.3
 	self.pressed = {}
@@ -42,6 +43,14 @@ end
 -- @param self Input.
 -- @param args Event.
 Input.event = function(self, args)
+	-- Filter out insane jumps in mouse input.
+	if args.type == "mousemotion" then
+		local m = self.mouse_motion_max
+		args.dx = math.max(args.dx, -m)
+		args.dx = math.min(args.dx, m)
+		args.dy = math.max(args.dy, -m)
+		args.dy = math.min(args.dy, m)
+	end
 	-- Maintain key states.
 	if args.type == "keypress" then
 		args.time = Program:get_time() + 0.25

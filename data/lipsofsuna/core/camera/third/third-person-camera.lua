@@ -138,11 +138,11 @@ ThirdPersonCamera.update = function(self, secs)
 		self.timer = self.timer - self.tick
 		if self.rotation_mode then
 			-- Update turning.
-			self.turn_state = self.turn_state + self.turn_speed * self.tick
+			self.turn_state = self.turn_state + self.turn_speed
 			self.turn_state = MathUtils:radian_wrap(self.turn_state)
 			self.turn_speed = 0
 			-- Update tilting.
-			self.tilt_state = self.tilt_state - self.tilt_speed * self.tick
+			self.tilt_state = self.tilt_state - self.tilt_speed
 			self.tilt_state = MathUtils:radian_wrap(self.tilt_state)
 			self.tilt_speed = 0
 		else
