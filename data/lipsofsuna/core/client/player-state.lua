@@ -9,18 +9,8 @@
 -- @alias PlayerState
 
 local Class = require("system/class")
+local MathUtils = require("system/math/utils")
 local Simulation = require("core/client/simulation")
-
-local radian_wrap = function(x)
-	local y = x
-	while y < -math.pi do
-		y = y + 2 * math.pi
-	end
-	while y > math.pi do
-		y = y - 2 * math.pi
-	end
-	return y
-end
 
 --- Manages the local player state.
 -- @type PlayerState
@@ -64,7 +54,7 @@ PlayerState.update = function(self, secs)
 		local spec = Client.player_object.spec
 		-- Update turning.
 		self.turn_state = self.turn_state + self.turn_speed * secs
-		self.turn_state = radian_wrap(self.turn_state)
+		self.turn_state = MathUtils:radian_wrap(self.turn_state)
 		self.turn_speed = 0
 		-- Update tilting.
 		self.tilt_state = self.tilt_state + self.tilt_speed * secs

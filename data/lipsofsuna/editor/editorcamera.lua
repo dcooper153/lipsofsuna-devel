@@ -11,14 +11,9 @@
 local Camera = require("system/camera")
 local Class = require("system/class")
 local Physics = require("system/physics")
+local MathUtils = require("system/math/utils")
 local Quaternion = require("system/math/quaternion")
 local Vector = require("system/math/vector")
-
-local radian_wrap = function(x)
-	if x < -math.pi then return x + 2 * math.pi
-	elseif x > math.pi then return x - 2 * math.pi
-	else return x end
-end
 
 --- TODO:doc
 -- @type EditorCamera
@@ -66,8 +61,8 @@ EditorCamera.get_velocity = function(self)
 end
 
 EditorCamera.rotate = function(self, turn, tilt)
-	self.own_turn = radian_wrap(self.own_turn + turn)
-	self.own_tilt = radian_wrap(self.own_tilt - tilt)
+	self.own_turn = MathUtils:radian_wrap(self.own_turn + turn)
+	self.own_tilt = MathUtils:radian_wrap(self.own_tilt - tilt)
 	self.own_rot = Quaternion{euler = {self.own_turn, 0, self.own_tilt}}
 end
 

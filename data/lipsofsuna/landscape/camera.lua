@@ -10,14 +10,9 @@
 
 local Camera = require("system/camera")
 local Class = require("system/class")
+local MathUtils = require("system/math/utils")
 local Quaternion = require("system/math/quaternion")
 local Vector = require("system/math/vector")
-
-local radian_wrap = function(x)
-	if x < -math.pi then return x + 2 * math.pi
-	elseif x > math.pi then return x - 2 * math.pi
-	else return x end
-end
 
 --- Camera for the landscape subgame.
 -- @type LandscapeCamera
@@ -68,11 +63,11 @@ LandscapeCamera.update = function(self, secs)
 	self:set_target_position(self.position)
 	-- Update the rotation.
 	if self.turn_speed then
-		self.turning = radian_wrap(self.turning - 0.1 * self.turn_speed)
+		self.turning = MathUtils:radian_wrap(self.turning - 0.1 * self.turn_speed)
 		self.turn_speed = 0
 	end
 	if self.tilt_speed then
-		self.tilting = radian_wrap(self.tilting - 0.1 * self.tilt_speed)
+		self.tilting = MathUtils:radian_wrap(self.tilting - 0.1 * self.tilt_speed)
 		self.tilt_speed = 0
 	end
 	self.rotation = Quaternion:new_from_euler(self.turning, 0, self.tilting)

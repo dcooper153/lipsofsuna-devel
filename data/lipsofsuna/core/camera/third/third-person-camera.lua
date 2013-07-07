@@ -10,17 +10,12 @@
 
 local Camera = require("system/camera")
 local Class = require("system/class")
+local MathUtils = require("system/math/utils")
 local Physics = require("system/physics")
 
 --- Third person camera.
 -- @type ThirdPersonCamera
 local ThirdPersonCamera = Class("ThirdPersonCamera", Camera)
-
-local radian_wrap = function(x)
-	if x < -math.pi then return x + 2 * math.pi
-	elseif x > math.pi then return x - 2 * math.pi
-	else return x end
-end
 
 --- Creates a new third person camera.
 -- @param clss Third person camera class.
@@ -144,11 +139,11 @@ ThirdPersonCamera.update = function(self, secs)
 		if self.rotation_mode then
 			-- Update turning.
 			self.turn_state = self.turn_state + self.turn_speed * self.tick
-			self.turn_state = radian_wrap(self.turn_state)
+			self.turn_state = MathUtils:radian_wrap(self.turn_state)
 			self.turn_speed = 0
 			-- Update tilting.
 			self.tilt_state = self.tilt_state - self.tilt_speed * self.tick
-			self.tilt_state = radian_wrap(self.tilt_state)
+			self.tilt_state = MathUtils:radian_wrap(self.tilt_state)
 			self.tilt_speed = 0
 		else
 			-- Reset mouse look.
