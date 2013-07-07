@@ -35,7 +35,7 @@ ShortcutManager.activate = function(self, index)
 	-- Record if an inventory item was active.
 	local w = Ui:get_focused_widget()
 	if w and w.class_name == "UiInvItem" then
-		if w.inventory_id == id and w.item and w.index then
+		if w.inventory_id == id and w.index then
 			Client:append_log(string.format("Shortcut #%d set to use item #%d.", index, w.index))
 			self:record_shortcut(index, w.index, "auto")
 			return
