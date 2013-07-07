@@ -1,8 +1,8 @@
 local Coroutine = require("system/coroutine")
-local Material = require("system/material")
 local Physics = require("system/physics")
 
 local perform_attack = function(attacker)
+	do return end --FIXME
 	local weapon = attacker:get_weapon()
 	if not weapon then return end
 	Coroutine(function(t)

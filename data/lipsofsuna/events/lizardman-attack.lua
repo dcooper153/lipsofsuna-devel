@@ -1,4 +1,5 @@
 local count_monsters = function(sector, objects)
+	do return 0 end --FIXME
 	if not Server.generator:is_overworld_sector_by_id(sector) then return 0 end
 	local monsters = math.random(1, 2)
 	for k,obj in pairs(objects) do
@@ -28,6 +29,7 @@ Globaleventspec{
 		event.silence_time = math.random(1000, 3000)
 	end,
 	update = function(self, event, secs)
+		do return end --FIXME
 		-- Wait for the silence time to end.
 		if event.start_time then return end
 		if event.silence_time and event.silence_time > 0 then return end

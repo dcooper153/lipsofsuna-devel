@@ -1,5 +1,3 @@
-local Material = require("system/material")
-
 Ui:add_state{
 	state = "editor",
 	root = "editor",

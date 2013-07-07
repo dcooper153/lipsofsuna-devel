@@ -1,4 +1,3 @@
-local Material = require("system/material")
 local ModifierSpec = require("core/specs/modifier")
 local Obstacle = require("core/objects/obstacle")
 

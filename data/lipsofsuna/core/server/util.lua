@@ -11,7 +11,6 @@
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Item = require("core/objects/item")
-local Material = require("system/material")
 local Sector = require("system/sector")
 local Vector = require("system/math/vector")
 

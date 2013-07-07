@@ -9,7 +9,6 @@
 -- @alias Generator
 
 local Class = require("system/class")
-local Material = require("system/material")
 local Marker = require("core/marker")
 local Network = require("system/network")
 local Region = require("landscape/generator/region")
@@ -19,18 +18,17 @@ local Staticobject = require("core/objects/static")
 
 --- Landscape generator.
 -- @type Generator
-Generator = Class("Generator")
-Generator.map_size = Vector(1000, 1000, 1000)
-Generator.map_start = Vector(600, 600, 600) - Generator.map_size * 0.5
-Generator.map_end = Vector(600, 600, 600) + Generator.map_size * 0.5
-Generator.map_version = "7"
-Generator.sector_types = {}
+local Generator = Class("Generator")
 
 --- Creates a new map generator.
 -- @param clss Generator class.
 -- @return Generator.
 Generator.new = function(clss)
 	local self = Class.new(Generator)
+	self.map_size = Vector(1000, 1000, 1000)
+	self.map_start = Vector(600, 600, 600) - self.map_size * 0.5
+	self.map_end = Vector(600, 600, 600) + self.map_size * 0.5
+	self.map_version = "7"
 	-- Initialize random seeds.
 	self.seed1 = math.random(10000, 60000)
 	self.seed2 = math.random(10000, 60000)
@@ -160,4 +158,4 @@ Generator.is_overworld_sector_by_point = function(self, point)
 	return tile_y > 1000
 end
 
-
+return Generator

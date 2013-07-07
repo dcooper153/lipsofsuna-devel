@@ -38,6 +38,7 @@ end
 --- Loads map generator data from the database.
 -- @param clss Serialize class.
 Serialize.load_generator = function(clss)
+	do return end --FIXME
 	-- Load settings.
 	local r1 = clss.db:query("SELECT key,value FROM generator_settings;")
 	local f1 = {
@@ -86,6 +87,7 @@ end
 -- @param clss Serialize class.
 -- @param erase True to erase existing database entries first.
 Serialize.save_generator = function(clss, erase)
+	do return end -- FIXME
 	clss.db:query("BEGIN TRANSACTION;")
 	if erase then
 		clss.db:query("DELETE FROM generator_settings;")

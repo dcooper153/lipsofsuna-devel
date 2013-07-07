@@ -60,8 +60,6 @@ Server.init = function(self, multiplayer, client)
 		self.object_database:reset()
 		Server.serialize:set_value("object_version", self.serialize.object_version)
 	end
-	-- Initialize the map generator.
-	self.generator = Generator()
 	-- Initialize the event manager.
 	self.events = GlobalEventManager()
 	-- Enable physics simulation.
@@ -86,7 +84,6 @@ Server.deinit = function(self)
 	self.account_database = nil
 	self.object_database = nil
 	Main.quests = nil
-	self.generator = nil
 	self.events = nil
 	collectgarbage()
 	-- Mark as uninitialized.
@@ -98,8 +95,8 @@ Server.load = function(self)
 	-- Initialize the heightmap.
 	if Map then Map:init() end
 	-- Generate the map.
-	if Settings.generate or self.serialize:get_value("map_version") ~= self.generator.map_version then
-		self.generator:generate()
+	if Settings.generate then --FIXME:or self.serialize:get_value("map_version") ~= self.generator.map_version then
+		--self.generator:generate()
 		self.unlocks:save()
 		self.serialize:set_value("data_version", self.serialize.data_version)
 	else
