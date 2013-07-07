@@ -35,7 +35,7 @@ serialize = function(val)
 			for k,v in pairs(val) do
 				local ks
 				local vs = serialize(v)
-				if string.match(k, "[^a-zA-Z_]") then
+				if type(k) ~= "string" or string.match(k, "[^a-zA-Z_]") then
 					ks = string.format("[%s]", serialize(k))
 				else
 					ks = k
@@ -57,6 +57,17 @@ serialize = function(val)
 		-- Default to nil for others.
 		return "nil"
 	end
+end
+
+--- Deserializes the value.
+-- @param value String.
+-- @return Value.
+Serialize.read = function(self, value)
+	local func,err = loadstring("return " .. value)
+	if not func then return end
+	local ok,ret = pcall(func)
+	if not ok then return end
+	return ret
 end
 
 --- Serializes the value.

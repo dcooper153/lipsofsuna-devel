@@ -13,8 +13,7 @@ local Coroutine = require("system/coroutine")
 local Item = require("core/objects/item")
 local Physics = require("system/physics")
 local Marker = require("core/marker")
-local ObjectSerializer = require("core/server/object-serializer")
-local Serialize = require("system/serialize")
+local Serializer = require("system/serializer")
 local SimulationObject = require("core/objects/simulation")
 local Skills = require("core/server/skills")
 local Stats = require("core/server/stats")
@@ -23,7 +22,7 @@ local Timer = require("system/timer")
 --- TODO:doc
 -- @type Actor
 local Actor = Class("Actor", SimulationObject)
-Actor.serializer = ObjectSerializer{
+Actor.serializer = Serializer{
 	{
 		name = "angular",
 		type = "vector",

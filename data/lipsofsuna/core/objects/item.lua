@@ -9,13 +9,13 @@
 -- @alias Item
 
 local Class = require("system/class")
-local ObjectSerializer = require("core/server/object-serializer")
+local Serializer = require("system/serializer")
 local SimulationObject = require("core/objects/simulation")
 
 --- Item object.
 -- @type Item
 local Item = Class("Item", SimulationObject)
-Item.serializer = ObjectSerializer{
+Item.serializer = Serializer{
 	{
 		name = "angular",
 		type = "vector",

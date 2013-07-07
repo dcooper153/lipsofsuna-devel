@@ -9,14 +9,14 @@
 -- @alias Staticobject
 
 local Class = require("system/class")
-local ObjectSerializer = require("core/server/object-serializer")
 local Marker = require("core/marker")
+local Serializer = require("system/serializer")
 local SimulationObject = require("core/objects/simulation")
 
 --- TODO:doc
 -- @type Staticobject
 local Staticobject = Class("Staticobject", SimulationObject)
-Staticobject.serializer = ObjectSerializer{
+Staticobject.serializer = Serializer{
 	{
 		name = "position",
 		type = "vector",

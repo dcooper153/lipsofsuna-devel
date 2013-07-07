@@ -1,8 +1,8 @@
-Unittest:add(1, "lipsofsuna", "object serializer: encoding", function()
-	local ObjectSerializer = require("core/server/object-serializer")
+Unittest:add(1, "lipsofsuna", "serializer: encoding", function()
+	local Serializer = require("system/serializer")
 	local Quaternion = require("system/math/quaternion")
 	local Vector = require("system/math/vector")
-	local s = ObjectSerializer{}
+	local s = Serializer{}
 	-- Boolean.
 	assert(s:encode_value("boolean", true) == "true")
 	assert(s:decode_value("boolean", "true") == true)
@@ -39,11 +39,18 @@ Unittest:add(1, "lipsofsuna", "object serializer: encoding", function()
 	assert(tostring(res4) == "Quaternion(1,2.2,3,4.44)")
 	assert(s:decode_value("quaternion", "1,2.2,3") == nil)
 	assert(s:decode_value("quaternion", "1,2.2,3,4.44,5") == nil)
+	-- Arbitrary.
+	local tmp5 = s:encode_value("lua", {"a", test = 2, [true] = false})
+	assert(type(tmp5) == "string")
+	local res5 = s:decode_value("lua", tmp5)
+	assert(res5[1] == "a")
+	assert(res5["test"] == 2)
+	assert(res5[true] == false)
 end)
 
-Unittest:add(1, "lipsofsuna", "object serializer: read", function()
-	local ObjectSerializer = require("core/server/object-serializer")
-	local s = ObjectSerializer{
+Unittest:add(1, "lipsofsuna", "serializer: read", function()
+	local Serializer = require("system/serializer")
+	local s = Serializer{
 		{name = "foo", type = "string"},
 		{name = "test", type = "vector", set = function(o, v) o.test,o.extra = v,"ok" end}}
 	local obj = {}
@@ -53,10 +60,10 @@ Unittest:add(1, "lipsofsuna", "object serializer: read", function()
 	assert(obj.extra == "ok")
 end)
 
-Unittest:add(1, "lipsofsuna", "object serializer: write", function()
-	local ObjectSerializer = require("core/server/object-serializer")
+Unittest:add(1, "lipsofsuna", "serializer: write", function()
+	local Serializer = require("system/serializer")
 	local Vector = require("system/math/vector")
-	local s = ObjectSerializer{
+	local s = Serializer{
 		{name = "test", type = "vector"}}
 	local hits = 0
 	s:write({test = Vector(1,2.2,3.33)}, function(name, value)

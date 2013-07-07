@@ -11,13 +11,13 @@
 local Class = require("system/class")
 local Item = require("core/objects/item")
 local Marker = require("core/marker")
-local ObjectSerializer = require("core/server/object-serializer")
+local Serializer = require("system/serializer")
 local SimulationObject = require("core/objects/simulation")
 
 --- TODO:doc
 -- @type Obstacle
 local Obstacle = Class("Obstacle", SimulationObject)
-Obstacle.serializer = ObjectSerializer{
+Obstacle.serializer = Serializer{
 	{
 		name = "angular",
 		type = "vector",
