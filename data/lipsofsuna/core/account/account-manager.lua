@@ -24,6 +24,8 @@ local AccountManager = Class("AccountManager")
 AccountManager.new = function(clss)
 	local self = Class.new(clss)
 	self.serializer = Serializer{}
+	self.__accounts_by_client = {}
+	self.__accounts_by_login = setmetatable({}, {__mode = "v"})
 	self.__version = "2"
 	self.__salt = Password:random_salt()
 	return self
@@ -31,12 +33,15 @@ end
 
 --- Creates an empty account.
 -- @param self AccountManager.
+-- @param client Client.
 -- @param login Login name.
 -- @param password Password.
 -- @return Account.
-AccountManager.create_account = function(self, login, password)
+AccountManager.create_account = function(self, client, login, password)
 	local hash = self:hash_password(login, password)
-	local account = Account(login, hash)
+	local account = Account(client, login, hash)
+	self.__accounts_by_client[client] = account
+	self.__accounts_by_login[login] = account
 	self:save_account(account)
 	return account
 end
@@ -52,13 +57,32 @@ end
 
 --- Loads or creates an account.
 -- @param self AccountManager.
+-- @param client Client.
 -- @param login Login name.
 -- @param password Password.
 -- @return Account or nil, status message or nil.
-AccountManager.load_account = function(self, login, password)
+AccountManager.load_account = function(self, client, login, password)
 	local hash = self:hash_password(login, password)
-	local account = Account(login, hash)
+	local account = Account(client, login, hash)
+	self.__accounts_by_client[client] = account
+	self.__accounts_by_login[login] = account
 	return account, "login successful"
+end
+
+--- Logs out a client.
+-- @param self AccountManager.
+-- @param client Client.
+-- @param object Object to save as a character. Nil to save no character.
+AccountManager.logout_client = function(self, client, object)
+	-- Find the account.
+	local account = self.__accounts_by_client[client]
+	if not account then return end
+	-- Save the account if the character was removed.
+	if not object then self:save_account(account) end
+	-- Remove the account.
+	account.client = nil
+	self.__accounts_by_client[client] = nil
+	self.__accounts_by_login[account.login] = nil
 end
 
 --- Resets the account database.
@@ -89,6 +113,22 @@ AccountManager.save_accounts = function(self)
 	for k,v in pairs(Server.players_by_client) do
 		self:save_account(v.account, v)
 	end
+end
+
+--- Gets an active account by client.
+-- @param self AccountManager.
+-- @param value Client.
+-- @return Account if found. Nil otherwise.
+AccountManager.get_account_by_client = function(self, value)
+	return self.__accounts_by_client[value]
+end
+
+--- Gets an active account by client.
+-- @param self AccountManager.
+-- @param value Login name.
+-- @return Account if found. Nil otherwise.
+AccountManager.get_account_by_login = function(self, value)
+	return self.__accounts_by_login[value]
 end
 
 --- Gets an account option.

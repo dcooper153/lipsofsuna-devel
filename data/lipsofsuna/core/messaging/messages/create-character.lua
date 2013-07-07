@@ -93,7 +93,7 @@ Main.messaging:register_message{
 	end,
 	client_to_server_handle = function(self, client, char)
 		-- Make sure the client has been authenticated.
-		local account = Server.accounts_by_client[client]
+		local account = Server.account_database:get_account_by_client(client)
 		if not account then return end
 		-- Make sure not created already.
 		local player = Server:get_player_by_client(client)

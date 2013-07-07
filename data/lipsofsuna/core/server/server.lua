@@ -40,8 +40,6 @@ Server.init = function(self, multiplayer, client)
 	self.initialized = true
 	self.multiplayer = multiplayer
 	self.client = client
-	self.accounts_by_client = {}
-	self.accounts_by_name = setmetatable({}, {__mode = "v"})
 	self.players_by_client = {}
 	self.trading = Trading()
 	-- Initialize the databases.
@@ -80,8 +78,6 @@ Server.deinit = function(self)
 	self.log = nil
 	self.config = nil
 	Main.dialogs = nil
-	self.accounts_by_client = nil
-	self.accounts_by_name = nil
 	self.players_by_client = nil
 	self.trading = nil
 	self.config = nil
@@ -125,29 +121,25 @@ end
 
 Server.authenticate_client = function(self, client, login, pass)
 	-- Make sure not authenticated already.
-	local account = self.accounts_by_client[client]
+	local account = self.account_database:get_account_by_client(client)
 	if account then return end
 	-- Make sure not logging in twice.
-	account = self.accounts_by_name[login]
+	account = self.account_database:get_account_by_login(login)
 	if account then
 		self.log:format("Client login from %q failed: account already in use.", self:get_client_address(client))
 		Main.messaging:server_event("login failed", client, "The account is already in use.")
 		return
 	end
 	-- Load or create an account.
-	local account,message = self.account_database:load_account(login, pass)
+	local account,message = self.account_database:load_account(client, login, pass)
 	if not account then
 		if message then
 			self.log:format("Client login from %q failed: %s.", self:get_client_address(client), message)
 			Main.messaging:server_event("login failed", client, "Invalid account name or password.")
 			return
 		end
-		account = self.account_database:create_account(login, pass)
+		account = self.account_database:create_account(client, login, pass)
 	end
-	-- Associate the account to the client.
-	account.client = client
-	self.accounts_by_name[login] = account
-	self.accounts_by_client[client] = account
 	-- Log the successful login.
 	self.log:format("Client login from %q using account %q.", self:get_client_address(client), login)
 	-- Create existing characters.

@@ -16,22 +16,17 @@ local Account = Class("Account")
 
 --- Loads or creates an account.
 -- @param clss Account class.
+-- @param client Client.
 -- @param login Login name.
 -- @param password Hashed password.
--- @param permissions Permission mask, or nil.
--- @param character Character string, or nil.
--- @param spawnpoint Spawn point string, or nil.
 -- @return Account.
-Account.new = function(clss, login, password, permissions, character, spawnpoint)
+Account.new = function(clss, client, login, password)
 	local self = Class.new(clss)
+	self.client = client
 	self.login = login
 	self.password = password
-	self.permissions = permissions or 0
-	self.character = character
-	if spawnpoint then
-		local ok,vec = pcall(loadstring("return " .. spawnpoint))
-		if ok then self.spawn_point = vec end
-	end
+	self.permissions = 0
+	self.character = nil
 	return self
 end
 

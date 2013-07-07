@@ -11,6 +11,7 @@
 local Account = require("core/account/account")
 local AccountManager = require("core/account/account-manager")
 local Class = require("system/class") 
+local Serialize = require("system/serialize") 
 
 --- Account database.
 -- @type AccountDatabase
@@ -35,10 +36,11 @@ end
 
 --- Loads an account from the account database.
 -- @param self AccountDatabase.
+-- @param client Client.
 -- @param login Login name.
 -- @param password Password.
 -- @return Account or nil, status message or nil.
-AccountDatabase.load_account = function(self, login, password)
+AccountDatabase.load_account = function(self, client, login, password)
 	-- Load the account data.
 	local r = self.__db:query(
 		[[SELECT login,password,permissions,character,spawn_point
@@ -49,7 +51,10 @@ AccountDatabase.load_account = function(self, login, password)
 	local hash = self:hash_password(login, password)
 	if v[2] ~= hash then return nil, "authentication failed" end
 	-- Create the account.
-	local account = Account(login, hash, v[3], v[4], v[5])
+	local account = AccountManager.load_account(self, client, login, password)
+	account.permission = v[3]
+	account.character = v[4]
+	account.spawn_point = v[5] and Serialize:read(v[5])
 	-- Load the fields.
 	local rows = self.__db:query(
 		[[SELECT name,value FROM account_fields WHERE account=?]], {login})
