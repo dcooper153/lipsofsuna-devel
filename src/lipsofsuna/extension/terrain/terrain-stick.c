@@ -109,6 +109,20 @@ void liext_terrain_stick_clamp_vertices_bottom (
 }
 
 /**
+ * \brief Clears the stick data.
+ * \param self Terrain stick.
+ */
+void liext_terrain_stick_clear (
+	LIExtTerrainStick* self)
+{
+	memset (self, 1, sizeof (LIExtTerrainStick));
+	self->vertices[0][0].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
+	self->vertices[1][0].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
+	self->vertices[0][1].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
+	self->vertices[1][1].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
+}
+
+/**
  * \brief Copies the vertices from another stick.
  * \param self Terrain stick.
  * \param src Terrain stick.

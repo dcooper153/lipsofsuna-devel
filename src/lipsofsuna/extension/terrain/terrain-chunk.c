@@ -201,12 +201,20 @@ int liext_terrain_chunk_add_stick_corners (
 /**
  * \brief Builds the model of the chunk.
  * \param self Terrain chunk.
+ * \param chunk_back Neighbour chunk used for culling.
+ * \param chunk_front Neighbour chunk used for culling.
+ * \param chunk_left Neighbour chunk used for culling.
+ * \param chunk_right Neighbour chunk used for culling.
  * \param grid_size Grid size.
  * \param offset Offset of the chunk, in world units.
  * \return Nonzero on success, zero on failure.
  */
 int liext_terrain_chunk_build_model (
 	LIExtTerrainChunk* self,
+	LIExtTerrainChunk* chunk_back,
+	LIExtTerrainChunk* chunk_front,
+	LIExtTerrainChunk* chunk_left,
+	LIExtTerrainChunk* chunk_right,
 	float              grid_size,
 	const LIMatVector* offset)
 {
@@ -220,41 +228,62 @@ int liext_terrain_chunk_build_model (
 	LIMatTransform transform;
 	LIMatVector pos;
 	LIMdlBuilder* builder;
+	LIExtTerrainStick stick_infinite;
+	LIExtTerrainColumn column_infinite;
 
 	/* Check if changes are needed. */
 	if (self->stamp == self->stamp_model)
 		return 1;
+
+	/* Create a very long column for culling. */
+	liext_terrain_stick_clear (&stick_infinite);
+	stick_infinite.height = 100000000000000000.0f;
+	stick_infinite.material = 1;
+	column_infinite.stamp = 0;
+	column_infinite.stamp_model = 0;
+	column_infinite.sticks = &stick_infinite;
+	column_infinite.model = NULL;
 
 	/* Build the column models. */
 	for (j = 0 ; j < self->size ; j++)
 	{
 		for (i = 0 ; i < self->size ; i++)
 		{
-			/* Get the neighbor sticks. */
-			sticks_back = NULL;
-			sticks_front = NULL;
-			sticks_left = NULL;
-			sticks_right = NULL;
+			/* Get the left neighbor sticks. */
 			if (i > 0)
-			{
 				column = self->columns + (i - 1) + j * self->size;
-				sticks_left = column->sticks;
-			}
+			else if (chunk_left != NULL)
+				column = chunk_left->columns + (self->size - 1) + j * self->size;
+			else
+				column = &column_infinite;
+			sticks_left = column->sticks;
+
+			/* Get the right neighbor sticks. */
 			if (i < self->size - 1)
-			{
 				column = self->columns + (i + 1) + j * self->size;
-				sticks_right = column->sticks;
-			}
+			else if (chunk_right != NULL)
+				column = chunk_right->columns + j * self->size;
+			else
+				column = &column_infinite;
+			sticks_right = column->sticks;
+
+			/* Get the front neighbor sticks. */
 			if (j > 0)
-			{
 				column = self->columns + i + (j - 1) * self->size;
-				sticks_front = column->sticks;
-			}
+			else if (chunk_front != NULL)
+				column = chunk_front->columns + i + (self->size - 1) * self->size;
+			else
+				column = &column_infinite;
+			sticks_front = column->sticks;
+
+			/* Get the back neighbor sticks. */
 			if (j < self->size - 1)
-			{
 				column = self->columns + i + (j + 1) * self->size;
-				sticks_back = column->sticks;
-			}
+			else if (chunk_back != NULL)
+				column = chunk_back->columns + i;
+			else
+				column = &column_infinite;
+			sticks_back = column->sticks;
 
 			/* Build the model. */
 			column = self->columns + i + j * self->size;

@@ -37,6 +37,11 @@ static LIExtTerrainChunkID private_get_chunk_id_and_column (
 	int*          column_x,
 	int*          column_y);
 
+static void private_mark_column_dirty (
+	LIExtTerrain* self,
+	int           grid_x,
+	int           grid_z);
+
 /*****************************************************************************/
 
 /**
@@ -118,6 +123,7 @@ int liext_terrain_add_stick (
 	LIExtTerrainStickFilter filter_func,
 	void*                   filter_data)
 {
+	int ret;
 	int column_x;
 	int column_z;
 	LIExtTerrainChunkID id;
@@ -130,8 +136,20 @@ int liext_terrain_add_stick (
 		return 0;
 
 	/* Add the stick. */
-	return liext_terrain_chunk_add_stick (chunk, column_x, column_z, world_y, world_h,
+	ret = liext_terrain_chunk_add_stick (chunk, column_x, column_z, world_y, world_h,
 		material, filter_func, filter_data);
+
+	/* Mark neighbor chunks dirty on border updates. */
+	if (column_x == 0 && grid_x > 0)
+		private_mark_column_dirty (self, grid_x - 1, grid_z);
+	if (column_x == self->chunk_size - 1)
+		private_mark_column_dirty (self, grid_x + 1, grid_z);
+	if (column_z == 0 && grid_x > 0)
+		private_mark_column_dirty (self, grid_x, grid_z - 1);
+	if (column_z == self->chunk_size - 1)
+		private_mark_column_dirty (self, grid_x, grid_z + 1);
+
+	return ret;
 }
 
 /**
@@ -168,6 +186,7 @@ int liext_terrain_add_stick_corners (
 	LIExtTerrainStickFilter filter_func,
 	void*                   filter_data)
 {
+	int ret;
 	int column_x;
 	int column_z;
 	LIExtTerrainChunkID id;
@@ -180,8 +199,20 @@ int liext_terrain_add_stick_corners (
 		return 0;
 
 	/* Add the stick. */
-	return liext_terrain_chunk_add_stick_corners (chunk, column_x, column_z, bot00, bot10, bot01, bot11, top00, top10, top01, top11,
+	ret = liext_terrain_chunk_add_stick_corners (chunk, column_x, column_z, bot00, bot10, bot01, bot11, top00, top10, top01, top11,
 		material, filter_func, filter_data);
+
+	/* Mark neighbor chunks dirty on border updates. */
+	if (column_x == 0 && grid_x > 0)
+		private_mark_column_dirty (self, grid_x - 1, grid_z);
+	if (column_x == self->chunk_size - 1)
+		private_mark_column_dirty (self, grid_x + 1, grid_z);
+	if (column_z == 0 && grid_x > 0)
+		private_mark_column_dirty (self, grid_x, grid_z - 1);
+	if (column_z == self->chunk_size - 1)
+		private_mark_column_dirty (self, grid_x, grid_z + 1);
+
+	return ret;
 }
 
 /**
@@ -693,6 +724,27 @@ static LIExtTerrainChunkID private_get_chunk_id_and_column (
 	*column_z = grid_z % self->chunk_size;
 
 	return chunk_x + chunk_z * 0xFFFF;
+}
+
+static void private_mark_column_dirty (
+	LIExtTerrain* self,
+	int           grid_x,
+	int           grid_z)
+{
+	int column_x;
+	int column_z;
+	LIExtTerrainChunkID id;
+	LIExtTerrainChunk* chunk;
+	LIExtTerrainColumn* column;
+
+	id = private_get_chunk_id_and_column (self, grid_x, grid_z, &column_x, &column_z);
+	chunk = lialg_u32dic_find (self->chunks, id);
+	if (chunk != NULL)
+	{
+		column = liext_terrain_chunk_get_column (chunk, column_x, column_z);
+		column->stamp++;
+		chunk->stamp++;
+	}
 }
 
 /** @} */
