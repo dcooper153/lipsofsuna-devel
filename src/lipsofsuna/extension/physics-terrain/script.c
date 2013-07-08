@@ -22,6 +22,7 @@
  * @{
  */
 
+#include "lipsofsuna/extension/terrain/module.h"
 #include "module.h"
 
 static void PhysicsTerrain_new (LIScrArgs* args)

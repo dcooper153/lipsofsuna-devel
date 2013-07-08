@@ -22,7 +22,8 @@
  * @{
  */
 
-#include "module.h"
+#include "terrain-column.h"
+#include "terrain-types.h"
 
 #if 0
 #define DEBUGPRINT printf

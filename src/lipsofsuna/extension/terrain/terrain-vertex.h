@@ -15,30 +15,17 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_TERRAIN_MODULE_H__
-#define __EXT_TERRAIN_MODULE_H__
+#ifndef __EXT_TERRAIN_VERTEX_H__
+#define __EXT_TERRAIN_VERTEX_H__
 
-#include "lipsofsuna/extension.h"
-#include "terrain-types.h"
+#include "lipsofsuna/math.h"
 
-struct _LIExtTerrainModule
+typedef struct _LIExtTerrainVertex LIExtTerrainVertex;
+struct _LIExtTerrainVertex
 {
-	LIMaiProgram* program;
+	float offset;
+	float splatting;
+	LIMatVector normal;
 };
-
-LIAPICALL (LIExtTerrainModule*, liext_terrain_module_new, (
-	LIMaiProgram* program));
-
-LIAPICALL (void, liext_terrain_module_free, (
-	LIExtTerrainModule* self));
-
-/*****************************************************************************/
-
-LIAPICALL (void, liext_script_terrain, (
-	LIScrScript* self));
-
-/*****************************************************************************/
-
-LIAPICALL (void, liext_terrain_unittest, ());
 
 #endif

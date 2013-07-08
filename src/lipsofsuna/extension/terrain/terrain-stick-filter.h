@@ -15,30 +15,19 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_TERRAIN_MODULE_H__
-#define __EXT_TERRAIN_MODULE_H__
+#ifndef __EXT_TERRAIN_STICK_FILTER_H__
+#define __EXT_TERRAIN_STICK_FILTER_H__
 
-#include "lipsofsuna/extension.h"
-#include "terrain-types.h"
+#include "terrain-stick.h"
 
-struct _LIExtTerrainModule
-{
-	LIMaiProgram* program;
-};
+typedef int (*LIExtTerrainStickFilter)(LIExtTerrainStick* stick, void* data);
 
-LIAPICALL (LIExtTerrainModule*, liext_terrain_module_new, (
-	LIMaiProgram* program));
+LIAPICALL (int, liext_terrain_stick_filter_id, (
+	LIExtTerrainStick* stick,
+	void*              data));
 
-LIAPICALL (void, liext_terrain_module_free, (
-	LIExtTerrainModule* self));
-
-/*****************************************************************************/
-
-LIAPICALL (void, liext_script_terrain, (
-	LIScrScript* self));
-
-/*****************************************************************************/
-
-LIAPICALL (void, liext_terrain_unittest, ());
+LIAPICALL (int, liext_terrain_stick_filter_mask, (
+	LIExtTerrainStick* stick,
+	void*              data));
 
 #endif

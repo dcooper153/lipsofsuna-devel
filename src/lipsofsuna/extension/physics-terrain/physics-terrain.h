@@ -20,7 +20,7 @@
 
 #include "lipsofsuna/math.h"
 #include "lipsofsuna/extension/physics/ext-module.h"
-#include "lipsofsuna/extension/terrain/module.h"
+#include "lipsofsuna/extension/terrain/terrain.h"
 
 typedef struct _LIExtPhysicsTerrainModule LIExtPhysicsTerrainModule;
 typedef struct _LIExtPhysicsTerrain LIExtPhysicsTerrain;

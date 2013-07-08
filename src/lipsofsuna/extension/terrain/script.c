@@ -23,6 +23,7 @@
  */
 
 #include "module.h"
+#include "terrain.h"
 
 static void Terrain_new (LIScrArgs* args)
 {

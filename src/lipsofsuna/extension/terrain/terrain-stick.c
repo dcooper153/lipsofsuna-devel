@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "module.h"
+#include "terrain-stick.h"
 
 static void private_clamp_vertices (
 	LIExtTerrainStick* self,

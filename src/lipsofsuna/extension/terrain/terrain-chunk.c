@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "module.h"
+#include "terrain-chunk.h"
 
 /**
  * \brief Creates a new terrain chunk.

@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "module.h"
+#include "terrain-column.h"
 #include <btBulletCollisionCommon.h>
 #include <BulletCollision/NarrowPhaseCollision/btGjkConvexCast.h>
 #include <BulletCollision/NarrowPhaseCollision/btSubSimplexConvexCast.h>

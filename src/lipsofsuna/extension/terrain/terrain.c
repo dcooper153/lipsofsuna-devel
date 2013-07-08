@@ -23,6 +23,7 @@
  */
 
 #include "module.h"
+#include "terrain.h"
 
 static LIExtTerrainChunkID private_get_chunk_id (
 	LIExtTerrain* self,

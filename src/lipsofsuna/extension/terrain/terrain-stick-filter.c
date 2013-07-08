@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "module.h"
+#include "terrain-stick-filter.h"
 
 /**
  * \brief Filters sticks that match the material ID.

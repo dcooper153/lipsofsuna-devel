@@ -23,6 +23,7 @@
  */
 
 #include "module.h"
+#include "terrain.h"
 
 /**
  * \brief Performs unittests for the internal algorithms.
