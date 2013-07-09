@@ -23,6 +23,7 @@
  */
 
 #include "terrain-column.h"
+#include "terrain-face-iterator.h"
 #include "terrain-types.h"
 
 #if 0
@@ -593,24 +594,12 @@ int liext_terrain_column_build_model (
 	float u;
 	float v;
 	float y;
-	float y_back;
-	float y_back0;
-	float y_back1;
-	float y_front;
-	float y_front0;
-	float y_front1;
-	float y_left;
-	float y_left0;
-	float y_left1;
-	float y_right;
-	float y_right0;
-	float y_right1;
 	LIExtTerrainStick* stick;
 	LIExtTerrainStick* stick_prev;
-	LIExtTerrainStick* stick_back;
-	LIExtTerrainStick* stick_front;
-	LIExtTerrainStick* stick_left;
-	LIExtTerrainStick* stick_right;
+	LIExtTerrainFaceIterator back;
+	LIExtTerrainFaceIterator front;
+	LIExtTerrainFaceIterator left;
+	LIExtTerrainFaceIterator right;
 	LIExtColumnVertex bot[2][2];
 	LIExtColumnVertex top[2][2];
 	LIMatVector normal;
@@ -673,23 +662,11 @@ int liext_terrain_column_build_model (
 	bot[0][1].normal = normal;
 	bot[1][1].normal = normal;
 
-	/* Initialize the neighbor iteration. */
-	y_back = 0.0f;
-	y_back0 = 0.0f;
-	y_back1 = 0.0f;
-	y_front = 0.0f;
-	y_front0 = 0.0f;
-	y_front1 = 0.0f;
-	y_left = 0.0f;
-	y_left0 = 0.0f;
-	y_left1 = 0.0f;
-	y_right = 0.0f;
-	y_right0 = 0.0f;
-	y_right1 = 0.0f;
-	stick_back = sticks_back;
-	stick_front = sticks_front;
-	stick_left = sticks_left;
-	stick_right = sticks_right;
+	/* Initialize the neighbor face iterators. */
+	liext_terrain_face_iterator_init (&back, sticks_back, 1, 0, 0, 0);
+	liext_terrain_face_iterator_init (&front, sticks_front, 0, 1, 1, 1);
+	liext_terrain_face_iterator_init (&left, sticks_left, 1, 0, 1, 1);
+	liext_terrain_face_iterator_init (&right, sticks_right, 0, 1, 0, 0);
 
 	/* Add the sticks to the builder. */
 	for (stick = self->sticks ; stick != NULL ; stick_prev = stick, stick = stick->next)
@@ -715,8 +692,7 @@ int liext_terrain_column_build_model (
 			u = (stick->material - 1) / 255.0f;
 
 			/* Left face. */
-			if (!private_cull_wall (&stick_left, &y_left, &y_left0, &y_left1,
-						1, 0, 1, 1, &bot[0][0], &bot[0][1], &top[0][0], &top[0][1]))
+			if (!liext_terrain_face_iterator_cull (&left, &bot[0][0].coord, &bot[0][1].coord, &top[0][0].coord, &top[0][1].coord))
 			{
 				v = 0.0f / 5.0f;
 				normal = limat_vector_init (-1.0f, 0.0f, 0.0f);
@@ -728,8 +704,7 @@ int liext_terrain_column_build_model (
 			}
 
 			/* Right face. */
-			if (!private_cull_wall (&stick_right, &y_right, &y_right0, &y_right1,
-						0, 1, 0, 0, &bot[1][1], &bot[1][0], &top[1][1], &top[1][0]))
+			if (!liext_terrain_face_iterator_cull (&right, &bot[1][1].coord, &bot[1][0].coord, &top[1][1].coord, &top[1][0].coord))
 			{
 				v = 1.0f / 5.0f;
 				normal = limat_vector_init (1.0f, 0.0f, 0.0f);
@@ -741,8 +716,7 @@ int liext_terrain_column_build_model (
 			}
 
 			/* Front face. */
-			if (!private_cull_wall (&stick_front, &y_front, &y_front0, &y_front1,
-						0, 1, 1, 1, &bot[0][0], &bot[1][0], &top[0][0], &top[1][0]))
+			if (!liext_terrain_face_iterator_cull (&front, &bot[0][0].coord, &bot[1][0].coord, &top[0][0].coord, &top[1][0].coord))
 			{
 				v = 2.0f / 5.0f;
 				normal = limat_vector_init (0.0f, 0.0f, -1.0f);
@@ -754,8 +728,7 @@ int liext_terrain_column_build_model (
 			}
 
 			/* Back face. */
-			if (!private_cull_wall (&stick_back, &y_back, &y_back0, &y_back1,
-						1, 0, 0, 0, &bot[1][1], &bot[0][1], &top[1][1], &top[0][1]))
+			if (!liext_terrain_face_iterator_cull (&back, &bot[1][1].coord, &bot[0][1].coord, &top[1][1].coord, &top[0][1].coord))
 			{
 				v = 3.0f / 5.0f;
 				normal = limat_vector_init (0.0f, 0.0f, 1.0f);
