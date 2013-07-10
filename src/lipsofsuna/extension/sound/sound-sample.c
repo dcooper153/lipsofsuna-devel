@@ -305,7 +305,7 @@ static int private_load_vorbis (
 	/* Decode the stream. */
 	while (1)
 	{
-		num = ov_read (&vorbis, buffer + pos, len - pos, 0, 2, 1, &bs);
+		num = ov_read (&vorbis, buffer + pos, len - pos, lisys_endian_big (), 2, 1, &bs);
 		if (num <= 0)
 			break;
 		pos += num;
