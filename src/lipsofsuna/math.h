@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,6 +29,8 @@
 #include "lipsofsuna/math/math-matrix.h"
 #include "lipsofsuna/math/math-plane.h"
 #include "lipsofsuna/math/math-polygon.h"
+#include "lipsofsuna/math/math-polygon-2d.h"
+#include "lipsofsuna/math/math-polygon-culler.h"
 #include "lipsofsuna/math/math-quadratic.h"
 #include "lipsofsuna/math/math-quaternion.h"
 #include "lipsofsuna/math/math-rectangle.h"
@@ -36,6 +38,8 @@
 #include "lipsofsuna/math/math-triangle.h"
 #include "lipsofsuna/math/math-unittest.h"
 #include "lipsofsuna/math/math-vector.h"
+#include "lipsofsuna/math/math-vector-2d.h"
 #include "lipsofsuna/math/math-vertex.h"
+#include "lipsofsuna/math/math-vertex-2d.h"
 
 #endif

@@ -66,6 +66,24 @@ static inline int check_transform (LIMatTransform t0, LIMatTransform t1)
 	       check_quaternion (t0.rotation, t1.rotation);
 }
 
+static inline int check_polygon_2d (LIMatPolygon2d* p0, LIMatPolygon2d* p1)
+{
+	int i;
+	LIMatVector2d v0;
+	LIMatVector2d v1;
+
+	if (p0->vertices.count != p1->vertices.count)
+		return 0;
+	for (i = 0 ; i < p0->vertices.count ; i++)
+	{
+		limat_polygon2d_get_coord (p0, i, &v0);
+		limat_polygon2d_get_coord (p1, i, &v1);
+		if (!limat_vector2d_compare (v0, v1, 0.00001f))
+			return 0;
+	}
+	return 1;
+}
+
 static inline void print_quaternion (const char* s, LIMatQuaternion q)
 {
 	printf ("%s: Quaternion({%f,%f,%f,%f})\n",
@@ -98,6 +116,32 @@ static inline void print_dualquat (const char* s, LIMatDualquat dq)
 {
 	printf ("%s: Dualquat({%f,%f,%f,%f}, {%f,%f,%f,%f})\n",
 		s, dq.r.x, dq.r.y, dq.r.z, dq.r.w, dq.d.x, dq.d.y, dq.d.z, dq.d.w);
+}
+
+static inline void print_polygon_2d (const char* s, LIMatPolygon2d* p)
+{
+	int i;
+	LIMatVector2d v;
+
+	printf ("%s: Polygon2d(", s);
+	for (i = 0 ; i < p->vertices.count ; i++)
+	{
+		limat_polygon2d_get_coord (p, i, &v);
+		printf ("{%f,%f}", v.x, v.y);
+		if (i < p->vertices.count - 1)
+			printf (", ");
+	}
+	printf (")\n");
+}
+
+static inline void print_polygon_culler (const char* s, LIMatPolygonCuller* c)
+{
+	int i;
+
+	printf ("%s: PolygonCuller\n", s);
+	print_polygon_2d ("  Remainder", c->remainder);
+	for (i = 0 ; i < c->pieces.count ; i++)
+		print_polygon_2d ("  Polygon  ", c->pieces.array[i]);
 }
 
 /*****************************************************************************/
@@ -825,6 +869,607 @@ static void dualquat_basics ()
 	}
 }
 
+/*****************************************************************************/
+
+static void polygon_culler ()
+{
+	LIMatPolygon2d* expected;
+	LIMatPolygon2d* expected1;
+	LIMatPolygonCuller* culler;
+	LIMatVector2d vtx0[8];
+	LIMatVector2d vtx1[4] =
+	{
+		{ 0.0f, 4.0f },
+		{ 4.0f, 0.0f },
+		{ 4.0f, 19.0f },
+		{ 0.0f, 16.0f },
+	};
+	LIMatVector2d vtx2[4] =
+	{
+		{ 0.0f, 0.0f },
+		{ 4.0f, 0.0f },
+		{ 0.0f, 4.0f },
+		{ 4.0f, 4.0f },
+	};
+
+	printf ("Testing polygon culler...\n");
+
+	/* Subtract none rectangle 1.
+	 * #######    +------------+
+	 * #######   /              \
+	 * #######  /                \
+	 * ####### +------------------+
+	 */
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx1, 4);
+	vtx2[0].y = -8.0f; vtx2[2].y = -2.0f;
+	vtx2[1].y = -8.0f; vtx2[3].y = -2.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 4 ||
+	    culler->pieces.count != 0 ||
+	   !check_polygon_2d (culler->remainder, expected))
+	{
+		printf ("1: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract none rectangle 2.
+	 *      +------------+    #######
+	 *     /              \   #######
+	 *    /                \  #######
+	 *   +------------------+ #######
+	 */
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx1, 4);
+	vtx2[0].y = 20.0f; vtx2[2].y = 26.0f;
+	vtx2[1].y = 20.0f; vtx2[3].y = 26.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 0 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->pieces.array[0], expected))
+	{
+		printf ("2: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected polygon", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract none trapezoid 1.
+	 * ########## +------------+
+	 *  ######## /              \
+	 *   ###### /                \
+	 *    #### +------------------+
+	 */
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx1, 4);
+	vtx2[0].y = -8.0f; vtx2[2].y =  2.0f;
+	vtx2[1].y = -4.0f; vtx2[3].y = -2.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 4 ||
+	    culler->pieces.count != 0 ||
+	   !check_polygon_2d (culler->remainder, expected))
+	{
+		printf ("3: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract none trapezoid 2.
+	 *      +------------+ ##########
+	 *     /              \ ########
+	 *    /                \ ######
+	 *   +------------------+ ####
+	 */
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx1, 4);
+	vtx2[0].y = 17.0f; vtx2[2].y = 30.0f;
+	vtx2[1].y = 20.0f; vtx2[3].y = 26.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 0 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->pieces.array[0], expected))
+	{
+		printf ("4: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected polygon", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract all rectangle.
+	 * #####+############+#####
+	 * ####/##############\####
+	 * ###/################\###
+	 * ##+##################+##
+	 */
+	expected = limat_polygon2d_new (&limat_vtxops_v2, NULL, 0);
+	vtx2[0].y = -2.0f; vtx2[2].y = 21.0f;
+	vtx2[1].y = -2.0f; vtx2[3].y = 21.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 0 ||
+	    culler->pieces.count != 0)
+	{
+		printf ("5: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract all trapezoid 1.
+	 *    ##+############+##
+	 *   ##/##############\##
+	 *  ##/################\##
+	 * ##+##################+##
+	 */
+	expected = limat_polygon2d_new (&limat_vtxops_v2, NULL, 0);
+	vtx2[0].y =  1.0f; vtx2[2].y = 17.0f;
+	vtx2[1].y = -2.0f; vtx2[3].y = 20.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 0 ||
+	    culler->pieces.count != 0)
+	{
+		printf ("6: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract all trapezoid 2.
+	 *      +############+
+	 *     /##############\
+	 *    /################\
+	 *   +##################+
+	 */
+	expected = limat_polygon2d_new (&limat_vtxops_v2, NULL, 0);
+	vtx2[0].y = 4.0f; vtx2[2].y = 16.0f;
+	vtx2[1].y = 0.0f; vtx2[3].y = 19.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 0 ||
+	    culler->pieces.count != 0)
+	{
+		printf ("7: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract bottom rectangle.
+	 * #####+#####-------+
+	 * ####/######        \
+	 * ###/#######         \
+	 * ##+########----------+
+	 */
+	vtx0[0] = limat_vector2d_init (0.0f, 9.0f);
+	vtx0[1] = limat_vector2d_init (4.0f, 9.0f);
+	vtx0[2] = vtx1[2];
+	vtx0[3] = vtx1[3];
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 4);
+	vtx2[0].y = -2.0f; vtx2[2].y = 9.0f;
+	vtx2[1].y = -2.0f; vtx2[3].y = 9.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 4 ||
+	    culler->pieces.count != 0 ||
+	   !check_polygon_2d (culler->remainder, expected))
+	{
+		printf ("8: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract bottom trapezoid.
+	 * #####+##----------+
+	 * ####/####          \
+	 * ###/######          \
+	 * ##+########----------+
+	 */
+	vtx0[0] = limat_vector2d_init (0.0f, 6.0f);
+	vtx0[1] = limat_vector2d_init (4.0f, 9.0f);
+	vtx0[2] = vtx1[2];
+	vtx0[3] = vtx1[3];
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 4);
+	vtx2[0].y = -2.0f; vtx2[2].y = 6.0f;
+	vtx2[1].y = -2.0f; vtx2[3].y = 9.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 4 ||
+	    culler->pieces.count != 0 ||
+	   !check_polygon_2d (culler->remainder, expected))
+	{
+		printf ("9: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract bottom triangle.
+	 * ###  +------------+
+	 * ####/              \
+	 * ###/#               \
+	 * ##+###---------------+
+	 */
+	vtx0[0] = vtx1[0];
+	vtx0[1] = limat_vector2d_init (2.0f, 2.0f);
+	vtx0[2] = limat_vector2d_init (4.0f, 4.0f);
+	vtx0[3] = vtx1[2];
+	vtx0[4] = vtx1[3];
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 5);
+	vtx2[0].y = -2.0f; vtx2[2].y = 0.0f;
+	vtx2[1].y = -2.0f; vtx2[3].y = 4.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 5 ||
+	    culler->pieces.count != 0 ||
+	   !check_polygon_2d (culler->remainder, expected))
+	{
+		printf ("10: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract top rectangle.
+	 *      +-------#####+#####
+	 *     /        ######\####
+	 *    /         #######\###
+	 *   +----------########+##
+	 */
+	vtx0[0] = limat_vector2d_init (0.0f, 11.0f);
+	vtx0[1] = vtx1[0];
+	vtx0[2] = vtx1[1];
+	vtx0[3] = limat_vector2d_init (4.0f, 11.0f);
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 4);
+	vtx2[0].y = 11.0f; vtx2[2].y = 21.0f;
+	vtx2[1].y = 11.0f; vtx2[3].y = 21.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 0 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->pieces.array[0], expected))
+	{
+		printf ("11: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected polygon", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract top trapezoid.
+	 *      +----------##+#####
+	 *     /          ####\####
+	 *    /          ######\###
+	 *   +----------########+##
+	 */
+	vtx0[0] = limat_vector2d_init (0.0f, 14.0f);
+	vtx0[1] = vtx1[0];
+	vtx0[2] = vtx1[1];
+	vtx0[3] = limat_vector2d_init (4.0f, 11.0f);
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 4);
+	vtx2[0].y = 14.0f; vtx2[2].y = 21.0f;
+	vtx2[1].y = 11.0f; vtx2[3].y = 21.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 0 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->pieces.array[0], expected))
+	{
+		printf ("12: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected polygon", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract top triangle.
+	 *      +------------+  ###
+	 *     /              \####
+	 *    /               #\###
+	 *   +---------------###+##
+	 */
+	vtx0[0] = vtx1[0];
+	vtx0[1] = vtx1[1];
+	vtx0[2] = limat_vector2d_init (4.0f, 16.0f);
+	vtx0[3] = limat_vector2d_init (2.0f, 17.5f);
+	vtx0[4] = vtx1[3];
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 5);
+	vtx2[0].y = 19.0f; vtx2[2].y = 21.0f;
+	vtx2[1].y = 16.0f; vtx2[3].y = 21.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 0 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->pieces.array[0], expected))
+	{
+		printf ("13: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected polygon", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract bottom-top triangle.
+	 * ###  +------------+  ###
+	 * ####/              \####
+	 * ###/#              #\###
+	 * ##+###------------###+##
+	 */
+	vtx0[0] = vtx1[0];
+	vtx0[1] = limat_vector2d_init (2.0f, 2.0f);
+	vtx0[2] = limat_vector2d_init (4.0f, 4.0f);
+	vtx0[3] = limat_vector2d_init (4.0f, 16.0f);
+	vtx0[4] = limat_vector2d_init (2.0f, 17.5f);
+	vtx0[5] = vtx1[3];
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 6);
+	vtx2[0].y = -2.0f; vtx2[2].y = 0.0f;
+	vtx2[1].y = -2.0f; vtx2[3].y = 4.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	vtx2[0].y = 19.0f; vtx2[2].y = 21.0f;
+	vtx2[1].y = 16.0f; vtx2[3].y = 21.0f;
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 0 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->pieces.array[0], expected))
+	{
+		printf ("14: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Subtract middle rectangle.
+	 *      +-##########-+
+	 *     /  ##########  \
+	 *    /   ##########   \
+	 *   +----##########----+
+	 */
+	vtx0[0] = limat_vector2d_init (0.0f, 6.0f);
+	vtx0[1] = vtx1[0];
+	vtx0[2] = vtx1[1];
+	vtx0[3] = limat_vector2d_init (4.0f, 6.0f);
+	vtx0[4] = limat_vector2d_init (0.0f, 13.0f);
+	vtx0[5] = limat_vector2d_init (4.0f, 13.0f);
+	vtx0[6] = vtx1[2];
+	vtx0[7] = vtx1[3];
+	expected1 = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 4);
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0 + 4, 4);
+	vtx2[0].y = 6.0f; vtx2[2].y = 13.0f;
+	vtx2[1].y = 6.0f; vtx2[3].y = 13.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 4 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->remainder, expected) ||
+	   !check_polygon_2d (culler->pieces.array[0], expected1))
+	{
+		printf ("15: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+		print_polygon_2d ("Expected polygon  ", expected1);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+	limat_polygon2d_free (expected1);
+
+	/* Subtract middle half-trapezoid 1.
+	 *      +-##########-+
+	 *     /  #########   \
+	 *    /   ########     \
+	 *   +----#######-------+
+	 */
+	vtx0[0] = limat_vector2d_init (0.0f, 6.0f);
+	vtx0[1] = vtx1[0];
+	vtx0[2] = vtx1[1];
+	vtx0[3] = limat_vector2d_init (4.0f, 6.0f);
+	vtx0[4] = limat_vector2d_init (0.0f, 15.0f);
+	vtx0[5] = limat_vector2d_init (4.0f, 13.0f);
+	vtx0[6] = vtx1[2];
+	vtx0[7] = vtx1[3];
+	expected1 = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 4);
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0 + 4, 4);
+	vtx2[0].y = 6.0f; vtx2[2].y = 15.0f;
+	vtx2[1].y = 6.0f; vtx2[3].y = 13.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 4 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->remainder, expected) ||
+	   !check_polygon_2d (culler->pieces.array[0], expected1))
+	{
+		printf ("16: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+		print_polygon_2d ("Expected polygon  ", expected1);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+	limat_polygon2d_free (expected1);
+
+	/* Subtract middle half-trapezoid 2.
+	 *      +-###########+
+	 *     /  ########### \
+	 *    /   ##########   \
+	 *   +----#########-----+
+	 */
+	vtx0[0] = limat_vector2d_init (0.0f, 6.0f);
+	vtx0[1] = vtx1[0];
+	vtx0[2] = vtx1[1];
+	vtx0[3] = limat_vector2d_init (4.0f, 6.0f);
+	vtx0[4] = limat_vector2d_init (4.0f, 13.0f);
+	vtx0[5] = vtx1[2];
+	vtx0[6] = vtx1[3];
+	expected1 = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 4);
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0 + 4, 3);
+	vtx2[0].y = 6.0f; vtx2[2].y = 16.0f;
+	vtx2[1].y = 6.0f; vtx2[3].y = 13.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 3 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->remainder, expected) ||
+	   !check_polygon_2d (culler->pieces.array[0], expected1))
+	{
+		printf ("17: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+		print_polygon_2d ("Expected polygon  ", expected1);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+	limat_polygon2d_free (expected1);
+
+	/* Subtract middle half-trapezoid 3.
+	 *      +-##########-+
+	 *     /   #########  \
+	 *    /     ########   \
+	 *   +-------#######----+
+	 */
+	vtx0[0] = limat_vector2d_init (0.0f, 6.0f);
+	vtx0[1] = vtx1[0];
+	vtx0[2] = vtx1[1];
+	vtx0[3] = limat_vector2d_init (4.0f, 8.0f);
+	vtx0[4] = limat_vector2d_init (0.0f, 13.0f);
+	vtx0[5] = limat_vector2d_init (4.0f, 13.0f);
+	vtx0[6] = vtx1[2];
+	vtx0[7] = vtx1[3];
+	expected1 = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 4);
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0 + 4, 4);
+	vtx2[0].y = 6.0f; vtx2[2].y = 13.0f;
+	vtx2[1].y = 8.0f; vtx2[3].y = 13.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 4 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->remainder, expected) ||
+	   !check_polygon_2d (culler->pieces.array[0], expected1))
+	{
+		printf ("18: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+		print_polygon_2d ("Expected polygon  ", expected1);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+	limat_polygon2d_free (expected1);
+
+	/* Subtract middle trapezoid 1.
+	 *      +-##########-+
+	 *     /   ########   \
+	 *    /     ######     \
+	 *   +-------####-------+
+	 */
+	vtx0[0] = limat_vector2d_init (0.0f, 6.0f);
+	vtx0[1] = vtx1[0];
+	vtx0[2] = vtx1[1];
+	vtx0[3] = limat_vector2d_init (4.0f, 8.0f);
+	vtx0[4] = limat_vector2d_init (0.0f, 15.0f);
+	vtx0[5] = limat_vector2d_init (4.0f, 13.0f);
+	vtx0[6] = vtx1[2];
+	vtx0[7] = vtx1[3];
+	expected1 = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 4);
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0 + 4, 4);
+	vtx2[0].y = 6.0f; vtx2[2].y = 15.0f;
+	vtx2[1].y = 8.0f; vtx2[3].y = 13.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 4 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->remainder, expected) ||
+	   !check_polygon_2d (culler->pieces.array[0], expected1))
+	{
+		printf ("19: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+		print_polygon_2d ("Expected polygon  ", expected1);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+	limat_polygon2d_free (expected1);
+
+	/* Subtract middle trapezoid 2.
+	 *     #+############+#
+	 *     /##############\
+	 *    /  ############  \
+	 *   +----##########----+
+	 */
+	vtx0[0] = limat_vector2d_init (1.0f, 3.0f);
+	vtx0[1] = vtx1[1];
+	vtx0[2] = limat_vector2d_init (4.0f, 6.0f);
+	vtx0[3] = limat_vector2d_init (4.0f, 13.0f);
+	vtx0[4] = vtx1[2];
+	vtx0[5] = limat_vector2d_init (1.0f, 16.75f);
+	expected1 = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 3);
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0 + 3, 3);
+	vtx2[0].y = 2.0f; vtx2[2].y = 18.0f;
+	vtx2[1].y = 6.0f; vtx2[3].y = 13.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 3 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->remainder, expected) ||
+	   !check_polygon_2d (culler->pieces.array[0], expected1))
+	{
+		printf ("20: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+		print_polygon_2d ("Expected polygon  ", expected1);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+	limat_polygon2d_free (expected1);
+
+	/* Alternate line direction.
+	 *     #+############+#
+	 *     /##############\
+	 *    /  ############  \
+	 *   +----##########----+
+	 */
+	vtx0[0] = limat_vector2d_init (1.0f, 3.0f);
+	vtx0[1] = vtx1[1];
+	vtx0[2] = limat_vector2d_init (4.0f, 6.0f);
+	vtx0[3] = limat_vector2d_init (4.0f, 13.0f);
+	vtx0[4] = vtx1[2];
+	vtx0[5] = limat_vector2d_init (1.0f, 16.75f);
+	expected1 = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 3);
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0 + 3, 3);
+	vtx2[0].y = 2.0f; vtx2[2].y = 18.0f;
+	vtx2[1].y = 6.0f; vtx2[3].y = 13.0f;
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2 + 1, vtx2, vtx2 + 3, vtx2 + 2);
+	if (culler->remainder->vertices.count != 3 ||
+	    culler->pieces.count != 1 ||
+	   !check_polygon_2d (culler->remainder, expected) ||
+	   !check_polygon_2d (culler->pieces.array[0], expected1))
+	{
+		printf ("21: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+		print_polygon_2d ("Expected polygon  ", expected1);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+	limat_polygon2d_free (expected1);
+}
+
+/*****************************************************************************/
+
 void limat_math_unittest ()
 {
 	convert_quaternion_matrix ();
@@ -845,4 +1490,5 @@ void limat_math_unittest ()
 	transform_vector ();
 	vector_basics ();
 	dualquat_basics ();
+	polygon_culler ();
 }

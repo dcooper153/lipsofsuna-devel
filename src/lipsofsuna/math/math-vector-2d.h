@@ -18,42 +18,37 @@
 /**
  * \addtogroup LIMat Math
  * @{
- * \addtogroup LIMatVector Vector
+ * \addtogroup LIMatVector2d Vector2d
  * @{
  */
 
-#ifndef __MATH_VECTOR_H__
-#define __MATH_VECTOR_H__
+#ifndef __MATH_VECTOR_2D_H__
+#define __MATH_VECTOR_2D_H__
 
 #include <math.h>
 #include "math-generic.h"
 
-#define LIMAT_VECTOR_EPSILON 0.0001f
-
 /**
  * \brief A three-dimensional vector type.
  */
-typedef struct _LIMatVector LIMatVector;
-struct _LIMatVector
+typedef struct _LIMatVector2d LIMatVector2d;
+struct _LIMatVector2d
 {
 	float x;
 	float y;
-	float z;
 };
 
 /**
  * \brief Returns a vector with the given components.
  * \param x Float.
  * \param y Float.
- * \param z Float.
  * \return Vector.
  */
-static inline LIMatVector limat_vector_init (
+static inline LIMatVector2d limat_vector2d_init (
 	float x,
-	float y,
-	float z)
+	float y)
 {
-	LIMatVector result = { x, y, z };
+	LIMatVector2d result = { x, y };
 	return result;
 }
 
@@ -64,20 +59,18 @@ static inline LIMatVector limat_vector_init (
  * \param threshold Threshold for each coordinate.
  * \return Vector.
  */
-static inline int limat_vector_compare (
-	LIMatVector self,
-	LIMatVector vector,
-	float       threshold)
+static inline int limat_vector2d_compare (
+	LIMatVector2d self,
+	LIMatVector2d vector,
+	float         threshold)
 {
-	LIMatVector tmp =
+	LIMatVector2d tmp =
 	{
 		self.x - vector.x,
-		self.y - vector.y,
-		self.z - vector.z
+		self.y - vector.y
 	};
 	if (-threshold <= tmp.x && tmp.x < threshold &&
-	    -threshold <= tmp.y && tmp.y < threshold &&
-	    -threshold <= tmp.z && tmp.z < threshold)
+	    -threshold <= tmp.y && tmp.y < threshold)
 		return 1;
 	return 0;
 }
@@ -87,10 +80,10 @@ static inline int limat_vector_compare (
  * \param self Vector.
  * \return Vector.
  */
-static inline LIMatVector limat_vector_invert (
-	LIMatVector self)
+static inline LIMatVector2d limat_vector2d_invert (
+	LIMatVector2d self)
 {
-	LIMatVector result = { -self.x, -self.y, -self.z };
+	LIMatVector2d result = { -self.x, -self.y };
 	return result;
 }
 
@@ -99,10 +92,10 @@ static inline LIMatVector limat_vector_invert (
  * \param self Vector.
  * \return Float.
  */
-static inline float limat_vector_get_length (
-	LIMatVector self)
+static inline float limat_vector2d_get_length (
+	LIMatVector2d self)
 {
-	return sqrt (self.x * self.x + self.y * self.y + self.z * self.z);
+	return sqrt (self.x * self.x + self.y * self.y);
 }
 
 /**
@@ -111,15 +104,14 @@ static inline float limat_vector_get_length (
  * \param vector Vector.
  * \return Vector.
  */
-static inline LIMatVector limat_vector_add (
-	LIMatVector self,
-	LIMatVector vector)
+static inline LIMatVector2d limat_vector2d_add (
+	LIMatVector2d self,
+	LIMatVector2d vector)
 {
-	LIMatVector result;
+	LIMatVector2d result;
 
 	result.x = self.x + vector.x;
 	result.y = self.y + vector.y;
-	result.z = self.z + vector.z;
 	return result;
 }
 
@@ -129,15 +121,14 @@ static inline LIMatVector limat_vector_add (
  * \param vector Vector.
  * \return Vector.
  */
-static inline LIMatVector limat_vector_subtract (
-	LIMatVector self,
-	LIMatVector vector)
+static inline LIMatVector2d limat_vector2d_subtract (
+	LIMatVector2d self,
+	LIMatVector2d vector)
 {
-	LIMatVector result;
+	LIMatVector2d result;
 
 	result.x = self.x - vector.x;
 	result.y = self.y - vector.y;
-	result.z = self.z - vector.z;
 	return result;
 }
 
@@ -147,15 +138,14 @@ static inline LIMatVector limat_vector_subtract (
  * \param scalar Vector.
  * \return Vector.
  */
-static inline LIMatVector limat_vector_multiply (
-	LIMatVector self,
-	float       scalar)
+static inline LIMatVector2d limat_vector2d_multiply (
+	LIMatVector2d self,
+	float         scalar)
 {
-	LIMatVector result;
+	LIMatVector2d result;
 
 	result.x = self.x * scalar;
 	result.y = self.y * scalar;
-	result.z = self.z * scalar;
 	return result;
 }
 
@@ -164,23 +154,21 @@ static inline LIMatVector limat_vector_multiply (
  * \param self Vector.
  * \return Vector.
  */
-static inline LIMatVector limat_vector_normalize (
-	LIMatVector self)
+static inline LIMatVector2d limat_vector2d_normalize (
+	LIMatVector2d self)
 {
-	LIMatVector result;
-	float len = limat_vector_get_length (self);
+	LIMatVector2d result;
+	float len = limat_vector2d_get_length (self);
 
-	if (len < LIMAT_VECTOR_EPSILON)
+	if (len < LIMAT_EPSILON)
 	{
 		result.x = 0.0f;
 		result.y = 0.0f;
-		result.z = 0.0f;
 	}
 	else
 	{
 		result.x = self.x / len;
 		result.y = self.y / len;
-		result.z = self.z / len;
 	}
 	return result;
 }
@@ -190,14 +178,13 @@ static inline LIMatVector limat_vector_normalize (
  * \param self Vector.
  * \return Vector.
  */
-static inline LIMatVector limat_vector_validate (
-	LIMatVector self)
+static inline LIMatVector2d limat_vector2d_validate (
+	LIMatVector2d self)
 {
-	LIMatVector result =
+	LIMatVector2d result =
 	{
 		limat_number_validate (self.x),
-		limat_number_validate (self.y),
-		limat_number_validate (self.z)
+		limat_number_validate (self.y)
 	};
 	return result;
 }
@@ -208,28 +195,27 @@ static inline LIMatVector limat_vector_validate (
  * \param vector Vector.
  * \return Scalar.
  */
-static inline float limat_vector_dot (
-	LIMatVector self,
-	LIMatVector vector)
+static inline float limat_vector2d_dot (
+	LIMatVector2d self,
+	LIMatVector2d vector)
 {
-	return self.x * vector.x + self.y * vector.y + self.z * vector.z;
+	return self.x * vector.x + self.y * vector.y;
 }
 
 /**
- * \brief Calculates the cross product of two vectors.
+ * \brief Gets the normal of the vector.
  * \param self Vector.
- * \param vector Vector.
  * \return Vector.
  */
-static inline LIMatVector limat_vector_cross (
-	LIMatVector self,
-	LIMatVector vector)
+static inline LIMatVector2d limat_vector2d_get_normal (
+	LIMatVector2d self)
 {
-	LIMatVector result;
+	LIMatVector2d result;
 
-	result.x =  (self.y * vector.z - self.z * vector.y);
-	result.y = -(self.x * vector.z - self.z * vector.x);
-	result.z =  (self.x * vector.y - self.y * vector.x);
+	result.x = self.y;
+	result.y = -self.x;
+	result = limat_vector2d_normalize (result);
+
 	return result;
 }
 
@@ -240,18 +226,17 @@ static inline LIMatVector limat_vector_cross (
  * \param weight Interpolating scalar.
  * \return Vector.
  */
-static inline LIMatVector limat_vector_lerp (
-	LIMatVector self,
-	LIMatVector vector,
-	float       weight)
+static inline LIMatVector2d limat_vector2d_lerp (
+	LIMatVector2d self,
+	LIMatVector2d vector,
+	float         weight)
 {
 	float a = weight;
 	float b = 1.0f - weight;
-	LIMatVector result;
+	LIMatVector2d result;
 
 	result.x = a * self.x + b * vector.x;
 	result.y = a * self.y + b * vector.y;
-	result.z = a * self.z + b * vector.z;
 
 	return result;
 }

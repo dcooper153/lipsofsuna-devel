@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,39 +29,20 @@
 #include "math-types.h"
 #include "math-vector.h"
 
-static inline void
-limat_plane_get_normal (const LIMatPlane* self,
-                        LIMatVector*      vector)
-{
-	vector->x = self->x;
-	vector->y = self->y;
-	vector->z = self->z;
-}
-
-static inline void
-limat_plane_get_point (const LIMatPlane* self,
-                       LIMatVector*      vector)
-{
-	vector->x = self->x * self->w;
-	vector->y = self->y * self->w;
-	vector->z = self->z * self->w;
-}
-
 /**
  * \brief Initializes the plane variables from a plane equation.
- *
  * \param self Plane.
  * \param a X term of the plane normal.
  * \param b Y term of the plane normal.
  * \param c Z term of the plane normal.
  * \param d Signed distance from the plane to the origin.
  */
-static inline void
-limat_plane_init (LIMatPlane* self,
-                  float       a,
-                  float       b,
-                  float       c,
-                  float       d)
+static inline void limat_plane_init (
+	LIMatPlane* self,
+	float       a,
+	float       b,
+	float       c,
+	float       d)
 {
 	self->x = a;
 	self->y = b;
@@ -71,15 +52,14 @@ limat_plane_init (LIMatPlane* self,
 
 /**
  * \brief Initializes the plane variables from a point and normal.
- *
  * \param self Plane.
  * \param point Point on the plane.
  * \param normal Normal of the plane.
  */
-static inline void
-limat_plane_init_from_point (LIMatPlane*        self,
-                             const LIMatVector* point,
-                             const LIMatVector* normal)
+static inline void limat_plane_init_from_point (
+	LIMatPlane*        self,
+	const LIMatVector* point,
+	const LIMatVector* normal)
 {
 	self->x = normal->x;
 	self->y = normal->y;
@@ -89,17 +69,16 @@ limat_plane_init_from_point (LIMatPlane*        self,
 
 /**
  * \brief Initializes the plane variables from a triangle.
- *
  * \param self Plane.
  * \param vertex0 Vertex.
  * \param vertex1 Vertex.
  * \param vertex2 Vertex.
  */
-static inline void
-limat_plane_init_from_points (LIMatPlane*        self,
-                              const LIMatVector* vertex0,
-                              const LIMatVector* vertex1,
-                              const LIMatVector* vertex2)
+static inline void limat_plane_init_from_points (
+	LIMatPlane*        self,
+	const LIMatVector* vertex0,
+	const LIMatVector* vertex1,
+	const LIMatVector* vertex2)
 {
 	LIMatVector normal;
 
@@ -113,29 +92,55 @@ limat_plane_init_from_points (LIMatPlane*        self,
 }
 
 /**
+ * \brief Gets the normal vector of the plane.
+ * \param self Plane.
+ * \param vector Return location for the normal.
+ */
+static inline void limat_plane_get_normal (
+	const LIMatPlane* self,
+	LIMatVector*      vector)
+{
+	vector->x = self->x;
+	vector->y = self->y;
+	vector->z = self->z;
+}
+
+/**
+ * \brief Gets the support vector of the plane.
+ * \param self Plane.
+ * \param vector Return location for the normal.
+ */
+static inline void limat_plane_get_point (
+	const LIMatPlane* self,
+	LIMatVector*      vector)
+{
+	vector->x = self->x * self->w;
+	vector->y = self->y * self->w;
+	vector->z = self->z * self->w;
+}
+
+/**
  * \brief Gets the distance to the point.
- *
  * \param self Plane.
  * \param point Point.
  * \return Distance to the point.
  */
-static inline float
-limat_plane_distance_to_point (LIMatPlane*        self,
-                               const LIMatVector* point)
+static inline float limat_plane_distance_to_point (
+	LIMatPlane*        self,
+	const LIMatVector* point)
 {
 	return LIMAT_ABS (self->x * point->x + self->y * point->y + self->z * point->z - self->w);
 }
 
 /**
  * \brief Gets the signed distance to the point.
- *
  * \param self Plane.
  * \param point Point.
  * \return Signed distance to the point.
  */
-static inline float
-limat_plane_signed_distance_to_point (const LIMatPlane*  self,
-                                      const LIMatVector* point)
+static inline float limat_plane_signed_distance_to_point (
+	const LIMatPlane*  self,
+	const LIMatVector* point)
 {
 	return self->x * point->x + self->y * point->y + self->z * point->z - self->w;
 }
@@ -151,11 +156,11 @@ limat_plane_signed_distance_to_point (const LIMatPlane*  self,
  * \param point Return location for the intersection point.
  * \return Nonzero if the plane and the line intersect.
  */
-static inline int
-limat_plane_intersects_line (const LIMatPlane*  self,
-                             const LIMatVector* point0,
-                             const LIMatVector* point1,
-                             LIMatVector*       point)
+static inline int limat_plane_intersects_line (
+	const LIMatPlane*  self,
+	const LIMatVector* point0,
+	const LIMatVector* point1,
+	LIMatVector*       point)
 {
 	float t;
 	LIMatVector tmp;
@@ -189,11 +194,11 @@ limat_plane_intersects_line (const LIMatPlane*  self,
  * \param point Return location for the intersection point.
  * \return Nonzero if the plane and the line segment intersect.
  */
-static inline int
-limat_plane_intersects_segment (const LIMatPlane*  self,
-                                const LIMatVector* point0,
-                                const LIMatVector* point1,
-                                LIMatVector*       point)
+static inline int limat_plane_intersects_segment (
+	const LIMatPlane*  self,
+	const LIMatVector* point0,
+	const LIMatVector* point1,
+	LIMatVector*       point)
 {
 	float t;
 	LIMatVector tmp;
@@ -231,11 +236,11 @@ limat_plane_intersects_segment (const LIMatPlane*  self,
  * \param result1 Return location for the second end point of the intersection.
  * \return Nonzero if the plane and the line segment intersect.
  */
-static inline int
-limat_plane_intersects_triangle (const LIMatPlane*    self,
-                                 const LIMatTriangle* triangle,
-                                 LIMatVector*         result0,
-                                 LIMatVector*         result1)
+static inline int limat_plane_intersects_triangle (
+	const LIMatPlane*    self,
+	const LIMatTriangle* triangle,
+	LIMatVector*         result0,
+	LIMatVector*         result1)
 {
 	LIMatVector p[2];
 
@@ -277,10 +282,10 @@ limat_plane_intersects_triangle (const LIMatPlane*    self,
  * \param results Return location for three triangle.
  * \return Nonzero if no intersection was found.
  */
-static inline int
-limat_plane_subdivide_triangle (const LIMatPlane*    self,
-                                const LIMatTriangle* triangle,
-                                LIMatTriangle*       results)
+static inline int limat_plane_subdivide_triangle (
+	const LIMatPlane*    self,
+	const LIMatTriangle* triangle,
+	LIMatTriangle*       results)
 {
 	LIMatVector p[2];
 	const LIMatVector* v = triangle->vertices;
