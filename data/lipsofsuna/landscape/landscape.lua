@@ -23,7 +23,7 @@ Landscape = Class("Landscape")
 Landscape.new = function(clss)
 	local self = Class.new(clss)
 	-- Initialize the terrain.
-	self.terrain = TerrainManager(8, 0.75, nil, false, true, true)
+	self.terrain = TerrainManager(12, 1, nil, false, true, true)
 	self.terrain.generate_hooks:register(0, TerrainGenerator.generate)
 	Main.terrain = self.terrain --FIXME
 	return self

@@ -27,7 +27,7 @@ local Crafting = Class("Crafting")
 Crafting.new = function(clss)
 	local self = Class.new(clss)
 	-- Initialize the terrain.
-	self.terrain = TerrainManager(8, 0.75, nil, false, true, true)
+	self.terrain = TerrainManager(12, 1, nil, false, true, true)
 	self.terrain:set_view_center(Vector(500, 0, 500))
 	self.terrain.generate_hooks:register(0, function(self)
 		local w = self.manager.chunk_size
