@@ -57,18 +57,37 @@ LIAPICALL (int, limat_polygon2d_add_vertices, (
 LIAPICALL (int, limat_polygon2d_clip, (
 	const LIMatPolygon2d* self,
 	const LIMatLine2d*    line,
+	float                 threshold,
 	LIMatPolygon2d*       front));
+
+LIAPICALL (int, limat_polygon2d_clip_inplace, (
+	LIMatPolygon2d*    self,
+	const LIMatLine2d* line,
+	float              threshold));
+
+LIAPICALL (int, limat_polygon2d_compare, (
+	const LIMatPolygon2d* self,
+	const LIMatPolygon2d* polygon));
+
+LIAPICALL (void, limat_polygon2d_print, (
+	const LIMatPolygon2d* self));
 
 LIAPICALL (int, limat_polygon2d_split, (
 	const LIMatPolygon2d* self,
 	const LIMatLine2d*    line,
+	float                 threshold,
 	LIMatPolygon2d*       front,
 	LIMatPolygon2d*       back));
 
 LIAPICALL (int, limat_polygon2d_split_inplace, (
 	LIMatPolygon2d*    self,
 	const LIMatLine2d* line,
+	float              threshold,
 	LIMatPolygon2d*    back));
+
+LIAPICALL (void, limat_polygon2d_remove_duplicates, (
+	LIMatPolygon2d* self,
+	float           threshold));
 
 LIAPICALL (int, limat_polygon2d_get_degenerate, (
 	const LIMatPolygon2d* self));

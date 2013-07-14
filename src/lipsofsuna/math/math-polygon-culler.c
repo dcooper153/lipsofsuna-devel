@@ -106,8 +106,9 @@ int limat_polygon_culler_subtract_quad (
 	piece = limat_polygon2d_new (self->remainder->ops, NULL, 0);
 	if (piece == NULL)
 		return 0;
-	limat_polygon2d_split_inplace (self->remainder, &l1, piece);
-	if (piece->vertices.count)
+	limat_polygon2d_split_inplace (self->remainder, &l1, 0.001f, piece);
+	limat_polygon2d_remove_duplicates (piece, 0.001f);
+	if (!limat_polygon2d_get_degenerate (piece))
 	{
 		/* Allocate space for the polygon. */
 		tmp = lisys_realloc (self->pieces.array, (self->pieces.count + 1) * sizeof(LIMatPolygon2d*));
@@ -120,12 +121,9 @@ int limat_polygon_culler_subtract_quad (
 		/* Add the polygon into the array. */
 		self->pieces.array = tmp;
 		self->pieces.array[self->pieces.count++] = piece;
-
-		/* Allocate a temporary polygon for the next pass. */
-		piece = limat_polygon2d_new (self->remainder->ops, NULL, 0);
-		if (piece == NULL)
-			return 0;
 	}
+	else
+		limat_polygon2d_free (piece);
 
 	/* Use the upper line to split a piece out of the polygon. */
 	/* The piece is discarded since it represents the portion that
@@ -135,12 +133,12 @@ int limat_polygon_culler_subtract_quad (
 		limat_line2d_init_from_points (&l2, top1, top0);
 	else
 		limat_line2d_init_from_points (&l2, top0, top1);
-	limat_polygon2d_split_inplace (self->remainder, &l2, piece);
-	limat_polygon2d_free (piece);
+	limat_polygon2d_clip_inplace (self->remainder, &l2, -0.001f);
 
 	/* Remove degenerate vertices. */
 	/* If the culling line is parallel to one of the edges, the polygon
 	 * may become degenerate instead of all the vertices being removed. */
+	limat_polygon2d_remove_duplicates (self->remainder, 0.001f);
 	if (limat_polygon2d_get_degenerate (self->remainder))
 	{
 		lisys_free (self->remainder->vertices.vertices);

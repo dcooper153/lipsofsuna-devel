@@ -24,6 +24,8 @@
 
 #include "math-polygon-2d.h"
 
+#define DEBUGPRINT(...)
+
 /**
  * \brief Creates a new polygon.
  * \param ops Vertex access operations.
@@ -152,12 +154,14 @@ int limat_polygon2d_add_vertices (
  *
  * \param self Polygon.
  * \param line Line.
+ * \param threshold Minimum signed distance that is considered to be inside.
  * \param front Return location for the polygon on the front side.
  * \return Nonzero on success.
  */
 int limat_polygon2d_clip (
 	const LIMatPolygon2d* self,
 	const LIMatLine2d*    line,
+	float                 threshold,
 	LIMatPolygon2d*       front)
 {
 	int i;
@@ -180,40 +184,50 @@ int limat_polygon2d_clip (
 		return 1;
 	prev_vtx = self->vertices.vertices + (self->vertices.count - 1) * ops->size;
 	ops->getcoord (prev_vtx, &prev_coord);
-	prev_in = limat_line2d_signed_distance_to_point (line, &prev_coord) >= 0.0f;
+	prev_in = limat_line2d_signed_distance_to_point (line, &prev_coord) >= threshold;
 	tmp_vtx = lisys_malloc (ops->size);
 	if (tmp_vtx == NULL)
 		return 0;
+	DEBUGPRINT ("BEGIN CLIP %f,%f,%f\n", line->x, line->y, line->w);
 
 	/* Calculate the vertices of the new polygons. */
 	for (i = 0 ; i < self->vertices.count ; i++)
 	{
 		curr_vtx = self->vertices.vertices + i * ops->size;
 		ops->getcoord (curr_vtx, &curr_coord);
-		curr_in = limat_line2d_signed_distance_to_point (line, &curr_coord) >= 0.0f;
+		curr_in = limat_line2d_signed_distance_to_point (line, &curr_coord) >= threshold;
+		DEBUGPRINT ("  VERTEX vtx=%f,%f prev_in=%d curr_in=%d\n",
+			curr_coord.x, curr_coord.y, prev_in, curr_in);
 		if (curr_in)
 		{
 			if (!prev_in)
 			{
-				limat_line2d_intersects_segment (line, &prev_coord, &curr_coord, &tmp_coord);
-				frac = limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, tmp_coord)) /
-				       limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, curr_coord));
-				ops->setcoord (tmp_vtx, &tmp_coord);
-				ops->interpolate (curr_vtx, prev_vtx, frac, tmp_vtx);
-				ret &= limat_polygon2d_add_vertices (front, tmp_vtx, 1);
+				if (limat_line2d_intersects_segment (line, &prev_coord, &curr_coord, &tmp_coord))
+				{
+					frac = limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, tmp_coord)) /
+						   limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, curr_coord));
+					ops->setcoord (tmp_vtx, &tmp_coord);
+					ops->interpolate (curr_vtx, prev_vtx, frac, tmp_vtx);
+					DEBUGPRINT ("    CUT1 %f,%f\n", tmp_coord.x, tmp_coord.y);
+					ret &= limat_polygon2d_add_vertices (front, tmp_vtx, 1);
+				}
 			}
+			DEBUGPRINT ("    KEEP %f,%f\n", curr_coord.x, curr_coord.y);
 			ret &= limat_polygon2d_add_vertices (front, curr_vtx, 1);
 		}
 		else
 		{
 			if (prev_in)
 			{
-				limat_line2d_intersects_segment (line, &prev_coord, &curr_coord, &tmp_coord);
-				frac = limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, tmp_coord)) /
-				       limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, curr_coord));
-				ops->setcoord (tmp_vtx, &tmp_coord);
-				ops->interpolate (curr_vtx, prev_vtx, frac, tmp_vtx);
-				ret &= limat_polygon2d_add_vertices (front, tmp_vtx, 1);
+				if (limat_line2d_intersects_segment (line, &prev_coord, &curr_coord, &tmp_coord))
+				{
+					frac = limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, tmp_coord)) /
+						   limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, curr_coord));
+					ops->setcoord (tmp_vtx, &tmp_coord);
+					ops->interpolate (curr_vtx, prev_vtx, frac, tmp_vtx);
+					DEBUGPRINT ("    CUT2 %f,%f\n", tmp_coord.x, tmp_coord.y);
+					ret &= limat_polygon2d_add_vertices (front, tmp_vtx, 1);
+				}
 			}
 		}
 		prev_coord = curr_coord;
@@ -227,6 +241,88 @@ int limat_polygon2d_clip (
 }
 
 /**
+ * \brief Returns the part of the polygon in front of the line.
+ *
+ * If the algorithm runs out of memory, zero is returned and the returned
+ * polygon misses one or more vertices.
+ *
+ * Uses the Sutherland-Hodgman algorithm.
+ *
+ * \param self Polygon.
+ * \param line Line.
+ * \param threshold Minimum signed distance that is considered to be inside.
+ * \return Nonzero on success.
+ */
+int limat_polygon2d_clip_inplace (
+	LIMatPolygon2d*    self,
+	const LIMatLine2d* line,
+	float              threshold)
+{
+	int ret;
+	LIMatPolygon2d front;
+
+	/* Create temporary storage for the front vertices. */
+	memset (&front, 0, sizeof (LIMatPolygon2d));
+	front.ops = self->ops;
+
+	/* Split into the temporary storage. */
+	ret = limat_polygon2d_clip (self, line, threshold, &front);
+
+	/* Replace the current vertices with the new ones. */
+	lisys_free (self->vertices.vertices);
+	self->vertices = front.vertices;
+
+	return ret;
+}
+
+/**
+ * \brief Compares two polygons.
+ * \param self Polygon.
+ * \param polygon Polygon.
+ * \return One if the polygons are equal. Zero otherwise.
+ */
+int limat_polygon2d_compare (
+	const LIMatPolygon2d* self,
+	const LIMatPolygon2d* polygon)
+{
+	int i;
+	LIMatVector2d v0;
+	LIMatVector2d v1;
+
+	if (self->vertices.count != polygon->vertices.count)
+		return 0;
+	for (i = 0 ; i < self->vertices.count ; i++)
+	{
+		limat_polygon2d_get_coord (self, i, &v0);
+		limat_polygon2d_get_coord (polygon, i, &v1);
+		if (!limat_vector2d_compare (v0, v1, 0.00001f))
+			return 0;
+	}
+	return 1;
+}
+
+/**
+ * \brief Debug prints the polygon.
+ * \param self Polygon.
+ */
+void limat_polygon2d_print (
+	const LIMatPolygon2d* self)
+{
+	int i;
+	LIMatVector2d v;
+
+	printf ("{");
+	for (i = 0 ; i < self->vertices.count ; i++)
+	{
+		limat_polygon2d_get_coord (self, i, &v);
+		printf ("{%f,%f}", v.x, v.y);
+		if (i < self->vertices.count - 1)
+			printf (", ");
+	}
+	printf ("}\n");
+}
+
+/**
  * \brief Splits the polygon in two parts by the line.
  *
  * If the algorithm runs out of memory, zero is returned and at least one
@@ -236,6 +332,7 @@ int limat_polygon2d_clip (
  *
  * \param self Polygon.
  * \param line Line.
+ * \param threshold Minimum signed distance that is considered to be inside.
  * \param front Return location for the polygon on the front side.
  * \param back Return location for the polygon on the back side.
  * \return Nonzero on success.
@@ -243,6 +340,7 @@ int limat_polygon2d_clip (
 int limat_polygon2d_split (
 	const LIMatPolygon2d* self,
 	const LIMatLine2d*    line,
+	float                 threshold,
 	LIMatPolygon2d*       front,
 	LIMatPolygon2d*       back)
 {
@@ -268,40 +366,55 @@ int limat_polygon2d_split (
 		return 1;
 	prev_vtx = self->vertices.vertices + (self->vertices.count - 1) * ops->size;
 	ops->getcoord (prev_vtx, &prev_coord);
-	prev_in = limat_line2d_signed_distance_to_point (line, &prev_coord) >= 0.0f;
+	prev_in = limat_line2d_signed_distance_to_point (line, &prev_coord) >= threshold;
 	tmp_vtx = lisys_malloc (ops->size);
 	if (tmp_vtx == NULL)
 		return 0;
+	DEBUGPRINT ("BEGIN CULL %f,%f,%f\n", line->x, line->y, line->w);
 
 	/* Calculate the vertices of the new polygons. */
 	for (i = 0 ; i < self->vertices.count ; i++)
 	{
 		curr_vtx = self->vertices.vertices + i * ops->size;
 		ops->getcoord (curr_vtx, &curr_coord);
-		curr_in = limat_line2d_signed_distance_to_point (line, &curr_coord) >= 0.0f;
+		curr_in = limat_line2d_signed_distance_to_point (line, &curr_coord) >= threshold;
+		DEBUGPRINT ("  VERTEX vtx=%f,%f prev_in=%d curr_in=%d\n",
+			curr_coord.x, curr_coord.y, prev_in, curr_in);
 		if (curr_in && !prev_in)
 		{
 			/* Back to front. */
-			limat_line2d_intersects_segment (line, &prev_coord, &curr_coord, &tmp_coord);
-			frac = limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, tmp_coord)) /
-			       limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, curr_coord));
-			ops->setcoord (tmp_vtx, &tmp_coord);
-			ops->interpolate (curr_vtx, prev_vtx, frac, tmp_vtx);
-			ret &= limat_polygon2d_add_vertices (back, tmp_vtx, 1);
-			ret &= limat_polygon2d_add_vertices (front, tmp_vtx, 1);
-			ret &= limat_polygon2d_add_vertices (front, curr_vtx, 1);
+			if (limat_line2d_intersects_segment (line, &prev_coord, &curr_coord, &tmp_coord))
+			{
+				frac = limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, tmp_coord)) /
+					   limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, curr_coord));
+				ops->setcoord (tmp_vtx, &tmp_coord);
+				ops->interpolate (curr_vtx, prev_vtx, frac, tmp_vtx);
+				ret &= limat_polygon2d_add_vertices (back, tmp_vtx, 1);
+				ret &= limat_polygon2d_add_vertices (front, tmp_vtx, 1);
+				ret &= limat_polygon2d_add_vertices (front, curr_vtx, 1);
+			}
+			else
+			{
+				ret &= limat_polygon2d_add_vertices (front, curr_vtx, 1);
+			}
 		}
 		else if (!curr_in && prev_in)
 		{
 			/* Front to back. */
-			limat_line2d_intersects_segment (line, &prev_coord, &curr_coord, &tmp_coord);
-			frac = limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, tmp_coord)) /
-			       limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, curr_coord));
-			ops->setcoord (tmp_vtx, &tmp_coord);
-			ops->interpolate (curr_vtx, prev_vtx, frac, tmp_vtx);
-			ret &= limat_polygon2d_add_vertices (front, tmp_vtx, 1);
-			ret &= limat_polygon2d_add_vertices (back, tmp_vtx, 1);
-			ret &= limat_polygon2d_add_vertices (back, curr_vtx, 1);
+			if (limat_line2d_intersects_segment (line, &prev_coord, &curr_coord, &tmp_coord))
+			{
+				frac = limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, tmp_coord)) /
+					   limat_vector2d_get_length (limat_vector2d_subtract (prev_coord, curr_coord));
+				ops->setcoord (tmp_vtx, &tmp_coord);
+				ops->interpolate (curr_vtx, prev_vtx, frac, tmp_vtx);
+				ret &= limat_polygon2d_add_vertices (front, tmp_vtx, 1);
+				ret &= limat_polygon2d_add_vertices (back, tmp_vtx, 1);
+				ret &= limat_polygon2d_add_vertices (back, curr_vtx, 1);
+			}
+			else
+			{
+				ret &= limat_polygon2d_add_vertices (back, curr_vtx, 1);
+			}
 		}
 		else if (curr_in)
 		{
@@ -333,12 +446,14 @@ int limat_polygon2d_split (
  *
  * \param self Polygon.
  * \param line Line.
+ * \param threshold Minimum signed distance that is considered to be inside.
  * \param back Return location for the polygon on the back side.
  * \return Nonzero on success.
  */
 int limat_polygon2d_split_inplace (
 	LIMatPolygon2d*    self,
 	const LIMatLine2d* line,
+	float              threshold,
 	LIMatPolygon2d*    back)
 {
 	int ret;
@@ -349,13 +464,52 @@ int limat_polygon2d_split_inplace (
 	front.ops = self->ops;
 
 	/* Split into the temporary storage. */
-	ret = limat_polygon2d_split (self, line, &front, back);
+	ret = limat_polygon2d_split (self, line, threshold, &front, back);
 
 	/* Replace the current vertices with the new ones. */
 	lisys_free (self->vertices.vertices);
 	self->vertices = front.vertices;
 
 	return ret;
+}
+
+/**
+ * \brief Removes duplicate vertices.
+ * \param self Polygon.
+ * \param threshold Maximum distance between removed vertices.
+ * \return Nonzero if the polygon is degenerate.
+ */
+void limat_polygon2d_remove_duplicates (
+	LIMatPolygon2d* self,
+	float           threshold)
+{
+	int i;
+	int j;
+	LIMatVector2d prev;
+	LIMatVector2d curr;
+	const LIMatVtxops2d* ops = self->ops;
+
+	if (!self->vertices.count)
+		return;
+	ops->getcoord (self->vertices.vertices + (self->vertices.count - 1) * ops->size, &prev);
+	for (i = 0 ; i < self->vertices.count ; )
+	{
+		ops->getcoord (self->vertices.vertices + i * ops->size, &curr);
+		if (limat_vector2d_compare (prev, curr, threshold))
+		{
+			for (j = 0 ; j < self->vertices.count - 1 ; j++)
+			{
+				memcpy (self->vertices.vertices + j * ops->size,
+					self->vertices.vertices + (j + 1) * ops->size, ops->size);
+			}
+			self->vertices.count--;
+		}
+		else
+		{
+			prev = curr;
+			i++;
+		}
+	}
 }
 
 /**
@@ -376,6 +530,16 @@ int limat_polygon2d_get_degenerate (
 
 	if (self->vertices.count < 3)
 		return 1;
+
+	ops->getcoord (self->vertices.vertices + (self->vertices.count - 1) * ops->size, coord + 0);
+	for (i = 0 ; i < self->vertices.count ; i++)
+	{
+		ops->getcoord (self->vertices.vertices + i * ops->size, coord + 1);
+		if (limat_vector2d_compare (coord[0], coord[1], 0.001f))
+			return 1;
+		coord[0] = coord[1];
+	}
+
 	ops->getcoord (self->vertices.vertices + 0 * ops->size, coord + 0);
 	ops->getcoord (self->vertices.vertices + 1 * ops->size, coord + 1);
 	for (i = 2 ; i < self->vertices.count ; i++)
