@@ -144,7 +144,7 @@ int liext_terrain_add_stick (
 		private_mark_column_dirty (self, grid_x - 1, grid_z);
 	if (column_x == self->chunk_size - 1)
 		private_mark_column_dirty (self, grid_x + 1, grid_z);
-	if (column_z == 0 && grid_x > 0)
+	if (column_z == 0 && grid_z > 0)
 		private_mark_column_dirty (self, grid_x, grid_z - 1);
 	if (column_z == self->chunk_size - 1)
 		private_mark_column_dirty (self, grid_x, grid_z + 1);
@@ -207,12 +207,52 @@ int liext_terrain_add_stick_corners (
 		private_mark_column_dirty (self, grid_x - 1, grid_z);
 	if (column_x == self->chunk_size - 1)
 		private_mark_column_dirty (self, grid_x + 1, grid_z);
-	if (column_z == 0 && grid_x > 0)
+	if (column_z == 0 && grid_z > 0)
 		private_mark_column_dirty (self, grid_x, grid_z - 1);
 	if (column_z == self->chunk_size - 1)
 		private_mark_column_dirty (self, grid_x, grid_z + 1);
 
 	return ret;
+}
+
+/**
+ * \brief Builds the model of the chunk.
+ * \param self Terrain chunk.
+ * \param grid_x X coordinate in grid units.
+ * \param grid_z Z coordinate in grid units.
+ * \param offset Offset of the chunk, in world units.
+ * \return Model owned by the terrain on success. NULL otherwise.
+ */
+LIMdlModel* liext_terrain_build_chunk_model (
+	LIExtTerrain*      self,
+	int                grid_x,
+	int                grid_z,
+	const LIMatVector* offset)
+{
+	int chunk_w;
+	LIExtTerrainChunk* chunk;
+	LIExtTerrainChunk* chunk_left;
+	LIExtTerrainChunk* chunk_right;
+	LIExtTerrainChunk* chunk_front;
+	LIExtTerrainChunk* chunk_back;
+
+	/* Get the chunk. */
+	chunk = liext_terrain_get_chunk (self, grid_x, grid_z);
+	if (chunk == NULL)
+		return NULL;
+
+	/* Get the neighbor chunks for culling. */
+	chunk_w = self->chunk_size;
+	chunk_left = (grid_x >= chunk_w)? liext_terrain_get_chunk (self, grid_x - chunk_w, grid_z) : NULL;
+	chunk_right = liext_terrain_get_chunk (self, grid_x + chunk_w, grid_z);
+	chunk_front = (grid_z >= chunk_w)? liext_terrain_get_chunk (self, grid_x, grid_z - chunk_w) : NULL;
+	chunk_back = liext_terrain_get_chunk (self, grid_x, grid_z + chunk_w);
+
+	/* Build the model. */
+	if (!liext_terrain_chunk_build_model (chunk, chunk_back, chunk_front, chunk_left, chunk_right, self->grid_size, offset))
+		return NULL;
+
+	return chunk->model;
 }
 
 /**
@@ -644,6 +684,16 @@ int liext_terrain_set_column_data (
 	if (!liext_terrain_column_set_data (column, reader))
 		return 0;
 	chunk->stamp++;
+
+	/* Mark neighbor chunks dirty on border updates. */
+	if (column_x == 0 && grid_x > 0)
+		private_mark_column_dirty (self, grid_x - 1, grid_z);
+	if (column_x == self->chunk_size - 1)
+		private_mark_column_dirty (self, grid_x + 1, grid_z);
+	if (column_z == 0 && grid_z > 0)
+		private_mark_column_dirty (self, grid_x, grid_z - 1);
+	if (column_z == self->chunk_size - 1)
+		private_mark_column_dirty (self, grid_x, grid_z + 1);
 
 	return 1;
 }

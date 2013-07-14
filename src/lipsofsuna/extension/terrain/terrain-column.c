@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -49,20 +49,6 @@ struct _LIExtColumnVertex
 	LIMatVector coord;
 	LIMatVector normal;
 };
-
-static int private_cull_wall (
-	LIExtTerrainStick**      stick,
-	float*                   stick_y,
-	float*                   stick_y0,
-	float*                   stick_y1,
-	int                      vx0,
-	int                      vz0,
-	int                      vx1,
-	int                      vz1,
-	const LIExtColumnVertex* bot0,
-	const LIExtColumnVertex* bot1,
-	const LIExtColumnVertex* top0,
-	const LIExtColumnVertex* top1);
 
 static int private_find_closest_stick (
 	LIExtTerrainStick* sticks,
@@ -596,10 +582,10 @@ int liext_terrain_column_build_model (
 	float y;
 	LIExtTerrainStick* stick;
 	LIExtTerrainStick* stick_prev;
-	LIExtTerrainFaceIterator back;
-	LIExtTerrainFaceIterator front;
 	LIExtTerrainFaceIterator left;
 	LIExtTerrainFaceIterator right;
+	LIExtTerrainFaceIterator front;
+	LIExtTerrainFaceIterator back;
 	LIExtColumnVertex bot[2][2];
 	LIExtColumnVertex top[2][2];
 	LIMatVector normal;
@@ -663,10 +649,10 @@ int liext_terrain_column_build_model (
 	bot[1][1].normal = normal;
 
 	/* Initialize the neighbor face iterators. */
-	liext_terrain_face_iterator_init (&back, sticks_back, 1, 0, 0, 0);
-	liext_terrain_face_iterator_init (&front, sticks_front, 0, 1, 1, 1);
 	liext_terrain_face_iterator_init (&left, sticks_left, 1, 0, 1, 1);
 	liext_terrain_face_iterator_init (&right, sticks_right, 0, 1, 0, 0);
+	liext_terrain_face_iterator_init (&front, sticks_front, 1, 1, 0, 1);
+	liext_terrain_face_iterator_init (&back, sticks_back, 0, 0, 1, 0);
 
 	/* Add the sticks to the builder. */
 	for (stick = self->sticks ; stick != NULL ; stick_prev = stick, stick = stick->next)
@@ -692,52 +678,24 @@ int liext_terrain_column_build_model (
 			u = (stick->material - 1) / 255.0f;
 
 			/* Left face. */
-			if (!liext_terrain_face_iterator_cull (&left, &bot[0][0].coord, &bot[0][1].coord, &top[0][0].coord, &top[0][1].coord))
-			{
-				v = 0.0f / 5.0f;
-				normal = limat_vector_init (-1.0f, 0.0f, 0.0f);
-				limdl_vertex_init (quad + 0, &bot[0][0].coord, &normal, u, v);
-				limdl_vertex_init (quad + 1, &bot[0][1].coord, &normal, u, v);
-				limdl_vertex_init (quad + 2, &top[0][1].coord, &normal, u, v);
-				limdl_vertex_init (quad + 3, &top[0][0].coord, &normal, u, v);
-				private_insert_quad (builder, quad);
-			}
+			normal = limat_vector_init (-1.0f, 0.0f, 0.0f);
+			liext_terrain_face_iterator_emit (&left, builder, u, 0.0f / 5.0f, &normal,
+				&bot[0][0].coord, &bot[0][1].coord, &top[0][0].coord, &top[0][1].coord);
 
 			/* Right face. */
-			if (!liext_terrain_face_iterator_cull (&right, &bot[1][1].coord, &bot[1][0].coord, &top[1][1].coord, &top[1][0].coord))
-			{
-				v = 1.0f / 5.0f;
-				normal = limat_vector_init (1.0f, 0.0f, 0.0f);
-				limdl_vertex_init (quad + 0, &bot[1][1].coord, &normal, u, v);
-				limdl_vertex_init (quad + 1, &bot[1][0].coord, &normal, u, v);
-				limdl_vertex_init (quad + 2, &top[1][0].coord, &normal, u, v);
-				limdl_vertex_init (quad + 3, &top[1][1].coord, &normal, u, v);
-				private_insert_quad (builder, quad);
-			}
+			normal = limat_vector_init (1.0f, 0.0f, 0.0f);
+			liext_terrain_face_iterator_emit (&right, builder, u, 1.0f / 5.0f, &normal,
+				&bot[1][1].coord, &bot[1][0].coord, &top[1][1].coord, &top[1][0].coord);
 
 			/* Front face. */
-			if (!liext_terrain_face_iterator_cull (&front, &bot[0][0].coord, &bot[1][0].coord, &top[0][0].coord, &top[1][0].coord))
-			{
-				v = 2.0f / 5.0f;
-				normal = limat_vector_init (0.0f, 0.0f, -1.0f);
-				limdl_vertex_init (quad + 0, &bot[0][0].coord, &normal, u, v);
-				limdl_vertex_init (quad + 1, &top[0][0].coord, &normal, u, v);
-				limdl_vertex_init (quad + 2, &top[1][0].coord, &normal, u, v);
-				limdl_vertex_init (quad + 3, &bot[1][0].coord, &normal, u, v);
-				private_insert_quad (builder, quad);
-			}
+			normal = limat_vector_init (0.0f, 0.0f, -1.0f);
+			liext_terrain_face_iterator_emit (&front, builder, u, 2.0f / 5.0f, &normal,
+				&bot[1][0].coord, &bot[0][0].coord, &top[1][0].coord, &top[0][0].coord);
 
 			/* Back face. */
-			if (!liext_terrain_face_iterator_cull (&back, &bot[1][1].coord, &bot[0][1].coord, &top[1][1].coord, &top[0][1].coord))
-			{
-				v = 3.0f / 5.0f;
-				normal = limat_vector_init (0.0f, 0.0f, 1.0f);
-				limdl_vertex_init (quad + 0, &bot[1][1].coord, &normal, u, v);
-				limdl_vertex_init (quad + 1, &top[1][1].coord, &normal, u, v);
-				limdl_vertex_init (quad + 2, &top[0][1].coord, &normal, u, v);
-				limdl_vertex_init (quad + 3, &bot[0][1].coord, &normal, u, v);
-				private_insert_quad (builder, quad);
-			}
+			normal = limat_vector_init (0.0f, 0.0f, 1.0f);
+			liext_terrain_face_iterator_emit (&back, builder, u, 3.0f / 5.0f, &normal,
+				&bot[0][1].coord, &bot[1][1].coord, &top[0][1].coord, &top[1][1].coord);
 
 			/* Bottom face. */
 			if (stick_prev != NULL && stick_prev->material == 0)
@@ -1162,93 +1120,6 @@ int liext_terrain_column_set_data (
 }
 
 /*****************************************************************************/
-
-static int private_cull_wall (
-	LIExtTerrainStick**      stick,
-	float*                   stick_y,
-	float*                   stick_y0,
-	float*                   stick_y1,
-	int                      vx0,
-	int                      vz0,
-	int                      vx1,
-	int                      vz1,
-	const LIExtColumnVertex* bot0,
-	const LIExtColumnVertex* bot1,
-	const LIExtColumnVertex* top0,
-	const LIExtColumnVertex* top1)
-{
-	float stick_y_top;
-	float stick_y0_top;
-	float stick_y1_top;
-	LIExtTerrainStick* s;
-
-	/* Check that there are neighbor sticks left. */
-	/* If the wall starts above all the neighbor sticks or there are no
-	   neighbors at all, then no culling can be done. */
-	if (*stick == NULL)
-		return 0;
-
-	/* Check for the bottom culling offset. */
-	/* If an empty stick caused the stick pointer to start above the bottom
-	   of the culled wall, then no culling can be done. */
-	if (*stick_y0 > bot0->coord.y || *stick_y1 > bot1->coord.y)
-		return 0;
-
-	/* Find the bottom of the neighbor wall. */
-	/* The culled wall may start well above the current stick pointer.
-	   To simplify things and reduce future iteration, the stick pointer
-	   and the Y offsets are rewound to the first neighbor stick that
-	   starts below the wall. */
-	stick_y_top = *stick_y;
-	stick_y0_top = *stick_y0;
-	stick_y1_top = *stick_y1;
-	for ( ; *stick != NULL ; *stick = (*stick)->next)
-	{
-		stick_y_top += (*stick)->height;
-		stick_y0_top = stick_y_top + (*stick)->vertices[vx0][vz0].offset;
-		stick_y1_top = stick_y_top + (*stick)->vertices[vx1][vz1].offset;
-		if (stick_y0_top > bot0->coord.y || stick_y1_top > bot1->coord.y)
-			break;
-		*stick_y = stick_y_top;
-		*stick_y0 = stick_y0_top;
-		*stick_y1 = stick_y1_top;
-	}
-	if (*stick == NULL)
-		return 0;
-	lisys_assert(*stick_y0 <= bot0->coord.y);
-	lisys_assert(*stick_y1 <= bot1->coord.y);
-
-	/* Skip empty sticks. */
-	/* The stick pointer is currently at the bottommost stick that is
-	   still below the bottom edge of the wall. If it is an empty stick,
-	   the culling fails as the bottom of the wall is not occluded. */
-	if ((*stick)->material == 0)
-	{
-		*stick_y += (*stick)->height;
-		*stick_y0 = *stick_y + (*stick)->vertices[vx0][vz0].offset;
-		*stick_y1 = *stick_y + (*stick)->vertices[vx1][vz1].offset;
-		*stick = (*stick)->next;
-		return 0;
-	}
-
-	/* Find the top of the neighbor wall. */
-	/* If the neighbor wall extends past the culled wall, then culling
-	   should be done. If an empty stick or the end of the column occur
-	   before that, no culling can be done. */
-	stick_y_top = *stick_y;
-	stick_y0_top = *stick_y0;
-	stick_y1_top = *stick_y1;
-	for (s = *stick ; s != NULL && s->material != 0 ; s = s->next)
-	{
-		stick_y_top += s->height;
-		stick_y0_top = stick_y_top + s->vertices[vx0][vz0].offset;
-		stick_y1_top = stick_y_top + s->vertices[vx1][vz1].offset;
-		if (stick_y0_top >= top0->coord.y && stick_y1_top >= top1->coord.y)
-			return 1;
-	}
-
-	return 0;
-}
 
 static int private_find_closest_stick (
 	LIExtTerrainStick* sticks,

@@ -115,7 +115,7 @@ void liext_terrain_stick_clamp_vertices_bottom (
 void liext_terrain_stick_clear (
 	LIExtTerrainStick* self)
 {
-	memset (self, 1, sizeof (LIExtTerrainStick));
+	memset (self, 0, sizeof (LIExtTerrainStick));
 	self->vertices[0][0].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
 	self->vertices[1][0].normal = limat_vector_init (0.0f, 1.0f, 0.0f);
 	self->vertices[0][1].normal = limat_vector_init (0.0f, 1.0f, 0.0f);

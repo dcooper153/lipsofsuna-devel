@@ -18,6 +18,7 @@
 #ifndef __EXT_TERRAIN_FACE_ITERATOR_H__
 #define __EXT_TERRAIN_FACE_ITERATOR_H__
 
+#include "lipsofsuna/model.h"
 #include "terrain-stick.h"
 
 typedef struct _LIExtTerrainFaceIterator LIExtTerrainFaceIterator;
@@ -41,8 +42,12 @@ void liext_terrain_face_iterator_init (
 	int                       vx1,
 	int                       vz1);
 
-int liext_terrain_face_iterator_cull (
+void liext_terrain_face_iterator_emit (
 	LIExtTerrainFaceIterator* self,
+	LIMdlBuilder*             builder,
+	float                     u,
+	float                     v,
+	const LIMatVector*        normal,
 	const LIMatVector*        bot0,
 	const LIMatVector*        bot1,
 	const LIMatVector*        top0,

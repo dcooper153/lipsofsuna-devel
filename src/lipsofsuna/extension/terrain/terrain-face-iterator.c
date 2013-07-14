@@ -24,8 +24,34 @@
 
 #include "terrain-face-iterator.h"
 
+#define DEBUGPRINT(...)
+//#define DEBUGPRINT printf
+
+static void private_emit_polygon (
+	LIMdlBuilder*      builder,
+	LIMatPolygon2d*    polygon,
+	float              u,
+	float              v,
+	const LIMatVector* normal,
+	const LIMatVector* bot0,
+	const LIMatVector* bot1,
+	const LIMatVector* top0,
+	const LIMatVector* top1);
+
+static void private_emit_triangle (
+	LIMdlBuilder*      builder,
+	float              u,
+	float              v,
+	const LIMatVector* normal,
+	const LIMatVector* v0,
+	const LIMatVector* v1,
+	const LIMatVector* v2);
+
+/*****************************************************************************/
+
 /**
  * \brief Initializes the face iterator.
+ * \param self Face iterator.
  * \param stick Stick containing the face.
  * \param vx0 X index of the first vertex.
  * \param vz0 Z indes of the first vertex.
@@ -41,7 +67,7 @@ void liext_terrain_face_iterator_init (
 	int                       vz1)
 {
 	self->vx0 = vx0;
-	self->vz0 = vz1;
+	self->vz0 = vz0;
 	self->vx1 = vx1;
 	self->vz1 = vz1;
 	self->stick_y = 0.0f;
@@ -52,90 +78,207 @@ void liext_terrain_face_iterator_init (
 
 /**
  * \brief Iterates while culling a neighbor stick.
+ * \param self Face iterator.
+ * \param builder Model builder.
+ * \param u Texture coordinate.
+ * \param v Texture coordinate.
+ * \param normal Face normal.
  * \param bot0 Coordinates of the first bottom vertex of the neighbor face.
  * \param bot1 Coordinates of the second bottom vertex of the neighbor face.
  * \param top0 Coordinates of the first top vertex of the neighbor face.
  * \param top1 Coordinates of the second top vertex of the neighbor face.
- * \return One if culled. Zero otherwise.
  */
-int liext_terrain_face_iterator_cull (
+void liext_terrain_face_iterator_emit (
 	LIExtTerrainFaceIterator* self,
+	LIMdlBuilder*             builder,
+	float                     u,
+	float                     v,
+	const LIMatVector*        normal,
 	const LIMatVector*        bot0,
 	const LIMatVector*        bot1,
 	const LIMatVector*        top0,
 	const LIMatVector*        top1)
 {
-	float stick_y_top;
-	float stick_y0_top;
-	float stick_y1_top;
-	LIExtTerrainStick* s;
+	int i;
+	float top_y;
+	float top_y0;
+	float top_y1;
+	LIMatVector2d face[4];
+	LIMatPolygonCuller* culler;
 
-	/* Check that there are neighbor sticks left. */
-	/* If the wall starts above all the neighbor sticks or there are no
-	   neighbors at all, then no culling can be done. */
-	if (self->stick == NULL)
-		return 0;
+	/* FIXME */
+	float valid_y = self->stick_y;
+	float valid_y0 = self->stick_y0;
+	float valid_y1 = self->stick_y1;
+	LIExtTerrainStick* valid_stick = self->stick;
 
-	/* Check for the bottom culling offset. */
-	/* If an empty stick caused the stick pointer to start above the bottom
-	   of the culled wall, then no culling can be done. */
-	if (self->stick_y0 > bot0->y || self->stick_y1 > bot1->y)
-		return 0;
-
-	/* Find the bottom of the neighbor wall. */
-	/* The culled wall may start well above the current stick pointer.
-	   To simplify things and reduce future iteration, the stick pointer
-	   and the Y offsets are rewound to the first neighbor stick that
-	   starts below the wall. */
-	stick_y_top = self->stick_y;
-	stick_y0_top = self->stick_y0;
-	stick_y1_top = self->stick_y1;
-	for ( ; self->stick != NULL ; self->stick = self->stick->next)
+	/* Initialize the polygon culler. */
+	if (normal->x == 0.0f)
 	{
-		stick_y_top += self->stick->height;
-		stick_y0_top = stick_y_top + self->stick->vertices[self->vx0][self->vz0].offset;
-		stick_y1_top = stick_y_top + self->stick->vertices[self->vx1][self->vz1].offset;
-		if (stick_y0_top > bot0->y || stick_y1_top > bot1->y)
+		face[0] = limat_vector2d_init (bot0->x, bot0->y);
+		face[1] = limat_vector2d_init (bot1->x, bot1->y);
+		face[2] = limat_vector2d_init (top1->x, top1->y);
+		face[3] = limat_vector2d_init (top0->x, top0->y);
+	}
+	else
+	{
+		face[0] = limat_vector2d_init (bot0->z, bot0->y);
+		face[1] = limat_vector2d_init (bot1->z, bot1->y);
+		face[2] = limat_vector2d_init (top1->z, top1->y);
+		face[3] = limat_vector2d_init (top0->z, top0->y);
+	}
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, face, 4);
+	if (culler == NULL)
+		return;
+
+	/* The stick pointer should never point above the bottom of the wall being
+	   culled. Otherwise, there is an error in the iteration logic. */
+	DEBUGPRINT ("\nSTART y=%f,%f face_bot=%f,%f face_top=%f,%f\n",
+		self->stick_y0, self->stick_y1, bot0->y, bot1->y, top0->y, top1->y);
+	lisys_assert (self->stick_y0 <= bot0->y);
+	lisys_assert (self->stick_y1 <= bot1->y);
+
+	/* Move the stick pointer to the first stick that intersects with the
+	   wall. This may save significant amount of culling work if the
+	   culling wall has high compelixity compared to the culled one. */
+	while (self->stick != NULL)
+	{
+		top_y = self->stick_y + self->stick->height;
+		top_y0 = top_y + self->stick->vertices[self->vx0][self->vz0].offset;
+		top_y1 = top_y + self->stick->vertices[self->vx1][self->vz1].offset;
+		if (top_y0 > bot0->y || top_y1 > bot1->y)
 			break;
-		self->stick_y = stick_y_top;
-		self->stick_y0 = stick_y0_top;
-		self->stick_y1 = stick_y1_top;
-	}
-	if (self->stick == NULL)
-		return 0;
-	lisys_assert(self->stick_y0 <= bot0->y);
-	lisys_assert(self->stick_y1 <= bot1->y);
-
-	/* Skip empty sticks. */
-	/* The stick pointer is currently at the bottommost stick that is
-	   still below the bottom edge of the wall. If it is an empty stick,
-	   the culling fails as the bottom of the wall is not occluded. */
-	if (self->stick->material == 0)
-	{
-		self->stick_y += self->stick->height;
-		self->stick_y0 = self->stick_y + self->stick->vertices[self->vx0][self->vz0].offset;
-		self->stick_y1 = self->stick_y + self->stick->vertices[self->vx1][self->vz1].offset;
+		DEBUGPRINT ("SKIP1 y=%f,%f top_y=%f,%f\n", self->stick_y0, self->stick_y1, top_y0, top_y1);
 		self->stick = self->stick->next;
-		return 0;
+		self->stick_y = top_y;
+		self->stick_y0 = top_y0;
+		self->stick_y1 = top_y1;
 	}
 
-	/* Find the top of the neighbor wall. */
-	/* If the neighbor wall extends past the culled wall, then culling
-	   should be done. If an empty stick or the end of the column occur
-	   before that, no culling can be done. */
-	stick_y_top = self->stick_y;
-	stick_y0_top = self->stick_y0;
-	stick_y1_top = self->stick_y1;
-	for (s = self->stick ; s != NULL && s->material != 0 ; s = s->next)
+	/* Cull the face until it has been fully consumed or there are no more
+	 * culling stick left in the column. */
+	while (self->stick != NULL)
 	{
-		stick_y_top += s->height;
-		stick_y0_top = stick_y_top + s->vertices[self->vx0][self->vz0].offset;
-		stick_y1_top = stick_y_top + s->vertices[self->vx1][self->vz1].offset;
-		if (stick_y0_top >= top0->y && stick_y1_top >= top1->y)
-			return 1;
+		top_y = self->stick_y + self->stick->height;
+		top_y0 = top_y + self->stick->vertices[self->vx0][self->vz0].offset;
+		top_y1 = top_y + self->stick->vertices[self->vx1][self->vz1].offset;
+
+		/* If the current stick is not empty, cull the polygon with it.
+		   The polygon culler will take care of generating polygons for the
+		   part that didn't get culled previously. */
+		if (self->stick->material != 0)
+		{
+			face[0].y = self->stick_y0;
+			face[1].y = self->stick_y1;
+			face[2].y = top_y1;
+			face[3].y = top_y0;
+			DEBUGPRINT ("CULL1 face_bot=%f,%f face_top=%f,%f\n", face[0].y, face[1].y, face[3].y, face[2].y);
+			limat_polygon_culler_subtract_quad (culler, face, face + 1, face + 3, face + 2);
+			if (!culler->remainder->vertices.count)
+				break;
+		}
+
+		/* Advance to the next culling stick. */
+		self->stick = self->stick->next;
+		self->stick_y = top_y;
+		self->stick_y0 = top_y0;
+		self->stick_y1 = top_y1;
 	}
 
-	return 0;
+	/* Triangulate the generated polygons. */
+	DEBUGPRINT ("RESULT remain=%d pieces=%d\n", culler->remainder->vertices.count, culler->pieces.count);
+	if (culler->remainder->vertices.count)
+	{
+		private_emit_polygon (builder, culler->remainder, u, v,
+			normal, bot0, bot1, top0, top1);
+	}
+	for (i = 0 ; i < culler->pieces.count ; i++)
+	{
+		private_emit_polygon (builder, culler->pieces.array[i], u, v,
+			normal, bot0, bot1, top0, top1);
+	}
+	limat_polygon_culler_free (culler);
+
+	/* FIXME */
+	self->stick_y = valid_y;
+	self->stick_y0 = valid_y0;
+	self->stick_y1 = valid_y1;
+	self->stick = valid_stick;
+}
+
+/*****************************************************************************/
+
+static void private_emit_polygon (
+	LIMdlBuilder*      builder,
+	LIMatPolygon2d*    polygon,
+	float              u,
+	float              v,
+	const LIMatVector* normal,
+	const LIMatVector* bot0,
+	const LIMatVector* bot1,
+	const LIMatVector* top0,
+	const LIMatVector* top1)
+{
+	int i;
+	LIMatVector first;
+	LIMatVector prev;
+	LIMatVector curr;
+	LIMatVector2d* vertex;
+
+	if (LIMAT_ABS (normal->x) == 0.0f)
+	{
+		vertex = limat_polygon2d_get_vertex (polygon, 0);
+		first = limat_vector_init (vertex->x, vertex->y, bot0->z);
+		vertex = limat_polygon2d_get_vertex (polygon, 1);
+		prev = limat_vector_init (vertex->x, vertex->y, bot0->z);
+		for (i = 2 ; i < polygon->vertices.count ; i++)
+		{
+			vertex = limat_polygon2d_get_vertex (polygon, i);
+			curr = limat_vector_init (vertex->x, vertex->y, bot0->z);
+			private_emit_triangle(builder, u, v, normal, &first, &prev, &curr);
+			prev = curr;
+		}
+	}
+	else
+	{
+		vertex = limat_polygon2d_get_vertex (polygon, 0);
+		first = limat_vector_init (bot0->x, vertex->y, vertex->x);
+		vertex = limat_polygon2d_get_vertex (polygon, 1);
+		prev = limat_vector_init (bot0->x, vertex->y, vertex->x);
+		for (i = 2 ; i < polygon->vertices.count ; i++)
+		{
+			vertex = limat_polygon2d_get_vertex (polygon, i);
+			curr = limat_vector_init (bot0->x, vertex->y, vertex->x);
+			private_emit_triangle(builder, u, v, normal, &first, &prev, &curr);
+			prev = curr;
+		}
+	}
+}
+
+static void private_emit_triangle (
+	LIMdlBuilder*      builder,
+	float              u,
+	float              v,
+	const LIMatVector* normal,
+	const LIMatVector* v0,
+	const LIMatVector* v1,
+	const LIMatVector* v2)
+{
+	LIMdlVertex vertices[3];
+
+	/* Initialize the vertices. */
+	limdl_vertex_init (vertices + 0, v0, normal, u, v);
+	limdl_vertex_init (vertices + 1, v1, normal, u, v);
+	limdl_vertex_init (vertices + 2, v2, normal, u, v);
+
+	/* Generate the colors. */
+	/* FIXME: Not implemented. Should be interpolated by the polygon culler. */
+	vertices[0].color[1] = 0; vertices[0].color[2] = 0;
+	vertices[1].color[1] = 0; vertices[1].color[2] = 0;
+	vertices[2].color[1] = 0; vertices[2].color[2] = 0;
+
+	/* Insert the triangle into the builder. */
+	limdl_builder_insert_face (builder, 0, 0, vertices, NULL);
 }
 
 /** @} */

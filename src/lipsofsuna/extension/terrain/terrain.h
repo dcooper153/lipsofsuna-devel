@@ -66,6 +66,12 @@ LIAPICALL (int, liext_terrain_add_stick_corners, (
 	LIExtTerrainStickFilter filter_func,
 	void*                   filter_data));
 
+LIAPICALL (LIMdlModel*, liext_terrain_build_chunk_model, (
+	LIExtTerrain*      self,
+	int                grid_x,
+	int                grid_z,
+	const LIMatVector* offset));
+
 LIAPICALL (int, liext_terrain_calculate_smooth_normals, (
 	LIExtTerrain* self,
 	int           grid_x,
