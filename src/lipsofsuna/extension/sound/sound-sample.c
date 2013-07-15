@@ -24,7 +24,11 @@
 
 #include "lipsofsuna/system.h"
 #ifndef LI_DISABLE_SOUND
+#ifdef HAVE_FLAC_STREAM_DECODER_H
+#include <FLAC/stream_decoder.h>
+#else
 #include <stream_decoder.h>
+#endif
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 #include "lipsofsuna/archive.h"

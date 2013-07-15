@@ -609,11 +609,19 @@ def check_flac(conf):
 	conf.start_msg('Checking for package flac')
 	conf.env.stash()
 	if conf.check_cfg(package='flac', atleast_version='1.2.0', args='--cflags --libs', uselib_store='FLAC', mandatory=False):
+		conf.check_cc(header_name='stream_decoder.h', mandatory=False, uselib='TEST FLAC', uselib_store='FLAC')
+		conf.check_cc(header_name='FLAC/stream_decoder.h', mandatory=False, uselib='TEST FLAC', uselib_store='FLAC')
 		conf.end_msg('pkg-config flac')
 		return
 	conf.env.revert()
 	conf.env.stash()
 	if conf.check_cc(header_name='stream_decoder.h', mandatory=False, uselib='TEST', uselib_store='FLAC') and\
+	   conf.check_cc(lib='FLAC', mandatory=False, uselib='TEST', uselib_store='FLAC'):
+		conf.end_msg('library FLAC')
+		return
+	conf.env.revert()
+	conf.env.stash()
+	if conf.check_cc(header_name='FLAC/stream_decoder.h', mandatory=False, uselib='TEST', uselib_store='FLAC') and\
 	   conf.check_cc(lib='FLAC', mandatory=False, uselib='TEST', uselib_store='FLAC'):
 		conf.end_msg('library FLAC')
 		return
