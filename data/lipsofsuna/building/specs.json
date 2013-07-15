@@ -1,0 +1,12 @@
+[
+	{
+		"type": "Actorspec",
+		"name": "building player",
+		"base": "aer-player",
+		"inventory_items":
+		{
+			"dress": 1,
+			"granite stone": 100
+		}
+	}
+]
