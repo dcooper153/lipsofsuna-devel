@@ -16,6 +16,15 @@ Main.game_modes:register("Building", function()
 	Ui:set_state("building")
 end)
 
+Main.main_start_hooks:register(0, function(secs)
+	Main.objects.object_created_hooks:register(15, function(object)
+		--FIXME
+		if Main.building then
+			object.has_server_data = function() return true end
+		end
+	end)
+end)
+
 Main.main_start_hooks:register(1000, function()
 	if Main.settings.building then
 		Main:start_game("Building")
@@ -26,7 +35,7 @@ end)
 Main.update_hooks:register(0, function(secs)
 	if Main.building then
 		Main.timing:start_action("building")
-		Main.building:update()
+		Main.building:update(secs)
 	end
 end)
 

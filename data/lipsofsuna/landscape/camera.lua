@@ -16,7 +16,7 @@ local Vector = require("system/math/vector")
 
 --- Camera for the landscape subgame.
 -- @type LandscapeCamera
-LandscapeCamera = Class("LandscapeCamera", Camera)
+local LandscapeCamera = Class("LandscapeCamera", Camera)
 
 --- Creates a new landscape camera.
 -- @param clss LandscapeCamera class.

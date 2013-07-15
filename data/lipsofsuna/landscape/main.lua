@@ -27,7 +27,7 @@ end)
 Main.update_hooks:register(0, function(secs)
 	if Main.landscape then
 		Main.timing:start_action("landscape")
-		Main.landscape:update()
+		Main.landscape:update(secs)
 	end
 end)
 

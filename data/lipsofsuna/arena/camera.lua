@@ -13,7 +13,7 @@ local ThirdPersonCamera = require("core/camera/third/third-person-camera")
 
 --- Camera for the arena subgame.
 -- @type ArenaCamera
-ArenaCamera = Class("ArenaCamera", ThirdPersonCamera)
+local ArenaCamera = Class("ArenaCamera", ThirdPersonCamera)
 
 --- Creates a new arena camera.
 -- @param clss ArenaCamera class.

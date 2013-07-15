@@ -8,23 +8,21 @@
 -- @module building.camera
 -- @alias BuildingCamera
 
-local Camera = require("system/camera")
 local Class = require("system/class")
-local Quaternion = require("system/math/quaternion")
-local Vector = require("system/math/vector")
+local ThirdPersonCamera = require("core/camera/third/third-person-camera")
 
 --- Camera for the building subgame.
 -- @type BuildingCamera
-BuildingCamera = Class("BuildingCamera", Camera)
+local BuildingCamera = Class("BuildingCamera", ThirdPersonCamera)
 
 --- Creates a new building camera.
 -- @param clss BuildingCamera class.
 -- @return BuildingCamera.
 BuildingCamera.new = function(clss)
-	local self = Camera.new(clss)
+	local self = ThirdPersonCamera.new(clss)
 	self:set_far(1000)
 	self:set_near(0.3)
-	self:set_mode("first-person")
+	self:set_mode("third-person")
 	return self
 end
 
@@ -34,13 +32,7 @@ end
 BuildingCamera.update = function(self, secs)
 	if Main.building then
 		Main.client.camera_manager:set_camera_mode("building")
-		local camctr = Vector(505,100,500)
-		local campos = Vector(525,110,510)
-		local camrot = Quaternion{dir = camctr - campos, up = Vector(0,1,0)}
-		self:set_target_position(campos)
-		self:set_target_rotation(camrot)
-		Camera.update(self, secs)
-		self:warp()
+		ThirdPersonCamera.update(self, secs)
 	end
 end
 

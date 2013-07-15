@@ -15,7 +15,7 @@ local ThirdPersonCamera = require("core/camera/third/third-person-camera")
 
 --- Camera for the character creator.
 -- @type ChargenCamera
-ChargenCamera = Class("ChargenCamera", ThirdPersonCamera)
+local ChargenCamera = Class("ChargenCamera", ThirdPersonCamera)
 
 --- Creates a new character creation camera.
 -- @param clss ChargenCamera class.

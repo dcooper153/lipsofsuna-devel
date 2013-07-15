@@ -39,7 +39,7 @@ end)
 Main.update_hooks:register(0, function(secs)
 	if Main.arena then
 		Main.timing:start_action("arena")
-		Main.arena:update()
+		Main.arena:update(secs)
 	end
 end)
 

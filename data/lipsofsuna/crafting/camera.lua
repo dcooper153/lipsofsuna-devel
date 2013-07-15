@@ -13,7 +13,7 @@ local ThirdPersonCamera = require("core/camera/third/third-person-camera")
 
 --- Camera for the crafting subgame.
 -- @type CraftingCamera
-CraftingCamera = Class("CraftingCamera", ThirdPersonCamera)
+local CraftingCamera = Class("CraftingCamera", ThirdPersonCamera)
 
 --- Creates a new crafting camera.
 -- @param clss CraftingCamera class.

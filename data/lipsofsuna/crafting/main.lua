@@ -39,7 +39,7 @@ end)
 Main.update_hooks:register(0, function(secs)
 	if Main.crafting then
 		Main.timing:start_action("crafting")
-		Main.crafting:update()
+		Main.crafting:update(secs)
 	end
 end)
 
