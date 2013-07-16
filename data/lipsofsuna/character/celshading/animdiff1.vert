@@ -17,30 +17,20 @@ varying vec2 F_texcoord;
 varying vec3 F_eyev;
 varying vec3 F_lightv[LIGHTS];
 
-void LOS_skeletal_animation_notan(
-	in vec3 vertex, in vec3 normal, in mat4 inverse,
-	out vec3 vertex_res, out vec3 normal_res)
-{
-	vec3 v = vec3(0.0);
-	vec3 n = vec3(0.0);
-	vec3 t = vec3(0.0);
-	float total = 0.0;
-	int bones[4] = int[](int(blendIndices.x), int(blendIndices.y), int(blendIndices.z), int(blendIndices.w));
-	float weights[4] = float[](blendWeights.x, blendWeights.y, blendWeights.z, blendWeights.w);
-	for(int i = 0 ; i < 4 ; i++)
-	{
-		v += weights[i] * LOS_skeletal_matrix[bones[i]] * vec4(vertex, 1.0);
-		n += weights[i] * LOS_skeletal_matrix[bones[i]] * vec4(normal, 0.0);
-		total += weights[i];
-	}
-	vertex_res = (inverse * vec4(v / total, 1.0)).xyz;
-	normal_res = (inverse * vec4(normalize(n), 0.0)).xyz;
-}
-
 void main()
 {
-	vec3 t_vertex;
-	LOS_skeletal_animation_notan(vertex, normal, LOS_matrix_world_inverse, t_vertex, F_normal);
+	vec3 skel_v = blendWeights.x * LOS_skeletal_matrix[int(blendIndices.x)] * vec4(vertex, 1.0) +
+		blendWeights.y * LOS_skeletal_matrix[int(blendIndices.y)] * vec4(vertex, 1.0) +
+		blendWeights.z * LOS_skeletal_matrix[int(blendIndices.z)] * vec4(vertex, 1.0) +
+		blendWeights.w * LOS_skeletal_matrix[int(blendIndices.w)] * vec4(vertex, 1.0);
+	vec3 skel_n = blendWeights.x * LOS_skeletal_matrix[int(blendIndices.x)] * vec4(normal, 0.0) +
+		blendWeights.y * LOS_skeletal_matrix[int(blendIndices.y)] * vec4(normal, 0.0) +
+		blendWeights.z * LOS_skeletal_matrix[int(blendIndices.z)] * vec4(normal, 0.0) +
+		blendWeights.w * LOS_skeletal_matrix[int(blendIndices.w)] * vec4(normal, 0.0);
+	float skel_w = blendWeights.x + blendWeights.y + blendWeights.z + blendWeights.w;
+	vec3 t_vertex = (LOS_matrix_world_inverse * vec4(skel_v / skel_w, 1.0)).xyz;
+	F_normal = (LOS_matrix_world_inverse * vec4(normalize(skel_n), 0.0)).xyz;
+
 	F_texcoord = uv0;
 	gl_Position = LOS_matrix_modelviewproj * vec4(t_vertex,1.0);
 	F_eyev = normalize(LOS_camera_position - vertex.xyz);

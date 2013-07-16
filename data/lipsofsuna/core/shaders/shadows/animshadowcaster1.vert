@@ -10,28 +10,15 @@ attribute vec4 blendWeights;
 
 varying vec2 F_depth;
 
-void LOS_skeletal_animation_nonortan(
-	in vec3 vertex, in mat4 inverse,
-	out vec3 vertex_res)
-{
-	vec3 v = vec3(0.0);
-	vec3 n = vec3(0.0);
-	vec3 t = vec3(0.0);
-	float total = 0.0;
-	int bones[4] = int[](int(blendIndices.x), int(blendIndices.y), int(blendIndices.z), int(blendIndices.w));
-	float weights[4] = float[](blendWeights.x, blendWeights.y, blendWeights.z, blendWeights.w);
-	for(int i = 0 ; i < 4 ; i++)
-	{
-		v += weights[i] * LOS_skeletal_matrix[bones[i]] * vec4(vertex, 1.0);
-		total += weights[i];
-	}
-	vertex_res = (inverse * vec4(v / total, 1.0)).xyz;
-}
-
 void main()
 {
-	vec3 t_vertex;
-	LOS_skeletal_animation_nonortan(vertex, LOS_matrix_world_inverse, t_vertex);
+	vec3 skel_v = blendWeights.x * LOS_skeletal_matrix[int(blendIndices.x)] * vec4(vertex, 1.0) +
+		blendWeights.y * LOS_skeletal_matrix[int(blendIndices.y)] * vec4(vertex, 1.0) +
+		blendWeights.z * LOS_skeletal_matrix[int(blendIndices.z)] * vec4(vertex, 1.0) +
+		blendWeights.w * LOS_skeletal_matrix[int(blendIndices.w)] * vec4(vertex, 1.0);
+	float skel_w = blendWeights.x + blendWeights.y + blendWeights.z + blendWeights.w;
+	vec3 t_vertex = (LOS_matrix_world_inverse * vec4(skel_v / skel_w, 1.0)).xyz;
+
 	gl_Position = LOS_matrix_modelviewproj * vec4(t_vertex,1.0);
 	F_depth = gl_Position.zw;
 }
