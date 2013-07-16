@@ -18,7 +18,7 @@ Actorspec{
 		lower_safe = "aerbloomers1",
 		upper = "aerupper1",
 		upper_safe = "aerbloomerstop1"},
-	skin_material = "animdiffnorm1",
+	skin_material = "animskin1",
 	skin_textures = {"android1", "aer1n"},
 	tilt_bone = {"back1", "back2", "back3"}}
 
@@ -31,5 +31,5 @@ Actorspec{
 Actorskinspec{
 	name = "Android skin 1",
 	actors = {["android"] = true},
-	material = "animdiffnorm1",
+	material = "animskin1",
 	textures = {"android1", "aer1n"}}

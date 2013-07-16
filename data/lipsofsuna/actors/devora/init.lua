@@ -22,7 +22,7 @@ Actorspec{
 		lower_safe = "aerbloomers1",
 		upper = "aerupper1",
 		upper_safe = "aerbloomerstop1"},
-	skin_material = "animdiffnorm1",
+	skin_material = "animskin1",
 	skin_textures = {"devora1", "devora1n"},
 	tilt_bone = {"back1", "back2", "back3"},
 	vulnerabilities = {["fire damage"] = 2, ["physical damage"] = 0.8}}
@@ -50,5 +50,5 @@ Actorspec{
 Actorskinspec{
 	name = "Devora skin 1",
 	actors = {["devora"] = true},
-	material = "animdiffnorm1",
+	material = "animskin1",
 	textures = {"devora1", "devora1n"}}

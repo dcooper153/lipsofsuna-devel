@@ -2,7 +2,7 @@ import * from "celshading.template"
 
 pass animskin1/lighting : celshading/pass
 {
-	vertex_program_ref animdiffnorm1/vert
+	vertex_program_ref animdiff1/vert
 	{
 	}
 	fragment_program_ref diffskin1/frag

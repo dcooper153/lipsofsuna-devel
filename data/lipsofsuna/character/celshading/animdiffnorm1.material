@@ -3,10 +3,10 @@ import * from "celshading.template"
 pass animdiffnorm1/lighting : celshading/pass
 {
 	ambient 0.7 0.7 0.7
-	vertex_program_ref animdiffnorm1/vert
+	vertex_program_ref animdiff1/vert
 	{
 	}
-	fragment_program_ref diffnorm1/frag
+	fragment_program_ref diff1/frag
 	{
 	}
 }
@@ -20,7 +20,7 @@ material animdiffnorm1
 		shadow_caster_material animshadowcaster1
 		pass LOS1 : animdiffnorm1/lighting
 		{
-			fragment_program_ref diffnorm1/frag/mrt
+			fragment_program_ref diff1/frag/mrt
 			{
 			}
 		}

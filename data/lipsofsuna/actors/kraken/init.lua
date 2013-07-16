@@ -68,7 +68,7 @@ Actorspec{
 		lower = "krakenlower1",
 		upper = "aerupper1",
 		upper_safe = "aerbloomerstop1"},
-	skin_material = "animdiffnorm1",
+	skin_material = "animskin1",
 	skin_textures = {"kraken1", "kraken1n"},
 	tilt_bone = {"back1", "back2", "back3"},
 	vulnerabilities = {["cold damage"] = 0.5, ["fire damage"] = 2},
@@ -83,7 +83,7 @@ Actorspec{
 Actorskinspec{
 	name = "Kraken skin 1",
 	actors = {["kraken"] = true},
-	material = "animdiffnorm1",
+	material = "animskin1",
 	textures = {"kraken1", "kraken1n"}}
 
 Animationspec{
