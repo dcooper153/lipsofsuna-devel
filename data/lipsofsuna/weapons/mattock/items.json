@@ -1,0 +1,232 @@
+[
+	{
+		"type": "Itemspec"
+		"name": "adamantium mattock",
+		"categories":
+		{
+			"mattock": true,
+			"melee": true,
+			"weapon": true
+		},
+		"actions":
+		{
+			"right": "dig",
+			"left": "dig"
+		},
+		"animations_equipped":
+		{
+			"default": "default axe equipped"
+		},
+		"description": "A high quality mattock used to mine ores",
+		"damage_mining": 1,
+		"health": 1000,
+		"icon": "mattock1",
+		"modifiers":
+		{
+			"physical damage": 10
+		},
+		"modifiers_bonus":
+		[
+			"melee"
+		],
+		"equipment_slot": "hand.R",
+		"equipment_slots_reserved":
+		{
+			"hand.L": true
+		},
+		"mass": 15,
+		"model": "mattock-000"
+	},
+	{
+		"type": "Itemspec"
+		"name": "aquanite mattock",
+		"categories":
+		{
+			"mattock": true,
+			"melee": true,
+			"weapon": true
+		},
+		"actions":
+		{
+			"right": "dig",
+			"left": "dig"
+		},
+		"animations_equipped":
+		{
+			"default": "default axe equipped"
+		},
+		"description": "A high quality mattock used to mine ores",
+		"damage_mining": 1,
+		"equipment_slot": "hand.R",
+		"equipment_slots_reserved":
+		{
+			"hand.L": true
+		},
+		"health": 500,
+		"icon": "mattock1",
+		"modifiers":
+		{
+			"cold damage": 3,
+			"physical damage": 4
+		},
+		"modifiers_bonus":
+		[
+			"melee"
+		],
+		"mass": 15,
+		"model": "mattock-000"
+	},
+	{
+		"type": "Itemspec"
+		"name": "crimson mattock",
+		"categories":
+		{
+			"mattock": true,
+			"melee": true,
+			"weapon": true
+		},
+		"actions":
+		{
+			"right": "dig",
+			"left": "dig"
+		},
+		"animations_equipped":
+		{
+			"default": "default axe equipped"
+		},
+		"description": "A high quality mattock used to mine ores",
+		"damage_mining": 1,
+		"equipment_slot": "hand.R",
+		"equipment_slots_reserved":
+		{
+			"hand.L": true
+		},
+		"health": 500,
+		"icon": "mattock1",
+		"modifiers":
+		{
+			"fire damage": 4,
+			"physical damage": 4
+		},
+		"modifiers_bonus":
+		[
+			"melee"
+		],
+		"mass": 15,
+		"model": "mattock-000"
+	},
+	{
+		"type": "Itemspec"
+		"name": "iron mattock",
+		"categories":
+		{
+			"mattock": true,
+			"melee": true,
+			"weapon": true
+		},
+		"actions":
+		{
+			"right": "dig",
+			"left": "dig"
+		},
+		"animations_equipped":
+		{
+			"default": "default axe equipped"
+		},
+		"description": "A medium quality mattock used to mine ores",
+		"damage_mining": 1,
+		"equipment_slot": "hand.R",
+		"equipment_slots_reserved":
+		{
+			"hand.L": true
+		},
+		"health": 220,
+		"icon": "mattock1",
+		"modifiers":
+		{
+			"physical damage": 5
+		},
+		"modifiers_bonus":
+		[
+			"melee"
+		],
+		"mass": 15,
+		"model": "mattock-000"
+	},
+	{
+		"type": "Itemspec"
+		"name": "stone mattock",
+		"categories":
+		{
+			"mattock": true,
+			"melee": true,
+			"weapon": true
+		},
+		"actions":
+		{
+			"right": "dig",
+			"left": "dig"
+		},
+		"animations_equipped":
+		{
+			"default": "default axe equipped"
+		},
+		"description": "A low quality mattock used to mine ores",
+		"damage_mining": 1,
+		"equipment_slot": "hand.R",
+		"equipment_slots_reserved":
+		{
+			"hand.L": true
+		},
+		"health": 130,
+		"icon": "mattock1",
+		"modifiers":
+		{
+			"physical damage": 3
+		},
+		"modifiers_bonus":
+		[
+			"melee"
+		],
+		"mass": 12,
+		"model": "mattock-000"
+	},
+	{
+		"type": "Itemspec"
+		"name": "wooden mattock",
+		"categories":
+		{
+			"mattock": true,
+			"melee": true,
+			"weapon": true
+		},
+		"actions":
+		{
+			"right": "dig",
+			"left": "dig"
+		},
+		"animations_equipped":
+		{
+			"default": "default axe equipped"
+		},
+		"damage_mining": 1,
+		"description": "A low quality mattock used to mine ores",
+		"equipment_slot": "hand.R",
+		"equipment_slots_reserved":
+		{
+			"hand.L": true
+		},
+		"health": 100,
+		"icon": "mattock1",
+		"modifiers":
+		{
+			"physical damage": 3
+		},
+		"modifiers_bonus":
+		[
+			"melee"
+		],
+		"mass": 7,
+		"model": "mattock-000"
+	}
+]

@@ -1,0 +1,82 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "adamantium mattock",
+		"effect": "craftmetal1",
+		"materials":
+		{
+			"adamantium": 9
+		},
+		"modes":
+		{
+			"metal": true
+		}
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "aquanite mattock",
+		"effect": "craftmetal1",
+		"materials":
+		{
+			"aquanite stone": 9
+		},
+		"modes":
+		{
+			"metal": true
+		}
+	},
+	{
+		"type": "CraftingRecipeSpec"
+		"name": "crimson mattock",
+		"effect": "craftmetal1",
+		"materials":
+		{
+			"crimson stone": 9
+		},
+		"modes":
+		{
+			"metal": true
+		}
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "iron mattock",
+		"effect": "craftmetal1",
+		"materials":
+		{
+			"iron ingot": 3
+		},
+		"modes":
+		{
+			"metal": true
+		}
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "stone mattock",
+		"effect": "craftmetal1",
+		"materials":
+		{
+			"granite stone": 4
+		},
+		"modes":
+		{
+			"metal": true,
+			"default": true
+		}
+	},
+	{
+		"type": "CraftingRecipeSpec"
+		"name": "wooden mattock",
+		"effect": "craftwood1",
+		"materials":
+		{
+			"log": 4
+		},
+		"modes":
+		{
+			"wood": true,
+			"default": true
+		}
+	}
+]
