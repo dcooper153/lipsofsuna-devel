@@ -1,5 +1,6 @@
 local Building = require("building/building")
 local BuildingCamera = require("building/camera")
+local BuildingUtils = require("building/building-utils")
 local Client = require("core/client/client")
 local Hooks = require("system/hooks")
 local Ui = require("ui/ui")
@@ -17,6 +18,7 @@ Main.game_modes:register("Building", function()
 end)
 
 Main.main_start_hooks:register(0, function(secs)
+	Main.building_utils = BuildingUtils()
 	Main.objects.object_created_hooks:register(15, function(object)
 		--FIXME
 		if Main.building then
