@@ -31,7 +31,7 @@ Actionspec{
 		local r = Physics:cast_ray(src, dst)
 		if not r or r.object then return end
 		-- Check for sufficient materials.
-		local radius = 0.2
+		local radius = 0.5
 		local terr = Main.terrain.terrain
 		local tile = Vector(r.point.x / terr.grid_size, r.point.y, r.point.z / terr.grid_size)
 		local materials = terr:count_column_materials(tile.x, tile.z, tile.y - radius, 2 * radius)

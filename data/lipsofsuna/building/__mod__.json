@@ -9,6 +9,6 @@
 		}
 	],
 	"server": false,
-	"scripts": ["main", "action-dig"],
+	"scripts": ["main", "action-build", "action-dig"],
 	"specs": ["specs"]
 }
