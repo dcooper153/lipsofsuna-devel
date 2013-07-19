@@ -19,6 +19,7 @@
 #define __EXT_TERRAIN_COLUMN_H__
 
 #include "lipsofsuna/model.h"
+#include "terrain-material.h"
 #include "terrain-stick.h"
 #include "terrain-stick-filter.h"
 
@@ -56,12 +57,13 @@ LIAPICALL (int, liext_terrain_column_add_stick_corners, (
 	void*                   filter_data));
 
 LIAPICALL (int, liext_terrain_column_build_model, (
-	LIExtTerrainColumn* self,
-	LIExtTerrainStick*  sticks_back,
-	LIExtTerrainStick*  sticks_front,
-	LIExtTerrainStick*  sticks_left,
-	LIExtTerrainStick*  sticks_right,
-	float               grid_size));
+	LIExtTerrainColumn*         self,
+	const LIExtTerrainMaterial* materials,
+	LIExtTerrainStick*          sticks_back,
+	LIExtTerrainStick*          sticks_front,
+	LIExtTerrainStick*          sticks_left,
+	LIExtTerrainStick*          sticks_right,
+	float                       grid_size));
 
 LIAPICALL (void, liext_terrain_column_calculate_smooth_normals, (
 	LIExtTerrainColumn* self,

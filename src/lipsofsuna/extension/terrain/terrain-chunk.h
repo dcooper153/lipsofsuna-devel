@@ -20,6 +20,7 @@
 
 #include "lipsofsuna/model.h"
 #include "terrain-column.h"
+#include "terrain-material.h"
 
 typedef int LIExtTerrainChunkID;
 
@@ -66,13 +67,14 @@ LIAPICALL (int, liext_terrain_chunk_add_stick_corners, (
 	void*                   filter_data));
 
 LIAPICALL (int, liext_terrain_chunk_build_model, (
-	LIExtTerrainChunk* self,
-	LIExtTerrainChunk* chunk_back,
-	LIExtTerrainChunk* chunk_front,
-	LIExtTerrainChunk* chunk_left,
-	LIExtTerrainChunk* chunk_right,
-	float              grid_size,
-	const LIMatVector* offset));
+	LIExtTerrainChunk*          self,
+	const LIExtTerrainMaterial* materials,
+	LIExtTerrainChunk*          chunk_back, 
+	LIExtTerrainChunk*          chunk_front,
+	LIExtTerrainChunk*          chunk_left,
+	LIExtTerrainChunk*          chunk_right,
+	float                       grid_size,
+	const LIMatVector*          offset));
 
 LIAPICALL (void, liext_terrain_chunk_clear_column, (
 	LIExtTerrainChunk* self,

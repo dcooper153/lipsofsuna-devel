@@ -201,6 +201,7 @@ int liext_terrain_chunk_add_stick_corners (
 /**
  * \brief Builds the model of the chunk.
  * \param self Terrain chunk.
+ * \param material Terrain materials.
  * \param chunk_back Neighbour chunk used for culling.
  * \param chunk_front Neighbour chunk used for culling.
  * \param chunk_left Neighbour chunk used for culling.
@@ -210,13 +211,14 @@ int liext_terrain_chunk_add_stick_corners (
  * \return Nonzero on success, zero on failure.
  */
 int liext_terrain_chunk_build_model (
-	LIExtTerrainChunk* self,
-	LIExtTerrainChunk* chunk_back,
-	LIExtTerrainChunk* chunk_front,
-	LIExtTerrainChunk* chunk_left,
-	LIExtTerrainChunk* chunk_right,
-	float              grid_size,
-	const LIMatVector* offset)
+	LIExtTerrainChunk*          self,
+	const LIExtTerrainMaterial* materials,
+	LIExtTerrainChunk*          chunk_back, 
+	LIExtTerrainChunk*          chunk_front,
+	LIExtTerrainChunk*          chunk_left,
+	LIExtTerrainChunk*          chunk_right,
+	float                       grid_size,
+	const LIMatVector*          offset)
 {
 	int i;
 	int j;
@@ -287,8 +289,11 @@ int liext_terrain_chunk_build_model (
 
 			/* Build the model. */
 			column = self->columns + i + j * self->size;
-			if (!liext_terrain_column_build_model (column, sticks_back, sticks_front, sticks_left, sticks_right, grid_size))
+			if (!liext_terrain_column_build_model (column, materials,
+				sticks_back, sticks_front, sticks_left, sticks_right, grid_size))
+			{
 				return 0;
+			}
 		}
 	}
 

@@ -56,6 +56,7 @@ LIExtTerrain* liext_terrain_new (
 	int                 chunk_size,
 	float               grid_size)
 {
+	int i;
 	LIExtTerrain* self;
 
 	/* Allocate self. */
@@ -73,6 +74,11 @@ LIExtTerrain* liext_terrain_new (
 		liext_terrain_free (self);
 		return NULL;
 	}
+
+	/* Initialize the materials. */
+	liext_terrain_material_init (self->materials, 0);
+	for (i = 1 ; i < LIEXT_TERRAIN_MATERIAL_MAX ; ++i)
+		liext_terrain_material_init (self->materials + i, i - 1);
 
 	return self;
 }
@@ -249,8 +255,11 @@ LIMdlModel* liext_terrain_build_chunk_model (
 	chunk_back = liext_terrain_get_chunk (self, grid_x, grid_z + chunk_w);
 
 	/* Build the model. */
-	if (!liext_terrain_chunk_build_model (chunk, chunk_back, chunk_front, chunk_left, chunk_right, self->grid_size, offset))
+	if (!liext_terrain_chunk_build_model (chunk, self->materials,
+		chunk_back, chunk_front, chunk_left, chunk_right, self->grid_size, offset))
+	{
 		return NULL;
+	}
 
 	return chunk->model;
 }

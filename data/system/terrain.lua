@@ -365,6 +365,33 @@ Terrain.set_column_data = function(self, x, z)
 	return Los.terrain_set_column_data(self.handle, x, z, packet.handle)
 end
 
+--- Sets the decoration type of the given material.
+-- @param self Terrain.
+-- @param index Material index.
+-- @param type Stick type.
+Terrain.set_material_decoration_type = function(self, index, type)
+	return Los.terrain_set_material_decoration_type(self.handle, index, type)
+end
+
+--- Sets the stick type of the given material.
+-- @param self Terrain.
+-- @param index Material index.
+-- @param type Stick type.
+Terrain.set_material_stick_type = function(self, index, type)
+	return Los.terrain_set_material_stick_type(self.handle, index, type)
+end
+
+--- Sets the textures of the material.
+-- @param self Terrain.
+-- @param index Material index.
+-- @param top Top texture number.
+-- @param bottom Bottom texture number.
+-- @param side Side texture number.
+-- @param decoration Decoration texture number.
+Terrain.set_material_textures = function(self, index, top, bottom, side, decoration)
+	return Los.terrain_set_material_textures(self.handle, index, top, bottom, side, decoration)
+end
+
 --- Finds the nearest chunk whose model is out of date.
 -- @param self Terrain.
 -- @param x Grid X coordinate.

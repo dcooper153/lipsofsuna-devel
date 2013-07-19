@@ -16,6 +16,7 @@ local Program = require("system/core")
 local Terrain = require("system/terrain")
 local TerrainChunk = require("core/terrain/terrain-chunk")
 local TerrainChunkLoader = require("core/terrain/terrain-chunk-loader")
+local TerrainMaterialSpec = require("core/specs/terrain-material")
 
 --- Manages terrain chunks.
 -- @type TerrainManager
@@ -42,9 +43,16 @@ TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, 
 	self.chunk_size = chunk_size
 	self.grid_size = grid_size
 	self.generate_hooks = Hooks()
-	self.terrain = Terrain(chunk_size, grid_size)
-	self.physics = PhysicsTerrain(self.terrain)
 	self.__view_distance = 48
+	self.terrain = Terrain(chunk_size, grid_size)
+	-- Initialize the materials.
+	for k,v in pairs(TerrainMaterialSpec.dict_id) do
+		self.terrain:set_material_decoration_type(k, v.decoration_type)
+		self.terrain:set_material_stick_type(k, v.stick_type)
+		self.terrain:set_material_textures(k, v.top_texture, v.bottom_texture, v.side_texture, v.decoration_texture)
+	end
+	-- Initialize physics.
+	self.physics = PhysicsTerrain(self.terrain)
 	if Game then
 		self.physics:set_collision_group(Game.PHYSICS_GROUP_TERRAIN)
 		self.physics:set_collision_mask(Game.PHYSICS_MASK_TERRAIN)

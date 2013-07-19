@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -759,6 +759,75 @@ static void Terrain_set_column_data (LIScrArgs* args)
 	liscr_args_seti_bool (args, liext_terrain_set_column_data (args->self, grid_x, grid_z, packet->reader));
 }
 
+static void Terrain_set_material_decoration_type (LIScrArgs* args)
+{
+	int index;
+	int type;
+	LIExtTerrain* self;
+	LIExtTerrainMaterial* material;
+
+	/* Get the arguments. */
+	self = args->self;
+	if (!liscr_args_geti_int (args, 0, &index) || index < 0 || index >= LIEXT_TERRAIN_MATERIAL_MAX)
+		return;
+	if (!liscr_args_geti_int (args, 1, &type) || type < 0 || type >= LIEXT_TERRAIN_DECORATION_TYPE_MAX)
+		return;
+
+	/* Set the type. */
+	material = self->materials + index;
+	material->decoration_type = type;
+}
+
+static void Terrain_set_material_stick_type (LIScrArgs* args)
+{
+	int index;
+	int type;
+	LIExtTerrain* self;
+	LIExtTerrainMaterial* material;
+
+	/* Get the arguments. */
+	self = args->self;
+	if (!liscr_args_geti_int (args, 0, &index) || index <= 0 || index >= LIEXT_TERRAIN_MATERIAL_MAX)
+		return;
+	if (!liscr_args_geti_int (args, 1, &type) || type <= 0 || type >= LIEXT_TERRAIN_STICK_TYPE_MAX)
+		return;
+
+	/* Set the type. */
+	material = self->materials + index;
+	material->stick_type = type;
+}
+
+static void Terrain_set_material_textures (LIScrArgs* args)
+{
+	int index;
+	int top;
+	int bottom;
+	int side;
+	int decor;
+	LIExtTerrain* self;
+	LIExtTerrainMaterial* material;
+
+	/* Get the arguments. */
+	self = args->self;
+	if (!liscr_args_geti_int (args, 0, &index) || index <= 0 || index >= LIEXT_TERRAIN_MATERIAL_MAX)
+		return;
+	if (!liscr_args_geti_int (args, 1, &top))
+		top = index - 1;
+	if (!liscr_args_geti_int (args, 2, &bottom))
+		bottom = index - 1;
+	if (!liscr_args_geti_int (args, 3, &side))
+		side = index - 1;
+	if (!liscr_args_geti_int (args, 4, &decor))
+		decor = index - 1;
+
+	/* Set the textures. */
+	material = self->materials + index;
+	material->texture_top = top;
+	material->texture_bottom = bottom;
+	material->texture_side = side;
+	material->texture_decoration = decor;
+}
+
 static void Terrain_get_nearest_chunk_with_outdated_model (LIScrArgs* args)
 {
 	int grid_x;
@@ -807,6 +876,9 @@ void liext_script_terrain (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_column", Terrain_set_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_column_data", Terrain_get_column_data);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_column_data", Terrain_set_column_data);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_material_decoration_type", Terrain_set_material_decoration_type);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_material_stick_type", Terrain_set_material_stick_type);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_material_textures", Terrain_set_material_textures);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_nearest_chunk_with_outdated_model", Terrain_get_nearest_chunk_with_outdated_model);
 }
 

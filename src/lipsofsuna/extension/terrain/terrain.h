@@ -21,6 +21,7 @@
 #include "terrain-types.h"
 #include "terrain-chunk.h"
 #include "terrain-column.h"
+#include "terrain-material.h"
 #include "terrain-stick.h"
 #include "terrain-stick-filter.h"
 
@@ -30,6 +31,7 @@ struct _LIExtTerrain
 	float grid_size;
 	LIAlgU32dic* chunks;
 	LIExtTerrainModule* module;
+	LIExtTerrainMaterial materials[LIEXT_TERRAIN_MATERIAL_MAX];
 };
 
 LIAPICALL (LIExtTerrain*, liext_terrain_new, (

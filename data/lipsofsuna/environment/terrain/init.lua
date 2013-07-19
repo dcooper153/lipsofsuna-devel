@@ -1,3 +1,5 @@
+local TerrainMaterialSpec = require("core/specs/terrain-material")
+
 Program:add_path(Mod.path)
 
 TerrainMaterialSpec{
@@ -6,7 +8,9 @@ TerrainMaterialSpec{
 
 TerrainMaterialSpec{
 	name = "grass1",
-	mining_item = "soil chunk"}
+	mining_item = "soil chunk",
+	bottom_texture = 0,
+	side_texture = 0}
 
 TerrainMaterialSpec{
 	name = "granite1",

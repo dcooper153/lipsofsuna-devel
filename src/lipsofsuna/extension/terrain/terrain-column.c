@@ -115,6 +115,10 @@ int liext_terrain_column_add_stick (
 	LIExtTerrainStick* stick2;
 	LIExtTerrainStick* stick_prev;
 
+	/* Make sure that the material is valid. */
+	if (material >= LIEXT_TERRAIN_MATERIAL_MAX)
+		material = LIEXT_TERRAIN_MATERIAL_MAX - 1;
+
 	y = 0.0f;
 	stick = self->sticks;
 	stick_prev = NULL;
@@ -538,6 +542,10 @@ int liext_terrain_column_add_stick_corners (
 	float slope_bot[4];
 	float slope_top[4];
 
+	/* Make sure that the material is valid. */
+	if (material >= LIEXT_TERRAIN_MATERIAL_MAX)
+		material = LIEXT_TERRAIN_MATERIAL_MAX - 1;
+
 	/* Calculate the stick offset and height. */
 	/* We estimate the offset and height of the stick by taking the average
 	   of the bottom and top surface offsets. The vertices are then offset
@@ -562,6 +570,7 @@ int liext_terrain_column_add_stick_corners (
 /**
  * \brief Builds the model of the column.
  * \param self Terrain column.
+ * \param material Terrain materials.
  * \param sticks_back Neighbour sticks used for culling.
  * \param sticks_front Neighbour sticks used for culling.
  * \param sticks_left Neighbour sticks used for culling.
@@ -570,12 +579,13 @@ int liext_terrain_column_add_stick_corners (
  * \return Nonzero on success, zero on failure.
  */
 int liext_terrain_column_build_model (
-	LIExtTerrainColumn* self,
-	LIExtTerrainStick*  sticks_back,
-	LIExtTerrainStick*  sticks_front,
-	LIExtTerrainStick*  sticks_left,
-	LIExtTerrainStick*  sticks_right,
-	float               grid_size)
+	LIExtTerrainColumn*         self,
+	const LIExtTerrainMaterial* materials,
+	LIExtTerrainStick*          sticks_back,
+	LIExtTerrainStick*          sticks_front,
+	LIExtTerrainStick*          sticks_left,
+	LIExtTerrainStick*          sticks_right,
+	float                       grid_size)
 {
 	float u;
 	float v;
@@ -675,7 +685,7 @@ int liext_terrain_column_build_model (
 		/* Generate vertices for non-empty sticks. */
 		if (stick->material != 0)
 		{
-			u = (stick->material - 1) / 255.0f;
+			u = materials[stick->material].texture_side / 255.0f;
 
 			/* Left face. */
 			normal = limat_vector_init (-1.0f, 0.0f, 0.0f);
@@ -700,6 +710,7 @@ int liext_terrain_column_build_model (
 			/* Bottom face. */
 			if (stick_prev != NULL && stick_prev->material == 0)
 			{
+				u = materials[stick->material].texture_bottom / 255.0f;
 				v = 4.0f / 5.0f;
 				limdl_vertex_init (quad + 0, &bot[0][0].coord, &bot[0][0].normal, u, v);
 				limdl_vertex_init (quad + 1, &bot[1][0].coord, &bot[1][0].normal, u, v);
@@ -715,6 +726,7 @@ int liext_terrain_column_build_model (
 			/* Top face. */
 			if (stick->next == NULL || stick->next->material == 0)
 			{
+				u = materials[stick->material].texture_top / 255.0f;
 				v = 5.0f / 5.0f;
 				limdl_vertex_init (quad + 0, &top[0][0].coord, &top[0][0].normal, u, v);
 				limdl_vertex_init (quad + 1, &top[0][1].coord, &top[0][1].normal, u, v);

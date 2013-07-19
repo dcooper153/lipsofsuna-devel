@@ -15,15 +15,31 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_TERRAIN_TYPES_H__
-#define __EXT_TERRAIN_TYPES_H__
+/**
+ * \addtogroup LIExt Extension
+ * @{
+ * \addtogroup LIExtTerrain Terrain
+ * @{
+ */
 
-#define LIEXT_SCRIPT_TERRAIN "Terrain"
-#define LIEXT_STICK_EPSILON 0.01f
-#define LIEXT_TERRAIN_MATERIAL_MAX 32
-#define LIEXT_TERRAIN_SMOOTHING_LIMIT 0.1f
+#include "terrain-material.h"
 
-typedef struct _LIExtTerrain LIExtTerrain;
-typedef struct _LIExtTerrainModule LIExtTerrainModule;
+/**
+ * \brief Initializes the material.
+ * \param self Material.
+ * \param texture Texture number.
+ */
+void liext_terrain_material_init (
+	LIExtTerrainMaterial* self,
+	int                   texture)
+{
+	self->stick_type = LIEXT_TERRAIN_STICK_TYPE_DEFAULT;
+	self->decoration_type = LIEXT_TERRAIN_DECORATION_TYPE_NONE;
+	self->texture_top = texture;
+	self->texture_bottom = texture;
+	self->texture_side = texture;
+	self->texture_decoration = texture;
+}
 
-#endif
+/** @} */
+/** @} */
