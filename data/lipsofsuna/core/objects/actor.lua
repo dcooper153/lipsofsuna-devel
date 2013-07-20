@@ -108,7 +108,6 @@ Actor.new = function(clss, manager, id)
 	local self = SimulationObject.new(clss, manager, id)
 	self.attributes = {}
 	self.carried_weight = 0
-	self.jumped = 0
 	self.skills = Skills(self:get_id())
 	self.stats = Stats(self:get_id())
 	self.update_timer = 0.1 * math.random()
@@ -654,26 +653,6 @@ Actor.update_actions = function(self, secs)
 			end
 		end
 		self.velocity_prev = self:get_velocity()
-	end
-	-- Play the landing animation after jumping.
-	-- Initiate climbing when applicable.
-	if self.jumping then
-		-- Climbing.
-		-- Player have an explicit climb command so auto-climb is only used by NPCs.
-		if not self.client then
-			self:climb()
-		end
-		-- Landing.
-		self.jump_timer = (self.jump_timer or 0) + secs
-		if self.jump_timer > 0.2 and Program:get_time() - self.jumped > 0.8 and self.physics:get_ground() then
-			if not self.submerged or self.submerged < 0.3 then
-				self:animate("land ground")
-				Main.vision:object_effect(self, self.spec.effect_landing)
-			else
-				self:animate("land water")
-			end
-			self.jumping = nil
-		end
 	end
 end
 
