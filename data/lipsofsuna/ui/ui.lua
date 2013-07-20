@@ -425,10 +425,6 @@ Ui.handle_event = function(self, args)
 	for k,v in pairs(state_.input_post) do
 		if not v(args) then return end
 	end
-	-- Scroll with remaining mouse wheel events.
-	if args.type == "mousescroll" then
-		self:scroll(args.rel > 0 and "up" or "down")
-	end
 end
 
 --- Pushes a new state on top of the state stack and shows it.

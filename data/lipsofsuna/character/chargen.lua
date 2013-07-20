@@ -157,6 +157,7 @@ Chargen.input = function(self, args)
 		return false
 	elseif args.type == "mousescroll" then
 		Client.camera_manager:zoom(args.rel < 0 and -1 or 1)
+		return false
 	end
 	return true
 end
