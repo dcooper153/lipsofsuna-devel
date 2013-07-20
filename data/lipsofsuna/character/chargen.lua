@@ -150,8 +150,8 @@ Chargen.input = function(self, args)
 		self.data.drag = nil
 		return false
 	elseif args.type == "mousemotion" and self.data.drag then
-		local sens = Client.options.mouse_sensitivity
-		Client.camera_manager:turn(args.dx * sens)
+		local sens = Client.options.mouse_sensitivity * 0.02
+		Client.camera_manager:turn(-args.dx * sens)
 		if Client.options.invert_mouse then sens = -sens end
 		Client.camera_manager:tilt(args.dy * sens)
 		return false

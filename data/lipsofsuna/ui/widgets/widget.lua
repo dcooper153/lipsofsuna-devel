@@ -36,7 +36,9 @@ end
 UiWidget.handle_event = function(self, args)
 	if Ui:get_pointer_grab() then return true end
 	if args.type ~= "mousepress" then return true end
-	self:apply()
+	local w = self:get_widget_by_point(Vector(args.x, args.y))
+	if not w then return true end
+	return w:apply()
 end
 
 UiWidget.update = function(self, secs)

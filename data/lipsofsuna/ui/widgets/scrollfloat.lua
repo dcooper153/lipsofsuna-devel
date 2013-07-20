@@ -38,30 +38,38 @@ end
 
 Widgets.Uiscrollfloat.handle_event = function(self, args)
 	if not Ui:get_pointer_grab() then
-	   if args.type == "mousepress" then
-		   local cx = Input:get_pointer_position().x
-		   if args.button == 1 then
-			   if cx < self:get_x() + Theme.width_label_1 + Theme.width_slider_button_1 then
-				   self.value = math.max(self.value - self.step, self.min)
-				   self.need_repaint = true
-				   self:update_text()
-				   self:changed()
-			   elseif cx >= self:get_x() + self.size.x - Theme.width_slider_button_1 then
-				   self.value = math.min(self.value + self.step, self.max)
-				   self.need_repaint = true
-				   self:update_text()
-				   self:changed()
-			   else
-				   self:set_value_at(cx)
-			   end
-		   end
-		   return
-	   elseif args.type == "mousemotion" then
-		   if Input:get_mouse_button_state() % 2 == 1 then
-			   self:set_value_at(args.x)
-		   end
-		   return
-	   end
+		if args.type == "mousepress" then
+			-- Make sure that the cursor is inside.
+			local w = self:get_widget_by_point(Vector(args.x, args.y))
+			if not w then return true end
+			-- Only accept left click.
+			if args.button ~= 1 then return end
+			-- Update the value.
+			local cx = Input:get_pointer_position().x
+			if cx < self:get_x() + Theme.width_label_1 + Theme.width_slider_button_1 then
+				self.value = math.max(self.value - self.step, self.min)
+				self.need_repaint = true
+				self:update_text()
+				self:changed()
+			elseif cx >= self:get_x() + self.size.x - Theme.width_slider_button_1 then
+				self.value = math.min(self.value + self.step, self.max)
+				self.need_repaint = true
+				self:update_text()
+				self:changed()
+			else
+				self:set_value_at(cx)
+			end
+			return
+		elseif args.type == "mousemotion" then
+			-- Make sure that the cursor is inside.
+			local w = self:get_widget_by_point(Vector(args.x, args.y))
+			if not w then return true end
+			-- Set the value by click.
+			if Input:get_mouse_button_state() % 2 == 1 then
+				self:set_value_at(args.x)
+			end
+			return true
+		end
 	end
 	return Widgets.Uiwidget.handle_event(self, args)
 end
