@@ -26,7 +26,8 @@ class LIExporter(bpy.types.Operator):
 		self.orig_frame = bpy.context.scene.frame_current
 		# Initialize the state.
 		bpy.context.scene.layers = [True for x in range(0, 20)]
-		if bpy.context.scene.objects.active:
+		active = bpy.context.scene.objects.active
+		if active and not active.library:
 			bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
 		# Find exported files.
 		for obj in bpy.data.objects:
