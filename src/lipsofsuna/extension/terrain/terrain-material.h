@@ -44,6 +44,7 @@ struct _LIExtTerrainMaterial
 	int texture_bottom;
 	int texture_side;
 	int texture_decoration;
+	float texture_scaling;
 };
 
 LIAPICALL (void, liext_terrain_material_init, (

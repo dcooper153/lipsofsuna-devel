@@ -30,8 +30,11 @@
 static void private_emit_polygon (
 	LIMdlBuilder*      builder,
 	LIMatPolygon2d*    polygon,
-	float              u,
-	float              v,
+	int                material,
+	float              uoffset,
+	float              voffset,
+	float              uscale,
+	float              vscale,
 	const LIMatVector* normal,
 	const LIMatVector* bot0,
 	const LIMatVector* bot1,
@@ -39,13 +42,15 @@ static void private_emit_polygon (
 	const LIMatVector* top1);
 
 static void private_emit_triangle (
-	LIMdlBuilder*      builder,
-	float              u,
-	float              v,
-	const LIMatVector* normal,
-	const LIMatVector* v0,
-	const LIMatVector* v1,
-	const LIMatVector* v2);
+	LIMdlBuilder*        builder,
+	int                  material,
+	const LIMatVector*   normal,
+	const LIMatVector*   v0,
+	const LIMatVector*   v1,
+	const LIMatVector*   v2,
+	const LIMatVector2d* uv0,
+	const LIMatVector2d* uv1,
+	const LIMatVector2d* uv2);
 
 /*****************************************************************************/
 
@@ -80,8 +85,11 @@ void liext_terrain_face_iterator_init (
  * \brief Iterates while culling a neighbor stick.
  * \param self Face iterator.
  * \param builder Model builder.
- * \param u Texture coordinate.
- * \param v Texture coordinate.
+ * \param texture Texture index.
+ * \param uoffset Horizontal texture offset.
+ * \param voffset Vertical texture offset.
+ * \param uscale Horizontal texture scaling.
+ * \param vscale Vertical texture scaling.
  * \param normal Face normal.
  * \param bot0 Coordinates of the first bottom vertex of the neighbor face.
  * \param bot1 Coordinates of the second bottom vertex of the neighbor face.
@@ -91,8 +99,11 @@ void liext_terrain_face_iterator_init (
 void liext_terrain_face_iterator_emit (
 	LIExtTerrainFaceIterator* self,
 	LIMdlBuilder*             builder,
-	float                     u,
-	float                     v,
+	int                       texture,
+	float                     uoffset,
+	float                     voffset,
+	float                     uscale,
+	float                     vscale,
 	const LIMatVector*        normal,
 	const LIMatVector*        bot0,
 	const LIMatVector*        bot1,
@@ -189,13 +200,13 @@ void liext_terrain_face_iterator_emit (
 	DEBUGPRINT ("RESULT remain=%d pieces=%d\n", culler->remainder->vertices.count, culler->pieces.count);
 	if (culler->remainder->vertices.count)
 	{
-		private_emit_polygon (builder, culler->remainder, u, v,
-			normal, bot0, bot1, top0, top1);
+		private_emit_polygon (builder, culler->remainder, texture, uoffset, voffset,
+			uscale, vscale, normal, bot0, bot1, top0, top1);
 	}
 	for (i = 0 ; i < culler->pieces.count ; i++)
 	{
-		private_emit_polygon (builder, culler->pieces.array[i], u, v,
-			normal, bot0, bot1, top0, top1);
+		private_emit_polygon (builder, culler->pieces.array[i], texture, uoffset, voffset,
+			uscale, vscale, normal, bot0, bot1, top0, top1);
 	}
 	limat_polygon_culler_free (culler);
 
@@ -211,8 +222,11 @@ void liext_terrain_face_iterator_emit (
 static void private_emit_polygon (
 	LIMdlBuilder*      builder,
 	LIMatPolygon2d*    polygon,
-	float              u,
-	float              v,
+	int                texture,
+	float              uoffset,
+	float              voffset,
+	float              uscale,
+	float              vscale,
 	const LIMatVector* normal,
 	const LIMatVector* bot0,
 	const LIMatVector* bot1,
@@ -223,59 +237,77 @@ static void private_emit_polygon (
 	LIMatVector first;
 	LIMatVector prev;
 	LIMatVector curr;
+	LIMatVector2d first_uv;
+	LIMatVector2d prev_uv;
+	LIMatVector2d curr_uv;
 	LIMatVector2d* vertex;
 
 	if (LIMAT_ABS (normal->x) == 0.0f)
 	{
 		vertex = limat_polygon2d_get_vertex (polygon, 0);
 		first = limat_vector_init (vertex->x, vertex->y, bot0->z);
+		first_uv = limat_vector2d_init (uscale * (uoffset + vertex->x), vscale * (voffset + vertex->y));
 		vertex = limat_polygon2d_get_vertex (polygon, 1);
 		prev = limat_vector_init (vertex->x, vertex->y, bot0->z);
+		prev_uv = limat_vector2d_init (uscale * (uoffset + vertex->x), vscale * (voffset + vertex->y));
 		for (i = 2 ; i < polygon->vertices.count ; i++)
 		{
 			vertex = limat_polygon2d_get_vertex (polygon, i);
 			curr = limat_vector_init (vertex->x, vertex->y, bot0->z);
-			private_emit_triangle(builder, u, v, normal, &first, &prev, &curr);
+			curr_uv = limat_vector2d_init (uscale * (uoffset + vertex->x), vscale * (voffset + vertex->y));
+			private_emit_triangle(builder, texture, normal, &first, &prev, &curr, &first_uv, &prev_uv, &curr_uv);
 			prev = curr;
+			prev_uv = curr_uv;
 		}
 	}
 	else
 	{
 		vertex = limat_polygon2d_get_vertex (polygon, 0);
 		first = limat_vector_init (bot0->x, vertex->y, vertex->x);
+		first_uv = limat_vector2d_init (uscale * (uoffset + vertex->x), vscale * (voffset + vertex->y));
 		vertex = limat_polygon2d_get_vertex (polygon, 1);
 		prev = limat_vector_init (bot0->x, vertex->y, vertex->x);
+		prev_uv = limat_vector2d_init (uscale * (uoffset + vertex->x), vscale * (voffset + vertex->y));
 		for (i = 2 ; i < polygon->vertices.count ; i++)
 		{
 			vertex = limat_polygon2d_get_vertex (polygon, i);
 			curr = limat_vector_init (bot0->x, vertex->y, vertex->x);
-			private_emit_triangle(builder, u, v, normal, &first, &prev, &curr);
+			curr_uv = limat_vector2d_init (uscale * (uoffset + vertex->x), vscale * (voffset + vertex->y));
+			private_emit_triangle(builder, texture, normal, &first, &prev, &curr, &first_uv, &prev_uv, &curr_uv);
 			prev = curr;
+			prev_uv = curr_uv;
 		}
 	}
 }
 
 static void private_emit_triangle (
-	LIMdlBuilder*      builder,
-	float              u,
-	float              v,
-	const LIMatVector* normal,
-	const LIMatVector* v0,
-	const LIMatVector* v1,
-	const LIMatVector* v2)
+	LIMdlBuilder*        builder,
+	int                  texture,
+	const LIMatVector*   normal,
+	const LIMatVector*   v0,
+	const LIMatVector*   v1,
+	const LIMatVector*   v2,
+	const LIMatVector2d* uv0,
+	const LIMatVector2d* uv1,
+	const LIMatVector2d* uv2)
 {
 	LIMdlVertex vertices[3];
 
 	/* Initialize the vertices. */
-	limdl_vertex_init (vertices + 0, v0, normal, u, v);
-	limdl_vertex_init (vertices + 1, v1, normal, u, v);
-	limdl_vertex_init (vertices + 2, v2, normal, u, v);
+	limdl_vertex_init (vertices + 0, v0, normal, uv0->x, uv0->y);
+	limdl_vertex_init (vertices + 1, v1, normal, uv1->x, uv1->y);
+	limdl_vertex_init (vertices + 2, v2, normal, uv2->x, uv2->y);
 
-	/* Generate the colors. */
+	/* Set the atlas index. */
+	vertices[0].color[0] = texture;
+	vertices[1].color[0] = texture;
+	vertices[2].color[0] = texture;
+
+	/* Generate the splatting colors. */
 	/* FIXME: Not implemented. Should be interpolated by the polygon culler. */
-	vertices[0].color[1] = 0; vertices[0].color[2] = 0;
-	vertices[1].color[1] = 0; vertices[1].color[2] = 0;
-	vertices[2].color[1] = 0; vertices[2].color[2] = 0;
+	vertices[0].color[2] = 0; vertices[0].color[3] = 0;
+	vertices[1].color[2] = 0; vertices[1].color[3] = 0;
+	vertices[2].color[2] = 0; vertices[2].color[3] = 0;
 
 	/* Insert the triangle into the builder. */
 	limdl_builder_insert_face (builder, 0, 0, vertices, NULL);

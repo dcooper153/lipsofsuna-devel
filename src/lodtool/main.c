@@ -69,7 +69,7 @@ int main (int argc, char** argv)
 			continue;
 		}
 		limdl_builder_calculate_lod (builder, 5, 0.05f);
-		limdl_builder_finish (builder);
+		limdl_builder_finish (builder, 0);
 		limdl_builder_free (builder);
 
 		/* Save the modified model. */

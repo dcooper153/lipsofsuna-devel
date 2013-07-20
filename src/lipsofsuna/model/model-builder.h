@@ -82,7 +82,8 @@ LIAPICALL (int, limdl_builder_find_vertex, (
 	const LIMdlVertex* vertex));
 
 LIAPICALL (int, limdl_builder_finish, (
-	LIMdlBuilder* self));
+	LIMdlBuilder* self,
+	int           calculate_tangents));
 
 LIAPICALL (int, limdl_builder_insert_face, (
 	LIMdlBuilder*      self,

@@ -10,6 +10,8 @@ TerrainMaterialSpec{
 	name = "grass1",
 	mining_item = "soil chunk",
 	bottom_texture = 0,
+	decoration_texture = 3,
+	decoration_type = 1,
 	side_texture = 0}
 
 TerrainMaterialSpec{

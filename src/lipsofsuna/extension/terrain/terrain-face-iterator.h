@@ -45,8 +45,11 @@ void liext_terrain_face_iterator_init (
 void liext_terrain_face_iterator_emit (
 	LIExtTerrainFaceIterator* self,
 	LIMdlBuilder*             builder,
-	float                     u,
-	float                     v,
+	int                       texture,
+	float                     uoffset,
+	float                     voffset,
+	float                     uscale,
+	float                     vscale,
 	const LIMatVector*        normal,
 	const LIMatVector*        bot0,
 	const LIMatVector*        bot1,

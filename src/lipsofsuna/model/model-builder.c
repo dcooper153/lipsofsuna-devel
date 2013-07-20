@@ -211,10 +211,12 @@ int limdl_builder_find_vertex (
 /**
  * \brief Finishes building the model.
  * \param self Model builder.
+ * \param calculate_tangents One to calculate tangents. Zero to not calculate.
  * \return Nonzero on success.
  */
 int limdl_builder_finish (
-	LIMdlBuilder* self)
+	LIMdlBuilder* self,
+	int           calculate_tangents)
 {
 	int i;
 	int j;
@@ -294,7 +296,8 @@ int limdl_builder_finish (
 	limdl_model_calculate_bounds (self->model);
 
 	/* Calculate vertex tangents. */
-	limdl_model_calculate_tangents (self->model);
+	if (calculate_tangents)
+		limdl_model_calculate_tangents (self->model);
 
 	return 1;
 }

@@ -39,6 +39,7 @@ void liext_terrain_material_init (
 	self->texture_bottom = texture;
 	self->texture_side = texture;
 	self->texture_decoration = texture;
+	self->texture_scaling = 0.2f;
 }
 
 /** @} */

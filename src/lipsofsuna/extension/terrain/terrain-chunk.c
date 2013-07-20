@@ -288,9 +288,10 @@ int liext_terrain_chunk_build_model (
 			sticks_back = column->sticks;
 
 			/* Build the model. */
+			pos = limat_vector_add (*offset, limat_vector_init (i * grid_size, 0.0f, j * grid_size));
 			column = self->columns + i + j * self->size;
 			if (!liext_terrain_column_build_model (column, materials,
-				sticks_back, sticks_front, sticks_left, sticks_right, grid_size))
+				sticks_back, sticks_front, sticks_left, sticks_right, grid_size, &pos))
 			{
 				return 0;
 			}
@@ -328,7 +329,7 @@ int liext_terrain_chunk_build_model (
 	}
 
 	/* Finish the build. */
-	limdl_builder_finish (builder);
+	limdl_builder_finish (builder, 0);
 	limdl_builder_free (builder);
 	self->stamp_model = self->stamp;
 

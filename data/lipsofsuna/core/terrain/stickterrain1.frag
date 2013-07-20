@@ -14,6 +14,7 @@ uniform vec4 LOS_light_spotparams[LIGHTS];
 
 varying vec3 F_coord;
 varying vec3 F_normal;
+varying vec2 F_texatlas;
 varying vec2 F_texcoord;
 varying vec3 F_splatting;
 varying vec3 F_eyev;
@@ -24,24 +25,9 @@ vec3 los_blinn_phong(in vec3 lv, in vec3 ev, in vec3 ld, in vec4 eq, in vec3 nor
 
 void main()
 {
-	/* Texcoord generation.
-	 *
-	 * F_texcoord contains the texture number in X and the face index
-	 * in Y. The texture coordinate is generated using the face index
-	 * and the world space vertex coordinate. The texture atlast index
-	 * is selected using the texture number, and the texture coordinate
-	 * is fitted into the atlas image.
-	 */
-	vec2 uv_world;
-	if(F_texcoord.y < 0.25)
-		uv_world = F_coord.yz;
-	else if(F_texcoord.y < 0.65)
-		uv_world = F_coord.xy;
-	else
-		uv_world = F_coord.xz;
-	int material = int(F_texcoord.x * 255.0 + 0.5);
-	vec2 uv_atlas = vec2(mod(material, 4), floor(material / 4)) * 0.25 + vec2(0.008);
-	vec2 uv = mod(uv_world * 0.2, 1.0) * 0.234;
+	/* Texture atlas fitting. */
+	vec2 uv_atlas = F_texatlas;
+	vec2 uv = mod(F_texcoord, 1.0) * 0.234;
 
 	/* Texture splatting.
 	 *

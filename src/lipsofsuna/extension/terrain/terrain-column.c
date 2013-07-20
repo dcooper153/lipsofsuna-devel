@@ -22,6 +22,7 @@
  * @{
  */
 
+#include "lipsofsuna/extension/noise/ext-module.h"
 #include "terrain-column.h"
 #include "terrain-face-iterator.h"
 #include "terrain-types.h"
@@ -59,6 +60,13 @@ static int private_find_closest_stick (
 
 static void private_free_sticks (
 	LIExtTerrainStick* sticks);
+
+static void private_generate_grass (
+	LIExtTerrainColumn*         self,
+	LIMdlBuilder*               builder,
+	const LIExtTerrainMaterial* material,
+	LIExtColumnVertex           top[2][2],
+	const LIMatVector*          offset);
 
 static void private_insert_quad (
 	LIMdlBuilder* builder,
@@ -576,6 +584,7 @@ int liext_terrain_column_add_stick_corners (
  * \param sticks_left Neighbour sticks used for culling.
  * \param sticks_right Neighbour sticks used for culling.
  * \param grid_size Grid size.
+ * \param offset Offset of the column, in world units.
  * \return Nonzero on success, zero on failure.
  */
 int liext_terrain_column_build_model (
@@ -585,10 +594,10 @@ int liext_terrain_column_build_model (
 	LIExtTerrainStick*          sticks_front,
 	LIExtTerrainStick*          sticks_left,
 	LIExtTerrainStick*          sticks_right,
-	float                       grid_size)
+	float                       grid_size,
+	const LIMatVector*          offset)
 {
-	float u;
-	float v;
+	float s;
 	float y;
 	LIExtTerrainStick* stick;
 	LIExtTerrainStick* stick_prev;
@@ -596,11 +605,12 @@ int liext_terrain_column_build_model (
 	LIExtTerrainFaceIterator right;
 	LIExtTerrainFaceIterator front;
 	LIExtTerrainFaceIterator back;
+	const LIExtTerrainMaterial* material;
 	LIExtColumnVertex bot[2][2];
 	LIExtColumnVertex top[2][2];
 	LIMatVector normal;
 	LIMdlBuilder* builder;
-	LIMdlMaterial material;
+	LIMdlMaterial model_material;
 	LIMdlVertex quad[4];
 
 	/* Check if changes are needed. */
@@ -618,11 +628,11 @@ int liext_terrain_column_build_model (
 		limdl_model_clear (self->model);
 
 	/* Allocate the material. */
-	if (!limdl_material_init (&material))
+	if (!limdl_material_init (&model_material))
 		return 0;
-	if (!limdl_material_set_material (&material, "stickterrain1"))
+	if (!limdl_material_set_material (&model_material, "stickterrain1"))
 	{
-		limdl_material_free (&material);
+		limdl_material_free (&model_material);
 		return 0;
 	}
 
@@ -630,16 +640,16 @@ int liext_terrain_column_build_model (
 	builder = limdl_builder_new (self->model);
 	if (builder == NULL)
 	{
-		limdl_material_free (&material);
+		limdl_material_free (&model_material);
 		return 0;
 	}
-	if (!limdl_builder_insert_material (builder, &material))
+	if (!limdl_builder_insert_material (builder, &model_material))
 	{
-		limdl_material_free (&material);
+		limdl_material_free (&model_material);
 		limdl_builder_free (builder);
 		return 0;
 	}
-	limdl_material_free (&material);
+	limdl_material_free (&model_material);
 
 	/* Initialize the bottom surface data. */
 	y = 0.0f;
@@ -685,58 +695,72 @@ int liext_terrain_column_build_model (
 		/* Generate vertices for non-empty sticks. */
 		if (stick->material != 0)
 		{
-			u = materials[stick->material].texture_side / 255.0f;
+			material = materials + stick->material;
+			s = material->texture_scaling;
 
 			/* Left face. */
 			normal = limat_vector_init (-1.0f, 0.0f, 0.0f);
-			liext_terrain_face_iterator_emit (&left, builder, u, 0.0f / 5.0f, &normal,
+			liext_terrain_face_iterator_emit (&left, builder, material->texture_side,
+				 offset->z, 0.0f, s, s, &normal,
 				&bot[0][0].coord, &bot[0][1].coord, &top[0][0].coord, &top[0][1].coord);
 
 			/* Right face. */
 			normal = limat_vector_init (1.0f, 0.0f, 0.0f);
-			liext_terrain_face_iterator_emit (&right, builder, u, 1.0f / 5.0f, &normal,
+			liext_terrain_face_iterator_emit (&right, builder, material->texture_side,
+				 offset->z, 0.0f, s, s, &normal,
 				&bot[1][1].coord, &bot[1][0].coord, &top[1][1].coord, &top[1][0].coord);
 
 			/* Front face. */
 			normal = limat_vector_init (0.0f, 0.0f, -1.0f);
-			liext_terrain_face_iterator_emit (&front, builder, u, 2.0f / 5.0f, &normal,
+			liext_terrain_face_iterator_emit (&front, builder, material->texture_side,
+				 offset->x, 0.0f, s, s, &normal,
 				&bot[1][0].coord, &bot[0][0].coord, &top[1][0].coord, &top[0][0].coord);
 
 			/* Back face. */
 			normal = limat_vector_init (0.0f, 0.0f, 1.0f);
-			liext_terrain_face_iterator_emit (&back, builder, u, 3.0f / 5.0f, &normal,
+			liext_terrain_face_iterator_emit (&back, builder, material->texture_side,
+				 offset->x, 0.0f, s, s, &normal,
 				&bot[0][1].coord, &bot[1][1].coord, &top[0][1].coord, &top[1][1].coord);
 
 			/* Bottom face. */
 			if (stick_prev != NULL && stick_prev->material == 0)
 			{
-				u = materials[stick->material].texture_bottom / 255.0f;
-				v = 4.0f / 5.0f;
-				limdl_vertex_init (quad + 0, &bot[0][0].coord, &bot[0][0].normal, u, v);
-				limdl_vertex_init (quad + 1, &bot[1][0].coord, &bot[1][0].normal, u, v);
-				limdl_vertex_init (quad + 2, &bot[1][1].coord, &bot[1][1].normal, u, v);
-				limdl_vertex_init (quad + 3, &bot[0][1].coord, &bot[0][1].normal, u, v);
-				quad[0].color[0] = 255 * (int)(1.0f - bot[0][0].splatting);
-				quad[1].color[0] = 255 * (int)(1.0f - bot[1][0].splatting);
-				quad[2].color[0] = 255 * (int)(1.0f - bot[1][1].splatting);
-				quad[3].color[0] = 255 * (int)(1.0f - bot[0][1].splatting);
+				limdl_vertex_init (quad + 0, &bot[0][0].coord, &bot[0][0].normal, s * (offset->x + bot[0][0].coord.x), s * (offset->z + bot[0][0].coord.z));
+				limdl_vertex_init (quad + 1, &bot[1][0].coord, &bot[1][0].normal, s * (offset->x + bot[1][0].coord.x), s * (offset->z + bot[1][0].coord.z));
+				limdl_vertex_init (quad + 2, &bot[1][1].coord, &bot[1][1].normal, s * (offset->x + bot[1][1].coord.x), s * (offset->z + bot[1][1].coord.z));
+				limdl_vertex_init (quad + 3, &bot[0][1].coord, &bot[0][1].normal, s * (offset->x + bot[0][1].coord.x), s * (offset->z + bot[0][1].coord.z));
+				quad[0].color[0] = material->texture_bottom;
+				quad[1].color[0] = material->texture_bottom;
+				quad[2].color[0] = material->texture_bottom;
+				quad[3].color[0] = material->texture_bottom;
+				quad[0].color[1] = 255 * (int)(1.0f - bot[0][0].splatting);
+				quad[1].color[1] = 255 * (int)(1.0f - bot[1][0].splatting);
+				quad[2].color[1] = 255 * (int)(1.0f - bot[1][1].splatting);
+				quad[3].color[1] = 255 * (int)(1.0f - bot[0][1].splatting);
 				private_insert_quad (builder, quad);
 			}
 
 			/* Top face. */
 			if (stick->next == NULL || stick->next->material == 0)
 			{
-				u = materials[stick->material].texture_top / 255.0f;
-				v = 5.0f / 5.0f;
-				limdl_vertex_init (quad + 0, &top[0][0].coord, &top[0][0].normal, u, v);
-				limdl_vertex_init (quad + 1, &top[0][1].coord, &top[0][1].normal, u, v);
-				limdl_vertex_init (quad + 2, &top[1][1].coord, &top[1][1].normal, u, v);
-				limdl_vertex_init (quad + 3, &top[1][0].coord, &top[1][0].normal, u, v);
-				quad[0].color[0] = 255 * (int)(1.0f - stick->vertices[0][0].splatting);
-				quad[1].color[0] = 255 * (int)(1.0f - stick->vertices[0][1].splatting);
-				quad[2].color[0] = 255 * (int)(1.0f - stick->vertices[1][1].splatting);
-				quad[3].color[0] = 255 * (int)(1.0f - stick->vertices[1][0].splatting);
+				/* Face. */
+				limdl_vertex_init (quad + 0, &top[0][0].coord, &top[0][0].normal, s * (offset->x + top[0][0].coord.x), s * (offset->z + top[0][0].coord.z));
+				limdl_vertex_init (quad + 1, &top[0][1].coord, &top[0][1].normal, s * (offset->x + top[0][1].coord.x), s * (offset->z + top[0][1].coord.z));
+				limdl_vertex_init (quad + 2, &top[1][1].coord, &top[1][1].normal, s * (offset->x + top[1][1].coord.x), s * (offset->z + top[1][1].coord.z));
+				limdl_vertex_init (quad + 3, &top[1][0].coord, &top[1][0].normal, s * (offset->x + top[1][0].coord.x), s * (offset->z + top[1][0].coord.z));
+				quad[0].color[0] = material->texture_top;
+				quad[1].color[0] = material->texture_top;
+				quad[2].color[0] = material->texture_top;
+				quad[3].color[0] = material->texture_top;
+				quad[0].color[1] = 255 * (int)(1.0f - stick->vertices[0][0].splatting);
+				quad[1].color[1] = 255 * (int)(1.0f - stick->vertices[0][1].splatting);
+				quad[2].color[1] = 255 * (int)(1.0f - stick->vertices[1][1].splatting);
+				quad[3].color[1] = 255 * (int)(1.0f - stick->vertices[1][0].splatting);
 				private_insert_quad (builder, quad);
+
+				/* Grass. */
+				if (material->decoration_type == LIEXT_TERRAIN_DECORATION_TYPE_GRASS)
+					private_generate_grass (self, builder, material, top, offset);
 			}
 		}
 
@@ -752,7 +776,7 @@ int liext_terrain_column_build_model (
 	}
 
 	/* Finish the build. */
-	limdl_builder_finish (builder);
+	limdl_builder_finish (builder, 0);
 	limdl_builder_free (builder);
 	self->stamp_model = self->stamp;
 
@@ -1180,16 +1204,109 @@ static void private_free_sticks (
 	}
 }
 
+static void private_generate_grass (
+	LIExtTerrainColumn*         self,
+	LIMdlBuilder*               builder,
+	const LIExtTerrainMaterial* material,
+	LIExtColumnVertex           top[2][2],
+	const LIMatVector*          offset)
+{
+	int i;
+	int j;
+	float scale;
+	float anim[2][2];
+	float grass[2][2];
+	LIMatVector c;
+	LIMatVector normal;
+	LIMdlVertex quad[4];
+
+	/* Generate the corner heights. */
+	for (j = 0 ; j < 2 ; ++j)
+	{
+		for (i = 0 ; i < 2 ; ++i)
+		{
+			c = limat_vector_add (top[i][j].coord, *offset);
+			grass[i][j] = 0.7f + 0.7f * liext_noise_simplex_noise_2d(0.7 * c.x, 0.7 * c.z);
+			anim[i][j] = grass[i][j] * 0.3f * liext_noise_simplex_noise_2d(0.1 * c.x, 0.1 * c.z);
+		}
+	}
+
+	/* Diagonal. */
+	scale = 0.3f;
+	normal = limat_vector_init (0.707f, 0.0f, -0.707f);
+	limdl_vertex_init (quad + 0, &top[0][0].coord, &normal, scale * (offset->x + top[0][0].coord.x), 1.0f);
+	limdl_vertex_init (quad + 1, &top[1][1].coord, &normal, scale * (offset->x + top[1][1].coord.x), 1.0f);
+	limdl_vertex_init (quad + 2, &top[1][1].coord, &normal, scale * (offset->x + top[1][1].coord.x), 0.0f);
+	limdl_vertex_init (quad + 3, &top[0][0].coord, &normal, scale * (offset->x + top[0][0].coord.x), 0.0f);
+	quad[2].coord.y += grass[1][1];
+	quad[3].coord.y += grass[0][0];
+	quad[2].tangent.x = anim[1][1];
+	quad[3].tangent.x = anim[0][0];
+	quad[0].color[0] = material->texture_decoration;
+	quad[1].color[0] = material->texture_decoration;
+	quad[2].color[0] = material->texture_decoration;
+	quad[3].color[0] = material->texture_decoration;
+	private_insert_quad (builder, quad);
+
+	/* Diagonal. */
+	normal = limat_vector_init (0.707f, 0.0f, 0.707f);
+	limdl_vertex_init (quad + 0, &top[0][1].coord, &normal, scale * (offset->x + top[0][1].coord.z), 1.0f);
+	limdl_vertex_init (quad + 1, &top[1][0].coord, &normal, scale * (offset->x + top[1][0].coord.z), 1.0f);
+	limdl_vertex_init (quad + 2, &top[1][0].coord, &normal, scale * (offset->x + top[1][0].coord.z), 0.0f);
+	limdl_vertex_init (quad + 3, &top[0][1].coord, &normal, scale * (offset->x + top[0][1].coord.z), 0.0f);
+	quad[2].coord.y += grass[1][0];
+	quad[3].coord.y += grass[0][1];
+	quad[2].tangent.x = anim[1][0];
+	quad[3].tangent.x = anim[0][1];
+	quad[0].color[0] = material->texture_decoration;
+	quad[1].color[0] = material->texture_decoration;
+	quad[2].color[0] = material->texture_decoration;
+	quad[3].color[0] = material->texture_decoration;
+	private_insert_quad (builder, quad);
+
+	/* Front. */
+	normal = limat_vector_init (0.0f, 0.0f, 1.0f);
+	limdl_vertex_init (quad + 0, &top[0][0].coord, &normal, scale * (offset->x + top[0][0].coord.x), 1.0f);
+	limdl_vertex_init (quad + 1, &top[1][0].coord, &normal, scale * (offset->x + top[1][0].coord.x), 1.0f);
+	limdl_vertex_init (quad + 2, &top[1][0].coord, &normal, scale * (offset->x + top[1][0].coord.x), 0.0f);
+	limdl_vertex_init (quad + 3, &top[0][0].coord, &normal, scale * (offset->x + top[0][0].coord.x), 0.0f);
+	quad[2].coord.y += grass[1][0];
+	quad[3].coord.y += grass[0][0];
+	quad[2].tangent.x = -anim[1][0];
+	quad[3].tangent.x = -anim[0][0];
+	quad[0].color[0] = material->texture_decoration;
+	quad[1].color[0] = material->texture_decoration;
+	quad[2].color[0] = material->texture_decoration;
+	quad[3].color[0] = material->texture_decoration;
+	private_insert_quad (builder, quad);
+
+	/* Right. */
+	normal = limat_vector_init (1.0f, 0.0f, 0.0f);
+	limdl_vertex_init (quad + 0, &top[1][0].coord, &normal, scale * (offset->z + top[1][0].coord.z), 1.0f);
+	limdl_vertex_init (quad + 1, &top[1][1].coord, &normal, scale * (offset->z + top[1][1].coord.z), 1.0f);
+	limdl_vertex_init (quad + 2, &top[1][1].coord, &normal, scale * (offset->z + top[1][1].coord.z), 0.0f);
+	limdl_vertex_init (quad + 3, &top[1][0].coord, &normal, scale * (offset->z + top[1][0].coord.z), 0.0f);
+	quad[2].coord.y += grass[1][1];
+	quad[3].coord.y += grass[1][0];
+	quad[2].tangent.x = -anim[1][1];
+	quad[3].tangent.x = -anim[1][0];
+	quad[0].color[0] = material->texture_decoration;
+	quad[1].color[0] = material->texture_decoration;
+	quad[2].color[0] = material->texture_decoration;
+	quad[3].color[0] = material->texture_decoration;
+	private_insert_quad (builder, quad);
+}
+
 static void private_insert_quad (
 	LIMdlBuilder* builder,
 	LIMdlVertex*  quad)
 {
 	LIMdlVertex vertices[3];
 
-	quad[0].color[1] =   0; quad[0].color[2] = 0;
-	quad[1].color[1] = 255; quad[1].color[2] = 0;
-	quad[2].color[1] = 255; quad[2].color[2] = 255;
-	quad[3].color[1] =   0; quad[3].color[2] = 255;
+	quad[0].color[2] =   0; quad[0].color[3] = 0;
+	quad[1].color[2] = 255; quad[1].color[3] = 0;
+	quad[2].color[2] = 255; quad[2].color[3] = 255;
+	quad[3].color[2] =   0; quad[3].color[3] = 255;
 	vertices[0] = quad[0];
 	vertices[1] = quad[1];
 	vertices[2] = quad[2];

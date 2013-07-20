@@ -4,7 +4,8 @@ pass stickterrain1/lighting
 	ambient 0.7 0.7 0.7
 	diffuse 1.0 1.0 1.0
 	specular 1.0 1.0 1.0 1.0 64
-	cull_hardware clockwise
+	cull_hardware none
+	alpha_rejection greater_equal 128
 	texture_unit
 	{
 		texture stickterrain1.png 2d
@@ -46,10 +47,16 @@ material stickterrain1
 		scheme srt_depth
 		pass
 		{
-			vertex_program_ref depth1/vert
+			cull_hardware none
+			texture_unit
+			{
+				texture stickterrain1.png 2d
+				tex_address_mode clamp
+			}
+			vertex_program_ref depthstickterrain1/vert
 			{
 			}
-			fragment_program_ref depth1/frag
+			fragment_program_ref depthstickterrain1/frag
 			{
 			}
 		}

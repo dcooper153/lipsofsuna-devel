@@ -609,9 +609,8 @@ int limdl_model_merge (
 		return 0;
 	}
 
-	/* FIXME: Recalculates tangents unnecessarily. */
 	/* FIXME: Recalculates the bounding box from scratch even though could just calculate the intersection. */
-	limdl_builder_finish (builder);
+	limdl_builder_finish (builder, 0);
 	limdl_builder_free (builder);
 
 	return 1;

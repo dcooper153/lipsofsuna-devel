@@ -57,7 +57,7 @@ static void Model_add_material (LIScrArgs* args)
 
 	/* Insert the material. */
 	limdl_builder_insert_material (builder, &material);
-	limdl_builder_finish (builder);
+	limdl_builder_finish (builder, 0);
 
 	/* Cleanup. */
 	limdl_builder_free (builder);
@@ -176,7 +176,7 @@ static void Model_add_triangles (LIScrArgs* args)
 	/* Insert the vertices and indices. */
 	limdl_builder_insert_vertices (builder, vertices, vertices_num, NULL);
 	limdl_builder_insert_indices (builder, 0, group - 1, indices, vertices_num, 0);
-	limdl_builder_finish (builder);
+	limdl_builder_finish (builder, 1);
 
 	/* Cleanup. */
 	limdl_builder_free (builder);
@@ -201,7 +201,7 @@ static void Model_calculate_lod (LIScrArgs* args)
 	if (builder == NULL)
 		return;
 	limdl_builder_calculate_lod (builder, levels, factor);
-	limdl_builder_finish (builder);
+	limdl_builder_finish (builder, 0);
 	limdl_builder_free (builder);
 	liscr_args_seti_bool (args, 1);
 }

@@ -63,7 +63,8 @@ LIAPICALL (int, liext_terrain_column_build_model, (
 	LIExtTerrainStick*          sticks_front,
 	LIExtTerrainStick*          sticks_left,
 	LIExtTerrainStick*          sticks_right,
-	float                       grid_size));
+	float                       grid_size,
+	const LIMatVector*          offset));
 
 LIAPICALL (void, liext_terrain_column_calculate_smooth_normals, (
 	LIExtTerrainColumn* self,
