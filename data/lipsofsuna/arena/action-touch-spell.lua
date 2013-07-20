@@ -31,7 +31,7 @@ Actionspec{
 			return
 		end
 		-- Cast a straight attack ray.
-		local src,dst = action.object:get_attack_ray()
+		local src,dst = Main.combat_utils:get_attack_ray_for_actor(action.object)
 		local r = Physics:cast_ray(src, dst, nil, {action.object.physics})
 		if not r then return end
 		-- Apply the damage.

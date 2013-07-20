@@ -259,7 +259,7 @@ SimulationObject.fire = function(self, args)
 	-- Store attack charge.
 	self.charge = args.charge
 	-- Add the projectile to the world.
-	local src,dst = args.owner:get_attack_ray()
+	local src,dst = Main.combat_utils:get_attack_ray_for_actor(args.owner)
 	self:detach()
 	self.owner = args.owner
 	self:set_position(src)

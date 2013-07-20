@@ -30,7 +30,7 @@ BoomerangController.attach = function(self)
 	self.projectile.physics:set_gravity(self.projectile.spec.gravity_projectile)
 	self.projectile.controller = self
 	-- Add the projectile to the world.
-	local src,dst = self.attacker:get_attack_ray()
+	local src,dst = Main.combat_utils:get_attack_ray_for_actor(self.attacker)
 	self.projectile:detach()
 	self.projectile:set_position(src + self.attacker:get_rotation() * Vector(0,0,-1))
 	self.projectile:set_rotation(Quaternion{axis = Vector(0,0,1), angle = -0.5 * math.pi})

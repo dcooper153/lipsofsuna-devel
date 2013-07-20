@@ -181,6 +181,30 @@ CombatUtils.get_actor_attack_point = function(self, actor, position)
 	return actor:transform_local_to_global(ctr + tip)
 end
 
+--- Gets the attack ray of the actor.
+-- @param self CombatUtils.
+-- @param actor Actor.
+-- @param ray_start Start distance. Nil for default.
+-- @param ray_end End distance. Nil for default.
+-- @param rel Destination shift vector. Nil for no shift.
+-- @return Ray start point and ray end point relative to the object.
+CombatUtils.get_attack_ray_for_actor = function(self, actor, ray_start, ray_end, rel)
+	local ctr = actor.spec.aim_ray_center
+	local ray1 = Vector(0, 0, -(ray_start or actor.spec.aim_ray_start))
+	local ray2 = Vector(0, 0, -(ray_end or actor.spec.aim_ray_end))
+	if rel then ray2 = ray2 + rel * (ray_end or actor.spec.aim_ray_end) end
+	if actor.tilt then
+		local rot = Quaternion{euler = actor.tilt.euler}
+		local src = actor:transform_local_to_global(ctr + rot * ray1)
+		local dst = actor:transform_local_to_global(ctr + rot * ray2)
+		return src, dst
+	else
+		local src = actor:transform_local_to_global(ctr + ray1)
+		local dst = actor:transform_local_to_global(ctr + ray2)
+		return src, dst
+	end
+end
+
 --- Gets the combat action for the weapon of the actor or the actor itself.
 -- @param self CombatUtils.
 -- @param actor Actor.

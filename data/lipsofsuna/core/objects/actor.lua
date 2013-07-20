@@ -818,27 +818,6 @@ Actor.get_attack_charge = function(self)
 	return math.min(1, (Program:get_time() - self.attack_charge) / 2)
 end
 
---- Gets the attack ray of the actor.
--- @param self Actor.
--- @param rel Destination shift vector or nil.
--- @return Ray start point and ray end point relative to the object.
-Actor.get_attack_ray = function(self, rel)
-	local ctr = self.spec.aim_ray_center
-	local ray1 = Vector(0, 0, -self.spec.aim_ray_start)
-	local ray2 = Vector(0, 0, -self.spec.aim_ray_end)
-	if rel then ray2 = ray2 + rel * self.spec.aim_ray_end end
-	if self.tilt then
-		local rot = Quaternion{euler = self.tilt.euler}
-		local src = self:transform_local_to_global(ctr + rot * ray1)
-		local dst = self:transform_local_to_global(ctr + rot * ray2)
-		return src, dst
-	else
-		local src = self:transform_local_to_global(ctr + ray1)
-		local dst = self:transform_local_to_global(ctr + ray2)
-		return src, dst
-	end
-end
-
 --- Returns true if the actor is behaded.
 -- @param self Actor.
 -- @return Boolean.

@@ -20,7 +20,7 @@ Actionspec{
 		action.timer = action.timer + secs
 		if action.timer < action.delay then return true end
 		-- Perform the sweep.
-		local src,dst = action.object:get_attack_ray()
+		local src,dst = Main.combat_utils:get_attack_ray_for_actor(action.object, 0)
 		local r = Physics:cast_ray(src, dst, nil, {action.object.physics})
 		if r then
 			local weapon = action.object:get_weapon()

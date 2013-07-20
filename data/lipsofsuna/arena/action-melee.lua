@@ -48,7 +48,7 @@ Actionspec{
 		if r then return apply(r) end
 		if action.path[action.frame] then return true end
 		-- Cast a straight ray as a fallback.
-		local src,dst = action.object:get_attack_ray()
+		local src,dst = Main.combat_utils:get_attack_ray_for_actor(action.object)
 		local r = Physics:cast_ray(src, dst, nil, {action.object.physics})
 		if r then apply(r) end
 	end,
