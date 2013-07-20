@@ -1,4 +1,5 @@
 local UiInvItem = require("ui/widgets/invitem")
+local UiScrollInteger = require("ui/widgets/scrollinteger")
 
 Ui:add_state{
 	state = "inventory",
@@ -29,7 +30,7 @@ Ui:add_widget{
 	state = "inventory/drop",
 	widget = function()
 		local count = Client.data.inventory.count
-		return Widgets.Uiscrollinteger("Count", 1, count, count, function(w)
+		return UiScrollInteger("Count", 1, count, count, function(w)
 			Client.data.inventory.count = w.value
 		end)
 	end}
@@ -55,7 +56,7 @@ Ui:add_widget{
 		local count = Client.data.inventory.count
 		local half = math.max(1, math.ceil(count / 2))
 		Client.data.inventory.count = half
-		return Widgets.Uiscrollinteger("Count", 1, count-1, half, function(w)
+		return UiScrollInteger("Count", 1, count-1, half, function(w)
 			Client.data.inventory.count = w.value
 		end)
 	end}

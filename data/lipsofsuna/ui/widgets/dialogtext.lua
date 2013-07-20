@@ -1,10 +1,22 @@
+--- Text widget for NPC dialogs.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module ui.widgets.dialog_text
+-- @alias UiDialogText
+
 local Class = require("system/class")
-require(Mod.path .. "widget")
+local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uidialogtext = Class("Uidialogtext", Widgets.Uiwidget)
+--- Text widget for NPC dialogs.
+-- @type UiDialogText
+local UiDialogText = Class("Uidialogtext", UiWidget)
 
-Widgets.Uidialogtext.new = function(clss, id, index, char, text)
-	local self = Widgets.Uiwidget.new(clss)
+UiDialogText.new = function(clss, id, index, char, text)
+	local self = UiWidget.new(clss)
 	self.dialog_id = id
 	self.dialog_index = index
 	self.char = char
@@ -13,14 +25,14 @@ Widgets.Uidialogtext.new = function(clss, id, index, char, text)
 	return self
 end
 
-Widgets.Uidialogtext.apply = function(self)
+UiDialogText.apply = function(self)
 	Main.messaging:client_event("choose dialog answer", self.dialog_id, "")
 	Client.effects:play_global("uitransition1")
 end
 
-Widgets.Uidialogtext.rebuild_size = function(self)
+UiDialogText.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiwidget.rebuild_size(self)
+	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.text and self.char then
 		local w1,h1 = Program:measure_text(Theme.text_font_1, self.char, size.x - 25)
@@ -32,7 +44,7 @@ Widgets.Uidialogtext.rebuild_size = function(self)
 	return size
 end
 
-Widgets.Uidialogtext.rebuild_canvas = function(self)
+UiDialogText.rebuild_canvas = function(self)
 	if not self.title_height then return end
 	-- Add the backgrounds.
 	self:canvas_clear()
@@ -65,3 +77,5 @@ Widgets.Uidialogtext.rebuild_canvas = function(self)
 		text_color = Theme.text_color_1,
 		text_font = Theme.text_font_1}
 end
+
+return UiDialogText

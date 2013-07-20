@@ -1,4 +1,5 @@
 local Client = require("core/client/client")
+local UiScrollFloat = require("ui/widgets/scrollfloat")
 
 local chargen_input = function(args)
 	return Client.chargen:input(args)
@@ -139,7 +140,7 @@ Ui:add_widget{
 		local widgets = {}
 		for k,v in ipairs(ChargenSliderSpec:find_by_category("body")) do
 			local value = Client.chargen:get_body(v.field_index) or 0
-			local widget = Widgets.Uiscrollfloat(v.name, 0, 1, value, function(w)
+			local widget = UiScrollFloat(v.name, 0, 1, value, function(w)
 				Client.chargen:set_body(k, w.value)
 			end)
 			table.insert(widgets, widget)
@@ -151,7 +152,7 @@ Ui:add_widget{
 	state = "chargen/body",
 	widget = function()
 		local value = Client.chargen:get_height()
-		return Widgets.Uiscrollfloat("Height", 0, 1, value, function(w)
+		return UiScrollFloat("Height", 0, 1, value, function(w)
 			Client.chargen:set_height(w.value)
 		end)
 	end}
@@ -200,7 +201,7 @@ Ui:add_widget{
 	state = "chargen/head",
 	widget = function()
 		local value = Client.chargen:get_hair_color(1)
-		return Widgets.Uiscrollfloat("Hair hue", 0, 1, value, function(w)
+		return UiScrollFloat("Hair hue", 0, 1, value, function(w)
 			Client.chargen:set_hair_color(1, w.value)
 		end)
 	end}
@@ -209,7 +210,7 @@ Ui:add_widget{
 	state = "chargen/head",
 	widget = function()
 		local value = Client.chargen:get_hair_color(2)
-		return Widgets.Uiscrollfloat("Hair saturation", 0, 1, value, function(w)
+		return UiScrollFloat("Hair saturation", 0, 1, value, function(w)
 			Client.chargen:set_hair_color(2, w.value)
 		end)
 	end}
@@ -218,7 +219,7 @@ Ui:add_widget{
 	state = "chargen/head",
 	widget = function()
 		local value = Client.chargen:get_hair_color(3)
-		return Widgets.Uiscrollfloat("Hair lightness", 0, 1, value, function(w)
+		return UiScrollFloat("Hair lightness", 0, 1, value, function(w)
 			Client.chargen:set_hair_color(3, w.value)
 		end)
 	end}
@@ -299,7 +300,7 @@ Ui:add_widget{
 	state = "chargen/face",
 	widget = function()
 		local value = Client.chargen:get_eye_color(1)
-		return Widgets.Uiscrollfloat("Eye hue", 0, 1, value, function(w)
+		return UiScrollFloat("Eye hue", 0, 1, value, function(w)
 			Client.chargen:set_eye_color(1, w.value)
 		end)
 	end}
@@ -308,7 +309,7 @@ Ui:add_widget{
 	state = "chargen/face",
 	widget = function()
 		local value = Client.chargen:get_eye_color(2)
-		return Widgets.Uiscrollfloat("Eye saturation", 0, 1, value, function(w)
+		return UiScrollFloat("Eye saturation", 0, 1, value, function(w)
 			Client.chargen:set_eye_color(2, w.value)
 		end)
 	end}
@@ -317,7 +318,7 @@ Ui:add_widget{
 	state = "chargen/face",
 	widget = function()
 		local value = Client.chargen:get_eye_color(3)
-		return Widgets.Uiscrollfloat("Eye lightness", 0, 1, value, function(w)
+		return UiScrollFloat("Eye lightness", 0, 1, value, function(w)
 			Client.chargen:set_eye_color(3, w.value)
 		end)
 	end}
@@ -329,7 +330,7 @@ Ui:add_widget{
 		local widgets = {}
 		for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
 			local value = Client.chargen:get_face(v.field_index) or 0
-			local widget = Widgets.Uiscrollfloat(v.name, 0, 1, value, function(w)
+			local widget = UiScrollFloat(v.name, 0, 1, value, function(w)
 				Client.chargen:set_face(k, w.value)
 			end)
 			table.insert(widgets, widget)
@@ -383,7 +384,7 @@ Ui:add_widget{
 	state = "chargen/misc",
 	widget = function()
 		local value = Client.chargen:get_skin_color(1)
-		return Widgets.Uiscrollfloat("Skin hue", 0, 1, value, function(w)
+		return UiScrollFloat("Skin hue", 0, 1, value, function(w)
 			Client.chargen:set_skin_color(1, w.value)
 		end)
 	end}
@@ -392,7 +393,7 @@ Ui:add_widget{
 	state = "chargen/misc",
 	widget = function()
 		local value = Client.chargen:get_skin_color(2)
-		return Widgets.Uiscrollfloat("Skin saturation", 0, 1, value, function(w)
+		return UiScrollFloat("Skin saturation", 0, 1, value, function(w)
 			Client.chargen:set_skin_color(2, w.value)
 		end)
 	end}
@@ -401,7 +402,7 @@ Ui:add_widget{
 	state = "chargen/misc",
 	widget = function()
 		local value = Client.chargen:get_skin_color(3)
-		return Widgets.Uiscrollfloat("Skin lightness", 0, 1, value, function(w)
+		return UiScrollFloat("Skin lightness", 0, 1, value, function(w)
 			Client.chargen:set_skin_color(3, w.value)
 		end)
 	end}

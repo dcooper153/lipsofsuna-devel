@@ -1,3 +1,6 @@
+local UiDialogChoice = require("ui/widgets/dialogchoice")
+local UiDialogText = require("ui/widgets/dialogtext")
+
 Ui:add_state{
 	state = "dialog",
 	label = "Dialog",
@@ -16,11 +19,11 @@ Ui:add_state{
 		if dlg.type == "choice" then
 			-- Show dialog choices.
 			for k,v in ipairs(dlg.choices) do
-				table.insert(widgets, Widgets.Uidialogchoice(o:get_id(), k, v))
+				table.insert(widgets, UiDialogChoice(o:get_id(), k, v))
 			end
 		else
 			-- Show a dialog line.
-			table.insert(widgets, Widgets.Uidialogtext(o:get_id(), 1, dlg.character, dlg.message))
+			table.insert(widgets, UiDialogText(o:get_id(), 1, dlg.character, dlg.message))
 		end
 		return widgets
 	end}

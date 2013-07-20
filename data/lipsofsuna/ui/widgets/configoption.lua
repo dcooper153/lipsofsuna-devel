@@ -4,6 +4,8 @@ require(Mod.path .. "scrollfloat")
 require(Mod.path .. "scrollinteger")
 require(Mod.path .. "toggle")
 require(Mod.path .. "widget")
+local UiScrollFloat = require("ui/widgets/scrollfloat")
+local UiScrollInteger = require("ui/widgets/scrollinteger")
 
 Widgets.Uiconfigoption = Class("Uiconfigoption", Widgets.Uiwidget)
 
@@ -48,13 +50,13 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionfloat = Class("Uiconfigoptionfloat", Widgets.Uiscrollfloat)
+Widgets.Uiconfigoptionfloat = Class("Uiconfigoptionfloat", UiScrollFloat)
 
 Widgets.Uiconfigoptionfloat.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
 	local value = Client.options[option]
 	-- Create the widget.
-	local self = Widgets.Uiscrollfloat.new(clss, opt[1], opt[3], opt[4], value)
+	local self = UiScrollFloat.new(clss, opt[1], opt[3], opt[4], value)
 	self.key = option
 	-- Report the initial value.
 	self.changed_cb = changed
@@ -70,13 +72,13 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionint = Class("Uiconfigoptionint", Widgets.Uiscrollinteger)
+Widgets.Uiconfigoptionint = Class("Uiconfigoptionint", UiScrollInteger)
 
 Widgets.Uiconfigoptionint.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
 	local value = Client.options[option]
 	-- Create the widget.
-	local self = Widgets.Uiscrollinteger.new(clss, opt[1], opt[3], opt[4], value)
+	local self = UiScrollInteger.new(clss, opt[1], opt[3], opt[4], value)
 	self.key = option
 	-- Report the initial value.
 	self.changed_cb = changed
@@ -92,14 +94,14 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionpow = Class("Uiconfigoptionpow", Widgets.Uiscrollinteger)
+Widgets.Uiconfigoptionpow = Class("Uiconfigoptionpow", UiScrollInteger)
 
 Widgets.Uiconfigoptionpow.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
 	local value_exp = Client.options[option]
 	local value_lin = math.floor(math.log(value_exp)/math.log(2) + 0.5)
 	-- Create the widget.
-	local self = Widgets.Uiscrollinteger.new(clss, opt[1], opt[3], opt[4], value_lin)
+	local self = UiScrollInteger.new(clss, opt[1], opt[3], opt[4], value_lin)
 	self.key = option
 	-- Report the initial value.
 	self.changed_cb = changed
