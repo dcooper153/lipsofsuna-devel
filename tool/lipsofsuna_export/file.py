@@ -4,6 +4,7 @@ from .collision import *
 from .format import *
 from .hierarchy import *
 from .mesh import *
+from .mesh_utils import *
 from .modifier_edgesplit import *
 from .modifier_mirror import *
 from .particles import *
@@ -12,9 +13,8 @@ from .writer import *
 class LIFile:
 
 	def __init__(self, file):
-		self.junkobjs = []
-		self.tempobjs = []
-		self.origobjs = {}
+		self.orig_objects = {}
+		self.created_objects = {}
 		self.coll = LICollision()
 		self.hier = None
 		self.mesh = None
@@ -52,10 +52,12 @@ class LIFile:
 	# \brief Iteratively collects the data belonging to the file.
 	# \return True when done, False if more work remains.
 	def process(self):
-		# Find objects.
+		# Find all the render meshes.
 		if self.state == 0:
 			for obj in bpy.data.objects:
-				self.origobjs[obj] = True
+				if LIUtils.object_check_export(obj, self.filename, 'RENDER'):
+					self.orig_objects[obj] = True
+				obj.select = False
 			self.state += 1
 			return False
 		# Create collision shapes.
@@ -65,66 +67,61 @@ class LIFile:
 					self.coll.add_mesh(obj)
 			self.state += 1
 			return False
-		# Select meshes.
+		# Copy the render meshes.
 		elif self.state == 2:
-			for obj in bpy.data.objects:
-				sel = False
-				if LIUtils.object_check_export(obj, self.filename, 'RENDER'):
-					sel = True
-				obj.select = sel
+			for obj in self.orig_objects:
+				self.orig_objects[obj] = True
+				created = LIMeshUtils.copy_object(obj)
+				self.created_objects[created] = obj
 			self.state += 1
 			return False
-		# Duplicate the meshes and select them.
+		# Apply the modifiers of the render meshes.
 		elif self.state == 3:
-			bpy.ops.object.duplicate()
-			for obj in bpy.data.objects:
-				if obj.select:
-					if obj in self.origobjs:
-						# Unselect originals.
-						obj.select = False
-					else:
-						# Select duplicates.
-						obj.select = True
-						self.tempobjs.append(obj)
+			for created,original in self.created_objects.items():
+				LIMeshUtils.apply_modifiers(created, original.modifiers)
+				created.select = False
 			self.state += 1
 			return False
-		# Apply modifiers to the duplicated meshes.
-		# This is currently setup so that multires and armature are the only
-		# modifiers that can coexist with shape keys. If any other modifiers
-		# exist, the shape key information is lost.
+		# Transfer the shape keys of the render meshes.
 		elif self.state == 4:
-			for obj in self.tempobjs:
-				# Remove unwanted modifiers.
-				num = 0
-				for mod in obj.modifiers:
-					if mod.type == 'ARMATURE' or mod.type == 'MULTIRES':
-						obj.modifiers.remove(mod)
-					elif mod.type == "MIRROR" and obj.data.shape_keys:
-						self.junkobjs.append(obj)
-						obj.select = False
-						m = LIModifierMirror(obj, mod)
-						newobj = m.apply()
-						newobj.select = True
-						self.tempobjs[self.tempobjs.index(obj)] = newobj
-					elif mod.type == "EDGE_SPLIT" and obj.data.shape_keys:
-						self.junkobjs.append(obj)
-						obj.select = False
-						m = LIModifierEdgeSplit(obj, mod)
-						newobj = m.apply()
-						newobj.select = True
-						self.tempobjs[self.tempobjs.index(obj)] = newobj
+			for created,original in self.created_objects.items():
+				if not original.data.shape_keys:
+					continue
+				for i,key in enumerate(original.data.shape_keys.key_blocks):
+					# Skip the basis shape.
+					if not i:
+						continue
+					# Create a mesh from the shape key.
+					tmp = LIMeshUtils.copy_object_with_shape_keys(original)
+					LIMeshUtils.apply_shape_key(tmp, i)
+					# Apply the modifiers to the mesh.
+					LIMeshUtils.apply_modifiers(tmp, original.modifiers)
+					# Add a shape key to the temporary mesh.
+					bpy.context.scene.objects.active = tmp
+					bpy.ops.object.shape_key_add()
+					# Transfer the shape key to the render mesh.
+					if len(tmp.data.vertices) != len(created.data.vertices):
+						print("""WARNING: Shape key \"%s\" cannot be exported because the vertex count was
+         different to that of the basis after applying modifiers. The shape key
+         had %d vertices while the basis shape had %d. Check that the mirror
+         modifier merges the vertices identically in both of the shape keys.""" %
+							(key.name, len(tmp.data.vertices), len(created.data.vertices)))
 					else:
-						num += 1
-				# Apply modifiers.
-				if num:
-					oldmesh = obj.data
-					obj.data = obj.to_mesh(bpy.context.scene, True, 'PREVIEW')
-					bpy.data.meshes.remove(oldmesh)
+						tmp.select = True
+						bpy.context.scene.objects.active = created
+						original.data.shape_keys.key_blocks
+						bpy.ops.object.join_shapes()
+						shapes = created.data.shape_keys.key_blocks
+						shapes[len(shapes) - 1].name = key.name
+					# Delete the temporary mesh.
+					bpy.context.scene.objects.active = tmp
+					bpy.ops.object.delete()
+				created.select = False
 			self.state += 1
 			return False
-		# Simplify the duplicated meshes.
+		# Simplify the render meshes.
 		elif self.state == 5:
-			for obj in self.tempobjs:
+			for obj in self.created_objects:
 				# Apply transformation.
 				bpy.context.scene.objects.active = obj
 				bpy.ops.object.location_clear()
@@ -141,11 +138,13 @@ class LIFile:
 				bpy.ops.object.vertex_group_clean(all_groups=True)
 			self.state += 1
 			return False
-		# Join the duplicated meshes.
+		# Join the render meshes.
 		elif self.state == 6:
-			if len(self.tempobjs) > 1:
+			if len(self.created_objects) > 1:
+				for obj in self.created_objects:
+					obj.select = True
 				bpy.ops.object.join()
-			if len(self.tempobjs):
+			if len(self.created_objects):
 				self.object = bpy.context.scene.objects.active
 			self.state += 1
 			return False
@@ -170,14 +169,12 @@ class LIFile:
 			return False
 		# Delete the temporary mesh.
 		elif self.state == 9:
-			need = False
 			if self.object != None:
-				bpy.ops.object.delete()
-				need = True
-			for obj in self.junkobjs:
-				obj.select = True
-				need = True
-			if need:
+				for obj in bpy.data.objects:
+					if obj == self.object:
+						obj.select = True
+					else:
+						obj.select = False
 				bpy.ops.object.delete()
 			self.state += 1
 			return False

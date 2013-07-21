@@ -15,6 +15,7 @@ from .material import *
 from .material_export_settings_operator import *
 from .material_property_panel import *
 from .mesh import *
+from .mesh_utils import *
 from .node import *
 from .node_armature import *
 from .node_bone import *
