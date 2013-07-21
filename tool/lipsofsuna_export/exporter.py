@@ -1,6 +1,7 @@
 import bpy
 from .file import *
 from .format import *
+from .mesh_cleaner import *
 from .utils import *
 
 class LIExporter(bpy.types.Operator):
@@ -40,6 +41,8 @@ class LIExporter(bpy.types.Operator):
 		# input so we have to export in one pass even though our code
 		# could easily do it iteratively.
 		bpy.context.user_preferences.edit.use_global_undo = False
+		self.meshes = LIMeshCleaner()
+		self.meshes.process_all()
 		while self.process():
 			pass
 		bpy.context.user_preferences.edit.use_global_undo = True
@@ -49,7 +52,7 @@ class LIExporter(bpy.types.Operator):
 		if self.state < len(self.files):
 			# Get the processed file.
 			if len(LIFormat.files) <= self.state:
-				file = LIFile(self.files[self.state])
+				file = LIFile(self.files[self.state], self.meshes.created_objects)
 				LIFormat.files.append(file)
 			else:
 				file = LIFormat.files[self.state]
@@ -62,6 +65,7 @@ class LIExporter(bpy.types.Operator):
 			return True
 		elif self.state == len(self.files):
 			# Restore state.
+			self.meshes.delete_created_objects()
 			bpy.context.scene.layers = self.orig_layers
 			bpy.context.scene.frame_set(self.orig_frame)
 			# Show the results.

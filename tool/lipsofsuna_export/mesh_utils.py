@@ -129,6 +129,12 @@ class LIMeshUtils:
 		object_data_add(bpy.context, new_mesh, operator=None)
 		new_obj = bpy.context.active_object
 
+		# Copy the transformation.
+		#new_obj.location = obj.location
+		#new_obj.rotation_quaternion = obj.rotation_quaternion
+		#new_obj.scale = obj.scale
+		new_obj.matrix_world = obj.matrix_world
+
 		# Copy the properties.
 		def copyprop(prop):
 			try:

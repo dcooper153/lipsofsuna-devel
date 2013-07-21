@@ -58,7 +58,10 @@ class LIUtils:
 		except:
 			pass
 		# Make sure that the filename matches.
-		if file not in cls.get_files_for_object(object):
+		files = cls.get_files_for_object(object)
+		if not files:
+			return False
+		if file and file not in files:
 			return False
 		# Make sure that the type is a requested one.
 		if type == 'NODE':
