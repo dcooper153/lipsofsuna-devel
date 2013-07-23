@@ -22,6 +22,7 @@ local Settings = Class("Settings")
 -- @return Settings.
 Settings.new = function(clss, mods)
 	local self = Class.new(clss)
+	self.__launch = nil
 	self.mods = mods
 	self.arguments = String.split(Program:get_args())
 	return self
@@ -59,7 +60,13 @@ Settings.parse_command_line = function(self)
 		-- Try mod launchers.
 		for k,v in ipairs(self.mods.launchers) do
 			if a[i] == v.short or a[i] == v.long then
-				self[v.name] = true
+				if self.__launch then
+					self.help = true
+				end
+				if v.dedicated then
+					self.server = true
+				end
+				self.__launch = v.name
 				incr = 1
 			end
 		end
@@ -122,6 +129,13 @@ Settings.usage = function(self)
 		table.sort(opts)
 		return msg .. table.concat(opts, "\n")
 	end
+end
+
+--- Gets the launched game mode.
+-- @param self Settings.
+-- @return String if specified. Nil otherwise.
+Settings.get_game_mode = function(self)
+	return self.__launch
 end
 
 return Settings

@@ -29,13 +29,6 @@ Main.main_start_hooks:register(0, function(secs)
 	end)
 end)
 
-Main.main_start_hooks:register(1000, function()
-	if Main.settings.crafting then
-		Main:start_game("Crafting")
-		return Hooks.STOP
-	end
-end)
-
 Main.update_hooks:register(0, function(secs)
 	if Main.crafting then
 		Main.timing:start_action("crafting")

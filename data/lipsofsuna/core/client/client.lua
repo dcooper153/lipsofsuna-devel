@@ -168,6 +168,16 @@ Client.register_update_hook = function(self, priority, hook)
 	self.update_hooks:register(priority, hook)
 end
 
+Client.show_main_menu = function(self, settings)
+	if settings and settings.join then
+		Main.join:join_game()
+	elseif settings and settings.host then
+		Main.host:host_game()
+	else
+		Ui:set_state("mainmenu")
+	end
+end
+
 Client.update = function(self, secs)
 	self.update_hooks:call(secs)
 end

@@ -2,7 +2,7 @@
 	"launchers":
 	[
 		{
-			"name": "character",
+			"name": "Character",
 			"desc": "Run the character creator.",
 			"short": "-C",
 			"long": "--character"

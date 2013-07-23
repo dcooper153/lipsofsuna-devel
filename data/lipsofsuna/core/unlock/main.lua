@@ -6,8 +6,8 @@ end)
 
 Main.game_start_hooks:register(15, function()
 	Main.unlocks:reset()
-	Main.unlocks:set_database(Main.game.database)
-	if Settings.generate then
+	Main.unlocks:set_database(Main.game and Main.game.database)
+	if Main.settings.generate then
 		Main.unlocks:reset_database()
 		Main.unlocks:save()
 	else

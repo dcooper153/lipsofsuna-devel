@@ -2,7 +2,7 @@
 	"launchers":
 	[
 		{
-			"name": "crafting",
+			"name": "Crafting",
 			"desc": "Run the crafting subgame.",
 			"short": "-R",
 			"long": "--crafting"

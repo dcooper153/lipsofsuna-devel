@@ -15,13 +15,6 @@ Main.game_modes:register("Character", function()
 	Ui:set_state("chargen")
 end)
 
-Main.main_start_hooks:register(1000, function()
-	if Main.settings.character then
-		Main:start_game("Character")
-		return Hooks.STOP
-	end
-end)
-
 Client:register_init_hook(26, function()
 	Client.chargen = Chargen()
 	Client.camera_manager:register_camera("chargen", Client.chargen.camera)

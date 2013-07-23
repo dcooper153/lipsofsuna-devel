@@ -2,7 +2,7 @@
 	"launchers":
 	[
 		{
-			"name": "arena",
+			"name": "Arena",
 			"desc": "Run the arena subgame.",
 			"short": "-A",
 			"long": "--arena"

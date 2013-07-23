@@ -17,13 +17,6 @@ Main.game_modes:register("Landscape", function()
 	Ui:set_state("landscape")
 end)
 
-Main.main_start_hooks:register(1000, function()
-	if Main.settings.landscape then
-		Main:start_game("Landscape")
-		return Hooks.STOP
-	end
-end)
-
 Main.update_hooks:register(0, function(secs)
 	if Main.landscape then
 		Main.timing:start_action("landscape")

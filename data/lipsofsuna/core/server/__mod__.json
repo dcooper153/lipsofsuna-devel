@@ -2,10 +2,11 @@
 	"launchers":
 	[
 		{
-			"name": "server",
+			"name": "Server",
 			"desc": "Run as a dedicated server.",
 			"short": "-S",
-			"long": "--server"
+			"long": "--server",
+			"dedicated": true
 		}
 	],
 	"options":

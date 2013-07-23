@@ -2,7 +2,7 @@
 	"launchers":
 	[
 		{
-			"name": "building",
+			"name": "Building",
 			"desc": "Run the building subgame.",
 			"short": "-B",
 			"long": "--building"

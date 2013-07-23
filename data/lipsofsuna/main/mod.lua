@@ -221,4 +221,14 @@ Mod.load_list_json = function(self, json, nocompat)
 	end
 end
 
+--- Gets information on a game mode launcher.
+-- @param self Mod.
+-- @param name String.
+-- @return Table if found. Nil otherwise.
+Mod.get_launcher_info = function(self, name)
+	for k,v in pairs(self.launchers) do
+		if v.name == name then return v end
+	end
+end
+
 return Mod

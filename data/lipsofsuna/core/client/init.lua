@@ -47,14 +47,6 @@ Main.main_start_hooks:register(10, function(secs)
 	end)
 	Main.client = Client --FIXME
 	Main.client:init()
-	-- FIXME
-	if Main.settings.join then
-		Main.join:join_game()
-	elseif Main.settings.host then
-		Main.host:host_game()
-	else
-		Ui:set_state("mainmenu")
-	end
 end)
 
 Main.main_end_hooks:register(10, function(secs)

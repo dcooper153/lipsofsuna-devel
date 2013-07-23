@@ -2,7 +2,7 @@
 	"launchers":
 	[
 		{
-			"name": "landscape",
+			"name": "Landscape",
 			"desc": "Run the landscape subgame.",
 			"short": "-L",
 			"long": "--landscape"

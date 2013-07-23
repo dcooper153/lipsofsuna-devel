@@ -29,13 +29,6 @@ Main.main_start_hooks:register(0, function(secs)
 	end)
 end)
 
-Main.main_start_hooks:register(1000, function()
-	if Main.settings.arena then
-		Main:start_game("Arena")
-		return Hooks.STOP
-	end
-end)
-
 Main.update_hooks:register(0, function(secs)
 	if Main.arena then
 		Main.timing:start_action("arena")

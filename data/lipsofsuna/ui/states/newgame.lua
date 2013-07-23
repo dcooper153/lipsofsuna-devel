@@ -25,7 +25,10 @@ Ui:add_widget{
 		-- Get the items from main.
 		local modes = {}
 		for k,v in Main.game_modes:get_modes() do
-			table.insert(modes, {k, function(w) game_mode = k end})
+			local info = Main.mods:get_launcher_info(k)
+			if not info or not info.dedicated then
+				table.insert(modes, {k, function(w) game_mode = k end})
+			end
 		end
 		-- Sort the items.
 		table.sort(modes, function(a, b) return a[1] < b[1] end)

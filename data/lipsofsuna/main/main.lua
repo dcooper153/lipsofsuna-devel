@@ -72,8 +72,15 @@ Main.main = function(self)
 	if self.settings.quit then
 		Program:set_quit(true)
 	end
-	-- Enter the main loop.
+	-- Start the game.
 	self.main_start_hooks:call()
+	local mode = self.settings:get_game_mode()
+	if mode then
+		self:start_game(mode)
+	else
+		self.client:show_main_menu(self.settings)
+	end
+	-- Enter the main loop.
 	self:enable_manual_gc()
 	while not Program:get_quit() do
 		-- Update the program state.
