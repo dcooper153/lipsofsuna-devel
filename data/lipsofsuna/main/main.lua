@@ -64,79 +64,52 @@ end
 --- Enters the main loop.
 -- @param self Main.
 Main.main = function(self)
+	-- Check for early exit.
 	if not self.start then
 		print(self.settings:usage())
 		return
 	end
-	-- Enter the main loop.
 	if self.settings.quit then
 		Program:set_quit(true)
-	elseif self.settings.server then
-		-- Server main.
-		self.main_start_hooks:call()
-		self:start_game("server", self.settings.file, self.settings.port)
-		Server:load()
-		Program:set_sleep(1/60)
-		self:enable_manual_gc()
-		while not Program:get_quit() do
-			-- Update the program state.
-			local tick = self.timing:get_frame_duration()
-			self.timing:start_frame()
-			self.timing:start_action("program")
-			Program:update()
-			-- Process events.
-			self.timing:start_action("event")
-			Eventhandler:update()
-			-- Update the logic.
-			self.update_hooks:call(tick)
-			self.timing:start_action("sectors")
-			if self.game then
-				self.game.sectors:update(tick)
-			end
-			self.timing:start_action("resources")
-			self.images:update(tick)
-			self.models:update(tick)
-			-- Collect garbage.
-			self.timing:start_action("garbage")
-			self:perform_manual_gc(tick)
+	end
+	-- Enter the main loop.
+	self.main_start_hooks:call()
+	self:enable_manual_gc()
+	while not Program:get_quit() do
+		-- Update the program state.
+		local tick = self.timing:get_frame_duration()
+		self.timing:start_frame()
+		self.timing:start_action("program")
+		if self.settings.watchdog then
+			Watchdog:start(30)
 		end
-		self:end_game()
-		self.main_end_hooks:call()
-	else
-		-- Client main.
-		self.main_start_hooks:call()
-		self:enable_manual_gc()
-		while not Program:get_quit() do
-			-- Update the program state.
-			local tick = self.timing:get_frame_duration()
-			self.timing:start_frame()
-			self.timing:start_action("program")
-			if self.settings.watchdog then
-				Watchdog:start(30)
-			end
-			Program:update()
+		Program:update()
+		if self.client then
+			self.timing:start_action("scene")
 			Program:update_scene(tick)
-			-- Process events.
-			self.timing:start_action("event")
-			Eventhandler:update()
-			-- Update the logic.
-			self.timing:start_action("sectors")
-			if self.game then
-				self.game.sectors:update(tick)
-			end
-			self.update_hooks:call(tick)
-			self.timing:start_action("resources")
-			self.images:update(tick)
-			self.models:update(tick)
-			-- Render the scene.
+		end
+		-- Process events.
+		self.timing:start_action("event")
+		Eventhandler:update()
+		-- Update the logic.
+		self.timing:start_action("sectors")
+		if self.game then
+			self.game.sectors:update(tick)
+		end
+		self.update_hooks:call(tick)
+		self.timing:start_action("resources")
+		self.images:update(tick)
+		self.models:update(tick)
+		-- Render the scene.
+		if self.client then
 			self.timing:start_action("render")
 			Program:render_scene()
-			-- Collect garbage.
-			self.timing:start_action("garbage")
-			self:perform_manual_gc(tick)
 		end
-		self.main_end_hooks:call()
+		-- Collect garbage.
+		self.timing:start_action("garbage")
+		self:perform_manual_gc(tick)
 	end
+	self.main_end_hooks:call()
 end
 
 --- Ends the game.

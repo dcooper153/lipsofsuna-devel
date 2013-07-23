@@ -1,3 +1,10 @@
+Main.game_modes:register("Server", function()
+	Main.game = Game("server", Main.settings.file, Main.settings.port)
+	Main.game.sectors.unload_time = nil
+	Server:load()
+	Program:set_sleep(1/60)
+end)
+
 Main.main_start_hooks:register(5, function(secs)
 	Main.server = Server --FIXME
 	Main.objects.object_update_hooks:register(5, function(object, secs)
