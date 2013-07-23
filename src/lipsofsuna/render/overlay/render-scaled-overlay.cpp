@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,6 +24,7 @@
  * @{
  */
 
+#include "lipsofsuna/math.h"
 #include "render-scaled-overlay.hpp"
 #include "render-tile-packer.hpp"
 #include <OgreHardwareBufferManager.h>
@@ -70,6 +71,14 @@ void LIRenScaledOverlay::updatePositionGeometry ()
 		top,
 		top - yscale * mPixelHeight
 	};
+
+	// Ogre seems to divide by zero during startup when the viewport
+	// hasn't been initialized. Refuse to do anything if that happened.
+	if (!limat_number_is_finite (left) || !limat_number_is_finite (top))
+	{
+		render_op.vertexData->vertexCount = 0;
+		return;
+	}
 
 	/* Calculate texture coordinates. */
 	float uscale = 1.0f / src_size[0];
