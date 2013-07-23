@@ -393,7 +393,7 @@ Ui.handle_event = function(self, args)
 		mouse_event = true
 	end
 	-- Trigger the back action if the cursor hit the left edge.
-	if mouse_mode then
+	if mouse_mode and args.type == "mousemotion" then
 		local snapped = (args.x == 0)
 		local snapped_prev = self.__snapped_left
 		self.__snapped_left = snapped
@@ -807,6 +807,8 @@ Ui.set_pointer_grab = function(self, v)
 		self.__pointer_grab = false
 		self.cursor:set_floating(true)
 		Input:set_pointer_grab(false)
+		-- Prevent instant menu close if the cursor was at the left edge.
+		self.__snapped_left = true
 	end
 end
 
