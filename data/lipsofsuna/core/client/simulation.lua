@@ -15,6 +15,7 @@ local Color = require("system/color")
 local Item = require("core/objects/item")
 local Obstacle = require("core/objects/obstacle")
 local Physics = require("system/physics")
+local PhysicsConsts = require("core/server/physics-consts")
 local Spell = require("core/objects/spell")
 local Staticobject = require("core/objects/static")
 
@@ -97,7 +98,7 @@ Simulation.pick_scene_by_ray = function(clss, ray1, ray2, ignore)
 	local best_point = nil
 	local best_dist = nil
 	-- Pick from the scene.
-	local ret = Physics:cast_ray(ray1, ray2, Game.PHYSICS_MASK_PICK, ignore)
+	local ret = Physics:cast_ray(ray1, ray2, PhysicsConsts.MASK_PICK, ignore)
 	if not ret then return end
 	return ret.point, ret.object and Main.objects:find_by_id(ret.object), ret.tile
 end

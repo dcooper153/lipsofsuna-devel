@@ -19,18 +19,6 @@ local SectorManager = require("core/server/sector-manager")
 Game = Class("Game")
 Game.scene_nodes_by_ref = {}
 
-Game.PHYSICS_GROUP_ACTORS = 0x0001
-Game.PHYSICS_GROUP_ITEMS = 0x0002
-Game.PHYSICS_GROUP_PLAYERS = 0x0004
-Game.PHYSICS_GROUP_TERRAIN = 0x0800
-Game.PHYSICS_GROUP_OBSTACLES = 0x1000
-Game.PHYSICS_GROUP_STATICS = 0x2000
-Game.PHYSICS_GROUP_HEIGHTMAP = 0x4000
-Game.PHYSICS_GROUP_VOXELS = 0x8000
-Game.PHYSICS_MASK_CAMERA = 0xFF03
-Game.PHYSICS_MASK_PICK = 0xFF03
-Game.PHYSICS_MASK_TERRAIN = 0x00FF
-
 --- Initializes the game.
 -- @param self Game.
 -- @param mode Game mode, "benchmark"/"editor"/"host"/"join"/"server".

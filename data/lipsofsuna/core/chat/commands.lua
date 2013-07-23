@@ -5,6 +5,7 @@ local Marker = require("core/marker")
 local ModifierSpec = require("core/specs/modifier")
 local Obstacle = require("core/objects/obstacle")
 local Physics = require("system/physics")
+local PhysicsConsts = require("core/server/physics-consts")
 local Staticobject = require("core/objects/static")
 
 ChatCommand{
@@ -129,8 +130,8 @@ ChatCommand{
 			player:send_message("/noclip mode off.")
 			player.noclip = nil
 			player.flying = player.spec.flying or false
-			player.physics:set_collision_mask(0xFFFF)
-			player.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYER)
+			player.physics:set_collision_mask(PhysicsConsts.MASK_ALL)
+			player.physics:set_collision_group(PhysicsConsts.GROUP_PLAYER)
 			player.physics:set_gravity(player.spec.gravity)
 			player.physics:set_gravity_liquid(player.spec.water_gravity)
 		else

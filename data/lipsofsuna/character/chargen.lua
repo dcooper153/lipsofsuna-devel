@@ -14,6 +14,7 @@ local Class = require("system/class")
 local Color = require("system/color")
 local Hooks = require("system/hooks")
 local Json = require("system/json")
+local PhysicsConsts = require("core/server/physics-consts")
 
 local scale255 = function(t)
 	local res = {}
@@ -223,7 +224,7 @@ Chargen.update = function(self, secs)
 		local spec = Actorspec:find_by_name(self.char.race .. "-player")
 		local data = self:get_build_data()
 		self.data.object:set_spec(spec)
-		self.data.object.physics:set_collision_group(Game.PHYSICS_GROUP_PLAYERS)
+		self.data.object.physics:set_collision_group(PhysicsConsts.GROUP_PLAYERS)
 		self.data.object.body_scale = self.char.height
 		self.data.object.body_style = scale255(self.char.body)
 		--self.data.object.equipment = {"bloomers", "bloomers top"}

@@ -12,6 +12,7 @@ local Camera = require("system/camera")
 local Class = require("system/class")
 local MathUtils = require("system/math/utils")
 local Physics = require("system/physics")
+local PhysicsConsts = require("core/server/physics-consts")
 
 --- Third person camera.
 -- @type ThirdPersonCamera
@@ -23,7 +24,7 @@ local ThirdPersonCamera = Class("ThirdPersonCamera", Camera)
 -- @return Third person camera.
 ThirdPersonCamera.new = function(clss, args)
 	local self = Camera.new(clss, args)
-	self:set_collision_mask(Game.PHYSICS_MASK_CAMERA)
+	self:set_collision_mask(PhysicsConsts.MASK_CAMERA)
 	self.mode = "third-person"
 	self.displacement_smoothing_rate = 0.1
 	self.tilt_speed = 0
