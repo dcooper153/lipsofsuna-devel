@@ -34,10 +34,10 @@ Settings.parse_command_line = function(self)
 	-- Parses an individual argument.
 	local parse_argument = function(mode, a, i)
 		if mode == "string" then
-			if i < #a then return end
+			if i >= #a then return end
 			return a[i + 1],2
 		elseif mode == "int" then
-			if i < #a then return end
+			if i >= #a then return end
 			return tonumber(a[i + 1]),2
 		elseif mode == "false" then
 			return false,1
