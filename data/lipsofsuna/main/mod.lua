@@ -40,6 +40,12 @@ Mod.init_all = function(self, settings)
 		if settings.client and m.client == false then return end
 		return true
 	end
+	local needed_script = function(name, mode)
+		if not needed(name) then return end
+		if not mode then return true end
+		if mode == "server" and settings.server then return true end
+		if mode == "client" and settings.client then return true end
+	end
 	-- Add the resource paths.
 	if self.resources then
 		for k,v in ipairs(self.resources) do
@@ -50,7 +56,7 @@ Mod.init_all = function(self, settings)
 	end
 	-- Run the scripts.
 	for k,v in ipairs(self.scripts) do
-		if needed(v[1]) then
+		if needed_script(v[1], v[4]) then
 			local prev_name = self.name
 			local prev_path = self.path
 			self.name = v[1]
@@ -159,6 +165,18 @@ Mod.load = function(self, name, optional, nocompat)
 		local path = name .. "/"
 		for k,v in ipairs(info.scripts) do
 			table.insert(self.scripts, {name, path, name .. "/" .. v})
+		end
+	end
+	if info.client_scripts then
+		local path = name .. "/"
+		for k,v in ipairs(info.client_scripts) do
+			table.insert(self.scripts, {name, path, name .. "/" .. v, "client"})
+		end
+	end
+	if info.server_scripts then
+		local path = name .. "/"
+		for k,v in ipairs(info.server_scripts) do
+			table.insert(self.scripts, {name, path, name .. "/" .. v, "server"})
 		end
 	end
 	-- Load child mods.

@@ -8,10 +8,8 @@
 			"long": "--arena"
 		}
 	],
-	"server": false,
 	"scripts":
 	[
-		"main",
 		"action-attack",
 		"action-bite",
 		"action-block",
@@ -21,6 +19,10 @@
 		"action-self-spell",
 		"action-throw",
 		"action-touch-spell"
+	],
+	"client_scripts":
+	[
+		"main"
 	],
 	"specs":
 	[

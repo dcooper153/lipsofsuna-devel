@@ -8,7 +8,14 @@
 			"long": "--building"
 		}
 	],
-	"server": false,
-	"scripts": ["main", "action-build", "action-dig"],
+	"scripts":
+	[
+		"action-build",
+		"action-dig"
+	],
+	"client_scripts":
+	[
+		"main"
+	],
 	"specs": ["specs"]
 }
