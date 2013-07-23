@@ -1344,6 +1344,13 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
   </asset>
 
   <asset>
+    <file>data/lipsofsuna/sounds/xeon5.ogg</file>
+    <author>Bart Kelsey</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/xeon-theme</source>
+  </asset>
+
+  <asset>
     <file>data/lipsofsuna/sounds/beam-000.flac</file>
     <file>data/lipsofsuna/sounds/hop-000.flac</file>
     <file>data/lipsofsuna/sounds/item1.flac</file>

@@ -603,7 +603,7 @@ Actor.update = function(self, secs)
 			self.update_timer = 0
 		end
 		-- Update the AI.
-		if self.ai and not self.dead then
+		if self.ai then
 			self.ai:update(secs)
 		end
 	end
@@ -857,6 +857,22 @@ end
 -- @return True if burdened.
 Actor.get_burdened = function(self)
 	return self.carried_weight > self:get_burden_limit()
+end
+
+--- Gets the hint on whether the actor is hostile at someone.
+-- @param self Actor.
+-- @return True if set. False otherwise.
+Actor.get_combat_hint = function(self)
+	return self.__combat_hint or false
+end
+
+--- Sets the hint on whether the actor is hostile at someone.
+-- @param self Actor.
+-- @param Value True to set the hint. Nil otherwise.
+Actor.set_combat_hint = function(self, value)
+	if self.__combat_hint == value then return end
+	self.__combat_hint = value
+	Main.vision:object_event(self, "object-combat")
 end
 
 Actor.set_dead_state = function(self, drop)

@@ -284,6 +284,10 @@ Player.vision_cb = function(self, args)
 			if o:get_static() then return end
 			Main.messaging:server_event("object beheaded", self.client, o:get_id(), o:get_beheaded())
 		end,
+		["object-combat"] = function(args)
+			local o = args.object
+			Main.messaging:server_event("object combat", self.client, o:get_id(), o:get_combat_hint())
+		end,
 		["object-dead"] = function(args)
 			local o = args.object
 			if o:get_static() then return end

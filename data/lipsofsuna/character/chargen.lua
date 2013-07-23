@@ -62,7 +62,7 @@ Chargen.init = function(self, standalone)
 	self:set_race("aer")
 	self.data.update_needed = true
 	-- Change the music track.
-	Client.effects:switch_music_track("char")
+	Client.music:switch_track("char", true)
 end
 
 --- Resets the character creator.

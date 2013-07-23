@@ -25,4 +25,6 @@ Main.messaging:register_message{
 		if not obj:has_server_data() then
 			obj:detach()
 		end
+		-- Disable the combat hint.
+		Client.music:set_combat_hint(obj, false)
 	end}

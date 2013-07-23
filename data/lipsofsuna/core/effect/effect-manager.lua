@@ -20,9 +20,11 @@ local SpeechBubbleEffect = require(Mod.path .. "speech-bubble-effect")
 -- @type EffectManager
 local EffectManager = Class("EffectManager")
 
+--- Creates the effect manager.
+-- @param clss EffectManager class.
+-- @return EffectManager.
 EffectManager.new = function(clss)
 	local self = Class.new(clss)
-	self.music_mode = "none"
 	self.speech_bubble_dict = {}
 	self.speech_bubble_dict_id = {}
 	self.scene_nodes_by_ref = {}
@@ -68,24 +70,6 @@ EffectManager.create_speech_bubble = function(self, args)
 	end
 end
 
---- Switches the music track.
--- @param self EffectManager.
-EffectManager.cycle_music_track = function(self)
-	local modes = {
-		boss = {"fairytale7", "fairytale9"},
-		char = {"fairytale2", "fairytale10", "fairytale8"},
-		game = {"fairytale1", "fairytale3", "fairytale4", "fairytale5",
-		        "fairytale6", "fairytale11", "fairytale12", "fairytale13"},
-		intro = {"fairytale7"},
-		menu = {"menu1"}};
-	if not self.music_mode then return end
-	local tracks = modes[self.music_mode];
-	if not tracks then return end
-	Sound:set_music_fading(2.0)
-	Sound:set_music_volume(Client.options.music_volume)
-	Sound:set_music(tracks[math.random(1, #tracks)])
-end
-
 --- Detaches all the scene nodes.
 -- @param self EffectManager.
 EffectManager.detach_scene_nodes = function(self)
@@ -93,16 +77,6 @@ EffectManager.detach_scene_nodes = function(self)
 		k:detach()
 	end
 	self.scene_nodes_by_ref = {}
-end
-
---- Switches the music track.
--- @param self EffectManager.
--- @param mode Music mode. ("boss"/"char"/"game"/"menu")
-EffectManager.switch_music_track = function(self, mode)
-	if not mode then return end
-	if mode == self.music_mode then return end
-	self.music_mode = mode
-	self:cycle_music_track()
 end
 
 EffectManager.play = function(self, name)

@@ -12,7 +12,11 @@ Aistatespec{
 			local s = p and p:get_phrase("angered")
 			if s then self.object:action("say", s) end
 			self.combat_taunt_timer = math.random(10, 30)
+			self.object:set_combat_hint(true)
 		end
+	end,
+	leave = function(self)
+		self.object:set_combat_hint()
 	end,
 	update = function(self, secs)
 		-- Check if the target is has died.

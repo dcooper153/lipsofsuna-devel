@@ -19,7 +19,7 @@ end
 local FlagType = make_flags{
 	"SELF", "SPEC", "ACTOR", "NAME", "COUNT", "POSITION", "ROTATION", "HEAD", "SKIN",
 	"EYE", "HAIR", "BODY", "FACE", "ANIMS", "EQUIPMENT", "STATS", "DIALOG", "SPEEDLINE",
-	"PROFILE"}
+	"PROFILE", "COMBAT"}
 
 -- The number of fields is so high that an exception is made for message
 -- type: the server passes the object itself and the client accepts either
@@ -205,6 +205,10 @@ Main.messaging:register_message{
 		if o.speedline then
 			flags = flags + FlagType.SPEEDLINE
 		end
+		-- Combat hint.
+		if o:get_combat_hint() then
+			flags = flags + FlagType.COMBAT
+		end
 		-- Rewrite the flags.
 		data[4] = flags
 		return data
@@ -366,6 +370,10 @@ Main.messaging:register_message{
 		if Bitwise:band(args.flags, FlagType.SPEEDLINE) ~= 0 then
 			args.speedline = true
 		end
+		-- Combat hint.
+		if Bitwise:band(args.flags, FlagType.COMBAT) ~= 0 then
+			args.combat_hint = true
+		end
 		return {args.self, args}
 	end,
 	server_to_client_handle = function(self, mine, args)
@@ -396,6 +404,10 @@ Main.messaging:register_message{
 			-- Speed lines.
 			if o.speedline then
 				o.render:add_speedline()
+			end
+			-- Combat hint.
+			if o.get_combat_hint and o:get_combat_hint() then
+				Client.music:set_combat_hint(o, true)
 			end
 			return
 		end
@@ -513,5 +525,9 @@ Main.messaging:register_message{
 		-- Speed lines.
 		if args.speedline then
 			o.render:add_speedline()
+		end
+		-- Combat hint.
+		if args.combat_hint then
+			Client.music:set_combat_hint(o, true)
 		end
 	end}

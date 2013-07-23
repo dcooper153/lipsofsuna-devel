@@ -257,6 +257,14 @@ NpcAi.set_state = function(self, args)
 	if not self.state_timer or s ~= self.state then
 		self.state_timer = 0
 	end
+	-- Leave the previous state.
+	if self.state and self.state ~= s then
+		local state = Aistatespec:find_by_name(self.state)
+		if state and state.leave then
+			state.leave(self)
+		end
+	end
+	-- Reset the controls.
 	local prev = self.state
 	self.state = s
 	self.target = args.target
@@ -268,7 +276,8 @@ NpcAi.set_state = function(self, args)
 	self.object:set_block(false)
 	self.object.running = (self.state == "combat")
 	self.object:calculate_speed()
-	local state = Aistatespec:find{name = s}
+	-- Enter the new state.
+	local state = Aistatespec:find_by_name(s)
 	if state and state.enter then
 		state.enter(self, prev)
 	end
@@ -278,6 +287,10 @@ end
 -- @param self AI.
 -- @param secs Seconds since the last update.
 NpcAi.update = function(self, secs)
+	-- Disable for dead actors.
+	if self.object.dead and self.state ~= "none" then
+		self:set_state{state = "none"}
+	end
 	-- Early exit for inactive AI.
 	-- There are often lots of actors in the active map area but most of them
 	-- have their AI disabled due no player being nearby. Since this function

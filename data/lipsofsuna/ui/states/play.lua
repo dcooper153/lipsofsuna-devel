@@ -6,7 +6,7 @@ Ui:add_state{
 		return true
 	end,
 	init = function()
-		Client.effects:switch_music_track("game")
+		Client.music:switch_track("game")
 		Client.camera_manager:set_camera_mode("third-person")
 	end,
 	input = function(args)
