@@ -32,7 +32,8 @@ end
 --- Closes the subgame.
 -- @param self Landscape.
 Landscape.close = function(self)
-	-- TODO
+	Main.terrain:unload_all()
+	Main.terrain = nil
 end
 
 --- Updates the subgame state.

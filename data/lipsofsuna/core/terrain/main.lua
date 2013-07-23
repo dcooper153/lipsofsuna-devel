@@ -8,7 +8,7 @@ Main.game_start_hooks:register(0, function()
 		Main.game.enable_generation, Main.game.enable_graphics)
 end)
 
-Main.game_end_hooks:register(0, function()
+Main.game_end_hooks:register(100, function()
 	if not Main.terrain then return end
 	Main.terrain:unload_all()
 	Main.terrain = nil

@@ -9,6 +9,7 @@
 -- @alias Arena
 
 local Class = require("system/class")
+local DialogManager = require("core/dialog/dialog-manager")
 local Hooks = require("system/hooks")
 local Item = require("core/objects/item")
 local Physics = require("system/physics")
@@ -46,6 +47,7 @@ Arena.new = function(clss)
 		return Hooks.STOP
 	end)
 	Main.terrain = self.terrain --FIXME
+	Main.dialogs = DialogManager()
 	-- Enable the simulation.
 	Physics:set_enable_simulation(true)
 	return self
@@ -54,7 +56,10 @@ end
 --- Closes the subgame.
 -- @param self Arena.
 Arena.close = function(self)
-	-- TODO
+	Main.terrain:unload_all()
+	Main.terrain = nil
+	Main.dialogs = nil
+	Physics:set_enable_simulation(false)
 end
 
 --- Updates the subgame state.

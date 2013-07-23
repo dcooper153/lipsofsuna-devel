@@ -32,10 +32,10 @@ end
 -- @param self Camera.
 -- @param secs Seconds since the last update.
 BenchmarkCamera.update = function(self, secs)
-	if Client.benchmark then
+	if Main.benchmark then
 		Client.camera_manager:set_camera_mode("benchmark")
 		local camctr = Vector(505,500,500)
-		local campos = camctr + Client.benchmark.translation
+		local campos = camctr + Main.benchmark.translation
 		local camrot = Quaternion{dir = camctr - campos, up = Vector(0,1,0)}
 		self:set_target_position(campos)
 		self:set_target_rotation(camrot)

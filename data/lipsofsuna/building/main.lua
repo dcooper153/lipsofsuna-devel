@@ -17,6 +17,13 @@ Main.game_modes:register("Building", function()
 	Ui:set_state("building")
 end)
 
+Main.game_end_hooks:register(0, function(secs)
+	if Main.building then
+		Main.building:close()
+		Main.building = nil
+	end
+end)
+
 Main.main_start_hooks:register(0, function(secs)
 	Main.building_utils = BuildingUtils()
 	Main.objects.object_created_hooks:register(15, function(object)

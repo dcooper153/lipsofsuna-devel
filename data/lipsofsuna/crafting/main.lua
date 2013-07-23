@@ -2,7 +2,6 @@ local Client = require("core/client/client")
 local Crafting = require("crafting/crafting")
 local CraftingCamera = require("crafting/camera")
 local CraftingUtils = require("crafting/crafting-utils")
-local DialogManager = require("core/dialog/dialog-manager")
 local Game = require("core/server/game")
 local Hooks = require("system/hooks")
 local Ui = require("ui/ui")
@@ -15,8 +14,14 @@ Main.game_modes:register("Crafting", function()
 	Main.game.sectors.unload_time = nil
 	-- Start the subsystems.
 	Main.crafting = Crafting()
-	Main.dialogs = DialogManager()
 	Ui:set_state("crafting")
+end)
+
+Main.game_end_hooks:register(0, function(secs)
+	if Main.crafting then
+		Main.crafting:close()
+		Main.crafting = nil
+	end
 end)
 
 Main.main_start_hooks:register(0, function(secs)

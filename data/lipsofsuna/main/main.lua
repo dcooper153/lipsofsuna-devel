@@ -126,6 +126,7 @@ Main.end_game = function(self)
 	self.game:free()
 	self.game = nil
 	self.messaging:set_transmit_mode(false, false, nil)
+	self.game_end_hooks:call()
 	collectgarbage()
 end
 

@@ -2,8 +2,8 @@ Ui:add_state{
 	state = "benchmark",
 	root = "benchmark",
 	exit_root = function()
-		Client.benchmark:close()
-		Client.benchmark = nil
+		Main.benchmark:close()
+		Main.benchmark = nil
 	end,
 	init = function()
 		Client.effects:switch_music_track("game")

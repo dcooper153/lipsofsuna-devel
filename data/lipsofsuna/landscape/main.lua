@@ -17,6 +17,13 @@ Main.game_modes:register("Landscape", function()
 	Ui:set_state("landscape")
 end)
 
+Main.game_end_hooks:register(0, function(secs)
+	if Main.landscape then
+		Main.landscape:close()
+		Main.landscape = nil
+	end
+end)
+
 Main.update_hooks:register(0, function(secs)
 	if Main.landscape then
 		Main.timing:start_action("landscape")

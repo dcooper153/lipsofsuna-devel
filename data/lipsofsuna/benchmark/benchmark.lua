@@ -60,18 +60,15 @@ Benchmark.new = function(clss)
 	self.terrain_timer2 = 1
 	self.terrain = TerrainManager(12, 1, nil, false, true, true)
 	self.terrain:refresh_chunks_by_point(Vector(500, 0, 500), 64)
+	Main.terrain = self.terrain
 	return self
 end
 
 --- Removes benchmark objects from the scene.
 -- @param self Benchmark.
 Benchmark.close = function(self)
-	-- Restore the normal map state.
-	Main.objects:detach_all()
-	Main.game.sectors:unload_all()
-	self.terrain:unload_all()
-	self.light:set_enabled(false)
-	Client.sectors.unload_time = 10
+	Main.terrain:unload_all()
+	Main.terrain = nil
 end
 
 --- Updates the benchmark scene.

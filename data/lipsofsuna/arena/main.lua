@@ -2,7 +2,6 @@ local Arena = require("arena/arena")
 local ArenaCamera = require("arena/camera")
 local Client = require("core/client/client")
 local CombatUtils = require("arena/combat-utils")
-local DialogManager = require("core/dialog/dialog-manager")
 local Game = require("core/server/game")
 local Hooks = require("system/hooks")
 local Ui = require("ui/ui")
@@ -15,8 +14,14 @@ Main.game_modes:register("Arena", function()
 	Main.game.sectors.unload_time = nil
 	-- Start the subsystems.
 	Main.arena = Arena()
-	Main.dialogs = DialogManager()
 	Ui:set_state("arena")
+end)
+
+Main.game_end_hooks:register(0, function(secs)
+	if Main.arena then
+		Main.arena:close()
+		Main.arena = nil
+	end
 end)
 
 Main.main_start_hooks:register(0, function(secs)
