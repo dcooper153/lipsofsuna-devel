@@ -127,9 +127,11 @@ EnchantState.get_actions = function(self)
 	local actions = {}
 	local index = 1
 	for k,v in ipairs(Actionspec:find_by_category("enchantment")) do
-		table.insert(actions, {v.name, function() self:set_action(v) end})
-		if self.__action == v then
-			index = k
+		if Client.data.unlocks:get("action", v.name) then
+			table.insert(actions, {v.name, function() self:set_action(v) end})
+			if self.__action == v then
+				index = k
+			end
 		end
 	end
 	return actions,index
@@ -157,8 +159,10 @@ EnchantState.get_modifiers_available = function(self)
 	-- Get the modifiers.
 	local modifiers = {}
 	for k,v in ipairs(ModifierSpec:find_by_category("spell")) do
-		if v.actions[self.__action.name] then
-			table.insert(modifiers, {v.name, function() self:add_modifier(v) end})
+		if Client.data.unlocks:get("modifier", v.name) then
+			if v.actions[self.__action.name] then
+				table.insert(modifiers, {v.name, function() self:add_modifier(v) end})
+			end
 		end
 	end
 	return modifiers
