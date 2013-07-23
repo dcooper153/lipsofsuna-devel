@@ -5,7 +5,7 @@ Ui:add_state{
 	root = "host/wait",
 	label = "Launching",
 	update = function(secs)
-		if Client.host:update(secs) then
+		if Main.host:update(secs) then
 			Ui:restart_state()
 		end
 	end}
@@ -14,7 +14,7 @@ Ui:add_widget{
 	state = "host/wait",
 	widget = function() return Widgets.Uibutton("Retry", function()
 			Client:terminate_game()
-			Client.host:host_game()
+			Main.host:host_game()
 			--Client:start_single_player()
 		end)
 	end}
@@ -29,4 +29,4 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "host/wait",
-	widget = function() return Widgets.Uilabel(Client.host:get_status()) end}
+	widget = function() return Widgets.Uilabel(Main.host:get_status()) end}

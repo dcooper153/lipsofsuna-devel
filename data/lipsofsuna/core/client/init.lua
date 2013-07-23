@@ -47,6 +47,14 @@ Main.main_start_hooks:register(10, function(secs)
 	end)
 	Main.client = Client --FIXME
 	Main.client:init()
+	-- FIXME
+	if Main.settings.join then
+		Main.join:join_game()
+	elseif Main.settings.host then
+		Main.host:host_game()
+	else
+		Ui:set_state("mainmenu")
+	end
 end)
 
 Main.main_end_hooks:register(10, function(secs)
@@ -59,17 +67,6 @@ Main.update_hooks:register(10, function(secs)
 end)
 
 -- FIXME: Most of these should be registered elsewhere.
-Client:register_start_hook(10, function(secs)
-	if Main.settings.join then
-		Client:join_game()
-	elseif Main.settings.host then
-		Client:host_game()
-	elseif Main.settings.editor then
-		Ui:set_state("editor")
-	else
-		Ui:set_state("mainmenu")
-	end
-end)
 Client:register_update_hook(12, function(secs)
 	-- Update the connection status.
 	if Client:get_connected() and not Network:get_connected() then

@@ -49,7 +49,7 @@ Ui:add_widget{
 					Settings.join = nil
 					Settings.account = Client.options.host_account
 					Settings.password = Client.options.host_password
-					Client.host:host_game()
+					Main.host:host_game()
 				end))
 			end
 		end

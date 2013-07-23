@@ -50,6 +50,6 @@ Ui:add_widget{
 			Settings.generate = Client.options.host_restart
 			Settings.account = Client.options.host_account
 			Settings.password = Client.options.host_password
-			Client.host:host_game(Settings.file, Client.options.host_port)
+			Main.host:host_game(Settings.file, Client.options.host_port)
 		end)
 	end}

@@ -7,7 +7,7 @@ Ui:add_state{
 	root = "join/connect",
 	label = "Connecting",
 	update = function(secs)
-		if Client.join:update(secs) then
+		if Main.join:update(secs) then
 			Ui:restart_state()
 		end
 	end}
@@ -16,7 +16,7 @@ Ui:add_widget{
 	state = "join/connect",
 	widget = function() return Widgets.Uibutton("Retry", function()
 			Client:terminate_game()
-			Client.join:join_game()
+			Main.join:join_game()
 		end)
 	end}
 
@@ -30,4 +30,4 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "join/connect",
-	widget = function() return Widgets.Uilabel(Client.join:get_status()) end}
+	widget = function() return Widgets.Uilabel(Main.join:get_status()) end}

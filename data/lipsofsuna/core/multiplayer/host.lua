@@ -44,7 +44,8 @@ Host.host_game = function(self, file, port)
 	Main.game = Game("host", self.data.file, self.data.port)
 	Server:init(true, true)
 	Main.messaging:set_transmit_mode(true, true, port or Server.config.server_port)
-	Main:start_game("Host")
+	Main.settings.generate = true --FIXME
+	Main.game_start_hooks:call()
 	-- Enter the waiting state.
 	Ui:set_state("host/wait")
 end
