@@ -59,7 +59,7 @@ Main.messaging:register_message{
 			end
 		else
 			-- Initialize render objects.
-			for k,v in pairs(Game.static_objects_by_id) do
+			for k,v in pairs(Main.game.static_objects_by_id) do
 				v.render:init(v)
 			end
 		end

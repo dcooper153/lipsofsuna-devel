@@ -25,6 +25,7 @@ EffectManager.new = function(clss)
 	self.music_mode = "none"
 	self.speech_bubble_dict = {}
 	self.speech_bubble_dict_id = {}
+	self.scene_nodes_by_ref = {}
 	return self
 end
 
@@ -83,6 +84,15 @@ EffectManager.cycle_music_track = function(self)
 	Sound:set_music_fading(2.0)
 	Sound:set_music_volume(Client.options.music_volume)
 	Sound:set_music(tracks[math.random(1, #tracks)])
+end
+
+--- Detaches all the scene nodes.
+-- @param self EffectManager.
+EffectManager.detach_scene_nodes = function(self)
+	for k in pairs(self.scene_nodes_by_ref) do
+		k:detach()
+	end
+	self.scene_nodes_by_ref = {}
 end
 
 --- Switches the music track.
@@ -195,6 +205,10 @@ EffectManager.speech = function(self, args)
 end
 
 EffectManager.update = function(self, secs)
+	-- Update scene nodes.
+	for k in pairs(self.scene_nodes_by_ref) do
+		k:update(secs)
+	end
 	-- Update text bubbles.
 	for k in pairs(self.speech_bubble_dict) do
 		k:update(secs)

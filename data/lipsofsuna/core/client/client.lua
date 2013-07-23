@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local File = require("system/file")
+local Game = require("core/server/game")
 local Hooks = require("system/hooks")
 local Lighting = require("core/client/lighting")
 local Options = require("core/client/options")
@@ -88,7 +89,7 @@ end
 Client.create_world = function(self)
 	if not Server.initialized then
 		Main.objects:detach_all()
-		Game.sectors:unload_all()
+		Main.game.sectors:unload_all()
 	end
 end
 
@@ -202,8 +203,7 @@ Client.start_single_player = function(self)
 	-- Start the server.
 	Sectors:unload_all()
 	Main.messaging:set_transmit_mode(true, true, nil)
-	Main.game = Game
-	Main.game:init("single", Main.settings.file)
+	Main.game = Game("single", Main.settings.file)
 	Server:init(false, true)
 	-- Set information for the UI.
 	Client.data.connection.mode = "single"
@@ -224,6 +224,7 @@ Client.terminate_game = function(self)
 	self.data.connection.waiting = false
 	Main:end_game()
 	self.terrain_sync:clear()
+	self.player_object = nil
 end
 
 Client.get_connected = function(self)

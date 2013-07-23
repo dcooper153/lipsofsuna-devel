@@ -13,8 +13,12 @@ end)
 Client:register_update_hook(40, function(secs)
 	-- Update effects.
 	-- Must be done after objects to ensure correct anchoring.
-	if Game.initialized then
-		Client.effects:update(secs)
+	Client.effects:update(secs)
+end)
+
+Main.game_end_hooks:register(40, function()
+	if Client.effects then
+		Client.effects:detach_scene_nodes()
 	end
 end)
 

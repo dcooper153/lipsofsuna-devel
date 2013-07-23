@@ -46,7 +46,7 @@ end
 -- @param self Terrain synchronizer.
 -- @param id Sector ID.
 TerrainSync.load_sector = function(self, id)
-	if Game.mode ~= "join" then return end
+	if Main.game.mode ~= "join" then return end
 	for x,y,z in Voxel:get_blocks_by_sector_id(id) do
 		local block = Sector:get_block_id_by_block_offset(x, y, z)
 		local packet = self.blocks_by_id[block]

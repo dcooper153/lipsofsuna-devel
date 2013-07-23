@@ -305,7 +305,7 @@ end
 --- Writes all static objects to the database.
 -- @param self ObjectDatabase.
 ObjectDatabase.save_static_objects = function(self)
-	for k,v in pairs(Game.static_objects_by_id) do
+	for k,v in pairs(Main.game.static_objects_by_id) do
 		if v:get_visible() then
 			v:write_db(self.db)
 		end

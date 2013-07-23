@@ -24,7 +24,7 @@ end)
 Main.main_start_hooks:register(10, function(secs)
 	Main.objects.object_created_hooks:register(10, function(object)
 		object.render = ClientRenderObject()
-		if Game.enable_prediction then
+		if Main.game.enable_prediction then
 			object.prediction = MovementPrediction()
 		end
 	end)
@@ -91,13 +91,6 @@ Client:register_update_hook(20, function(secs)
 		Client.player_object:refresh()
 		-- Notify the terrain manager of the view center.
 		Main.terrain:set_view_center(Client.player_object:get_position())
-	end
-	-- Update effects.
-	-- Must be done after objects to ensure correct anchoring.
-	if Game.initialized then
-		for k in pairs(Game.scene_nodes_by_ref) do
-			k:update(secs)
-		end
 	end
 	-- FIXME
 	if Client.player_object then

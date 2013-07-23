@@ -45,7 +45,7 @@ Staticobject.new = function(clss, manager, args)
 		if args.spec then self:set_spec(args.spec) end
 		if args.realized then self:set_visible(args.realized) end
 	end
-	Game.static_objects_by_id[self:get_id()] = self
+	Main.game.static_objects_by_id[self:get_id()] = self
 	return self
 end
 

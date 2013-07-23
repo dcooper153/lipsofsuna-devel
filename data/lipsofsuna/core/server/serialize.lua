@@ -71,7 +71,7 @@ end
 -- @param erase True to erase existing database entries first.
 Serialize.save = function(clss, erase)
 	if erase then Server.object_database:clear_objects() end
-	Game.sectors:save_world(erase)
+	Main.game.sectors:save_world(erase)
 	Main.terrain:save_all(erase)
 	if not erase then
 		Server.object_database:update_world_decay()

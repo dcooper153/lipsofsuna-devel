@@ -31,16 +31,16 @@ EffectObject.new = function(clss, args)
 	self.parent_node = args.parent_node or args.node
 	self.position_mode = args.position_mode or "node"
 	self.rotation_mode = args.rotation_mode or "node"
-	Game.scene_nodes_by_ref[self] = true
 	self.__visible = true
 	self.__initial_position = args.position
+	Client.effects.scene_nodes_by_ref[self] = true
 	return self
 end
 
 --- Removes the effect from the scene.
 -- @param self EffectObject.
 EffectObject.detach = function(self)
-	Game.scene_nodes_by_ref[self] = nil
+	Client.effects.scene_nodes_by_ref[self] = nil
 end
 
 --- Transforms a position vector from the local coordinate space to global.

@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Client = require("core/client/client")
+local Game = require("core/server/game")
 local Sectors = require("system/sectors")
 local Ui = require("ui/ui")
 
@@ -40,8 +41,7 @@ Host.host_game = function(self, file, port)
 	self.data.status = "Starting the server on " .. self.data.port .. "..."
 	-- Start the server.
 	Sectors:unload_all()
-	Main.game = Game
-	Main.game:init("host", self.data.file, self.data.port)
+	Main.game = Game("host", self.data.file, self.data.port)
 	Server:init(true, true)
 	Main.messaging:set_transmit_mode(true, true, port or Server.config.server_port)
 	Main:start_game("Host")

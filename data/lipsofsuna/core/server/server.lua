@@ -43,10 +43,10 @@ Server.init = function(self, multiplayer, client)
 	local account_database = Database("accounts" .. Settings.file .. ".sqlite")
 	account_database:query("PRAGMA synchronous=OFF;")
 	account_database:query("PRAGMA count_changes=OFF;")
-	self.serialize = Serialize(Game.database)
+	self.serialize = Serialize(Main.game.database)
 	self.account_database = AccountDatabase(account_database)
-	self.object_database = ObjectDatabase(Game.database)
-	Main.quests = QuestDatabase(Game.database)
+	self.object_database = ObjectDatabase(Main.game.database)
+	Main.quests = QuestDatabase(Main.game.database)
 	Main.database = self.database --FIXME
 	Main.serialize = self.serialize --FIXME
 	if self.serialize:get_value("game_version") ~= self.serialize.game_version then
@@ -186,7 +186,7 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 	end
 	-- Transmit static objects.
 	local objects = {}
-	for k,v in pairs(Game.static_objects_by_id) do
+	for k,v in pairs(Main.game.static_objects_by_id) do
 		table.insert(objects, {v:get_id(), v.spec.name, v:get_position(), v:get_rotation()})
 	end
 	Main.messaging:server_event("create static objects", client, objects)

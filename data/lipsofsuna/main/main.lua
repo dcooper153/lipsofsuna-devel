@@ -12,7 +12,6 @@ require("main/event")
 local Class = require("system/class")
 local Eventhandler = require("system/eventhandler")
 local Hooks = require("system/hooks")
-local Game = require("core/server/game") --FIXME
 local GameModeManager = require("main/game-mode-manager")
 local ImageManager = require("main/image-manager")
 local Log = require("main/log")
@@ -91,8 +90,8 @@ Main.main = function(self)
 			-- Update the logic.
 			self.update_hooks:call(tick)
 			self.timing:start_action("sectors")
-			if Game.initialized then
-				Game.sectors:update(tick)
+			if self.game then
+				self.game.sectors:update(tick)
 			end
 			self.timing:start_action("resources")
 			self.images:update(tick)
@@ -122,8 +121,8 @@ Main.main = function(self)
 			Eventhandler:update()
 			-- Update the logic.
 			self.timing:start_action("sectors")
-			if Game.initialized then
-				Game.sectors:update(tick)
+			if self.game then
+				self.game.sectors:update(tick)
 			end
 			self.update_hooks:call(tick)
 			self.timing:start_action("resources")
@@ -144,9 +143,10 @@ end
 -- @param self Main.
 Main.end_game = function(self)
 	if not self.game then return end
-	self.game:deinit()
+	self.game:free()
 	self.game = nil
 	self.messaging:set_transmit_mode(false, false, nil)
+	collectgarbage()
 end
 
 --- Starts the game.

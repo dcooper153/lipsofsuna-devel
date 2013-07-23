@@ -50,13 +50,13 @@ Generator.generate = function(self, args)
 	-- Reset the world.
 	self:update_status(0, "Resetting world")
 	Marker:reset()
-	Game.sectors:unload_all()
+	Main.game.sectors:unload_all()
 	self:reset()
 	-- Save the map.
 	self:update_status(0, "Saving the map")
 	Server.object_database:clear_objects()
-	Game.sectors:save_world(true, function(p) self:update_status(p) end)
-	Game.sectors:unload_all()
+	Main.game.sectors:save_world(true, function(p) self:update_status(p) end)
+	Main.game.sectors:unload_all()
 	Server.object_database:save_static_objects()
 	Server.serialize:set_value("map_version", Generator.map_version)
 	-- Save map markers.

@@ -1,5 +1,6 @@
 local Client = require("core/client/client")
 local Chargen = require("character/chargen")
+local Game = require("core/server/game")
 local Hooks = require("system/hooks")
 local Ui = require("ui/ui")
 
@@ -7,8 +8,7 @@ Main.game_modes:register("Character", function()
 	-- Configure messaging.
 	Main.messaging:set_transmit_mode(true, true)
 	-- FIXME: Initialize the game.
-	Main.game = Game
-	Main.game:init("benchmark")
+	Main.game = Game("benchmark")
 	Main.game.sectors.unload_time = nil
 	-- Start the subsystems.
 	Client.chargen:init(true)

@@ -383,10 +383,10 @@ end
 -- @param self Object.
 -- @param radius Refresh radius, or 0 for default.
 SimulationObject.refresh = function(self, radius)
-	if Game.sectors then
-		Game.sectors:refresh(self:get_position(), radius)
+	if Main.game.sectors then
+		Main.game.sectors:refresh(self:get_position(), radius)
 	end
-	if Main.terrain and Game.enable_generation then
+	if Main.terrain and Main.game.enable_generation then
 		Main.terrain:refresh_chunks_by_point(self:get_position(), radius or 16)
 	end
 end

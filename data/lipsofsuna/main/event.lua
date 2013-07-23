@@ -72,8 +72,8 @@ Eventhandler{type = "packet", func = function(self, args)
 end}
 
 Eventhandler{type = "sector-load", func = function(self, args)
-	if Game.initialized then
-		Game.sectors:load_sector(args.sector)
+	if Main.game then
+		Main.game.sectors:load_sector(args.sector)
 	end
 end}
 
