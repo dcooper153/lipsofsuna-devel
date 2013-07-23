@@ -25,7 +25,6 @@ local QuestDatabase = require("core/quest/quest-database")
 local Serialize = require(Mod.path .. "serialize")
 local ServerConfig = require(Mod.path .. "server-config")
 local Trading = require(Mod.path .. "trading")
-local UnlockManager = require(Mod.path .. "unlock-manager")
 
 --- TODO:doc
 -- @type Server
@@ -47,12 +46,12 @@ Server.init = function(self, multiplayer, client)
 	account_database:query("PRAGMA synchronous=OFF;")
 	account_database:query("PRAGMA count_changes=OFF;")
 	self.serialize = Serialize(Game.database)
-	self.unlocks = UnlockManager(Game.database)
 	self.account_database = AccountDatabase(account_database)
 	self.object_database = ObjectDatabase(Game.database)
 	Main.quests = QuestDatabase(Game.database)
+	Main.database = self.database --FIXME
+	Main.serialize = self.serialize --FIXME
 	if self.serialize:get_value("game_version") ~= self.serialize.game_version then
-		self.unlocks:reset()
 		Main.quests:reset()
 		self.serialize:set_value("game_version", self.serialize.game_version)
 	end
@@ -80,7 +79,6 @@ Server.deinit = function(self)
 	self.trading = nil
 	self.config = nil
 	self.serialize = nil
-	self.unlocks = nil
 	self.account_database = nil
 	self.object_database = nil
 	Main.quests = nil
@@ -97,23 +95,12 @@ Server.load = function(self)
 	-- Generate the map.
 	if Settings.generate then --FIXME:or self.serialize:get_value("map_version") ~= self.generator.map_version then
 		--self.generator:generate()
-		self.unlocks:save()
 		self.serialize:set_value("data_version", self.serialize.data_version)
 	else
 		self.serialize:load()
-		self.unlocks:load()
 		Main.quests:load_quests()
 		self.object_database:load_static_objects()
 	end
-	-- Initialize default unlocks.
-	self.unlocks:unlock("skill", "Health lv1")
-	self.unlocks:unlock("skill", "Willpower lv1")
-	self.unlocks:unlock("action", "ranged spell")
-	self.unlocks:unlock("action", "self spell")
-	self.unlocks:unlock("spell effect", "fire damage")
-	self.unlocks:unlock("spell effect", "light")
-	self.unlocks:unlock("spell effect", "physical damage")
-	self.unlocks:unlock("spell effect", "restore health")
 end
 
 Server.authenticate_client = function(self, client, login, pass)
@@ -193,7 +180,7 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 		end
 	end
 	-- Transmit other unlocks.
-	Main.messaging:server_event("unlocks init", client, self.unlocks.unlocks)
+	Main.messaging:server_event("unlocks init", client, Main.unlocks.unlocks)
 	-- Transmit skills.
 	player:update_skills()
 	-- Transmit active and completed quests.

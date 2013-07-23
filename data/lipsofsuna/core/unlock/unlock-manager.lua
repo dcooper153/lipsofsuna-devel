@@ -1,17 +1,19 @@
---- TODO:doc
+--- Manages unlocks.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.server.unlock_manager
+-- @module core.unlock.unlock_manager
 -- @alias UnlockManager
 
+local ActionSpec = require("core/specs/action")
 local Class = require("system/class")
 local ModifierSpec = require("core/specs/modifier")
+local Skillspec = require("core/specs/skill")
 
---- TODO:doc
+--- Manages unlocks.
 -- @type UnlockManager
 local UnlockManager = Class("UnlockManager")
 
@@ -30,6 +32,11 @@ end
 -- @param self UnlockManager.
 UnlockManager.reset = function(self)
 	self.unlocks = {}
+end
+
+--- Clears all unlocks from the database.
+-- @param self UnlockManager.
+UnlockManager.reset_database = function(self)
 	if self.db then
 		self.db:query([[DROP TABLE IF EXISTS unlocks;]])
 		self.db:query([[CREATE TABLE unlocks (
@@ -140,26 +147,26 @@ UnlockManager.unlock_random = function(self)
 	-- Find the unlockable actions.
 	-- All spell types that have a description are assumed to be used by
 	-- players. Out of those, we choose ones not yet unlocked.
-	for k,v in pairs(Actionsspec.dict_name) do
+	for k,v in pairs(ActionSpec.dict_name) do
 		if v.description and not self:get("action", k) then
 			table.insert(choices, {"action", k})
 		end
 	end
-	-- Find the unlockable spell effects.
-	-- All spell effects that have a description are assumed to be used by
+	-- Find the unlockable modifiers.
+	-- All modifiers that have a description are assumed to be used by
 	-- players. Out of those, we choose ones that are not yet unlocked but
-	-- have at least one of the allowed spell types unlocked.
+	-- have at least one of the allowed actions unlocked.
 	for k,v in pairs(ModifierSpec.dict_name) do
-		if v.description and not self:get("spell effect", k) then
+		if v.description and not self:get("modifier", k) then
 			local pass = false
-			for name in pairs(v.animations) do
-				if self:get("spell type", name) then
+			for name in pairs(v.actions) do
+				if self:get("action", name) then
 					pass = true
 					break
 				end
 			end
 			if pass then
-				table.insert(choices, {"spell effect", k})
+				table.insert(choices, {"modifier", k})
 			end
 		end
 	end
@@ -198,6 +205,11 @@ UnlockManager.save = function(self)
 	end
 end
 
+--- Sets the database used by the manager.
+-- @param self UnlockManager.
+-- @param value Database. Nil to disable loading and saving.
+UnlockManager.set_database = function(self, value)
+	self.db = value
+end
+
 return UnlockManager
-
-

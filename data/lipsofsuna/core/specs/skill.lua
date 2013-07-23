@@ -112,4 +112,4 @@ Skillspec.find_indirect_requirements = function(self)
 	return reqs
 end
 
-
+return Skillspec

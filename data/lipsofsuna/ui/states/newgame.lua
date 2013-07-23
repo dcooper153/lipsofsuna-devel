@@ -57,6 +57,7 @@ Ui:add_widget{
 			if Operators.single_player:does_save_name_exist(name) then return end
 			-- Start the game.
 			Settings.file = Operators.single_player:get_save_filename()
+			Settings.generate = true
 			Main:start_game(game_mode)
 		end)
 	end}

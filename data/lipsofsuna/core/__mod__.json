@@ -49,6 +49,7 @@
 		["load", "core/shaders"],
 		["load", "core/shortcut"],
 		["load", "core/terrain"],
+		["load", "core/unlock"],
 		["load", "core/vision"],
 		["load", "core/misc"]
 	]

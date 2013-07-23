@@ -19,7 +19,7 @@ local Reload = require("system/reload")
 local Simulation = require("core/client/simulation")
 local Skills = require("core/server/skills")
 local TerrainSync = require("core/client/terrain-sync")
-local UnlockManager = require("core/server/unlock-manager")
+local UnlockManager = require("core/unlock/unlock-manager")
 
 --- TODO:doc
 -- @type Client

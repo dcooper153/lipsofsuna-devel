@@ -357,16 +357,6 @@ ChatCommand{
 	end}
 
 ChatCommand{
-	name = "unlock_all",
-	description = "Unlock all skills, spell types or spell effects.",
-	pattern = "^/unlock_all$",
-	permission = "admin",
-	handler = "server",
-	func = function(player, matches)
-		repeat until not Server.unlocks:unlock_random()
-	end}
-
-ChatCommand{
 	name = "unlock_marker",
 	description = "Unlock a map marker.",
 	pattern = "^/unlock_marker (.*)$",
@@ -381,64 +371,10 @@ ChatCommand{
 		end
 	end}
 
-ChatCommand{
-	name = "unlock_random",
-	description = "Unlock a random skill, spell type or spell effect.",
-	pattern = "^/unlock_random$",
-	permission = "admin",
-	handler = "server",
-	func = function(player, matches)
-		Server.unlocks:unlock_random()
-	end}
-
-ChatCommand{
-	name = "unlock_skill",
-	description = "Unlock a skill.",
-	pattern = "^/unlock_skill (.*)$",
-	permission = "admin",
-	handler = "server",
-	func = function(player, matches)
-		local spec = Skillspec:find{name = matches[1]}
-		if spec then
-			Server.unlocks:unlock("skill", matches[1])
-		else
-			player:send_message(string.format("No such skill %q.", matches[1]))
-		end
-	end}
-
-ChatCommand{
-	name = "unlock_spell_effect",
-	description = "Unlock a spell effect.",
-	pattern = "^/unlock_spell_effect (.*)$",
-	permission = "admin",
-	handler = "server",
-	func = function(player, matches)
-		local spec = ModifierSpec:find{name = matches[1]}
-		if spec then
-			Server.unlocks:unlock("spell effect", matches[1])
-		else
-			player:send_message(string.format("No such spell effect %q.", matches[1]))
-		end
-	end}
-
-ChatCommand{
-	name = "unlock_spell_type",
-	description = "Unlock a spell type.",
-	pattern = "^/unlock_spell_type (.*)$",
-	permission = "admin",
-	handler = "server",
-	func = function(player, matches)
-		local spec = Actionspec:find_by_name(matches[1])
-		if spec then
-			Server.unlocks:unlock("action", matches[1])
-		else
-			player:send_message(string.format("No such action %q.", matches[1]))
-		end
-	end}
-
 -- Invalid commands.
 ChatCommand{
 	pattern = "^(/[^ ]*).*",
+	fallback = true,
 	handler = "server",
 	permission = "player",
 	func = function(player, matches)
@@ -448,15 +384,19 @@ ChatCommand{
 -- Normal chat.
 ChatCommand{
 	pattern = ".*",
+	fallback = true,
 	handler = "client",
 	permission = "player",
+	priority = 100,
 	func = function(player, matches)
 		Main.messaging:client_event("player chat", matches[1])
 	end}
 ChatCommand{
 	pattern = ".*",
+	fallback = true,
 	handler = "server",
 	permission = "player",
+	priority = 100,
 	func = function(player, matches)
 		player:action("say", matches[1])
 	end}

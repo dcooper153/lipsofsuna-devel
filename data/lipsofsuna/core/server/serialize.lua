@@ -80,7 +80,7 @@ Serialize.save = function(clss, erase)
 	clss:save_generator(erase)
 	clss:save_markers(erase)
 	Server.account_database:save_accounts(erase)
-	Server.unlocks:save()
+	Main.unlocks:save()
 end
 
 --- Saves the map generator state.

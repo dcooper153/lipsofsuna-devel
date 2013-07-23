@@ -552,14 +552,14 @@ Dialog.execute = function(self)
 			for i = #vm,1,-1 do vm[i] = nil end
 		end,
 		["unlock marker"] = function(vm, c)
-			local m = Marker:find{name = c[2]}
+			local m = Marker:find_by_name(c[2])
 			if m and not m.unlocked then
 				m:unlock()
 			end
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["unlock reward"] = function(vm, c)
-			Server.unlocks:unlock_random()
+			Main.unlocks:unlock_random()
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["var"] = function(vm, c)
