@@ -31,7 +31,7 @@ Eventhandler{type = "quit", func = function(self, args)
 end}
 
 Eventhandler{type = "login", func = function(self, event)
-	Server.log:format("Client connect from %q.", Network:get_client_address(event.client) or "???")
+	Main.log:format("Client connect from %q.", Network:get_client_address(event.client) or "???")
 	-- Tell the client to authenticate.
 	Main.messaging:server_event("login", event.client)
 	-- Update lobby.
@@ -39,7 +39,7 @@ Eventhandler{type = "login", func = function(self, event)
 end}
 
 Eventhandler{type = "logout", func = function(self, event)
-	Server.log:text("Client disconnect.")
+	Main.log:text("Client disconnect.")
 	-- Detach the player object.
 	local object = Server.players_by_client[event.client]
 	if object then

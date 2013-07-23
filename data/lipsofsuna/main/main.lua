@@ -5,7 +5,7 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.main.init
+-- @module main.main
 -- @alias Main
 
 require("main/event")
@@ -15,6 +15,7 @@ local Hooks = require("system/hooks")
 local Game = require("core/server/game") --FIXME
 local GameModeManager = require("main/game-mode-manager")
 local ImageManager = require("main/image-manager")
+local Log = require("main/log")
 local Messaging = require("main/messaging")
 local ModelManager = require("main/model-manager")
 local Mod = require("main/mod")
@@ -30,6 +31,7 @@ local Main = Class("Main")
 -- @param clss Main class.
 Main.new = function(clss)
 	local self = Class.new(clss)
+	self.log = Log()
 	self.images = ImageManager()
 	self.models = ModelManager()
 	self.timing = Timing()

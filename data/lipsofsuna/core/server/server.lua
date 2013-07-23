@@ -14,7 +14,6 @@ local Database = require("system/database")
 local DialogManager = require("core/dialog/dialog-manager")
 local GlobalEventManager = require(Mod.path .. "global-event-manager")
 local Hooks = require("system/hooks")
-local Log = require(Mod.path .. "log")
 local Marker = require("core/marker")
 local Modifier = require("core/server/modifier")
 local ModifierSpec = require("core/specs/modifier")
@@ -32,7 +31,6 @@ Server = Class("Server")
 
 Server.init = function(self, multiplayer, client)
 	self.login_hooks = Hooks()
-	self.log = Log()
 	self.config = ServerConfig()
 	Main.dialogs = DialogManager()
 	self.marker_timer = 0
@@ -72,7 +70,6 @@ Server.deinit = function(self)
 	-- This needs to be done right now so that the databases are freed
 	-- for sure. Otherwise, they might remain locked in memory when the
 	-- client starts a new server.
-	self.log = nil
 	self.config = nil
 	Main.dialogs = nil
 	self.players_by_client = nil
@@ -110,7 +107,7 @@ Server.authenticate_client = function(self, client, login, pass)
 	-- Make sure not logging in twice.
 	account = self.account_database:get_account_by_login(login)
 	if account then
-		self.log:format("Client login from %q failed: account already in use.", self:get_client_address(client))
+		Main.log:format("Client login from %q failed: account already in use.", self:get_client_address(client))
 		Main.messaging:server_event("login failed", client, "The account is already in use.")
 		return
 	end
@@ -118,14 +115,14 @@ Server.authenticate_client = function(self, client, login, pass)
 	local account,message = self.account_database:load_account(client, login, pass)
 	if not account then
 		if message then
-			self.log:format("Client login from %q failed: %s.", self:get_client_address(client), message)
+			Main.log:format("Client login from %q failed: %s.", self:get_client_address(client), message)
 			Main.messaging:server_event("login failed", client, "Invalid account name or password.")
 			return
 		end
 		account = self.account_database:create_account(client, login, pass)
 	end
 	-- Log the successful login.
-	self.log:format("Client login from %q using account %q.", self:get_client_address(client), login)
+	Main.log:format("Client login from %q using account %q.", self:get_client_address(client), login)
 	-- Create existing characters.
 	local object = self.object_database:load_player(account)
 	if object then

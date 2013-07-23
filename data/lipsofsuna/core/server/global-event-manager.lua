@@ -213,7 +213,7 @@ GlobalEventManager.start_event = function(self, name)
 	event.start_time = Program:get_time()
 	event.spec:started(event)
 	-- Log the event.
-	Server.log:format("Started global event %q", name)
+	Main.log:format("Started global event %q", name)
 end
 
 --- Stops an event.
@@ -228,7 +228,7 @@ GlobalEventManager.stop_event = function(self, name)
 	event.start_time = nil
 	event.spec:stopped(event)
 	-- Log the event.
-	Server.log:format("Stopped global event %q", name)
+	Main.log:format("Stopped global event %q", name)
 end
 
 --- Updates global events.
