@@ -11,6 +11,8 @@
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Marker = require("core/marker")
+local Modifier = require("core/server/modifier")
+local ModifierSpec = require("core/specs/modifier")
 local Packet = require("system/packet")
 local Sector = require("system/sector")
 local Vision = require("system/vision")
@@ -91,8 +93,18 @@ Player.removed_modifier = function(self, name)
 end
 
 Player.respawn = function(self)
-	self:disable()
-	Server.account_database:save_account(self.account)
+	-- Teleport the player.
+	local home = self:set_spawn_point()
+	self:teleport{position = home}
+	-- Resurrect the player.
+	self:action("resurrect")
+	-- Spawn the player.
+	local spec = ModifierSpec:find_by_name("respawn")
+	if not spec then return end
+	local modifier = Modifier(spec, self, self)
+	if modifier:start(1) then
+		self:add_modifier(modifier)
+	end
 end
 
 Player.handle_inventory_event = function(self, args)
@@ -160,7 +172,7 @@ Player.set_spawn_point = function(self, name)
 	-- Select the spawn point.
 	local home
 	if not name or name == "Home" then
-		home = self.account.spawn_point
+		home = self.account and self.account.spawn_point
 	else
 		local r = Patternspec:find{name = spawnpoint}
 		if r and not r.spawn_point then r = nil end
@@ -171,7 +183,9 @@ Player.set_spawn_point = function(self, name)
 		home = Utils:get_player_spawn_point()
 	end
 	-- Set the spawn point vector.
-	self.account.spawn_point = home
+	if self.account then
+		self.account.spawn_point = home
+	end
 	return home
 end
 

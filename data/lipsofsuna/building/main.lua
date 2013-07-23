@@ -2,17 +2,10 @@ local Building = require("building/building")
 local BuildingCamera = require("building/camera")
 local BuildingUtils = require("building/building-utils")
 local Client = require("core/client/client")
-local Game = require("core/server/game")
 local Hooks = require("system/hooks")
 local Ui = require("ui/ui")
 
 Main.game_modes:register("Building", function()
-	-- Configure messaging.
-	Main.messaging:set_transmit_mode(true, true)
-	-- FIXME: Initialize the game.
-	Main.game = Game("benchmark")
-	Main.game.sectors.unload_time = nil
-	-- Start the subsystems.
 	Main.building = Building()
 	Ui:set_state("building")
 end)

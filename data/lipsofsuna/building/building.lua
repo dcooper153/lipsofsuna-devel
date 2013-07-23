@@ -9,10 +9,12 @@
 -- @alias Building
 
 local Class = require("system/class")
+local Game = require("core/server/game")
 local Hooks = require("system/hooks")
 local Physics = require("system/physics")
 local PhysicsConsts = require("core/server/physics-consts")
 local Player = require("core/objects/player")
+local ServerUtils = require("core/server/util") --FIXME
 local TerrainManager = require("core/terrain/terrain-manager")
 local Vector = require("system/math/vector")
 
@@ -25,6 +27,11 @@ Building = Class("Building")
 -- @return Building.
 Building.new = function(clss)
 	local self = Class.new(clss)
+	-- Initialize the game.
+	Main.messaging:set_transmit_mode(true, true)
+	Main.game = Game("benchmark")
+	Main.game.sectors.unload_time = nil
+	ServerUtils:set_player_spawn_point(Vector(500,101,500))
 	-- Initialize the terrain.
 	self.terrain = TerrainManager(12, 1, nil, false, true, true)
 	self.terrain:set_view_center(Vector(500, 0, 500))
@@ -52,7 +59,9 @@ end
 --- Closes the subgame.
 -- @param self Building.
 Building.close = function(self)
-	-- TODO
+	Main.terrain:unload_all();
+	Main.terrain = nil
+	ServerUtils:set_player_spawn_point()
 end
 
 --- Updates the subgame state.

@@ -169,7 +169,11 @@ end
 -- @param self Utils class.
 -- @return Vector.
 Utils.get_player_spawn_point = function(self)
-	return Vector(500,1000,500)
+	return self.__player_spawn_point or Vector(500,1000,500)
+end
+
+Utils.set_player_spawn_point = function(self, value)
+	self.__player_spawn_point = value
 end
 
 --- Gets the difficulty of the spawn point.
@@ -215,3 +219,5 @@ Utils.explosion = function(clss, point, radius)
 		v1:damaged{amount = 40 * (1 - frac), type = "explosion"}
 	end
 end
+
+return Utils

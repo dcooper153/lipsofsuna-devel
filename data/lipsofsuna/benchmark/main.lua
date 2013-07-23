@@ -6,9 +6,8 @@ local Hooks = require("system/hooks")
 local Ui = require("ui/ui")
 
 Main.game_modes:register("Benchmark", function()
-	-- Configure messaging.
+	-- Initialize the game.
 	Main.messaging:set_transmit_mode(true, true)
-	-- FIXME: Initialize the game.
 	Main.game = Game("benchmark")
 	Main.game.sectors.unload_time = nil
 	-- Start the subsystems.
