@@ -33,6 +33,7 @@ Spec.register = function(clss, name, type, fields)
 	spec.dict_cat = {}
 	spec.dict_name = {}
 	if fields then
+		local Introspect = require("core/introspect/introspect")
 		spec.introspect = Introspect{name = name, fields = fields}
 	end
 	clss.dict_spec[name] = spec
@@ -146,6 +147,7 @@ Spec.is_field_set = function(self, name)
 	if not field then return end
 	-- Check if default.
 	if field.default == nil then return true end
+	local Introspect = require("core/introspect/introspect")
 	local t = Introspect.types_dict[field.type]
 	if not t.equals(value, field.default) then return true end
 end

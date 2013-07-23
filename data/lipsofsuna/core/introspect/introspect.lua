@@ -9,12 +9,20 @@
 -- @alias Introspect
 
 local Class = require("system/class")
+local File = require("system/file")
 local Spec = require("core/specs/spec")
 
 --- Introspection and validation for specs and other custom types.
 -- @type Introspect
 Introspect = Class("Introspect")
 Introspect.types_dict = {}
+
+-- Got to load the types this way to avoid problems with unittests.
+for k,v in pairs{"boolean", "color", "dialog-tree", "dict", "generic", "ignore",
+	"list", "map-object-list", "map-object", "map-tile-list", "map-tile",
+	"number", "quaternion", "spawn", "string", "table", "todo", "vector"} do
+	require("core/introspect/types/" .. v)
+end
 
 --- Creates a new introspection ruleset.
 -- @param clss Introspect class.
