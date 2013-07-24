@@ -48,7 +48,7 @@ end
 -- @return True if executed. False otherwise.
 DialogManager.execute = function(self, object, user, special)
 	-- Only allow one dialog at a time.
-	if self.dialogs_by_object[object] then return end
+	if self.dialogs_by_object[object] then return true end
 	-- Construct the dialog spec name.
 	local name = object.spec.dialog
 	if not name then return end
