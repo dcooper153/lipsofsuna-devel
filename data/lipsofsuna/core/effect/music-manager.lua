@@ -27,8 +27,15 @@ MusicManager.new = function(clss)
 	return self
 end
 
+--- Clears all the combat hints.
+-- @param self MusicManager.
+MusicManager.clear_combat_hints = function(self)
+	self.__combat_hints = setmetatable({}, {__mode = "k"})
+	self.__combat_timer = nil
+end
+
 --- Switches the music track.
--- @param self EffectManager.
+-- @param self MusicManager.
 -- @param force True to force even in combat. Nil otherwise.
 MusicManager.cycle_track = function(self, force)
 	local modes = {

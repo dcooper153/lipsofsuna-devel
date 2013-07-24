@@ -6,7 +6,8 @@ Ui:add_state{
 		return Widgets.Uibackground("mainmenu1")
 	end,
 	init = function()
-		Client.music:switch_track("menu", true)
+		Client.music:clear_combat_hints()
+		Client.music:switch_track("menu")
 	end}
 
 Ui:add_widget{
