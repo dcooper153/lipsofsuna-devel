@@ -172,11 +172,8 @@ Damage.apply_defender_armor = function(self, object)
 	-- Reduce modifiers based on the blocking bonus.
 	local mult = math.max(0.0, 1 - armor)
 	for k,v in pairs(self.modifiers) do
-		if reduce[k] then
-			local prev = self.modifiers[k]
-			if prev < 0 then
-				self.modifiers[k] = prev * mult
-			end
+		if v > 0 and reduce[k] then
+			self.modifiers[k] = v * mult
 		end
 	end
 end
