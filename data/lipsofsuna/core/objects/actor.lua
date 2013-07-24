@@ -374,7 +374,9 @@ Actor.damaged = function(self, args)
 	end
 	-- Play the flinch animation.
 	if args.type == "physical" and args.amount > 0 then
-		self:animate("flinch")
+		if not self.blocking then
+			self:animate("flinch")
+		end
 	end
 end
 
