@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -65,6 +65,10 @@ LIAPICALL (void, liext_physics_terrain_set_collision_group, (
 LIAPICALL (void, liext_physics_terrain_set_collision_mask, (
 	LIExtPhysicsTerrain* self,
 	int                  value));
+
+LIAPICALL (void, liext_physics_terrain_set_friction, (
+	LIExtPhysicsTerrain* self,
+	float                value));
 
 LIAPICALL (void, liext_physics_terrain_set_id, (
 	LIExtPhysicsTerrain* self,

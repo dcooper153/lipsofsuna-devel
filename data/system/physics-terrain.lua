@@ -66,6 +66,21 @@ PhysicsTerrain.set_collision_mask = function(self, v)
 	Los.physics_terrain_set_collision_mask(self.handle, v)
 end
 
+--- Gets the friction coefficient of the physics terrain.
+-- @param self PhysicsTerrain.
+-- @return Number.
+PhysicsTerrain.get_friction = function(self)
+	return self.__friction or 1.0
+end
+
+--- Sets the friction coefficient of the physics terrain.
+-- @param self PhysicsTerrain.
+-- @param v Number.
+PhysicsTerrain.set_friction = function(self, v)
+	self.__friction = v
+	Los.physics_terrain_set_friction(self.handle, v)
+end
+
 --- Gets the unique ID of the physics terrain.
 -- @param self PhysicsTerrain.
 -- @return Number.

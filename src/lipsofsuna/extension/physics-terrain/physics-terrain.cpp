@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -73,6 +73,7 @@ LIExtPhysicsTerrain* liext_physics_terrain_new (
 	self->object->setCollisionShape (self->shape);
 	self->object->setWorldTransform (btTransform (r, p));
 	self->object->setUserPointer (self->pointer);
+	self->object->setFriction (1.0f);
 
 	/* Create the raycast hook. */
 	self->raycast_hook = new LIExtPhysicsTerrainRaycastHook (self);
@@ -243,6 +244,18 @@ void liext_physics_terrain_set_collision_mask (
 		self->module->physics->dynamics->removeCollisionObject (self->object);
 		self->module->physics->dynamics->addCollisionObject (self->object, self->collision_group, self->collision_mask);
 	}
+}
+
+/**
+ * \brief Sets the friction coefficient of the terrain.
+ * \param self Terrain.
+ * \param value Number.
+ */
+void liext_physics_terrain_set_friction (
+	LIExtPhysicsTerrain* self,
+	float                value)
+{
+	self->object->setFriction (value);
 }
 
 /**

@@ -71,6 +71,17 @@ static void PhysicsTerrain_set_collision_mask (LIScrArgs* args)
 	liext_physics_terrain_set_collision_mask (args->self, value);
 }
 
+static void PhysicsTerrain_set_friction (LIScrArgs* args)
+{
+	float value;
+
+	if (!liscr_args_geti_float (args, 0, &value))
+		return;
+	value = LIMAT_MAX (0.0f, value);
+
+	liext_physics_terrain_set_friction (args->self, value);
+}
+
 static void PhysicsTerrain_set_id (LIScrArgs* args)
 {
 	int value;
@@ -104,6 +115,7 @@ void liext_script_physics_terrain (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_new", PhysicsTerrain_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_set_collision_group", PhysicsTerrain_set_collision_group);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_set_collision_mask", PhysicsTerrain_set_collision_mask);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_set_friction", PhysicsTerrain_set_friction);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_set_id", PhysicsTerrain_set_id);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_get_valid", PhysicsTerrain_get_valid);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_set_visible", PhysicsTerrain_set_visible);
