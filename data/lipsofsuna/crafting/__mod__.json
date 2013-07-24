@@ -14,14 +14,14 @@
 		["load", "crafting/ui"],
 		["load", "crafting/workbench"]
 	],
-	"client_scripts":
-	[
-		"main"
-	],
-	"server_scripts":
+	"scripts":
 	[
 		"message-disenchant",
 		"message-enchant"
+	],
+	"client_scripts":
+	[
+		"main"
 	],
 	"specs":
 	[
