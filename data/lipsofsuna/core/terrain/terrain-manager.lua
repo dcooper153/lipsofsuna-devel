@@ -196,7 +196,10 @@ end
 -- @param self TerrainManager.
 TerrainManager.unload_all = function(self)
 	-- Unload the chunks.
-	for id in pairs(self.chunks) do
+	for id,chunk in pairs(self.chunks) do
+		if self.graphics then
+			chunk:detach_render_object()
+		end
 		self.terrain:unload_chunk(self:get_chunk_xz_by_id(id))
 	end
 	-- Clear the dictionaries.
@@ -213,7 +216,11 @@ end
 TerrainManager.unload_chunk = function(self, x, z)
 	-- Unload the chunk.
 	local id = self:get_chunk_id_by_xz(x, z)
-	if not self.chunks[id] then return end
+	local chunk = self.chunks[id]
+	if not chunk then return end
+	if self.graphics then
+		chunk:detach_render_object()
+	end
 	self.terrain:unload_chunk(x, z)
 	-- Remove from the dictionaries.
 	self.chunks[id] = nil
