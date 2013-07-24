@@ -60,6 +60,8 @@ void limat_polygon_culler_free (
 {
 	int i;
 
+	if (self->remainder != NULL)
+		limat_polygon2d_free (self->remainder);
 	for (i = 0 ; i < self->pieces.count ; ++i)
 		limat_polygon2d_free (self->pieces.array[i]);
 	lisys_free (self->pieces.array);
