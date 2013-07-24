@@ -1,15 +1,11 @@
-local Combat = require("core/server/combat")
+local Damage = require("arena/damage")
 local Physics = require("system/physics")
 
 Actionspec{
 	name = "melee",
 	categories = { ["melee"] = true },
-	start = function(action, move)
+	start = function(action, move, charge)
 		if action.object.cooldown then return end
-		-- Initialize timing.
-		action.frame = 1
-		action.time = 0
-		action.duration = action.object.spec.timing_attack_melee * 0.02
 		-- Choose the weapon sweep path.
 		if not move then
 			move = Main.combat_utils:get_melee_move_of_actor(action.object)
@@ -27,13 +23,29 @@ Actionspec{
 		Main.vision:object_effect(action.object, "swing1")
 		Main.vision:object_event(action.object, "object attack", {move = move, variant = math.random(0, 255)})
 		-- Enable effect-over-time updates.
+		action.charge = charge or 0
+		action.frame = 1
+		action.time = 0
+		action.duration = action.object.spec.timing_attack_melee * 0.02
 		return true
 	end,
 	update = function(action, secs)
 		local apply = function(r)
-			local weapon = action.object:get_weapon()
-			local target = r.object and Main.objects:find_by_id(r.object)
-			Combat:apply_melee_impact(action.object, action.weapon, r.point, target, r.tile)
+			local attacker = action.object
+			local defender = r.object and Main.objects:find_by_id(r.object)
+			local weapon = attacker:get_weapon()
+			-- Calculate the damage.
+			local damage = Damage()
+			damage:add_item_or_unarmed_modifiers(weapon, attacker.skills)
+			damage:add_knockback()
+			damage:apply_attacker_physical_modifiers(attacker)
+			damage:apply_attacker_charge(attacker:get_attack_charge())
+			damage:apply_defender_armor(defender)
+			damage:apply_defender_blocking(defender)
+			damage:apply_defender_vulnerabilities(defender)
+			damage:apply_attacker_charge(action.charge)
+			-- Apply the damage.
+			Main.combat_utils:apply_damage(attacker, defender, r.tile, damage, r.point)
 		end
 		-- Wait for the next sweep.
 		action.object.cooldown = 0.3

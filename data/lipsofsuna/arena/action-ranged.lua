@@ -1,10 +1,10 @@
-local Combat = require("core/server/combat")
+local Damage = require("arena/damage")
 local ProjectileController = require("core/server/projectile-controller")
 
 Actionspec{
 	name = "ranged",
 	categories = { ["ranged"] = true },
-	start = function(action)
+	start = function(action, move)
 		-- Prevent during cooldown.
 		if action.object.cooldown then return end
 		-- Check for weapon and ammo.
@@ -17,9 +17,9 @@ Actionspec{
 		-- Start the charge animation.
 		action.object:animate("charge stand", true)
 		-- Enable effect-over-time updates.
+		action.charge_value = 0
 		action.weapon = weapon
 		action.delay = (weapon.spec.timings["fire"] or 0) * 0.02
-		action.charge_value = 0
 		action.released = false
 		action.time = 0
 		return true
@@ -51,14 +51,19 @@ Actionspec{
 				action.object:animate("charge cancel")
 				return
 			end
+			local projectile = ammo:split()
 			-- Play the attack effect.
 			if weapon.spec.effect_attack then
 				Main.vision:object_effect(action.object, weapon.spec.effect_attack)
 			end
 			Main.vision:object_event(action.object, "object attack", {move = "stand", variant = math.random(0, 255)})
+			-- Calculate the base damage.
+			local damage = Damage()
+			damage:add_item_modifiers(weapon, action.object.skills)
+			damage:add_item_modifiers(projectile, action.object.skills)
+			damage:add_knockback()
+			damage:apply_attacker_charge(action.charge_value)
 			-- Fire the projectile.
-			local projectile = ammo:split()
-			local damage = Combat:calculate_ranged_damage(action.object, projectile)
 			local controller = ProjectileController(action.object, projectile, damage, 20, true)
 			controller:attach()
 			return

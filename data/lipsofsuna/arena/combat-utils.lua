@@ -24,6 +24,21 @@ CombatUtils.new = function(clss)
 	return self
 end
 
+--- Applies the damage to an actor or a tile.
+-- @param self CombatUtils.
+-- @param caster Actor.
+-- @param target Actor if present. Nil otherwise.
+-- @param tile Tile offset if present. Nil otherwise.
+-- @param damage Damage.
+-- @param point Hit point in world space.
+CombatUtils.apply_damage = function(self, caster, target, tile, damage, point)
+	if target then
+		self:apply_damage_to_actor(caster, target, damage, point)
+	elseif tile then
+		self:apply_damage_to_terrain(caster, tile, damage, point)
+	end
+end
+
 --- Applies the damage to the actor.
 -- @param self CombatUtils.
 -- @param caster Actor.

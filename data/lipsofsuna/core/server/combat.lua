@@ -26,19 +26,13 @@ local Combat = Class("Combat")
 Combat.apply_melee_impact = function(self, attacker, weapon, point, defender, tile)
 	-- Calculate the damage.
 	local damage = Damage()
-	if weapon then
-		damage:add_item_modifiers(weapon, attacker.skills)
-	else
-		damage:add_barehanded_modifiers(attacker.skills)
-	end
+	damage:add_item_or_unarmed_modifiers(weapon, attacker.skills)
 	damage:add_knockback()
 	damage:apply_attacker_physical_modifiers(attacker)
 	damage:apply_attacker_charge(attacker:get_attack_charge())
-	if defender then
-		damage:apply_defender_armor(defender)
-		damage:apply_defender_blocking(defender)
-		damage:apply_defender_vulnerabilities(defender)
-	end
+	damage:apply_defender_armor(defender)
+	damage:apply_defender_blocking(defender)
+	damage:apply_defender_vulnerabilities(defender)
 	-- Apply object damage.
 	if defender then
 		Main.combat_utils:apply_damage_to_actor(attacker, defender, damage, point)
@@ -57,10 +51,8 @@ end
 -- @param tile Hit tile, or nil.
 Combat.apply_ranged_impact = function(self, attacker, projectile, damage, point, defender, tile)
 	-- Apply defender's status.
-	if defender then
-		damage:apply_defender_armor(defender)
-		damage:apply_defender_vulnerabilities(defender)
-	end
+	damage:apply_defender_armor(defender)
+	damage:apply_defender_vulnerabilities(defender)
 	-- Apply object damage.
 	if defender then
 		Main.combat_utils:apply_damage_to_actor(attacker, defender, damage, point)
@@ -77,12 +69,8 @@ end
 -- @return Damage information.
 Combat.calculate_ranged_damage = function(self, attacker, weapon, projectile)
 	local damage = Damage()
-	if weapon then
-		damage:add_item_modifiers(weapon, attacker.skills)
-	end
-	if projectile then
-		damage:add_item_modifiers(projectile, attacker.skills)
-	end
+	damage:add_item_modifiers(weapon, attacker.skills)
+	damage:add_item_modifiers(projectile, attacker.skills)
 	damage:add_knockback()
 	damage:apply_attacker_charge(attacker:get_attack_charge())
 	return damage

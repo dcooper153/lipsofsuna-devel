@@ -32,7 +32,7 @@ end
 --
 -- @param self Damage.
 -- @param skills Attacker's skills. Nil if not available.
-Damage.add_barehanded_modifiers = function(self, skills)
+Damage.add_unarmed_modifiers = function(self, skills)
 	-- Calculate the damage multiplier.
 	local mult = 1
 	if skills then
@@ -52,6 +52,18 @@ end
 Damage.add_item_modifiers = function(self, weapon, skills)
 	if not weapon then return end
 	self:add_itemspec_modifiers(weapon.spec, skills)
+end
+
+--- Adds modifiers for the given item or for barehanded if the item is nil.
+-- @param self Damage.
+-- @param weapon Item.
+-- @param skills Attacker's skills. Nil if not available.
+Damage.add_item_or_unarmed_modifiers = function(self, weapon, skills)
+	if weapon then
+		self:add_itemspec_modifiers(weapon.spec, skills)
+	else
+		self:add_unarmed_modifiers(skills)
+	end
 end
 
 --- Adds modifiers for the given itemspec.<br/>
@@ -109,6 +121,7 @@ end
 -- @param self Damage.
 -- @param charge Charge time in seconds. Nil for no charge.
 Damage.apply_attacker_charge = function(self, charge)
+	if not charge then return end
 	local p = self.modifiers["physical damage"]
 	if p and p > 0 then
 		local f = 1 + math.min(1.5, charge)
@@ -176,6 +189,7 @@ end
 -- @param self Damage.
 -- @param object Defender object.
 Damage.apply_defender_blocking = function(self, object)
+	if not object then return end
 	if object.blocking then
 		self.blocking = true
 	end

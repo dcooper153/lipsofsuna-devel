@@ -71,9 +71,12 @@ end
 -- @param self ProjectileController.
 -- @param result Contact result.
 ProjectileController.handle_contact = function(self, result)
-	-- Apply the damage.
 	if result.object == self.attacker then return end
-	Combat:apply_ranged_impact(self.attacker, self.projectile, self.damage, result.point, result.object, result.tile)
+	-- Calculate the final damage.
+	self.damage:apply_defender_armor(result.object)
+	self.damage:apply_defender_vulnerabilities(result.object)
+	-- Apply the damage.
+	Main.combat_utils:apply_damage(self.attacker, result.object, result.tile, self.damage, result.point)
 	-- Detach the projectile.
 	self:detach()
 end

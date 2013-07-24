@@ -17,7 +17,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "arrow",
 	categories = {["arrow"] = true},
-	modifiers = {["physical damage"] = 5},
+	modifiers = {["physical damage"] = 1},
 	gravity_projectile = Vector(0,-1,0),
 	icon = "arrow1",
 	mass = 1,
@@ -95,7 +95,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {["hand.L"] = true},
 	icon = "bow1",
-	modifiers = {["physical damage"] = 4},
+	modifiers = {["physical damage"] = 2},
 	modifiers_bonus = {"ranged"},
 	mass = 7,
 	model = "bow1",

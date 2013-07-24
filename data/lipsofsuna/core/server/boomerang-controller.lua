@@ -59,8 +59,11 @@ BoomerangController.handle_contact = function(self, result)
 		self:detach()
 		return
 	end
+	-- Calculate the final damage.
+	self.damage:apply_defender_armor(result.object)
+	self.damage:apply_defender_vulnerabilities(result.object)
 	-- Apply the damage.
-	Combat:apply_ranged_impact(self.attacker, self.projectile, self.damage, result.point, result.object, result.tile)
+	Main.combat_utils:apply_damage(self.attacker, result.object, result.tile, self.damage, result.point)
 	-- Disable the boomerang mode.
 	self:detach()
 end
