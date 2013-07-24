@@ -1,4 +1,5 @@
 local ModifierSpec = require("core/specs/modifier")
+local MusicSpec = require("core/specs/music")
 
 Main.main_start_hooks:register(0, function()
 	Actionspec:validate_all()
@@ -10,6 +11,7 @@ Main.main_start_hooks:register(0, function()
 	Dialogspec:validate_all()
 	Factionspec:validate_all()
 	ModifierSpec:validate_all()
+	MusicSpec:validate_all()
 	Iconspec:validate_all()
 	Itemspec:validate_all()
 	Obstaclespec:validate_all()

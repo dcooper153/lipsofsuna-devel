@@ -1,5 +1,6 @@
 {
 	"server": false,
 	"resources": ["."],
-	"scripts": ["main"]
+	"scripts": ["main"],
+	"specs": ["music"]
 }

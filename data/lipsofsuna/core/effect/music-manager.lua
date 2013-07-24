@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Client = require("core/client/client")
+local MusicSpec = require("core/specs/music")
 local Sound = require("system/sound")
 
 --- Manages music playback.
@@ -21,9 +22,10 @@ local MusicManager = Class("MusicManager")
 -- @return MusicManager.
 MusicManager.new = function(clss)
 	local self = Class.new(clss)
-	self.__music_mode = "none"
 	self.__combat_hints = setmetatable({}, {__mode = "k"})
 	self.__combat_timer = nil
+	self.__fade_out = 2
+	self.__music_mode = "none"
 	return self
 end
 
@@ -38,25 +40,21 @@ end
 -- @param self MusicManager.
 -- @param force True to force even in combat. Nil otherwise.
 MusicManager.cycle_track = function(self, force)
-	local modes = {
-		boss = {"fairytale7", "fairytale9"},
-		char = {"fairytale2", "fairytale10", "fairytale8"},
-		combat = {"xeon5"},
-		game = {"fairytale1", "fairytale3", "fairytale4", "fairytale5",
-		        "fairytale6", "fairytale11", "fairytale12", "fairytale13"},
-		intro = {"fairytale7"},
-		menu = {"menu1"}}
 	-- Check for combat.
 	if self.__combat_timer and not force then return end
 	local mode = self.__combat_timer and "combat" or self.__music_mode
 	if not mode then return end
 	-- Find the tracks.
-	local tracks = modes[mode]
+	local tracks = MusicSpec:find_by_category(mode)
 	if not tracks then return end
-	-- Crossfade find a random track.
-	Sound:set_music_fading(2.0)
-	Sound:set_music_volume(Client.options.music_volume)
-	Sound:set_music(tracks[math.random(1, #tracks)])
+	if #tracks == 0 then return end
+	-- Choose a random track.
+	local spec = tracks[math.random(1, #tracks)]
+	-- Crossfade with the previous track.
+	Sound:set_music_fading(math.max(spec.fade_in, self.__fade_out))
+	Sound:set_music_volume(spec.volume * Client.options.music_volume)
+	Sound:set_music(spec.file)
+	self.__fade_out = spec.fade_out
 end
 
 --- Switches the music track.
