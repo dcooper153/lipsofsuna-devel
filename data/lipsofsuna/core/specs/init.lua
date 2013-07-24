@@ -1,7 +1,4 @@
-local File = require("system/file")
 local ModifierSpec = require("core/specs/modifier")
-
-File:require_directory(Mod.path, "init")
 
 Main.main_start_hooks:register(0, function()
 	Actionspec:validate_all()

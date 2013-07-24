@@ -40,6 +40,15 @@ Spec.register = function(clss, name, type, fields)
 	return spec
 end
 
+--- Registers all the spec types.
+-- @param clss Spec class.
+Spec.register_all = function(clss)
+	if not clss.__registered then
+		clss.__registered = true
+		File:require_directory("core/specs", "init")
+	end
+end
+
 --- Extends a spec with the values in the table.
 -- @param clss Spec class.
 -- @param args Arguments.<ul>
@@ -311,5 +320,3 @@ Spec.write_str = function(self)
 end
 
 return Spec
-
-

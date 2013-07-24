@@ -10,7 +10,7 @@
 
 local Class = require("system/class")
 local Color = require("system/color")
-local Spec = require(Mod.path .. "spec")
+local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Actorspec

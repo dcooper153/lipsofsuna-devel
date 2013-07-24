@@ -11,6 +11,7 @@
 local Class = require("system/class")
 local File = require("system/file")
 local Json = require("system/json")
+local Spec = require("core/specs/spec")
 
 --- Mod loading.
 -- @type Mod
@@ -27,6 +28,7 @@ Mod.new = function(clss)
 	self.resources = {}
 	self.scripts = {}
 	self.specs = {}
+	Spec:register_all()
 	return self
 end
 
@@ -69,8 +71,7 @@ Mod.init_all = function(self, settings)
 	-- Create the specs.
 	for k,v in ipairs(self.specs) do
 		if needed(v[1]) then
-			-- FIXME: Should not accept just any global.
-			local cls = _G[v[3]]
+			local cls = Spec.dict_spec[v[3]]
 			if not cls then
 				error("loading mod \"" .. v[1] .. "\" failed: " ..
 					"invalid spec type \"" .. v[3] .. "\" in \"" .. v[2] .. "\"")
@@ -107,7 +108,10 @@ Mod.load = function(self, name, optional, nocompat)
 				return "missing spec type in \"" .. path .. "\""
 			end
 			-- Validate the type.
-			-- FIXME: Should not accept just any type.
+			local cls = Spec.dict_spec[type_]
+			if not cls then
+				return "invalid spec type \"" .. type_ .. "\" in \"" .. path .. "\""
+			end
 			spec["type"] = nil
 			table.insert(self.specs, {name, path, type_, spec})
 		end
