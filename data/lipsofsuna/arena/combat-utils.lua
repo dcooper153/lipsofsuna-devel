@@ -241,6 +241,7 @@ end
 -- @return Dictionary of modifier names and values. Nil if none existed.
 CombatUtils.get_spell_modifiers_for_item = function(self, item)
 	-- Get the modifier names.
+	if not item then return end
 	local names = {}
 	if item.spell_modifiers then
 		for k,v in pairs(item.spell_modifiers) do
