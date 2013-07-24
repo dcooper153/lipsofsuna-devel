@@ -62,6 +62,17 @@ EnchantState.enchant = function(self)
 	Ui:pop_state()
 end
 
+--- Gets the stat cost of the enchantment.
+-- @param self EnchantState.
+-- @return Table.
+EnchantState.get_required_stats = function(self)
+	local modifiers = {}
+	for k,v in pairs(self.__modifiers) do
+		modifiers[v.name] = v.spell_strength
+	end
+	return Main.combat_utils:count_modifier_stats(modifiers)
+end
+
 --- Initializes the enchantment state.
 -- @param self EnchantState.
 -- @return True if succeeded. False and error message otherwise.

@@ -58,3 +58,17 @@ Ui:add_widget{
 		if not state:can_enchant() then return end
 		return UiButton("Enchant", function() state:enchant() end)
 	end}
+
+Ui:add_widget{
+	state = "enchant",
+	widget = function()
+		if not state:can_enchant() then return end
+		local required = state:get_required_stats()
+		local sorted = {}
+		for k,v in pairs(required) do
+			table.insert(sorted, string.format(" * %s: %d", k, v))
+		end
+		if not #sorted then return end
+		table.sort(sorted)
+		return UiLabel("Stats required to use the enchanted item:\n" .. table.concat(sorted, "\n"))
+	end}

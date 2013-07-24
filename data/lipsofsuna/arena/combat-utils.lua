@@ -130,11 +130,7 @@ end
 -- @param actor Actor.
 -- @param modifiers Modifiers.
 -- @return True if subtracted successfully. False and stat name if not enough stats.
-CombatUtils.subtract_modifier_stats_for_actor = function(self, actor, modifiers)
-	-- Get the actor stats.
-	local stats = actor.stats
-	if not stats then return true end
-	-- Get the require stats.
+CombatUtils.count_modifier_stats = function(self, modifiers)
 	local required = {}
 	for k,v in pairs(modifiers) do
 		local spec = ModifierSpec:find_by_name(k)
@@ -142,6 +138,20 @@ CombatUtils.subtract_modifier_stats_for_actor = function(self, actor, modifiers)
 			spec:get_required_stats(required)
 		end
 	end
+	return required
+end
+
+--- Subtracts the stats of the actor.
+-- @param self CombatUtils.
+-- @param actor Actor.
+-- @param modifiers Modifiers.
+-- @return True if subtracted successfully. False and stat name if not enough stats.
+CombatUtils.subtract_modifier_stats_for_actor = function(self, actor, modifiers)
+	-- Get the actor stats.
+	local stats = actor.stats
+	if not stats then return true end
+	-- Get the require stats.
+	local required = self:count_modifier_stats(modifiers)
 	-- Check that all requirements are met.
 	for k,v in pairs(required) do
 		local val = stats:get_value(k)
