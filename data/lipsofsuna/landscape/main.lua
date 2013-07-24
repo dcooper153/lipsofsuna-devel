@@ -1,5 +1,4 @@
 local Client = require("core/client/client")
-local Game = require("core/server/game")
 local Hooks = require("system/hooks")
 local Keysym = require("system/keysym")
 local Landscape = require("landscape/landscape")
@@ -7,12 +6,6 @@ local LandscapeCamera = require("landscape/camera")
 local Ui = require("ui/ui")
 
 Main.game_modes:register("Landscape", function()
-	-- Configure messaging.
-	Main.messaging:set_transmit_mode(true, true)
-	-- FIXME: Initialize the game.
-	Main.game = Game("benchmark")
-	Main.game.sectors.unload_time = nil
-	-- Start the subsystems.
 	Main.landscape = Landscape()
 	Ui:set_state("landscape")
 end)

@@ -9,6 +9,7 @@
 -- @alias Landscape
 
 local Class = require("system/class")
+local Game = require("core/server/game")
 local TerrainGenerator = require("landscape/generator/terrain-generator")
 local TerrainManager = require("core/terrain/terrain-manager")
 local Vector = require("system/math/vector")
@@ -22,10 +23,13 @@ Landscape = Class("Landscape")
 -- @return Landscape.
 Landscape.new = function(clss)
 	local self = Class.new(clss)
+	-- Initialize the game.
+	Main.messaging:set_transmit_mode(true, true)
+	Main.game = Game("benchmark")
+	Main.game.sectors.unload_time = nil
 	-- Initialize the terrain.
-	self.terrain = TerrainManager(12, 1, nil, false, true, true)
-	self.terrain.generate_hooks:register(0, TerrainGenerator.generate)
-	Main.terrain = self.terrain --FIXME
+	Main.terrain = TerrainManager(12, 1, nil, false, true, true)
+	Main.terrain.generate_hooks:register(0, TerrainGenerator.generate)
 	return self
 end
 
@@ -46,8 +50,8 @@ Landscape.update = function(self, secs)
 	local camera = Main.client.camera_manager:find_camera_by_type("landscape")
 	if not camera then return end
 	local center = camera:get_target_position()
-	self.terrain:set_view_center(center)
-	self.terrain:refresh_chunks_by_point(center, 50)
+	Main.terrain:set_view_center(center)
+	Main.terrain:refresh_chunks_by_point(center, 50)
 end
 
 return Landscape

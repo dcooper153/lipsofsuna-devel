@@ -42,7 +42,6 @@ Ui.init = function(self)
 	self.label = Label()
 	-- Initialize the cursor.
 	self.cursor = Cursor(Iconspec:find_by_name("cursor1"))
-	self:set_pointer_grab(Client.options.grab_cursor)
 	-- Initialize input.
 	self.input = InputHandler(Client.bindings, self.widgets)
 	self.input.focus_changed = function(w, mouse)
@@ -589,7 +588,7 @@ Ui.show_state = function(self, state, focus)
 	-- Rebuild the help text.
 	self:update_help()
 	-- Update the grab state.
-	self:set_pointer_grab(self:get_pointer_grab())
+	self:set_pointer_grab(state_.grab())
 end
 
 --- Internal function that adds all widgets to the window in the right order.

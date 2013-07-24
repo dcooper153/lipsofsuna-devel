@@ -1,9 +1,11 @@
+local Ui = require("ui/ui")
+
 Ui:add_state{
 	state = "benchmark",
 	root = "benchmark",
 	exit_root = function()
-		Main.benchmark:close()
-		Main.benchmark = nil
+		Main:end_game()
+		Ui:set_state("mainmenu")
 	end,
 	init = function()
 		Client.music:switch_track("game")

@@ -13,5 +13,5 @@
 		["load", "landscape/generator"]
 	],
 	"server": false,
-	"scripts": ["main"]
+	"scripts": ["main", "ui"]
 }
