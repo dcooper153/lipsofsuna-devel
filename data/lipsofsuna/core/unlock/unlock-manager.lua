@@ -23,6 +23,7 @@ local UnlockManager = Class("UnlockManager")
 -- @return UnlockManager
 UnlockManager.new = function(clss, db)
 	local self = Class.new(clss)
+	self.__messaging = false
 	self.db = db
 	self.unlocks = {}
 	return self
@@ -52,7 +53,7 @@ end
 -- @param name Unlock name.
 -- @param added True if added, false if removed.
 UnlockManager.changed = function(self, type, name, added)
-	if not self.db then return end
+	if not self.__messaging then return end
 	if added then
 		Main.messaging:server_event_broadcast("unlocks add", type, name)
 	else
@@ -83,7 +84,7 @@ UnlockManager.get_list = function(self)
 	return res
 end
 
---- Locks an item.
+--- Locks an entry of the given type with the given name.
 -- @param self UnlockManager.
 -- @param type Unlock type.
 -- @param name Unlock name.
@@ -100,7 +101,7 @@ UnlockManager.lock = function(self, type, name)
 	end
 end
 
---- UnlockManager an item.
+--- Unlocks an entry of the given type with the given name.
 -- @param self UnlockManager.
 -- @param type Unlock type.
 -- @param name Unlock name.
@@ -120,7 +121,13 @@ UnlockManager.unlock = function(self, type, name)
 	end
 end
 
---- UnlockManager a random skill, spell type or spell effect.
+--- Unlocks all skills, actions and modifiers.
+-- @param self UnlockManager.
+UnlockManager.unlock_all = function(self)
+	repeat until not self:unlock_random()
+end
+
+--- Unlock a random skill, actions or modifier.
 -- @param self UnlockManager.
 -- @return Unlock type and unlock name, or nil.
 UnlockManager.unlock_random = function(self)
@@ -210,6 +217,13 @@ end
 -- @param value Database. Nil to disable loading and saving.
 UnlockManager.set_database = function(self, value)
 	self.db = value
+end
+
+--- Enables or disables messaging.
+-- @param self UnlockManager.
+-- @param value True to enable. False otherwise.
+UnlockManager.set_messaging = function(self, value)
+	self.__messaging = value
 end
 
 return UnlockManager

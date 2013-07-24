@@ -2,6 +2,7 @@ local UnlockManager = require("core/unlock/unlock-manager")
 
 Main.main_start_hooks:register(5, function(secs)
 	Main.unlocks = UnlockManager()
+	Main.unlocks:set_messaging(true)
 end)
 
 Main.game_start_hooks:register(15, function()

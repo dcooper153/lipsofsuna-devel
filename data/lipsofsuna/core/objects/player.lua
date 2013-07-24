@@ -161,6 +161,7 @@ end
 -- @param self Object.
 -- @return Spawn point vector in world space, or nil.
 Player.get_spawn_point = function(self)
+	if not self.account then return end
 	return self.account.spawn_point
 end
 

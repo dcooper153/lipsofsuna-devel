@@ -25,7 +25,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		repeat until not Main.unlocks:unlock_random()
+		Main.unlocks:unlock_all()
 	end}
 
 ChatCommand{

@@ -148,6 +148,43 @@ Server.authenticate_client = function(self, client, login, pass)
 	self.login_hooks:call(account)
 end
 
+Server.send_game_state = function(self, player)
+	-- Transmit the home marker.
+	local client = player.client
+	local home = player:get_spawn_point() or player:get_position():copy()
+	Main.messaging:server_event("create marker", client, "home", home)
+	-- Transmit unlocked map markers.
+	for k,m in pairs(Marker.dict_name) do
+		if m.unlocked then
+			Main.messaging:server_event("create marker", client, m.name, m.position)
+		end
+	end
+	-- Transmit other unlocks.
+	Main.messaging:server_event("unlocks init", client, Main.unlocks.unlocks)
+	-- Transmit skills.
+	player:update_skills()
+	-- Transmit active and completed quests.
+	if Main.quests then
+		for k,q in pairs(Main.quests:get_all_quests()) do
+			q:send_to_client(client, true, true)
+		end
+	end
+	-- Transmit static objects.
+	local objects = {}
+	for k,v in pairs(Main.game.static_objects_by_id) do
+		table.insert(objects, {v:get_id(), v.spec.name, v:get_position(), v:get_rotation()})
+	end
+	Main.messaging:server_event("create static objects", client, objects)
+	-- Transmit dialog states of static objects.
+	if Main.dialogs then
+		for k,v in pairs(Main.dialogs.dialogs_by_object) do
+			if v.object and v.object.static and v.event then
+				player:vision_cb(v.event)
+			end
+		end
+	end
+end
+
 Server.spawn_player = function(self, player, client, spawnpoint)
 	-- Notify the client of the game start.
 	Main.messaging:server_event("accept character", client)
@@ -168,34 +205,8 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 	end
 	player:set_client(client)
 	player:set_visible(true)
-	-- Transmit the home marker.
-	Main.messaging:server_event("create marker", client, "home", home)
-	-- Transmit unlocked map markers.
-	for k,m in pairs(Marker.dict_name) do
-		if m.unlocked then
-			Main.messaging:server_event("create marker", client, m.name, m.position)
-		end
-	end
-	-- Transmit other unlocks.
-	Main.messaging:server_event("unlocks init", client, Main.unlocks.unlocks)
-	-- Transmit skills.
-	player:update_skills()
-	-- Transmit active and completed quests.
-	for k,q in pairs(Main.quests:get_all_quests()) do
-		q:send_to_client(client, true, true)
-	end
-	-- Transmit static objects.
-	local objects = {}
-	for k,v in pairs(Main.game.static_objects_by_id) do
-		table.insert(objects, {v:get_id(), v.spec.name, v:get_position(), v:get_rotation()})
-	end
-	Main.messaging:server_event("create static objects", client, objects)
-	-- Transmit dialog states of static objects.
-	for k,v in pairs(Main.dialogs.dialogs_by_object) do
-		if v.object and v.object.static and v.event then
-			player:vision_cb(v.event)
-		end
-	end
+	-- Synchronize the state.
+	self:send_game_state(player)
 	-- Notify the global event manager.
 	self.events:notify_action("player spawn", player)
 end

@@ -88,7 +88,8 @@ Arena.update = function(self, secs)
 		Server.players_by_client = {}
 		Server.players_by_client[-1] = self.player --FIXME
 		self.player:calculate_animation()
-		
+		Server:send_game_state(self.player)
+
 		self.button = Obstacle(Main.objects)
 		self.button:set_spec(Obstaclespec:find_by_name("arena button"))
 		self.button:set_position(Vector(505,100.5,500))
@@ -104,6 +105,9 @@ Arena.update = function(self, secs)
 		spelltable:set_spec(Obstaclespec:find_by_name("spell table"))
 		spelltable:set_position(Vector(500,100.1,495))
 		spelltable:set_visible(true)
+
+		-- Unlock everything.
+		Main.unlocks:unlock_all()
 	end
 	-- Update lighting.
 	Client.lighting:update(secs)
