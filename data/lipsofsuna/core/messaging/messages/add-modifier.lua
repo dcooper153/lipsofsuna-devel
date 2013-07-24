@@ -16,5 +16,5 @@ Main.messaging:register_message{
 	server_to_client_handle = function(self, name, time)
 		Client.data.modifiers[name] = time
 		local hud = Ui:get_hud("modifier")
-		if hud then hud.widget:add(name, time) end
+		if hud and hud.widget then hud.widget:add(name, time) end
 	end}

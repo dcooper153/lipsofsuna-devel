@@ -84,7 +84,6 @@ Arena.update = function(self, secs)
 		self.player.physics:set_collision_group(PhysicsConsts.GROUP_PLAYERS)
 		self.player:set_visible(true)
 		self.player:set_client(-1)
-		self.player:respawn()
 		Client:set_player_object(self.player)
 		Server.players_by_client = {}
 		Server.players_by_client[-1] = self.player --FIXME
