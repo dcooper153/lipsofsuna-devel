@@ -49,4 +49,5 @@ Actionspec{
 		else
 			self:animate("land water")
 		end
+		self.jumping = nil
 	end}
