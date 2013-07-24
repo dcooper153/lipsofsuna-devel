@@ -1,5 +1,6 @@
 local Class = require("system/class")
 local Database = require("system/database")
+local Model = require("system/model")
 local Render = require("system/render")
 
 Operators.stats = Class("StatsOperator")
@@ -11,18 +12,15 @@ end
 
 Operators.stats.update_client_stats = function(self, show_objects)
 	-- Collect various memory stats.
-	local models = 0
-	for k,v in pairs(__userdata_lookup) do
-		if v.class_name == "Model" then
-			models = models + v:get_memory_used()
-		end
-	end
+	local models = Model:get_total_model_count()
+	local model_mem = Model:get_total_memory_used()
 	local stats = Render:get_stats()
 	-- Store the stats into a string.
 	self.data.client_stats = string.format([[
 FPS: %.2f
 Database memory: %d kB
 Script memory: %d kB
+Model count: %d
 Model memory: %d kB
 
 %s
@@ -35,8 +33,8 @@ Allocated meshes: %d : %dkB
 Allocated skeletons: %d
 Allocated textures: %d/%d : %dkB
 Allocated materials: %d/%d
-]], Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024, models / 1024,
-Main.timing:get_profiling_string(),
+]], Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024,
+models, model_mem / 1024, Main.timing:get_profiling_string(),
 stats.batch_count, stats.face_count, stats.attachment_count, stats.entity_count, stats.mesh_count,
 stats.mesh_memory / 1000, stats.skeleton_count, stats.texture_count_loaded, stats.texture_count,
 stats.texture_memory / 1000, stats.material_count_loaded, stats.material_count)

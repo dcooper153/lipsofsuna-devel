@@ -181,6 +181,28 @@ static void Model_get_vertex_count (LIScrArgs* args)
 	liscr_args_seti_int (args, self->vertices.count);
 }
 
+static void Model_get_total_model_count (LIScrArgs* args)
+{
+	LIMaiProgram* program;
+
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	liscr_args_seti_int (args, program->models->models->size);
+}
+
+static void Model_get_total_memory_used (LIScrArgs* args)
+{
+	int total;
+	LIMaiProgram* program;
+	LIAlgU32dicIter iter;
+
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+
+	total = 0;
+	LIALG_U32DIC_FOREACH (iter, program->models->models)
+		total += limdl_model_get_memory (iter.value);
+	liscr_args_seti_int (args, total);
+}
+
 /*****************************************************************************/
 
 void liext_script_model (
@@ -195,6 +217,8 @@ void liext_script_model (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_center_offset", Model_get_center_offset);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_memory_used", Model_get_memory_used);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_vertex_count", Model_get_vertex_count);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_MODEL, "model_get_total_model_count", Model_get_total_model_count);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_MODEL, "model_get_total_memory_used", Model_get_total_memory_used);
 }
 
 /** @} */

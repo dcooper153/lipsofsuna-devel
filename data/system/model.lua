@@ -1,4 +1,4 @@
---- TODO:doc
+--- 3D model.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@ end
 
 ------------------------------------------------------------------------------
 
---- TODO:doc
+--- 3D model.
 -- @type Model
 local Model = Class("Model")
 
@@ -138,6 +138,20 @@ end
 -- @return Number.
 Model.get_vertex_count = function(self)
 	return Los.model_get_vertex_count(self.handle)
+end
+
+--- Gets the approximate total memory used by all models, in bytes.
+-- @param clss Model class.
+-- @return Memory used, in bytes
+Model.get_total_model_count = function(clss)
+	return Los.model_get_total_model_count()
+end
+
+--- Gets the approximate total memory used by all models, in bytes.
+-- @param clss Model class.
+-- @return Memory used, in bytes
+Model.get_total_memory_used = function(self)
+	return Los.model_get_total_memory_used()
 end
 
 return Model
