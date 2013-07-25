@@ -155,9 +155,12 @@ class LIMeshUtils:
 		for i,old_vert in enumerate(mesh.vertices):
 			new_vert = new_mesh.vertices[i]
 			for j,old_elem in enumerate(old_vert.groups):
-				old_group = obj.vertex_groups[old_elem.group]
-				new_group = new_obj.vertex_groups[old_elem.group]
-				new_group.add([i], old_elem.weight, 'REPLACE')
+				if old_elem.group >= len(obj.vertex_groups):
+					print("WARNING: Vertex group %d/%d out of bounds for vertex %d" % (old_elem.group, len(obj.vertex_groups), i))
+				else:
+					old_group = obj.vertex_groups[old_elem.group]
+					new_group = new_obj.vertex_groups[old_elem.group]
+					new_group.add([i], old_elem.weight, 'REPLACE')
 
 		return new_obj
 
