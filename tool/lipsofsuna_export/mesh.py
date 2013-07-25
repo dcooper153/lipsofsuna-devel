@@ -103,7 +103,7 @@ class LIMesh:
 		uvmode = 'UV'
 		if uvtexture and uvlayer:
 			if bmat and len(bmat.texture_slots):
-				if bmat.texture_slots[0].texture_coords == 'ORCO':
+				if bmat.texture_slots[0] and bmat.texture_slots[0].texture_coords == 'ORCO':
 					uvmode = 'ORCO'
 		else:
 			uvmode = 'ORCO'
