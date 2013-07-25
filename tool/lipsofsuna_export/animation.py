@@ -51,7 +51,7 @@ class LIAnimation:
 						while next:
 							self.add_channel(next.name)
 							next = next.parent
-				elif cons.type == 'COPY_ROTATION' and cons.target and cons.subtarget in self.channeldict:
+				elif cons.type in ['COPY_ROTATION', 'COPY_LOCATION', 'COPY_SCALE'] and cons.target and cons.subtarget in self.channeldict:
 					# Copy rotation from an animated bone.
 					self.add_channel(bone.name)
 
