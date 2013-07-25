@@ -29,7 +29,6 @@ Landscape.new = function(clss)
 	Main.game.sectors.unload_time = nil
 	-- Initialize the terrain.
 	Main.terrain = TerrainManager(12, 1, nil, false, true, true)
-	Main.terrain.generate_hooks:register(0, TerrainGenerator.generate)
 	return self
 end
 
