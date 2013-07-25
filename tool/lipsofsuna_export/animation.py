@@ -43,14 +43,14 @@ class LIAnimation:
 						next = bone
 						for i in range(0, cons.chain_count):
 							self.add_channel(next.name)
-							next = bone.parent
+							next = next.parent
 							if not next:
 								break
 					else:
 						next = bone
 						while next:
 							self.add_channel(next.name)
-							next = bone.parent
+							next = next.parent
 				elif cons.type == 'COPY_ROTATION' and cons.target and cons.subtarget in self.channeldict:
 					# Copy rotation from an animated bone.
 					self.add_channel(bone.name)
