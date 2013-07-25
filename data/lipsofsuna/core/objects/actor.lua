@@ -11,8 +11,8 @@
 local Class = require("system/class")
 local Coroutine = require("system/coroutine")
 local Item = require("core/objects/item")
+local ObjectSerializer = require("core/objects/object-serializer")
 local Physics = require("system/physics")
-local Serializer = require("system/serializer")
 local SimulationObject = require("core/objects/simulation")
 local Skills = require("core/server/skills")
 local Stats = require("core/server/stats")
@@ -21,7 +21,16 @@ local Timer = require("system/timer")
 --- TODO:doc
 -- @type Actor
 local Actor = Class("Actor", SimulationObject)
-Actor.serializer = Serializer{
+Actor.serializer = ObjectSerializer(
+{
+	"base",
+	"fields",
+	"inventory",
+	"sector",
+	"skills",
+	"stats"
+},
+{
 	{
 		name = "angular",
 		type = "vector",
@@ -96,7 +105,7 @@ Actor.serializer = Serializer{
 		name = "skin_style",
 		type = "string"
 	}
-}
+})
 
 --- Creates a new actor.
 -- @param clss Actor class.
@@ -534,17 +543,6 @@ Actor.randomize = function(self)
 	end
 end
 
---- Reads the object from a database.
--- @param self Actor.
--- @param db Database.
-Actor.read_db = function(self, db)
-	SimulationObject.read_db(self, db)
-	Server.object_database:load_inventory(self)
-	Server.object_database:load_skills(self)
-	self:update_skills()
-	Server.object_database:load_stats(self)
-end
-
 --- Removes a modifier.
 -- @param self Actor.
 -- @param name Modifier name.
@@ -764,32 +762,6 @@ Actor.update_summon = function(self, secs)
 	self.summon_timer = self.summon_timer - secs
 	if self.summon_timer < 0 then
 		self:unsummon()
-	end
-end
-
---- Writes the object to a database.
--- @param self Actor.
--- @param db Database.
-Actor.write_db = function(self, db)
-	-- Don't save summons.
-	if self.summon_timer then return end
-	-- Write the object data.
-	local id = self:get_id()
-	SimulationObject.write_db(self, db)
-	-- Write the inventory contents.
-	db:query([[DELETE FROM object_inventory WHERE parent=?;]], {id})
-	for index,object in pairs(self.inventory.stored) do
-		object:write_db(db)
-	end
-	-- Write skills.
-	db:query([[DELETE FROM object_skills WHERE id=?;]], {id})
-	for name,value in pairs(self.skills.skills) do
-		db:query([[REPLACE INTO object_skills (id,name) VALUES (?,?);]], {id, name})
-	end
-	-- Write stats.
-	db:query([[DELETE FROM object_stats WHERE id=?;]], {id})
-	for name,args in pairs(self.stats.stats) do
-		db:query([[REPLACE INTO object_stats (id,name,value) VALUES (?,?,?);]], {id, name, args.value})
 	end
 end
 
@@ -1021,10 +993,6 @@ Actor.set_stat = function(self, s, v, m, diff)
 			self.physics:set_shape("default")
 		end
 	end
-end
-
-Actor.get_storage_sector = function(self)
-	return self:get_sector()
 end
 
 Actor.get_storage_type = function(self)

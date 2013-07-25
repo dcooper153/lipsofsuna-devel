@@ -9,13 +9,18 @@
 -- @alias Staticobject
 
 local Class = require("system/class")
-local Serializer = require("system/serializer")
+local ObjectSerializer = require("core/objects/object-serializer")
 local SimulationObject = require("core/objects/simulation")
 
 --- TODO:doc
 -- @type Staticobject
 local Staticobject = Class("Staticobject", SimulationObject)
-Staticobject.serializer = Serializer{
+Staticobject.serializer = ObjectSerializer(
+{
+	"base",
+	"fields"
+},
+{
 	{
 		name = "position",
 		type = "vector",
@@ -28,7 +33,7 @@ Staticobject.serializer = Serializer{
 		get = function(self) return self:get_rotation() end,
 		set = function(self, v) self:set_rotation(v) end
 	}
-}
+})
 
 --- Creates an static object.
 -- @param clss Staticobject class.
@@ -94,9 +99,4 @@ Staticobject.get_storage_type = function(self)
 	return "static"
 end
 
-Staticobject.get_storage_sector = function(self)
-end
-
 return Staticobject
-
-

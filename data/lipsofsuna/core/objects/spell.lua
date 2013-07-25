@@ -85,11 +85,6 @@ Spell.update = function(self, secs)
 	SimulationObject.update(self, secs)
 end
 
---- Prevents spell from being saved.
--- @param self Spell.
-Spell.write_db = function(self)
-end
-
 --- Sets the modifiers of the spell.
 -- @param self Spell.
 -- @param value Dictionary of modifiers and their values.

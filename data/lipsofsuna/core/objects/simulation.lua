@@ -470,39 +470,6 @@ SimulationObject.update = function(self, secs)
 	Main.objects.object_update_hooks:call(self, secs)
 end
 
---- Reads the object from a database.
--- @param self Object.
--- @param db Database.
-SimulationObject.read_db = function(self, db)
-	Server.object_database:load_fields(self)
-end
-
---- Writes the object to a database.
--- @param self Object.
--- @param db Database.
-SimulationObject.write_db = function(self, db)
-	-- Write the object data.
-	local id = self:get_id()
-	db:query([[REPLACE INTO object_data (id,type,spec,dead) VALUES (?,?,?,?);]],
-		{id, self:get_storage_type(), self.spec.name, self.dead and 1 or 0})
-	-- Write the serializer fields.
-	db:query([[DELETE FROM object_fields WHERE id=?;]], {id})
-	self.serializer:write(self, function(name, value)
-		db:query([[REPLACE INTO object_fields (id,name,value) VALUES (?,?,?);]], {id, name, value})
-	end)
-	-- Write the sector information.
-	local sector = self:get_storage_sector()
-	if sector then
-		if self.spec.important then
-			db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {id, sector, nil})
-		else
-			db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {id, sector, 0})
-		end
-	else
-		db:query([[DELETE FROM object_sectors where id=?;]], {id})
-	end
-end
-
 --- Sets the dialog state of the object.
 -- @param self Object.
 -- @param type Dialog type. ("choice"/"message"/nil)

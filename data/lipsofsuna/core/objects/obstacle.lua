@@ -10,13 +10,19 @@
 
 local Class = require("system/class")
 local Item = require("core/objects/item")
-local Serializer = require("system/serializer")
+local ObjectSerializer = require("core/objects/object-serializer")
 local SimulationObject = require("core/objects/simulation")
 
 --- TODO:doc
 -- @type Obstacle
 local Obstacle = Class("Obstacle", SimulationObject)
-Obstacle.serializer = Serializer{
+Obstacle.serializer = ObjectSerializer(
+{
+	"base",
+	"fields",
+	"sector"
+},
+{
 	{
 		name = "angular",
 		type = "vector",
@@ -39,7 +45,7 @@ Obstacle.serializer = Serializer{
 		get = function(self) return self:get_rotation() end,
 		set = function(self, v) self:set_rotation(v) end
 	}
-}
+})
 
 --- Creates an obstacle.
 -- @param clss Mover class.
@@ -135,14 +141,8 @@ Obstacle.set_spec = function(self, value)
 	self:set_model_name(spec.model)
 end
 
-Obstacle.get_storage_sector = function(self)
-	return self:get_sector()
-end
-
 Obstacle.get_storage_type = function(self)
 	return "obstacle"
 end
 
 return Obstacle
-
-

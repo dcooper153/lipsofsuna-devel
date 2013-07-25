@@ -9,13 +9,21 @@
 -- @alias Item
 
 local Class = require("system/class")
-local Serializer = require("system/serializer")
+local ObjectSerializer = require("core/objects/object-serializer")
 local SimulationObject = require("core/objects/simulation")
 
 --- Item object.
 -- @type Item
 local Item = Class("Item", SimulationObject)
-Item.serializer = Serializer{
+Item.serializer = ObjectSerializer(
+{
+	"base",
+	"fields",
+	"inventory",
+	"parent",
+	"sector"
+},
+{
 	{
 		name = "angular",
 		type = "vector",
@@ -48,7 +56,7 @@ Item.serializer = Serializer{
 		get = function(self) return self:get_rotation() end,
 		set = function(self, v) self:set_rotation(v) end
 	}
-}
+})
 
 --- Creates an item.
 -- @param clss Item class.
@@ -156,14 +164,6 @@ Item.randomize = function(self)
 	end
 end
 
---- Reads the object from a database.
--- @param self Item.
--- @param db Database.
-Item.read_db = function(self, db)
-	SimulationObject.read_db(self, db)
-	Server.object_database:load_inventory(self)
-end
-
 --- Splits items from the stack.
 -- @param self Item.
 -- @param count Number of items to split.
@@ -189,30 +189,6 @@ Item.update = function(self, secs)
 		self.controller:update(secs)
 	end
 	SimulationObject.update(self, secs)
-end
-
---- Writes the object to a database.
--- @param self Item.
--- @param db Database.
-Item.write_db = function(self, db)
-	-- Write the object data.
-	local id = self:get_id()
-	SimulationObject.write_db(self, db)
-	-- Write the inventory contents.
-	db:query([[DELETE FROM object_inventory WHERE parent=?;]], {id})
-	for index,object in pairs(self.inventory.stored) do
-		object:write_db(db)
-	end
-	-- Write the own inventory index.
-	local parent = self.parent and Main.objects:find_by_id(self.parent)
-	if parent then
-		local index = parent.inventory:get_index_by_object(self)
-		local slot = parent.inventory:get_slot_by_index(index)
-		db:query([[REPLACE INTO object_inventory (id,parent,offset,slot) VALUES (?,?,?,?);]],
-			{id, self.parent, index, slot})
-	else
-		db:query([[DELETE FROM object_inventory WHERE id=?;]], {id})
-	end
 end
 
 --- Gets the stack count of the item.
@@ -263,10 +239,6 @@ Item.set_spec = function(self, value)
 	self.inventory:set_size(spec.inventory_size)
 	-- Set the model.
 	self:set_model_name(spec.model)
-end
-
-Item.get_storage_sector = function(self)
-	return self:get_sector()
 end
 
 Item.get_storage_type = function(self)

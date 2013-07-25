@@ -383,18 +383,6 @@ Player.vision_cb = function(self, args)
 	if fun then fun(args) end
 end
 
---- Writes the object to a database.
--- @param self Object.
--- @param db Database.
-Player.write_db = function(self, db)
-	-- Write the object data.
-	Actor.write_db(self, db)
-	-- Write account information.
-	if self.client and self.account then
-		Main.accounts:save_account(self.account, self)
-	end
-end
-
 Player.get_admin = function(self)
 	local account = rawget(self, "account")
 	if not account then return end
@@ -406,11 +394,6 @@ Player.set_admin = function(self, v)
 	if not account then return end
 	Server.config.admins[account.login] = v and true or nil
 	Server.config:save()
-end
-
-Player.get_storage_sector = function(self)
-	if self.client then return end
-	return self:get_sector()
 end
 
 Player.get_storage_type = function(self)

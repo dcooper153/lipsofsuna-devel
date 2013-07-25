@@ -137,39 +137,6 @@ ObjectDatabase.does_object_exist = function(self, id)
 	return rows and rows[1]
 end
 
---- Reads the fields of the object from the database.
--- @param self ObjectDatabase.
--- @param parent Object.
-ObjectDatabase.load_fields = function(self, parent)
-	local rows = self.db:query(
-		[[SELECT name,value FROM object_fields WHERE id=?]], {parent:get_id()})
-	parent.serializer:read(parent, rows)
-end
-
---- Reads all objects in a sector.
--- @param self ObjectDatabase.
--- @param parent Object.
--- @return List of objects.
-ObjectDatabase.load_inventory = function(self, parent)
-	local objects = {}
-	local rows = self.db:query(
-		[[SELECT b.id,b.type,b.spec,b.dead,a.offset,a.slot FROM
-		object_inventory AS a INNER JOIN
-		object_data AS b WHERE
-		a.parent=? AND a.id=b.id]], {parent:get_id()})
-	for k,v in ipairs(rows) do
-		local obj = self:load_object(v[1], v[2], v[3], v[4])
-		if obj then
-			parent.inventory:set_object(v[5], obj)
-			if v[6] then
-				parent.inventory:equip_index(v[5], v[6])
-			end
-			table.insert(objects, obj)
-		end
-	end
-	return objects
-end
-
 --- Reads an object from the database.
 -- @param self ObjectDatabase.
 -- @param id Object ID.
@@ -204,7 +171,10 @@ ObjectDatabase.load_object = function(self, id, type_, spec, dead)
 	object:set_spec(objspec)
 	if object.set_dead then object:set_dead(dead == 1) end
 	-- Read the additional fields.
-	object:read_db(self.db)
+	if object.serializer then
+		local create = function(a,b,c,d) return self:load_object(a,b,c,d) end
+		object.serializer:read(object, self.db, create)
+	end
 	return object
 end
 
@@ -220,29 +190,6 @@ ObjectDatabase.load_player = function(self, account)
 		{"player", account.character})
 	for k,v in ipairs(rows) do
 		return self:load_object(v[1], v[2], v[3], v[4])
-	end
-end
-
---- Reads the skills of the object from the database.
--- @param self ObjectDatabase.
--- @param parent Object.
-ObjectDatabase.load_skills = function(self, parent)
-	local rows = self.db:query(
-		[[SELECT name FROM object_skills WHERE id=?]], {parent:get_id()})
-	for k,v in ipairs(rows) do
-		parent.skills:add_without_requirements(v[1])
-	end
-	parent.skills:remove_invalid()
-end
-
---- Reads the skills of the object from the database.
--- @param self ObjectDatabase.
--- @param parent Object.
-ObjectDatabase.load_stats = function(self, parent)
-	local rows = self.db:query(
-		[[SELECT name,value FROM object_stats WHERE id=?]], {parent:get_id()})
-	for k,v in ipairs(rows) do
-		parent.stats:set_value(v[1], v[2])
 	end
 end
 
@@ -288,7 +235,9 @@ end
 -- @param self ObjectDatabase.
 -- @param object Object.
 ObjectDatabase.save_object = function(self, object)
-	object:write_db(self.db)
+	if object.serializer then
+		object.serializer:write(object, self.db)
+	end
 end
 
 --- Writes objects in the given sector to the database.
@@ -298,7 +247,7 @@ ObjectDatabase.save_sector_objects = function(self, sector)
 	self.db:query([[DELETE FROM object_sectors WHERE sector=?;]], {sector})
 	local objs = Main.objects:find_by_sector(sector)
 	for k,v in pairs(objs) do
-		v:write_db(self.db)
+		self:save_object(v)
 	end
 end
 
@@ -307,7 +256,7 @@ end
 ObjectDatabase.save_static_objects = function(self)
 	for k,v in pairs(Main.game.static_objects_by_id) do
 		if v:get_visible() then
-			v:write_db(self.db)
+			self:save_object(v)
 		end
 	end
 end
@@ -331,5 +280,3 @@ ObjectDatabase.update_world_decay = function(self, secs)
 end
 
 return ObjectDatabase
-
-
