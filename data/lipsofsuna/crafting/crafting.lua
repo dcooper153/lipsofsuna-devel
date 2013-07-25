@@ -9,7 +9,6 @@
 -- @alias Crafting
 
 local Class = require("system/class")
-local DialogManager = require("core/dialog/dialog-manager")
 local Game = require("core/server/game")
 local Hooks = require("system/hooks")
 local Item = require("core/objects/item")
@@ -35,7 +34,6 @@ Crafting.new = function(clss)
 	Main.game = Game("benchmark")
 	Main.game:start()
 	Main.game.sectors.unload_time = nil
-	Main.dialogs = DialogManager()
 	ServerUtils:set_player_spawn_point(Vector(500,101,500))
 	-- Initialize the terrain.
 	self.terrain = TerrainManager(12, 1, nil, false, true, true)
@@ -66,7 +64,6 @@ end
 Crafting.close = function(self)
 	Main.terrain:unload_all()
 	Main.terrain = nil
-	Main.dialogs = nil
 	Physics:set_enable_simulation(false)
 	ServerUtils:set_player_spawn_point()
 end

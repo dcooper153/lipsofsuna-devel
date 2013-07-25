@@ -26,7 +26,6 @@ Server = Class("Server")
 
 Server.init = function(self, multiplayer, client)
 	self.config = ServerConfig()
-	Main.dialogs = DialogManager()
 	self.marker_timer = 0
 	self.initialized = true
 	self.multiplayer = multiplayer
@@ -53,10 +52,8 @@ Server.deinit = function(self)
 	-- for sure. Otherwise, they might remain locked in memory when the
 	-- client starts a new server.
 	self.config = nil
-	Main.dialogs = nil
 	self.players_by_client = nil
 	self.trading = nil
-	self.config = nil
 	self.object_database = nil
 	self.events = nil
 	collectgarbage()
@@ -211,5 +208,3 @@ end
 Server.get_player_by_client = function(self, client)
 	return self.players_by_client[client]
 end
-
-

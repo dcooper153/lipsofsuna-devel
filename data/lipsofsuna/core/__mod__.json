@@ -41,6 +41,7 @@
 		["load", "core/camera"],
 		["load", "core/camera/first"],
 		["load", "core/camera/third"],
+		["load", "core/dialog"],
 		["load", "core/effect"],
 		["load", "core/input"],
 		["load", "core/marker"],

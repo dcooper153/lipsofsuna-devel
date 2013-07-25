@@ -9,7 +9,6 @@
 -- @alias Arena
 
 local Class = require("system/class")
-local DialogManager = require("core/dialog/dialog-manager")
 local Game = require("core/server/game")
 local Hooks = require("system/hooks")
 local Item = require("core/objects/item")
@@ -55,7 +54,6 @@ Arena.new = function(clss)
 		return Hooks.STOP
 	end)
 	Main.terrain = self.terrain --FIXME
-	Main.dialogs = DialogManager()
 	-- Enable the simulation.
 	Physics:set_enable_simulation(true)
 	return self
@@ -66,7 +64,6 @@ end
 Arena.close = function(self)
 	Main.terrain:unload_all()
 	Main.terrain = nil
-	Main.dialogs = nil
 	Physics:set_enable_simulation(false)
 	ServerUtils:set_player_spawn_point()
 end
