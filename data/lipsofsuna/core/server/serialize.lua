@@ -9,7 +9,6 @@
 -- @alias Serialize
 
 local Class = require("system/class")
-local Marker = require("core/marker")
 
 --- TODO:doc
 -- @type Serialize
@@ -31,17 +30,6 @@ end
 --- Loads everything except map data.
 -- @param clss Serialize class.
 Serialize.load = function(clss)
-	clss:load_markers()
-end
-
---- Loads map markers from the database.
--- @param clss Serialize class.
-Serialize.load_markers = function(clss)
-	local r = clss.db:query("SELECT name,id,x,y,z,unlocked,discoverable FROM markers;")
-	for k,v in ipairs(r) do
-		Marker{name = v[1], target = v[2], position = Vector(v[3], v[4], v[5]),
-			unlocked = (v[6] == 1), discoverable = (v[7] == 1)}
-	end
 end
 
 --- Saves everything.
@@ -54,36 +42,8 @@ Serialize.save = function(clss, erase)
 		Server.object_database:update_world_decay()
 		Server.object_database:clear_unused_objects()
 	end
-	clss:save_markers(erase)
 	Server.account_database:save_accounts(erase)
 	Main.unlocks:save()
-end
-
---- Saves a map marker.
--- @param clss Serialize class.
--- @param marker Map marker.
-Serialize.save_marker = function(clss, marker)
-	clss.db:query("BEGIN TRANSACTION;")
-	clss.db:query("REPLACE INTO markers (name,id,x,y,z,unlocked,discoverable) VALUES (?,?,?,?,?,?,?);",
-		{marker.name, marker.target, marker.position.x, marker.position.y, marker.position.z,
-		 marker.unlocked and 1 or 0, marker.discoverable and 1 or 0})
-	clss.db:query("END TRANSACTION;")
-end
-
---- Saves all map markers.
--- @param clss Serialize class.
--- @param erase True to erase existing database entries first.
-Serialize.save_markers = function(clss, erase)
-	clss.db:query("BEGIN TRANSACTION;")
-	if erase then
-		clss.db:query("DELETE FROM markers;")
-	end
-	for k,v in pairs(Marker.dict_name) do
-		clss.db:query("REPLACE INTO markers (name,id,x,y,z,unlocked,discoverable) VALUES (?,?,?,?,?,?,?);",
-			{k, v.target, v.position.x, v.position.y, v.position.z,
-			 v.unlocked and 1 or 0, v.discoverable and 1 or 0})
-	end
-	clss.db:query("END TRANSACTION;")
 end
 
 ------------------------------------------------------------------------------
@@ -97,20 +57,11 @@ Serialize.init_game_database = function(self, reset)
 	local version = self:get_value("game_version")
 	if not reset and version == self.game_version then return end
 	-- Initialize tables.
-	self.db:query([[DROP TABLE IF EXISTS markers;]])
 	self.db:query([[DROP TABLE IF EXISTS options;]])
 	self.db:query(
 		[[CREATE TABLE options (
 		key TEXT PRIMARY KEY,
 		value TEXT);]])
-	self.db:query([[CREATE TABLE markers (
-		name TEXT PRIMARY KEY,
-		id INTEGER,
-		x FLOAT,
-		y FLOAT,
-		z FLOAT,
-		unlocked INTENGER,
-		discoverable INTEGER);]])
 end
 
 --- Gets a value from the key-value database.

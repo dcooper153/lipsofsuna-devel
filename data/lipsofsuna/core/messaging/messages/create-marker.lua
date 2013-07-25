@@ -3,8 +3,6 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 
-local Marker = require("core/marker")
-
 Main.messaging:register_message{
 	name = "create marker",
 	server_to_client_encode = function(self, name, point)
@@ -16,9 +14,9 @@ Main.messaging:register_message{
 		return {name, Vector(x,y,z)}
 	end,
 	server_to_client_handle = function(self, name, point)
-		local m = Marker:find{name = name}
+		local m = Main.markers:find_by_name(name)
 		if not m then
-			m = Marker{name = name}
+			m = Main.markers:create(name)
 			if not Operators.play:is_startup_period() then
 				Client:append_log("Location added: " .. name)
 			end

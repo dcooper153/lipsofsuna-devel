@@ -9,7 +9,6 @@
 -- @alias Generator
 
 local Class = require("system/class")
-local Marker = require("core/marker")
 local Network = require("system/network")
 local Region = require("landscape/generator/region")
 local Sector = require("system/sector")
@@ -49,7 +48,7 @@ Generator.generate = function(self, args)
 	Server.players_by_client = {}
 	-- Reset the world.
 	self:update_status(0, "Resetting world")
-	Marker:reset()
+	Main.markers:reset()
 	Main.game.sectors:unload_all()
 	self:reset()
 	-- Save the map.
@@ -61,8 +60,6 @@ Generator.generate = function(self, args)
 	Server.serialize:set_value("map_version", Generator.map_version)
 	-- Save map markers.
 	self:update_status(0, "Saving quests")
-	Server.serialize:save_generator(true)
-	Server.serialize:save_markers(true)
 	Main.quests:reset()
 	Server.account_database:reset_characters()
 	Server.account_database:save_accounts()

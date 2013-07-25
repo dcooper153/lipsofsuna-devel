@@ -1,5 +1,3 @@
-local Marker = require("core/marker")
-
 --- Gets the currently shown map marker.
 -- @param self Client.
 -- @return Marker or nil.
@@ -8,7 +6,7 @@ Client.get_active_marker = function(self)
 	if not self.player_object then return end
 	local quest = Questspec:find{name = self.data.quest.shown}
 	if not quest or not quest.marker then return end
-	return Marker:find{name = quest.marker}
+	return Main.markers:find_by_name(quest.marker)
 end
 
 --- Gets the compass direction for the currently shown quest.<br/>

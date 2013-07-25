@@ -42,6 +42,7 @@
 		["load", "core/camera/third"],
 		["load", "core/effect"],
 		["load", "core/input"],
+		["load", "core/marker"],
 		["load", "core/messaging"],
 		["load", "core/multiplayer"],
 		["load", "core/objects"],

@@ -11,7 +11,6 @@
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Item = require("core/objects/item")
-local Marker = require("core/marker")
 local Obstacle = require("core/objects/obstacle")
 local Trading = require("core/server/trading") --FIXME
 
@@ -319,7 +318,7 @@ Dialog.execute = function(self)
 		if c.position_absolute then return c.position_absolute end
 		local pos = self.object:get_position()
 		if c.position_marker then
-			local m = Marker:find{name = c.position_marker}
+			local m = Main.markers:find_by_name(c.position_marker)
 			if m then pos = m.position end
 		end
 		if c.position_relative then
@@ -523,11 +522,11 @@ Dialog.execute = function(self)
 				local name = c.assign_marker
 				local marker
 				local index = 1
-				while Marker:find{name = name} do
+				while Main.markers:find_by_name(name) do
 					name = string.format("%s(%d)", c.assign_marker, index)
 					index = index + 1
 				end
-				object.marker = Marker{name = name, position = object:get_position(), target = object:get_id()}
+				object.marker = Main.markers:create(name, object:get_id(), object:get_position())
 				object.marker:unlock()
 			end
 			vm[1].pos = vm[1].pos + 1
@@ -552,7 +551,7 @@ Dialog.execute = function(self)
 			for i = #vm,1,-1 do vm[i] = nil end
 		end,
 		["unlock marker"] = function(vm, c)
-			local m = Marker:find_by_name(c[2])
+			local m = Main.markers:find_by_name(c[2])
 			if m and not m.unlocked then
 				m:unlock()
 			end

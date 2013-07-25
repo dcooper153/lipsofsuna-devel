@@ -9,7 +9,6 @@
 -- @alias Quest
 
 local Class = require("system/class")
-local Marker = require("core/marker")
 
 --- Stores the status of an individual quest
 -- @type Quest
@@ -62,7 +61,7 @@ Quest.update = function(self, args)
 	local ch_s = false
 	local ch_t = false
 	if args.marker and self.marker ~= args.marker then
-		local m = Marker:find{name = args.marker}
+		local m = Main.markers:find_by_name(args.marker)
 		if m then
 			if not m.unlocked then
 				m:unlock()

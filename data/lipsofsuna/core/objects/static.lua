@@ -9,7 +9,6 @@
 -- @alias Staticobject
 
 local Class = require("system/class")
-local Marker = require("core/marker")
 local Serializer = require("system/serializer")
 local SimulationObject = require("core/objects/simulation")
 
@@ -85,7 +84,7 @@ Staticobject.set_spec = function(self, value)
 	self.physics:set_physics("static")
 	-- Create the marker.
 	if spec.marker then
-		self.marker = Marker{name = spec.marker, position = self:get_position(), target = self:get_id()}
+		self.marker = Main.markers:create(spec.marker, self:get_id(), self:get_position())
 	end
 	-- Set the model.
 	self:set_model_name(spec.model)

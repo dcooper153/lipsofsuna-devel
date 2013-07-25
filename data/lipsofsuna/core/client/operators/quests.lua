@@ -1,5 +1,4 @@
 local Class = require("system/class")
-local Marker = require("core/marker")
 
 Operators.quests = Class("QuestsOperator")
 Operators.quests.data = {}
@@ -38,7 +37,7 @@ Operators.quests.get_active_marker = function(self)
 	if not self.data.shown then return end
 	local quest = self.data.shown
 	if not quest or not quest.marker then return end
-	return Marker:find{name = quest.marker}
+	return Main.markers:find_by_name(quest.marker)
 end
 
 --- Gets the active quest.</br>

@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local Item = require("core/objects/item")
-local Marker = require("core/marker")
 local Serializer = require("system/serializer")
 local SimulationObject = require("core/objects/simulation")
 
@@ -130,7 +129,7 @@ Obstacle.set_spec = function(self, value)
 	self.physics:set_physics(spec.physics)
 	-- Create the marker.
 	if self:has_server_data() and spec.marker then
-		self.marker = Marker{name = spec.marker, position = self:get_position(), target = self:get_id()}
+		self.marker = Main.markers:create(spec.marker, self:get_id(), self:get_position())
 	end
 	-- Set the model.
 	self:set_model_name(spec.model)

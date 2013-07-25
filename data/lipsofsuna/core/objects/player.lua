@@ -10,7 +10,6 @@
 
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
-local Marker = require("core/marker")
 local Modifier = require("core/server/modifier")
 local ModifierSpec = require("core/specs/modifier")
 local Packet = require("system/packet")
@@ -226,7 +225,7 @@ end
 
 Player.update_map = function(self)
 	-- Discover map markers.
-	for k,v in pairs(Marker.dict_discoverable) do
+	for k,v in pairs(Main.markers.__dict_discoverable) do
 		if (self:get_position() - v.position).length < 3 * self.vision:get_radius() then
 			v:unlock()
 		end

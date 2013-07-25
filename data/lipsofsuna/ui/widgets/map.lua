@@ -1,5 +1,4 @@
 local Class = require("system/class")
-local Marker = require("core/marker")
 require(Mod.path .. "widget")
 
 Widgets.Uimap = Class("Uimap", Widgets.Uiwidget)
@@ -88,7 +87,7 @@ Widgets.Uimap.rebuild_canvas = function(self)
 	local player = Client.player_object
 	self:clear_markers()
 	self:add_marker("mapmarker2", "player", player:get_position(), player:get_rotation().euler[1])
-	for k,v in pairs(Marker.dict_name) do
+	for k,v in pairs(Main.markers.__dict_name) do
 		if v.unlocked then
 			self:add_marker("mapmarker1", k, v.position, 0)
 		end

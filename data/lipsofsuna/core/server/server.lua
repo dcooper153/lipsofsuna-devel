@@ -14,7 +14,6 @@ local Database = require("system/database")
 local DialogManager = require("core/dialog/dialog-manager")
 local GlobalEventManager = require(Mod.path .. "global-event-manager")
 local Hooks = require("system/hooks")
-local Marker = require("core/marker")
 local Modifier = require("core/server/modifier")
 local ModifierSpec = require("core/specs/modifier")
 local Network = require("system/network")
@@ -154,7 +153,7 @@ Server.send_game_state = function(self, player)
 	local home = player:get_spawn_point() or player:get_position():copy()
 	Main.messaging:server_event("create marker", client, "home", home)
 	-- Transmit unlocked map markers.
-	for k,m in pairs(Marker.dict_name) do
+	for k,m in pairs(Main.markers.__dict_name) do
 		if m.unlocked then
 			Main.messaging:server_event("create marker", client, m.name, m.position)
 		end
@@ -217,7 +216,7 @@ Server.update = function(self, secs)
 	self.marker_timer = self.marker_timer + secs
 	if self.marker_timer > 2 then
 		self.marker_timer = 0
-		for k,m in pairs(Marker.dict_name) do
+		for k,m in pairs(Main.markers.__dict_name) do
 			if m.unlocked and m.target then
 				local o = Main.objects:find_by_id(m.target)
 				if o and (m.position - o:get_position()).length > 1 then

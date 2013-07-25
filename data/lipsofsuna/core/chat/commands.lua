@@ -1,7 +1,6 @@
 local Actor = require("core/objects/actor")
 local Debug = require( "system/debug")
 local Item = require("core/objects/item")
-local Marker = require("core/marker")
 local ModifierSpec = require("core/specs/modifier")
 local Obstacle = require("core/objects/obstacle")
 local Physics = require("system/physics")
@@ -364,7 +363,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local m = Marker:find{name = matches[1]}
+		local m = Main.markers:find_by_name(matches[1])
 		if m then
 			m:unlock()
 		else

@@ -14,7 +14,6 @@ local Actorpresetspec = require("core/specs/actorpreset")
 local Class = require("system/class")
 local Inventory = require("core/server/inventory")
 local Object = require("system/object")
-local Marker = require("core/marker")
 local Model = require("system/model")
 local PhysicsObject = require("system/physics-object")
 local Timer = require("system/timer")
@@ -439,7 +438,7 @@ end
 SimulationObject.teleport = function(self, args)
 	-- Set the position.
 	if args.marker then
-		local marker = Marker:find{name = args.marker}
+		local marker = Main.markers:find_by_name(args.marker)
 		if not marker or not marker.position then return end
 		self:set_position(marker.position + Vector(0, 2, -1))
 	elseif args.region then

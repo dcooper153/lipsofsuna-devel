@@ -12,7 +12,6 @@ local Class = require("system/class")
 local Coroutine = require("system/coroutine")
 local Item = require("core/objects/item")
 local Physics = require("system/physics")
-local Marker = require("core/marker")
 local Serializer = require("system/serializer")
 local SimulationObject = require("core/objects/simulation")
 local Skills = require("core/server/skills")
@@ -972,12 +971,12 @@ Actor.set_spec = function(self, v)
 	if self:has_server_data() then
 		-- Create the map marker.
 		if spec.marker then
-			self.marker = Marker:find{name = spec.marker}
+			self.marker = Main.markers:find_by_name(spec.marker)
 			if self.marker then
 				self.marker.position = self:get_position()
 				self.marker.target = self:get_id()
 			else
-				self.marker = Marker{name = spec.marker, position = self:get_position(), target = self:get_id()}
+				self.marker = Main.markers:create(spec.marker, self:get_id(), self:get_position())
 			end
 		end
 		-- Mark corpses as dead.
