@@ -48,7 +48,7 @@ Eventhandler{type = "logout", func = function(self, event)
 		Server.players_by_client[event.client] = nil
 	end
 	-- Update the account.
-	Server.account_database:logout_client(event.client, object)
+	Main.accounts:logout_client(event.client, object)
 	-- Update lobby.
 	Lobby:set_players(Lobby:get_players() - 1)
 end}

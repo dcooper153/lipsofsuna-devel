@@ -92,7 +92,7 @@ ChatCommand{
 			Server.config.admins[matches] = true
 			Server.config:save()
 			player:send_message("Admin privileges have been granted to " .. matches)
-			local affected = Server.account_database:get_account_by_login(matches)
+			local affected = Main.accounts:get_account_by_login(matches)
 			if affected and affected.client then
 				Main.messaging:server_event("change privilege level", affected.client, true)
 			end
@@ -169,7 +169,7 @@ ChatCommand{
 			Server.config.admins[matches] = nil
 			Server.config:save()
 			player:send_message("Admin privileges have been revoked from " .. matches)
-			local affected = Server.account_database:get_account_by_login(matches)
+			local affected = Main.accounts:get_account_by_login(matches)
 			if affected and affected.client then
 				Main.messaging:server_event("change privilege level", affected.client, false)
 			end

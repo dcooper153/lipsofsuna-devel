@@ -34,6 +34,7 @@
 		["load", "core/introspect"],
 		["load", "core/specs"],
 		["load", "core/ai"],
+		["load", "core/account"],
 		["load", "core/actions"],
 		["load", "core/chat"],
 		["load", "core/client"],

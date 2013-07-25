@@ -10,10 +10,25 @@ Client:register_play_hook(5, function()
 end)
 
 Main.game_start_hooks:register(10, function()
-	if not Main.server then return end
-	if not Main.server.account_database then return end
-	Main.server.account_database.serializer:add_field("shortcuts", "lua")
-	Main.server.login_hooks:register(10, function(account)
+	Main.accounts.serializer:add_field("shortcuts", "lua")
+	Main.accounts.login_hooks:register(10, function(account)
+		if not account.shortcuts then return end
+		Main.messaging:server_event("shortcut", account.client, account.shortcuts)
+	end)
+end)
+
+Main.game_load_hooks:register(10, function(db)
+	Main.accounts.serializer:add_field("shortcuts", "lua")
+	Main.accounts.login_hooks:register(10, function(account)
+		if not account.shortcuts then return end
+		Main.messaging:server_event("shortcut", account.client, account.shortcuts)
+	end)
+end)
+
+Main.game_save_hooks:register(10, function(db, erase)
+	if not erase then return end
+	Main.accounts.serializer:add_field("shortcuts", "lua")
+	Main.accounts.login_hooks:register(10, function(account)
 		if not account.shortcuts then return end
 		Main.messaging:server_event("shortcut", account.client, account.shortcuts)
 	end)

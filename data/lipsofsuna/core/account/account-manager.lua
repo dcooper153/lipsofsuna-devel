@@ -10,6 +10,7 @@
 
 local Account = require("core/account/account")
 local Class = require("system/class") 
+local Hooks = require("system/hooks")
 local Password = require("system/password")
 local Serializer = require("system/serializer")
 
@@ -23,6 +24,7 @@ local AccountManager = Class("AccountManager")
 -- @return AccountManager.
 AccountManager.new = function(clss)
 	local self = Class.new(clss)
+	self.login_hooks = Hooks()
 	self.serializer = Serializer{}
 	self.__accounts_by_client = {}
 	self.__accounts_by_login = setmetatable({}, {__mode = "v"})

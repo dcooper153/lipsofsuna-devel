@@ -391,7 +391,7 @@ Player.write_db = function(self, db)
 	Actor.write_db(self, db)
 	-- Write account information.
 	if self.client and self.account then
-		Server.account_database:save_account(self.account, self)
+		Main.accounts:save_account(self.account, self)
 	end
 end
 

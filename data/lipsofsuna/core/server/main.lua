@@ -39,7 +39,7 @@ Main.game_save_hooks:register(0, function(db, erase)
 		Main.server.object_database:update_world_decay()
 		Main.server.object_database:clear_unused_objects()
 	end
-	Main.server.account_database:save_accounts(erase)
+	Main.accounts:save_accounts(erase)
 end)
 
 Main.update_hooks:register(5, function(secs)

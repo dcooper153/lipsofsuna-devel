@@ -9,11 +9,9 @@
 -- @alias Server
 
 local Class = require("system/class")
-local AccountDatabase = require("core/account/account-database")
 local Database = require("system/database")
 local DialogManager = require("core/dialog/dialog-manager")
 local GlobalEventManager = require(Mod.path .. "global-event-manager")
-local Hooks = require("system/hooks")
 local Modifier = require("core/server/modifier")
 local ModifierSpec = require("core/specs/modifier")
 local Network = require("system/network")
@@ -27,7 +25,6 @@ local Trading = require(Mod.path .. "trading")
 Server = Class("Server")
 
 Server.init = function(self, multiplayer, client)
-	self.login_hooks = Hooks()
 	self.config = ServerConfig()
 	Main.dialogs = DialogManager()
 	self.marker_timer = 0
@@ -36,11 +33,7 @@ Server.init = function(self, multiplayer, client)
 	self.client = client
 	self.players_by_client = {}
 	self.trading = Trading()
-	-- Initialize the databases.
-	local account_database = Database("accounts" .. Settings.file .. ".sqlite")
-	account_database:query("PRAGMA synchronous=OFF;")
-	account_database:query("PRAGMA count_changes=OFF;")
-	self.account_database = AccountDatabase(account_database)
+	-- Initialize the object database.
 	self.object_database = ObjectDatabase(Main.game.database)
 	Main.database = self.database --FIXME
 	if Main.settings.generate then
@@ -64,7 +57,6 @@ Server.deinit = function(self)
 	self.players_by_client = nil
 	self.trading = nil
 	self.config = nil
-	self.account_database = nil
 	self.object_database = nil
 	self.events = nil
 	collectgarbage()
@@ -75,24 +67,24 @@ end
 
 Server.authenticate_client = function(self, client, login, pass)
 	-- Make sure not authenticated already.
-	local account = self.account_database:get_account_by_client(client)
+	local account = Main.accounts:get_account_by_client(client)
 	if account then return end
 	-- Make sure not logging in twice.
-	account = self.account_database:get_account_by_login(login)
+	account = Main.accounts:get_account_by_login(login)
 	if account then
 		Main.log:format("Client login from %q failed: account already in use.", self:get_client_address(client))
 		Main.messaging:server_event("login failed", client, "The account is already in use.")
 		return
 	end
 	-- Load or create an account.
-	local account,message = self.account_database:load_account(client, login, pass)
+	local account,message = Main.accounts:load_account(client, login, pass)
 	if not account then
 		if message then
 			Main.log:format("Client login from %q failed: %s.", self:get_client_address(client), message)
 			Main.messaging:server_event("login failed", client, "Invalid account name or password.")
 			return
 		end
-		account = self.account_database:create_account(client, login, pass)
+		account = Main.accounts:create_account(client, login, pass)
 	end
 	-- Log the successful login.
 	Main.log:format("Client login from %q using account %q.", self:get_client_address(client), login)
@@ -118,7 +110,7 @@ Server.authenticate_client = function(self, client, login, pass)
 		Main.messaging:server_event("start character creation", client)
 	end
 	-- Invoke login hooks.
-	self.login_hooks:call(account)
+	Main.accounts.login_hooks:call(account)
 end
 
 Server.send_game_state = function(self, player)
