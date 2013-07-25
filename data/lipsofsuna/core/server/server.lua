@@ -19,7 +19,6 @@ local ModifierSpec = require("core/specs/modifier")
 local Network = require("system/network")
 local ObjectDatabase = require(Mod.path .. "object-database")
 local Physics = require("system/physics")
-local QuestDatabase = require("core/quest/quest-database")
 local ServerConfig = require(Mod.path .. "server-config")
 local Trading = require(Mod.path .. "trading")
 
@@ -43,10 +42,8 @@ Server.init = function(self, multiplayer, client)
 	account_database:query("PRAGMA count_changes=OFF;")
 	self.account_database = AccountDatabase(account_database)
 	self.object_database = ObjectDatabase(Main.game.database)
-	Main.quests = QuestDatabase(Main.game.database)
 	Main.database = self.database --FIXME
 	if Main.settings.generate then
-		Main.quests:reset()
 		self.object_database:reset()
 	end
 	-- Initialize the event manager.
@@ -67,10 +64,8 @@ Server.deinit = function(self)
 	self.players_by_client = nil
 	self.trading = nil
 	self.config = nil
-	self.serialize = nil
 	self.account_database = nil
 	self.object_database = nil
-	Main.quests = nil
 	self.events = nil
 	collectgarbage()
 	-- Mark as uninitialized.

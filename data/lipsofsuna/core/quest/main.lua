@@ -1,3 +1,4 @@
+local QuestDatabase = require("core/quest/quest-database")
 local QuestManager = require("core/quest/quest-manager")
 
 Main.game_start_hooks:register(0, function()
@@ -9,6 +10,13 @@ Main.game_end_hooks:register(0, function()
 end)
 
 Main.game_load_hooks:register(5, function(db)
-	if not Main.quests then return end
+	Main.quests = QuestDatabase(db)
 	Main.quests:load_quests()
+end)
+
+Main.game_save_hooks:register(5, function(db, erase)
+	if erase then
+		Main.quests = QuestDatabase(db)
+		Main.quests:reset()
+	end
 end)
