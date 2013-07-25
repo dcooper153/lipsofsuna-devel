@@ -50,7 +50,8 @@ class LINodeBone(LINode):
 		matrix = rest.inverted() * pose
 		loc = matrix.to_translation()
 		rot = matrix.to_3x3().to_quaternion().normalized()
-		return (loc, rot)
+		scale = matrix.to_scale()
+		return (loc, rot, scale)
 
 	# \brief Gets the armature space rest matrix of the bone head.
 	def get_head_rest_matrix(self):

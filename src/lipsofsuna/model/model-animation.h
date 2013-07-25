@@ -25,7 +25,7 @@
 typedef struct _LIMdlFrame LIMdlFrame;
 struct _LIMdlFrame
 {
-	float scale;
+	LIMatVector scale;
 	LIMatTransform transform;
 };
 
@@ -75,7 +75,8 @@ LIAPICALL (void, limdl_animation_clear, (
 
 LIAPICALL (int, limdl_animation_read, (
 	LIMdlAnimation* self,
-	LIArcReader*    reader));
+	LIArcReader*    reader,
+	int             version));
 
 LIAPICALL (int, limdl_animation_get_channel, (
 	LIMdlAnimation* self,

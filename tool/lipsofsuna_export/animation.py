@@ -122,5 +122,8 @@ class LIAnimation:
 				writer.write_float(xform[1].y)
 				writer.write_float(xform[1].z)
 				writer.write_float(xform[1].w)
+				writer.write_float(xform[2].x)
+				writer.write_float(xform[2].y)
+				writer.write_float(xform[2].z)
 				writer.write_marker()
 			writer.write_marker()

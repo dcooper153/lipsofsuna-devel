@@ -26,6 +26,7 @@
 #include "model-animation.h"
 
 #define LIMDL_ANIMATION_VERSION 0x00000001
+#define LIMDL_ANIMATION_VERSION_2 0x00000002
 #define LIMDL_ANIMATION_TIMESCALE 0.02f
 
 static void private_frame_transform (
@@ -231,7 +232,7 @@ int limdl_animation_insert_channel (
 				dstframe->transform = srcframe->transform;
 			}
 			dstframe = buffer + (self->channels.count + 1) * frame + chan;
-			dstframe->scale = 1.0f;
+			dstframe->scale = limat_vector_init (1.0f, 1.0f, 1.0f);
 			dstframe->transform = limat_transform_identity ();
 		}
 	}
@@ -282,11 +283,13 @@ void limdl_animation_clear (
  * \brief Reads the animation from a stream.
  * \param self Animation.
  * \param reader Stream reader.
+ * \param format Format version.
  * \return Nonzero on success.
  */
 int limdl_animation_read (
 	LIMdlAnimation* self,
-	LIArcReader*    reader)
+	LIArcReader*    reader,
+	int             version)
 {
 	int i;
 	uint32_t count0;
@@ -328,7 +331,6 @@ int limdl_animation_read (
 	/* Read frames. */
 	for (i = 0 ; i < self->buffer.count ; i++)
 	{
-		self->buffer.array[i].scale = 1.0f;
 		transform = &self->buffer.array[i].transform;
 		if (!liarc_reader_get_float (reader, &transform->position.x) ||
 			!liarc_reader_get_float (reader, &transform->position.y) ||
@@ -338,6 +340,17 @@ int limdl_animation_read (
 			!liarc_reader_get_float (reader, &transform->rotation.z) ||
 			!liarc_reader_get_float (reader, &transform->rotation.w))
 			return 0;
+		if (version == LIMDL_ANIMATION_VERSION_2)
+		{
+			if (!liarc_reader_get_float (reader, &self->buffer.array[i].scale.x) ||
+				!liarc_reader_get_float (reader, &self->buffer.array[i].scale.y) ||
+				!liarc_reader_get_float (reader, &self->buffer.array[i].scale.z))
+				return 0;
+		}
+		else
+		{
+			self->buffer.array[i].scale = limat_vector_init (1.0f, 1.0f, 1.0f);
+		}
 	}
 
 	return 1;
@@ -437,7 +450,7 @@ int limdl_animation_set_length (
 		self->buffer.array = tmp;
 		for (i = self->channels.count * self->length ; i < self->channels.count * value ; i++)
 		{
-			self->buffer.array[i].scale = 1.0f;
+			self->buffer.array[i].scale = limat_vector_init (1.0f, 1.0f, 1.0f);
 			self->buffer.array[i].transform = limat_transform_identity ();
 		}
 	}
@@ -471,7 +484,9 @@ int limdl_animation_set_transform (
 	chan = limdl_animation_get_channel (self, name);
 	if (chan == -1)
 		return 0;
-	self->buffer.array[self->channels.count * frame + chan].scale = scale;
+	self->buffer.array[self->channels.count * frame + chan].scale.x = scale;
+	self->buffer.array[self->channels.count * frame + chan].scale.y = scale;
+	self->buffer.array[self->channels.count * frame + chan].scale.z = scale;
 	self->buffer.array[self->channels.count * frame + chan].transform = *value;
 
 	return 1;
@@ -538,7 +553,7 @@ static void private_frame_transform (
 	float*          scale,
 	LIMatTransform* value)
 {
-	*scale = self->buffer.array[self->channels.count * frame + chan].scale;
+	*scale = self->buffer.array[self->channels.count * frame + chan].scale.x;
 	*value = self->buffer.array[self->channels.count * frame + chan].transform;
 }
 
@@ -570,7 +585,8 @@ static int private_read (
 	/* Read the version. */
 	if (!liarc_reader_get_uint32 (reader, &version))
 		return 0;
-	if (version != LIMDL_ANIMATION_VERSION)
+	if (version != LIMDL_ANIMATION_VERSION &&
+	    version != LIMDL_ANIMATION_VERSION_2)
 	{
 		lisys_error_set (LISYS_ERROR_VERSION, "animation version mismatch");
 		return 0;
@@ -594,7 +610,9 @@ static int private_read (
 			return 0;
 		}
 		if (!strcmp (id, "ani"))
-			ret = limdl_animation_read (self, reader);
+		{
+			ret = limdl_animation_read (self, reader, version);
+		}
 		else
 		{
 			if (!liarc_reader_skip_bytes (reader, size))
