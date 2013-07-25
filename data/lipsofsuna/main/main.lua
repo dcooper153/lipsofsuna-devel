@@ -40,6 +40,8 @@ Main.new = function(clss)
 	self.game_modes = GameModeManager()
 	self.game_start_hooks = Hooks()
 	self.game_end_hooks = Hooks()
+	self.game_load_hooks = Hooks()
+	self.game_save_hooks = Hooks()
 	self.main_start_hooks = Hooks()
 	self.main_end_hooks = Hooks()
 	self.update_hooks = Hooks()
@@ -126,7 +128,6 @@ Main.end_game = function(self)
 	self.game:free()
 	self.game = nil
 	self.messaging:set_transmit_mode(false, false, nil)
-	self.game_end_hooks:call()
 	collectgarbage()
 end
 
@@ -138,8 +139,6 @@ end
 Main.start_game = function(self, mode, save, port)
 	-- Call the mode start function.
 	self.game_modes:start(mode)
-	-- Call the game start hooks.
-	self.game_start_hooks:call()
 end
 
 --- Enables manual garbage collection.

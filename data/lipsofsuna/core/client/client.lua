@@ -215,6 +215,11 @@ Client.start_single_player = function(self)
 	Main.messaging:set_transmit_mode(true, true, nil)
 	Main.game = Game("single", Main.settings.file)
 	Server:init(false, true)
+	if Main.settings.generate then
+		Main.game:save(true)
+	else
+		Main.game:load()
+	end
 	-- Set information for the UI.
 	Client.data.connection.mode = "single"
 	Client.data.connection.text = "Starting the single player mode..."

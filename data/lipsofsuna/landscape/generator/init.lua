@@ -15,3 +15,15 @@ Main.game_end_hooks:register(5, function()
 		Main.terrain_generator = nil
 	end
 end)
+
+Main.game_load_hooks:register(5, function(db)
+	if Main.terrain_generator then
+		Main.terrain_generator:load(db)
+	end
+end)
+
+Main.game_save_hooks:register(5, function(db, erase)
+	if Main.terrain_generator then
+		Main.terrain_generator:save(db, erase)
+	end
+end)

@@ -31,29 +31,7 @@ end
 --- Loads everything except map data.
 -- @param clss Serialize class.
 Serialize.load = function(clss)
-	clss:load_generator()
 	clss:load_markers()
-end
-
---- Loads map generator data from the database.
--- @param clss Serialize class.
-Serialize.load_generator = function(clss)
-	do return end --FIXME
-	-- Load settings.
-	local r1 = clss.db:query("SELECT key,value FROM generator_settings;")
-	local f1 = {
-		seed1 = function(v) Server.generator.seed1 = tonumber(v) end,
-		seed2 = function(v) Server.generator.seed2 = tonumber(v) end,
-		seed3 = function(v) Server.generator.seed3 = tonumber(v) end}
-	for k,v in ipairs(r1) do
-		local f = f1[v[1]]
-		if f then f(v[2]) end
-	end
-	-- Load special sectors.
-	local r2 = clss.db:query("SELECT id,value FROM generator_sectors;")
-	for k,v in ipairs(r2) do
-		Server.generator.sectors[v[1]] = v[2]
-	end
 end
 
 --- Loads map markers from the database.
@@ -72,34 +50,13 @@ end
 Serialize.save = function(clss, erase)
 	if erase then Server.object_database:clear_objects() end
 	Main.game.sectors:save_world(erase)
-	Main.terrain:save_all(erase)
 	if not erase then
 		Server.object_database:update_world_decay()
 		Server.object_database:clear_unused_objects()
 	end
-	clss:save_generator(erase)
 	clss:save_markers(erase)
 	Server.account_database:save_accounts(erase)
 	Main.unlocks:save()
-end
-
---- Saves the map generator state.
--- @param clss Serialize class.
--- @param erase True to erase existing database entries first.
-Serialize.save_generator = function(clss, erase)
-	do return end -- FIXME
-	clss.db:query("BEGIN TRANSACTION;")
-	if erase then
-		clss.db:query("DELETE FROM generator_settings;")
-		clss.db:query("DELETE FROM generator_sectors;")
-	end
-	clss.db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed1", tostring(Server.generator.seed1)})
-	clss.db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed2", tostring(Server.generator.seed2)})
-	clss.db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed3", tostring(Server.generator.seed3)})
-	for k,v in pairs(Server.generator.sectors) do
-		clss.db:query("REPLACE INTO generator_sectors (id,value) VALUES (?,?);", {k, v})
-	end
-	clss.db:query("END TRANSACTION;")
 end
 
 --- Saves a map marker.
@@ -140,18 +97,10 @@ Serialize.init_game_database = function(self, reset)
 	local version = self:get_value("game_version")
 	if not reset and version == self.game_version then return end
 	-- Initialize tables.
-	self.db:query([[DROP TABLE IF EXISTS generator_sectors;]])
-	self.db:query([[DROP TABLE IF EXISTS generator_settings;]])
 	self.db:query([[DROP TABLE IF EXISTS markers;]])
 	self.db:query([[DROP TABLE IF EXISTS options;]])
 	self.db:query(
 		[[CREATE TABLE options (
-		key TEXT PRIMARY KEY,
-		value TEXT);]])
-	self.db:query([[CREATE TABLE generator_sectors (
-		id INTEGER PRIMARY KEY,
-		value TEXT);]])
-	self.db:query([[CREATE TABLE generator_settings (
 		key TEXT PRIMARY KEY,
 		value TEXT);]])
 	self.db:query([[CREATE TABLE markers (

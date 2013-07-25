@@ -41,15 +41,19 @@ Game.new = function(clss, mode, save, port)
 	self.sectors = SectorManager(self.database, self.enable_unloading)
 	-- Initialize storage.
 	self.static_objects_by_id = setmetatable({}, {__mode = "kv"})
+	-- Call the game start hooks.
+	Main.game = self --FIXME
+	Main.game_start_hooks:call()
 	return self
 end
 
 --- Frees the game.
 -- @param self Game.
 Game.free = function(self)
+	-- Save the game.
+	self:save()
 	-- Terminate the server.
 	if Server.initialized then
-		Server.serialize:save()
 		Server:deinit()
 	end
 	-- Detach all objects.
@@ -59,6 +63,29 @@ Game.free = function(self)
 	self.static_objects_by_id = nil
 	-- Shutdown networking.
 	Network:shutdown()
+	-- Call the game end hooks.
+	Main.game_end_hooks:call()
+end
+
+--- Loads the game from the database.
+-- @param self Game.
+Game.load = function(self)
+	if not self.database then return end
+	if Server.initialized then
+		Server.serialize:load()
+	end
+	Main.game_load_hooks:call(self.database)
+end
+
+--- Saves the game into the database.
+-- @param self Game.
+-- @param reset True to reset tables. False otherwise.
+Game.save = function(self, reset)
+	if not self.database then return end
+	if Server.initialized then
+		Server.serialize:save(reset)
+	end
+	Main.game_save_hooks:call(self.database, reset)
 end
 
 return Game
