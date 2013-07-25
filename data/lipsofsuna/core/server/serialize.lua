@@ -13,8 +13,6 @@ local Class = require("system/class")
 --- TODO:doc
 -- @type Serialize
 local Serialize = Class("Serialize")
-Serialize.game_version = "7"
-Serialize.object_version = "7"
 
 --- Creates a new serializer.
 -- @param clss Serialize class.
@@ -23,13 +21,7 @@ Serialize.object_version = "7"
 Serialize.new = function(clss, db)
 	local self = Class.new(clss)
 	self.db = db
-	self:init_game_database()
 	return self
-end
-
---- Loads everything except map data.
--- @param clss Serialize class.
-Serialize.load = function(clss)
 end
 
 --- Saves everything.
@@ -46,50 +38,4 @@ Serialize.save = function(clss, erase)
 	Main.unlocks:save()
 end
 
-------------------------------------------------------------------------------
--- Game database.
-
---- Initializes the game database.
--- @param self Serialize class.
--- @param reset True to clear the database.
-Serialize.init_game_database = function(self, reset)
-	-- Check if changes are needed.
-	local version = self:get_value("game_version")
-	if not reset and version == self.game_version then return end
-	-- Initialize tables.
-	self.db:query([[DROP TABLE IF EXISTS options;]])
-	self.db:query(
-		[[CREATE TABLE options (
-		key TEXT PRIMARY KEY,
-		value TEXT);]])
-end
-
---- Gets a value from the key-value database.
--- @param self Serialize class.
--- @param key Key string.
--- @return Value string or nil.
-Serialize.get_value = function(self, key)
-	-- Check that the options table exists.
-	-- This is just to silence an error message.
-	local rows1 = self.db:query([[SELECT name FROM sqlite_master WHERE type='table' AND name='options';]])
-	if not rows1 then return end
-	if #rows1 == 0 then return end
-	-- Get the value from the options table
-	local rows = self.db:query([[SELECT value FROM options WHERE key=?;]], {key})
-	if not rows then return end
-	for k,v in ipairs(rows) do
-		return v[1]
-	end
-end
-
---- Stores a value to the key-value database.
--- @param self Serialize class.
--- @param key Key string.
--- @param value Value string.
-Serialize.set_value = function(self, key, value)
-	self.db:query([[REPLACE INTO options (key,value) VALUES (?,?);]], {key, value})
-end
-
 return Serialize
-
-

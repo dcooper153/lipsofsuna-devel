@@ -2,6 +2,11 @@ local Game = require("core/server/game")
 
 Main.game_modes:register("Server", function()
 	Main.game = Game("server", Main.settings.file, Main.settings.port)
+	if not Main.game:start() then
+		print("ERROR: Unsupported save file.")
+		Main.game = nil
+		return
+	end
 	Server:init(true)
 	Server:load()
 	Program:set_sleep(1/60)

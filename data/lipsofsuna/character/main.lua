@@ -9,6 +9,7 @@ Main.game_modes:register("Character", function()
 	Main.messaging:set_transmit_mode(true, true)
 	-- FIXME: Initialize the game.
 	Main.game = Game("benchmark")
+	Main.game:start()
 	Main.game.sectors.unload_time = nil
 	-- Start the subsystems.
 	Client.chargen:init(true)

@@ -9,6 +9,7 @@ Main.game_modes:register("Benchmark", function()
 	-- Initialize the game.
 	Main.messaging:set_transmit_mode(true, true)
 	Main.game = Game("benchmark")
+	Main.game:start()
 	Main.game.sectors.unload_time = nil
 	-- Start the subsystems.
 	Main.benchmark = Benchmark()

@@ -57,7 +57,6 @@ Generator.generate = function(self, args)
 	Main.game.sectors:save_world(true, function(p) self:update_status(p) end)
 	Main.game.sectors:unload_all()
 	Server.object_database:save_static_objects()
-	Server.serialize:set_value("map_version", Generator.map_version)
 	-- Save map markers.
 	self:update_status(0, "Saving quests")
 	Main.quests:reset()

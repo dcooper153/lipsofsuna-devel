@@ -11,6 +11,7 @@
 local Class = require("system/class")
 local Database = require("system/database")
 local Network = require("system/network")
+local OptionsDatabase = require("core/server/options-database")
 local Physics = require("system/physics")
 local SectorManager = require("core/server/sector-manager")
 
@@ -39,11 +40,12 @@ Game.new = function(clss, mode, save, port)
 		self.database:query("PRAGMA count_changes=OFF;")
 	end
 	self.sectors = SectorManager(self.database, self.enable_unloading)
+	-- Initialize the options database.
+	if save then
+		self.options = OptionsDatabase(self.database)
+	end
 	-- Initialize storage.
 	self.static_objects_by_id = setmetatable({}, {__mode = "kv"})
-	-- Call the game start hooks.
-	Main.game = self --FIXME
-	Main.game_start_hooks:call()
 	return self
 end
 
@@ -71,9 +73,6 @@ end
 -- @param self Game.
 Game.load = function(self)
 	if not self.database then return end
-	if Server.initialized then
-		Server.serialize:load()
-	end
 	Main.game_load_hooks:call(self.database)
 end
 
@@ -82,10 +81,22 @@ end
 -- @param reset True to reset tables. False otherwise.
 Game.save = function(self, reset)
 	if not self.database then return end
+	self.options:save(reset)
 	if Server.initialized then
 		Server.serialize:save(reset)
 	end
 	Main.game_save_hooks:call(self.database, reset)
+end
+
+--- Starts the game.
+-- @param self Game.
+-- @return True if succeeded. False if the save file was invalid.
+Game.start = function(self)
+	-- Check for save version.
+	if self.options and not self.options:check_version() then return end
+	-- Call the game start hooks.
+	Main.game_start_hooks:call()
+	return true
 end
 
 return Game

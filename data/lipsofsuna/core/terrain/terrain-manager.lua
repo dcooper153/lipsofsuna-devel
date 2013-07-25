@@ -345,6 +345,20 @@ TerrainManager.get_chunk_xz_range_by_point = function(self, point, radius)
 	return x0, z0, x1, z1
 end
 
+--- Enables or disables terrain generation.
+-- @param self TerrainManager.
+-- @param value True to enable. False otherwise.
+TerrainManager.set_enable_generation = function(self, value)
+	self.generate = true
+end
+
+--- Enables or disables terrain graphics.
+-- @param self TerrainManager.
+-- @param value True to enable. False otherwise.
+TerrainManager.set_enable_graphics = function(self, value)
+	self.graphics = true
+end
+
 --- Sets the view center of the terrain manager.<br/>
 --
 -- This affects which chunks are prioritized when their models need rebuilding.

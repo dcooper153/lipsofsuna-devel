@@ -33,6 +33,7 @@ Crafting.new = function(clss)
 	-- Initialize the game.
 	Main.messaging:set_transmit_mode(true, true)
 	Main.game = Game("benchmark")
+	Main.game:start()
 	Main.game.sectors.unload_time = nil
 	Main.dialogs = DialogManager()
 	ServerUtils:set_player_spawn_point(Vector(500,101,500))

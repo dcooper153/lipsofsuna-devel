@@ -48,13 +48,9 @@ Server.init = function(self, multiplayer, client)
 	Main.quests = QuestDatabase(Main.game.database)
 	Main.database = self.database --FIXME
 	Main.serialize = self.serialize --FIXME
-	if self.serialize:get_value("game_version") ~= self.serialize.game_version then
+	if Main.settings.generate then
 		Main.quests:reset()
-		self.serialize:set_value("game_version", self.serialize.game_version)
-	end
-	if self.serialize:get_value("object_version") ~= self.serialize.object_version then
 		self.object_database:reset()
-		Server.serialize:set_value("object_version", self.serialize.object_version)
 	end
 	-- Initialize the event manager.
 	self.events = GlobalEventManager()
@@ -86,17 +82,6 @@ Server.deinit = function(self)
 end
 
 Server.load = function(self)
-	-- Initialize the heightmap.
-	if Map then Map:init() end
-	-- Generate the map.
-	if Settings.generate then --FIXME:or self.serialize:get_value("map_version") ~= self.generator.map_version then
-		--self.generator:generate()
-		self.serialize:set_value("data_version", self.serialize.data_version)
-	else
-		self.serialize:load()
-		Main.quests:load_quests()
-		self.object_database:load_static_objects()
-	end
 end
 
 Server.authenticate_client = function(self, client, login, pass)

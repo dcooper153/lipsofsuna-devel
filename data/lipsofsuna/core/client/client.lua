@@ -212,8 +212,13 @@ end
 Client.start_single_player = function(self)
 	-- Start the server.
 	Sectors:unload_all()
-	Main.messaging:set_transmit_mode(true, true, nil)
 	Main.game = Game("single", Main.settings.file)
+	if not Main.game:start() then
+		print("ERROR: Unsupported save file.")
+		Main.game = nil
+		return
+	end
+	Main.messaging:set_transmit_mode(true, true, nil)
 	Server:init(false, true)
 	if Main.settings.generate then
 		Main.game:save(true)

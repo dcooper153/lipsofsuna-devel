@@ -42,6 +42,11 @@ Host.host_game = function(self, file, port)
 	-- Start the server.
 	Sectors:unload_all()
 	Main.game = Game("host", self.data.file, self.data.port)
+	if not Main.game:start() then
+		print("ERROR: Unsupported save file.")
+		Main.game = nil
+		return
+	end
 	Server:init(true, true)
 	Main.messaging:set_transmit_mode(true, true, port or Server.config.server_port)
 	Main.settings.generate = true --FIXME

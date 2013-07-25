@@ -44,6 +44,7 @@ Join.join_game = function(self, addr, port)
 	-- Clear the world.
 	Sectors:unload_all()
 	Main.game = Game("join", self.data.file, self.data.port)
+	Main.game:start()
 	Main.messaging:set_transmit_mode(false, true, nil)
 	Main.game_start_hooks:call()
 	-- Enter the connection state.
