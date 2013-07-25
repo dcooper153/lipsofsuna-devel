@@ -114,14 +114,12 @@ void liext_terrain_face_iterator_emit (
 	float top_y;
 	float top_y0;
 	float top_y1;
+	float valid_y;
+	float valid_y0;
+	float valid_y1;
 	LIMatVector2d face[4];
 	LIMatPolygonCuller* culler;
-
-	/* FIXME */
-	float valid_y = self->stick_y;
-	float valid_y0 = self->stick_y0;
-	float valid_y1 = self->stick_y1;
-	LIExtTerrainStick* valid_stick = self->stick;
+	LIExtTerrainStick* valid_stick;
 
 	/* Initialize the polygon culler. */
 	if (normal->x == 0.0f)
@@ -165,6 +163,10 @@ void liext_terrain_face_iterator_emit (
 		self->stick_y0 = top_y0;
 		self->stick_y1 = top_y1;
 	}
+	valid_y = self->stick_y;
+	valid_y0 = self->stick_y0;
+	valid_y1 = self->stick_y1;
+	valid_stick = self->stick;
 
 	/* Cull the face until it has been fully consumed or there are no more
 	 * culling stick left in the column. */
@@ -194,6 +196,13 @@ void liext_terrain_face_iterator_emit (
 		self->stick_y = top_y;
 		self->stick_y0 = top_y0;
 		self->stick_y1 = top_y1;
+		if (top_y0 < top0->y && top_y1 < top1->y)
+		{
+			valid_stick = self->stick;
+			valid_y = top_y;
+			valid_y0 = top_y0;
+			valid_y1 = top_y1;
+		}
 	}
 
 	/* Triangulate the generated polygons. */
@@ -210,7 +219,7 @@ void liext_terrain_face_iterator_emit (
 	}
 	limat_polygon_culler_free (culler);
 
-	/* FIXME */
+	/* Reset the pointer below the beginning of the next stick. */
 	self->stick_y = valid_y;
 	self->stick_y0 = valid_y0;
 	self->stick_y1 = valid_y1;
