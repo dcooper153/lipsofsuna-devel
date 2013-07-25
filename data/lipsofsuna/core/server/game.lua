@@ -82,9 +82,6 @@ end
 Game.save = function(self, reset)
 	if not self.database then return end
 	self.options:save(reset)
-	if Server.initialized then
-		Server.serialize:save(reset)
-	end
 	Main.game_save_hooks:call(self.database, reset)
 end
 

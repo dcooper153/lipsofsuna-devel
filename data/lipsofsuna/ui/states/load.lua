@@ -17,10 +17,6 @@ Ui:add_state{
 		end
 		if Client.data.load.timer >= 0.1 then
 			Client:create_world()
-			Map:init()
-			if Server.initialized then
-				Server:load()
-			end
 			Client.data.load.finished = true
 		end
 		Client.data.load.timer = Client.data.load.timer + secs

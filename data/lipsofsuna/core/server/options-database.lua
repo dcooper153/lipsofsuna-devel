@@ -6,7 +6,7 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.server.options_database
--- @alias Serialize
+-- @alias OptionsDatabase
 
 local Class = require("system/class")
 

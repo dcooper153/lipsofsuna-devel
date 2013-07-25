@@ -20,7 +20,6 @@ local Network = require("system/network")
 local ObjectDatabase = require(Mod.path .. "object-database")
 local Physics = require("system/physics")
 local QuestDatabase = require("core/quest/quest-database")
-local Serialize = require(Mod.path .. "serialize")
 local ServerConfig = require(Mod.path .. "server-config")
 local Trading = require(Mod.path .. "trading")
 
@@ -42,12 +41,10 @@ Server.init = function(self, multiplayer, client)
 	local account_database = Database("accounts" .. Settings.file .. ".sqlite")
 	account_database:query("PRAGMA synchronous=OFF;")
 	account_database:query("PRAGMA count_changes=OFF;")
-	self.serialize = Serialize(Main.game.database)
 	self.account_database = AccountDatabase(account_database)
 	self.object_database = ObjectDatabase(Main.game.database)
 	Main.quests = QuestDatabase(Main.game.database)
 	Main.database = self.database --FIXME
-	Main.serialize = self.serialize --FIXME
 	if Main.settings.generate then
 		Main.quests:reset()
 		self.object_database:reset()
@@ -79,9 +76,6 @@ Server.deinit = function(self)
 	-- Mark as uninitialized.
 	self.initialized = false
 	Physics:set_enable_simulation(false)
-end
-
-Server.load = function(self)
 end
 
 Server.authenticate_client = function(self, client, login, pass)

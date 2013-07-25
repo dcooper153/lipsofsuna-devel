@@ -185,7 +185,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		Server.serialize:save()
+		Main.game:save()
 	end}
 
 ChatCommand{
@@ -195,7 +195,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		Server.serialize:save()
+		Main.game:save()
 		Program:shutdown()
 	end}
 
