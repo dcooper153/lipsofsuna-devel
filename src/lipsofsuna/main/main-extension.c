@@ -30,6 +30,7 @@ extern LIMaiExtensionInfo liext_camera_info;
 extern LIMaiExtensionInfo liext_config_file_info;
 extern LIMaiExtensionInfo liext_database_info;
 extern LIMaiExtensionInfo liext_file_info;
+extern LIMaiExtensionInfo liext_filter_info;
 extern LIMaiExtensionInfo liext_graphics_info;
 extern LIMaiExtensionInfo liext_heightmap_info;
 extern LIMaiExtensionInfo liext_heightmap_physics_info;
@@ -84,6 +85,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "config-file", &liext_config_file_info },
 		{ "database", &liext_database_info },
 		{ "file", &liext_file_info },
+		{ "filter", &liext_filter_info },
 		{ "heightmap", &liext_heightmap_info },
 		{ "heightmap-physics", &liext_heightmap_physics_info },
 		{ "image", &liext_image_info },

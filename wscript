@@ -14,7 +14,7 @@ out = '.build'
 
 CORE_DIRS = 'ai algorithm archive callback client engine extension generator main math model network particle paths physics script sound system'
 CORE_DIRS_GFX = 'render render/font render/image render/internal render/overlay'
-EXTS_DIRS = 'ai animation config-file database file heightmap heightmap-physics image image-merge lobby math model model-editing model-merge network noise object password physics physics-object physics-terrain reload sectors skeleton sound string terrain thread time vision watchdog'
+EXTS_DIRS = 'ai animation config-file database file filter heightmap heightmap-physics image image-merge lobby math model model-editing model-merge network noise object password physics physics-object physics-terrain reload sectors skeleton sound string terrain thread time vision watchdog'
 EXTS_DIRS_GFX = 'camera graphics heightmap-render input render render-model render-object widgets wireframe'
 LODT_DIRS = 'algorithm archive model system'
 
