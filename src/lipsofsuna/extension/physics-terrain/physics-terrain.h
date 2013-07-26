@@ -74,6 +74,10 @@ LIAPICALL (void, liext_physics_terrain_set_id, (
 	LIExtPhysicsTerrain* self,
 	int                  value));
 
+LIAPICALL (void, liext_physics_terrain_set_unloaded_collision, (
+	LIExtPhysicsTerrain* self,
+	int                  value));
+
 LIAPICALL (int, liext_physics_terrain_get_valid, (
 	const LIExtPhysicsTerrain* self));
 

@@ -31,6 +31,7 @@ struct _LIExtPhysicsTerrain
 	int collision_group;
 	int collision_mask;
 	int realized;
+	int unloaded_collision;
 	btCollisionObject* object;
 	LIPhyPointer* pointer;
 	LIExtPhysicsTerrainModule* module;

@@ -20,6 +20,8 @@
 #include "physics-terrain.hpp"
 #include "physics-terrain-collision-algorithm.hpp"
 
+/*****************************************************************************/
+
 void* liext_physics_terrain_collision_algorithm_new (
 	LIPhyPhysics* physics)
 {
@@ -150,7 +152,7 @@ void LIExtPhysicsTerrainCollisionAlgorithm::processCollision (
 	{
 		// Get the column.
 		LIExtTerrainColumn* column = liext_terrain_get_column (shape_terrain->terrain->terrain, x, z);
-		if (column == NULL)
+		if (column == NULL && !shape_terrain->terrain->unloaded_collision)
 			continue;
 
 		// Initialize the stick vertices.
@@ -166,6 +168,33 @@ void LIExtPhysicsTerrainCollisionAlgorithm::processCollision (
 			offset + btVector3(     0.0f, 0.0f, grid_size),
 			offset + btVector3(grid_size, 0.0f, grid_size)
 		};
+
+		// Collide against unloaded chunks.
+		if (column == NULL)
+		{
+			verts[0][1] = min_y - 1.0f;
+			verts[1][1] = verts[0][1];
+			verts[2][1] = verts[0][1];
+			verts[3][1] = verts[0][1];
+			verts[4][1] = max_y + 1.0f;
+			verts[5][1] = verts[4][1];
+			verts[6][1] = verts[4][1];
+			verts[7][1] = verts[4][1];
+			btConvexHullShape shape ((btScalar*) verts, 8, sizeof (btVector3));
+			pointer_terrain->tile[0] = x;
+			pointer_terrain->tile[1] = 0;
+			pointer_terrain->tile[2] = z;
+#if BT_BULLET_VERSION >= 281
+			btCollisionObjectWrapper ob0(0, &shape, object_terrain, xform_terrain);
+			btCollisionObjectWrapper ob1(0, shape_convex, object_convex, xform_convex);
+			btConvexConvexAlgorithm::processCollision (&ob0, &ob1, dispatchInfo, resultOut);
+#else
+			object_terrain->setCollisionShape (&shape);
+			btConvexConvexAlgorithm::processCollision (object_terrain, object_convex, dispatchInfo, resultOut);
+			object_terrain->setCollisionShape ((btCollisionShape*) shape_terrain);
+#endif
+			continue;
+		}
 
 		// Collide against each stick.
 		float ys = 0.0f;

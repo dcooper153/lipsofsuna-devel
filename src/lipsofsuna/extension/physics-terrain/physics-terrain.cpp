@@ -271,6 +271,21 @@ void liext_physics_terrain_set_id (
 }
 
 /**
+ * \brief Sets whether unloaded chunks will be considered solid.
+ * \param self Terrain.
+ * \param value Nonzero to enable collisions. False otherwise.
+ */
+void liext_physics_terrain_set_unloaded_collision (
+	LIExtPhysicsTerrain* self,
+	int                  value)
+{
+	/* Make sure the terrain has not been garbage collected. */
+	if (self->terrain == NULL)
+		return;
+	self->unloaded_collision = value;
+}
+
+/**
  * \brief Returns nonzero if there is a terrain object assigned.
  * \param self Terrain.
  * \return Nonzero if attached, zero if not.

@@ -96,6 +96,13 @@ PhysicsTerrain.set_id = function(self, v)
 	Los.physics_terrain_set_id(self.handle, v)
 end
 
+--- Sets whether unloaded chunks collide with objects.
+-- @param self PhysicsTerrain.
+-- @param v Boolean.
+PhysicsTerrain.set_unloaded_collision = function(self, v)
+	Los.physics_terrain_set_unloaded_collision(self.handle, v)
+end
+
 --- Returns true if the physics terrain has a terrain object assigned.</br>
 --
 -- This is mainly for unittesting purposes since normally the terrain
