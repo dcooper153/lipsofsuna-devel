@@ -2,7 +2,9 @@ local Game = require("core/server/game")
 
 Main.game_modes:register("Server", function()
 	-- Start the game.
-	Main.game = Game("server", Main.settings.file)
+	Main.settings.generate = true --FIXME
+	local file = Main.settings.file or "Dedicated" --FIXME: Default to new file
+	Main.game = Game("server", file)
 	if not Main.game:start() then
 		print("ERROR: Unsupported save file.")
 		Main.game = nil
