@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,6 +20,7 @@
 
 #include "lipsofsuna/extension.h"
 #include "lipsofsuna/render.h"
+#include "camera.h"
 
 #define LIEXT_SCRIPT_CAMERA "Camera"
 
@@ -37,14 +38,9 @@ void liext_cameras_free (
 
 float liext_cameras_clip_camera (
 	LIExtModule*    self,
-	LIAlgCamera*    camera,
+	LIExtCamera*    camera,
 	LIMatTransform* start,
 	LIMatTransform* end);
-
-void liext_cameras_update (
-	LIExtModule* self,
-	LIAlgCamera* camera,
-	float        secs);
 
 /*****************************************************************************/
 
