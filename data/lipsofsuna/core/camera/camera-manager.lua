@@ -146,6 +146,7 @@ end
 -- @param mode Mode.
 CameraManager.set_camera_mode = function(self, mode)
 	local camera = self.cameras[mode]
+	if self.camera == camera then return end
 	if camera then
 		self.camera = camera
 		self.camera:reset()
