@@ -51,7 +51,9 @@ end
 -- @param amount Quake amount.
 CameraManager.quake = function(self, amount)
 	for k,v in pairs(self.cameras) do
-		v.quake = math.max(v.quake or 0, amount) -- FIXME: should be a function
+		if v.quake then
+			v:quake(amount)
+		end
 	end
 end
 

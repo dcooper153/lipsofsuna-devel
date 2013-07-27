@@ -38,7 +38,8 @@ end
 EffectManager.apply_quake = function(self, point, magnitude)
 	if point and magnitude and Client.player_object then
 		local dist = (Client.player_object:get_position() - point).length
-		local quake = math.min(math.max(magnitude / (0.05 * dist * dist + 0.5), 0), 1)
+		local atten = 1 + 0.1 * dist^2
+		local quake = math.min(math.max(magnitude / atten, 0), 1)
 		if Client.camera_manager then
 			Client.camera_manager:quake(quake)
 		end
@@ -159,7 +160,7 @@ EffectManager.play_world = function(self, name, position)
 			sound_volume = effect.sound_volume}
 	end
 	-- Quake the camera.
-	self:apply_quake(Vector(x,y,z), effect.quake)
+	self:apply_quake(position, effect.quake)
 end
 
 EffectManager.speech = function(self, args)

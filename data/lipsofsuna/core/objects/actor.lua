@@ -981,8 +981,9 @@ Actor.set_stat = function(self, s, v, m, diff)
 		-- Show a health change text.
 		Client.effects:create_damage_text(self, nil, diff)
 		-- Quake the camera if the player was hurt.
-		if self == Client.player_object and diff < -5 then
-			Client.effects:apply_quake(self:get_position(), 0.01 * (5 - diff))
+		if self == Client.player_object and diff < -2 then
+			local amount = math.min(1, 0.01 * (2 - diff))
+			Client.effects:apply_quake(self:get_position(), amount)
 		end
 		-- Set the correct collision shape.
 		-- Dead actors have a different collision shape. We switch between

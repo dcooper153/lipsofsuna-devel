@@ -37,6 +37,16 @@ ThirdPersonCamera.new = function(clss, args)
 	return self
 end
 
+--- Quakes the camera.
+-- @param self Camera.
+-- @param amount Magnitude in the range of [0, 1].
+ThirdPersonCamera.quake = function(self, amount)
+	self.__quake_vector = Vector()
+	self.__quake_force = Vector(2*math.random()-1, 2*math.random()-1, 2*math.random()-1)
+	self.__quake_force:normalize()
+	self.__quake_force:multiply(10 * amount)
+end
+
 ThirdPersonCamera.get_picking_ray = function(self)
 	local pos,rot = self:get_transform()
 	return pos,pos + rot * Vector(0,0,-50)
@@ -147,15 +157,6 @@ ThirdPersonCamera.get_eye_transform = function(self)
 	-- Mix in the free rotation mode.
 	local mix = math.max(math.abs(self.turn_state),math.abs(self.tilt_state))
 	drot:nlerp(Quaternion(), 1 - math.min(1, 30 * mix))
-	-- Mix in the camera quake.
-	if self.quake then
-		local rnd = Vector(2*math.random()-1, 2*math.random()-1, 2*math.random()-1)
-		pos = pos + rnd * 6 * math.min(1, self.quake)
-		self.quake = self.quake - self.tick
-		if self.quake < 0 then
-			self.quake = 0
-		end
-	end
 	-- Calculate the eye transformation.
 	local eye_pos = dpos:transform(turn, pos)
 	local eye_rot = drot:concat(rot)
@@ -167,9 +168,9 @@ end
 -- @param secs Seconds since the last update.
 ThirdPersonCamera.update = function(self, secs)
 	if not self.object then return end
-	-- Update the rotation state.
 	self.timer = self.timer + secs
 	while self.timer > self.tick do
+		-- Update the rotation state.
 		self.timer = self.timer - self.tick
 		if self.rotation_mode then
 			-- Update turning.
@@ -185,12 +186,27 @@ ThirdPersonCamera.update = function(self, secs)
 			self.turn_state = self.turn_state * math.max(1 - 3 * self.tick, 0)
 			self.tilt_state = self.tilt_state * math.max(1 - 3 * self.tick, 0)
 		end
+		-- Update quake.
+		if self.__quake_vector then
+			if self.__quake_force.length > 0.01 or self.__quake_vector.length > 0.01 then
+				self.__quake_force:multiply(0.7)
+				self.__quake_force:subtract(self.__quake_vector:copy())
+				self.__quake_vector:add(self.__quake_force:copy())
+			else
+				self.__quake_force = nil
+				self.__quake_vector = nil
+			end
+		end
 	end
 	-- Calculate the final transformation.
 	local pos,rot = self:get_eye_transform()
 	local dist = self:calculate_3rd_person_clipped_distance(pos, rot,
 		self.__zoom, self:get_collision_group(), self:get_collision_mask())
 	pos,rot = self:calculate_3rd_person_transform(pos, rot, dist)
+	-- Mix in the camera quake.
+	if self.__quake_vector then
+		pos = pos + self.__quake_vector
+	end
 	self:set_position(pos)
 	self:set_rotation(rot)
 end
