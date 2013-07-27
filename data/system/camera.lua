@@ -32,6 +32,52 @@ Camera.new = function(clss, args)
 	return self
 end
 
+--- Calculates the 1st person camera transformation.
+-- @param self Camera.
+-- @return Vector and quaternion.
+Camera.calculate_1st_person_transform = function(self)
+	local a,b = Los.camera_calculate_1st_person_transform(self.handle)
+	return Vector:new_from_handle(a), Quaternion:new_from_handle(b)
+end
+
+--- Clips the 3rd person camera distance based on collisions.
+-- @param self Camera.
+-- @param center_pos Center position vector.
+-- @param center_rot Center rotation quaternion.
+-- @param distance Distance to the center.
+-- @param collision_group Collision group. Nil for default.
+-- @param collision_mask Collision mask. Nil for default.
+-- @return Number.
+Camera.calculate_3rd_person_clipped_distance = function(self, center_pos, center_rot, distance, collision_mask, collision_group)
+	return Los.camera_calculate_3rd_person_clipped_distance(
+		self.handle, center_pos.handle, center_rot.handle, distance, collision_mask, collision_group)
+end
+
+--- Calculates the 3rd person camera transformation.
+-- @param self Camera.
+-- @param center_pos Center position vector.
+-- @param center_rot Center rotation quaternion.
+-- @param distance Distance to the center.
+-- @return Vector and quaternion.
+Camera.calculate_3rd_person_transform = function(self, center_pos, center_rot, distance)
+	local a,b = Los.camera_calculate_3rd_person_transform(
+		self.handle, center_pos.handle, center_rot.handle, distance)
+	return Vector:new_from_handle(a), Quaternion:new_from_handle(b)
+end
+
+--- Calculates the camera transformation after smoothing.
+-- @param self Camera.
+-- @param target_pos Target position vector.
+-- @param target_rot Target rotation quaternion.
+-- @param smooth_pos Position smoothing factor. Nil for no smoothing.
+-- @param smooth_rot Rotation smoothing factor. Nil for no smoothing.
+-- @return Vector and quaternion.
+Camera.calculate_smoothed_transform = function(self, target_pos, target_rot, smooth_pos, smooth_rot)
+	local a,b = Los.camera_calculate_smoothed_transform(
+		self.handle, target_pos.handle, target_rot.handle, smooth_pos, smooth_rot)
+	return Vector:new_from_handle(a), Quaternion:new_from_handle(b)
+end
+
 --- Moves the camera forward or backward.
 -- @param self Camera.
 -- @param rate Movement rate.
@@ -78,7 +124,6 @@ Camera.warp = function(self)
 end
 
 --- Animates the camera.
---
 -- @param self Camera.
 -- @param secs Tick length.
 Camera.update = function(self, secs)
@@ -183,6 +228,13 @@ Camera.get_position = function(self)
 	return Vector:new_from_handle(Los.camera_get_position(self.handle))
 end
 
+--- Sets the current position of the camera.
+-- @param self Camera.
+-- @param value Vector.
+Camera.set_position = function(self, value)
+	Los.camera_set_position(self.handle, value.handle)
+end
+
 --- Gets the position smoothing factor of the camera.
 -- @param self Camera.
 -- @return Number.
@@ -224,6 +276,13 @@ end
 -- @return Quaternion.
 Camera.get_rotation = function(self)
 	return Quaternion:new_from_handle(Los.camera_get_rotation(self.handle))
+end
+
+--- Sets the current rotation of the camera.
+-- @param self Camera.
+-- @param value Quaternion.
+Camera.set_rotation = function(self, value)
+	Los.camera_set_rotation(self.handle, value.handle)
 end
 
 --- Gets the rotation smoothing factor of the camera.

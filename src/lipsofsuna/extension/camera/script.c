@@ -22,7 +22,9 @@
  * @{
  */
 
-#include "ext-module.h"
+#include "camera.h"
+#include "module.h"
+#include "lipsofsuna/render.h"
 
 static void Camera_new (LIScrArgs* args)
 {
@@ -34,11 +36,10 @@ static void Camera_new (LIScrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_CAMERA);
-	self = liext_camera_new ();
+	self = liext_camera_new (module);
 	if (self == NULL)
 		return;
 	liext_camera_set_driver (self, LIALG_CAMERA_THIRDPERSON);
-	liext_camera_set_clipping (self, (LIExtCameraClip) liext_cameras_clip_camera, module);
 
 	/* Initialize the viewport. */
 	render = limai_program_find_component (module->program, "render");
@@ -56,6 +57,76 @@ static void Camera_new (LIScrArgs* args)
 		return;
 	}
 	liscr_args_seti_stack (args);
+}
+
+static void Camera_calculate_1st_person_transform (LIScrArgs* args)
+{
+	LIMatTransform result;
+
+	liext_camera_calculate_1st_person_transform (args->self, &result);
+	liscr_args_seti_vector (args, &result.position);
+	liscr_args_seti_quaternion (args, &result.rotation);
+}
+
+static void Camera_calculate_3rd_person_clipped_distance (LIScrArgs* args)
+{
+	int group = 0xFFFF;
+	int mask = 0xFFFF;
+	float distance;
+	float result;
+	LIMatTransform center;
+
+	if (!liscr_args_geti_vector (args, 0, &center.position))
+		return;
+	if (!liscr_args_geti_quaternion (args, 1, &center.rotation))
+		return;
+	if (!liscr_args_geti_float (args, 2, &distance))
+		return;
+	liscr_args_geti_int (args, 3, &group);
+	liscr_args_geti_int (args, 4, &mask);
+
+	result = liext_camera_calculate_3rd_person_clipped_distance (
+		args->self, &center, distance, group, mask);
+	liscr_args_seti_float (args, result);
+}
+
+static void Camera_calculate_3rd_person_transform (LIScrArgs* args)
+{
+	float distance;
+	LIMatTransform center;
+	LIMatTransform result;
+
+	if (!liscr_args_geti_vector (args, 0, &center.position))
+		return;
+	if (!liscr_args_geti_quaternion (args, 1, &center.rotation))
+		return;
+	if (!liscr_args_geti_float (args, 2, &distance))
+		return;
+
+	liext_camera_calculate_3rd_person_transform (
+		args->self, &center, distance, &result);
+	liscr_args_seti_vector (args, &result.position);
+	liscr_args_seti_quaternion (args, &result.rotation);
+}
+
+static void Camera_calculate_smoothed_transform (LIScrArgs* args)
+{
+	float position_smoothing = 1.0f;
+	float rotation_smoothing = 1.0f;
+	LIMatTransform target;
+	LIMatTransform result;
+
+	if (!liscr_args_geti_vector (args, 0, &target.position))
+		return;
+	if (!liscr_args_geti_quaternion (args, 1, &target.rotation))
+		return;
+	liscr_args_geti_float (args, 2, &position_smoothing);
+	liscr_args_geti_float (args, 3, &rotation_smoothing);
+
+	liext_camera_calculate_smoothed_transform (
+		args->self, &target, position_smoothing, rotation_smoothing, &result);
+	liscr_args_seti_vector (args, &result.position);
+	liscr_args_seti_quaternion (args, &result.rotation);
 }
 
 static void Camera_move (LIScrArgs* args)
@@ -270,6 +341,17 @@ static void Camera_set_near (LIScrArgs* args)
 	}
 }
 
+static void Camera_set_position (LIScrArgs* args)
+{
+	LIExtCamera* camera;
+	LIMatTransform transform;
+
+	camera = args->self;
+	transform = limat_transform_identity ();
+	liext_camera_get_transform (camera, &transform);
+	liscr_args_geti_vector (args, 0, &transform.position);
+	liext_camera_set_transform (camera, &transform);
+}
 static void Camera_get_position (LIScrArgs* args)
 {
 	LIExtCamera* camera;
@@ -311,6 +393,17 @@ static void Camera_get_projection (LIScrArgs* args)
 		liscr_args_seti_float (args, matrix.m[i]);
 }
 
+static void Camera_set_rotation (LIScrArgs* args)
+{
+	LIExtCamera* camera;
+	LIMatTransform transform;
+
+	camera = args->self;
+	transform = limat_transform_identity ();
+	liext_camera_get_transform (camera, &transform);
+	liscr_args_geti_quaternion (args, 0, &transform.rotation);
+	liext_camera_set_transform (camera, &transform);
+}
 static void Camera_get_rotation (LIScrArgs* args)
 {
 	LIExtCamera* camera;
@@ -412,6 +505,10 @@ void liext_script_camera (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_CAMERA, "camera_new", Camera_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_calculate_1st_person_transform", Camera_calculate_1st_person_transform);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_calculate_3rd_person_clipped_distance", Camera_calculate_3rd_person_clipped_distance);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_calculate_3rd_person_transform", Camera_calculate_3rd_person_transform);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_calculate_smoothed_transform", Camera_calculate_smoothed_transform);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_move", Camera_move);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_picking_ray", Camera_picking_ray);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_reset", Camera_reset);
@@ -432,10 +529,12 @@ void liext_script_camera (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_near", Camera_set_near);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_modelview", Camera_get_modelview);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_position", Camera_get_position);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_position", Camera_set_position);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_position_smoothing", Camera_get_position_smoothing);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_position_smoothing", Camera_set_position_smoothing);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_projection", Camera_get_projection);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_rotation", Camera_get_rotation);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_rotation", Camera_set_rotation);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_rotation_smoothing", Camera_get_rotation_smoothing);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_rotation_smoothing", Camera_set_rotation_smoothing);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_target_position", Camera_get_target_position);

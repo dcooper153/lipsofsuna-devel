@@ -23,6 +23,7 @@
  */
 
 #include "lipsofsuna/system.h"
+#include "lipsofsuna/extension/physics/physics.h"
 #include "camera.h"
 
 #define LIALG_CAMERA_DEFAULT_FOV (M_PI / 5.0f)
@@ -56,9 +57,11 @@ static void private_update_projection (
 
 /**
  * \brief Creates a new camera.
+ * \param module Camera module.
  * \return New camera or NULL.
  */
-LIExtCamera* liext_camera_new ()
+LIExtCamera* liext_camera_new (
+	LIExtModule* module)
 {
 	LIExtCamera* self;
 
@@ -66,6 +69,7 @@ LIExtCamera* liext_camera_new ()
 	self = lisys_calloc (1, sizeof (LIExtCamera));
 	if (self == NULL)
 		return NULL;
+	self->module = module;
 	self->config.collision_group = 0xFFFF;
 	self->config.collision_mask = 0xFFFF;
 	self->config.driver = LIALG_CAMERA_FIRSTPERSON;
@@ -96,6 +100,135 @@ void liext_camera_free (
 	LIExtCamera* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Calculates the world space transformation for the first person driver.
+ * \param self Camera.
+ * \param center Center position and rotation.
+ * \param distance Distance from the center.
+ * \param result Return location for the transformation.
+ */
+void liext_camera_calculate_1st_person_transform (
+	LIExtCamera*    self,
+	LIMatTransform* result)
+{
+	LIMatTransform target;
+
+	target = limat_transform_multiply (self->transform.center, self->transform.local);
+	target.rotation = limat_quaternion_normalize (target.rotation);
+	*result = target;
+}
+
+/**
+ * \brief Calculates the 3rd person camera distance after collisions.
+ * \param self Camera.
+ * \param center Center position and rotation.
+ * \param distance Distance from the center.
+ * \param collision_group Collision group.
+ * \param collision_mask Collision mask.
+ * \return Clipped distance.
+ */
+float liext_camera_calculate_3rd_person_clipped_distance (
+	LIExtCamera*          self,
+	const LIMatTransform* center,
+	float                 distance,
+	int                   collision_group,
+	int                   collision_mask)
+{
+	int hit;
+	float frac;
+	LIMatTransform center1;
+	LIMatTransform target;
+	LIPhyContact tmp;
+	LIPhyPhysics* physics;
+
+	/* Find the physics manager. */
+	physics = limai_program_find_component (self->module->program, "physics");
+	if (physics == NULL)
+		return distance;
+
+	/* Apply the local transformation. */
+	center1 = limat_transform_multiply (*center, self->transform.local);
+	center1.rotation = limat_quaternion_normalize (center->rotation);
+
+	/* Calculate the unclipped target transformation. */
+	liext_camera_calculate_3rd_person_transform (self, center, distance, &target);
+
+	/* Find the clip distance with a ray cast. */
+	/* A convex cast might sound like a better idea but it makes the behavior
+	   less predictable so scripting will suffer. The gain is also relatively
+	   small so we just use a ray cast now. */
+	hit = liphy_physics_cast_ray (physics, &center1.position, &target.position,
+		collision_group, collision_mask, NULL, 0, &tmp);
+
+	/* Return the clip distance. */
+	if (hit)
+		return distance * tmp.fraction;
+	else
+		return distance;
+
+	return distance * frac;
+}
+
+/**
+ * \brief Calculates the world space transformation for the third person driver.
+ * \param self Camera.
+ * \param center Center position and rotation.
+ * \param distance Distance from the center.
+ * \param result Return location for the transformation.
+ */
+void liext_camera_calculate_3rd_person_transform (
+	LIExtCamera*          self,
+	const LIMatTransform* center,
+	float                 distance,
+	LIMatTransform*       result)
+{
+	LIMatTransform center1;
+	LIMatTransform project;
+	LIMatTransform target;
+
+	/* Apply the local transformation. */
+	center1 = limat_transform_multiply (*center, self->transform.local);
+	center1.rotation = limat_quaternion_normalize (center->rotation);
+
+	/* Project the camera backwards from the target. */
+	project = limat_transform_init (
+		limat_vector_init (0.0f, 0.0f, distance),
+		limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f));
+	target = limat_transform_multiply (center1, project);
+	target.rotation = limat_quaternion_normalize (target.rotation);
+
+	/* Set the target position. */
+	*result = target;
+}
+
+/**
+ * \brief Calculates the transformation after smoothing.
+ * \param self Camera.
+ * \param target Target transformation.
+ * \param position_smoothing Position smoothing factor.
+ * \param rotation_smoothing Rotation smoothing factor.
+ * \param result Return location for the transformation.
+ */
+void liext_camera_calculate_smoothed_transform (
+	LIExtCamera*          self,
+	const LIMatTransform* target,
+	float                 position_smoothing,
+	float                 rotation_smoothing,
+	LIMatTransform*       result)
+{
+	LIMatTransform src;
+	LIMatTransform dst;
+
+	/* Get the source and destination transformations. */
+	dst = *target;
+	src = self->transform.current;
+	src.rotation = limat_quaternion_get_nearest (src.rotation, dst.rotation);
+
+	/* Calculate the interpolated transformation. */
+	result->position = limat_vector_lerp (dst.position, src.position, position_smoothing);
+	result->rotation = limat_quaternion_nlerp (dst.rotation, src.rotation, rotation_smoothing);
 }
 
 /**
@@ -343,26 +476,6 @@ void liext_camera_set_center (
 }
 
 /**
- * \brief Sets the external clipping function of the camera.
- *
- * When the clipping function is set, the camera ensures that its distance to the
- * target in the third person mode isn't more than that returned by the clip
- * function.
- *
- * \param self Camera.
- * \param func Clipping function or NULL to disable.
- * \param data Userdata to be passed to the clipping function.
- */
-void liext_camera_set_clipping (
-	LIExtCamera*    self,
-	LIExtCameraClip func,
-	void*           data)
-{
-	self->config.clip_func = func;
-	self->config.clip_data = data;
-}
-
-/**
  * \brief Gets the driver type of the camera.
  * \param self Camera.
  * \return Camera driver type.
@@ -541,7 +654,7 @@ void liext_camera_get_transform (
 }
 
 /**
- * \brief Sets the target transformation of the camera.
+ * \brief Sets the current transformation of the camera.
  * \param self Camera.
  * \param value Transformation.
  */
@@ -550,7 +663,20 @@ void liext_camera_set_transform (
 	const LIMatTransform* value)
 {
 	self->transform.target = *value;
+	self->transform.current = *value;
 	private_update_modelview (self);
+}
+
+/**
+ * \brief Sets the target transformation of the camera.
+ * \param self Camera.
+ * \param value Transformation.
+ */
+void liext_camera_set_target_transform (
+	LIExtCamera*          self,
+	const LIMatTransform* value)
+{
+	self->transform.target = *value;
 }
 
 /**
@@ -595,51 +721,20 @@ void liext_camera_set_viewport (
 static void private_update_1st_person (
 	LIExtCamera* self)
 {
-	/* Copy center position and rotation. */
-	self->transform.target = self->transform.center;
 	self->transform.current.position = self->transform.target.position;
-
-	/* Apply local rotation. */
-	self->transform.target = limat_transform_multiply (self->transform.target, self->transform.local);
-	self->transform.target.rotation = limat_quaternion_normalize (self->transform.target.rotation);
+	liext_camera_calculate_1st_person_transform (self, &self->transform.target);
 }
 
 static void private_update_3rd_person (
 	LIExtCamera* self,
 	float        dist)
 {
-	float frac;
-	LIMatTransform transform;
-	LIMatTransform target;
-	LIMatTransform center;
-
-	/* Copy center position and rotation. */
-	center = self->transform.center;
-
-	/* Apply local rotation. */
-	center = limat_transform_multiply (center, self->transform.local);
-	center.rotation = limat_quaternion_normalize (center.rotation);
-
-	/* Project backwards. */
-	transform = limat_transform_init (
-		limat_vector_init (0.0f, 0.0f, dist),
-		limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f));
-	target = limat_transform_multiply (center, transform);
-	target.rotation = limat_quaternion_normalize (target.rotation);
-
-	/* Apply clipping. */
-	if (self->config.clip_func != NULL)
-	{
-		frac = self->config.clip_func (self->config.clip_data, self, &center, &target);
-		transform = limat_transform_init (
-			limat_vector_init (0.0f, 0.0f, dist * frac),
-			limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f));
-		target = limat_transform_multiply (center, transform);
-		target.rotation = limat_quaternion_normalize (target.rotation);
-	}
-
-	/* Set the target position. */
-	self->transform.target = target;
+	dist = liext_camera_calculate_3rd_person_clipped_distance (
+		self, &self->transform.center, dist,
+		self->config.collision_group, self->config.collision_mask);
+	liext_camera_calculate_3rd_person_transform (
+		self, &self->transform.center,
+		dist, &self->transform.target);
 }
 
 static void private_update_modelview (
@@ -647,8 +742,6 @@ static void private_update_modelview (
 {
 	LIMatTransform t;
 
-	self->transform.current.rotation = limat_quaternion_normalize (self->transform.current.rotation);
-	self->transform.target.rotation = limat_quaternion_normalize (self->transform.target.rotation);
 	t = limat_transform_invert (self->transform.current);
 	self->transform.inverse = t;
 	self->view.modelview = limat_convert_transform_to_matrix (t);
@@ -660,9 +753,6 @@ static void private_update_orientation (
 {
 	float dist;
 	LIMatVector disp;
-	LIMatTransform transform;
-	LIMatTransform transform0;
-	LIMatTransform transform1;
 
 	/* Update timer. */
 	self->smoothing.timer += secs;
@@ -682,14 +772,12 @@ static void private_update_orientation (
 	/* Interpolate the transformation. */
 	while (self->smoothing.timer >= LIALG_CAMERA_SMOOTHING_TIMESTEP)
 	{
-		transform0 = self->transform.current;
-		transform1 = self->transform.target;
-		transform0.rotation = limat_quaternion_get_nearest (transform0.rotation, transform1.rotation);
-		transform.position = limat_vector_lerp (
-			transform1.position, transform0.position, self->smoothing.pos);
-		transform.rotation = limat_quaternion_nlerp (
-			transform1.rotation, transform0.rotation, self->smoothing.rot);
-		self->transform.current = transform;
+		liext_camera_calculate_smoothed_transform (
+			self,
+			&self->transform.target,
+			self->smoothing.pos,
+			self->smoothing.rot,
+			&self->transform.current);
 		self->smoothing.timer -= LIALG_CAMERA_SMOOTHING_TIMESTEP;
 	}
 }

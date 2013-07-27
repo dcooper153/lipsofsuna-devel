@@ -23,16 +23,16 @@
  */
 
 #include "lipsofsuna/extension/physics/ext-module.h"
-#include "ext-module.h"
+#include "module.h"
 
 LIMaiExtensionInfo liext_camera_info =
 {
 	LIMAI_EXTENSION_VERSION, "Camera",
-	liext_cameras_new,
-	liext_cameras_free
+	liext_camera_module_new,
+	liext_camera_module_free
 };
 
-LIExtModule* liext_cameras_new (
+LIExtModule* liext_camera_module_new (
 	LIMaiProgram* program)
 {
 	LIExtModule* self;
@@ -50,39 +50,10 @@ LIExtModule* liext_cameras_new (
 	return self;
 }
 
-void liext_cameras_free (
+void liext_camera_module_free (
 	LIExtModule* self)
 {
 	lisys_free (self);
-}
-
-float liext_cameras_clip_camera (
-	LIExtModule*    self,
-	LIExtCamera*    camera,
-	LIMatTransform* start,
-	LIMatTransform* end)
-{
-	int hit;
-	LIPhyContact tmp;
-	LIPhyPhysics* physics;
-
-	/* Find the physics manager. */
-	physics = limai_program_find_component (self->program, "physics");
-	if (physics == NULL)
-		return 1.0f;
-
-	/* Find the clip distance with a ray cast. */
-	/* A convex cast might sound like a better idea but it makes the behavior
-	   less predictable so scripting will suffer. The gain is also relatively
-	   small so we just use a ray cast now. */
-	hit = liphy_physics_cast_ray (physics, &start->position, &end->position,
-		camera->config.collision_group, camera->config.collision_mask, NULL, 0, &tmp);
-
-	/* Return the clip distance. */
-	if (hit)
-		return tmp.fraction;
-	else
-		return 1.0f;
 }
 
 /** @} */

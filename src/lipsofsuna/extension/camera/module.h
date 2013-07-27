@@ -15,12 +15,10 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __EXT_CAMERA_MODULE_H__
+#define __EXT_CAMERA_MODULE_H__
 
 #include "lipsofsuna/extension.h"
-#include "lipsofsuna/render.h"
-#include "camera.h"
 
 #define LIEXT_SCRIPT_CAMERA "Camera"
 
@@ -30,17 +28,11 @@ struct _LIExtModule
 	LIMaiProgram* program;
 };
 
-LIExtModule* liext_cameras_new (
+LIExtModule* liext_camera_module_new (
 	LIMaiProgram* program);
 
-void liext_cameras_free (
+void liext_camera_module_free (
 	LIExtModule* self);
-
-float liext_cameras_clip_camera (
-	LIExtModule*    self,
-	LIExtCamera*    camera,
-	LIMatTransform* start,
-	LIMatTransform* end);
 
 /*****************************************************************************/
 

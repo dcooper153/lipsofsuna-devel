@@ -15,10 +15,11 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ALGORITHM_CAMERA_H__
-#define __ALGORITHM_CAMERA_H__
+#ifndef __EXT_CAMERA_CAMERA_H__
+#define __EXT_CAMERA_CAMERA_H__
 
 #include "lipsofsuna/math.h"
+#include "module.h"
 
 typedef struct _LIExtCamera LIExtCamera;
 typedef int LIExtCameraDriver;
@@ -34,14 +35,13 @@ enum
 
 struct _LIExtCamera
 {
+	LIExtModule* module;
 	struct
 	{
 		int collision_mask;
 		int collision_group;
 		float distance;
 		LIExtCameraDriver driver;
-		LIExtCameraClip clip_func;
-		void* clip_data;
 	} config;
 	struct
 	{
@@ -69,10 +69,35 @@ struct _LIExtCamera
 	} view;
 };
 
-LIAPICALL (LIExtCamera*, liext_camera_new, ());
+LIAPICALL (LIExtCamera*, liext_camera_new, (
+	LIExtModule* module));
 
 LIAPICALL (void, liext_camera_free, (
 	LIExtCamera* self));
+
+LIAPICALL (void, liext_camera_calculate_1st_person_transform, (
+	LIExtCamera*    self,
+	LIMatTransform* result));
+
+LIAPICALL (float, liext_camera_calculate_3rd_person_clipped_distance, (
+	LIExtCamera*          self,
+	const LIMatTransform* center,
+	float                 distance,
+	int                   collision_group,
+	int                   collision_mask));
+
+LIAPICALL (void, liext_camera_calculate_3rd_person_transform, (
+	LIExtCamera*          self,
+	const LIMatTransform* center,
+	float                 distance,
+	LIMatTransform*       result));
+
+LIAPICALL (void, liext_camera_calculate_smoothed_transform, (
+	LIExtCamera*          self,
+	const LIMatTransform* target,
+	float                 position_smoothing,
+	float                 rotation_smoothing,
+	LIMatTransform*       result));
 
 LIAPICALL (void, liext_camera_move, (
 	LIExtCamera* self,
@@ -118,11 +143,6 @@ LIAPICALL (void, liext_camera_get_center, (
 LIAPICALL (void, liext_camera_set_center, (
 	LIExtCamera*          self,
 	const LIMatTransform* value));
-
-LIAPICALL (void, liext_camera_set_clipping, (
-	LIExtCamera*    self,
-	LIExtCameraClip func,
-	void*           data));
 
 LIAPICALL (LIExtCameraDriver, liext_camera_get_driver, (
 	LIExtCamera* self));
@@ -180,6 +200,14 @@ LIAPICALL (void, liext_camera_get_transform, (
 	LIMatTransform*    value));
 
 LIAPICALL (void, liext_camera_set_transform, (
+	LIExtCamera*          self,
+	const LIMatTransform* value));
+
+LIAPICALL (void, liext_camera_set_target, (
+	LIExtCamera*          self,
+	const LIMatTransform* value));
+
+LIAPICALL (void, liext_camera_set_target_transform, (
 	LIExtCamera*          self,
 	const LIMatTransform* value));
 
