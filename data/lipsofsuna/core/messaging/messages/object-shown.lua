@@ -117,8 +117,8 @@ Main.messaging:register_message{
 		if o.body_scale or o.body_style then
 			flags = flags + FlagType.BODY
 			add(data, "uint8", o.body_scale or 128)
-			add(data, "uint16", #o.body_style)
-			for k,v in ipairs(o.body_style) do
+			add(data, "uint16", o.body_style and #o.body_style or 0)
+			for k,v in ipairs(o.body_style or {}) do
 				add(data, "uint8", o.body_style[k])
 			end
 		end
@@ -206,7 +206,7 @@ Main.messaging:register_message{
 			flags = flags + FlagType.SPEEDLINE
 		end
 		-- Combat hint.
-		if o:get_combat_hint() then
+		if o.get_combat_hint and o:get_combat_hint() then
 			flags = flags + FlagType.COMBAT
 		end
 		-- Rewrite the flags.
