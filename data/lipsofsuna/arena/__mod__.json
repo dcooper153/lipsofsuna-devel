@@ -10,6 +10,7 @@
 	],
 	"scripts":
 	[
+		"main",
 		"action-attack",
 		"action-bite",
 		"action-block",
@@ -22,7 +23,7 @@
 	],
 	"client_scripts":
 	[
-		"main"
+		"main-client"
 	],
 	"specs":
 	[
