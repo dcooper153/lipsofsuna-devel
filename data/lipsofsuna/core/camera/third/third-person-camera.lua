@@ -33,7 +33,7 @@ ThirdPersonCamera.new = function(clss, args)
 	self.turn_state = 0
 	self.timer = 1/60
 	self.tick = 1/60
-	self:zoom{rate = -8}
+	self.__zoom = 4
 	return self
 end
 
@@ -103,7 +103,10 @@ ThirdPersonCamera.get_rotation_displacement = function(self, pos, rot, ratio)
 	return drot:concat(rot.conjugate)
 end
 
-ThirdPersonCamera.get_transform = function(self)
+--- Calculates the transformation of the center of the view.
+-- @param self ThirdPersonCamera.
+-- @return Vector, quaternion, quaternion, vector, quaternion.
+ThirdPersonCamera.get_center_transform = function(self)
 	-- Calculate the initial rotation.
 	local turn = self.turn_state + self.object:get_turn_angle()
 	local tilt = self.tilt_state + self.object:get_tilt_angle()
@@ -129,11 +132,42 @@ ThirdPersonCamera.get_transform = function(self)
 	return pos,rot,turn1,displ_pos,displ_rot
 end
 
+--- Calculates the transformation of the camera lens.
+-- @param self ThirdPersonCamera.
+-- @return Vector, quaternion.
+ThirdPersonCamera.get_eye_transform = function(self)
+	-- Calculate the target transformation.
+	local pos,rot,turn,dpos,drot = self:get_center_transform()
+	if self:get_rotation_smoothing() < 1 and self.prev_target_pos then
+		dpos:lerp(self.prev_target_pos, 1 - self.displacement_smoothing_rate)
+		drot:nlerp(self.prev_target_rot, self.displacement_smoothing_rate)
+	end
+	self.prev_target_pos = dpos:copy()
+	self.prev_target_rot = drot:copy()
+	-- Mix in the free rotation mode.
+	local mix = math.max(math.abs(self.turn_state),math.abs(self.tilt_state))
+	drot:nlerp(Quaternion(), 1 - math.min(1, 30 * mix))
+	-- Mix in the camera quake.
+	if self.quake then
+		local rnd = Vector(2*math.random()-1, 2*math.random()-1, 2*math.random()-1)
+		pos = pos + rnd * 6 * math.min(1, self.quake)
+		self.quake = self.quake - self.tick
+		if self.quake < 0 then
+			self.quake = 0
+		end
+	end
+	-- Calculate the eye transformation.
+	local eye_pos = dpos:transform(turn, pos)
+	local eye_rot = drot:concat(rot)
+	return eye_pos,eye_rot
+end
+
 --- Updates the camera transformation.
 -- @param self Camera.
 -- @param secs Seconds since the last update.
 ThirdPersonCamera.update = function(self, secs)
 	if not self.object then return end
+	-- Update the rotation state.
 	self.timer = self.timer + secs
 	while self.timer > self.tick do
 		self.timer = self.timer - self.tick
@@ -151,34 +185,21 @@ ThirdPersonCamera.update = function(self, secs)
 			self.turn_state = self.turn_state * math.max(1 - 3 * self.tick, 0)
 			self.tilt_state = self.tilt_state * math.max(1 - 3 * self.tick, 0)
 		end
-		-- Calculate the target transformation.
-		local pos,rot,turn,dpos,drot = self:get_transform()
-		if self:get_rotation_smoothing() < 1 and self.prev_target_pos then
-			dpos:lerp(self.prev_target_pos, 1 - self.displacement_smoothing_rate)
-			drot:nlerp(self.prev_target_rot, self.displacement_smoothing_rate)
-		end
-		self.prev_target_pos = dpos:copy()
-		self.prev_target_rot = drot:copy()
-		-- Mix in the free rotation mode.
-		local mix = math.max(math.abs(self.turn_state),math.abs(self.tilt_state))
-		drot:nlerp(Quaternion(), 1 - math.min(1, 30 * mix))
-		-- Mix in the camera quake.
-		if self.quake then
-			local rnd = Vector(2*math.random()-1, 2*math.random()-1, 2*math.random()-1)
-			pos = pos + rnd * 6 * math.min(1, self.quake)
-			self.quake = self.quake - self.tick
-			if self.quake < 0 then
-				self.quake = 0
-			end
-		end
-		-- Set the target transformation.
-		local target_pos = dpos:transform(turn, pos)
-		local target_rot = drot:concat(rot)
-		self:set_target_position(target_pos)
-		self:set_target_rotation(target_rot)
-		-- Interpolate.
-		Camera.update(self, self.tick)
 	end
+	-- Calculate the final transformation.
+	local pos,rot = self:get_eye_transform()
+	local dist = self:calculate_3rd_person_clipped_distance(pos, rot,
+		self.__zoom, self:get_collision_group(), self:get_collision_mask())
+	pos,rot = self:calculate_3rd_person_transform(pos, rot, dist)
+	self:set_position(pos)
+	self:set_rotation(rot)
+end
+
+ThirdPersonCamera.zoom = function(self, rate)
+	local z = self.__zoom + rate
+	z = math.max(1.5, z)
+	z = math.min(100, z)
+	self.__zoom = z
 end
 
 return ThirdPersonCamera
