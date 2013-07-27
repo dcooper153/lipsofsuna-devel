@@ -80,6 +80,21 @@ Packet.resume_table = function(self, ...)
 	return ok,res
 end
 
+--- Reads data starting from the beginning of the packet.
+-- @param self Packet.
+-- @param count Number of fields to read.
+-- @param type Type to read.
+-- @return Boolean and a table of read values.
+Packet.resume_table_count = function(self, count, type)
+	local res = {}
+	for i = 1,count do
+		local ok,v = self:resume(type)
+		if not ok then return false,{} end
+		res[i] = v
+	end
+	return true,v
+end
+
 --- Appends data to the packet.
 -- @param self Packet.
 -- @param ... Types to write.

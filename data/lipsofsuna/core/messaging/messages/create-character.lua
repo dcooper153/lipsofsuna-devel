@@ -8,88 +8,80 @@ local Player = require("core/objects/player")
 Main.messaging:register_message{
 	name = "create character",
 	client_to_server_encode = function(self, char)
-		return {
-			"string", char.name,
-			"string", char.race,
-			-- Animation profile.
-			"string", char.animation_profile,
-			-- Body style.
-			"uint8", char.body_scale,
-			"uint8", char.body_style[1],
-			"uint8", char.body_style[2],
-			"uint8", char.body_style[3],
-			"uint8", char.body_style[4],
-			"uint8", char.body_style[5],
-			"uint8", char.body_style[6],
-			"uint8", char.body_style[7],
-			"uint8", char.body_style[8],
-			"uint8", char.body_style[9],
-			"uint8", char.body_style[10],
-			-- Head style.
-			"string", char.head_style,
-			-- Eye style.
-			"string", char.eye_style,
-			"uint8", char.eye_color[1],
-			"uint8", char.eye_color[2],
-			"uint8", char.eye_color[3],
-			-- Face style.
-			"uint8", char.face_style[1],
-			"uint8", char.face_style[2],
-			"uint8", char.face_style[3],
-			"uint8", char.face_style[4],
-			"uint8", char.face_style[5],
-			"uint8", char.face_style[6],
-			"uint8", char.face_style[7],
-			"uint8", char.face_style[8],
-			"uint8", char.face_style[9],
-			"uint8", char.face_style[10],
-			"uint8", char.face_style[11],
-			"uint8", char.face_style[12],
-			"uint8", char.face_style[13],
-			"uint8", char.face_style[14],
-			"uint8", char.face_style[15],
-			-- Hair style.
-			"string", char.hair_style,
-			"uint8", char.hair_color[1],
-			"uint8", char.hair_color[2],
-			"uint8", char.hair_color[3],
-			-- Skin style.
-			"string", char.skin_style,
-			"uint8", char.skin_color[1],
-			"uint8", char.skin_color[2],
-			"uint8", char.skin_color[3],
-			-- Spawn point
-			"string", char.spawn_point}
+		local res = {}
+		local add = function(t, v)
+			table.insert(res, t)
+			table.insert(res, v)
+		end
+		-- Name.
+		add("string", char.name)
+		add("string", char.race)
+		-- Animation profile.
+		add("string", char.animation_profile)
+		-- Body style.
+		add("uint8", char.body_scale)
+		add("uint8", #char.body_style)
+		for k,v in ipairs(char.body_style) do
+			add("uint8", v)
+		end
+		-- Head style.
+		add("string", char.head_style)
+		-- Eye style.
+		add("string", char.eye_style)
+		add("uint8", char.eye_color[1])
+		add("uint8", char.eye_color[2])
+		add("uint8", char.eye_color[3])
+		-- Face style.
+		add("uint8", #char.face_style)
+		for k,v in ipairs(char.face_style) do
+			add("uint8", v)
+		end
+		-- Hair style.
+		add("string", char.hair_style)
+		add("uint8", char.hair_color[1])
+		add("uint8", char.hair_color[2])
+		add("uint8", char.hair_color[3])
+		-- Skin style.
+		add("string", char.skin_style)
+		add("uint8", char.skin_color[1])
+		add("uint8", char.skin_color[2])
+		add("uint8", char.skin_color[3])
+		-- Spawn point.
+		add("string", char.spawn_point)
+		return res
 	end,
 	client_to_server_decode = function(self, packet)
-		-- Reconstruct the character style.
-		local style,ok1,ok2 = {}
-		ok1,style.name,style.race,style.animation_profile = packet:read("string", "string", "string")
+		local char,count,ok1,ok2 = {}
+		-- Name.
+		ok1,char.name,char.race,char.animation_profile = packet:read("string", "string", "string")
 		if not ok1 then return end
-		ok1,style.body_scale = packet:resume("uint8")
-		ok2,style.body_style = packet:resume_table(
-			"uint8", "uint8", "uint8", "uint8", "uint8",
-			"uint8", "uint8", "uint8", "uint8", "uint8")
+		-- Body style.
+		ok1,char.body_scale,count = packet:resume("uint8", "uint8")
+		ok2,char.body_style = packet:resume_table_count(count or 0, "uint8")
 		if not ok1 or not ok2 then return end
-		ok1,style.head_style = packet:resume("string")
+		-- Head style.
+		ok1,char.head_style = packet:resume("string")
 		if not ok1 then return end
-		ok1,style.eye_style = packet:resume("string")
-		ok2,style.eye_color = packet:resume_table("uint8", "uint8", "uint8")
+		-- Eye style.
+		ok1,char.eye_style = packet:resume("string")
+		ok2,char.eye_color = packet:resume_table("uint8", "uint8", "uint8")
 		if not ok1 or not ok2 then return end
-		ok1,style.face_style = packet:resume_table(
-			"uint8", "uint8", "uint8", "uint8", "uint8",
-			"uint8", "uint8", "uint8", "uint8", "uint8",
-			"uint8", "uint8", "uint8", "uint8", "uint8")
+		-- Face style.
+		ok1,count = packet:resume("uint8")
+		ok2,char.face_style = packet:resume_table_count(count or 0, "uint8")
+		if not ok1 or not ok2 then return end
+		-- Hair style.
+		ok1,char.hair_style = packet:resume("string")
+		ok2,char.hair_color = packet:resume_table("uint8", "uint8", "uint8")
+		if not ok1 or not ok2 then return end
+		-- Skin style.
+		ok1,char.skin_style = packet:resume("string")
+		ok2,char.skin_color = packet:resume_table("uint8", "uint8", "uint8")
+		if not ok1 or not ok2 then return end
+		-- Spawn point.
+		ok1,char.spawn_point = packet:resume("string")
 		if not ok1 then return end
-		ok1,style.hair_style = packet:resume("string")
-		ok2,style.hair_color = packet:resume_table("uint8", "uint8", "uint8")
-		if not ok1 or not ok2 then return end
-		ok1,style.skin_style = packet:resume("string")
-		ok2,style.skin_color = packet:resume_table("uint8", "uint8", "uint8")
-		if not ok1 or not ok2 then return end
-		ok1,style.spawn_point = packet:resume("string")
-		if not ok1 then return end
-		return {style}
+		return {char}
 	end,
 	client_to_server_handle = function(self, client, char)
 		-- Make sure the client has been authenticated.
