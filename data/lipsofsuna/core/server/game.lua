@@ -21,11 +21,10 @@ local Game = Class("Game")
 
 --- Creates a new game.
 -- @param clss Game class.
--- @param mode Game mode, "benchmark"/"editor"/"host"/"join"/"server".
--- @param save Save file name, or nil when not using local I/O.
--- @param port Server port number, or nil if not hosting.
+-- @param mode Game mode.
+-- @param save Save file name. Nil to not use local I/O.
 -- @return Game.
-Game.new = function(clss, mode, save, port)
+Game.new = function(clss, mode, save)
 	local self = Class.new(clss)
 	self.mode = mode
 	-- Initialize settings.

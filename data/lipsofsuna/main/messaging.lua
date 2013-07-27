@@ -51,7 +51,7 @@ Messaging.client_event = function(self, type, ...)
 		handler.client_to_server_handle(self, -1, ...)
 	else
 		if not self.networking then
-			error("tried to send remote event without remote server")
+			error("tried to send remote event without connection to a remote server")
 		end
 		local args = handler.client_to_server_encode(self, ...)
 		if not args then return end
@@ -127,7 +127,7 @@ Messaging.server_event = function(self, type, client, ...)
 		handler.server_to_client_handle(self, ...)
 	else
 		if not self.networking then
-			error("tried to send remote event without remote server")
+			error("tried to send remote event without hosting a networked server")
 		end
 		local args = handler.server_to_client_encode(self, ...)
 		if not args then return end
@@ -147,7 +147,7 @@ Messaging.server_event_broadcast = function(self, type, ...)
 	if self.local_client then
 		self:server_event(type, -1, ...)
 	end
-	if self.multiplayer then
+	if self.networking then
 		for k,v in pairs(Network:get_clients()) do
 			self:server_event(type, v, ...)
 		end
@@ -205,10 +205,10 @@ Messaging.set_transmit_mode = function(self, local_server, local_client, port)
 	self.local_server = local_server
 	self.local_client = local_client
 	if port then
-		self.multiplayer = true
+		self.networking = true
 		Network:host{port = port}
 	else
-		self.multiplayer = false
+		self.networking = false
 		Network:shutdown()
 	end
 end

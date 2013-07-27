@@ -1,19 +1,25 @@
 local Game = require("core/server/game")
 
 Main.game_modes:register("Server", function()
-	Main.game = Game("server", Main.settings.file, Main.settings.port)
+	-- Start the game.
+	Main.game = Game("server", Main.settings.file)
 	if not Main.game:start() then
 		print("ERROR: Unsupported save file.")
 		Main.game = nil
 		return
 	end
+	-- Initialize the server.
 	Server:init(true)
+	Program:set_sleep(1/60)
+	-- Initialize networking.
+	local port = Main.settings.port or Server.config.server_port
+	Main.messaging:set_transmit_mode(true, true, port)
+	-- Load the save file.
 	if Main.settings.generate then
 		Game:save(true)
 	else
 		Game:load()
 	end
-	Program:set_sleep(1/60)
 end)
 
 Main.main_start_hooks:register(5, function(secs)

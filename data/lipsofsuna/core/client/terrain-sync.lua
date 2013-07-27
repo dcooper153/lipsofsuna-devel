@@ -1,4 +1,4 @@
---- TODO:doc
+--- Synchronizes terrain with the server.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -11,7 +11,7 @@
 local Class = require("system/class")
 local Sector = require("system/sector")
 
---- TODO:doc
+--- Synchronizes terrain with the server.
 -- @type TerrainSync
 local TerrainSync = Class("TerrainSync")
 
@@ -20,33 +20,33 @@ local TerrainSync = Class("TerrainSync")
 -- @return Terrain synchronizer.
 TerrainSync.new = function(clss)
 	local self = Class.new(clss)
-	self.blocks_by_id = {}
+	self.__chunks = {}
 	return self
 end
 
 --- Clears all memorized blocks.
 -- @param self Terrain synchronizer.
 TerrainSync.clear = function(self)
-	self.blocks_by_id = {}
+	self.__chunks = {}
 end
 
---- Memorized terrain for the given block.
+--- Memorizes the terrain for the given chunk.
 -- @param self Terrain synchronizer.
--- @param x Block offset.
--- @param y Block offset.
--- @param z Block offset.
--- @param data Block data.
-TerrainSync.add_block = function(self, x, y, z, data)
-	local block = Sector:get_block_id_by_block_offset(x, y, z)
-	self.blocks_by_id[block] = data
-	Voxel:set_block(x, y, z, data)
+-- @param x Chunk offset in grid units.
+-- @param z Chunk offset in grid units.
+-- @param data Chunk data.
+TerrainSync.add_chunk = function(self, x, z, data)
+	local id = Main.terrain:get_chunk_id_by_xz(x, z)
+	Sector.__chunks[id] = data
+	--Voxel:set_block(x, y, z, data)
 end
 
---- Loads memorized blocks for the given sector.
+--- Loads a memorized chunk.
 -- @param self Terrain synchronizer.
 -- @param id Sector ID.
-TerrainSync.load_sector = function(self, id)
+TerrainSync.load_chunk = function(self, x, z)
 	if Main.game.mode ~= "join" then return end
+--[[
 	for x,y,z in Voxel:get_blocks_by_sector_id(id) do
 		local block = Sector:get_block_id_by_block_offset(x, y, z)
 		local packet = self.blocks_by_id[block]
@@ -54,9 +54,7 @@ TerrainSync.load_sector = function(self, id)
 			packet:read("uint32", "uint32", "uint32")
 			Voxel:set_block(x, y, z, packet)
 		end
-	end
+	end--]]
 end
 
 return TerrainSync
-
-

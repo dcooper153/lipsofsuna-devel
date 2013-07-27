@@ -57,10 +57,6 @@ SectorManager.load_sector = function(self, sector)
 		self.loaders[sector] = SectorLoader(self, sector)
 		self.loaders_iterator = nil
 	end
-	-- Handle client side terrain swapping.
-	if Main.game.mode == "join" then
-		Client.terrain_sync:load_sector(sector)
-	end
 end
 
 --- Increases the timestamp of the sectors inside the given sphere.
