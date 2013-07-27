@@ -45,13 +45,6 @@ struct _LIExtCamera
 	} config;
 	struct
 	{
-		float move_rate;
-		float tilt_rate;
-		float turn_rate;
-		float zoom_rate;
-	} controls;
-	struct
-	{
 		float pos;
 		float rot;
 		float timer;

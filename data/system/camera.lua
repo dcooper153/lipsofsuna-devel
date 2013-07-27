@@ -34,11 +34,9 @@ end
 
 --- Moves the camera forward or backward.
 -- @param self Camera.
--- @param args Arguments.<ul>
---   <li>rate: Movement rate.</li>
---   <li>keep: True if should keep moving.</li></ul>
-Camera.move = function(self, args)
-	Los.camera_move(self.handle, args)
+-- @param rate Movement rate.
+Camera.move = function(self, rate)
+	Los.camera_move(self.handle, rate)
 end
 
 --- Creates a picking ray for the current camera configuration.
@@ -61,20 +59,16 @@ end
 
 --- Sets the tilting rate of the camera.
 -- @param self Camera.
--- @param args Arguments.<ul>
---   <li>rate: Tilting rate.</li>
---   <li>keep: True if should keep tilting.</li></ul>
-Camera.tilt = function(self, args)
-	Los.camera_tilt(self.handle, args)
+-- @param rate Tilting rate.
+Camera.tilt = function(self, rate)
+	Los.camera_tilt(self.handle, rate)
 end
 
 --- Sets the turning rate of the camera.
 -- @param self Camera.
--- @param args Arguments.<ul>
---   <li>rate: Turning rate.</li>
---   <li>keep: True if should keep turning.</li></ul>
-Camera.turn = function(self, args)
-	Los.camera_turn(self.handle, args)
+-- @param rate Turning rate.
+Camera.turn = function(self, rate)
+	Los.camera_turn(self.handle, rate)
 end
 
 --- Warps the camera to the target point.
@@ -86,19 +80,16 @@ end
 --- Animates the camera.
 --
 -- @param self Camera.
--- @param args Arguments.<ul>
---   <li>1,secs: Tick length.</li></ul>
-Camera.update = function(self, args)
-	Los.camera_update(self.handle, args)
+-- @param secs Tick length.
+Camera.update = function(self, secs)
+	Los.camera_update(self.handle, secs)
 end
 
 --- Adjusts the zoom of the camera.
 -- @param self Camera.
--- @param args Arguments.<ul>
---   <li>rate: Zooming rate.</li>
---   <li>keep: True if should keep zooming.</li></ul>
-Camera.zoom = function(self, args)
-	Los.camera_zoom(self.handle, args)
+-- @param rate Zooming rate.
+Camera.zoom = function(self, rate)
+	Los.camera_zoom(self.handle, rate)
 end
 
 --- Gets the collision group of the camera.
@@ -140,7 +131,7 @@ end
 -- @param self Camera.
 -- @param v Number.
 Camera.set_far = function(self, v)
-	rawset(self, "__far", v)
+	self.__far = v
 	Los.camera_set_far(self.handle, v)
 end
 

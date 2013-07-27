@@ -60,19 +60,10 @@ static void Camera_new (LIScrArgs* args)
 
 static void Camera_move (LIScrArgs* args)
 {
-	int keep = 0;
 	float value;
-	LIExtCamera* camera;
 
-	if (liscr_args_gets_float (args, "rate", &value))
-	{
-		camera = args->self;
-		liscr_args_gets_bool (args, "keep", &keep);
-		if (keep)
-			camera->controls.move_rate = value;
-		else
-			liext_camera_move (camera, -value);
-	}
+	if (liscr_args_geti_float (args, 0, &value))
+		liext_camera_move (args->self, -value);
 }
 
 static void Camera_picking_ray (LIScrArgs* args)
@@ -126,38 +117,18 @@ static void Camera_reset (LIScrArgs* args)
 
 static void Camera_tilt (LIScrArgs* args)
 {
-	int keep = 0;
 	float value;
-	LIExtCamera* camera;
 
-	if (liscr_args_gets_float (args, "rate", &value))
-	{
-		value *= M_PI / 180.0f;
-		camera = args->self;
-		liscr_args_gets_bool (args, "keep", &keep);
-		if (keep)
-			camera->controls.tilt_rate = value;
-		else
-			liext_camera_tilt (camera, -value);
-	}
+	if (liscr_args_geti_float (args, 0, &value))
+		liext_camera_tilt (args->self, -value * M_PI / 180.0f);
 }
 
 static void Camera_turn (LIScrArgs* args)
 {
-	int keep = 0;
 	float value;
-	LIExtCamera* camera;
 
-	if (liscr_args_gets_float (args, "rate", &value))
-	{
-		value *= M_PI / 180.0f;
-		camera = args->self;
-		liscr_args_gets_bool (args, "keep", &keep);
-		if (keep)
-			camera->controls.turn_rate = value;
-		else
-			liext_camera_turn (camera, value);
-	}
+	if (liscr_args_geti_float (args, 0, &value))
+		liext_camera_turn (args->self, value * M_PI / 180.0f);
 }
 
 static void Camera_warp (LIScrArgs* args)
@@ -175,19 +146,10 @@ static void Camera_update (LIScrArgs* args)
 
 static void Camera_zoom (LIScrArgs* args)
 {
-	int keep = 0;
 	float value;
-	LIExtCamera* camera;
 
-	if (liscr_args_gets_float (args, "rate", &value))
-	{
-		camera = args->self;
-		liscr_args_gets_bool (args, "keep", &keep);
-		if (keep)
-			camera->controls.zoom_rate = value;
-		else
-			liext_camera_zoom (camera, value);
-	}
+	if (liscr_args_geti_float (args, 0, &value))
+		liext_camera_zoom (args->self, value);
 }
 
 static void Camera_get_collision_group (LIScrArgs* args)

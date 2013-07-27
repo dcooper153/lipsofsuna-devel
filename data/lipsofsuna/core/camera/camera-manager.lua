@@ -126,7 +126,7 @@ end
 -- @param amount Zooming amount.
 CameraManager.zoom = function(self, amount)
 	if self.camera.zoom then
-		self.camera:zoom{rate = -amount}
+		self.camera:zoom(-amount)
 	end
 end
 
