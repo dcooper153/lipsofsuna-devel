@@ -16,12 +16,13 @@
 	],
 	"scripts":
 	[
+		"main",
 		"message-disenchant",
 		"message-enchant"
 	],
 	"client_scripts":
 	[
-		"main"
+		"main-client"
 	],
 	"specs":
 	[
