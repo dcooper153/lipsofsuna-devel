@@ -1,9 +1,8 @@
-local Combat = require("core/server/combat")
 local Damage = require("arena/damage")
 local Physics = require("system/physics")
 
 Actionspec{
-	name = "bite",
+	name = "left claw",
 	categories = { ["melee"] = true },
 	start = function(action)
 		-- Initialize timing.
@@ -11,7 +10,7 @@ Actionspec{
 		action.delay = action.object.spec.timing_attack_melee * 0.02
 		-- Play the start effect.
 		Main.vision:object_effect(action.object, "swing1")
-		action.object:animate("attack bite", true)
+		action.object:animate("attack left claw", true)
 		-- Enable effect-over-time updates.
 		return true
 	end,

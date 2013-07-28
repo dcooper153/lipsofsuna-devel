@@ -14,9 +14,11 @@
 		"action-attack",
 		"action-bite",
 		"action-block",
+		"action-left-claw",
 		"action-melee",
 		"action-ranged",
 		"action-ranged-spell",
+		"action-right-claw",
 		"action-self-spell",
 		"action-throw",
 		"action-touch-spell"
