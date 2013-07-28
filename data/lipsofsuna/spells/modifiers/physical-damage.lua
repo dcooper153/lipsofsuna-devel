@@ -12,11 +12,10 @@ local PhysicalDamageModifier = ModifierSpec{
 	actions =
 	{
 		["bite"] = true,
-		["dragon bite"] = true,
 		["explode"] = true,
 		["left claw"] = true,
+		["melee"] = true,
 		["ranged"] = true,
-		["right hand"] = true,
 		["right claw"] = true,
 		["tackle"] = true
 	},
