@@ -72,6 +72,8 @@ end
 -- @param self Crafting.
 -- @param secs Seconds since the last update.
 Crafting.update = function(self, secs)
+	-- Update terrain.
+	self.terrain:refresh_chunks_by_point(Vector(500, 0, 500), 20)
 	-- Initialize the player.
 	if not self.player then
 		self.player = Player(Main.objects)
@@ -109,13 +111,10 @@ Crafting.update = function(self, secs)
 
 		local chest = Item(Main.objects)
 		chest:set_spec(Itemspec:find_by_name("crafting chest"))
-		chest:set_position(Vector(505,100.1,510))
+		chest:set_position(Vector(505,105.1,510))
 		chest:set_visible(true)
+		chest:randomize()
 	end
-	-- Update lighting.
-	Client.lighting:update(secs)
-	-- Update terrain.
-	self.terrain:refresh_chunks_by_point(Vector(500, 0, 500), 20)
 end
 
 return Crafting
