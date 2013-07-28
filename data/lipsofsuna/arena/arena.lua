@@ -36,9 +36,9 @@ Arena.new = function(clss)
 	Main.game.sectors.unload_time = nil
 	ServerUtils:set_player_spawn_point(Vector(500,101,500))
 	-- Initialize the terrain.
-	self.terrain = TerrainManager(12, 1, nil, false, true, true)
-	self.terrain:set_view_center(Vector(500, 0, 500))
-	self.terrain.generate_hooks:register(0, function(self)
+	Main.terrain:set_view_center(Vector(500, 0, 500))
+	Main.terrain:set_enable_generation(true)
+	Main.terrain.generate_hooks:register(0, function(self)
 		local w = self.manager.chunk_size
 		local t = self.manager.terrain
 		for z = 0,w-1 do
@@ -53,7 +53,6 @@ Arena.new = function(clss)
 		end
 		return Hooks.STOP
 	end)
-	Main.terrain = self.terrain --FIXME
 	-- Enable the simulation.
 	Physics:set_enable_simulation(true)
 	return self
@@ -62,8 +61,6 @@ end
 --- Closes the subgame.
 -- @param self Arena.
 Arena.close = function(self)
-	Main.terrain:unload_all()
-	Main.terrain = nil
 	Physics:set_enable_simulation(false)
 	ServerUtils:set_player_spawn_point()
 end
@@ -72,6 +69,8 @@ end
 -- @param self Arena.
 -- @param secs Seconds since the last update.
 Arena.update = function(self, secs)
+	-- Update terrain.
+	Main.terrain:refresh_chunks_by_point(Vector(500, 0, 500), 20)
 	-- Initialize the player.
 	if not self.player then
 		self.player = Player(Main.objects)
@@ -95,7 +94,7 @@ Arena.update = function(self, secs)
 
 		local chest = Item(Main.objects)
 		chest:set_spec(Itemspec:find_by_name("arena chest"))
-		chest:set_position(Vector(500,100.1,505))
+		chest:set_position(Vector(500,105.1,505))
 		chest:randomize()
 		chest:set_visible(true)
 
@@ -107,10 +106,6 @@ Arena.update = function(self, secs)
 		-- Unlock everything.
 		Main.unlocks:unlock_all()
 	end
-	-- Update lighting.
-	Client.lighting:update(secs)
-	-- Update terrain.
-	self.terrain:refresh_chunks_by_point(Vector(500, 0, 500), 20)
 end
 
 return Arena
