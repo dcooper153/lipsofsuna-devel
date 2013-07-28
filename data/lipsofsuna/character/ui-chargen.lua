@@ -52,10 +52,6 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "chargen",
-	widget = function() return Widgets.Uitransition("Start point", "chargen/spawnpoint") end}
-
-Ui:add_widget{
-	state = "chargen",
 	widget = function() return Widgets.Uibutton("Create", function()
 			Client.chargen:apply()
 		end)
@@ -400,37 +396,6 @@ Ui:add_state{
 			end)
 			widget.profile = v[2]
 			if Client.chargen:get_animation_profile() == widget.style then
-				widget.value = true
-			end
-			table.insert(widgets, widget)
-		end
-		return widgets
-	end,
-	input_post = chargen_input,
-	update = chargen_update}
-
-------------------------------------------------------------------------------
-
-Ui:add_state{
-	state = "chargen/spawnpoint",
-	label = "Select start point",
-	init = function()
-		-- Get the spawn point list.
-		local spawnpoints = {}
-		for k,v in ipairs(Patternspec:find_spawn_points()) do
-			table.insert(spawnpoints, v.name)
-		end
-		table.sort(spawnpoints, function(a,b) return a < b end)
-		table.insert(spawnpoints, 1, "Home")
-		-- Create the widgets.
-		local current = Client.chargen:get_spawn_point()
-		local widgets = {}
-		for k,v in ipairs(spawnpoints) do
-			local widget = Widgets.Uiradio(v, "spawn", function(w)
-				Client.chargen:set_spawn_point(w.spawnpoint)
-			end)
-			widget.spawnpoint = v
-			if widget.spawnpoint == current then
 				widget.value = true
 			end
 			table.insert(widgets, widget)
