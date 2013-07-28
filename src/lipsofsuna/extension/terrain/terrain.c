@@ -708,6 +708,24 @@ int liext_terrain_set_column_data (
 }
 
 /**
+ * \brief Gets the estimate of how much memory the terrain uses.
+ * \param self Terrain.
+ * \return Memory consumption in bytes.
+ */
+int liext_terrain_get_memory_used (
+	const LIExtTerrain* self)
+{
+	int total;
+	LIAlgU32dicIter iter;
+
+	total = sizeof (*self);
+	LIALG_U32DIC_FOREACH (iter, self->chunks)
+		total += liext_terrain_chunk_get_memory_used (iter.value);
+
+	return total;
+}
+
+/**
  * \brief Get the nearest chunk to the given grid point whose model is out of date.
  * \param self Terrain.
  * \param grid_x X coordinate in grid units.

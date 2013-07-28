@@ -467,5 +467,25 @@ int liext_terrain_chunk_set_data (
 	return 1;
 }
 
+/**
+ * \brief Gets the estimate of how much memory the chunk uses.
+ * \param self Terrain chunk.
+ * \return Memory consumption in bytes.
+ */
+int liext_terrain_chunk_get_memory_used (
+	const LIExtTerrainChunk* self)
+{
+	int i;
+	int total;
+
+	total = sizeof (*self);
+	for (i = 0 ; i < self->size * self->size ; i++)
+		total += liext_terrain_column_get_memory_used (self->columns + i);
+	if (self->model)
+		total += limdl_model_get_memory (self->model);
+
+	return total;
+}
+
 /** @} */
 /** @} */

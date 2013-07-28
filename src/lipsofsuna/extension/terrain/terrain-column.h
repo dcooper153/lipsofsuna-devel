@@ -102,4 +102,7 @@ LIAPICALL (int, liext_terrain_column_set_data, (
 	LIExtTerrainColumn* self,
 	LIArcReader*        reader));
 
+LIAPICALL (int, liext_terrain_column_get_memory_used, (
+	const LIExtTerrainColumn* self));
+
 #endif

@@ -1155,6 +1155,26 @@ int liext_terrain_column_set_data (
 	return 1;
 }
 
+/**
+ * \brief Gets the estimate of how much memory the chunk uses.
+ * \param self Terrain column.
+ * \return Memory consumption in bytes.
+ */
+int liext_terrain_column_get_memory_used (
+	const LIExtTerrainColumn* self)
+{
+	int total;
+	const LIExtTerrainStick* stick;
+
+	total = sizeof (*self);
+	for (stick = self->sticks ; stick != NULL ; stick = stick->next)
+		total += sizeof (*stick);
+	if (self->model)
+		total += limdl_model_get_memory (self->model);
+
+	return total;
+}
+
 /*****************************************************************************/
 
 static int private_find_closest_stick (

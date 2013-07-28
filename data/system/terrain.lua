@@ -425,6 +425,13 @@ Terrain.set_material_textures = function(self, index, top, bottom, side, decorat
 	return Los.terrain_set_material_textures(self.handle, index, top, bottom, side, decoration)
 end
 
+--- Gets the estimated memory consumption of the terrain.
+-- @param self Terrain.
+-- @return Memory consumption in bytes.
+Terrain.get_memory_used = function(self)
+	return Los.terrain_get_memory_used(self.handle)
+end
+
 --- Finds the nearest chunk whose model is out of date.
 -- @param self Terrain.
 -- @param x Grid X coordinate.

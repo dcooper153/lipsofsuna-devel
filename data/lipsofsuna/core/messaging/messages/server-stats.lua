@@ -104,7 +104,8 @@ Obstacles: %d+%d
 Others: %d+%d
 Vision: %d+%d
 Sectors: %d]],
-			Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024, Voxel:get_memory_used() / 1024,
+			Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024,
+			Main.terrain.terrain:get_memory_used() / 1024,
 			Main.timing:get_profiling_string(),
 			num_players_real, num_players_miss,
 			num_actors_real, num_actors_idle, num_actors_miss,

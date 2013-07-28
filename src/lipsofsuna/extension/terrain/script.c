@@ -831,6 +831,11 @@ static void Terrain_set_material_textures (LIScrArgs* args)
 	material->texture_decoration = decor;
 }
 
+static void Terrain_get_memory_used (LIScrArgs* args)
+{
+	liscr_args_seti_int (args, liext_terrain_get_memory_used (args->self));
+}
+
 static void Terrain_get_nearest_chunk_with_outdated_model (LIScrArgs* args)
 {
 	int grid_x;
@@ -883,6 +888,7 @@ void liext_script_terrain (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_material_decoration_type", Terrain_set_material_decoration_type);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_material_stick_type", Terrain_set_material_stick_type);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_material_textures", Terrain_set_material_textures);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_memory_used", Terrain_get_memory_used);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_nearest_chunk_with_outdated_model", Terrain_get_nearest_chunk_with_outdated_model);
 }
 

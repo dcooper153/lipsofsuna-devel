@@ -97,4 +97,7 @@ LIAPICALL (int, liext_terrain_chunk_set_data, (
 	LIExtTerrainChunk* self,
 	LIArcReader*       reader));
 
+LIAPICALL (int, liext_terrain_chunk_get_memory_used, (
+	const LIExtTerrainChunk* self));
+
 #endif

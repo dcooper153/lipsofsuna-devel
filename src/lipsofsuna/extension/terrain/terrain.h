@@ -145,6 +145,9 @@ LIAPICALL (int, liext_terrain_set_column_data, (
 	int           grid_z,
 	LIArcReader*  reader));
 
+LIAPICALL (int, liext_terrain_get_memory_used, (
+	const LIExtTerrain* self));
+
 LIAPICALL (int, liext_terrain_get_nearest_chunk_with_outdated_model, (
 	LIExtTerrain* self,
 	int           grid_x,
