@@ -565,6 +565,17 @@ LIExtTerrainChunk* liext_terrain_get_chunk (
 }
 
 /**
+ * \brief Gets the total number of loaded chunks.
+ * \param self Terrain.
+ * \return Chunk count.
+ */
+int liext_terrain_get_chunk_count (
+	const LIExtTerrain* self)
+{
+	return self->chunks->size;
+}
+
+/**
  * \brief Gets the serialized contents of the chunk.
  * \param self Terrain.
  * \param grid_x X coordinate in grid units.

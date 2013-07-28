@@ -506,6 +506,11 @@ static void Terrain_unload_chunk (LIScrArgs* args)
 	liscr_args_seti_bool (args, liext_terrain_unload_chunk (args->self, grid_x, grid_z));
 }
 
+static void Terrain_get_chunk_count (LIScrArgs* args)
+{
+	liscr_args_seti_int (args, liext_terrain_get_chunk_count (args->self));
+}
+
 static void Terrain_get_chunk_data (LIScrArgs* args)
 {
 	int grid_x;
@@ -878,6 +883,7 @@ void liext_script_terrain (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_load_chunk", Terrain_load_chunk);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_smoothen_column", Terrain_smoothen_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_unload_chunk", Terrain_unload_chunk);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_chunk_count", Terrain_get_chunk_count);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_chunk_data", Terrain_get_chunk_data);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_chunk_data", Terrain_set_chunk_data);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_chunk_time_stamp", Terrain_get_chunk_time_stamp);

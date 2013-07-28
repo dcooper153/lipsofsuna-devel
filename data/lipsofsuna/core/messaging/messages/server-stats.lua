@@ -93,6 +93,7 @@ Main.messaging:register_message{
 		local response = string.format([[FPS: %.2f
 Database memory: %d kB
 Script memory: %d kB
+Terrain chunks: %d
 Terrain memory: %d kB
 
 %s
@@ -105,7 +106,7 @@ Others: %d+%d
 Vision: %d+%d
 Sectors: %d]],
 			Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024,
-			Main.terrain.terrain:get_memory_used() / 1024,
+			Main.terrain.terrain:get_chunk_count(), Main.terrain.terrain:get_memory_used() / 1024,
 			Main.timing:get_profiling_string(),
 			num_players_real, num_players_miss,
 			num_actors_real, num_actors_idle, num_actors_miss,

@@ -116,6 +116,9 @@ LIAPICALL (LIExtTerrainChunk*, liext_terrain_get_chunk, (
 	int           grid_x,
 	int           grid_z));
 
+LIAPICALL (int, liext_terrain_get_chunk_count, (
+	const LIExtTerrain* self));
+
 LIAPICALL (int, liext_terrain_get_chunk_data, (
 	LIExtTerrain* self,
 	int           grid_x,

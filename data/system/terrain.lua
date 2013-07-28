@@ -304,6 +304,13 @@ Terrain.unload_chunk = function(self, x, z)
 	return Los.terrain_unload_chunk(self.handle, x, z)
 end
 
+--- Gets the number of loaded chunks.
+-- @param self Terrain.
+-- @return Number of loaded chunks.
+Terrain.get_chunk_count = function(self)
+	return Los.terrain_get_chunk_count(self.handle)
+end
+
 --- Writes the contents of the chunk to a packet.
 -- @param self Terrain.
 -- @param x Grid X coordinate.
