@@ -553,6 +553,27 @@ static void Terrain_set_chunk_data (LIScrArgs* args)
 		liscr_args_seti_bool (args, liext_terrain_set_chunk_data (args->self, grid_x, grid_z, packet->reader));
 }
 
+static void Terrain_get_chunk_time_stamp (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	LIExtTerrainChunk* chunk;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_int (args, 0, &grid_x) || grid_x < 0)
+		return;
+	if (!liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
+		return;
+
+	/* Get the chunk. */
+	chunk = liext_terrain_get_chunk (args->self, grid_x, grid_z);
+	if (chunk == NULL)
+		return;
+
+	/* Return the time stamp. */
+	liscr_args_seti_int (args, chunk->stamp);
+}
+
 static void Terrain_get_column (LIScrArgs* args)
 {
 	int i;
@@ -854,6 +875,7 @@ void liext_script_terrain (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_unload_chunk", Terrain_unload_chunk);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_chunk_data", Terrain_get_chunk_data);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_chunk_data", Terrain_set_chunk_data);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_chunk_time_stamp", Terrain_get_chunk_time_stamp);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_column", Terrain_get_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_column", Terrain_set_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_column_data", Terrain_get_column_data);

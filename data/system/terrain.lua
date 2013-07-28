@@ -324,6 +324,40 @@ Terrain.set_chunk_data = function(self, x, z, packet)
 	return Los.terrain_set_chunk_data(self.handle, x, z, packet.handle)
 end
 
+--- Gets the time stamp of the chunk.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @return Time stamp on success. Nil if the chunk is not loaded.
+Terrain.get_chunk_time_stamp = function(self, x, z)
+	return Los.terrain_get_chunk_time_stamp(self.handle, x, z)
+end
+
+--- Returns an iterator for chunks in the given circle.
+-- @param self Terrain.
+-- @param point Point in world units.
+-- @param radius Radius in world units.
+-- @return Iterator.
+Terrain.get_chunks_in_circle = function(self, point, radius)
+	return coroutine.wrap(function()
+		local c = 1 / self.grid_size / self.chunk_size
+		local p = Vector(point.x * c, 0, point.z * c)
+		local r = radius * c
+		local x0 = math.floor(p.x - r)
+		local x1 = math.floor(p.x + r)
+		local z0 = math.floor(p.z - r)
+		local z1 = math.floor(p.z + r)
+		for z = z0,z1 do
+			for x = x0,x1 do
+				local gx = x * self.chunk_size
+				local gz = z * self.chunk_size
+				local ts = self:get_chunk_time_stamp(gx, gz)
+				coroutine.yield(gx, gz, ts)
+			end
+		end
+	end)
+end
+
 --- Writes the contents of the column to a table.
 -- @param self Terrain.
 -- @param x Grid X coordinate.
@@ -404,6 +438,7 @@ end
 -- @param self Terrain.
 -- @param point Point in world units.
 -- @param radius Radius in world units.
+-- @return Iterator.
 Terrain.get_sticks_in_sphere = function(self, point, radius)
 	return coroutine.wrap(function()
 		local t = 0.5 * radius
