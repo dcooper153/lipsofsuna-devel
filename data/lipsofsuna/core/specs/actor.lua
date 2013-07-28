@@ -34,7 +34,7 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "ai_offense_factor", type = "number", default = 0.75, description = "How much the actor prefers offense over defense, in the range of [0,1]."},
 	{name = "ai_search_time", type = "number", default = 20, description = "Time in seconds how long the AI will search for hidden foes."},
 	{name = "ai_type", type = "string", description = "Name of the AI type to use."},
-	{name = "ai_update_delay", type = "number", default = 2, description = "Number of seconds between AI state updates."},
+	{name = "ai_update_delay", type = "number", default = 0.5, description = "Number of seconds between AI state updates."},
 	{name = "ai_wait_allowed", type = "boolean", default = true, description = "False to prohibit waiting."},
 	{name = "ai_wander_time", type = "number", default = 60, description = "Time in seconds how long the AI will wander before going to sleep."},
 	{name = "aim_ray_center", type = "vector", default = Vector(0,1), description = "Center vector of the aim ray."},

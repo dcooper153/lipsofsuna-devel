@@ -3,7 +3,7 @@ Aiactionspec{
 	categories = {["combat"] = true, ["offensive"] = true},
 	calculate = function(self, args)
 		if not args.allow_forward and not args.allow_forward_jump then return end
-		if args.dist < args.hint then return end
+		if args.dist < 0.5 * args.hint then return end
 		return 1
 	end,
 	perform = function(self, args)

@@ -257,15 +257,16 @@ NpcAi.set_state = function(self, args)
 	if not self.state_timer or s ~= self.state then
 		self.state_timer = 0
 	end
+	local prev = self.state
+	if s == prev then return end
 	-- Leave the previous state.
-	if self.state and self.state ~= s then
-		local state = Aistatespec:find_by_name(self.state)
+	if prev then
+		local state = Aistatespec:find_by_name(prev)
 		if state and state.leave then
 			state.leave(self)
 		end
 	end
 	-- Reset the controls.
-	local prev = self.state
 	self.state = s
 	self.target = args.target
 	self.ai_timer = math.random()

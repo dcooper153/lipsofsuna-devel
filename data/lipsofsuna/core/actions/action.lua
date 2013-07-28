@@ -31,7 +31,7 @@ end
 -- @param self Action.
 -- @return Range in world units.
 Action.get_range = function(self)
-	if not self.spec.get_range then return self.object.spec.aim_ray_end * 0.7 end
+	if not self.spec.get_range then return self.object.spec.aim_ray_end * 0.9 end
 	return self.spec.get_range(self)
 end
 
