@@ -1,5 +1,5 @@
 local Damage = require("arena/damage")
-local ProjectileController = require("core/server/projectile-controller")
+local ProjectileController = require("arena/projectile-controller")
 
 Actionspec{
 	name = "ranged",

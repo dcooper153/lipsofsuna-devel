@@ -1,17 +1,17 @@
---- TODO:doc
+--- Provides boomerange movement to objects.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.server.boomerang_controller
+-- @module arena.boomerang_controller
 -- @alias BoomerangController
 
 local Class = require("system/class")
 local Combat = require("core/server/combat")
 
---- TODO:doc
+--- Provides boomerange movement to objects.
 -- @type BoomerangController
 local BoomerangController = Class("BoomerangController")
 

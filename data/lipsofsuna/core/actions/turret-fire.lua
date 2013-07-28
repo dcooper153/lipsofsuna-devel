@@ -1,5 +1,5 @@
 local Combat = require("core/server/combat")
-local ProjectileController = require("core/server/projectile-controller")
+local ProjectileController = require("arena/projectile-controller")
 
 local perform_attack = function(attacker)
 	-- Split the ammo.

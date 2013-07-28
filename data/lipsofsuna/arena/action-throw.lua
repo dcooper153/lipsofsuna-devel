@@ -1,6 +1,6 @@
-local BoomerangController = require("core/server/boomerang-controller")
+local BoomerangController = require("arena/boomerang-controller")
 local Combat = require("core/server/combat")
-local ProjectileController = require("core/server/projectile-controller")
+local ProjectileController = require("arena/projectile-controller")
 
 Actionspec{
 	name = "throw",

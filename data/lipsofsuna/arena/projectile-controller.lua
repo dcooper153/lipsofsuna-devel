@@ -5,7 +5,7 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.server.projectile_controller
+-- @module arena.projectile_controller
 -- @alias ProjectileController
 
 local Class = require("system/class")
