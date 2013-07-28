@@ -32,10 +32,6 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "chargen",
-	widget = function() return Widgets.Uitransition("Race", "chargen/race") end}
-
-Ui:add_widget{
-	state = "chargen",
 	widget = function() return Widgets.Uitransition("Preset", "chargen/presets") end}
 
 Ui:add_widget{
@@ -68,30 +64,6 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "chargen",
 	widget = function() return Widgets.Uitransition("Quit", "quit") end}
-
-------------------------------------------------------------------------------
-
-Ui:add_state{
-	state = "chargen/race",
-	label = "Select race",
-	init = function()
-		-- Create the race radio buttons.
-		local widgets = {}
-		local races = Client.chargen:get_races()
-		for k,v in ipairs(races) do
-			local widget = Widgets.Uiradio(v[1], "race", function(w)
-				Client.chargen:set_race(w.race)
-			end)
-			widget.race = v[2]
-			if widget.race == Client.chargen:get_race() then
-				widget.value = true
-			end
-			table.insert(widgets, widget)
-		end
-		return widgets
-	end,
-	input_post = chargen_input,
-	update = chargen_update}
 
 ------------------------------------------------------------------------------
 

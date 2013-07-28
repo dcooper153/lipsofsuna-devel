@@ -34,13 +34,6 @@ Chargen.new = function(clss)
 	self.char = {}
 	self.data = {}
 	self.camera = ChargenCamera()
-	-- FIXME: Should not be here.
-	self.list_races = {
-		{"Aer", "aer"},
-		{"Android", "android"},
-		{"Devora", "devora"},
-		{"Kraken", "kraken"},
-		{"Wyrm", "wyrm"}}
 	return self
 end
 
@@ -169,8 +162,7 @@ end
 --
 -- @param self Chargen.
 Chargen.randomize = function(self)
-	local index = math.random(1, #self.list_races)
-	self:set_race(self.list_races[index][2])
+	self:set_race("aer")
 	self.data.update_needed = true
 end
 
@@ -555,16 +547,6 @@ Chargen.set_race = function(self, race)
 	local presets = self:get_presets()
 	local preset = presets[math.random(1,#presets)]
 	self:set_preset(preset)
-end
-
---- Gets the list of available races.
---
--- Context: The character creator must have been initialized.
---
--- @param self Chargen.
--- @return Indexed list of races.
-Chargen.get_races = function(self)
-	return self.list_races
 end
 
 --- Gets the skin style of the character.
