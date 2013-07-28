@@ -49,7 +49,9 @@ TerrainChunkLoader.execute = function(self, yield)
 		if rows and #rows ~= 0 then
 			self.manager.terrain:load_chunk(self.x, self.z)
 			for k,v in ipairs(rows) do
-				if self.manager.terrain:set_chunk_data(self.x, self.z, v[2]) then
+				local data = v[2]
+				data:read()
+				if self.manager.terrain:set_chunk_data(self.x, self.z, data) then
 					return
 				end
 			end

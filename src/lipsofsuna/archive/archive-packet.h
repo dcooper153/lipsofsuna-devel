@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -30,12 +30,12 @@ struct _LIArcPacket
 	LIArcWriter* writer;
 };
 
-LIAPICALL (LIArcPacket*, liarc_packet_new_copy, (
-	const LIArcPacket* packet));
-
 LIAPICALL (LIArcPacket*, liarc_packet_new_readable, (
 	const char* buffer,
 	int         length));
+
+LIAPICALL (LIArcPacket*, liarc_packet_new_readable_copy, (
+	const LIArcPacket* packet));
 
 LIAPICALL (LIArcPacket*, liarc_packet_new_writable, (
 	int type));

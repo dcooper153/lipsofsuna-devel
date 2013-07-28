@@ -521,13 +521,23 @@ Unittest:add(1, "system", "terrain: saving and loading", function()
 	t:add_stick(1, 1, 0, 40, 3)
 	t:add_stick(4, 4, 0, 40, 3)
 	t:add_stick(4, 4, 50, 4, 2)
-	-- Serialization.
-	local data = Packet(1)
-	assert(t:get_chunk_data(0, 0, data))
-	-- Deserialization.
-	assert(t:set_chunk_data(0, 0, data))
+	-- Serialization 1.
+	local writer = Packet(1)
+	assert(t:get_chunk_data(0, 0, writer))
+	-- Deserialization 1.
+	local reader = writer:copy_readable()
+	assert(t:set_chunk_data(0, 0, reader))
 	t:load_chunk(1, 1)
-	assert(t:set_chunk_data(1, 1, data))
+	reader:read()
+	assert(t:set_chunk_data(1, 1, reader))
+	-- Serialization 2.
+	local writer = Packet(1, "uint32", 0, "uint32", 0, "string", "some data")
+	assert(t:get_chunk_data(0, 0, writer))
+	-- Deserialization 2.
+	local reader = writer:copy_readable()
+	local ok,x,z,s = reader:read("uint32", "uint32", "string")
+	assert(ok)
+	assert(t:set_chunk_data(x, z, reader))
 end)
 
 Unittest:add(1, "system", "terrain: smooth normals", function()

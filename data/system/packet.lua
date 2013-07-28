@@ -40,6 +40,16 @@ Packet.new_from_handle = function(clss, handle)
 	return self
 end
 
+--- Creates a readable copy of the packet.
+-- @param self Packet.
+-- @return New packet.
+Packet.copy_readable = function(self)
+	local res = Class.new(self.class)
+	res.handle = Los.packet_copy_readable(self.handle)
+	res:read()
+	return res
+end
+
 --- Reads data starting from the beginning of the packet.
 -- @param self Packet.
 -- @param ... Types to read.

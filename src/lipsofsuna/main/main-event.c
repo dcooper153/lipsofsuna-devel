@@ -98,7 +98,7 @@ LIMaiEvent* limai_event_new (
 		else if (field->type == LIMAI_FIELD_PACKET)
 		{
 			pptr = va_arg (args, void*);
-			field->value_packet = liarc_packet_new_copy (pptr);
+			field->value_packet = liarc_packet_new_readable_copy (pptr);
 			if (field->value_packet == NULL)
 			{
 				limai_event_free (self);

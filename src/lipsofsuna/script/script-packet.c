@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -62,6 +62,26 @@ static void Packet_new (LIScrArgs* args)
 
 	/* Write content. */
 	private_write (data->data, args, 1);
+}
+
+static void Packet_copy_readable (LIScrArgs* args)
+{
+	LIArcPacket* self;
+	LIScrData* data;
+
+	/* Allocate the packet. */
+	self = liarc_packet_new_readable_copy (args->self);
+	if (self == NULL)
+		return;
+
+	/* Allocate the userdata. */
+	data = liscr_data_new (args->script, args->lua, self, LISCR_SCRIPT_PACKET, liarc_packet_free);
+	if (data == NULL)
+	{
+		liarc_packet_free (self);
+		return;
+	}
+	liscr_args_seti_stack (args);
 }
 
 static void Packet_read (LIScrArgs* args)
@@ -138,6 +158,7 @@ void liscr_script_packet (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PACKET, "packet_new", Packet_new);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_PACKET, "packet_copy_readable", Packet_copy_readable);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_PACKET, "packet_read", Packet_read);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_PACKET, "packet_resume", Packet_resume);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_PACKET, "packet_write", Packet_write);
