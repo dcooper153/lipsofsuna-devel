@@ -50,6 +50,7 @@ Chargen.init = function(self, standalone)
 	self.data.object:set_position(Vector(1, 1, 1))
 	self.data.object:randomize()
 	self.data.object:set_visible(true)
+	self.data.object.physics:set_physics("static")
 	self.data.object.render:init(self.data.object)
 	self.data.object.render:add_animation("idle")
 	self.camera.object = self.data.object
