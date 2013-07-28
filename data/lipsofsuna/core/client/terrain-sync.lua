@@ -9,7 +9,6 @@
 -- @alias TerrainSync
 
 local Class = require("system/class")
-local Sector = require("system/sector")
 
 --- Synchronizes terrain with the server.
 -- @type TerrainSync
@@ -37,24 +36,25 @@ end
 -- @param data Chunk data.
 TerrainSync.add_chunk = function(self, x, z, data)
 	local id = Main.terrain:get_chunk_id_by_xz(x, z)
-	Sector.__chunks[id] = data
-	--Voxel:set_block(x, y, z, data)
+	self.__chunks[id] = data
+	Main.terrain:reload_chunk(x, z)
 end
 
---- Loads a memorized chunk.
+--- Loads a memorized chunk.<br/>
+--
+-- This function is called when a chunk has been created by the client. At
+-- the time of being called, the memorized chunk list is up to date so we
+-- can just read the data from it and add it to the terrain.
+--
 -- @param self Terrain synchronizer.
--- @param id Sector ID.
+-- @param x Chunk offset in grid units.
+-- @param z Chunk offset in grid units.
 TerrainSync.load_chunk = function(self, x, z)
-	if Main.game.mode ~= "join" then return end
---[[
-	for x,y,z in Voxel:get_blocks_by_sector_id(id) do
-		local block = Sector:get_block_id_by_block_offset(x, y, z)
-		local packet = self.blocks_by_id[block]
-		if packet then
-			packet:read("uint32", "uint32", "uint32")
-			Voxel:set_block(x, y, z, packet)
-		end
-	end--]]
+	local id = Main.terrain:get_chunk_id_by_xz(x, z)
+	local data = self.__chunks[id]
+	if data then
+		Main.terrain.terrain:set_chunk_data(x, z, data)
+	end
 end
 
 return TerrainSync

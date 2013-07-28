@@ -31,7 +31,7 @@ Game.new = function(clss, mode, save)
 	self.enable_graphics = (mode ~= "server")
 	self.enable_prediction = (mode == "join")
 	self.enable_unloading = (mode ~= "editor" and mode ~= "benchmark")
-	self.enable_generation = (mode == "server" or mode == "host" or mode == "single")
+	self.enable_generation = (mode == "server" or mode == "host" or mode == "single" or mode == "join")
 	-- Initialize sectors.
 	if save then
 		self.database = Database("save" .. save .. ".sqlite")

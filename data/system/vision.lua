@@ -51,11 +51,6 @@ Vision.dispatch_event = function(clss, event, objects)
 		local vision = Vision.dict[event.vision]
 		if not vision then return end
 		vision:push_event(event)
-	elseif event.type == "vision-voxel-block-changed" then
-		-- Terrain changes.
-		local vision = Vision.dict[event.vision]
-		if not vision then return end
-		vision:push_event(event)
 	elseif event.object or event.id then
 		-- Object events.
 		if not event.object then
@@ -103,9 +98,6 @@ Vision.push_event = function(self, event)
 		if not event.object then return end
 		if not self.objects[event.object] then return end
 		self.objects[event.object] = nil
-		table.insert(self.events, event)
-	elseif event.type == "vision-voxel-block-changed" then
-		event.type = "voxel-block-changed"
 		table.insert(self.events, event)
 	else
 		if event.id then

@@ -24,7 +24,6 @@ end
 Eventhandler{type = "object-motion", func = handle_motion}
 Eventhandler{type = "vision-object-shown", func = handle_vision}
 Eventhandler{type = "vision-object-hidden", func = handle_vision}
-Eventhandler{type = "vision-voxel-block-changed", func = handle_vision}
 
 Eventhandler{type = "quit", func = function(self, args)
 	Program:set_quit(true)

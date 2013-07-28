@@ -89,7 +89,7 @@ TerrainManager.is_point_loaded = function(self, point)
 	return true
 end
 
---- Reads a chunk from the database.
+--- Loads a chunk.
 -- @param self TerrainManager.
 -- @param x X coordinate in grid units.
 -- @param z Z coordinate in grid units.
@@ -102,11 +102,8 @@ TerrainManager.load_chunk = function(self, x, z)
 	self.chunks[id] = TerrainChunk(self, x, z)
 	self.chunks_iterator = nil
 	-- Create a chunk loader.
-	if self.database or self.generate then
-		self.loaders[id] = TerrainChunkLoader(self, id, x, z)
-		self.loaders_iterator = nil
-	end
-	-- TODO: Handle client side terrain swapping.
+	self.loaders[id] = TerrainChunkLoader(self, id, x, z)
+	self.loaders_iterator = nil
 	return true
 end
 
@@ -151,6 +148,22 @@ end
 -- @param hook Hook.
 TerrainManager.register_generate_hook = function(self, priority, hook)
 	self.generate_hooks:register(priority, hook)
+end
+
+--- Loads or reloads a chunk.
+-- @param self TerrainManager.
+-- @param x X coordinate in grid units.
+-- @param z Z coordinate in grid units.
+TerrainManager.reload_chunk = function(self, x, z)
+	-- Create the chunk.
+	local id = self:get_chunk_id_by_xz(x, z)
+	if not self.chunks[id] then
+		self.chunks[id] = TerrainChunk(self, x, z)
+		self.chunks_iterator = nil
+	end
+	-- Create a chunk loader.
+	self.loaders[id] = TerrainChunkLoader(self, id, x, z)
+	self.loaders_iterator = nil
 end
 
 --- Saves a chunk to the database.

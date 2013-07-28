@@ -44,6 +44,7 @@ PlayerVision.update = function(self, secs)
 		Vision.update(self, self.__timer)
 		self.__timer = 0
 		self:__update_markers()
+		self:__update_terrain()
 	end
 end
 
@@ -66,6 +67,33 @@ PlayerVision.__update_markers = function(self)
 	for k,v in pairs(Main.markers.__dict_discoverable) do
 		if (pos - v.position).length < radius then
 			v:unlock()
+		end
+	end
+end
+
+--- Updates the terrain.
+-- @param self PlayerVision.
+PlayerVision.__update_terrain = function(self)
+	-- Check if terrain vision is needed.
+	if not Main.game.enable_generation then return end
+	local client = self.object.client
+	if client == -1 then return end
+	-- Get the nearby terrain chunks.
+	local pos = self.object:get_position()
+	local radius = self:get_radius()
+	local chunks = Main.terrain.terrain:get_chunks_in_circle(pos, radius)
+	-- Synchronize the outdated chunks.
+	local msgid = Main.messaging:get_event_id("update terrain")
+	for x,z,stamp1 in chunks do
+		if stamp1 then
+			local id = Main.terrain:get_chunk_id_by_xz(x, z)
+			local stamp0 = self.__terrain[id]
+			if not stamp0 or stamp0 ~= stamp1 then
+				local packet = Packet(msgid, "uint32", x, "uint32", z)
+				Main.terrain.terrain:get_chunk_data(x, z, packet)
+				Main.messaging:server_event("update terrain", client, packet)
+				self.__terrain[id] = stamp1
+			end
 		end
 	end
 end
@@ -171,15 +199,6 @@ PlayerVision.__callback = function(self, args)
 			-- The client doesn't need the item information of the unsubscribed
 			-- inventory anymore so we can clear the item.
 			Main.messaging:server_event("remove inventory item", client, id, args.index)
-		end,
-		["voxel-block-changed"] = function(args)
-			if client == -1 then return end
-			local id = Main.messaging:get_event_id("update terrain")
-			local x,y,z = Sector:get_block_offset_by_block_id(args.index)
-			local packet = Packet(id, "uint32", x, "uint32", y, "uint32", z)
-			-- FIXME
-			--Voxel:get_block(x, y, z, packet)
-			--Main.messaging:server_event("update terrain", client, packet)
 		end,
 		["world-effect"] = function(args)
 			Main.messaging:server_event("world effect", client, args.point, args.effect)

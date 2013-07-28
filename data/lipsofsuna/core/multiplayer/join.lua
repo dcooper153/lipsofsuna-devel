@@ -11,6 +11,7 @@
 local Class = require("system/class")
 local Client = require("core/client/client")
 local Game = require("core/server/game")
+local Hooks = require("system/hooks")
 local Network = require("system/network")
 local Sectors = require("system/sectors")
 local Ui = require("ui/ui")
@@ -43,10 +44,17 @@ Join.join_game = function(self, addr, port)
 	self.data.status = "Joining the server at " .. self.data.remote .. "..."
 	-- Clear the world.
 	Sectors:unload_all()
+	-- Initialize the game.
 	Main.game = Game("join", nil, self.data.port)
 	Main.game:start()
 	Main.messaging:set_transmit_mode(false, true, self.data.port)
 	Main.game_start_hooks:call()
+	-- Initialize terrain synchronization.
+	Main.terrain.unload_time = nil --FIXME
+	Main.terrain.generate_hooks:register(0, function(self)
+		Client.terrain_sync:load_chunk(self.x, self.z)
+		return Hooks.STOP
+	end)
 	-- Enter the connection state.
 	Ui:set_state("join/connect")
 end
