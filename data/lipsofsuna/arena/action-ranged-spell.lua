@@ -7,6 +7,7 @@ Actionspec{
 		["enchantment"] = true,
 		["ranged spell"] = true
 	},
+	description = "Cast a spell on a target far ahead.",
 	start = function(action, item)
 		if action.object.cooldown then return end
 		action.timer = 0

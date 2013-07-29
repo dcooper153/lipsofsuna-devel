@@ -10,6 +10,7 @@ Actionspec{
 		["enchantment"] = true,
 		["self spell"] = true
 	},
+	description = "Cast a spell on yourself.",
 	start = function(action, item)
 		if action.object.cooldown then return end
 		action.timer = 0

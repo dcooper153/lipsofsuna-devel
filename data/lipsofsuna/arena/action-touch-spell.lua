@@ -8,6 +8,7 @@ Actionspec{
 		["enchantment"] = true,
 		["touch spell"] = true
 	},
+	description = "Cast a spell on a target right in front of you.",
 	start = function(action, item)
 		if action.object.cooldown then return end
 		action.timer = 0
