@@ -175,7 +175,8 @@ Messaging.handle_packet = function(self, client, packet)
 		handler.client_to_server_handle(self, client, unpack(args))
 	else
 		if not self.local_client then
-			error("received unexpected client packet")
+			--error("received unexpected client packet")
+			return
 		end
 		local args = handler.server_to_client_decode(self, packet)
 		if not args then
