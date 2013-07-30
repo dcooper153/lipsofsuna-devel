@@ -14,7 +14,11 @@ Main.messaging:register_message{
 		return {message}
 	end,
 	server_to_client_handle = function(self, message)
-		Ui:set_state("start-game")
-		Client.data.connection.text = "Authentication failed: " .. message
-		Ui:restart_state()
+		if Ui:get_state() == "join/connect" then
+			Main.join:login_failed(message)
+		else
+			Ui:set_state("start-game")
+			Client.data.connection.text = "Authentication failed: " .. message
+			Ui:restart_state()
+		end
 	end}

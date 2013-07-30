@@ -31,6 +31,15 @@ Join.new = function(clss)
 	return self
 end
 
+--- Called when logging in has failed.
+-- @param self Join.
+-- @param message Error message.
+Join.login_failed = function(self, message)
+	self.data.status = "Login failed: " .. message
+	self.data.state = "failed"
+	Ui:restart_state()
+end
+
 --- Switches the game to the joining start state.
 -- @param self Join.
 -- @param addr Address.
