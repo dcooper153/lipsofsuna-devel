@@ -33,6 +33,16 @@ AccountManager.new = function(clss)
 	return self
 end
 
+--- Checks if the password matches that of the account.
+-- @param self AccountManager.
+-- @param account Account.
+-- @param password Password.
+-- @return True if matched. False otherwise.
+AccountManager.check_password = function(self, account, password)
+	local hash = self:hash_password(account.login, password)
+	return hash == account.password
+end
+
 --- Creates an empty account.
 -- @param self AccountManager.
 -- @param client Client.

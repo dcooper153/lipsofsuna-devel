@@ -11,14 +11,15 @@
 local Class = require("system/class")
 local Database = require("system/database")
 local DialogManager = require("core/dialog/dialog-manager")
-local GlobalEventManager = require(Mod.path .. "global-event-manager")
+local GlobalEventManager = require("core/server/global-event-manager")
+local Lobby = require("system/lobby")
 local Modifier = require("core/server/modifier")
 local ModifierSpec = require("core/specs/modifier")
 local Network = require("system/network")
-local ObjectDatabase = require(Mod.path .. "object-database")
+local ObjectDatabase = require("core/server/object-database")
 local Physics = require("system/physics")
-local ServerConfig = require(Mod.path .. "server-config")
-local Trading = require(Mod.path .. "trading")
+local ServerConfig = require("core/server/server-config")
+local Trading = require("core/server/trading")
 
 --- TODO:doc
 -- @type Server
@@ -67,11 +68,15 @@ Server.authenticate_client = function(self, client, login, pass)
 	local account = Main.accounts:get_account_by_client(client)
 	if account then return end
 	-- Make sure not logging in twice.
-	account = Main.accounts:get_account_by_login(login)
+	local account = Main.accounts:get_account_by_login(login)
 	if account then
-		Main.log:format("Client login from %q failed: account already in use.", self:get_client_address(client))
-		Main.messaging:server_event("login failed", client, "The account is already in use.")
-		return
+		if not Main.accounts:check_password(account, pass) then
+			Main.log:format("Client login from %q failed: %s.", self:get_client_address(client), message)
+			Main.messaging:server_event("login failed", client, "Invalid account name or password.")
+			return
+		end
+		Main.log:format("Kicking client %q: %q logged into the same account.", self:get_client_address(account.client), self:get_client_address(client))
+		self:kick_client(account.client)
 	end
 	-- Load or create an account.
 	local account,message = Main.accounts:load_account(client, login, pass)
@@ -108,6 +113,25 @@ Server.authenticate_client = function(self, client, login, pass)
 	end
 	-- Invoke login hooks.
 	Main.accounts.login_hooks:call(account)
+end
+
+Server.kick_client = function(self, client)
+	Network:disconnect(client)
+	self:remove_client(client)
+end
+
+Server.remove_client = function(self, client)
+	-- Detach the player object.
+	local object = self.players_by_client[client]
+	if object then
+		self.object_database:save_object(object)
+		object:detach()
+		self.players_by_client[client] = nil
+	end
+	-- Update the account.
+	Main.accounts:logout_client(client, object)
+	-- Update lobby.
+	Lobby:set_players(Lobby:get_players() - 1)
 end
 
 Server.send_game_state = function(self, player)

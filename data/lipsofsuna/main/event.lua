@@ -39,17 +39,7 @@ end}
 
 Eventhandler{type = "logout", func = function(self, event)
 	Main.log:text("Client disconnect.")
-	-- Detach the player object.
-	local object = Server.players_by_client[event.client]
-	if object then
-		Server.object_database:save_object(object)
-		object:detach()
-		Server.players_by_client[event.client] = nil
-	end
-	-- Update the account.
-	Main.accounts:logout_client(event.client, object)
-	-- Update lobby.
-	Lobby:set_players(Lobby:get_players() - 1)
+	Server:remove_client(event.client)
 end}
 
 Eventhandler{type = "object-contact", func = function(self, event)
