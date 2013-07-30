@@ -15,12 +15,12 @@ Main.game_modes:register("Server", function()
 	Program:set_sleep(1/60)
 	-- Initialize networking.
 	local port = Main.settings.port or Server.config.server_port
-	Main.messaging:set_transmit_mode(true, true, port)
+	Main.messaging:set_transmit_mode(true, false, port)
 	-- Load the save file.
 	if Main.settings.generate then
-		Game:save(true)
+		Main.game:save(true)
 	else
-		Game:load()
+		Main.game:load()
 	end
 end)
 

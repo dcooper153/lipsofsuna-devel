@@ -35,7 +35,6 @@ Server.init = function(self, multiplayer, client)
 	self.trading = Trading()
 	-- Initialize the object database.
 	self.object_database = ObjectDatabase(Main.game.database)
-	Main.database = self.database --FIXME
 	if Main.settings.generate then
 		self.object_database:reset()
 	end
