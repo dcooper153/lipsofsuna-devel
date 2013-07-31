@@ -4,20 +4,6 @@ local Ui = require("ui/ui")
 
 Client:register_init_hook(500, function()
 
-	Client.input:register_binding{name = "camera", mode = "press", key1 = Keysym.y, func = function()
-		if not Client.player_object then return end
-		if Client.camera_manager:get_camera_mode() == "first-person" then
-			Client.camera_manager:set_camera_mode("third-person")
-			if Client.player_object then
-				local e = Client.player_object:get_rotation().euler
-				e[3] = 0
-				Client.player_object:set_rotation(Quaternion{euler = e})
-			end
-		else
-			Client.camera_manager:set_camera_mode("first-person")
-		end
-	end}
-
 	Client.input:register_binding{name = "rotate_camera", mode = "toggle", key1 = Keysym.LCTRL, func = function(v)
 		if not Client.player_object then return end
 		Client.camera_manager:set_rotation_mode(v)
