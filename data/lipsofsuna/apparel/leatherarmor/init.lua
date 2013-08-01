@@ -63,10 +63,12 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {["armor"] = true},
 	equipment_models = {
-		["aer"] = {skirt = "aerskirt1", panties = "panties2"},
-		["kraken"] = {skirt = "aerskirt1"},
 		["aermale"] = {legs = "aermaleleatherlegs2"}},
-	equipment_slot = "lowerbody",
+	equipment_textures =
+	{
+		["aer"] = {["aer1"] = "aerspats1"}
+	},
+	equipment_slot = "pants",
 	mass = 5,
 	water_gravity = Vector(0,6,0)}
 
