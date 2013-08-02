@@ -275,6 +275,17 @@ Terrain.count_materials_in_sphere = function(self, point, radius, t)
 	return materials
 end
 
+--- Finds the nearest empty stick in the column.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @param y Reference Y offset.
+-- @param h Minimum stick height. Nil for zero.
+-- @return True on success.
+Terrain.find_nearest_empty_stick = function(self, x, z, y, h)
+	return Los.terrain_find_nearest_empty_stick(self.handle, x, z, y, h)
+end
+
 --- Loads a terrain chunk.
 -- @param self Terrain.
 -- @param x Grid X coordinate.

@@ -458,6 +458,30 @@ static void Terrain_count_column_materials (LIScrArgs* args)
 	}
 }
 
+static void Terrain_find_nearest_empty_stick (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	float y;
+	float min_height;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_int (args, 0, &grid_x) || grid_x < 0 ||
+	    !liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
+	{
+		liscr_args_seti_float (args, 1000000000.0f);
+		return;
+	}
+	if (!liscr_args_geti_float (args, 2, &y))
+		return;
+	if (!liscr_args_geti_float (args, 3, &min_height))
+		min_height = 0.0f;
+
+	/* Find the stick. */
+	y = liext_terrain_find_nearest_empty_stick (args->self, grid_x, grid_z, y, min_height);
+	liscr_args_seti_float (args, y);
+}
+
 static void Terrain_load_chunk (LIScrArgs* args)
 {
 	int grid_x;
@@ -880,6 +904,7 @@ void liext_script_terrain (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_clear_chunk_model", Terrain_clear_chunk_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_clear_column", Terrain_clear_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_count_column_materials", Terrain_count_column_materials);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_find_nearest_empty_stick", Terrain_find_nearest_empty_stick);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_load_chunk", Terrain_load_chunk);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_smoothen_column", Terrain_smoothen_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_unload_chunk", Terrain_unload_chunk);

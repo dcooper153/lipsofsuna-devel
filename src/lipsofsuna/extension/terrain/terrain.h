@@ -84,6 +84,13 @@ LIAPICALL (int, liext_terrain_clear_column, (
 	int           grid_x,
 	int           grid_z));
 
+LIAPICALL (float, liext_terrain_find_nearest_empty_stick, (
+	LIExtTerrain* self,
+	int           grid_x,
+	int           grid_z,
+	float         y,
+	float         min_height));
+
 LIAPICALL (int, liext_terrain_intersect_ray, (
 	LIExtTerrain*      self,
 	const LIMatVector* src,

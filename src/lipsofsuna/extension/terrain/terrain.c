@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -339,6 +339,40 @@ int liext_terrain_clear_column (
 	liext_terrain_chunk_clear_column (chunk, column_x, column_z);
 
 	return 1;
+}
+
+/**
+ * \brief Clears the stick at the given grid point.
+ * \param self Terrain.
+ * \param grid_x X coordinate in grid units.
+ * \param grid_z Z coordinate in grid units.
+ * \param y Y offset.
+ * \param min_height Minimum stick height.
+ * \return Y offset.
+ * \return Nonzero on success, zero if not loaded.
+ */
+float liext_terrain_find_nearest_empty_stick (
+	LIExtTerrain* self,
+	int           grid_x,
+	int           grid_z,
+	float         y,
+	float         min_height)
+{
+	int column_x;
+	int column_z;
+	LIExtTerrainChunkID id;
+	LIExtTerrainChunk* chunk;
+	LIExtTerrainColumn* column;
+
+	/* Get the chunk. */
+	id = private_get_chunk_id_and_column (self, grid_x, grid_z, &column_x, &column_z);
+	chunk = lialg_u32dic_find (self->chunks, id);
+	if (chunk == NULL)
+		return 1000000000.0f;
+
+	/* Find the stick. */
+	column = liext_terrain_chunk_get_column (chunk, column_x, column_z);
+	return liext_terrain_column_find_nearest_empty_stick (column, y, min_height);
 }
 
 /**

@@ -983,6 +983,54 @@ void liext_terrain_column_clear_model (
 }
 
 /**
+ * \brief Finds the stick nearest to the given Y offset.
+ * \param self Terrain column.
+ * \param y Y offset.
+ * \param min_height Minimum stick height.
+ * \return Y offset.
+ */
+float liext_terrain_column_find_nearest_empty_stick (
+	LIExtTerrainColumn* self,
+	float               y,
+	float               min_height)
+{
+	float dist;
+	float best_dist;
+	float best_y;
+	float curr_y;
+	LIExtTerrainStick* stick;
+
+	best_dist = 1000000000000000.0f;
+	best_y = 0.0f;
+	curr_y = 0.0f;
+
+	/* Try each stick. */
+	for (stick = self->sticks ; stick != NULL ; stick = stick->next)
+	{
+		if (!stick->material && stick->height >= min_height)
+		{
+			dist = LIMAT_ABS (curr_y - y);
+			if (dist < best_dist)
+			{
+				best_y = curr_y;
+				best_dist = dist;
+			}
+		}
+		curr_y += stick->height;
+	}
+
+	/* Try the remainder. */
+	dist = LIMAT_ABS (curr_y - y);
+	if (dist < best_dist)
+	{
+		best_y = curr_y;
+		best_dist = dist;
+	}
+
+	return best_y;
+}
+
+/**
  * \brief Smoothens the vertices of the four columns in the given Y range.
  * \param self Terrain column (0,0).
  * \param c10 Terrain column (1,0).

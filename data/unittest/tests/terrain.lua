@@ -421,6 +421,27 @@ Unittest:add(1, "system", "terrain: filtering", function()
 	assert(c[5][2] == 2)
 end)
 
+Unittest:add(1, "system", "terrain: find nearest empty stick", function()
+	local Terrain = require("system/terrain")
+	local t = Terrain(32, 0.5)
+	t:load_chunk(0, 0)
+	t:add_stick(0, 0, 10, 4, 1)
+	t:add_stick(0, 0, 20, 7, 1)
+	t:add_stick(0, 0, 30, 1, 1)
+	-- Initial gap.
+	local y = t:find_nearest_empty_stick(0, 0, 5, 10)
+	assert(y == 0)
+	-- Middle gap.
+	local y = t:find_nearest_empty_stick(0, 0, 20, 6)
+	assert(y == 14)
+	-- Too small gap.
+	local y = t:find_nearest_empty_stick(0, 0, 20, 7)
+	assert(y == 31)
+	-- Top gap.
+	local y = t:find_nearest_empty_stick(0, 0, 60, 7)
+	assert(y == 31)
+end)
+
 Unittest:add(1, "system", "terrain: hidden face culling", function()
 	local Terrain = require("system/terrain")
 	local t = Terrain(32, 0.5)
