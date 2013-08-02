@@ -49,7 +49,7 @@ GlobalEventManager.find_actor_spawn_point = function(self)
 	if not player.vision then return end
 	-- Check that there are not too many actors nearby.
 	local radius = player.vision:get_radius()
-	local objects = Main.objects:find_by_point(player:get_position(), radius * 2)
+	local objects = Main.objects:find_by_point(player:get_position(), radius)
 	local monsters = 0
 	for id,object in pairs(objects) do
 		if object.class == Actor then

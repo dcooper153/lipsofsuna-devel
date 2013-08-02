@@ -125,18 +125,16 @@ end
 --- Finds a spawn point suitable for actors.
 -- @param clss Utils class.
 -- @param point Point in world space.
+-- @param height Actor height. Nil for default.
 -- @return Point in world units, or nil.
-Utils.find_spawn_point = function(clss, point)
+Utils.find_spawn_point = function(clss, point, height)
 	-- Find the terrain surface.
-	-- FIXME: Only works when above surface.
-	local src = Vector(point.x, point.y + 10, point.z)
-	local dst = Vector(src.x, 0, src.z)
-	local p = Main.terrain.terrain:cast_ray(src, dst)
-	if not p then return end
-	-- Check that there's enough room above.
-	local p2 = Vector(p.x, p.y + 5, p.z)
-	if p2 and p2.y < p.y + 4 then return end
-	return p
+	local x = math.floor(point.x / Main.terrain.grid_size)
+	local z = math.floor(point.z / Main.terrain.grid_size)
+	local y = Main.terrain.terrain:find_nearest_empty_stick(x, z, point.y, height or 2)
+	-- Check that the point was valid.
+	if y == 0 or y > 10000 then return end
+	return Vector(point.x, y, point.z)
 end
 
 --- Finds spawns point suitable for actors.
