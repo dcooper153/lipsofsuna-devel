@@ -504,6 +504,33 @@ Unittest:add(1, "system", "terrain: hidden face culling", function()
 	t:add_stick(5, 5, 4, 1, 3)
 	local m = t:build_chunk_model(0, 0)
 	assert(m:get_vertex_count() == 20 * 6)
+	-- Sloped sticks.
+	--
+	-- 10--11--12--13
+	--  |   |   |   |
+	-- 11--12--13--14
+	--  |   |   |   |
+	-- 12--13--14--15
+	--  |   |   |   |
+	-- 13--14--15--16
+	--
+	-- Where the centermost stick is then shortened to 10.
+	t:unload_chunk(0, 0)
+	t:load_chunk(0, 0)
+	t:add_stick_corners(1, 1,  0, 0, 0, 0,  10, 11, 11, 12,  1)
+	t:add_stick_corners(2, 1,  0, 0, 0, 0,  11, 12, 12, 13,  1)
+	t:add_stick_corners(3, 1,  0, 0, 0, 0,  12, 13, 13, 14,  1)
+	t:add_stick_corners(1, 2,  0, 0, 0, 0,  11, 12, 12, 13,  1)
+	t:add_stick_corners(2, 2,  0, 0, 0, 0,  12, 13, 13, 14,  1)
+	t:add_stick_corners(3, 2,  0, 0, 0, 0,  13, 14, 14, 15,  1)
+	t:add_stick_corners(1, 3,  0, 0, 0, 0,  12, 13, 13, 14,  1)
+	t:add_stick_corners(2, 3,  0, 0, 0, 0,  13, 14, 14, 15,  1)
+	t:add_stick_corners(3, 3,  0, 0, 0, 0,  14, 15, 15, 16,  1)
+	local m = t:build_chunk_model(0, 0)
+	assert(m:get_vertex_count() == 21 * 6)
+	t:add_stick(2, 2, 13, 100, 0)
+	local m = t:build_chunk_model(17, 0)
+	assert(m:get_vertex_count() == 21 * 6 + 4 * 3)
 end)
 
 Unittest:add(1, "system", "terrain: internal", function()

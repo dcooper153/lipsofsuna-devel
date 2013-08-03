@@ -1546,7 +1546,7 @@ static void polygon_culler ()
 	if (culler->remainder->vertices.count != 0 ||
 	    culler->pieces.count != 0)
 	{
-		printf ("23: FAILED!\n");
+		printf ("25: FAILED!\n");
 		print_polygon_culler ("Got", culler);
 		print_polygon_2d ("Expected remainder", expected);
 	}
@@ -1577,7 +1577,104 @@ static void polygon_culler ()
 			if (culler->remainder->vertices.count != 0 ||
 				culler->pieces.count != 0)
 			{
-				printf ("24: FAILED %d,%d!\n", i, j);
+				printf ("26: FAILED %d,%d!\n", i, j);
+				print_polygon_culler ("Got", culler);
+				print_polygon_2d ("Expected remainder", expected);
+			}
+			limat_polygon_culler_free (culler);
+			limat_polygon2d_free (expected);
+		}
+	}
+
+	/* Triangle remainder 1.
+	 *   +#######+__
+	 *   #########  --__
+	 *   #########      --__
+	 *   +########----------+
+	 */
+	vtx0[0] = limat_vector2d_init (1.0f, 13.0f);
+	vtx0[1] = limat_vector2d_init (1.0f, 14.0f);
+	vtx0[2] = limat_vector2d_init (0.0f, 13.0f);
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 3);
+	vtx1[0] = limat_vector2d_init (0.0f, 0.0f);
+	vtx1[1] = limat_vector2d_init (1.0f, 0.0f);
+	vtx1[2] = limat_vector2d_init (1.0f, 14.0f);
+	vtx1[3] = limat_vector2d_init (0.0f, 13.0f);
+	vtx2[0] = limat_vector2d_init (0.0f, 0.0f);
+	vtx2[1] = limat_vector2d_init (1.0f, 0.0f);
+	vtx2[2] = limat_vector2d_init (1.0f, 13.0f);
+	vtx2[3] = limat_vector2d_init (0.0f, 13.0f);
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 3 ||
+	    culler->pieces.count != 0 ||
+	   !limat_polygon2d_compare (culler->remainder, expected))
+	{
+		printf ("27: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Triangle remainder 2.
+	 *   +#######+__
+	 *   ########## --__
+	 *   ###########    --__
+	 *   +###########-------+
+	 */
+	vtx0[0] = limat_vector2d_init (1.0f, 13.5f);
+	vtx0[1] = limat_vector2d_init (1.0f, 14.0f);
+	vtx0[2] = limat_vector2d_init (0.0f, 13.0f);
+	expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 3);
+	vtx1[0] = limat_vector2d_init (0.0f, 0.0f);
+	vtx1[1] = limat_vector2d_init (1.0f, 0.0f);
+	vtx1[2] = limat_vector2d_init (1.0f, 14.0f);
+	vtx1[3] = limat_vector2d_init (0.0f, 13.0f);
+	vtx2[0] = limat_vector2d_init (0.0f, 0.0f);
+	vtx2[1] = limat_vector2d_init (1.0f, 0.0f);
+	vtx2[2] = limat_vector2d_init (1.0f, 13.5f);
+	vtx2[3] = limat_vector2d_init (0.0f, 13.0f);
+	culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+	limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+	if (culler->remainder->vertices.count != 3 ||
+	    culler->pieces.count != 0 ||
+	   !limat_polygon2d_compare (culler->remainder, expected))
+	{
+		printf ("28: FAILED!\n");
+		print_polygon_culler ("Got", culler);
+		print_polygon_2d ("Expected remainder", expected);
+	}
+	limat_polygon_culler_free (culler);
+	limat_polygon2d_free (expected);
+
+	/* Triangle remainder 3.
+	 *
+	 * Loops over several different cases.
+	 */
+	for (i = 13 ; i <= 30 ; ++i)
+	{
+		for (j = 1 ; j < i ; ++j)
+		{
+			vtx0[0] = limat_vector2d_init (1.0f, j);
+			vtx0[1] = limat_vector2d_init (1.0f, i);
+			vtx0[2] = limat_vector2d_init (0.0f, 13.0f);
+			expected = limat_polygon2d_new (&limat_vtxops_v2, vtx0, 3);
+			vtx1[0] = limat_vector2d_init (0.0f, 0.0f);
+			vtx1[1] = limat_vector2d_init (1.0f, 0.0f);
+			vtx1[2] = limat_vector2d_init (1.0f, i);
+			vtx1[3] = limat_vector2d_init (0.0f, 13.0f);
+			vtx2[0] = limat_vector2d_init (0.0f, 0.0f);
+			vtx2[1] = limat_vector2d_init (1.0f, 0.0f);
+			vtx2[2] = limat_vector2d_init (1.0f, j);
+			vtx2[3] = limat_vector2d_init (0.0f, 13.0f);
+			culler = limat_polygon_culler_new (&limat_vtxops_v2, vtx1, 4);
+			limat_polygon_culler_subtract_quad (culler, vtx2, vtx2 + 1, vtx2 + 2, vtx2 + 3);
+			if (culler->remainder->vertices.count != 3 ||
+				culler->pieces.count != 0 ||
+			   !limat_polygon2d_compare (culler->remainder, expected))
+			{
+				printf ("29: FAILED!\n");
 				print_polygon_culler ("Got", culler);
 				print_polygon_2d ("Expected remainder", expected);
 			}

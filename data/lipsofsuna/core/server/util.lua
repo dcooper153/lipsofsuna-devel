@@ -98,6 +98,8 @@ end
 -- @param point Point in world space.
 -- @return Point in world units, or nil.
 Utils.find_drop_point = function(clss, point)
+	-- FIXME
+	do return end
 	-- Find an empty tile.
 	local t,c = Voxel:find_tile{match = "empty", point = point, radius = Voxel.tile_size}
 	if not t then return end

@@ -28,6 +28,14 @@
 #include "math-generic.h"
 #include "math-vector-2d.h"
 
+enum
+{
+	LIMAT_LINE2D_MISS,
+	LIMAT_LINE2D_INTERSECT,
+	LIMAT_LINE2D_PARALLEL,
+	LIMAT_LINE2D_COINCIDE
+};
+
 /**
  * \brief A 2D line defined by a point and a normal.
  */
@@ -126,7 +134,7 @@ static inline void limat_line2d_get_point (
  * \return Distance to the point.
  */
 static inline float limat_line2d_distance_to_point (
-	LIMatLine2d*         self,
+	const LIMatLine2d*   self,
 	const LIMatVector2d* point)
 {
 	return LIMAT_ABS (self->x * point->x + self->y * point->y - self->w);
@@ -154,7 +162,7 @@ static inline float limat_line2d_signed_distance_to_point (
  * \param point0 First point of the line.
  * \param point1 Second point of the line.
  * \param point Return location for the intersection point.
- * \return Nonzero if the plane and the line intersect.
+ * \return Intersection type.
  */
 static inline int limat_line2d_intersects_line (
 	const LIMatLine2d*   self,
@@ -175,12 +183,17 @@ static inline int limat_line2d_intersects_line (
 	/* Check if parallel. */
 	t = self->x * line.x + self->y * line.y;
 	if (LIMAT_ABS (t) < LIMAT_EPSILON)
-		return 0;
+	{
+		if (limat_line2d_distance_to_point (self, point0) < LIMAT_EPSILON)
+			return LIMAT_LINE2D_COINCIDE;
+		else
+			return LIMAT_LINE2D_PARALLEL;
+	}
 
 	/* Find the intersection. */
 	t = (self->x * offs.x + self->y * offs.y) / t;
 	*point = limat_vector2d_add (*point0, limat_vector2d_multiply (line, t));
-	return 1;
+	return LIMAT_LINE2D_INTERSECT;
 }
 
 /**
@@ -192,7 +205,7 @@ static inline int limat_line2d_intersects_line (
  * \param point0 First point of the line segment.
  * \param point1 First point of the line segment.
  * \param point Return location for the intersection point.
- * \return Nonzero if the plane and the line segment intersect.
+ * \return Intersection type.
  */
 static inline int limat_line2d_intersects_segment (
 	const LIMatLine2d*   self,
@@ -213,16 +226,21 @@ static inline int limat_line2d_intersects_segment (
 	/* Check if parallel. */
 	t = self->x * line.x + self->y * line.y;
 	if (LIMAT_ABS (t) <= LIMAT_EPSILON)
-		return 0;
+	{
+		if (limat_line2d_distance_to_point (self, point0) < LIMAT_EPSILON)
+			return LIMAT_LINE2D_COINCIDE;
+		else
+			return LIMAT_LINE2D_PARALLEL;
+	}
 
 	/* Check if intersects. */
 	t = (self->x * offs.x + self->y * offs.y) / t;
 	if (t < 0.0 || t > 1.0)
-		return 0;
+		return LIMAT_LINE2D_MISS;
 
 	/* Find the intersection. */
 	*point = limat_vector2d_add (*point0, limat_vector2d_multiply (line, t));
-	return 1;
+	return LIMAT_LINE2D_INTERSECT;
 }
 
 #endif
