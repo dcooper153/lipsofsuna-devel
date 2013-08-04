@@ -149,11 +149,7 @@ void LIRenAttachmentEntity::update (float secs)
 	/* Check if background loading has finished. */
 	if (loaded)
 		return;
-	if (entity != NULL)
-	{
-		loaded = true;
-		return;
-	}
+	lisys_assert (entity == NULL);
 
 	/* Wait for the mesh to load. */
 	if (!mesh->isLoaded ())
@@ -247,6 +243,7 @@ void LIRenAttachmentEntity::update (float secs)
 	resources.clear ();
 	loading_mesh = false;
 	loading_deps = false;
+	loaded = true;
 }
 
 /**
