@@ -1469,7 +1469,10 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
   </asset>
 
   <asset>
-    <file>data/lipsofsuna/arena/spelltable1.lmdl</file>
+    <file>data/lipsofsuna/crafting/anvil1.lmdl</file>
+    <file>data/lipsofsuna/crafting/anvil1.png</file>
+    <file>data/lipsofsuna/crafting/spelltable/spelltable1.lmdl</file>
+    <file>data/lipsofsuna/crafting/spelltable/spelltable1.png</file>
     <file>data/lipsofsuna/environment/furniture/shelf1.lmdl</file>
     <file>data/lipsofsuna/environment/furniture/shelf1.png</file>
     <file>data/lipsofsuna/environment/obelisk/obelisk1.lmdl</file>

@@ -17,22 +17,6 @@
 	},
 	{
 		"type": "Obstaclespec",
-		"name": "anvil",
-		"categories":
-		{
-			"furniture": true
-		},
-		"collision_mask": 65535,
-		"mass": 100,
-		"model": "workbench2",
-		"physics": "static",
-		"usages":
-		{
-			"craft metal": true
-		}
-	},
-	{
-		"type": "Obstaclespec",
 		"name": "workbench",
 		"categories":
 		{

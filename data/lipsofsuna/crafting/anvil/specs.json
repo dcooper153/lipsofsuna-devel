@@ -1,0 +1,18 @@
+[
+	{
+		"type": "Obstaclespec",
+		"name": "anvil",
+		"categories":
+		{
+			"furniture": true
+		},
+		"collision_mask": 65535,
+		"mass": 100,
+		"model": "anvil1",
+		"physics": "static",
+		"usages":
+		{
+			"craft metal": true
+		}
+	}
+]
