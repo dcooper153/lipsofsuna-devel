@@ -1,3 +1,18 @@
+0.7.0:
+
+  * New terrain system.
+  * More responsive controls.
+  * Real single player mode.
+  * New spell and enchantment systems.
+  * Many graphical improvements.
+  * Added limited scope game modes.
+  * Improved script performance.
+  * Extended character modeling support.
+  * User interface improvements.
+  * Improved mod loading.
+  * Major code cleanup.
+  * Several less interesting changes.
+
 0.6.0:
 
   * New graphics engine based on Ogre.

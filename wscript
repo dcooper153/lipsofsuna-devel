@@ -7,7 +7,7 @@ from waflib import Logs
 from waflib import Options
 
 APPNAME='lipsofsuna'
-VERSION='0.6.0'
+VERSION='0.7.0'
 
 top = '.'
 out = '.build'
@@ -107,12 +107,16 @@ def configure(conf):
 		conf.define('LI_DISABLE_INPUT_GRABS', 1)
 	if not Options.options.graphics:
 		conf.define('LI_DISABLE_GRAPHICS', 1)
+		conf.env.GRAPHICS = False
+	else:
+		conf.env.GRAPHICS = True
 	if not Options.options.sound:
 		conf.define('LI_DISABLE_SOUND', 1)
 	if Options.options.memdebug:
 		conf.define('LI_ENABLE_MEMDEBUG', 1)
 	if Options.options.relpath:
 		conf.define('LI_RELATIVE_PATHS', 1)
+		conf.env.RELPATH = True
 		conf.env.RPATH_CORE = ['$ORIGIN/lib']
 		conf.env.PREFIX = conf.path.abspath()
 		conf.env.BINDIR = conf.env.PREFIX
@@ -121,6 +125,7 @@ def configure(conf):
 		conf.env.PROGDIR = os.path.join(conf.env.PREFIX, 'bin')
 		conf.env.TOOLDIR = os.path.join(conf.env.PREFIX, 'tool')
 	else:
+		conf.env.RELPATH = False
 		bindir = Options.options.bindir
 		if not bindir:
 			bindir = os.path.join(conf.env.PREFIX, 'bin')
@@ -173,7 +178,7 @@ def configure(conf):
 def build(bld):
 	def get_dirs(core, gfx):
 		dirs = core.split(' ')
-		if Options.options.graphics:
+		if bld.env.GRAPHICS:
 			dirs += gfx.split(' ')
 		return dirs
 	bld.add_group("build")
@@ -203,7 +208,7 @@ def build(bld):
 		use = 'CORE THREAD ZLIB')
 	# Installation.
 	bld.set_group("install")
-	if not Options.options.relpath:
+	if not bld.env.RELPATH:
 		start_dir = bld.path.find_dir('tool')
 		bld.install_files(bld.env.TOOLDIR, start_dir.ant_glob('lipsofsuna_export/*.py'), cwd=start_dir, relative_trick=True)
 		start_dir = bld.path.find_dir('data')
@@ -213,8 +218,8 @@ def build(bld):
 
 def dist(ctx):
 	import tarfile
-	dirs = ['src/**/*.*', 'data/**/*.*', 'tool/*', 'misc/*', 'docs/*', 'AUTHORS', 'COPYING', 'NEWS', 'README', 'waf', 'wscript']
-	excl = ['**/.*', '**/import', 'docs/html']
+	dirs = ['src/**/*.*', 'data/**/*.*', 'tool/**/*.*', 'misc/*', 'docs/*', 'AUTHORS', 'ASSETS.xml', 'COPYING', 'NEWS', 'README', 'waf', 'wscript']
+	excl = ['**/.*', 'docs/html', '**/__pycache__']
 	base = APPNAME + '-' + VERSION
 	name = base + '.tar.gz'
 	Logs.pprint('GREEN', "Creating `%s'" % name)
