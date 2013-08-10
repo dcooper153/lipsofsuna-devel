@@ -97,7 +97,7 @@ Mod.load = function(self, name, optional, nocompat)
 		-- Decode the file.
 		local res,err = Json:decode(specs)
 		if err then
-			return "could not load specs \"" .. path .. "\": " .. err
+			return path .. ": " .. err
 		end
 		specs = res
 		-- Create each spec.
@@ -160,7 +160,7 @@ Mod.load = function(self, name, optional, nocompat)
 		for k,v in ipairs(info.specs) do
 			local err = load_spec(info, v)
 			if err then
-				error("loading mod \"" .. name .. "\" failed: " .. err)
+				error("loading mod \"" .. name .. "\" failed:\nERROR: " .. err)
 			end
 		end
 	end

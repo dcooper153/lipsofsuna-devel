@@ -26,6 +26,7 @@ local Json = Class("Json")
 Json.decode = function(self, str)
 	local ok,res = pcall(json.decode, str)
 	if not ok then
+		res = string.gsub(res, "system/json/json.lua:[^:]*: ", "")
 		return nil, res
 	else
 		return res
