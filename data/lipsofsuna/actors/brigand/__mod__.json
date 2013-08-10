@@ -1,0 +1,12 @@
+{
+	"resources":
+	[
+		"."
+	],
+	"specs":
+	[
+		"actors",
+		"items",
+		"recipes"
+	]
+}

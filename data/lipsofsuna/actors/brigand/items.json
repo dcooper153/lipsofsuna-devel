@@ -1,0 +1,35 @@
+[
+	{
+		"type": "Itemspec",
+		"name": "leather brigand pants",
+		"model": "book-000",
+		"icon": "leatherarmor1",
+		"armor_class": 0.04,
+		"categories":
+		{
+			"armor": true
+		},
+		"equipment_models":
+		{
+			"aer": {"skirt": "aerlowerarmor1", "panties": "panties2"},
+			"aermale": {"legs": "aermaleleatherlegs1"}
+		},
+		"equipment_slot": "lowerbody",
+		"mass": 5
+	},
+	{
+		"type": "Itemspec",
+		"name": "leather brigand chest",
+		"model": "book-000",
+		"icon": "leatherarmor1",
+		"armor_class": 0.04,
+		"categories": {"armor": true},
+		"equipment_models":
+		{
+			"aer": {"upper1": "aerleatherchest1"},
+			"aermale": {"upper": "aermaleleatherchest1"}
+		},
+		"equipment_slot": "upperbody",
+		"mass": 5
+	}
+]
