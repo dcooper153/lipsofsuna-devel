@@ -55,6 +55,7 @@
 		["load", "core/terrain"],
 		["load", "core/unlock"],
 		["load", "core/vision"],
-		["load", "core/misc"]
+		["load", "core/misc"],
+		["load", "core/debug"]
 	]
 }

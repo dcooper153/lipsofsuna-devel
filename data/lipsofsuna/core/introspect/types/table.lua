@@ -1,14 +1,15 @@
-Introspect.types_dict["table"] = {
-	equals = function(val1, val2)
+return {
+	name = "table",
+	equals = function(self, val1, val2)
 		-- TODO
 	end,
-	validate = function(val)
+	validate = function(self, val)
 		return type(val) == "table" and not val.class
 	end,
-	write_str = function(val)
+	write_str = function(self, val)
 		local write_table
 		local write_value = function(v)
-			return Introspect.types_dict["generic"].write_str(v)
+			return self.types_dict["generic"].write_str(self, v)
 		end
 		local write_named = function(k, v)
 			local s = write_value(v)

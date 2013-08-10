@@ -157,8 +157,7 @@ Spec.is_field_set = function(self, name)
 	-- Check if default.
 	if field.default == nil then return true end
 	local Introspect = require("core/introspect/introspect")
-	local t = Introspect.types_dict[field.type]
-	if not t.equals(value, field.default) then return true end
+	if not Introspect:equals(field.type, value, field.default) then return true end
 end
 
 --- Returns a random spec.

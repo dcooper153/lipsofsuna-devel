@@ -1,5 +1,7 @@
 local Class = require("system/class")
 require(Mod.path .. "entry")
+local Introspect = require("core/introspect/introspect")
+local IntrospectOperator = require("core/debug/introspect-operator")
 
 Widgets.Uiintrospectfield = Class("Uiintrospectfield", Widgets.Uientry)
 Widgets.Uiintrospectfield.brief_fields = {["boolean"] = true, ["color"] = true, ["number"] = true, ["quaternion"] = true, ["string"] = true, ["vector"] = true}
@@ -19,7 +21,7 @@ Widgets.Uiintrospectfield.new = function(clss, spec, field)
 			if field.type == "string" then
 				str = value
 			else
-				str = t.write_str(value)
+				str = t.write_str(Introspect, value)
 			end
 		else
 			str = ""
@@ -36,7 +38,7 @@ Widgets.Uiintrospectfield.new = function(clss, spec, field)
 end
 
 Widgets.Uiintrospectfield.apply = function(self)
-	Operators.introspect:set_field_name(self.field.name)
+	IntrospectOperator:set_field_name(self.field.name)
 	Ui:push_state("introspect/field")
 	Client.effects:play_global("uitransition1")
 end

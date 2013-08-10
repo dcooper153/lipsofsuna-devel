@@ -21,7 +21,8 @@ Introspect.types_dict = {}
 for k,v in pairs{"boolean", "color", "dialog-tree", "dict", "generic", "ignore",
 	"list", "map-object-list", "map-object", "map-tile-list", "map-tile",
 	"number", "quaternion", "spawn", "string", "table", "todo", "vector"} do
-	require("core/introspect/types/" .. v)
+	local res = require("core/introspect/types/" .. v)
+	Introspect.types_dict[res.name] = res
 end
 
 --- Creates a new introspection ruleset.
@@ -61,6 +62,17 @@ Introspect.add_field = function(self, args)
 	table.insert(self.fields_list, args)
 end
 
+--- Checks if the two values are equal.
+-- @param self Introspect class.
+-- @param type Type name,
+-- @param value1 Value.
+-- @param value2 Value.
+-- @return True if the values are equal. False otherwise.
+Introspect.equals = function(self, type, value1, value2)
+	local t = self.types_dict[type]
+	return t.equals(self, value1, value2)
+end
+
 --- Reads the fields of the type from a string.
 -- @param self Introspect.
 -- @param data Instance of the type of this introspection ruleset.
@@ -91,7 +103,7 @@ Introspect.validate = function(self, data)
 	local validate_type = function(field, value)
 		local t = self.types_dict[field.type]
 		assert(t)
-		if t.validate and not t.validate(value, field) then
+		if t.validate and not t.validate(self, value, field) then
 			error(type(value) .. " not of type " .. field.type, 0)
 		end
 	end
@@ -157,9 +169,9 @@ Introspect.write_str = function(self, data)
 		if base then default = base[v.name] end
 		-- Omit default values.
 		if value == nil then return end
-		if default ~= nil and type.equals(value, default) then return end
+		if default ~= nil and type.equals(self, value, default) then return end
 		-- Convert the value to a string.
-		local ret,s = xpcall(function() return type.write_str(value, v) end, function(err)
+		local ret,s = xpcall(function() return type.write_str(self, value, v) end, function(err)
 			print(string.format("ERROR: Failed to write field %q of type %q", v.name, v.type))
 			print(debug.traceback("ERROR: " .. err)) end)
 		if not s then return end

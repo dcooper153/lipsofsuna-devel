@@ -1,5 +1,6 @@
-Introspect.types_dict["TODO"] = {
-	equals = function(val1, val2)
+return {
+	name = "TODO",
+	equals = function(self, val1, val2)
 	end,
-	write_str = function(val)
+	write_str = function(self, val)
 	end}

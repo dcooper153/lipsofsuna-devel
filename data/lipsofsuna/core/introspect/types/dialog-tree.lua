@@ -1,16 +1,17 @@
-Introspect.types_dict["dialog tree"] = {
-	equals = function(val1, val2)
+return {
+	name = "dialog tree",
+	equals = function(self, val1, val2)
 		-- TODO
 		for k,v in pairs(val1) do return end
 		for k,v in pairs(val2) do return end
 		return true
 	end,
-	write_str = function(val)
+	write_str = function(self, val)
 		local write_table = function(t)
-			return Introspect.types_dict["table"].write_str(t)
+			return self.types_dict["table"].write_str(self, t)
 		end
 		local write_value = function(v)
-			return Introspect.types_dict["generic"].write_str(v)
+			return self.types_dict["generic"].write_str(self, v)
 		end
 		local write_branch
 		write_branch = function(branch, indent)

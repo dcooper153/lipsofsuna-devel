@@ -1,5 +1,6 @@
-Introspect.types_dict["ignore"] = {
-	equals = function(val1, val2)
+return {
+	name = "ignore",
+	equals = function(self, val1, val2)
 	end,
-	write_str = function(val)
+	write_str = function(self, val)
 	end}

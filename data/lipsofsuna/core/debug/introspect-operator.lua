@@ -1,17 +1,26 @@
+--- Manages the state of the introspection UI.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.debug.introspect_operator
+-- @alias IntrospectOperator
+
 local Class = require("system/class")
+local Spec = require("core/specs/spec")
 
-Operators.introspect = Class("IntrospectOperator")
-Operators.introspect.data = {}
+--- Manages the state of the introspection UI.
+-- @type IntrospectOperator
+local IntrospectOperator = Class("IntrospectOperator")
 
---- Initializes the introspection tool.
---
--- Context: Any.
---
+--- Initializes the introspection UI.
 -- @param self Operator.
-Operators.introspect.init = function(self)
-	self.data.spec_type = nil
-	self.data.spec_name = nil
-	self.data.field_name = nil
+IntrospectOperator.init = function(self)
+	self.__spec_type = nil
+	self.__spec_name = nil
+	self.__field_name = nil
 end
 
 --- Gets the introspected field.
@@ -20,9 +29,9 @@ end
 --
 -- @param self Operator.
 -- @param Introspecter field.
-Operators.introspect.get_field = function(self)
+IntrospectOperator.get_field = function(self)
 	local spec = self:get_spec()
-	return spec.introspect.fields_dict[self.data.field_name]
+	return spec.introspect.fields_dict[self.__field_name]
 end
 
 --- Gets the name of the introspected field.
@@ -31,8 +40,8 @@ end
 --
 -- @param self Operator.
 -- @param String.
-Operators.introspect.get_field_name = function(self)
-	return self.data.field_name
+IntrospectOperator.get_field_name = function(self)
+	return self.__field_name
 end
 
 --- Sets the name of the introspected field.
@@ -41,8 +50,8 @@ end
 --
 -- @param self Operator.
 -- @param value Field name.
-Operators.introspect.set_field_name = function(self, value)
-	self.data.field_name = value
+IntrospectOperator.set_field_name = function(self, value)
+	self.__field_name = value
 end
 
 --- Gets the fields of the introspected spec.
@@ -51,7 +60,7 @@ end
 --
 -- @param self Operator.
 -- @param List of introspecter fields.
-Operators.introspect.get_fields = function(self)
+IntrospectOperator.get_fields = function(self)
 	local spec = self:get_spec()
 	return spec.introspect.fields_list
 end
@@ -62,9 +71,9 @@ end
 --
 -- @param self Operator.
 -- @param Spec.
-Operators.introspect.get_spec = function(self)
-	local spec_clss = _G[self.data.spec_type]
-	return spec_clss:find{name = self.data.spec_name}
+IntrospectOperator.get_spec = function(self)
+	local spec_clss = Spec.dict_spec[self.__spec_type]
+	return spec_clss:find{name = self.__spec_name}
 end
 
 --- Gets the list of introspectable specs.
@@ -73,9 +82,9 @@ end
 --
 -- @param self Operator.
 -- @param List of specs.
-Operators.introspect.get_specs = function(self)
+IntrospectOperator.get_specs = function(self)
 	local lst = {}
-	local spec_clss = _G[self.data.spec_type]
+	local spec_clss = Spec.dict_spec[self.__spec_type]
 	for k,v in pairs(spec_clss.dict_name) do table.insert(lst, v) end
 	table.sort(lst, function(a,b) return a.name < b.name end)
 	return lst
@@ -87,8 +96,8 @@ end
 --
 -- @param self Operator.
 -- @return String.
-Operators.introspect.get_spec_name = function(self)
-	return self.data.spec_name
+IntrospectOperator.get_spec_name = function(self)
+	return self.__spec_name
 end
 
 --- Sets the name of the introspected spec.
@@ -97,8 +106,8 @@ end
 --
 -- @param self Operator.
 -- @param value Spec name.
-Operators.introspect.set_spec_name = function(self, value)
-	self.data.spec_name = value
+IntrospectOperator.set_spec_name = function(self, value)
+	self.__spec_name = value
 end
 
 --- Gets the type of the introspected spec.
@@ -107,8 +116,8 @@ end
 --
 -- @param self Operator.
 -- @return String.
-Operators.introspect.get_spec_type = function(self)
-	return self.data.spec_type
+IntrospectOperator.get_spec_type = function(self)
+	return self.__spec_type
 end
 
 --- Sets the type of the introspected spec.
@@ -117,6 +126,8 @@ end
 --
 -- @param self Operator.
 -- @param value Spec type.
-Operators.introspect.set_spec_type = function(self, value)
-	self.data.spec_type = value
+IntrospectOperator.set_spec_type = function(self, value)
+	self.__spec_type = value
 end
+
+return IntrospectOperator
