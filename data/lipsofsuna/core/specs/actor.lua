@@ -133,6 +133,9 @@ Actorspec.new = function(clss, args)
 	-- args field of the instance so that they can be easily copied to the
 	-- inherited specs here.
 	local base = args.base and clss:find_by_name(args.base)
+	if args.base and not base then
+		print(string.format("WARNING: Actor spec %q has invalid base %q", args.name, args.base))
+	end
 	if base then
 		local t = {}
 		for k,v in pairs(base.args) do t[k] = v end
