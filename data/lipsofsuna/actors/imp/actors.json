@@ -1,0 +1,101 @@
+[
+	{
+		"type": "Actorspec",
+		"name": "stone imp",
+		"categories":
+		{
+			"enemy": true,
+			"mining": true
+		},
+		"ai_enable_block": false,
+		"ai_enable_strafe": false,
+		"ai_enable_weapon_switch": false,
+		"ai_offense_factor": 0.8,
+		"animations":
+		{
+			"default": "imp"
+		},
+		"difficulty": 0,
+		"factions":
+		{
+			"evil": true
+		},
+		"actions":
+		{
+			"right": "bite",
+			"left": "tackle"
+		},
+		"equipment_slots":
+		{
+			"hand.R": "#hand.R",
+			"hand.L": "#hand.L"
+		},
+		"inventory_items":
+		{
+			"impstone": 1
+		},
+		"inventory_size": 2,
+		"jump_force": 4,
+		"model": "stoneimp2",
+		"speed_walk": 1,
+		"skills":
+		{
+			"Nerf health lv2": true,
+			"Nerf combat lv2": true
+		},
+		"vulnerabilities":
+		{
+			"cold damage": 1.1,
+			"fire damage": 1.1,
+			"physical damage": 0.8
+		}
+	},
+	{
+		"type": "Actorspec",
+		"name": "fire imp",
+		"categories":
+		{
+			"enemy": true,
+			"mining": true
+		},
+		"base": "stone imp",
+		"ai_enable_block": false,
+		"ai_enable_strafe": false,
+		"ai_enable_weapon_switch": false,
+		"ai_offense_factor": 0.8,
+		"difficulty": 0.2,
+		"equipment_slots":
+		{
+			"hand.R": "#hand.R",
+			"hand.L": "#hand.L"
+		},
+		"factions":
+		{
+			"evil": true
+		},
+		"actions":
+		{
+			"right": "bite",
+			"left": "explode"
+		},
+		"jump_force": 4,
+		"model": "stoneimp2",
+		"speed_walk": 1,
+		"inventory_items":
+		{
+			"firestone": 1
+		},
+		"inventory_size": 2,
+		"skills":
+		{
+			"Nerf health lv1": true,
+			"Nerf combat lv1": true
+		},
+		"vulnerabilities":
+		{
+			"cold damage": 2,
+			"fire damage": 0.4,
+			"physical damage": 0.8
+		}
+	}
+]

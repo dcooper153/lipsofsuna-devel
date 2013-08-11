@@ -1,0 +1,98 @@
+[
+	{
+		"type": "Animationspec",
+		"name": "stoneimp attack bite",
+		"animation": "stoneimp1-bite",
+		"channel": 2,
+		"weight": 30
+	},
+	{
+		"type": "Animationspec",
+		"name": "stoneimp dead",
+		"animation": "stoneimp1-death",
+		"channel": 1,
+		"permanent": true,
+		"repeat_start": 10,
+		"time": 10
+	},
+	{
+		"type": "Animationspec",
+		"name": "stoneimp death",
+		"animation": "stoneimp1-death",
+		"channel": 1,
+		"permanent": true,
+		"repeat_start": 10
+	},
+	{
+		"type": "Animationspec",
+		"name": "stoneimp idle",
+		"animation": "stoneimp1-idle",
+		"channel": 1,
+		"permanent": true
+	},
+	{
+		"type": "Animationspec",
+		"name": "stoneimp jump",
+		"animation": "stoneimp1-jump",
+		"channel": 5,
+		"fade_out": 0.4,
+		"permanent": true,
+		"repeat_start": 10,
+		"weight": 10
+	},
+	{
+		"type": "Animationspec",
+		"name": "stoneimp walk",
+		"animation": "stoneimp1-walk",
+		"channel": 1,
+		"permanent": true
+	},
+	{
+		"type": "Animationspec",
+		"name": "stoneimp walk back",
+		"animation": "stoneimp1-walk-back",
+		"channel": 1,
+		"permanent": true
+	},
+	{
+		"type": "Animationspec",
+		"name": "stoneimp strafe left",
+		"animation": "stoneimp1-strafe-left",
+		"channel": 1,
+		"permanent": true
+	},
+	{
+		"type": "Animationspec",
+		"name": "stoneimp strafe right",
+		"animation": "stoneimp1-strafe-right",
+		"channel": 1,
+		"permanent": true
+	},
+	{
+		"type": "AnimationProfileSpec",
+		"name": "imp",
+		"animations":
+		{
+			"attack bite": "stoneimp attack bite",
+			"dead": "stoneimp dead",
+			"death": "stoneimp death",
+			"idle": "stoneimp idle",
+			"jump": "stoneimp jump",
+			"run": "stoneimp walk",
+			"run left": "stoneimp walk",
+			"run right": "stoneimp walk",
+			"strafe left": "stoneimp strafe left",
+			"strafe right": "stoneimp strafe right",
+			"walk": "stoneimp walk",
+			"walk back": "stoneimp walk back"
+		}
+	},
+	{
+		"type": "AnimationProfileSpec",
+		"name": "default stone equipped",
+		"animations":
+		{
+			"hold": "default hold bulky"
+		}
+	}
+]

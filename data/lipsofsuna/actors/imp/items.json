@@ -1,0 +1,63 @@
+[
+	{
+		"type": "Itemspec",
+		"name": "impstone",
+		"categories":
+		{
+			"melee": true,
+			"weapon": true
+		},
+		"animations_equipped":
+		{
+			"default": "default stone equipped"
+		},
+		"equipment_slot": "hand.R",
+		"icon": "stone1",
+		"modifiers":
+		{
+			"physical damage": 1
+		},
+		"mass": 4,
+		"model": "firestone1",
+		"stacking": false,
+	},
+	{
+		"type": "Itemspec",
+		"name": "firestone",
+		"categories":
+		{
+			"explosive": true,
+			"melee": true,
+			"weapon": true
+		},
+		"animations_equipped":
+		{
+			"default": "default stone equipped"
+		},
+		"destroy_actions":
+		[
+			"explode"
+		],
+		"destroy_timer": 5,
+		"equipment_slot": "hand.R",
+		"health": 1,
+		"icon": "stone2",
+		"modifiers":
+		{
+			"fire damage": 10,
+			"physical damage": 10
+		},
+		"modifiers_bonus":
+		[
+			"melee",
+			"explosives"
+		],
+		"mass": 4,
+		"model": "firestone1",
+		"special_effects":
+		[
+			"impflame1"
+		],
+		"stacking": false
+	}
+]

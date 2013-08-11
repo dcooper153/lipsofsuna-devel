@@ -1,0 +1,9 @@
+{
+	"resources": ["."],
+	"specs":
+	[
+		"actors",
+		"animations",
+		"items"
+	]
+}

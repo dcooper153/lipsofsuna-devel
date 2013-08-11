@@ -1,0 +1,14 @@
+[
+	{
+		"type": "Itemspec",
+		"name": "dragon scale",
+		"icon": "bone1",
+		"model": "book-000",
+		"mass": 1,
+		"categories":
+		{
+			"material": true
+		},
+		"stacking": true
+	}
+]

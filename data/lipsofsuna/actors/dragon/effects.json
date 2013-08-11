@@ -1,0 +1,9 @@
+
+	{
+		"type": "Effectspec",
+		"name": "dragonbreath1",
+		"node": "head",
+		"particle": "firebreath1",
+		"sound": "squish-000"
+	}
+]

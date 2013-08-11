@@ -1,0 +1,42 @@
+[
+	{
+		"type": "Actorspec",
+		"name": "bitingbark",
+		"ai_enable_strafe": false,
+		"ai_enable_block": false,
+		"ai_enable_jump": false,
+		"ai_enable_weapon_switch": false,
+		"ai_offense_factor": 1,
+		"animations":
+		{
+			"default": "bitingbark"
+		},
+		"categories":
+		{
+			"enemy": true
+		},
+		"difficulty": 0.3,
+		"effect_physical_damage": "fleshimpact1",
+		"factions":
+		{
+			"evil": true
+		},
+		"actions":
+		{
+			"left": "left claw",
+			"right": "right claw"
+		},
+		"inventory_size": 3,
+		"inventory_items_death":
+		{
+			"log": 4
+		},
+		"jump_force": 0,
+		"model": "bitingbark1",
+		"skills":
+		{
+			"Nerf combat lv1": true
+		},
+		"speed_walk": 1
+	}
+]

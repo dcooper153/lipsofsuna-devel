@@ -1,0 +1,80 @@
+[
+	{
+		"type": "Animationspec",
+		"name": "bitingbark attack claw left",
+		"animation": "bitingbark1-claw-left",
+		"channel": 2,
+		"weight": 30
+	},
+	{
+		"type": "Animationspec",
+		"name": "bitingbark attack claw right",
+		"animation": "bitingbark1-claw-right",
+		"channel": 2,
+		"weight": 30
+	},
+	{
+		"type": "Animationspec",
+		"name": "bitingbark dead",
+		"animation": "bitingbark1-death",
+		"channel": 1,
+		"permanent": true,
+		"repeat_start": 10,
+		"time": 10
+	},
+	{
+		"type": "Animationspec",
+		"name": "bitingbark death",
+		"animation": "bitingbark1-death",
+		"channel": 1,
+		"permanent": true,
+		"repeat_start": 10
+	},
+	{
+		"type": "Animationspec",
+		"name": "bitingbark idle",
+		"animation": "bitingbark1-idle",
+		"channel": 1,
+		"permanent": true
+	},
+	{
+		"type": "Animationspec",
+		"name": "bitingbark run",
+		"animation": "bitingbark1-run",
+		"channel": 1,
+		"permanent": true
+	},
+	{
+		"type": "Animationspec",
+		"name": "bitingbark walk",
+		"animation": "bitingbark1-walk",
+		"channel": 1,
+		"permanent": true
+	},
+	{
+		"type": "Animationspec",
+		"name": "bitingbark walk back",
+		"animation": "bitingbark1-walk-back",
+		"channel": 1,
+		"permanent": true
+	},
+	{
+		"type": "AnimationProfileSpec",
+		"name": "bitingbark",
+		"animations":
+		{
+			"attack left claw": "bitingbark attack claw left",
+			"attack right claw": "bitingbark attack claw right",
+			"dead": "bitingbark dead",
+			"death": "bitingbark death",
+			"idle": "bitingbark idle",
+			"run": "bitingbark run",
+			"run left": "bitingbark run",
+			"run right": "bitingbark run",
+			"strafe left": "bitingbark walk",
+			"strafe right": "bitingbark walk",
+			"walk": "bitingbark walk",
+			"walk back": "bitingbark walk back"
+		}
+	}
+]
