@@ -17,7 +17,6 @@
 	["load", "actors/kraken"],
 	["load", "actors/lizardman"],
 	["load", "actors/rat"],
-	["load", "actors/scapegoat"],
 	["load", "actors/seirei"],
 	["load", "actors/slime"],
 	["load", "actors/troglodyte"],

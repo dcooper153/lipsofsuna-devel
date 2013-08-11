@@ -5,23 +5,6 @@ Obstaclespec{
 	name = "wanted poster",
 	model = "wantedposter1",
 	categories = {["special"] = true},
-	dialog = "castlewanted",
-	usages = {["examine"] = true}}
-
-Obstaclespec{
-	name = "sanctuary device",
-	model = "torch1",
-	categories = {["special"] = true},
-	dialog = "sanctuary",
-	marker = "sanctuary",
-	usages = {["examine"] = true}}
-
-Obstaclespec{
-	name = "bridge chest",
-	model = "chest1",
-	categories = {["special"] = true},
-	dialog = "bridgechest",
-	marker = "bridgechest",
 	usages = {["examine"] = true}}
 
 ------------------------------------------------------------------------------
@@ -32,13 +15,6 @@ Effectspec{
 	light = true,
 	light_diffuse = {1,0.7,0.6,1},
 	light_equation = {0.1,0.1,0.01},
-	node = "#root"}
-
-Effectspec{
-	name = "lipssunlight1",
-	light = true,
-	light_diffuse = {1,0.7,0.6,1},
-	light_equation = {0.5,0.5,0.5},
 	node = "#root"}
 
 Obstaclespec{
@@ -56,11 +32,3 @@ Obstaclespec{
 	health = 100,
 	special_effects = {"lamppostlight1"},
 	interactive = false}
-
-Obstaclespec{
-	name = "lips sun",
-	model = "torch1",
-	categories = {["prop"] = true},
-	collision_mask = 0xFFFF,
-	special_effects = {"lipssunlight1"},
-	health = 100}

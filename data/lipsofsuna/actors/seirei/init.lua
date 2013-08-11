@@ -9,10 +9,3 @@ Actorspec{
 	ai_enable_combat = false,
 	ai_enable_wander = false,
 	factions = {["neutral"] = true, ["seirei"] = true}}
-
-Actorspec{
-	name = "Erinyes",
-	base = "seirei",
-	dialog = "erinyes",
-	important = true,
-	marker = "erinyes"}
