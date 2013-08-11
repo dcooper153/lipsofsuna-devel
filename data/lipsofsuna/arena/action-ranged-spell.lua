@@ -39,6 +39,9 @@ Actionspec{
 		spell:set_owner(action.object)
 		spell:fire()
 	end,
+	get_range = function(action)
+		return 20
+	end,
 	get_score = function(action)
 		return 1
 	end}

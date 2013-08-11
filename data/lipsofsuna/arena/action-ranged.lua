@@ -73,6 +73,9 @@ Actionspec{
 		action.object.cooldown = 1
 		return true
 	end,
+	get_range = function(action)
+		return 20
+	end,
 	get_score = function(action)
 		return 1
 	end}
