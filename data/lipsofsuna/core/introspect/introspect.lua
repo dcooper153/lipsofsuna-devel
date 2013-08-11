@@ -88,6 +88,13 @@ Introspect.read_table = function(self, data, tbl)
 	for k,field in ipairs(self.fields_list) do
 		local value = tbl and tbl[field.name]
 		local type = self.types_dict[field.type]
+		if type.read_json then
+			local ok,ret = pcall(type.read_json, self, value)
+			if not ok then
+				error(string.format("invalid value in field %q", tostring(k)))
+			end
+			value = ret
+		end
 		if value ~= nil then
 			data[field.name] = value
 		elseif field.default then
