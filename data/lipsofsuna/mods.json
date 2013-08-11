@@ -99,16 +99,6 @@
 	["load", "spells"],
 	["load", "unused"],
 
-	["# Regions and quests"],
-	["load", "regions/castle"],
-	["load", "regions/dungeons"],
-	["load", "regions/lips"],
-	["load", "regions/keepersofknowledge"],
-	["load", "regions/rootsofworld"],
-	["load", "regions/silverspring"],
-	["load", "regions/supplycamp"],
-	["load", "regions/tutorial"],
-
 	["# Global events"],
 	["load", "events"],
 
