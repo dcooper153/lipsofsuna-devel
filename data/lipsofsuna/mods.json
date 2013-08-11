@@ -21,6 +21,7 @@
 	["load", "actors/seirei"],
 	["load", "actors/slime"],
 	["load", "actors/troglodyte"],
+	["load", "actors/turret"],
 	["load", "actors/wyrm"],
 
 	["# Armor and clothes"],

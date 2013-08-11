@@ -1,0 +1,101 @@
+[
+	{
+		"type": "Actorspec",
+		"name": "security robot",
+		"model": "barrel1",
+		"aim_ray_start": 0.7,
+		"animations":
+		{
+			"default": "default"
+		},
+		"equipment_slots":
+		{
+			"robotarm.L": "#hand.L",
+			"robotarm.R": "#hand.R"
+		},
+		"factions":
+		{
+			"evil": true
+		},
+		"actions":
+		{
+			"right": "ranged"
+		},
+		"important": true,
+		"inventory_size": 4,
+		"inventory_items":
+		{
+			"bullet": 100,
+			"security robot arm": 1
+		},
+		"skills":
+		{
+			"Health lv4": true,
+			"Willpower lv4": true
+		},
+		"weapon_slot": "robotarm.R"
+	},
+	{
+		"type": "Animationspec",
+		"name": "turret fire",
+		"animation": "turret1-fire",
+		"channel": 1
+	},
+	{
+		"type": "AnimationProfileSpec",
+		"name": "turret",
+		"animations":
+		{
+			"attack back": "turret fire",
+			"attack front": "turret fire",
+			"attack left": "turret fire",
+			"attack right": "turret fire",
+			"attack stand": "turret fire"
+		}
+	},
+	{
+		"type": "Actorspec",
+		"name": "security turret",
+		"ai_enable_backstep": false,
+		"ai_enable_block": false,
+		"ai_enable_jump": false,
+		"ai_enable_strafe": false,
+		"ai_enable_wander": false,
+		"ai_enable_walk": false,
+		"ai_enable_weapon_switch": false,
+		"aim_ray_start": 0.7,
+		"animations":
+		{
+			"default": "turret"
+		},
+		"categories":
+		{
+			"enemy": true
+		},
+		"factions":
+		{
+			"evil": true
+		},
+		"actions":
+		{
+			"right": "turret fire"
+		},
+		"important": true,
+		"inventory_size": 2,
+		"inventory_items":
+		{
+			"bullet": 100
+		},
+		"model": "turret1",
+		"skills":
+		{
+			"Health lv4": true,
+			"Willpower lv4": true
+		},
+		"tilt_bone":
+		[
+			"tilt"
+		],
+		"weapon_slot": "turretbarrel"
+	}
+]
