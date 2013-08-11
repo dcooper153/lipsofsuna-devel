@@ -13,6 +13,7 @@ Actorspec{
 		["hand.R"] = "#hand.R",
 		["head"] = "",
 		["lowerbody"] = "",
+		["pants"] = "",
 		["upperbody"] = ""},
 	factions = {["good"] = true},
 	footstep_height = 0.3,
