@@ -1,3 +1,7 @@
 {
-	"client_scripts": ["introspect"]
+	"client_scripts":
+	[
+		"anchor-editor",
+		"introspect"
+	]
 }
