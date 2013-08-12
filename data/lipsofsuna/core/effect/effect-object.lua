@@ -21,7 +21,9 @@ local EffectObject = Class("EffectObject")
 --   <li>parent: Parent object, or nil.</li>
 --   <li>parent_node: Parent node name, or nil.</li>
 --   <li>position: Position in world space, or nil if parent is used.</li>
+--   <li>position_local: Local extra translation. Nil for none.</li>
 --   <li>position_mode: One of "node-node", "node" or nil.</li>
+--   <li>rotation_local: Local extra rotation. Nil for none.</li>
 --   <li>rotation_mode: One of "node-node", "node" or nil.</li></ul>
 -- @return EffectObject.
 EffectObject.new = function(clss, args)
@@ -29,7 +31,9 @@ EffectObject.new = function(clss, args)
 	self.life = args.life
 	self.parent = args.parent or args.object
 	self.parent_node = args.parent_node or args.node
+	self.position_local = args.position_local
 	self.position_mode = args.position_mode or "node"
+	self.rotation_local = args.rotation_local
 	self.rotation_mode = args.rotation_mode or "node"
 	self.__visible = true
 	self.__initial_position = args.position
@@ -84,48 +88,60 @@ end
 -- @param secs Seconds since the last update.
 EffectObject.update_transform = function(self, secs)
 	if not self.parent then return end
-	-- Update the position.
-	if self.position_mode == "node-node" then
-		local p,r = self.parent:find_node{name = self.parent_node, space = "world"}
-		if not p then p = self.parent:get_position() end
+	local par_p = self.parent:get_position():copy()
+	local par_r = self.parent:get_rotation():copy()
+	local node_p,node_r = self.parent:find_node{name = self.parent_node}
+	if self.rotation_mode == "node-node" then
+		-- Parent.
+		local r = par_r:copy()
+		local p = par_p:copy()
+		-- Node.
+		if node_p then
+			p = node_p:copy():transform(r, p)
+			r = r:concat(node_r)
+		end
+		-- Anchor.
 		if self.model_anchor and self.render then
 			local h,s = self.render:find_node{name = self.model_anchor}
 			if h then
 				p:subtract(h:transform(s.conjugate):transform(r))
+				r = r:concat(s)
 			end
-		end
-		self:set_position(p)
-	elseif self.position_mode == "node" then
-		local p = self.parent:find_node{name = self.parent_node}
-		if p then
-			p:transform(self.parent:get_rotation(), self.parent:get_position())
-			self:set_position(p)
-		else
-			self:set_position(self.parent:get_position())
-		end
-	else
-		self:set_position(self.parent:get_position())
-	end
-	-- Update the rotation.
-	if self.rotation_mode == "node-node" then
-		local p,r = self.parent:find_node{name = self.parent_node, space = "world"}
-		if not r then r = self.parent:get_rotation() end
-		if self.model_anchor and self.render then
-			local h,s = self.render:find_node{name = self.model_anchor}
-			if s then r = r * s.conjugate end
 		else
 			r:concat(Quaternion{axis = Vector(0,1,0), angle = math.pi/2})
 		end
+		-- Extra.
+		if self.rotation_local then
+			r = r:concat(self.rotation_local)
+		end
+		if self.position_local then
+			p = self.position_local:copy():transform(r, p)
+		end
+		-- Final.
+		self:set_position(p)
 		self:set_rotation(r)
 	elseif self.rotation_mode == "node" then
-		local p,r = self.parent:find_node{name = self.parent_node}
-		if r then
-			self:set_rotation(self.parent:get_rotation():copy():concat(r))
-		else
-			self:set_rotation(self.parent:get_rotation())
+		-- Parent.
+		local r = par_r:copy()
+		local p = par_p:copy()
+		-- Node.
+		if node_p then
+			r = r:concat(node_r)
+			p = node_p:copy():transform(par_r, p)
 		end
+		-- Extra.
+		if self.rotation_local then
+			r = r:concat(self.rotation_local)
+		end
+		if self.position_local then
+			p = self.position_local:copy():transform(r, p)
+		end
+		-- Final.
+		self:set_position(p)
+		self:set_rotation(r)
 	else
-		self:set_rotation(self.parent:get_rotation())
+		self:set_rotation(par_r)
+		self:set_position(par_p)
 	end
 end
 

@@ -154,7 +154,9 @@ ClientRenderObject.add_equipment_anchor = function(self, object, slot, node)
 		model_node = object.spec.equipment_anchor,
 		parent = self,
 		parent_node = node,
+		position_local = object.spec.equipment_anchor_position,
 		position_mode = "node-node",
+		rotation_local = object.spec.equipment_anchor_rotation,
 		rotation_mode = "node-node"}
 	effect.anchor_object = object
 	if self.special_effects then

@@ -36,6 +36,8 @@ Itemspec = Spec:register("Itemspec", "item", {
 	{name = "effect_unequip", type = "string", description = "Name of the effect to play when the item is unequiped."},
 	{name = "effect_use", type = "string", description = "Name of the effect to play when the item is used."},
 	{name = "equipment_anchor", type = "string", description = "Name of the node snapped to the hand of the actor when wielded."},
+	{name = "equipment_anchor_position", type = "vector", description = "Positional displacement of the model when equipped."},
+	{name = "equipment_anchor_rotation", type = "quaternion", description = "Rotational displacement of the model when equipped."},
 	{name = "equipment_models", type = "dict", dict = {type = "dict", dict = {type = "string"}}, description = "Dictionary of equipment models."},
 	{name = "equipment_priority", type = "number", default = 0, description = "The priority of equipment models and textures when worn."},
 	{name = "equipment_slot", type = "string", description = "Equipment slot into which the item can be placed."},
