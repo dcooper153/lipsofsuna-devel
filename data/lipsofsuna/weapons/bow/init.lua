@@ -92,6 +92,7 @@ Itemspec{
 	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "arrow",
 	animations_equipped = {["default"] = "default bow equipped"},
+	equipment_anchor_rotation = {0.0102222, -0.388443, 0.051111, 0.919997},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {["hand.L"] = true},
 	icon = "bow1",

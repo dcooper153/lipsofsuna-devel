@@ -44,6 +44,7 @@ Itemspec{
 	actions = {["right"] = "attack", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default staff equipped"},
 	damage_mining = 1,
+	equipment_anchor_rotation = {-0.325667, 0, 0, 0.945485},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {["hand.L"] = true},
 	health = 300,

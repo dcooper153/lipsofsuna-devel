@@ -98,6 +98,7 @@ Itemspec{
 	icon = "revolver1",
 	modifiers = {["physical damage"] = 10},
 	modifiers_bonus = {"ranged", "guns"},
+	equipment_anchor_rotation = {0, -0.707107, 0, 0.707107},
 	equipment_slot = "hand.R",
 	mass = 8,
 	model = "revolver1",
