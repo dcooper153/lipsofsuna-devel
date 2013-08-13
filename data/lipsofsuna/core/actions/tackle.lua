@@ -37,7 +37,6 @@ Actionspec{
 		action.object:action("jump")
 		action.velocity = action.object:get_rotation() * Vector(0,0.25,-1) * 10
 		action.object:set_velocity(action.velocity)
-		--feat:play_effects(args)
 		-- Initialize timing.
 		action.timer = 0
 		action.updates = 0

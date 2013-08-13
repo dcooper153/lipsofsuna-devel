@@ -6,6 +6,7 @@ Actionspec{
 	name = "bite",
 	categories = { ["melee"] = true },
 	start = function(action)
+		if action.object.cooldown then return end
 		-- Initialize timing.
 		action.time = 0
 		action.delay = action.object.spec.timing_attack_melee * 0.02
@@ -17,6 +18,7 @@ Actionspec{
 	end,
 	update = function(action, secs)
 		-- Wait for the delay to end.
+		action.object.cooldown = 1
 		action.time = action.time + secs
 		if action.time < action.delay then return true end
 		-- Cast a straight attack ray.
