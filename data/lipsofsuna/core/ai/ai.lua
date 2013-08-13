@@ -231,18 +231,30 @@ Ai.find_best_action = function(self, args)
 		local range = action:get_range()
 		local dist = (self.object:get_position() - args.target:get_position()).length
 		if dist > range then return end
-		-- Check if this is the best action.
-		local score = action:get_score()
-		if score <= best_score then return end
-		best_action = action
-		best_score = score
+		-- Calculate the score.
+		return action:get_score()
 	end
 	-- Score each action and choose the best one.
-	for k,action_name in pairs(self.object.spec.actions) do
-		local spec = Actionspec:find_by_name(action_name)
-		if spec and spec.categories[args.category] then process_action(spec) end
+	local actions = {}
+	local total = 0
+	for k,name in pairs(self.object.spec.actions) do
+		local spec = Actionspec:find_by_name(name)
+		if spec and spec.categories[args.category] then
+			local score = process_action(spec)
+			if score then
+				actions[spec] = score
+				total = total + score
+			end
+		end
 	end
-	return best_action
+	-- Choose a random action weighted by the score.
+	local val = total * math.random()
+	for action,score in pairs(actions) do
+		val = val - score
+		if val <= 0 then
+			return action
+		end
+	end
 end
 
 --- Updates the enemy list of the AI.
