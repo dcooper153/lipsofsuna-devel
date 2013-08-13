@@ -83,9 +83,6 @@ Itemspec{
 	icon = "leatherarmor1",
 	armor_class = 0.04,
 	categories = {["armor"] = true},
-	equipment_models = {
-		["aer"] = {upper_safe = "", upper1 = "aerbra1"},
-		["kraken"] = {upper_safe = "", upper1 = "aerbra1"}},
 	equipment_slot = "upperbody",
 	mass = 5,
 	water_gravity = Vector(0,6,0)}
