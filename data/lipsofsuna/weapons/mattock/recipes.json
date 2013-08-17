@@ -26,7 +26,7 @@
 		}
 	},
 	{
-		"type": "CraftingRecipeSpec"
+		"type": "CraftingRecipeSpec",
 		"name": "crimson mattock",
 		"effect": "craftmetal1",
 		"materials":
@@ -66,7 +66,7 @@
 		}
 	},
 	{
-		"type": "CraftingRecipeSpec"
+		"type": "CraftingRecipeSpec",
 		"name": "wooden mattock",
 		"effect": "craftwood1",
 		"materials":

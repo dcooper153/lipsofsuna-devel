@@ -13,9 +13,9 @@
 	[
 		{
 			"name": "generate",
-			"desc": "Generate a new map."
+			"desc": "Generate a new map.",
 			"short": "-g",
-			"long": "--generate",
+			"long": "--generate"
 		}
 	],
 	"scripts": ["main", "game", "modifier", "server", "util"]

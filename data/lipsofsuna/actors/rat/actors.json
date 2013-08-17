@@ -4,7 +4,7 @@
 		"name": "small rat",
 		"ai_enable_strafe": false,
 		"ai_enable_block": false,
-		"ai_offense_factor": .1,
+		"ai_offense_factor": 0.1,
 		"actions":
 		{
 			"right": "bite"

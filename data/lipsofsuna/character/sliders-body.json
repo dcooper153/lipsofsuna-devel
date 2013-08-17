@@ -58,7 +58,7 @@
 	},
 	{
 		"type": "ChargenSliderSpec",
-		"name": "Torso width"
+		"name": "Torso width",
 		"categories": {"body": true},
 		"field_name": "body_style",
 		"field_index": 8,

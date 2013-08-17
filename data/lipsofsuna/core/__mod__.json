@@ -20,13 +20,13 @@
 			"name": "unittest",
 			"desc": "Run unittests.",
 			"short": "-U",
-			"long": "--unittest",
+			"long": "--unittest"
 		},
 		{
 			"name": "version",
 			"desc": "Print the version number and exit.",
 			"short": "-v",
-			"long": "--version",
+			"long": "--version"
 		}
 	],
 	"mods":

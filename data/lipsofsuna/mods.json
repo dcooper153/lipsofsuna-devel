@@ -81,7 +81,6 @@
 	["load", "environment/door"],
 	["load", "environment/furnace"],
 	["load", "environment/furniture"],
-	["load", "environment/heightmap"],
 	["load", "environment/mines"],
 	["load", "environment/obelisk"],
 	["load", "environment/portal"],

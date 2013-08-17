@@ -19,7 +19,7 @@
 		},
 		"mass": 4,
 		"model": "firestone1",
-		"stacking": false,
+		"stacking": false
 	},
 	{
 		"type": "Itemspec",

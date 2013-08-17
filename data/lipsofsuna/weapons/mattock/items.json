@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Itemspec"
+		"type": "Itemspec",
 		"name": "adamantium mattock",
 		"categories":
 		{
@@ -38,7 +38,7 @@
 		"model": "mattock-000"
 	},
 	{
-		"type": "Itemspec"
+		"type": "Itemspec",
 		"name": "aquanite mattock",
 		"categories":
 		{
@@ -77,7 +77,7 @@
 		"model": "mattock-000"
 	},
 	{
-		"type": "Itemspec"
+		"type": "Itemspec",
 		"name": "crimson mattock",
 		"categories":
 		{
@@ -116,7 +116,7 @@
 		"model": "mattock-000"
 	},
 	{
-		"type": "Itemspec"
+		"type": "Itemspec",
 		"name": "iron mattock",
 		"categories":
 		{
@@ -154,7 +154,7 @@
 		"model": "mattock-000"
 	},
 	{
-		"type": "Itemspec"
+		"type": "Itemspec",
 		"name": "stone mattock",
 		"categories":
 		{
@@ -192,7 +192,7 @@
 		"model": "mattock-000"
 	},
 	{
-		"type": "Itemspec"
+		"type": "Itemspec",
 		"name": "wooden mattock",
 		"categories":
 		{

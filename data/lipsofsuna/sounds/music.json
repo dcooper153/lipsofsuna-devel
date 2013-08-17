@@ -2,138 +2,138 @@
 	{
 		"type": "MusicSpec",
 		"name": "fairytale1",
-		"file": "fairytale1"
+		"file": "fairytale1",
 		"categories":
 		{
 			"game": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "fairytale2",
-		"file": "fairytale2"
+		"file": "fairytale2",
 		"categories":
 		{
 			"char": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "fairytale3",
-		"file": "fairytale3"
+		"file": "fairytale3",
 		"categories":
 		{
 			"game": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "fairytale4",
-		"file": "fairytale4"
+		"file": "fairytale4",
 		"categories":
 		{
 			"game": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "fairytale5",
-		"file": "fairytale5"
+		"file": "fairytale5",
 		"categories":
 		{
 			"game": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "fairytale6",
-		"file": "fairytale6"
+		"file": "fairytale6",
 		"categories":
 		{
 			"game": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "fairytale7",
-		"file": "fairytale7"
+		"file": "fairytale7",
 		"categories":
 		{
 			"boss": true,
 			"intro": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "fairytale8",
-		"file": "fairytale8"
+		"file": "fairytale8",
 		"categories":
 		{
 			"char": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "fairytale9",
-		"file": "fairytale9"
+		"file": "fairytale9",
 		"categories":
 		{
 			"boss": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "fairytale10",
-		"file": "fairytale10"
+		"file": "fairytale10",
 		"categories":
 		{
 			"char": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "fairytale11",
-		"file": "fairytale11"
+		"file": "fairytale11",
 		"categories":
 		{
 			"game": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "fairytale12",
-		"file": "fairytale12"
+		"file": "fairytale12",
 		"categories":
 		{
 			"game": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "fairytale13",
-		"file": "fairytale13"
+		"file": "fairytale13",
 		"categories":
 		{
 			"game": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "menu1",
-		"file": "menu1"
+		"file": "menu1",
 		"categories":
 		{
 			"menu": true
-		},
+		}
 	},
 	{
 		"type": "MusicSpec",
 		"name": "xeon5",
-		"file": "xeon5"
+		"file": "xeon5",
 		"fade_out": 8,
 		"categories":
 		{
 			"combat": true
-		},
+		}
 	}
 ]
