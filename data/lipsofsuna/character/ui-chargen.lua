@@ -192,6 +192,15 @@ Ui:add_widget{
 		end)
 	end}
 
+Ui:add_widget{
+	state = "chargen/head",
+	widget = function()
+		local value = Client.chargen:get_head_scale()
+		return UiScrollFloat("Head size", 0, 1, value, function(w)
+			Client.chargen:set_head_scale(w.value)
+		end)
+	end}
+
 ------------------------------------------------------------------------------
 
 Ui:add_state{

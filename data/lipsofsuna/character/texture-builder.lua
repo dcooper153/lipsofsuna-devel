@@ -104,7 +104,8 @@ TextureBuilder.build_with_merger = function(clss, merger, args, hash)
 		return hash
 	end
 	-- Set the base texture.
-	local basename = "aer1" -- FIXME
+	local basename = args.spec:get_base_texture()
+	if not basename then return end
 	local skinspec = args.skin_style and Actorskinspec:find_by_name(args.skin_style)
 	local skinname = skinspec and skinspec.textures[1] or basename
 	local base = Main.images:copy_by_name(skinname)

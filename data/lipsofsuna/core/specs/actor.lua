@@ -71,6 +71,8 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "hair_color", type = "color", description = "Hair color."},
 	{name = "hair_style", type = "string", description = "Hair style."},
 	{name = "hair_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of hair styles."},
+	{name = "head_scale_min", type = "number", default = 1, description = "Minimum head scale."},
+	{name = "head_scale_max", type = "number", default = 1, description = "Maximum head scale."},
 	{name = "head_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of head styles."},
 	{name = "important", type = "boolean", description = "True to not allow the actor to be cleaned up from the map."},
 	{name = "interactive", type = "boolean", default = true, description = "False to make the object not appear interactive."},
@@ -225,6 +227,13 @@ Actorspec.get_animation_arguments = function(self, name, profile, variant)
 		for k,v in pairs(anim:get_arguments(variant)) do args[k] = v end
 	end
 	return args
+end
+
+--- Gets the base diffuse texture of the actor.
+-- @param self Actorspec.
+-- @return String if found. Nil otherwise.
+Actorspec.get_base_texture = function(self)
+	return self.skin_textures and self.skin_textures[1]
 end
 
 --- Gets a model node name for the given equipment slot.

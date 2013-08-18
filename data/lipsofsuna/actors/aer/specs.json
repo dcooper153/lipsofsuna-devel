@@ -13,6 +13,8 @@
 		"type": "Actorspec",
 		"name": "aer",
 		"base": "race",
+		"body_scale_min": 0.8,
+		"body_scale_max": 1.2,
 		"actions":
 		{
 			"left": "block",
@@ -22,6 +24,8 @@
 		"equipment_class": "aer",
 		"eye_style": "random",
 		"hair_style": "random",
+		"head_scale_min": 0.8,
+		"head_scale_max": 1.2,
 		"model": "aer1",
 		"models":
 		{
@@ -36,6 +40,7 @@
 			"upper": "aerupper1",
 			"upper_safe": "aerbloomerstop1"
 		},
+		"skin_textures": ["aer1"],
 		"tilt_bone": ["back1", "back2", "back3"]
 	},
 	{

@@ -20,16 +20,29 @@ local RenderUtils = Class("RenderUtils")
 --- Creates a scale animation for an actor.
 -- @param self Render utils.
 -- @param spec Actor spec.
--- @param scale Scale ratio.
+-- @param scale_body Scale ratio for the body. Nil for none.
+-- @param scale_head Scale ratio for the body. Nil for none.
 -- @return Animation arguments, or nil.
-RenderUtils.create_scale_animation = function(self, spec, scale)
-	local min = spec.body_scale_min
-	local max = spec.body_scale_max
-	if not min and not max then return end
-	local r = scale or 0.5
-	local s = (min or 1) * (1 - r) + (max or 1) * r
+RenderUtils.create_scale_animation = function(self, spec, scale_body, scale_head)
 	local anim = Animation("scale")
-	anim:set_transform{frame = 1, node = "mover", scale = s}
+	if scale_body then
+		local min = spec.body_scale_min
+		local max = spec.body_scale_max
+		if min or max then
+			local r = scale_body
+			local s = (min or 1) * (1 - r) + (max or 1) * r
+			anim:set_transform{frame = 1, node = "mover", scale = s}
+		end
+	end
+	if scale_head then
+		local min = spec.head_scale_min
+		local max = spec.head_scale_max
+		if min or max then
+			local r = scale_head
+			local s = (min or 1) * (1 - r) + (max or 1) * r
+			anim:set_transform{frame = 1, node = "head", scale = s}
+		end
+	end
 	return {channel = Animation.CHANNEL_CUSTOMIZE, animation = anim, fade_in = 0,
 		fade_out = 0, permanent = true, replace = true, weight = 0, weight_scale = 1000}
 end

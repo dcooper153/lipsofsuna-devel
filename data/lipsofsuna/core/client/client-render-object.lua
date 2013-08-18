@@ -319,8 +319,22 @@ ClientRenderObject.update = function(self, secs)
 	if self.object.image_merger then
 		local image = self.object.image_merger:pop_image()
 		if image then
-			self:add_texture_alias("aer1", image) -- FIXME
+			local spec = self.object:get_spec()
+			local base = spec:get_base_texture()
+			if base then
+				self:add_texture_alias(base, image)
+			end
 		end
+	end
+end
+
+--- Updates the body and head scale of the object.
+-- @param self Render object.
+ClientRenderObject.update_scale = function(self)
+	if not self.initialized then return end
+	local args = RenderUtils:create_scale_animation(self.object.spec, self.object.body_scale, self.object.head_scale)
+	if args then
+		self:animate(args)
 	end
 end
 
@@ -350,11 +364,8 @@ ClientRenderObject.set_model = function(self, value)
 		end
 		self.model = value
 	end
-	-- Set the body scale animation.
-	local args = RenderUtils:create_scale_animation(self.object.spec, self.body_scale)
-	if args then
-		self:animate(args)
-	end
+	-- Set the scale animation.
+	self:update_scale()
 end
 
 --- Sets the tilt angle of the object.

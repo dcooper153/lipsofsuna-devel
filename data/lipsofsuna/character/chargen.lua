@@ -76,8 +76,9 @@ Chargen.reset = function(self)
 		face = {},
 		hair_color = {1,1,1},
 		hair_style = "default",
+		head_scale = 0.5,
 		head_style = "aerhead1",
-		height = 1,
+		height = 0.5,
 		name = "Guest",
 		race = "aer",
 		skin_color = {1,1,1},
@@ -122,6 +123,7 @@ Chargen.apply = function(self)
 		face_style = scale255(self.char.face),
 		hair_color = scale255(self.char.hair_color),
 		hair_style = self.char.hair_style,
+		-- TODO: head_scale
 		head_style = self.char.head_style,
 		body_scale = self.char.height,
 		name = self.char.name,
@@ -227,6 +229,7 @@ Chargen.update = function(self, secs)
 		self.data.object.face_style = scale255(self.char.face)
 		self.data.object.hair_color = scale255(self.char.hair_color)
 		self.data.object.hair_style = self.char.hair_style
+		self.data.object.head_scale = self.char.head_scale
 		self.data.object.head_style = self.char.head_style
 		self.data.object.skin_color = scale255(self.char.skin_color)
 		self.data.object.skin_style = self.char.skin_style
@@ -293,6 +296,7 @@ Chargen.get_build_data = function(self)
 		eye_style = self.char.eye_style,
 		face_style = scale255(self.char.face),
 		hair_color = self.char.hair_color,
+		head_scale = self.char.head_scale,
 		hair_style = self.char.hair_style,
 		head_style = self.char.head_style,
 		nudity = Client.options.nudity_enabled,
@@ -430,10 +434,23 @@ Chargen.get_head_style = function(self)
 	return self.char.head_style
 end
 
+--- Gets the head scaling of the character.
+-- @param self Chargen.
+-- @return Scaling.
+Chargen.get_head_scale = function(self, value)
+	return self.char.head_scale
+end
+
+--- Sets the head scaling of the character.
+-- @param self Chargen.
+-- @param value Scaling.
+Chargen.set_head_scale = function(self, value)
+	self.char.head_scale = value
+	self.data.object.head_scale = self.char.head_scale
+	self.data.object.render:update_scale()
+end
+
 --- Sets the head style of the character.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @param value Style name.
 Chargen.set_head_style = function(self, value)
@@ -442,9 +459,6 @@ Chargen.set_head_style = function(self, value)
 end
 
 --- Gets the height of the character.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @return Height.
 Chargen.get_height = function(self, value)
@@ -452,14 +466,12 @@ Chargen.get_height = function(self, value)
 end
 
 --- Sets the height of the character.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @param value Height.
 Chargen.set_height = function(self, value)
 	self.char.height = value
-	self.data.update_needed = true
+	self.data.object.body_scale = self.char.height
+	self.data.object.render:update_scale()
 end
 
 --- Gets the name of the character.
