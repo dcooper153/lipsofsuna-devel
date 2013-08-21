@@ -133,6 +133,12 @@ public:
 		int*             modes_num) const;
 
 private:
+	bool init_window (
+		LIRenVideomode*                  mode,
+		Ogre::RenderSystemCapabilities*& retry);
+
+	void deinit_window ();
+
 	int count_resources (
 		const Ogre::ResourceManager& manager) const;
 

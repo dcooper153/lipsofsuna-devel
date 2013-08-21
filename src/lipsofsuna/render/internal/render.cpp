@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -71,74 +71,13 @@ int LIRenRender::init (
 	log = new Ogre::LogManager ();
 	log->createLog ("render.log", true, false, false);
 
-	/* Initialize the Ogre root. */
-	root = new Ogre::Root("", "", "");
-
-	/* Load plugins. */
-	load_plugin ("RenderSystem_GL");
-	load_plugin ("Plugin_OctreeSceneManager");
-	load_plugin ("Plugin_ParticleFX");
-
-	/* Make sure that the required plugins were loaded. */
-	if (!check_plugin ("GL RenderSystem"))
-		return 0;
-
-	/* Initialize the render system. */
-	render_system = root->getRenderSystemByName ("OpenGL Rendering Subsystem");
-	if (!(render_system->getName () == "OpenGL Rendering Subsystem"))
-		return 0;
-
-	/* Choose the video mode. */
-	Ogre::String fsaa = Ogre::StringConverter::toString (mode->multisamples);
-	Ogre::String video_mode =
-		Ogre::StringConverter::toString (mode->width) + " x " +
-		Ogre::StringConverter::toString (mode->height);
-	render_system->setConfigOption ("Full Screen", mode->fullscreen? "Yes" : "No");
-	render_system->setConfigOption ("VSync", mode->sync? "Yes" : "No");
-	render_system->setConfigOption ("Video Mode", video_mode);
-	render_system->setConfigOption ("FSAA", fsaa);
-
-	/* Initialize the render window. */
-	root->setRenderSystem (render_system);
-
-	/* Initialize custom render system capabilities. */
-	/* This is a debug feature that allows emulating older hardware by setting
-	   the LOS_READ_RENDERCAPS environment variable. */
-	if (getenv ("LOS_READ_RENDERCAPS"))
+	/* Create the window. */
+	Ogre::RenderSystemCapabilities* retry = NULL;
+	while (!init_window (mode, retry))
 	{
-		Ogre::String dirname = data1 + "/debug";
-		Ogre::String capsname = getenv ("LOS_READ_RENDERCAPS");
-		Ogre::RenderSystemCapabilitiesManager* rscm = Ogre::RenderSystemCapabilitiesManager::getSingletonPtr ();
-		rscm->parseCapabilitiesFromArchive (dirname, "FileSystem", true);
-		Ogre::RenderSystemCapabilities* caps = rscm->loadParsedCapabilities (capsname);
-		if (caps != NULL)
-		{
-			root->useCustomRenderSystemCapabilities (caps);
-			printf ("NOTE: read rendercaps `%s'\n", capsname.c_str ());
-		}
-		else
-		{
-			lisys_error_set (EINVAL, "could not find rendercaps `%s'", capsname.c_str ());
-			lisys_error_report ();
-		}
-	}
-
-	/* Create the main window. */
-	render_window = root->initialise (true, "Lips of Suna");
-	this->mode = *mode;
-	update_mode ();
-
-	/* Dump the render system capabilities. */
-	/* The rendercaps files require all the fields to be present so we can't
-	   realistically expect anyone to write them manually. */
-	if (getenv ("LOS_WRITE_RENDERCAPS"))
-	{
-		const Ogre::RenderSystemCapabilities* caps = render_system->getCapabilities ();
-		Ogre::RenderSystemCapabilitiesSerializer s;
-		Ogre::String capsname = getenv ("LOS_WRITE_RENDERCAPS");
-		Ogre::String filename = data1 + "/debug/" + capsname + ".rendercaps";
-		s.writeScript (caps, capsname, filename);
-		printf ("NOTE: dumped rendercaps to `%s'\n", filename.c_str ());
+		deinit_window ();
+		if (!retry)
+			return 0;
 	}
 
 	/* Initialize the scene manager. */
@@ -649,6 +588,109 @@ int LIRenRender::get_videomodes (
 }
 
 /*****************************************************************************/
+
+bool LIRenRender::init_window (
+	LIRenVideomode*                  mode,
+	Ogre::RenderSystemCapabilities*& retry)
+{
+	/* Initialize the Ogre root. */
+	root = new Ogre::Root("", "", "");
+
+	/* Load plugins. */
+	load_plugin ("RenderSystem_GL");
+	load_plugin ("Plugin_OctreeSceneManager");
+	load_plugin ("Plugin_ParticleFX");
+
+	/* Make sure that the required plugins were loaded. */
+	if (!check_plugin ("GL RenderSystem"))
+	{
+		retry = NULL;
+		return 0;
+	}
+
+	/* Initialize the render system. */
+	render_system = root->getRenderSystemByName ("OpenGL Rendering Subsystem");
+	if (!(render_system->getName () == "OpenGL Rendering Subsystem"))
+	{
+		retry = NULL;
+		return 0;
+	}
+
+	/* Choose the video mode. */
+	Ogre::String fsaa = Ogre::StringConverter::toString (mode->multisamples);
+	Ogre::String video_mode =
+		Ogre::StringConverter::toString (mode->width) + " x " +
+		Ogre::StringConverter::toString (mode->height);
+	render_system->setConfigOption ("Full Screen", mode->fullscreen? "Yes" : "No");
+	render_system->setConfigOption ("VSync", mode->sync? "Yes" : "No");
+	render_system->setConfigOption ("Video Mode", video_mode);
+	render_system->setConfigOption ("FSAA", fsaa);
+
+	/* Initialize the render window. */
+	root->setRenderSystem (render_system);
+
+	/* Override the render capabilities. */
+	/* This is used to disable shaders either due to a bad video card or a
+	   manual trigger via an environment variable. */
+	if (retry)
+		root->useCustomRenderSystemCapabilities (retry);
+
+	/* Create the main window. */
+	render_window = root->initialise (true, "Lips of Suna");
+
+	/* Hack for old Intel cards. */
+	/* Cards that report OpenGL older than 2.1 really should be using shaders
+	   at all. Intel GMA 31xx takes 20 seconds to render the main menu with
+	   shaders enabled and some driver versions will crash straight out. */
+	if (!retry)
+	{
+		/* Check for the driver version. */
+		const Ogre::RenderSystemCapabilities* caps = render_system->getCapabilities ();
+		Ogre::DriverVersion version = caps->getDriverVersion ();
+		if (version.major < 2 || (version.major == 2 && version.minor < 1))
+		{
+			printf ("WARNING: Driver reported version %d.%d.%d.%d but 2.1 is required\n",
+				version.major, version.minor, version.release, version.build);
+			if (!getenv ("LOS_FORCE_ENABLE_SHADERS"))
+			{
+				printf ("WARNING: Disabling shaders because OpenGL 2.1 is not supported.\n");
+				retry = render_system->createRenderSystemCapabilities ();
+			}
+		}
+
+		/* Check for manual shader disable. */
+		if (!retry && getenv ("LOS_FORCE_DISABLE_SHADERS"))
+		{
+			printf ("WARNING: Forcing shaders to be disabled.\n");
+			retry = render_system->createRenderSystemCapabilities ();
+		}
+
+		/* Create new rendercaps and retry if shaders were disabled. */
+		if (retry)
+		{
+			retry->unsetCapability (Ogre::RSC_VERTEX_PROGRAM);
+			retry->unsetCapability (Ogre::RSC_FRAGMENT_PROGRAM);
+			retry->removeShaderProfile ("arbfp1");
+			retry->removeShaderProfile ("arbvp1");
+			retry->removeShaderProfile ("glsl");
+			return false;
+		}
+	}
+
+	/* Update the video mode. */
+	this->mode = *mode;
+	update_mode ();
+
+	return true;
+}
+
+void LIRenRender::deinit_window ()
+{
+	delete root;
+	root = NULL;
+	render_system = NULL;
+	render_window = NULL;
+}
 
 int LIRenRender::count_resources (
 	const Ogre::ResourceManager& manager) const
