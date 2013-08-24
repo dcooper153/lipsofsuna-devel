@@ -31,7 +31,7 @@ RenderUtils.create_scale_animation = function(self, spec, scale_body, scale_head
 		if min or max then
 			local r = scale_body
 			local s = (min or 1) * (1 - r) + (max or 1) * r
-			anim:set_transform{frame = 1, node = "mover", scale = s}
+			anim:set_transform{frame = 1, node = "hips_main", scale = s}
 		end
 	end
 	if scale_head then

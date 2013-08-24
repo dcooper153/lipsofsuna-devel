@@ -1,7 +1,7 @@
 [
 	{
 		"type": "CraftingRecipeSpec",
-		"name": "skirt",
+		"name": "shirt",
 		"effect": "craftsewing1",
 		"materials":
 		{
@@ -10,23 +10,29 @@
 	},
 	{
 		"type": "Itemspec",
-		"name": "skirt",
-		"model": "book-000",
+		"name": "shirt",
+		"model": "leggings1",
 		"icon": "leatherarmor1",
-		"armor_class": 0.04,
+		"armor_class": 0.02,
 		"categories":
 		{
 			"armor": true
 		},
 		"equipment_models":
 		{
-			"aer": {"skirt": "aerskirt1"}
+			"aer":
+			{
+				"shirt": "aerupperclothed1"
+			}
 		},
 		"equipment_textures":
 		{
-			"aer": {"skin1": "aerskirt1"}
+			"aer":
+			{
+				"skin1": "aershirt1"
+			}
 		},
-		"equipment_slot": "lowerbody",
+		"equipment_slot": "upperbody",
 		"mass": 5
 	}
 ]

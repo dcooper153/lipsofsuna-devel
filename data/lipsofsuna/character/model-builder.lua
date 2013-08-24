@@ -188,7 +188,7 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 		end
 	end
 	-- Face customization.
-	if args.face_style and (string.match(name, ".*head.*") or string.match(name, ".*eye.*")) then
+	if args.face_style then--and string.match(name, ".*head.*" then
 		for k,spec in ipairs(ChargenSliderSpec:find_by_category("face")) do
 			local field = args[spec.field_name]
 			if field then

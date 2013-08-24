@@ -20,11 +20,11 @@
 		"categories": {"armor": true},
 		"equipment_models":
 		{
-			"aer": {"upper": "aerupperunderwear1"}
+			"aer": {"upper": "aerupperbra1"}
 		},
 		"equipment_textures":
 		{
-			"aer": {"aer1": "aerbra1"}
+			"aer": {"skin1": "aerbra1"}
 		},
 		"equipment_priority": -5,
 		"equipment_slot": "bra",
@@ -43,10 +43,10 @@
 		},
 		"equipment_textures":
 		{
-			"aer": {"aer1": "aerpanties1"}
+			"aer": {"skin1": "aerpanties1"}
 		},
 		"equipment_priority": -5,
-		"equipment_slot": "panties",
+		"equipment_slot": "pants",
 		"mass": 5
 	}
 ]

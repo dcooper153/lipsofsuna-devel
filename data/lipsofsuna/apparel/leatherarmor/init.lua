@@ -66,8 +66,9 @@ Itemspec{
 		["aermale"] = {legs = "aermaleleatherlegs2"}},
 	equipment_textures =
 	{
-		["aer"] = {["aer1"] = "aerspats1"}
+		["aer"] = {["skin1"] = "aerspats1"}
 	},
+	equipment_priority = -3,
 	equipment_slot = "pants",
 	mass = 5,
 	water_gravity = Vector(0,6,0)}

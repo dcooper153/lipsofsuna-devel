@@ -14,11 +14,10 @@
 		"categories": {"armor": true},
 		"equipment_models":
 		{
-			"aer": {"feet": "aerfootsock1"}
 		},
 		"equipment_textures":
 		{
-			"aer": {"aer1": "aerleggings1"}
+			"aer": {"skin1": "aerleggings1"}
 		},
 		"equipment_slot": "feet",
 		"mass": 5

@@ -127,6 +127,9 @@
 			"url": "http://www.blendswap.com/3D-models/author/anonymous/"
 		},
 		{
+			"name": "gruntunbur"
+		},
+		{
 			"name": "hiponboy",
 			"url": "http://opengameart.org/user/783"
 		},
@@ -267,6 +270,8 @@
 				"data/lipsofsuna/actors/aer/aereye1.png",
 				"data/lipsofsuna/actors/aer/aerface1.png",
 				"data/lipsofsuna/actors/hair/aershorthair1.lmdl",
+				"data/lipsofsuna/actors/hair/aerpigtails1.lmdl",
+				"data/lipsofsuna/actors/hair/aerpigtails1.png",
 				"data/lipsofsuna/actors/hair/hair1.dds",
 				"data/lipsofsuna/actors/hair/hair1.png",
 				"data/lipsofsuna/actors/hair/hair1n.dds",
@@ -287,6 +292,9 @@
 				"data/lipsofsuna/apparel/dress/aerdress1.png",
 				"data/lipsofsuna/apparel/dress/aerdress2.png",
 				"data/lipsofsuna/apparel/dress/aerlowerdress1.lmdl",
+				"data/lipsofsuna/apparel/headband/aerheadband1.lmdl",
+				"data/lipsofsuna/apparel/headband/headband1.lmdl",
+				"data/lipsofsuna/apparel/headband/headband1.png"
 				"data/lipsofsuna/apparel/leatherarmor/aerspats1.png",
 				"data/lipsofsuna/apparel/leggings/aerfootsock1.lmdl",
 				"data/lipsofsuna/apparel/leggings/aerleggings1.png",
@@ -294,6 +302,7 @@
 				"data/lipsofsuna/apparel/leggings/leggings1.dds",
 				"data/lipsofsuna/apparel/leggings/leggings1.lmdl",
 				"data/lipsofsuna/apparel/leggings/leggings1n.png",
+				"data/lipsofsuna/apparel/shirt/aershirt1.png",
 				"data/lipsofsuna/apparel/skirt/aerskirt1.lmdl",
 				"data/lipsofsuna/apparel/skirt/aerskirt1.png",
 				"data/lipsofsuna/apparel/skirt/skirt1.png",
@@ -324,21 +333,18 @@
 				"actors/hair1n.png",
 				"actors/hair2.blend",
 				"actors/hair5.blend",
-				"actors/ribbon1.png",
+				"actors/player/aerpigtails1.blend",
+				"actors/player/aerpigtails1.png",
+				"actors/player/ribbon1.png",
 				"apparel/aeritem1.blend",
 				"apparel/aerbloomers1.png",
 				"apparel/aerbloomers1.svg",
 				"apparel/aerbloomerstop1.png",
 				"apparel/aerbloomerstop1.svg",
-				"apparel/aerbra1.png",
 				"apparel/aerbra1.svg",
-				"apparel/aerleggings1.png",
 				"apparel/aerleggings1.svg",
-				"apparel/aerpanties1.png",
 				"apparel/aerpanties1.svg",
-				"apparel/aerskirt1.png",
 				"apparel/aerskirt1.svg",
-				"apparel/aerspats1.png",
 				"apparel/aerspats1.svg",
 				"apparel/aerdress1.png",
 				"apparel/aerdress1.svg",
@@ -346,6 +352,8 @@
 				"apparel/aerdress2.svg",
 				"apparel/bloomers1.blend",
 				"apparel/bloomers1.png",
+				"apparel/headband1.blend",
+				"apparel/headband1.png"
 				"apparel/leggings1.blend",
 				"apparel/leggings1.png",
 				"apparel/leggings1n.png",
@@ -353,6 +361,7 @@
 				"apparel/longcoat1.blend",
 				"apparel/longcoat1.png",
 				"apparel/longcoat1.xcf",
+				"apparel/shirt1.svg",
 				"apparel/skirt1.blend",
 				"apparel/skirt1.png",
 				"weapons/boomerang1.blend",
@@ -373,16 +382,20 @@
 			"files":
 			[
 				"data/lipsofsuna/actors/aer/aer1.lmdl",
-				"data/lipsofsuna/actors/aer/aer1-*.lani"
+				"data/lipsofsuna/actors/aer/aerbody1.lmdl",
+				"data/lipsofsuna/actors/aer/skin1.png",
+				"data/lipsofsuna/apparel/underwear/aerupperbra1.lmdl"
 			],
 			"files_original":
 			[
-				"actors/aer1.blend"
+				"actors/player/player1.blend",
+				"actors/player/playerunderwear1.blend",
+				"actors/player/skin1.png"
 			],
 			"authors":
 			[
-				"Ari Mustonen",
-				"Renoki"
+				"gruntunbur",
+				"Ari Mustonen"
 			],
 			"licenses":
 			[
@@ -1311,27 +1324,6 @@
 			],
 			"source": "http://www.blendswap.com/3D-models/characters/sara-tween-girl/",
 			"comment": "Minor modifications were done to fit the mesh with our rigs. The texture was desaturated to make it compatible with our hair coloring system. The normal map was generated from hair2.png"
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/apparel/headband/aerheadband1.lmdl",
-				"data/lipsofsuna/apparel/headband/headband1.lmdl",
-				"data/lipsofsuna/apparel/headband/headband1.dds"
-			],
-			"files_original":
-			[
-				"apparel/headband1.blend",
-				"apparel/headband1.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
 		},
 		{
 			"files_original":

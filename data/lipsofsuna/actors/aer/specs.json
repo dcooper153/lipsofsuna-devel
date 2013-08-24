@@ -30,17 +30,9 @@
 		"models":
 		{
 			"skeleton": "aer1",
-			"arms": "aerarm1",
-			"head": "aerhead1",
-			"hands": "aerhand1",
-			"feet": "aerfoot1",
-			"legs": "aerleg1",
-			"lower": "aerlower1",
-			"lower_safe": "aerbloomers1",
-			"upper": "aerupper1",
-			"upper_safe": "aerbloomerstop1"
+			"body": "aerbody1"
 		},
-		"skin_textures": ["aer1"],
+		"skin_textures": ["skin1"],
 		"tilt_bone": ["back1", "back2", "back3"]
 	},
 	{
@@ -50,28 +42,14 @@
 		"ai_enabled": false,
 		"inventory_items":
 		{
-			"torch": 1,
-			"workbench": 1,
-			"dress": 1,
-			"leather leggings": 1
+			"leather leggings": 1,
+			"leather pants": 1
 		}
 	},
 	{
 		"type": "Actorskinspec",
 		"name": "Aer skin 1",
 		"actors": {"aer": true},
-		"textures": ["aer1"]
-	},
-	{
-		"type": "Actorskinspec",
-		"name": "Aer skin 2",
-		"actors": {"aer": true},
-		"textures": ["aer1"]
-	},
-	{
-		"type": "Actorskinspec",
-		"name": "Aer skin 3",
-		"actors": {"aer": true},
-		"textures": ["aer1"]
+		"textures": ["skin1"]
 	}
 ]

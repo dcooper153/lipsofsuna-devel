@@ -22,7 +22,7 @@
 		"categories": {"face": true},
 		"field_name": "face_style",
 		"field_index": 3,
-		"shape_keys": ["chin sharp"]
+		"shape_keys": ["chin dull", "chin sharp"]
 	},
 	{
 		"type": "ChargenSliderSpec",
@@ -30,8 +30,7 @@
 		"categories": {"face": true},
 		"field_name": "face_style",
 		"field_index": 4,
-		"invert": true,
-		"shape_keys": ["chin small"]
+		"shape_keys": ["chin big"]
 	},
 	{
 		"type": "ChargenSliderSpec",
@@ -39,7 +38,6 @@
 		"categories": {"face": true},
 		"field_name": "face_style",
 		"field_index": 5,
-		"invert": true,
 		"shape_keys": ["jaw straight"]
 	},
 	{
@@ -48,7 +46,6 @@
 		"categories": {"face": true},
 		"field_name": "face_style",
 		"field_index": 6,
-		"invert": true,
 		"shape_keys": ["jaw wide"]
 	}
 ]
