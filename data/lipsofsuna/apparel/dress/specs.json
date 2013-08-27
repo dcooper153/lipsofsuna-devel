@@ -20,11 +20,11 @@
 		"categories": {"armor": true},
 		"equipment_models":
 		{
-			"aer": {"lower": "aerlowerdress1", "upper": "aerupperclothed1", "upper_safe": ""}
+			"aer": {"lower": "aerlowerdress1", "upper": "aerupperclothed1"}
 		},
 		"equipment_textures":
 		{
-			"aer": {"aer1": "aerdress2"}
+			"aer": {"skin1": "aerdress1"}
 		},
 		"equipment_slot": "upperbody",
 		"mass": 1
@@ -38,11 +38,11 @@
 		"categories": {"armor": true},
 		"equipment_models":
 		{
-			"aer": {"lower": "aerlowerdress1", "upper_safe": ""}
+			"aer": {"lower": "aerlowerdress1", "upper": "aerupperbra1"}
 		},
 		"equipment_textures":
 		{
-			"aer": {"aer1": "aerdress1"}
+			"aer": {"skin1": "aerdress2"}
 		},
 		"equipment_slot": "upperbody",
 		"mass": 1
