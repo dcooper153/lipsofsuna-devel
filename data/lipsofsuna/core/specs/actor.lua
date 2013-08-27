@@ -103,6 +103,7 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "swim_force", type = "number", default = 3.5, description = "Mass-independent upward swim force of the actor."},
 	{name = "tilt_bone", type = "list", list = {type = "string"}, default = {}, description = "Name of the tilt bone of the actor."},
 	{name = "tilt_limit", type = "number", default = math.pi, description = "Tilt limit in radians of the tilting bone."},
+	{name = "tilt_mult", type = "number", default = 1, description = "Tilt angle multiplier."},
 	{name = "timing_attack_bow", type = "number", default = 20, description = "Timing of bow firing, in frames."},
 	{name = "timing_attack_crossbow", type = "number", default = 20, description = "Timing of crossbow firing, in frames."},
 	{name = "timing_attack_explode", type = "number", default = 120, description = "Timing of explosion attack, in frames."},

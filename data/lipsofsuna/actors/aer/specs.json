@@ -33,7 +33,8 @@
 			"body": "aerbody1"
 		},
 		"skin_textures": ["skin1"],
-		"tilt_bone": ["back1", "back2", "back3"]
+		"tilt_bone": ["spine", "chest"],
+		"tilt_mult": -1
 	},
 	{
 		"type": "Actorspec",
@@ -42,8 +43,8 @@
 		"ai_enabled": false,
 		"inventory_items":
 		{
-			"leather leggings": 1,
-			"leather pants": 1
+			"leather pants": 1,
+			"shirt": 1
 		}
 	},
 	{

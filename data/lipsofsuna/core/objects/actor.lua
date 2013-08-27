@@ -1017,7 +1017,9 @@ Actor.set_tilt_angle = function(self, tilt, predict)
 	SimulationObject.set_tilt_angle(self, tilt, predict)
 	-- Back tilting.
 	if self:has_client_data() and (not self.predict or not predict) and self.spec then
-		self.render:set_tilt(self.spec.tilt_bone, self.dead and 0 or tilt or 0)
+		local t = self.dead and 0 or tilt or 0
+		t = t * self.spec.tilt_mult
+		self.render:set_tilt(self.spec.tilt_bone, t)
 	end
 end
 
