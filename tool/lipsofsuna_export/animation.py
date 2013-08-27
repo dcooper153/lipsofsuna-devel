@@ -65,7 +65,10 @@ class LIAnimation:
 		if self.state == None:
 			# TODO: Make sure that there are no solo tracks.
 			# Make sure that there is no active action.
-			self.armature.animation_data.action = None
+			try:
+				self.armature.animation_data.action = None
+			except Exception as e:
+				print("WARNING: %s" % str(e))
 			# Disable blend in/out to avoid broken frames at start or end.
 			for track in self.armature.animation_data.nla_tracks:
 				for strip in track.strips:

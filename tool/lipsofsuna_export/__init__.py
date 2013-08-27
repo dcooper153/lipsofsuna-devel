@@ -30,6 +30,7 @@ from .shape import *
 from .shape_part import *
 from .shapekey import *
 from .texture import *
+from .update_shape_keys_operator import *
 from .utils import *
 from .vertex import *
 from .writer import *
