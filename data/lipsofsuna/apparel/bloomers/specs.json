@@ -20,14 +20,14 @@
 		"categories": {"armor": true},
 		"equipment_models":
 		{
-			"aer": {"lower": "aerlowerclothed1", "lower1": "aerbloomers1"}
+			"aer": {"lower1": "aerbloomers1"}
 		},
 		"equipment_textures":
 		{
-			"aer": {"aer1": "aerbloomers1"}
+			"aer": {"skin1": "aerbloomers1"}
 		},
 		"equipment_priority": -5,
-		"equipment_slot": "panties",
+		"equipment_slot": "pants",
 		"mass": 5
 	},
 	{
@@ -39,14 +39,14 @@
 		"categories": {"armor": true},
 		"equipment_models":
 		{
-			"aer": {"upper": "aerupperclothed1", "upper1": "aerbloomerstop1"}
+			"aer": {"upper1": "aerbloomerstop1"}
 		},
 		"equipment_textures":
 		{
-			"aer": {"aer1": "aerbloomerstop1"}
+			"aer": {"skin1": "aerbloomerstop1"}
 		},
 		"equipment_priority": -5,
-		"equipment_slot": "bra",
+		"equipment_slot": "upperbody",
 		"mass": 5
 	}
 ]
