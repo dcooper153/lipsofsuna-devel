@@ -1,0 +1,65 @@
+[
+	{
+		"type": "HairStyleSpec",
+		"name": "Bald 1"
+	},
+	{
+		"type": "HairStyleSpec",
+		"name": "Pigtails 1",
+		"equipment_models":
+		{
+			"aer":
+			{
+				"hair": "aerpigtails1"
+			}
+		}
+	},
+	{
+		"type": "HairStyleSpec",
+		"name": "Drill 1",
+		"equipment_models":
+		{
+			"aer":
+			{
+				"hair": "hair4"
+			}
+		}
+	},
+	{
+		"type": "HairStyleSpec",
+		"name": "Short 1",
+		"equipment_models":
+		{
+			"aer":
+			{
+				"hair_back": "aerhairbackshort1",
+				"hair_front": "aerhairfrontshort1"
+			}
+		}
+	},
+	{
+		"type": "HairStyleSpec",
+		"name": "Short 2",
+		"equipment_models":
+		{
+			"aer":
+			{
+				"hair_back": "aerhairbackshort2",
+				"hair_front": "aerhairfrontshort1"
+			}
+		}
+	},
+	{
+		"type": "HairStyleSpec",
+		"name": "Ponytail 1",
+		"equipment_models":
+		{
+			"aer":
+			{
+				"hair_back": "aerhairbacksmooth1",
+				"hair_front": "aerhairfrontshort1",
+				"hair_ponytail": "aerhairponytail1"
+			}
+		}
+	}
+]
