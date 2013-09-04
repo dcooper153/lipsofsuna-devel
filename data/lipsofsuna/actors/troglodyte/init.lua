@@ -29,7 +29,7 @@ Actorspec{
 	eye_style = "random",
 	factions = {["evil"] = true},
 	hair_style = "random",
-	hair_styles = {["troglong"] = "trogfemlonghair1", ["trogshort"] = "trogfemshorthair1"},
+	--hair_styles = {["troglong"] = "trogfemlonghair1", ["trogshort"] = "trogfemshorthair1"},
 	inventory_items = {["wooden club"] = 1, ["trog rags"] = 1},
 	loot_categories = {"material"},
 	loot_count_min = 2,

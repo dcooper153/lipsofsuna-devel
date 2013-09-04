@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Color = require("system/color")
+local HairStyleSpec = require("core/specs/hair-style")
 local Model = require("system/model")
 local ModelMerger = require("system/model-merger")
 local Serialize = require("system/serialize")
@@ -75,22 +76,26 @@ ModelBuilder.build_with_merger = function(clss, merger, args, hash)
 	if args.head_style and args.head_style ~= "" then
 		meshes["head"] = args.head_style
 	end
-	-- Add the hair model.
-	if args.hair_style and args.hair_style ~= "" then
-		meshes.hair = args.hair_style
-	end
-	-- Sort equipment by priority.
+	-- Find the equipment specs.
 	local equipment = {}
 	if args.equipment then
 		for slot,name in pairs(args.equipment) do
-			local spec = Itemspec:find{name = name}
+			local spec = Itemspec:find_by_name(name)
 			if spec then
 				table.insert(equipment, spec)
 			end
 		end
-		table.sort(equipment, function(a,b) return a.equipment_priority < b.equipment_priority end)
 	end
-	-- Add equipment models.
+	-- Find the haircut spec.
+	if args.hair_style and args.hair_style ~= "" then
+		local spec = HairStyleSpec:find_by_name(args.hair_style)
+		if spec then
+			table.insert(equipment, spec)
+		end
+	end
+	-- Prioritize the equipment models.
+	table.sort(equipment, function(a,b) return a.equipment_priority < b.equipment_priority end)
+	-- Add the equipment models.
 	for i,spec in ipairs(equipment) do
 		local models = spec:get_equipment_models(args.spec.equipment_class or args.spec.name, lod)
 		if models then

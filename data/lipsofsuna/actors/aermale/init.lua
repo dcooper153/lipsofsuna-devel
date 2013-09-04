@@ -47,7 +47,7 @@ Actorspec{
 		feet = "aermale1feet1",
 		eyes = "aermale1eyes1",
 		upper = "aermale1chest1"},
-	hair_styles = {["Bald"] = "", ["Short"] = "aermale1hair1"},
+	--hair_styles = {["Bald"] = "", ["Short"] = "aermale1hair1"},
 	tilt_bone = {"back1", "back2", "back3"},
 	timing_attack_throw = 4,
 	timing_spell_ranged = 4,

@@ -70,7 +70,6 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "gravity", type = "vector", default = Vector(0,-15), description = "Gravity vector."},
 	{name = "hair_color", type = "color", description = "Hair color."},
 	{name = "hair_style", type = "string", description = "Hair style."},
-	{name = "hair_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of hair styles."},
 	{name = "head_scale_min", type = "number", default = 1, description = "Minimum head scale."},
 	{name = "head_scale_max", type = "number", default = 1, description = "Maximum head scale."},
 	{name = "head_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of head styles."},

@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Color = require("system/color")
+local HairStyleSpec = require("core/specs/hair-style")
 local Image = require("system/image")
 local ImageMerger = require("system/image-merger")
 local Serialize = require("system/serialize")
@@ -67,18 +68,26 @@ end
 -- @param hash Hash of the old texture, or nil.
 -- @return hash Hash of the new texture.
 TextureBuilder.build_with_merger = function(clss, merger, args, hash)
-	-- Sort equipment by priority.
+	-- Find the equipment specs.
 	local equipment = {}
 	if args.equipment then
 		for slot,name in pairs(args.equipment) do
-			local spec = Itemspec:find{name = name}
+			local spec = Itemspec:find_by_name(name)
 			if spec then
 				table.insert(equipment, spec)
 			end
 		end
-		table.sort(equipment, function(a,b) return a.equipment_priority < b.equipment_priority end)
 	end
-	-- Add equipment textures.
+	-- Find the haircut spec.
+	if args.hair_style and args.hair_style ~= "" then
+		local spec = HairStyleSpec:find_by_name(args.hair_style)
+		if spec then
+			table.insert(equipment, spec)
+		end
+	end
+	-- Sort the specs by priority.
+	table.sort(equipment, function(a,b) return a.equipment_priority < b.equipment_priority end)
+	-- Add the equipment textures.
 	local textures = {}
 	for i,spec in ipairs(equipment) do
 		local tex = spec:get_equipment_textures(args.spec.equipment_class or args.spec.name, lod)

@@ -9,7 +9,7 @@ Actorspec{
 	camera_center = Vector(0, 1, 0),
 	damage_from_magma = 9,
 	equipment_class = "aer",
-	hair_styles = {["Bald"] = "", ["Plant 1"] = "devorahair1", ["Plant 2"] = "devorahair2"},
+	--hair_styles = {["Bald"] = "", ["Plant 1"] = "devorahair1", ["Plant 2"] = "devorahair2"},
 	model = "aer1",
 	models = {
 		skeleton = "aer1",

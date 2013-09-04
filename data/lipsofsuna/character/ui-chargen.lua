@@ -1,4 +1,5 @@
 local Client = require("core/client/client")
+local HairStyleSpec = require("core/specs/hair-style")
 local UiScrollFloat = require("ui/widgets/scrollfloat")
 
 local chargen_input = function(args)
@@ -207,15 +208,12 @@ Ui:add_state{
 	state = "chargen/head/hairstyle",
 	label = "Select hair style",
 	init = function()
-		local widgets = {}
-		local race = Client.chargen:get_race()
-		local spec = Actorspec:find{name = race}
-		if not spec.hair_styles then return end
 		local lst = {}
-		for k,v in pairs(spec.hair_styles) do
-			table.insert(lst, {k, v})
+		for k,v in pairs(HairStyleSpec.dict_name) do
+			table.insert(lst, {k, k})
 		end
 		table.sort(lst, function(a,b) return a[1] < b[1] end)
+		local widgets = {}
 		for k,v in ipairs(lst) do
 			local widget = Widgets.Uiradio(v[1], "hair", function(w)
 				Client.chargen:set_hair_style(w.style)
