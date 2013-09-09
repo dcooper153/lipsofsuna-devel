@@ -84,7 +84,7 @@ Actorpresetspec.get_chargen_face = function(self)
 	local count = 0
 	for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
 		count = math.max(count, v.field_index)
-		list[v.field_index] = self.body[v.name] or v.default
+		list[v.field_index] = self.face[v.name] or v.default
 	end
 	for i = 1,count do
 		if not list[i] then
