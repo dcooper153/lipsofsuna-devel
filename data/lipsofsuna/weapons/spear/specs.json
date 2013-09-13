@@ -1,0 +1,22 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "iron spear",
+		"effect": "craftmetal1",
+		"materials": {"iron ingot": 4},
+		"modes": {"metal": true}
+	},
+	{
+		"type": "Itemspec",
+		"name": "iron spear",
+		"actions": {"right": "attack", "left": "block weapon"},
+		"categories": {"melee": true, "weapon": true},
+		"effect_attack_speedline": true,
+		"icon": "staff1",
+		"modifiers": {"physical damage": 10},
+		"modifiers_bonus": ["melee"],
+		"equipment_slot": "hand.R",
+		"mass": 15,
+		"model": "spear1"
+	}
+]

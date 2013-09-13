@@ -17,5 +17,9 @@
 	[
 		"main"
 	],
-	"specs": ["specs"]
+	"specs":
+	[
+		"effects",
+		"specs"
+	]
 }

@@ -1,0 +1,31 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "long coat",
+		"effect": "craftsewing1",
+		"materials":
+		{
+			"hide": 3
+		}
+	},
+	{
+		"type": "Itemspec",
+		"name": "long coat",
+		"categories":
+		{
+			"armor": true
+		},
+		"armor_class": 0.05,
+		"equipment_models":
+		{
+			"aer":
+			{
+				"upper1": "longcoat1"
+			}
+		},
+		"equipment_slot": "upperbody",
+		"icon": "lizardboot1",
+		"mass": 4,
+		"model": "longcoat1"
+	}
+]

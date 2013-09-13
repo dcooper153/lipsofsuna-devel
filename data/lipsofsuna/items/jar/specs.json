@@ -1,0 +1,24 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "jar",
+		"effect": "craftmetal1",
+		"materials": {"granite stone": 3}
+	},
+	{
+		"type": "Itemspec",
+		"name": "jar",
+		"model": "jar1",
+		"icon": "potion3",
+		"mass": 9,
+		"categories": {"container": true, "generate": true},
+		"description": "Small container, used for storing things",
+		"important": true,
+		"inventory_size": 4,
+		"inventory_type": "chest",
+		"loot_categories": ["material", "misc", "potion"],
+		"loot_count_max": 4,
+		"stacking": false,
+		"usages": {"loot": true}
+	}
+]

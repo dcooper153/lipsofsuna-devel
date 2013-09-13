@@ -1,0 +1,28 @@
+[
+	{
+		"type": "Effectspec",
+		"name": "builtrock1",
+		"sound": "builtrock1",
+		"sound_delay": 0.1
+	},
+	{
+		"type": "Effectspec",
+		"name": "builtwood1",
+		"sound": "builtwood1",
+		"sound_delay": 0.1
+	},
+	{
+		"type": "Effectspec",
+		"name": "collapse1",
+		"particle": "dust1",
+		"particle_life": 5,
+		"sound": "destroyrock1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "collapse2",
+		"particle": "dust2",
+		"particle_life": 5,
+		"sound": "destroyrock1"
+	}
+]

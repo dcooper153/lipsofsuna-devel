@@ -1,0 +1,10 @@
+{
+	"resources": ["."],
+	"specs": ["effects"],
+	"scripts":
+	[
+		"items",
+		"obstacles",
+		"quests"
+	]
+}

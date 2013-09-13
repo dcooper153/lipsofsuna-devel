@@ -1,0 +1,43 @@
+[
+	{
+		"type": "Effectspec",
+		"name": "behead1",
+		"particle": "blood2",
+		"particle_life": 5,
+		"rotation": false,
+		"sound": "squish-000"
+	},
+	{
+		"type": "Effectspec",
+		"name": "fleshimpact1",
+		"particle": "impact1",
+		"particle_life": 5,
+		"sound": "thud-000"
+	},
+	{
+		"type": "Effectspec",
+		"name": "growl1",
+		"sound": "growl-000",
+		"sound_pitch_min": 0.9,
+		"sound_pitch_max": 1.1
+	},
+	{
+		"type": "Effectspec",
+		"name": "impact1",
+		"particle": "impact1",
+		"particle_life": 5,
+		"sound": "thud-000",
+		"sound_pitch_min": 0.9,
+		"sound_pitch_max": 1.1
+	},
+	{
+		"type": "Effectspec",
+		"name": "swing1",
+		"sound": "swing-000"
+	},
+	{
+		"type": "Effectspec",
+		"name": "wield1",
+		"sound": "wield-000"
+	}
+]

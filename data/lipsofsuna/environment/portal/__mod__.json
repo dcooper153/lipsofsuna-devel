@@ -1,0 +1,11 @@
+{
+	"resources": ["."],
+	"specs": ["specs"],
+	"scripts":
+	[
+		"portaloflips",
+		"portaloflips1",
+		"portalofmidguard",
+		"portalofmidguard1"
+	]
+}

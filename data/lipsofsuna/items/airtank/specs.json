@@ -1,0 +1,19 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "air tank",
+		"effect": "craftmetal1",
+		"materials": {"iron ingot": 2},
+		"modes": {"metal": true}
+	},
+	{
+		"type": "Itemspec",
+		"name": "air tank",
+		"model": "airtank1",
+		"mass": 15,
+		"categories": {"explosive": true},
+		"destroy_actions": ["explode"],
+		"health": 1,
+		"stacking": false
+	}
+]

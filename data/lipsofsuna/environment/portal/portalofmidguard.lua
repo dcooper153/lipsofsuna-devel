@@ -1,11 +1,3 @@
-Obstaclespec{
-	name = "portal of midguard",
-	model = "portal1",
-	categories = {["portal"] = true, ["special"] = true},
-	dialog = "portal of midguard",
-	marker = "portal of midguard",
-	usages = {["teleport"] = true}}
-
 Dialogspec{
 	name = "portal of midguard",
 	commands = {

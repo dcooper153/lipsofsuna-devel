@@ -87,7 +87,6 @@
 	["load", "environment/portal"],
 	["load", "environment/sky"],
 	["load", "environment/terrain"],
-	["load", "environment/voxel"],
 	["load", "environment/wood"],
 
 	["# Miscellaneous"],
@@ -96,6 +95,7 @@
 	["load", "particle"],
 	["load", "sounds"],
 	["load", "spells"],
+	["load", "spells/effects"],
 	["load", "unused"],
 
 	["# Global events"],

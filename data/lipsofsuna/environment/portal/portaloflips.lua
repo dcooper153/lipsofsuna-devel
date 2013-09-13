@@ -1,11 +1,3 @@
-Obstaclespec{
-	name = "portal of lips",
-	model = "portal1",
-	categories = {["portal"] = true, ["special"] = true},
-	dialog = "portal of lips",
-	marker = "portal of lips",
-	usages = {["teleport"] = true}}
-
 Dialogspec{
 	name = "portal of lips",
 	commands = {

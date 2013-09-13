@@ -1,0 +1,17 @@
+[
+	{
+		"type": "Staticspec",
+		"name": "obelisk",
+		"model": "obelisk1",
+		"categories":
+		{
+			"obelisk": true,
+			"special": true
+		},
+		"dialog": "obelisk",
+		"usages":
+		{
+			"examine": true
+		}
+	}
+]

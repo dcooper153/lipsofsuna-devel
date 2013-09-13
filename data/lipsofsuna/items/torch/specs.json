@@ -1,0 +1,56 @@
+[
+	{
+		"type": "Effectspec",
+		"name": "torch1",
+		"sound": "torchlit1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "torchflame1",
+		"light": true,
+		"light_diffuse": [1,1,1,1],
+		"light_equation": [2,0.1,0.1],
+		"node": "#flame",
+		"particle": "torchfx1"
+	},
+	{
+		"type": "AnimationProfileSpec",
+		"name": "default torch equipped",
+		"animations":
+		{
+			"hold": "default hold torch"
+		}
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "torch",
+		"effect": "craftwood1",
+		"materials":
+		{
+			"log": 1
+		},
+		"modes":
+		{
+			"wood": true,
+			"default": true
+		}
+	},
+	{
+		"type": "Itemspec",
+		"name": "torch",
+		"animations_equipped":
+		{
+			"default": "default torch equipped"
+		},
+		"effect_equip": "torch1",
+		"effect_unequip": "torch1",
+		"equipment_slot": "hand.L",
+		"icon": "torch1",
+		"mass": 3,
+		"model": "torch1",
+		"special_effects":
+		[
+			"torchflame1"
+		]
+	}
+]

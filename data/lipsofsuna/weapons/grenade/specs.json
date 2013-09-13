@@ -1,0 +1,56 @@
+[
+	{
+		"type": "AnimationProfileSpec",
+		"name": "default grenade equipped",
+		"animations": {}
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "aquanite grenade",
+		"effect": "craftmetal1",
+		"materials": {"aquanite stone": 1, "iron ingot": 1},
+		"modes": {"metal": true}
+	},
+	{
+		"type": "Itemspec",
+		"name": "aquanite grenade",
+		"categories": {"explosive": true, "throwable": true, "weapon": true},
+		"actions": {"right": "throw"},
+		"animations_equipped": {"default": "default grenade equipped"},
+		"damage_mining": 1,
+		"destroy_actions": ["explode"],
+		"destroy_timer": 3,
+		"equipment_slot": "hand.R",
+		"health": 1,
+		"icon": "grenade1",
+		"modifiers": {"cold damage": 15, "physical damage": 5},
+		"modifiers_bonus": ["explosives"],
+		"mass": 3,
+		"model": "grenade1",
+		"stacking": true
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "crimson grenade",
+		"effect": "craftmetal1",
+		"materials": {"crimson stone": 1, "iron ingot": 1},
+		"modes": {"metal": true}
+	},
+	{
+		"type": "Itemspec",
+		"name": "crimson grenade",
+		"categories": {"explosive": true, "throwable": true, "weapon": true},
+		"actions": {"right": "throw"},
+		"animations_equipped": {"default": "default grenade equipped"},
+		"destroy_actions": ["explode"],
+		"destroy_timer": 3,
+		"equipment_slot": "hand.R",
+		"health": 1,
+		"icon": "grenade1",
+		"modifiers": {"fire damage": 15, "physical damage": 5},
+		"modifiers_bonus": ["explosives"],
+		"mass": 3,
+		"model": "grenade1",
+		"stacking": true
+	}
+]

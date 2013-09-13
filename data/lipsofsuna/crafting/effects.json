@@ -1,0 +1,37 @@
+[
+	{
+		"type": "Effectspec",
+		"name": "craftmetal1",
+		"sound": "craftmetal1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "craftalchemy1",
+		"sound": "craftpotion1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "craftfood1",
+		"sound": "craftpotion1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "craftpotion1",
+		"sound": "craftpotion1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "craftsewing1",
+		"sound": "craftsewing1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "craftwood1",
+		"sound": "craftwood1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "harvest1",
+		"sound": "scissor1"
+	}
+]

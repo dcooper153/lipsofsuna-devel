@@ -1,0 +1,132 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "adamantium dagger",
+		"effect": "craftmetal1",
+		"materials": {"adamantium": 3},
+		"modes": {"metal": true}
+	},
+	{
+		"type": "Itemspec",
+		"name": "adamantium dagger",
+		"categories": {"melee": true, "weapon": true},
+		"actions": {"right": "attack", "left": "block weapon"},
+		"effect_attack_speedline": true,
+		"icon": "dagger1",
+		"modifiers": {"physical damage": 10},
+		"modifiers_bonus": ["melee"],
+		"equipment_slot": "hand.R",
+		"mass": 15,
+		"model": "dagger1"
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "aquanite dagger",
+		"effect": "craftmetal1",
+		"materials": {"aquanite stone": 3},
+		"modes": {"metal": true}
+	},
+	{
+		"type": "Itemspec",
+		"name": "aquanite dagger",
+		"model": "dagger1",
+		"categories": {"melee": true, "weapon": true},
+		"actions": {"right": "attack", "left": "block weapon"},
+		"damage_mining": 1,
+		"effect_attack_speedline": true,
+		"equipment_slot": "hand.R",
+		"health": 500,
+		"icon": "dagger1",
+		"modifiers": {"cold damage": 4, "physical damage": 4},
+		"modifiers_bonus": ["melee"],
+		"mass": 15
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "crimson dagger",
+		"effect": "craftmetal1",
+		"materials": {"crimson stone": 3},
+		"modes": {"metal": true}
+	},
+	{
+		"type": "Itemspec",
+		"name": "crimson dagger",
+		"categories": {"melee": true, "weapon": true},
+		"actions": {"right": "attack", "left": "block weapon"},
+		"damage_mining": 1,
+		"effect_attack_speedline": true,
+		"equipment_slot": "hand.R",
+		"health": 500,
+		"icon": "dagger1",
+		"modifiers": {"fire damage": 4, "physical damage": 4},
+		"modifiers_bonus": ["melee"],
+		"mass": 15,
+		"model": "dagger1"
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "iron dagger",
+		"effect": "craftmetal1",
+		"materials": {"iron ingot": 1},
+		"modes": {"metal": true}
+	},
+	{
+		"type": "Itemspec",
+		"name": "iron dagger",
+		"categories": {"melee": true, "weapon": true},
+		"actions": {"right": "attack", "left": "block weapon"},
+		"damage_mining": 1,
+		"effect_attack_speedline": true,
+		"equipment_slot": "hand.R",
+		"health": 220,
+		"icon": "dagger1",
+		"modifiers": {"physical damage": 5},
+		"modifiers_bonus": ["melee"],
+		"mass": 5,
+		"model": "dagger1"
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "stone dagger",
+		"effect": "craftmetal1",
+		"materials": {"granite stone": 2},
+		"modes": {"metal": true, "default": true}
+	},
+	{
+		"type": "Itemspec",
+		"name": "stone dagger",
+		"categories": {"melee": true, "weapon": true},
+		"actions": {"right": "attack", "left": "block weapon"},
+		"damage_mining": 1,
+		"effect_attack_speedline": true,
+		"equipment_slot": "hand.R",
+		"icon": "dagger1",
+		"modifiers": {"physical damage": 3},
+		"modifiers_bonus": ["melee"],
+		"health": 130,
+		"mass": 6,
+		"model": "dagger1"
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "wooden dagger",
+		"effect": "craftwood1",
+		"materials": {"log": 2},
+		"modes": {"wood": true, "default": true}
+	},
+	{
+		"type": "Itemspec",
+		"name": "wooden dagger",
+		"categories": {"melee": true, "weapon": true},
+		"actions": {"right": "attack", "left": "block weapon"},
+		"damage_mining": 1,
+		"effect_attack_speedline": true,
+		"equipment_slot": "hand.R",
+		"health": 100,
+		"icon": "dagger1",
+		"modifiers": {"physical damage": 3},
+		"modifiers_bonus": ["melee"],
+		"mass": 7,
+		"model": "woodshortsword"
+	}
+]

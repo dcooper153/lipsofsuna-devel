@@ -1,0 +1,103 @@
+[
+	{
+		"type": "Actorspec",
+		"name": "slime",
+		"categories":
+		{
+			"enemy": true
+		},
+		"ai_combat_actions":
+		{
+			"bounce": true,
+			"melee": true
+		},
+		"ai_offense_factor": 0.5,
+		"ai_enable_backstep": false,
+		"ai_enable_strafe": false,
+		"ai_enable_walk": false,
+		"ai_enabled_states":
+		{
+			"bounce": true,
+			"combat": true,
+			"idle": true
+		},
+		"animations":
+		{
+			"default": "slime"
+		},
+		"difficulty": 0,
+		"factions":
+		{
+			"evil": true
+		},
+		"falling_damage_rate": 0,
+		"actions":
+		{
+			"right": "tackle"
+		},
+		"inventory_size": 0,
+		"jump_force": 7,
+		"model": "slime2",
+		"speed_walk": 5,
+		"skills":
+		{
+			"Nerf health lv2": true,
+			"Nerf combat lv2": true
+		},
+		"vulnerabilities":
+		{
+			"cold damage": 1.5,
+			"fire damage": 1.5,
+			"physical damage": 0.6
+		}
+	},
+	{
+		"type": "Actorspec",
+		"name": "plague slime",
+		"categories": {"plague": true},
+		"ai_combat_actions":
+		{
+			"bounce": true,
+			"melee": true
+		},
+		"ai_offense_factor": 0.5,
+		"ai_enable_backstep": false,
+		"ai_enable_strafe": false,
+		"ai_enable_walk": false,
+		"ai_enabled_states":
+		{
+			"bounce": true,
+			"combat": true,
+			"idle": true
+		},
+		"animations":
+		{
+			"default": "slime"
+		},
+		"difficulty": 0.7,
+		"factions":
+		{
+			"evil": true
+		},
+		"falling_damage_rate": 0,
+		"actions":
+		{
+			"right": "tackle"
+		},
+		"inventory_size": 0,
+		"jump_force": 7,
+		"model": "slime2",
+		"speed_walk": 5,
+		"skills":
+		{
+			"Health lv2": true,
+			"Nerf combat lv1": true
+		},
+		"vulnerabilities":
+		{
+			"cold damage": 1.5,
+			"fire damage": 1.5,
+			"physical damage": 0.6
+		}
+	}
+]

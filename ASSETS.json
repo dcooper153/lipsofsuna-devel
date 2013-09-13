@@ -253,25 +253,21 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/actors/aer/aerarm1.lmdl",
-				"data/lipsofsuna/actors/aer/aereye1.lmdl",
-				"data/lipsofsuna/actors/aer/aerfoot1.lmdl",
-				"data/lipsofsuna/actors/aer/aerhand1.lmdl",
-				"data/lipsofsuna/actors/aer/aerhead1.lmdl",
-				"data/lipsofsuna/actors/aer/aerhead2.lmdl",
-				"data/lipsofsuna/actors/aer/aerleg1.lmdl",
-				"data/lipsofsuna/actors/aer/aerlower1.lmdl",
-				"data/lipsofsuna/actors/aer/aerlowerclothed1.lmdl",
-				"data/lipsofsuna/actors/aer/aerupper1.lmdl",
-				"data/lipsofsuna/actors/aer/aerupperclothed1.lmdl",
 				"data/lipsofsuna/actors/aer/aer1.png",
 				"data/lipsofsuna/actors/aer/aereye2.png",
 				"data/lipsofsuna/actors/aer/eye1.png",
 				"data/lipsofsuna/actors/aer/aereye1.png",
 				"data/lipsofsuna/actors/aer/aerface1.png",
 				"data/lipsofsuna/actors/hair/aershorthair1.lmdl",
+				"data/lipsofsuna/actors/hair/aershorthair1.png",
 				"data/lipsofsuna/actors/hair/aerpigtails1.lmdl",
 				"data/lipsofsuna/actors/hair/aerpigtails1.png",
+				"data/lipsofsuna/actors/hair/aerhairfrontshort1.lmdl",
+				"data/lipsofsuna/actors/hair/aerhairponytail1.lmdl",
+				"data/lipsofsuna/actors/hair/aerhairbackshort2.lmdl",
+				"data/lipsofsuna/actors/hair/aerhairbacksmooth1.lmdl",
+				"data/lipsofsuna/actors/hair/aerhairbackshort1.lmdl",
+				"data/lipsofsuna/actors/hair/aerponytail1.png",
 				"data/lipsofsuna/actors/hair/hair1.dds",
 				"data/lipsofsuna/actors/hair/hair1.png",
 				"data/lipsofsuna/actors/hair/hair1n.dds",
@@ -294,7 +290,7 @@
 				"data/lipsofsuna/apparel/dress/aerlowerdress1.lmdl",
 				"data/lipsofsuna/apparel/headband/aerheadband1.lmdl",
 				"data/lipsofsuna/apparel/headband/headband1.lmdl",
-				"data/lipsofsuna/apparel/headband/headband1.png"
+				"data/lipsofsuna/apparel/headband/headband1.png",
 				"data/lipsofsuna/apparel/leatherarmor/aerspats1.png",
 				"data/lipsofsuna/apparel/leggings/aerfootsock1.lmdl",
 				"data/lipsofsuna/apparel/leggings/aerleggings1.png",
@@ -308,10 +304,8 @@
 				"data/lipsofsuna/apparel/skirt/skirt1.png",
 				"data/lipsofsuna/apparel/longcoat/longcoat1.lmdl",
 				"data/lipsofsuna/apparel/longcoat/longcoat1.png",
-				"data/lipsofsuna/apparel/underwear/aerupperunderwear1.lmdl",
 				"data/lipsofsuna/apparel/underwear/aerpanties1.png",
 				"data/lipsofsuna/apparel/underwear/aerbra1.png",
-				"data/lipsofsuna/apparel/underwear/aerlowerunderwear1.lmdl",
 				"data/lipsofsuna/weapons/boomerang/boomerang1.dds",
 				"data/lipsofsuna/weapons/boomerang/boomerang1.lmdl",
 				"data/lipsofsuna/weapons/musket/musket1.lmdl"
@@ -353,7 +347,7 @@
 				"apparel/bloomers1.blend",
 				"apparel/bloomers1.png",
 				"apparel/headband1.blend",
-				"apparel/headband1.png"
+				"apparel/headband1.png",
 				"apparel/leggings1.blend",
 				"apparel/leggings1.png",
 				"apparel/leggings1n.png",
@@ -384,11 +378,13 @@
 				"data/lipsofsuna/actors/aer/aer1.lmdl",
 				"data/lipsofsuna/actors/aer/aerbody1.lmdl",
 				"data/lipsofsuna/actors/aer/skin1.png",
+				"data/lipsofsuna/apparel/shirt/aerupperclothed1.lmdl",
 				"data/lipsofsuna/apparel/underwear/aerupperbra1.lmdl"
 			],
 			"files_original":
 			[
 				"actors/player/player1.blend",
+				"actors/player/playerclothed1.blend",
 				"actors/player/playerunderwear1.blend",
 				"actors/player/skin1.png"
 			],
@@ -2723,7 +2719,7 @@
 				"data/lipsofsuna/plants/watermelon/watermelonleaf1.png",
 				"data/lipsofsuna/actors/turret/turret1.lmdl",
 				"data/lipsofsuna/actors/turret/turret1.png",
-				"data/lipsofsuna/actors/turret/turret1-*.lani"
+				"data/lipsofsuna/actors/turret/turret1-fire.lani"
 			],
 			"files_original":
 			[

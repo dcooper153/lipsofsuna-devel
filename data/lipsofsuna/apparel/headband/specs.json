@@ -1,0 +1,30 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "kitty headband",
+		"effect": "craftsewing1",
+		"materials":
+		{
+			"hide": 2
+		}
+	},
+	{
+		"type": "Itemspec",
+		"name": "kitty headband",
+		"model": "headband1",
+		"armor_class": 0.02,
+		"categories":
+		{
+			"armor": true
+		},
+		"equipment_models":
+		{
+			"aer":
+			{
+				"headband": "aerheadband1"
+			}
+		},
+		"equipment_slot": "head",
+		"mass": 1
+	}
+]

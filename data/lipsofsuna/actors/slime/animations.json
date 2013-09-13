@@ -1,0 +1,63 @@
+[
+	{
+		"type": "Animationspec",
+		"name": "slime dead",
+		"animation": "slime2-death",
+		"channel": 1,
+		"permanent": true,
+		"repeat_start": 10,
+		"time": 10
+	},
+	{
+		"type": "Animationspec",
+		"name": "slime death",
+		"animation": "slime2-death",
+		"channel": 1,
+		"permanent": true,
+		"repeat_start": 10
+	},
+	{
+		"type": "Animationspec",
+		"name": "slime idle",
+		"animation": "slime2-idle",
+		"channel": 1,
+		"permanent": true
+	},
+	{
+		"type": "Animationspec",
+		"name": "slime jump",
+		"animation": "slime2-bounce",
+		"channel": 2,
+		"weight": 30
+	},
+	{
+		"type": "Animationspec",
+		"name": "slime land",
+		"animation": "slime2-bounce",
+		"channel": 2,
+		"weight": 30
+	},
+	{
+		"type": "Animationspec",
+		"name": "slime tackle",
+		"animation": "slime2-tackle",
+		"channel": 2,
+		"weight": 30
+	},
+	{
+		"type": "AnimationProfileSpec",
+		"name": "slime",
+		"animations":
+		{
+			"dead": "slime dead",
+			"death": "slime death",
+			"idle": "slime idle",
+			"jump": "slime jump",
+			"land ground": "slime land",
+			"land water": "slime land",
+			"tackle": "slime tackle",
+			"walk": "slime jump"
+		},
+		"inherit": ["default"]
+	}
+]

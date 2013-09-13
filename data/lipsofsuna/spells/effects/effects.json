@@ -1,0 +1,61 @@
+[
+	{
+		"type": "Effectspec",
+		"name": "berserk1",
+		"particle": "spell1",
+		"particle_life": 5,
+		"sound": "spellberserk1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "disease1",
+		"sound": "diseasecontact1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "explosion1",
+		"particle": "explosion1",
+		"particle_life": 5,
+		"quake": 1,
+		"sound": "explosion1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "fireball1",
+		"sound": "fire-000"
+	},
+	{
+		"type": "Effectspec",
+		"name": "firewall1",
+		"particle": "firewall1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "light1",
+		"particle": "spell2",
+		"particle_life": 5,
+		"rotation": false,
+		"sound": "spelllight1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "heal1",
+		"particle": "heal1",
+		"particle_life": 5,
+		"sound": "spellhealing1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "sanctuary1",
+		"particle": "sanctuary1",
+		"particle_life": 5,
+		"sound": "spellsanctuary1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "selfdestruct1",
+		"particle": "particle1",
+		"particle_life": 5,
+		"sound": "selfdestructcountdown1"
+	}
+]
