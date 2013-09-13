@@ -258,7 +258,6 @@
 				"data/lipsofsuna/actors/aer/eye1.png",
 				"data/lipsofsuna/actors/aer/aereye1.png",
 				"data/lipsofsuna/actors/aer/aerface1.png",
-				"data/lipsofsuna/actors/hair/aershorthair1.lmdl",
 				"data/lipsofsuna/actors/hair/aershorthair1.png",
 				"data/lipsofsuna/actors/hair/aerpigtails1.lmdl",
 				"data/lipsofsuna/actors/hair/aerpigtails1.png",
@@ -304,6 +303,7 @@
 				"data/lipsofsuna/apparel/longcoat/longcoat1.png",
 				"data/lipsofsuna/apparel/underwear/aerpanties1.png",
 				"data/lipsofsuna/apparel/underwear/aerbra1.png",
+				"data/lipsofsuna/sounds/coins-000.flac",
 				"data/lipsofsuna/weapons/boomerang/boomerang1.dds",
 				"data/lipsofsuna/weapons/boomerang/boomerang1.lmdl",
 				"data/lipsofsuna/weapons/musket/musket1.lmdl"
@@ -996,15 +996,8 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/spells/effects/dust1.lmdl",
-				"data/lipsofsuna/spells/effects/dust2.lmdl",
 				"data/lipsofsuna/spells/effects/dust1.dds",
-				"data/lipsofsuna/spells/effects/dust2.dds",
-				"data/lipsofsuna/spells/effects/fireball1.lmdl",
-				"data/lipsofsuna/spells/effects/firewall1.lmdl",
-				"data/lipsofsuna/spells/effects/heal1.lmdl",
-				"data/lipsofsuna/spells/effects/magicmissile1.lmdl",
-				"data/lipsofsuna/spells/effects/sanctuary1.lmdl"
+				"data/lipsofsuna/spells/effects/dust2.dds"
 			],
 			"files_original":
 			[
@@ -1052,25 +1045,6 @@
 			],
 			"source": "http://www.blendswap.com/3D-models/clothes/fedora/",
 			"comment": "Manually retopologized and fitted to the original texture. Applied contrast stretching to the texture. Baked normals from the high polygon model."
-		},
-		{
-			"files":
-			[
-			],
-			"files_original":
-			[
-				"import/ferrostone1.png",
-				"import/ferrostone1n.png"
-			],
-			"authors":
-			[
-				"Dim"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/dims-enviromental-and-architectural-textures"
 		},
 		{
 			"files_original":
@@ -1172,8 +1146,7 @@
 			"files_original":
 			[
 				"import/grass-000.png",
-				"import/grass-000-nml.png",
-				"import/grass-001.png"
+				"import/grass-000-nml.png"
 			],
 			"authors":
 			[
@@ -1295,7 +1268,8 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/ui/icons1.dds"
+				"data/lipsofsuna/ui/icons1.dds",
+				"data/lipsofsuna/ui/icons2.dds"
 			],
 			"files_original":
 			[
@@ -1459,7 +1433,6 @@
 				"data/lipsofsuna/core/terrain/stickterrain1.png",
 				"data/lipsofsuna/spells/effects/explosion1.dds",
 				"data/lipsofsuna/spells/effects/flare1.png",
-				"data/lipsofsuna/particle/blood1.lmdl",
 				"data/lipsofsuna/particle/blood1.dds",
 				"data/lipsofsuna/particle/particle1.dds",
 				"data/lipsofsuna/particle/particle2.dds",
@@ -1475,6 +1448,10 @@
 			[
 				"import/blood1.blend",
 				"import/blood1.png",
+				"import/devorahair1.blend",
+				"import/devorahair1.png",
+				"import/firebreath1.blend",
+				"import/heal2.blend",
 				"import/particle1.png",
 				"import/particle2.png",
 				"import/particle5.png",
@@ -1956,6 +1933,7 @@
 			"files_original":
 			[
 				"environment/tree1.blend",
+				"environment/tree2.blend",
 				"environment/tree1.png",
 				"environment/tree1n.png",
 				"environment/tree3.png",
@@ -2127,20 +2105,6 @@
 			"source": "http://opengameart.org/content/moderna-graphical-interface"
 		},
 		{
-			"files_original":
-			[
-				"import/widgets2.png"
-			],
-			"authors":
-			[
-				"hiponboy"
-			],
-			"licenses":
-			[
-				"CC0"
-			]
-		},
-		{
 			"files":
 			[
 				"data/lipsofsuna/ui/widgets3.png",
@@ -2217,7 +2181,7 @@
 			],
 			"files_original":
 			[
-				"import/gate01.blend"
+				"environment/gate1.blend"
 			],
 			"authors":
 			[
@@ -2485,6 +2449,8 @@
 				"data/lipsofsuna/actors/rat/plaguerat1.lmdl",
 				"data/lipsofsuna/actors/rat/smallrat1.lmdl",
 				"data/lipsofsuna/actors/slime/slime2.lmdl",
+				"data/lipsofsuna/environment/furniture/bench1.lmdl",
+				"data/lipsofsuna/environment/furniture/chair2.lmdl",
 				"data/lipsofsuna/environment/furniture/table1.dds",
 				"data/lipsofsuna/environment/furniture/table1.lmdl",
 				"data/lipsofsuna/items/workbench/workbench1.dds",
@@ -2511,11 +2477,15 @@
 				"actors/stoneimp1.blend",
 				"actors/stoneimp2.blend",
 				"actors/slime2.blend",
+				"environment/bench1.blend",
+				"environment/chair2.blend",
 				"environment/table1.blend",
 				"environment/table1.png",
 				"environment/workbench1.blend",
 				"environment/workbench1.png",
 				"import/aermale1.blend",
+				"weapons/shield-001.blend",
+				"weapons/shield-001-wood1.png",
 				"weapons/staff1.blend",
 				"weapons/woodenclub1.blend",
 				"weapons/woodenclub1.png"

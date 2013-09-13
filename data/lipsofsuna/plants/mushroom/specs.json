@@ -1,0 +1,23 @@
+[
+	{
+		"type": "Itemspec",
+		"name": "mushroom",
+		"model": "mushroom-000",
+		"icon": "mushroom1",
+		"description": "An alchemy reagent",
+		"categories": {"material": true},
+		"mass": 1,
+		"stacking": true
+	},
+	{
+		"type": "Obstaclespec",
+		"name": "mushroom",
+		"model": "mushroom-000",
+		"categories": {"small-plant": true, "reagent": true},
+		"health": 10,
+		"harvest_behavior": "destroy",
+		"harvest_effect": "harvest1",
+		"harvest_materials": {"mushroom": 1},
+		"usages": {"harvest": true}
+	}
+]
