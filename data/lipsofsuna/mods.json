@@ -53,6 +53,7 @@
 	["load", "items/book"],
 	["load", "items/chest"],
 	["load", "items/food"],
+	["load", "items/gem"],
 	["load", "items/ingot"],
 	["load", "items/jar"],
 	["load", "items/lantern"],

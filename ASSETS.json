@@ -291,9 +291,7 @@
 				"data/lipsofsuna/apparel/headband/aerheadband1.lmdl",
 				"data/lipsofsuna/apparel/headband/headband1.lmdl",
 				"data/lipsofsuna/apparel/headband/headband1.png",
-				"data/lipsofsuna/apparel/leggings/aerfootsock1.lmdl",
 				"data/lipsofsuna/apparel/leggings/aerleggings1.png",
-				"data/lipsofsuna/apparel/leggings/aerleggings1.lmdl",
 				"data/lipsofsuna/apparel/leggings/leggings1.dds",
 				"data/lipsofsuna/apparel/leggings/leggings1.lmdl",
 				"data/lipsofsuna/apparel/leggings/leggings1n.png",
@@ -329,6 +327,8 @@
 				"actors/hair5.blend",
 				"actors/player/aerpigtails1.blend",
 				"actors/player/aerpigtails1.png",
+				"actors/player/ponytail1.blend",
+				"actors/player/shorthair1.blend",
 				"actors/player/ribbon1.png",
 				"apparel/aeritem1.blend",
 				"apparel/aerbloomers1.png",
@@ -338,11 +338,11 @@
 				"apparel/aerbra1.svg",
 				"apparel/aerleggings1.svg",
 				"apparel/aerpanties1.svg",
+				"apparel/aershirt1.svg",
 				"apparel/aerskirt1.svg",
 				"apparel/aerspats1.svg",
 				"apparel/aerdress1.png",
 				"apparel/aerdress1.svg",
-				"apparel/aerdress2.png",
 				"apparel/aerdress2.svg",
 				"apparel/bloomers1.blend",
 				"apparel/bloomers1.png",
@@ -351,14 +351,13 @@
 				"apparel/leggings1.blend",
 				"apparel/leggings1.png",
 				"apparel/leggings1n.png",
-				"apparel/leggings1.svg",
 				"apparel/longcoat1.blend",
 				"apparel/longcoat1.png",
 				"apparel/longcoat1.xcf",
-				"apparel/shirt1.svg",
 				"apparel/skirt1.blend",
 				"apparel/skirt1.png",
 				"weapons/boomerang1.blend",
+				"weapons/boomerang1.png",
 				"weapons/musket1.blend",
 				"import/eye1.png",
 				"import/eyes-000.png"
@@ -810,7 +809,7 @@
 			],
 			"files_original":
 			[
-				"import/compass1.svg"
+				"import/compass1.png"
 			],
 			"authors":
 			[
@@ -2030,7 +2029,7 @@
 				"weapons/poleaxe-000.png",
 				"weapons/poleaxe-001.png",
 				"import/stone-000.png",
-				"weapons/stone1.blend",
+				"import/stone1.blend",
 				"weapons/wand-000.png",
 				"weapons/wand-001.png"
 			],
@@ -2046,9 +2045,11 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/items/gem/gem-000.dds",
+				"data/lipsofsuna/items/gem/gem-000.lmdl",
+				"data/lipsofsuna/misc/fence1.lmdl",
 				"data/lipsofsuna/weapons/hatchet/axe1.lmdl",
-				"data/lipsofsuna/weapons/bow/bow1.lmdl",
-				"data/lipsofsuna/misc/fence1.lmdl"
+				"data/lipsofsuna/weapons/bow/bow1.lmdl"
 			],
 			"files_original":
 			[
@@ -2095,10 +2096,10 @@
 				"import/stone-004.blend",
 				"weapons/wand-000.blend",
 				"weapons/wand-001.blend",
-				"weapons/wood-002.png",
-				"weapons/wood-002-nml.png",
-				"weapons/wood-003.png",
-				"weapons/wood-004.png"
+				"import/wood-002.png",
+				"import/wood-002-nml.png",
+				"import/wood-003.png",
+				"import/wood-004.png"
 			],
 			"authors":
 			[
@@ -2231,6 +2232,7 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/weapons/hatchet/woodhatchet.lmdl",
 				"data/lipsofsuna/weapons/sword/weaponwood.dds",
 				"data/lipsofsuna/weapons/sword/weaponwoodn.dds",
 				"data/lipsofsuna/weapons/sword/woodsword.lmdl",
@@ -2513,7 +2515,10 @@
 				"environment/table1.png",
 				"environment/workbench1.blend",
 				"environment/workbench1.png",
-				"import/aermale1.blend"
+				"import/aermale1.blend",
+				"weapons/staff1.blend",
+				"weapons/woodenclub1.blend",
+				"weapons/woodenclub1.png"
 			],
 			"authors":
 			[
@@ -2573,6 +2578,8 @@
 			],
 			"files_original":
 			[
+				"actors/turret1.blend",
+				"actors/turret1.png",
 				"items/apple1.blend",
 				"items/apple1.png",
 				"items/bread1.blend",
@@ -2584,6 +2591,8 @@
 				"items/cheese1.png",
 				"items/cookedmeat1.png",
 				"items/egg1.blend",
+				"items/ingot1.blend",
+				"items/ingot1.png",
 				"items/lantern1.blend",
 				"items/lantern1.png",
 				"items/meat1.blend",
@@ -2604,13 +2613,10 @@
 				"environment/shelf1.blend",
 				"environment/shelf1.png",
 				"environment/spelltable1.blend",
-				"environment/workbench2.blend",
-				"environment/workbench2.png",
-				"actors/turret1.blend",
-				"actors/turret1.png",
 				"environment/watermelon1.blend",
 				"environment/watermelon1.png",
 				"environment/watermelonleaf1.png",
+				"environment/workbench2.blend",
 				"environment/workbench2.png"
 			],
 			"authors":

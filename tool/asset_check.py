@@ -21,6 +21,9 @@ class Specs(object):
 			model = spec.get('model')
 			if model:
 				self.models[model] = True
+			# Models.
+			for slot,model in spec.get('models', {}).items():
+				self.models[model] = True
 			# Equipment models.
 			models = spec.get('equipment_models')
 			if models:
@@ -268,16 +271,15 @@ def process(d):
 	specs = sorted([(k,v) for k,v in a.specs.items()])
 	print("Non-existing assets referenced by specs:")
 	for path,spec in specs:
-		print(" %s" % path)
 		for model in spec.models:
 			model_file = model + '.lmdl'
 			if model_file not in a.disk_data_names:
-				print("  %s" % model_file)
+				print(" %s (%s)" % (model_file, path))
 		for texture in spec.textures:
 			texture_file = texture + '.png'
 			texture_file1 = texture + '.dds'
 			if texture_file not in a.disk_data_names and texture_file1 not in a.disk_data_names:
-				print("  %s" % texture_file)
+				print(" %s (%s)" % (texture_file, path))
 
 	# Check for unused assets.
 	# TODO

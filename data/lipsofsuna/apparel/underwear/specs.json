@@ -37,10 +37,6 @@
 		"icon": "leatherarmor1",
 		"armor_class": 0,
 		"categories": {"armor": true},
-		"equipment_models":
-		{
-			"aer": {"lower": "aerlowerunderwear1"}
-		},
 		"equipment_textures":
 		{
 			"aer": {"skin1": "aerpanties1"}

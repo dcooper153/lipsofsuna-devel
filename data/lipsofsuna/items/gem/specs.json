@@ -1,0 +1,11 @@
+[
+	{
+		"type": "Itemspec",
+		"name": "ruby",
+		"icon": "gem1",
+		"model": "gem-000",
+		"mass": 2,
+		"categories": {"reagent": true},
+		"stacking": true
+	}
+]

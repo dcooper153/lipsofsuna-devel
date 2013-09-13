@@ -53,14 +53,3 @@ Itemspec{
 	health = 50,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
-
-------------------------------------------------------------------------------
--- FIXME
-
-Itemspec{
-	name = "gem",
-	icon = "gem1",
-	model = "gem-000",
-	mass = 2,
-	categories = {["reagent"] = true},
-	stacking = true}
