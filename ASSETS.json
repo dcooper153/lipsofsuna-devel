@@ -291,7 +291,6 @@
 				"data/lipsofsuna/apparel/headband/aerheadband1.lmdl",
 				"data/lipsofsuna/apparel/headband/headband1.lmdl",
 				"data/lipsofsuna/apparel/headband/headband1.png",
-				"data/lipsofsuna/apparel/leatherarmor/aerspats1.png",
 				"data/lipsofsuna/apparel/leggings/aerfootsock1.lmdl",
 				"data/lipsofsuna/apparel/leggings/aerleggings1.png",
 				"data/lipsofsuna/apparel/leggings/aerleggings1.lmdl",
@@ -302,6 +301,7 @@
 				"data/lipsofsuna/apparel/skirt/aerskirt1.lmdl",
 				"data/lipsofsuna/apparel/skirt/aerskirt1.png",
 				"data/lipsofsuna/apparel/skirt/skirt1.png",
+				"data/lipsofsuna/apparel/spats/aerspats1.png",
 				"data/lipsofsuna/apparel/longcoat/longcoat1.lmdl",
 				"data/lipsofsuna/apparel/longcoat/longcoat1.png",
 				"data/lipsofsuna/apparel/underwear/aerpanties1.png",
@@ -471,35 +471,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/actors/android/android1.dds",
-				"data/lipsofsuna/actors/android/android1n.dds"
-			],
-			"files_original":
-			[
-				"import/android1.blend",
-				"import/android1.png",
-				"import/android1n.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/environment/terrain/aquanite1.dds",
-				"data/lipsofsuna/environment/terrain/crimson1.dds",
-				"data/lipsofsuna/environment/terrain/crimson1n.dds",
-				"data/lipsofsuna/environment/terrain/granite1.png",
-				"data/lipsofsuna/environment/terrain/ice1.dds",
-				"data/lipsofsuna/environment/terrain/ice1n.dds",
-				"data/lipsofsuna/environment/terrain/sand1.dds",
-				"data/lipsofsuna/environment/terrain/sand1n.dds"
 			],
 			"files_original":
 			[
@@ -571,8 +542,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/terrain/basalt1.dds",
-				"data/lipsofsuna/environment/terrain/basalt1n.dds"
 			],
 			"files_original":
 			[
@@ -592,7 +561,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/building/windowsill1.lmdl"
 			],
 			"files_original":
 			[
@@ -705,36 +673,12 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/bricks/bricks1.dds",
-				"data/lipsofsuna/environment/bricks/bricks2.dds",
-				"data/lipsofsuna/environment/bricks/bricks3.dds"
 			],
 			"files_original":
 			[
 				"import/bricks1.png",
 				"import/bricks2.png",
-				"import/bricks3.png"
-			],
-			"authors":
-			[
-				"WeaponGuy",
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/cottage"
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/environment/bricks/bricks1n.dds",
-				"data/lipsofsuna/environment/bricks/bricks2n.dds",
-				"data/lipsofsuna/environment/bricks/bricks3n.png"
-			],
-			"files_original":
-			[
+				"import/bricks3.png",
 				"import/bricks1n.png",
 				"import/bricks2n.png",
 				"import/bricks3n.png"
@@ -842,8 +786,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/terrain/cobbles1.dds",
-				"data/lipsofsuna/environment/terrain/cobbles1n.png"
 			],
 			"files_original":
 			[
@@ -926,16 +868,17 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/actors/devora/devorahair1.lmdl",
-				"data/lipsofsuna/actors/devora/devora1.dds",
-				"data/lipsofsuna/actors/devora/devora1n.png",
-				"data/lipsofsuna/actors/devora/devorahair1.dds"
 			],
 			"files_original":
 			[
+				"import/android1.blend",
+				"import/android1.png",
+				"import/android1n.png",
 				"import/devora1.blend",
 				"import/devora1.png",
-				"import/devora1n.png"
+				"import/devora1n.png",
+				"import/kraken1.blend",
+				"import/kraken1.png"
 			],
 			"authors":
 			[
@@ -1114,8 +1057,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/terrain/ferrostone1.dds",
-				"data/lipsofsuna/environment/terrain/ferrostone1n.dds"
 			],
 			"files_original":
 			[
@@ -1210,7 +1151,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/terrain/granite1n.png"
 			],
 			"files_original":
 			[
@@ -1229,8 +1169,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/terrain/grass-000.dds",
-				"data/lipsofsuna/environment/terrain/grass-000-nml.dds"
 			],
 			"files_original":
 			[
@@ -1340,7 +1278,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/building/house2.lmdl"
 			],
 			"files_original":
 			[
@@ -1398,30 +1335,6 @@
 				"Creative Commons BY-SA 3.0"
 			],
 			"source": "http://opengameart.org/content/netted-jar"
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/actors/kraken/kraken1.lmdl",
-				"data/lipsofsuna/actors/kraken/krakenfoot1.lmdl",
-				"data/lipsofsuna/actors/kraken/krakenleg1.lmdl",
-				"data/lipsofsuna/actors/kraken/krakenlower1.lmdl",
-				"data/lipsofsuna/actors/kraken/kraken1.dds",
-				"data/lipsofsuna/actors/kraken/kraken1n.png"
-			],
-			"files_original":
-			[
-				"import/kraken1.blend",
-				"import/kraken1.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
 		},
 		{
 			"files":
@@ -1584,7 +1497,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/wood/planks1.dds"
 			],
 			"files_original":
 			[
@@ -1699,7 +1611,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/building/roof1.dds"
 			],
 			"files_original":
 			[
@@ -1718,7 +1629,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/building/roof1n.dds"
 			],
 			"files_original":
 			[
@@ -1738,7 +1648,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/actors/seirei/seirei1.lmdl"
 			],
 			"files_original":
 			[
@@ -1808,9 +1717,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/building/shutter1.lmdl",
-				"data/lipsofsuna/environment/building/shutter1.dds",
-				"data/lipsofsuna/environment/building/shutter1n.dds"
 			],
 			"files_original":
 			[
@@ -1846,7 +1752,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/terrain/soil1.png"
 			],
 			"files_original":
 			[
@@ -1865,9 +1770,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/terrain/soil1n.png",
-				"data/lipsofsuna/environment/terrain/soil1h.png",
-				"data/lipsofsuna/environment/terrain/soil1s.png"
 			],
 			"files_original":
 			[
@@ -2144,14 +2046,9 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/terrain/adamantium1.dds",
 				"data/lipsofsuna/weapons/hatchet/axe1.lmdl",
 				"data/lipsofsuna/weapons/bow/bow1.lmdl",
-				"data/lipsofsuna/misc/fence1.lmdl",
-				"data/lipsofsuna/environment/terrain/stone-001.dds",
-				"data/lipsofsuna/environment/terrain/stone-001-nml.dds",
-				"data/lipsofsuna/environment/wood/wood-002.dds",
-				"data/lipsofsuna/environment/wood/wood-002-nml.dds"
+				"data/lipsofsuna/misc/fence1.lmdl"
 			],
 			"files_original":
 			[
@@ -2260,7 +2157,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/wood/wood1.dds"
 			],
 			"files_original":
 			[
@@ -2279,7 +2175,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/wood/wood1n.png"
 			],
 			"files_original":
 			[
@@ -2298,8 +2193,6 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/wood/wood2.dds",
-				"data/lipsofsuna/environment/wood/wood2n.dds"
 			],
 			"files_original":
 			[
@@ -2590,12 +2483,6 @@
 				"data/lipsofsuna/actors/rat/plaguerat1.lmdl",
 				"data/lipsofsuna/actors/rat/smallrat1.lmdl",
 				"data/lipsofsuna/actors/slime/slime2.lmdl",
-				"data/lipsofsuna/actors/troglodyte/trogfem.dds",
-				"data/lipsofsuna/actors/troglodyte/trogfem1.lmdl",
-				"data/lipsofsuna/actors/troglodyte/trogfembody1.lmdl",
-				"data/lipsofsuna/actors/troglodyte/trogfemlonghair1.lmdl",
-				"data/lipsofsuna/actors/troglodyte/trogfemshorthair1.lmdl",
-				"data/lipsofsuna/actors/troglodyte/trogfemrags1.lmdl",
 				"data/lipsofsuna/environment/furniture/table1.dds",
 				"data/lipsofsuna/environment/furniture/table1.lmdl",
 				"data/lipsofsuna/items/workbench/workbench1.dds",
@@ -2625,44 +2512,7 @@
 				"environment/table1.blend",
 				"environment/table1.png",
 				"environment/workbench1.blend",
-				"environment/workbench1.png"
-			],
-			"authors":
-			[
-				"Francisco \"FreeLikeGNU\" Athens"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/actors/aermale/aermale1arms1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermale1chest1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermale1eyes1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermale1feet1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermale1hair1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermale1hands1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermale1head1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermale1legs1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermale1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermaleboots1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermaleleatherarms2.lmdl",
-				"data/lipsofsuna/actors/aermale/aermaleleatherchest1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermaleleatherchest2.lmdl",
-				"data/lipsofsuna/actors/aermale/aermaleleatherhead2.lmdl",
-				"data/lipsofsuna/actors/aermale/aermaleleatherlegs1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermaleleatherlegs2.lmdl",
-				"data/lipsofsuna/actors/aermale/aermalepants1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermaleshirt1.lmdl",
-				"data/lipsofsuna/actors/aermale/aermale1.dds",
-				"data/lipsofsuna/actors/aermale/aermale1eyes1.dds",
-				"data/lipsofsuna/actors/aermale/aermale1n.dds"
-			],
-			"files_original":
-			[
+				"environment/workbench1.png",
 				"import/aermale1.blend"
 			],
 			"authors":

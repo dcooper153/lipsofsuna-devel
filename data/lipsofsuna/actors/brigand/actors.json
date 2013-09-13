@@ -17,7 +17,7 @@
 		"inventory_items":
 		{
 			"iron sword": 1,
-			"leather top": 1,
+			"shirt": 1,
 			"leather pants": 1,
 			"leather leggings": 1
 		},
@@ -90,7 +90,7 @@
 		"inventory_items":
 		{
 			"wooden crossbow": 1,
-			"leather top": 1,
+			"shirt": 1,
 			"leather pants": 1,
 			"leather leggings": 1,
 			"arrow": 20
@@ -165,7 +165,7 @@
 		"hair_style": "random",
 		"inventory_items":
 		{
-			"leather top": 1,
+			"shirt": 1,
 			"leather pants": 1,
 			"crimson grenade": 15
 		},

@@ -1,0 +1,23 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "leather pants",
+		"effect": "craftsewing1",
+		"materials": {"hide": 4}
+	},
+	{
+		"type": "Itemspec",
+		"name": "leather pants",
+		"model": "book-000",
+		"icon": "leatherarmor1",
+		"armor_class": 0.04,
+		"categories": {"armor": true},
+		"equipment_textures":
+		{
+			"aer": {"skin1": "aerspats1"}
+		},
+		"equipment_priority": -3,
+		"equipment_slot": "pants",
+		"mass": 5
+	}
+]
