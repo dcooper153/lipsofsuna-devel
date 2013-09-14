@@ -74,6 +74,26 @@ class Model(object):
 			raise Exception("invalid string")
 		return s
 
+class OgreScript(object):
+
+	def __init__(self, type, path):
+		self.type = type
+		self.path = path
+		self.textures = {}
+		with open(path, 'r') as file:
+			self.load_file(file)
+
+	def load_file(self, file):
+		for line in file:
+			line = line.strip()
+			tags = [t for t in line.split(' ') if t != '']
+			if len(tags) > 1:
+				if tags[0] == 'texture':
+					self.textures[tags[1]] = True
+				elif tags[0] == 'cubic_texture':
+					for t in tags[1:]:
+						self.textures[t] = True
+
 class Specs(object):
 
 	def __init__(self, path):
@@ -140,6 +160,7 @@ class Assets(object):
 
 		self.specs = {}
 		self.models = {}
+		self.ogre_scripts = {}
 
 	def load_licenses(self, data):
 		for v in data['licenses']:
@@ -215,6 +236,15 @@ class Assets(object):
 					self.models[path] = model
 				except Exception as e:
 					print("ERROR: %s: %s" % (path, str(e)))
+		# Load Ogre scripts.
+		exts = ['.material']
+		for root,dirs,names in os.walk('data/lipsofsuna'):
+			for name in names:
+				for ext in exts:
+					if name.endswith(ext):
+						path = os.path.join(root, name)
+						self.ogre_scripts[path] = OgreScript(ext, path)
+						break
 
 	def parse_disk_mods(self):
 		for root,dirs,names in os.walk('data'):
@@ -307,6 +337,11 @@ class Assets(object):
 					used[name1] = True
 				elif name2 in self.disk_data_names:
 					used[name2] = True
+		# Check for textures referenced by Ogre scripts.
+		for path,script in self.ogre_scripts.items():
+			for name in script.textures:
+				if name in self.disk_data_names:
+					used[name] = True
 		# Find unreferenced files.
 		res = {}
 		for name in self.disk_data_names:
