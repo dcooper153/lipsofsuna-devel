@@ -6,7 +6,7 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.hair_style
--- @alias Modelspec
+-- @alias HairStyleSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")

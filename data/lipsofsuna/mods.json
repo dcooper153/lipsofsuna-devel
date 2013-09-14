@@ -58,8 +58,8 @@
 	["load", "items/jar"],
 	["load", "items/lantern"],
 	["load", "items/milkypowder"],
+	["load", "items/ore"],
 	["load", "items/potion"],
-	["load", "items/stones"],
 	["load", "items/torch"],
 	["load", "items/workbench"],
 

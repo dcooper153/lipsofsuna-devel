@@ -19,17 +19,18 @@ class Specs(object):
 		for spec in data:
 			# Model.
 			model = spec.get('model')
-			if model:
+			if model and not model.startswith('#'):
 				self.models[model] = True
 			# Models.
 			for slot,model in spec.get('models', {}).items():
-				self.models[model] = True
+				if not model.startswith('#'):
+					self.models[model] = True
 			# Equipment models.
 			models = spec.get('equipment_models')
 			if models:
 				for mdllist in models.values():
 					for model in mdllist.values():
-						if len(model):
+						if len(model) and not model.startswith('#'):
 							self.models[model] = True
 			# Equipment textures.
 			textures = spec.get('equipment_textures')
