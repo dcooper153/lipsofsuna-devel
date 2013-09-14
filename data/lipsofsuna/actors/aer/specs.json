@@ -23,6 +23,11 @@
 		"effect_falling_damage": "aerhurt1",
 		"equipment_class": "aer",
 		"eye_style": "random",
+		"eye_styles":
+		{
+			"Default": "aereye1",
+			"Angled": "aereye2"
+		},
 		"hair_style": "random",
 		"head_scale_min": 0.8,
 		"head_scale_max": 1.2,

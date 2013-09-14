@@ -116,19 +116,22 @@ class Specs(object):
 				if not model.startswith('#'):
 					self.models[model] = True
 			# Equipment models.
-			models = spec.get('equipment_models')
-			if models:
-				for mdllist in models.values():
-					for model in mdllist.values():
-						if len(model) and not model.startswith('#'):
-							self.models[model] = True
+			models = spec.get('equipment_models', {})
+			for mdllist in models.values():
+				for model in mdllist.values():
+					if len(model) and not model.startswith('#'):
+						self.models[model] = True
 			# Equipment textures.
-			textures = spec.get('equipment_textures')
-			if textures:
-				for texlist in textures.values():
-					for texture in texlist.values():
-						if len(texture):
-							self.textures[texture] = True
+			textures = spec.get('equipment_textures', {})
+			for texlist in textures.values():
+				for texture in texlist.values():
+					if len(texture):
+						self.textures[texture] = True
+			# Customization textures.
+			textures = spec.get('eye_styles', {})
+			for texture in textures.values():
+				if len(texture):
+					self.textures[texture] = True
 			# Sound effects.
 			if spec['type'] == 'Effectspec':
 				sound = spec.get('sound')

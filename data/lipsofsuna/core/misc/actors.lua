@@ -30,6 +30,5 @@ Actorspec{
 	-- Customization.
 	body_scale_min = 0.9,
 	body_scale_max = 1.05,
-	eye_styles = {["Default"] = "aereye1", ["Angled"] = "aereye2"},
 	head_styles = {["Default"] = ""},
 	skin_styles = {["Default"] = ""}}

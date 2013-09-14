@@ -253,10 +253,8 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/actors/aer/aer1.png",
-				"data/lipsofsuna/actors/aer/aereye2.png",
-				"data/lipsofsuna/actors/aer/eye1.png",
 				"data/lipsofsuna/actors/aer/aereye1.png",
+				"data/lipsofsuna/actors/aer/aereye2.png",
 				"data/lipsofsuna/actors/aer/aerface1.png",
 				"data/lipsofsuna/actors/hair/aershorthair1.png",
 				"data/lipsofsuna/actors/hair/aerpigtails1.lmdl",
@@ -426,8 +424,7 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/apparel/lizardarmor/lizardarmor1.dds",
-				"data/lipsofsuna/apparel/lizardarmor/lizardarmor1n.png"
+				"data/lipsofsuna/apparel/lizardarmor/lizardarmor1.dds"
 			],
 			"files_original":
 			[
