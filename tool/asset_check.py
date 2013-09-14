@@ -1,8 +1,78 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 from __future__ import unicode_literals
 import os
 import json
+import struct
+
+class Model(object):
+
+	def __init__(self, path):
+		self.path = path
+		self.textures = {}
+		with open(path, 'rb') as file:
+			self.load_file(file)
+
+	def load_file(self, file):
+		while True:
+			# Read the block.
+			name = self.__read_str(file)
+			length = self.__read_int(file)
+			if not length:
+				break
+			# Read materials.
+			start = file.tell()
+			if name == 'mat':
+				matn = self.__read_int(file)
+				for i in range(matn):
+					flag = self.__read_int(file)
+					emit = self.__read_flt(file)
+					shin = self.__read_flt(file)
+					diff = [self.__read_flt(file) for i in range(4)]
+					spec = [self.__read_flt(file) for i in range(4)]
+					stra = [self.__read_flt(file) for i in range(3)]
+					texn = self.__read_int(file)
+					shad = self.__read_str(file)
+					mate = ''
+					if flag & 0x10:
+						mate = self.__read_str(file)
+					for j in range(texn):
+						ttype = self.__read_int(file)
+						tflag = self.__read_int(file)
+						twidt = self.__read_int(file)
+						theig = self.__read_int(file)
+						tname = self.__read_str(file)
+						self.textures[tname] = True
+			file.seek(start + length)
+
+	def __read_block(self, file):
+		return (name, data)
+
+	def __read_int(self, file):
+		data = file.read(4)
+		if len(data) < 4:
+			return
+		i, = struct.unpack('>i', data)
+		return i
+
+	def __read_flt(self, file):
+		data = file.read(4)
+		if len(data) < 4:
+			return
+		i, = struct.unpack('>f', data)
+		return i
+
+	def __read_str(self, file):
+		s = []
+		for i in range(0,512):
+			c = file.read(1).decode('utf8')
+			if c == '\0':
+				break
+			s.append(c)
+		s = ''.join(s)
+		if len(s) >= 512:
+			raise Exception("invalid string")
+		return s
 
 class Specs(object):
 
@@ -69,6 +139,7 @@ class Assets(object):
 		self.disk_orig_paths = {}
 
 		self.specs = {}
+		self.models = {}
 
 	def load_licenses(self, data):
 		for v in data['licenses']:
@@ -115,6 +186,7 @@ class Assets(object):
 				self.json_orig_paths[path] = self.json_orig_paths.get(path, 0) + 1
 
 	def parse_disk_files(self):
+		# Find data files.
 		exts = ['.png', '.dds', '.lmdl', '.svg', '.blend', '.ogg', '.flac']
 		for root,dirs,names in os.walk('data/lipsofsuna'):
 			for name in names:
@@ -124,6 +196,7 @@ class Assets(object):
 						self.disk_data_names[name] = True
 						self.disk_data_paths[path] = True
 						break
+		# Find original files.
 		exts = ['.png', '.dds', '.svg', '.blend', '.ogg', '.flac']
 		for root,dirs,names in os.walk(self.datarepo):
 			for name in names:
@@ -134,6 +207,14 @@ class Assets(object):
 						self.disk_orig_names[name] = True
 						self.disk_orig_paths[path] = True
 						break
+		# Load compiled models.
+		for path in self.disk_data_paths:
+			if path.endswith('.lmdl'):
+				try:
+					model = Model(path)
+					self.models[path] = model
+				except Exception as e:
+					print("ERROR: %s: %s" % (path, str(e)))
 
 	def parse_disk_mods(self):
 		for root,dirs,names in os.walk('data'):
@@ -197,6 +278,7 @@ class Assets(object):
 
 	def get_unused_data_names(self):
 		used = {}
+		# Check for files referenced by specs.
 		for path,spec in self.specs.items():
 			for name in spec.models:
 				name1 = name + '.lmdl'
@@ -216,11 +298,18 @@ class Assets(object):
 					used[name1] = True
 				elif name2 in self.disk_data_names:
 					used[name2] = True
-		# TODO: Check for textures referenced by model files.
+		# Check for textures referenced by model files.
+		for path,model in self.models.items():
+			for name in model.textures:
+				name1 = name + '.png'
+				name2 = name + '.dds'
+				if name1 in self.disk_data_names:
+					used[name1] = True
+				elif name2 in self.disk_data_names:
+					used[name2] = True
+		# Find unreferenced files.
 		res = {}
 		for name in self.disk_data_names:
-			if name.endswith('.png') or name.endswith('.dds'):
-				continue
 			if name not in used:
 				res[name] = True
 		return sorted([k for k in res])
