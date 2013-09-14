@@ -12,6 +12,14 @@
 		"particle": "torchfx1"
 	},
 	{
+		"type": "AnimationProfileSpec",
+		"name": "default staff equipped",
+		"animations":
+		{
+			"hold": "default hold staff"
+		}
+	},
+	{
 		"type": "CraftingRecipeSpec",
 		"name": "wooden staff",
 		"effect": "craftwood1",

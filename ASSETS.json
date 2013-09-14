@@ -3,11 +3,7 @@
 	[
 		"This file contains attribution and license information for non-script files",
 		"in the data directory. The rest of the files are licensed under the same",
-		"license as the source code of the game (GNU LGPL 3.0 or newer).",
-		"",
-		"Originals generally aren't included to the package. This mainly applies",
-		"to Blender models and PNG originals of DDS files. Such files start with",
-		"'import/' and can be downloaded from the Lips of Suna data repository."
+		"license as the source code of the game (GNU LGPL 3.0 or newer)."
 	],
 	"authors":
 	[
@@ -209,21 +205,7 @@
 		{
 			"files_original":
 			[
-				"concept/aer1.xcf"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
-		},
-		{
-			"files_original":
-			[
-				"concept/logo.svg"
+				"data/lipsofsuna/misc/logo.svg"
 			],
 			"authors":
 			[
@@ -235,7 +217,6 @@
 				"Creative Commons BY-SA 3.0"
 			]
 		},
-		
 		{
 			"files":
 			[
@@ -276,8 +257,8 @@
 				"data/lipsofsuna/actors/hair/ribbon1.png",
 				"data/lipsofsuna/apparel/bloomers/aerbloomers1.lmdl",
 				"data/lipsofsuna/apparel/bloomers/aerbloomers1.png",
-				"data/lipsofsuna/apparel/bloomers/aerbloomerstop1.png",
 				"data/lipsofsuna/apparel/bloomers/aerbloomerstop1.lmdl",
+				"data/lipsofsuna/apparel/bloomers/aerbloomerstop1.png",
 				"data/lipsofsuna/apparel/bloomers/bloomers1.lmdl",
 				"data/lipsofsuna/apparel/bloomers/bloomers1.png",
 				"data/lipsofsuna/apparel/bloomers/bloomers1.dds",
@@ -285,12 +266,14 @@
 				"data/lipsofsuna/apparel/dress/aerdress1.png",
 				"data/lipsofsuna/apparel/dress/aerdress2.png",
 				"data/lipsofsuna/apparel/dress/aerlowerdress1.lmdl",
+				"data/lipsofsuna/apparel/dress/chinadress1.lmdl",
+				"data/lipsofsuna/apparel/dress/chinadress1.dds",
 				"data/lipsofsuna/apparel/headband/aerheadband1.lmdl",
 				"data/lipsofsuna/apparel/headband/headband1.lmdl",
 				"data/lipsofsuna/apparel/headband/headband1.png",
 				"data/lipsofsuna/apparel/leggings/aerleggings1.png",
-				"data/lipsofsuna/apparel/leggings/leggings1.dds",
 				"data/lipsofsuna/apparel/leggings/leggings1.lmdl",
+				"data/lipsofsuna/apparel/leggings/leggings1.png",
 				"data/lipsofsuna/apparel/leggings/leggings1n.png",
 				"data/lipsofsuna/apparel/shirt/aershirt1.png",
 				"data/lipsofsuna/apparel/skirt/aerskirt1.lmdl",
@@ -304,63 +287,42 @@
 				"data/lipsofsuna/items/ore/ore1.lmdl",
 				"data/lipsofsuna/items/ore/ore1.png",
 				"data/lipsofsuna/sounds/coins-000.flac",
-				"data/lipsofsuna/weapons/boomerang/boomerang1.dds",
 				"data/lipsofsuna/weapons/boomerang/boomerang1.lmdl",
+				"data/lipsofsuna/weapons/boomerang/boomerang1.png",
+				"data/lipsofsuna/weapons/grenade/grenade1.lmdl",
+				"data/lipsofsuna/weapons/grenade/grenade1.png",
 				"data/lipsofsuna/weapons/musket/musket1.lmdl"
 			],
 			"files_original":
 			[
-				"actors/aer1.png",
-				"actors/aerbody1.blend",
-				"actors/aerbodyclothed1.blend",
-				"actors/aerbodydress1.blend",
-				"actors/aerbodyunderwear1.blend",
-				"actors/aereye1.png",
-				"actors/aereye1.svg",
-				"actors/aereye2.png",
-				"actors/aereye2.svg",
-				"actors/aerface1.png",
-				"actors/aerface1.svg",
-				"actors/hair1.png",
-				"actors/hair1n.png",
-				"actors/hair2.blend",
-				"actors/hair5.blend",
-				"actors/player/aerpigtails1.blend",
-				"actors/player/aerpigtails1.png",
-				"actors/player/ponytail1.blend",
-				"actors/player/shorthair1.blend",
-				"actors/player/ribbon1.png",
-				"apparel/aeritem1.blend",
-				"apparel/aerbloomers1.png",
-				"apparel/aerbloomers1.svg",
-				"apparel/aerbloomerstop1.png",
-				"apparel/aerbloomerstop1.svg",
-				"apparel/aerbra1.svg",
-				"apparel/aerleggings1.svg",
-				"apparel/aerpanties1.svg",
-				"apparel/aershirt1.svg",
-				"apparel/aerskirt1.svg",
-				"apparel/aerspats1.svg",
-				"apparel/aerdress1.png",
-				"apparel/aerdress1.svg",
-				"apparel/aerdress2.svg",
-				"apparel/bloomers1.blend",
-				"apparel/bloomers1.png",
-				"apparel/headband1.blend",
-				"apparel/headband1.png",
-				"apparel/leggings1.blend",
-				"apparel/leggings1.png",
-				"apparel/leggings1n.png",
-				"apparel/longcoat1.blend",
-				"apparel/longcoat1.png",
-				"apparel/longcoat1.xcf",
-				"apparel/skirt1.blend",
-				"apparel/skirt1.png",
-				"weapons/boomerang1.blend",
-				"weapons/boomerang1.png",
-				"weapons/musket1.blend",
-				"import/eye1.png",
-				"import/eyes-000.png"
+				"data/lipsofsuna/actors/aer/aereye1.svg",
+				"data/lipsofsuna/actors/aer/aereye2.svg",
+				"data/lipsofsuna/actors/aer/aerface1.svg",
+				"data/lipsofsuna/actors/hair/aerpigtails1.blend",
+				"data/lipsofsuna/actors/hair/aerhairponytail1.blend",
+				"data/lipsofsuna/actors/hair/aershorthair1.blend",
+				"data/lipsofsuna/actors/hair/hair2.blend",
+				"data/lipsofsuna/actors/hair/hair5.blend",
+				"data/lipsofsuna/apparel/dress/aerdress1.svg",
+				"data/lipsofsuna/apparel/dress/aerdress2.svg",
+				"data/lipsofsuna/apparel/bloomers/bloomers1.blend",
+				"data/lipsofsuna/apparel/bloomers/aerbloomers1.svg",
+				"data/lipsofsuna/apparel/bloomers/aerbloomerstop1.svg",
+				"data/lipsofsuna/apparel/headband/headband1.blend",
+				"data/lipsofsuna/apparel/leggings/aerleggings1.svg",
+				"data/lipsofsuna/apparel/leggings/leggings1.blend",
+				"data/lipsofsuna/apparel/shirt/aershirt1.svg",
+				"data/lipsofsuna/apparel/skirt/aerskirt1.svg",
+				"data/lipsofsuna/apparel/skirt/skirt1.blend",
+				"data/lipsofsuna/apparel/spats/aerspats1.svg",
+				"data/lipsofsuna/apparel/underwear/aerbra1.svg",
+				"data/lipsofsuna/apparel/underwear/aerpanties1.svg",
+				"data/lipsofsuna/apparel/longcoat/longcoat1.blend",
+				"data/lipsofsuna/apparel/longcoat/longcoat1.xcf",
+				"data/lipsofsuna/items/ore/ore1.blend",
+				"data/lipsofsuna/weapons/boomerang/boomerang1.blend",
+				"data/lipsofsuna/weapons/grenade/grenade1.blend",
+				"data/lipsofsuna/weapons/musket/musket1.blend"
 			],
 			"authors":
 			[
@@ -382,10 +344,9 @@
 			],
 			"files_original":
 			[
-				"actors/player/player1.blend",
-				"actors/player/playerclothed1.blend",
-				"actors/player/playerunderwear1.blend",
-				"actors/player/skin1.png"
+				"data/lipsofsuna/actors/aer/aerbody1.blend",
+				"data/lipsofsuna/apparel/shirt/aerbodyclothed1.blend",
+				"data/lipsofsuna/apparel/underwear/aerbodyunderwear1.blend"
 			],
 			"authors":
 			[
@@ -409,7 +370,7 @@
 			],
 			"files_original":
 			[
-				"apparel/lizardarmor1.blend"
+				"data/lipsofsuna/apparel/lizardarmor/lizardarmor1.blend"
 			],
 			"authors":
 			[
@@ -424,12 +385,7 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/apparel/lizardarmor/lizardarmor1.dds"
-			],
-			"files_original":
-			[
-				"apparel/lizardarmor1.png",
-				"apparel/lizardarmor1n.png"
+				"data/lipsofsuna/apparel/lizardarmor/lizardarmor1.png"
 			],
 			"authors":
 			[
@@ -444,16 +400,13 @@
 			"files":
 			[
 				"data/lipsofsuna/items/airtank/airtank1.lmdl",
-				"data/lipsofsuna/items/airtank/airtank1.dds",
-				"data/lipsofsuna/items/airtank/airtank1n.dds",
-				"data/lipsofsuna/items/airtank/airtank2.dds"
+				"data/lipsofsuna/items/airtank/airtank1.png",
+				"data/lipsofsuna/items/airtank/airtank1n.png",
+				"data/lipsofsuna/items/airtank/airtank2.png"
 			],
 			"files_original":
 			[
-				"items/airtank1.blend",
-				"items/airtank1.png",
-				"items/airtank2.png",
-				"items/airtank1n.png"
+				"data/lipsofsuna/items/airtank/airtank1.blend"
 			],
 			"authors":
 			[
@@ -469,38 +422,12 @@
 		{
 			"files":
 			[
-			],
-			"files_original":
-			[
-				"import/aquanite1.png",
-				"import/crimson1.png",
-				"import/crimson1n.png",
-				"import/granite1.png",
-				"import/ice1.png",
-				"import/ice1n.png",
-				"import/sand1.png",
-				"import/sand1n.png"
-			],
-			"authors":
-			[
-				"Mysteryem"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			],
-			"source": "http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024"
-		},
-		{
-			"files":
-			[
 				"data/lipsofsuna/weapons/bow/arrow-000.lmdl",
-				"data/lipsofsuna/weapons/bow/arrow-000.dds"
+				"data/lipsofsuna/weapons/bow/arrow-000.png"
 			],
 			"files_original":
 			[
-				"items/arrow-000.blend",
-				"items/arrow-000.png"
+				"data/lipsofsuna/weapons/bow/arrow-000.blend"
 			],
 			"authors":
 			[
@@ -516,16 +443,13 @@
 			"files":
 			[
 				"data/lipsofsuna/items/barrel/barrel1.lmdl",
-				"data/lipsofsuna/items/barrel/barrel1.dds",
-				"data/lipsofsuna/items/barrel/barrel1n.dds",
-				"data/lipsofsuna/items/barrel/barrel1s.dds"
+				"data/lipsofsuna/items/barrel/barrel1.png",
+				"data/lipsofsuna/items/barrel/barrel1n.png",
+				"data/lipsofsuna/items/barrel/barrel1s.png"
 			],
 			"files_original":
 			[
-				"environment/barrel1.blend",
-				"environment/barrel1.png",
-				"environment/barrel1n.png",
-				"environment/barrel1s.png"
+				"data/lipsofsuna/items/barrel/barrel1.blend"
 			],
 			"authors":
 			[
@@ -540,69 +464,12 @@
 		{
 			"files":
 			[
-			],
-			"files_original":
-			[
-				"import/basalt1.png"
-			],
-			"authors":
-			[
-				"Dim"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/dims-enviromental-and-architectural-textures"
-		},
-		
-		{
-			"files":
-			[
-			],
-			"files_original":
-			[
-				"environment/windowsill1.blend"
-			],
-			"authors":
-			[
-				"Harald"
-			],
-			"licenses":
-			[
-				"CC0"
-			]
-		},
-		
-		{
-			"files":
-			[
-				"data/lipsofsuna/misc/lamppost01.lmdl"
-			],
-			"files_original":
-			[
-				"environment/lamppost1.blend"
-			],
-			"authors":
-			[
-				"Andrew Kator &amp; Jennifer Legaz"
-			],
-			"licenses":
-			[
-				"CC0"
-			],
-			"source": "http://www.katorlegaz.com/3d_models/lights_outdoor/0152/index.php"
-		},
-		{
-			"files":
-			[
 				"data/lipsofsuna/items/book/book-000.lmdl",
-				"data/lipsofsuna/items/book/book-000.dds"
+				"data/lipsofsuna/items/book/book-000.png"
 			],
 			"files_original":
 			[
-				"items/book-000.blend",
-				"items/book-000.png"
+				"data/lipsofsuna/items/book/book-000.blend"
 			],
 			"authors":
 			[
@@ -616,11 +483,7 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/items/book/book1.dds"
-			],
-			"files_original":
-			[
-				"items/book1.png"
+				"data/lipsofsuna/items/book/book1.png"
 			],
 			"authors":
 			[
@@ -636,12 +499,11 @@
 			"files":
 			[
 				"data/lipsofsuna/environment/furniture/bookcase1.lmdl",
-				"data/lipsofsuna/environment/furniture/bookcase1.dds"
+				"data/lipsofsuna/environment/furniture/bookcase1.png"
 			],
 			"files_original":
 			[
-				"environment/bookcase1.blend",
-				"environment/bookcase1.png"
+				"data/lipsofsuna/environment/furniture/bookcase1.blend"
 			],
 			"authors":
 			[
@@ -654,69 +516,14 @@
 			"source": "http://opengameart.org/content/bookshelf"
 		},
 		{
-			"files_original":
-			[
-				"items/bottle-000.blend"
-			],
-			"authors":
-			[
-				"Andrew Kator &amp; Jennifer Legaz"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			],
-			"source": "http://www.katorlegaz.com/3d_models/household_dining/0113/index.php"
-		},
-		{
-			"files":
-			[
-			],
-			"files_original":
-			[
-				"import/bricks1.png",
-				"import/bricks2.png",
-				"import/bricks3.png",
-				"import/bricks1n.png",
-				"import/bricks2n.png",
-				"import/bricks3n.png"
-			],
-			"authors":
-			[
-				"WeaponGuy",
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/cottage"
-		},
-		{
-			"files_original":
-			[
-				"import/bricks-000.blend"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"CC0"
-			],
-			"comment": "Needs better textures"
-		},
-		{
 			"files":
 			[
 				"data/lipsofsuna/environment/furniture/chair1.lmdl",
-				"data/lipsofsuna/environment/furniture/chair1.dds"
+				"data/lipsofsuna/environment/furniture/chair1.png"
 			],
 			"files_original":
 			[
-				"environment/chair1.blend",
-				"environment/chair1.png"
+				"data/lipsofsuna/environment/furniture/chair1.blend"
 			],
 			"authors":
 			[
@@ -729,27 +536,13 @@
 			"source": "http://opengameart.org/content/low-poly-chair"
 		},
 		{
-			"files_original":
-			[
-				"environment/chair-001.blend"
-			],
-			"authors":
-			[
-				"Martin Frydenlund"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
-		},
-		{
 			"files":
 			[
 				"data/lipsofsuna/items/chest/chest1.lmdl"
 			],
 			"files_original":
 			[
-				"environment/chest1.blend"
+				"data/lipsofsuna/items/chest/chest1.blend"
 			],
 			"authors":
 			[
@@ -765,50 +558,11 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/apparel/dress/chinadress1.lmdl",
-				"data/lipsofsuna/apparel/dress/chinadress1.dds"
+				"data/lipsofsuna/ui/compass1.png"
 			],
 			"files_original":
 			[
-				"apparel/chinadress1.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
-		},
-		{
-			"files":
-			[
-			],
-			"files_original":
-			[
-				"import/cobbles1.png",
-				"import/cobbles1n.png"
-			],
-			"authors":
-			[
-				"titus tscharntk",
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"CC0"
-			],
-			"source": "http://www.burningwell.org/gallery2/v/textures/buildings/pavingBrickCobbles/cobbles_grey_texture_TT7010071.JPG.html"
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/ui/compass1.dds"
-			],
-			"files_original":
-			[
-				"import/compass1.png"
+				"data/lipsofsuna/ui/compass1.xcf"
 			],
 			"authors":
 			[
@@ -823,12 +577,11 @@
 			"files":
 			[
 				"data/lipsofsuna/weapons/crossbow/crossbow1.lmdl",
-				"data/lipsofsuna/weapons/crossbow/crossbow1.dds"
+				"data/lipsofsuna/weapons/crossbow/crossbow1.png"
 			],
 			"files_original":
 			[
-				"weapons/crossbow1.blend",
-				"weapons/crossbow1.png"
+				"data/lipsofsuna/weapons/crossbow/crossbow1.blend"
 			],
 			"authors":
 			[
@@ -844,13 +597,12 @@
 			"files":
 			[
 				"data/lipsofsuna/weapons/dagger/dagger1.lmdl",
-				"data/lipsofsuna/weapons/dagger/dagger1.dds",
+				"data/lipsofsuna/weapons/dagger/dagger1.png",
 				"data/lipsofsuna/weapons/dagger/dagger1n.dds"
 			],
 			"files_original":
 			[
-				"weapons/dagger1.blend",
-				"weapons/dagger1.png"
+				"data/lipsofsuna/weapons/dagger/dagger1.blend"
 			],
 			"authors":
 			[
@@ -866,42 +618,15 @@
 		{
 			"files":
 			[
-			],
-			"files_original":
-			[
-				"import/android1.blend",
-				"import/android1.png",
-				"import/android1n.png",
-				"import/devora1.blend",
-				"import/devora1.png",
-				"import/devora1n.png",
-				"import/kraken1.blend",
-				"import/kraken1.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
-		},
-		{
-			"files":
-			[
 				"data/lipsofsuna/plants/dewspring/dewspring1.lmdl",
-				"data/lipsofsuna/plants/dewspring/dewspring1.dds",
-				"data/lipsofsuna/plants/dewspring/dewspring1n.dds",
-				"data/lipsofsuna/plants/dewspring/dewspring1s.dds",
+				"data/lipsofsuna/plants/dewspring/dewspring1.png",
+				"data/lipsofsuna/plants/dewspring/dewspring1n.png",
+				"data/lipsofsuna/plants/dewspring/dewspring1s.png",
 				"data/lipsofsuna/plants/dewspring/dewspringleaf1.lmdl"
 			],
 			"files_original":
 			[
-				"environment/dewspring1.blend",
-				"environment/dewspring1.png",
-				"environment/dewspring1n.png",
-				"environment/dewspring1s.png"
+				"data/lipsofsuna/plants/dewspring/dewspring1.blend"
 			],
 			"authors":
 			[
@@ -916,13 +641,8 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/environment/door/door1.dds",
-				"data/lipsofsuna/environment/door/door1n.dds"
-			],
-			"files_original":
-			[
-				"environment/door1.png",
-				"environment/door1n.png"
+				"data/lipsofsuna/environment/door/door1.png",
+				"data/lipsofsuna/environment/door/door1n.png"
 			],
 			"authors":
 			[
@@ -942,7 +662,7 @@
 			],
 			"files_original":
 			[
-				"environment/door1.blend"
+				"data/lipsofsuna/environment/door/door1.blend"
 			],
 			"authors":
 			[
@@ -960,7 +680,7 @@
 			],
 			"files_original":
 			[
-				"actors/dragon1.blend"
+				"data/lipsofsuna/actors/dragon/dragon1.blend"
 			],
 			"authors":
 			[
@@ -975,41 +695,8 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/actors/dragon/dragon1.dds",
-				"data/lipsofsuna/actors/dragon/dragon1n.dds"
-			],
-			"files_original":
-			[
-				"actors/dragon1.png",
-				"actors/dragon1n.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"CC0"
-			]
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/spells/effects/dust1.dds",
-				"data/lipsofsuna/spells/effects/dust2.dds"
-			],
-			"files_original":
-			[
-				"import/dust1.blend",
-				"import/dust1.png",
-				"import/dust2.png",
-				"import/fireball1.blend",
-				"import/firewall1.blend",
-				"import/heal1.blend",
-				"import/magicmissile1.blend",
-				"import/spell1.blend",
-				"import/spell2.blend",
-				"import/sanctuary1.blend"
+				"data/lipsofsuna/actors/dragon/dragon1.png",
+				"data/lipsofsuna/actors/dragon/dragon1n.png"
 			],
 			"authors":
 			[
@@ -1025,13 +712,11 @@
 			[
 				"data/lipsofsuna/apparel/fedora/aerfedora1.lmdl",
 				"data/lipsofsuna/apparel/fedora/fedora1.lmdl",
-				"data/lipsofsuna/apparel/fedora/fedora1.dds"
+				"data/lipsofsuna/apparel/fedora/fedora1.png"
 			],
 			"files_original":
 			[
-				"apparel/fedora1.blend",
-				"apparel/fedora1.png",
-				"apparel/fedora1n.png"
+				"data/lipsofsuna/apparel/fedora/fedora1.blend"
 			],
 			"authors":
 			[
@@ -1046,30 +731,14 @@
 			"comment": "Manually retopologized and fitted to the original texture. Applied contrast stretching to the texture. Baked normals from the high polygon model."
 		},
 		{
-			"files_original":
-			[
-				"import/flowerpot-000.blend"
-			],
-			"authors":
-			[
-				"Scopia Visual Interfaces Systems, s.l."
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://resources.blogscopia.com/models/arboles/maceta/maceta_en.html"
-		},
-		{
 			"files":
 			[
 				"data/lipsofsuna/misc/fruit1.lmdl",
-				"data/lipsofsuna/misc/fruit1.dds"
+				"data/lipsofsuna/misc/fruit1.png"
 			],
 			"files_original":
 			[
-				"items/food1.blend",
-				"items/fruit1.png"
+				"data/lipsofsuna/misc/food1.blend"
 			],
 			"authors":
 			[
@@ -1084,32 +753,13 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/actors/rat/fur1.dds"
-			],
-			"files_original":
-			[
-				"import/fur1.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"CC0"
-			],
-			"comment": "This is a special texture used by the fur shader."
-		},
-		{
-			"files":
-			[
 				"data/lipsofsuna/environment/furnace/furnace1.lmdl",
 				"data/lipsofsuna/environment/furnace/furnace1.dds",
 				"data/lipsofsuna/environment/furnace/furnace1n.dds"
 			],
 			"files_original":
 			[
-				"environment/furnace1.blend"
+				"data/lipsofsuna/environment/furnace/furnace1.blend"
 			],
 			"authors":
 			[
@@ -1123,100 +773,13 @@
 		{
 			"files":
 			[
-			],
-			"files_original":
-			[
-				"import/granite1n.blend",
-				"import/granite1n.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
-		},
-		{
-			"files":
-			[
-			],
-			"files_original":
-			[
-				"import/grass-000.png",
-				"import/grass-000-nml.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"CC0"
-			]
-		},
-		{
-			"files_original":
-			[
-				"import/grass-002.png"
-			],
-			"authors":
-			[
-				"Unknown"
-			],
-			"licenses":
-			[
-				"CC0"
-			],
-			"source": "http://opengameart.org/content/golgotha-textures-francegrassfulljpg"
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/weapons/grenade/grenade1.lmdl",
-				"data/lipsofsuna/weapons/grenade/grenade1.dds"
-			],
-			"files_original":
-			[
-				"weapons/grenade1.blend",
-				"weapons/grenade1.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
-		},
-		{
-			"files_original":
-			[
-				"import/ground-000.blend"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"CC0"
-			]
-		},
-		{
-			"files":
-			[
 				"data/lipsofsuna/actors/hair/hair3.lmdl",
-				"data/lipsofsuna/actors/hair/hair2.dds",
-				"data/lipsofsuna/actors/hair/hair2n.dds"
+				"data/lipsofsuna/actors/hair/hair2.png",
+				"data/lipsofsuna/actors/hair/hair2n.png"
 			],
 			"files_original":
 			[
-				"actors/hair1.blend",
-				"actors/hair2.png",
-				"actors/hair2n.png"
+				"data/lipsofsuna/actors/hair/hair1.blend"
 			],
 			"authors":
 			[
@@ -1231,48 +794,14 @@
 			"comment": "Minor modifications were done to fit the mesh with our rigs. The texture was desaturated to make it compatible with our hair coloring system. The normal map was generated from hair2.png"
 		},
 		{
-			"files_original":
-			[
-				"import/house1.blend"
-			],
-			"authors":
-			[
-				"WeaponGuy",
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/cottage"
-		},
-		{
 			"files":
 			[
-			],
-			"files_original":
-			[
-				"import/house2.blend"
-			],
-			"authors":
-			[
-				"yazjack"
-			],
-			"licenses":
-			[
-				"CC0"
-			],
-			"source": "http://www.blendswap.com/blends/architecture/medieval-house/"
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/ui/icons1.dds",
+				"data/lipsofsuna/ui/icons1.png",
 				"data/lipsofsuna/ui/icons2.dds"
 			],
 			"files_original":
 			[
-				"import/icons1.png"
+				"data/lipsofsuna/ui/icons1.xcf"
 			],
 			"authors":
 			[
@@ -1288,15 +817,13 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/items/jar/jar1.dds",
-				"data/lipsofsuna/items/jar/jar1n.dds",
+				"data/lipsofsuna/items/jar/jar1.png",
+				"data/lipsofsuna/items/jar/jar1n.png",
 				"data/lipsofsuna/items/jar/jar1.lmdl"
 			],
 			"files_original":
 			[
-				"items/jar1.blend",
-				"items/jar1.png",
-				"items/jar1n.png"
+				"data/lipsofsuna/items/jar/jar1.blend"
 			],
 			"authors":
 			[
@@ -1311,11 +838,7 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/ui/mainmenu1.dds"
-			],
-			"files_original":
-			[
-				"import/mainmenu1.png"
+				"data/lipsofsuna/ui/mainmenu1.png"
 			],
 			"authors":
 			[
@@ -1330,12 +853,11 @@
 			"files":
 			[
 				"data/lipsofsuna/weapons/mattock/mattock-000.lmdl",
-				"data/lipsofsuna/weapons/mattock/mattock-000.dds"
+				"data/lipsofsuna/weapons/mattock/mattock-000.png"
 			],
 			"files_original":
 			[
-				"weapons/mattock-000.blend",
-				"weapons/mattock-000.png"
+				"data/lipsofsuna/weapons/mattock/mattock-000.blend"
 			],
 			"authors":
 			[
@@ -1345,53 +867,16 @@
 			[
 				"CC0"
 			]
-		},
-		{
-			"files_original":
-			[
-				"items/meat-000.blend",
-				"items/meat-000.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"CC0"
-			]
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/misc/metal2.dds",
-				"data/lipsofsuna/misc/metal3.dds"
-			],
-			"files_original":
-			[
-				"import/metal2.png",
-				"import/metal3.png"
-			],
-			"authors":
-			[
-				"WeaponGuy"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/treasure-chest"
 		},
 		{
 			"files":
 			[
 				"data/lipsofsuna/plants/mushroom/mushroom-000.lmdl",
-				"data/lipsofsuna/plants/mushroom/mushroom-000.dds"
+				"data/lipsofsuna/plants/mushroom/mushroom-000.png"
 			],
 			"files_original":
 			[
-				"environment/mushroom-000.blend",
-				"environment/mushroom-000.png"
+				"data/lipsofsuna/plants/mushroom/mushroom-000.blend"
 			],
 			"authors":
 			[
@@ -1406,11 +891,7 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/weapons/musket/musket1.dds"
-			],
-			"files_original":
-			[
-				"weapons/musket1.png"
+				"data/lipsofsuna/weapons/musket/musket1.png"
 			],
 			"authors":
 			[
@@ -1428,37 +909,12 @@
 			"files":
 			[
 				"data/lipsofsuna/character/celshading/celramp1.png",
-				"data/lipsofsuna/core/terrain/stickterrainfixed1.png",
 				"data/lipsofsuna/core/terrain/stickterrain1.png",
+				"data/lipsofsuna/core/terrain/stickterrainfixed1.png",
 				"data/lipsofsuna/spells/effects/explosion1.dds",
 				"data/lipsofsuna/spells/effects/flare1.png",
 				"data/lipsofsuna/particle/blood1.dds",
-				"data/lipsofsuna/particle/particle1.dds",
-				"data/lipsofsuna/particle/particle2.dds",
-				"data/lipsofsuna/particle/particle4.dds",
-				"data/lipsofsuna/particle/particle5.dds",
-				"data/lipsofsuna/particle/particle6.dds",
-				"data/lipsofsuna/particle/star1.png",
-				"data/lipsofsuna/particle/particle-000.dds",
-				"data/lipsofsuna/particle/particle-001.dds",
-				"data/lipsofsuna/particle/particle-002.dds"
-			],
-			"files_original":
-			[
-				"import/blood1.blend",
-				"import/blood1.png",
-				"import/devorahair1.blend",
-				"import/devorahair1.png",
-				"import/firebreath1.blend",
-				"import/heal2.blend",
-				"import/particle1.png",
-				"import/particle2.png",
-				"import/particle5.png",
-				"import/particle6.png",
-				"import/particle-000.png",
-				"import/particle-001.png",
-				"import/particle-002.png",
-				"import/particle-003.png"
+				"data/lipsofsuna/particle/star1.png"
 			],
 			"authors":
 			[
@@ -1472,24 +928,6 @@
 		{
 			"files":
 			[
-			],
-			"files_original":
-			[
-				"import/planks1.png"
-			],
-			"authors":
-			[
-				"WeaponGuy"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/treasure-chest"
-		},
-		{
-			"files":
-			[
 				"data/lipsofsuna/apparel/platearmor/aerarmplate1.lmdl",
 				"data/lipsofsuna/apparel/platearmor/aerlegplate1.lmdl",
 				"data/lipsofsuna/apparel/platearmor/aerlowerplate1.lmdl",
@@ -1497,14 +935,12 @@
 				"data/lipsofsuna/apparel/platearmor/armplate1.lmdl",
 				"data/lipsofsuna/apparel/platearmor/legplate1.lmdl",
 				"data/lipsofsuna/apparel/platearmor/upperplate1.lmdl",
-				"data/lipsofsuna/apparel/platearmor/platemail1.dds",
+				"data/lipsofsuna/apparel/platearmor/platemail1.png",
 				"data/lipsofsuna/apparel/platearmor/platemail1n.png"
 			],
 			"files_original":
 			[
-				"apparel/plate1.blend",
-				"apparel/platemail1.png",
-				"apparel/platemail1n.png"
+				"data/lipsofsuna/apparel/platearmor/plate1.blend"
 			],
 			"authors":
 			[
@@ -1519,12 +955,11 @@
 			"files":
 			[
 				"data/lipsofsuna/environment/portal/portal1.lmdl",
-				"data/lipsofsuna/environment/portal/portal1.dds"
+				"data/lipsofsuna/environment/portal/portal1.png"
 			],
 			"files_original":
 			[
-				"environment/portal1.blend",
-				"environment/portal1.png"
+				"data/lipsofsuna/environment/portal/portal1.blend"
 			],
 			"authors":
 			[
@@ -1549,7 +984,7 @@
 			],
 			"files_original":
 			[
-				"items/potion1.blend"
+				"data/lipsofsuna/items/potion/potion1.blend"
 			],
 			"authors":
 			[
@@ -1565,12 +1000,11 @@
 			"files":
 			[
 				"data/lipsofsuna/weapons/revolver/revolver1.lmdl",
-				"data/lipsofsuna/weapons/revolver/revolver1.dds"
+				"data/lipsofsuna/weapons/revolver/revolver1.png"
 			],
 			"files_original":
 			[
-				"weapons/revolver1.blend",
-				"weapons/revolver1.png"
+				"data/lipsofsuna/weapons/revolver/revolver1.blend"
 			],
 			"authors":
 			[
@@ -1586,69 +1020,13 @@
 		{
 			"files":
 			[
-			],
-			"files_original":
-			[
-				"import/roof1.png"
-			],
-			"authors":
-			[
-				"WeaponGuy"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/cottage"
-		},
-		{
-			"files":
-			[
-			],
-			"files_original":
-			[
-				"import/roof1n.png"
-			],
-			"authors":
-			[
-				"WeaponGuy",
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/cottage"
-		},
-		{
-			"files":
-			[
-			],
-			"files_original":
-			[
-				"import/seirei1.blend"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
-		},
-		{
-			"files":
-			[
 				"data/lipsofsuna/weapons/shield/shield1.lmdl",
-				"data/lipsofsuna/weapons/shield/shield1.dds",
-				"data/lipsofsuna/weapons/shield/shield1n.dds"
+				"data/lipsofsuna/weapons/shield/shield1.png",
+				"data/lipsofsuna/weapons/shield/shield1n.png"
 			],
 			"files_original":
 			[
-				"weapons/shield1.blend",
-				"weapons/shield1.png",
-				"weapons/shield1n.png"
+				"data/lipsofsuna/weapons/shield/shield1.blend"
 			],
 			"authors":
 			[
@@ -1662,58 +1040,13 @@
 			"comment": "Textures baked from the original model."
 		},
 		{
-			"files_original":
-			[
-				"weapons/shield-000.blend"
-			],
-			"authors":
-			[
-				"Peragro Tempus Project"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
-		},
-		{
-			"files_original":
-			[
-				"weapons/shield-000.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"CC0"
-			]
-		},
-		{
 			"files":
 			[
+				"data/lipsofsuna/ui/skills1.png"
 			],
 			"files_original":
 			[
-				"environment/shutter1.blend"
-			],
-			"authors":
-			[
-				"Millz"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/ui/skills1.dds"
-			],
-			"files_original":
-			[
-				"import/skills1.svg"
+				"data/lipsofsuna/ui/skills1.svg"
 			],
 			"authors":
 			[
@@ -1723,90 +1056,17 @@
 			[
 				"Creative Commons BY-SA 3.0"
 			]
-		},
-		{
-			"files":
-			[
-			],
-			"files_original":
-			[
-				"import/soil1.png"
-			],
-			"authors":
-			[
-				"Dim"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/dims-enviromental-and-architectural-textures"
-		},
-		{
-			"files":
-			[
-			],
-			"files_original":
-			[
-				"import/soil1n.blend",
-				"import/soil1n.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			]
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/weapons/spear/spear1.lmdl"
-			],
-			"files_original":
-			[
-				"weapons/spear-000.blend"
-			],
-			"authors":
-			[
-				"Blender Open Model Repository"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://www.blendermodels.org/models/weapon/"
-		},
-		{
-			"files_original":
-			[
-				"import/stone_color.png",
-				"import/stone_normal.png"
-			],
-			"authors":
-			[
-				"Clint Bellanger"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/stone-and-wood-barricade"
 		},
 		{
 			"files":
 			[
 				"data/lipsofsuna/weapons/hatchet/stoneaxe1.lmdl",
-				"data/lipsofsuna/weapons/hatchet/stoneaxe1.dds",
-				"data/lipsofsuna/weapons/hatchet/stoneaxe1n.dds"
+				"data/lipsofsuna/weapons/hatchet/stoneaxe1.png",
+				"data/lipsofsuna/weapons/hatchet/stoneaxe1n.png"
 			],
 			"files_original":
 			[
-				"weapons/stoneaxe1.blend",
-				"weapons/stoneaxe1.png",
-				"weapons/stoneaxe1n.png"
+				"data/lipsofsuna/weapons/hatchet/stoneaxe1.blend"
 			],
 			"authors":
 			[
@@ -1822,14 +1082,12 @@
 			"files":
 			[
 				"data/lipsofsuna/weapons/sword/sword1.lmdl",
-				"data/lipsofsuna/weapons/sword/sword1.dds",
-				"data/lipsofsuna/weapons/sword/sword1n.dds"
+				"data/lipsofsuna/weapons/sword/sword1.png",
+				"data/lipsofsuna/weapons/sword/sword1n.png"
 			],
 			"files_original":
 			[
-				"weapons/sword1.blend",
-				"weapons/sword1.png",
-				"weapons/sword1n.png"
+				"data/lipsofsuna/weapons/sword/sword1.blend"
 			],
 			"authors":
 			[
@@ -1849,7 +1107,7 @@
 			],
 			"files_original":
 			[
-				"weapons/sword5.blend"
+				"data/lipsofsuna/weapons/sword/sword5.blend"
 			],
 			"authors":
 			[
@@ -1866,12 +1124,11 @@
 			"files":
 			[
 				"data/lipsofsuna/weapons/sword/sword6.lmdl",
-				"data/lipsofsuna/weapons/sword/sword6.dds"
+				"data/lipsofsuna/weapons/sword/sword6.png"
 			],
 			"files_original":
 			[
-				"weapons/sword6.blend",
-				"weapons/sword6.png"
+				"data/lipsofsuna/weapons/sword/sword6.blend"
 			],
 			"authors":
 			[
@@ -1886,11 +1143,7 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/weapons/sword/sword5.dds"
-			],
-			"files_original":
-			[
-				"weapons/sword5.png"
+				"data/lipsofsuna/weapons/sword/sword5.png"
 			],
 			"authors":
 			[
@@ -1903,42 +1156,21 @@
 			"status": "complete"
 		},
 		{
-			"files_original":
-			[
-				"import/tiles1.blend"
-			],
-			"authors":
-			[
-				"Clint Bellanger"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/cave-tileset"
-		},
-		{
 			"files":
 			[
 				"data/lipsofsuna/plants/tree/tree1.lmdl",
 				"data/lipsofsuna/plants/tree/tree2.lmdl",
-				"data/lipsofsuna/plants/tree/tree1.dds",
-				"data/lipsofsuna/plants/tree/tree1n.dds",
-				"data/lipsofsuna/plants/tree/tree3.dds",
-				"data/lipsofsuna/plants/tree/tree3n.dds",
-				"data/lipsofsuna/plants/tree/tree4.dds",
-				"data/lipsofsuna/plants/tree/tree4n.dds"
+				"data/lipsofsuna/plants/tree/tree1.png",
+				"data/lipsofsuna/plants/tree/tree1n.png",
+				"data/lipsofsuna/plants/tree/tree3.png",
+				"data/lipsofsuna/plants/tree/tree3n.png",
+				"data/lipsofsuna/plants/tree/tree4.png",
+				"data/lipsofsuna/plants/tree/tree4n.png"
 			],
 			"files_original":
 			[
-				"environment/tree1.blend",
-				"environment/tree2.blend",
-				"environment/tree1.png",
-				"environment/tree1n.png",
-				"environment/tree3.png",
-				"environment/tree3n.png",
-				"environment/tree4.png",
-				"environment/tree4n.png"
+				"data/lipsofsuna/plants/tree/tree1.blend",
+				"data/lipsofsuna/plants/tree/tree2.blend"
 			],
 			"authors":
 			[
@@ -1952,11 +1184,7 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/plants/tree/tree2.dds"
-			],
-			"files_original":
-			[
-				"environment/tree2.png"
+				"data/lipsofsuna/plants/tree/tree2.png"
 			],
 			"authors":
 			[
@@ -1973,14 +1201,13 @@
 			"files":
 			[
 				"data/lipsofsuna/items/torch/torch1.lmdl",
-				"data/lipsofsuna/items/torch/torch1.dds",
-				"data/lipsofsuna/items/torch/torch1n.dds"
+				"data/lipsofsuna/items/torch/torch1.png",
+				"data/lipsofsuna/items/torch/torch1n.png",
+				"data/lipsofsuna/items/torch/torchfx1.png"
 			],
 			"files_original":
 			[
-				"items/torch1.blend",
-				"items/torch1.png",
-				"items/torch1n.png"
+				"data/lipsofsuna/items/torch/torch1.blend"
 			],
 			"authors":
 			[
@@ -1994,21 +1221,8 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/weapons/hatchet/axe1.dds",
-				"data/lipsofsuna/weapons/bow/bow1.dds"
-			],
-			"files_original":
-			[
-				"weapons/axe1.png",
-				"weapons/bow1.png",
-				"weapons/katana-000.png",
-				"weapons/morningstar-000.png",
-				"weapons/poleaxe-000.png",
-				"weapons/poleaxe-001.png",
-				"import/stone-000.png",
-				"import/stone1.blend",
-				"weapons/wand-000.png",
-				"weapons/wand-001.png"
+				"data/lipsofsuna/weapons/hatchet/axe1.png",
+				"data/lipsofsuna/weapons/bow/bow1.png"
 			],
 			"authors":
 			[
@@ -2022,61 +1236,17 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/items/gem/gem-000.dds",
 				"data/lipsofsuna/items/gem/gem-000.lmdl",
+				"data/lipsofsuna/items/gem/gem-000.png",
 				"data/lipsofsuna/misc/fence1.lmdl",
 				"data/lipsofsuna/weapons/hatchet/axe1.lmdl",
 				"data/lipsofsuna/weapons/bow/bow1.lmdl"
 			],
 			"files_original":
 			[
-				"import/adamantium1.png",
-				"import/bricks-002.png",
-				"import/bricks-002-nml.png",
-				"items/candle-000.blend",
-				"items/candle-000.png",
-				"items/candle-001.blend",
-				"items/candle-001.png",
-				"items/candle-002.blend",
-				"items/candle-002.png",
-				"items/candle-003.blend",
-				"environment/chair-002.blend",
-				"environment/chair-002.png",
-				"environment/chest-000.blend",
-				"environment/chest-000.png",
-				"weapons/axe1.blend",
-				"environment/bench-000.blend",
-				"environment/bench-000.png",
-				"weapons/bow1.blend",
-				"environment/crate-000.blend",
-				"environment/crate-000.png",
-				"environment/fence1.blend",
-				"items/gem-000.blend",
-				"items/gem-000.png",
-				"weapons/katana-000.blend",
-				"items/lantern-000.blend",
-				"items/lantern-000.png",
-				"import/metal-000.png",
-				"weapons/morningstar-000.blend",
-				"weapons/poleaxe-000.blend",
-				"weapons/poleaxe-001.blend",
-				"environment/porticullis-000.blend",
-				"environment/table-000.blend",
-				"import/stone-000.blend",
-				"import/stone-001.blend",
-				"import/stone-001.png",
-				"import/stone-001-nml.png",
-				"import/stone-002.blend",
-				"import/stone-002.png",
-				"import/stone-002-nml.png",
-				"import/stone-003.blend",
-				"import/stone-004.blend",
-				"weapons/wand-000.blend",
-				"weapons/wand-001.blend",
-				"import/wood-002.png",
-				"import/wood-002-nml.png",
-				"import/wood-003.png",
-				"import/wood-004.png"
+				"data/lipsofsuna/weapons/hatchet/axe1.blend",
+				"data/lipsofsuna/weapons/bow/bow1.blend",
+				"data/lipsofsuna/items/gem/gem-000.blend"
 			],
 			"authors":
 			[
@@ -2088,25 +1258,12 @@
 			]
 		},
 		{
-			"files_original":
-			[
-				"import/widgets1.png"
-			],
-			"authors":
-			[
-				"hiponboy",
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/moderna-graphical-interface"
-		},
-		{
 			"files":
 			[
-				"data/lipsofsuna/ui/widgets3.png",
+				"data/lipsofsuna/ui/widgets3.png"
+			],
+			"files_original":
+			[
 				"data/lipsofsuna/ui/widgets3.svg"
 			],
 			"authors":
@@ -2121,91 +1278,15 @@
 		{
 			"files":
 			[
-			],
-			"files_original":
-			[
-				"import/wood1.png"
-			],
-			"authors":
-			[
-				"WeaponGuy"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/cottage"
-		},
-		{
-			"files":
-			[
-			],
-			"files_original":
-			[
-				"import/wood1n.blend",
-				"import/wood1n.png"
-			],
-			"authors":
-			[
-				"Ari Mustonen"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			]
-		},
-		{
-			"files":
-			[
-			],
-			"files_original":
-			[
-				"import/wood2.png",
-				"import/wood2n.png"
-			],
-			"authors":
-			[
-				"Clint Bellanger"
-			],
-			"licenses":
-			[
-				"Creative Commons BY 3.0"
-			],
-			"source": "http://opengameart.org/content/cave-tileset"
-		},
-		{
-			"files":
-			[
-				"data/lipsofsuna/misc/gate01.lmdl"
-			],
-			"files_original":
-			[
-				"environment/gate1.blend"
-			],
-			"authors":
-			[
-				"Harald"
-			],
-			"licenses":
-			[
-				"Creative Commons BY-SA 3.0"
-			],
-			"source": "http://opengameart.org/content/simple-jail-door"
-		},
-		{
-			"files":
-			[
 				"data/lipsofsuna/weapons/hatchet/woodhatchet.lmdl",
-				"data/lipsofsuna/weapons/sword/weaponwood.dds",
-				"data/lipsofsuna/weapons/sword/weaponwoodn.dds",
+				"data/lipsofsuna/weapons/sword/weaponwood.png",
+				"data/lipsofsuna/weapons/sword/weaponwoodn.png",
 				"data/lipsofsuna/weapons/sword/woodsword.lmdl",
 				"data/lipsofsuna/weapons/sword/woodshortsword.lmdl"
 			],
 			"files_original":
 			[
-				"weapons/woodweapons1.blend",
-				"weapons/weaponwood.png",
-				"weapons/weaponwoodn.png"
+				"data/lipsofsuna/weapons/sword/woodweapons1.blend"
 			],
 			"authors":
 			[
@@ -2437,57 +1518,50 @@
 			"files":
 			[
 				"data/lipsofsuna/actors/bitingbark/bitingbark1.lmdl",
-				"data/lipsofsuna/actors/bitingbark/bitingbark1.dds",
+				"data/lipsofsuna/actors/bitingbark/bitingbark1.png",
 				"data/lipsofsuna/actors/bitingbark/bitingbark1n.dds",
 				"data/lipsofsuna/actors/bloodworm/bloodworm2.lmdl",
 				"data/lipsofsuna/actors/imp/firestone1.lmdl",
 				"data/lipsofsuna/actors/imp/stoneimp1.lmdl",
 				"data/lipsofsuna/actors/imp/stoneimp2.lmdl",
 				"data/lipsofsuna/actors/lizardman/lizardman2.lmdl",
-				"data/lipsofsuna/actors/lizardman/lizardman2.dds",
+				"data/lipsofsuna/actors/lizardman/lizardman2.png",
 				"data/lipsofsuna/actors/rat/plaguerat1.lmdl",
 				"data/lipsofsuna/actors/rat/smallrat1.lmdl",
 				"data/lipsofsuna/actors/slime/slime2.lmdl",
 				"data/lipsofsuna/environment/furniture/bench1.lmdl",
 				"data/lipsofsuna/environment/furniture/chair2.lmdl",
-				"data/lipsofsuna/environment/furniture/table1.dds",
+				"data/lipsofsuna/environment/furniture/table1.png",
 				"data/lipsofsuna/environment/furniture/table1.lmdl",
-				"data/lipsofsuna/items/workbench/workbench1.dds",
+				"data/lipsofsuna/items/workbench/workbench1.png",
 				"data/lipsofsuna/items/workbench/workbench1.lmdl",
 				"data/lipsofsuna/plants/tree/log1.lmdl",
 				"data/lipsofsuna/plants/tree/log2.lmdl",
-				"data/lipsofsuna/weapons/club/woodenclub1.dds",
+				"data/lipsofsuna/weapons/club/woodenclub1.png",
 				"data/lipsofsuna/weapons/club/woodenclub1.lmdl",
 				"data/lipsofsuna/weapons/shield/shield-001-wood1.lmdl",
-				"data/lipsofsuna/weapons/shield/shield-001-wood1.dds",
+				"data/lipsofsuna/weapons/shield/shield-001-wood1.png",
+				"data/lipsofsuna/weapons/spear/spear1.lmdl",
 				"data/lipsofsuna/weapons/staff/staff1.lmdl"
 			],
 			"files_original":
 			[
-				"actors/bitingbark1.blend",
-				"actors/bitingbark1.png",
-				"actors/bloodworm2.blend",
-				"actors/lizardman2.blend",
-				"actors/lizardman2.png",
-				"actors/plaguerat1.blend",
-				"actors/smallrat1.blend",
-				"actors/troglodyte1.blend",
-				"actors/trogfem.png",
-				"actors/stoneimp1.blend",
-				"actors/stoneimp2.blend",
-				"actors/slime2.blend",
-				"environment/bench1.blend",
-				"environment/chair2.blend",
-				"environment/table1.blend",
-				"environment/table1.png",
-				"environment/workbench1.blend",
-				"environment/workbench1.png",
-				"import/aermale1.blend",
-				"weapons/shield-001.blend",
-				"weapons/shield-001-wood1.png",
-				"weapons/staff1.blend",
-				"weapons/woodenclub1.blend",
-				"weapons/woodenclub1.png"
+				"data/lipsofsuna/actors/bitingbark/bitingbark1.blend",
+				"data/lipsofsuna/actors/bloodworm/bloodworm2.blend",
+				"data/lipsofsuna/actors/lizardman/lizardman2.blend",
+				"data/lipsofsuna/actors/rat/plaguerat1.blend",
+				"data/lipsofsuna/actors/rat/smallrat1.blend",
+				"data/lipsofsuna/actors/imp/stoneimp1.blend",
+				"data/lipsofsuna/actors/imp/stoneimp2.blend",
+				"data/lipsofsuna/actors/slime/slime2.blend",
+				"data/lipsofsuna/environment/furniture/bench1.blend",
+				"data/lipsofsuna/environment/furniture/chair2.blend",
+				"data/lipsofsuna/environment/furniture/table1.blend",
+				"data/lipsofsuna/items/workbench/workbench1.blend",
+				"data/lipsofsuna/weapons/shield/shield-001.blend",
+				"data/lipsofsuna/weapons/spear/spear1.blend",
+				"data/lipsofsuna/weapons/staff/staff1.blend",
+				"data/lipsofsuna/weapons/club/woodenclub1.blend"
 			],
 			"authors":
 			[
@@ -2501,6 +1575,9 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/actors/turret/turret1.lmdl",
+				"data/lipsofsuna/actors/turret/turret1.png",
+				"data/lipsofsuna/actors/turret/turret1-fire.lani",
 				"data/lipsofsuna/crafting/anvil/anvil1.lmdl",
 				"data/lipsofsuna/crafting/anvil/anvil1.png",
 				"data/lipsofsuna/crafting/spelltable/spelltable1.lmdl",
@@ -2540,53 +1617,29 @@
 				"data/lipsofsuna/plants/watermelon/watermelon1.lmdl",
 				"data/lipsofsuna/plants/watermelon/watermelon1.png",
 				"data/lipsofsuna/plants/watermelon/watermelon2.lmdl",
-				"data/lipsofsuna/plants/watermelon/watermelonleaf1.png",
-				"data/lipsofsuna/actors/turret/turret1.lmdl",
-				"data/lipsofsuna/actors/turret/turret1.png",
-				"data/lipsofsuna/actors/turret/turret1-fire.lani"
+				"data/lipsofsuna/plants/watermelon/watermelonleaf1.png"
 			],
 			"files_original":
 			[
-				"actors/turret1.blend",
-				"actors/turret1.png",
-				"items/apple1.blend",
-				"items/apple1.png",
-				"items/bread1.blend",
-				"items/bread1.png",
-				"items/bread2.blend",
-				"items/bread2.png",
-				"items/bowl1.png",
-				"items/cheese1.blend",
-				"items/cheese1.png",
-				"items/cookedmeat1.png",
-				"items/egg1.blend",
-				"items/ingot1.blend",
-				"items/ingot1.png",
-				"items/lantern1.blend",
-				"items/lantern1.png",
-				"items/meat1.blend",
-				"items/meat2.blend",
-				"items/milkypowder1.blend",
-				"items/milkypowder1.png",
-				"environment/anvil1.blend",
-				"environment/anvil1.png",
-				"environment/obelisk1.blend",
-				"environment/obelisk1.png",
-				"environment/spelltable1.png",
-				"items/orange1.blend",
-				"items/orange1.png",
-				"items/orange1n.png",
-				"items/rawmeat1.png",
-				"items/rice1.png",
-				"items/ricebowl1.blend",
-				"environment/shelf1.blend",
-				"environment/shelf1.png",
-				"environment/spelltable1.blend",
-				"environment/watermelon1.blend",
-				"environment/watermelon1.png",
-				"environment/watermelonleaf1.png",
-				"environment/workbench2.blend",
-				"environment/workbench2.png"
+				"data/lipsofsuna/actors/turret/turret1.blend",
+				"data/lipsofsuna/crafting/anvil/anvil1.blend",
+				"data/lipsofsuna/crafting/spelltable/spelltable1.blend",
+				"data/lipsofsuna/crafting/workbench/workbench2.blend",
+				"data/lipsofsuna/environment/furniture/shelf1.blend",
+				"data/lipsofsuna/environment/obelisk/obelisk1.blend",
+				"data/lipsofsuna/items/food/apple1.blend",
+				"data/lipsofsuna/items/food/bread1.blend",
+				"data/lipsofsuna/items/food/bread2.blend",
+				"data/lipsofsuna/items/food/cheese1.blend",
+				"data/lipsofsuna/items/food/egg1.blend",
+				"data/lipsofsuna/items/food/meat1.blend",
+				"data/lipsofsuna/items/food/meat2.blend",
+				"data/lipsofsuna/items/food/orange1.blend",
+				"data/lipsofsuna/items/food/ricebowl1.blend",
+				"data/lipsofsuna/items/ingot/ingot1.blend",
+				"data/lipsofsuna/items/lantern/lantern1.blend",
+				"data/lipsofsuna/items/milkypowder/milkypowder1.blend",
+				"data/lipsofsuna/plants/watermelon/watermelon1.blend"
 			],
 			"authors":
 			[

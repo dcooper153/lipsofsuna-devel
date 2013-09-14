@@ -37,7 +37,6 @@
 	["load", "weapons/crossbow"],
 	["load", "weapons/dagger"],
 	["load", "weapons/grenade"],
-	["load", "weapons/halberd"],
 	["load", "weapons/hatchet"],
 	["load", "weapons/mattock"],
 	["load", "weapons/musket"],

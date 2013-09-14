@@ -211,7 +211,7 @@ class Assets(object):
 
 	def parse_disk_files(self):
 		# Find data files.
-		exts = ['.png', '.dds', '.lmdl', '.svg', '.blend', '.ogg', '.flac']
+		exts = ['.png', '.dds', '.lmdl', '.ogg', '.flac']
 		for root,dirs,names in os.walk('data/lipsofsuna'):
 			for name in names:
 				for ext in exts:
@@ -221,13 +221,12 @@ class Assets(object):
 						self.disk_data_paths[path] = True
 						break
 		# Find original files.
-		exts = ['.png', '.dds', '.svg', '.blend', '.ogg', '.flac']
-		for root,dirs,names in os.walk(self.datarepo):
+		exts = ['.svg', '.blend']
+		for root,dirs,names in os.walk('data/lipsofsuna'):
 			for name in names:
 				for ext in exts:
 					if name.endswith(ext):
 						path = os.path.join(root, name)
-						path = path[len(self.datarepo):]
 						self.disk_orig_names[name] = True
 						self.disk_orig_paths[path] = True
 						break
@@ -290,8 +289,7 @@ class Assets(object):
 	def get_missing_orig_paths(self):
 		res = {}
 		for path in self.json_orig_paths:
-			realpath = os.path.join(self.datarepo, path)
-			if not os.path.exists(realpath):
+			if not os.path.exists(path):
 				res[path] = True
 		return sorted([k for k in res])
 
@@ -384,7 +382,7 @@ class Assets(object):
 
 def process(d):
 	datadir = 'data/'
-	datarepo = '../lipsofsuna-data/'
+	datarepo = 'data/'
 
 	a = Assets(datarepo)
 	a.load_licenses(d)

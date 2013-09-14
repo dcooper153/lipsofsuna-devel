@@ -5,7 +5,7 @@ pass torchfx1/alpha
 	depth_write off
 	texture_unit
 	{
-		texture particle5.dds
+		texture torchfx1.png
 	}
 }
 
