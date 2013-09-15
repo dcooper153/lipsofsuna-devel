@@ -56,7 +56,7 @@ Animationspec{
 	replace = true,
 	time = frames(20),
 	weight = 1000,
-	node_weights = {LOWER = 1}}
+	node_weights = {LOWER = 10}}
 
 Animationspec{
 	name = "default block start",
@@ -133,7 +133,7 @@ Animationspec{
 	repeat_end = frames(20),
 	repeat_start = frames(20),
 	weight = 100,
-	node_weights = {LOWER = 1}}
+	node_weights = {LOWER = 10}}
 
 Animationspec{
 	name = "default charge cancel",
@@ -266,7 +266,7 @@ Animationspec{
 
 Animationspec{
 	name = "default idle",
-	animation = "aer1-idle",
+	animation = "aer1-idle2",
 	channel = 1,
 	permanent = true}
 

@@ -77,12 +77,15 @@ end
 Animationspec.get_node_weights = function(self)
 	if not self.node_weights then return end
 	local mapping = {
-		LOWER = {"IK", "pelvis", "pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "foot.L", "leg1.R", "leg2.R", "foot.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6"},
-		LEGS = {"pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "foot.L", "leg1.R", "leg2.R", "foot.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6"},
+		LOWER = {"IK", "pelvis", "pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "leg1.R", "leg2.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6",
+			"thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "hips", "hips_main"},
+		LEGS = {"pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "leg1.R", "leg2.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6",
+			"thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "hips", "hips_main"},
 		ARMS = {"arm1.L", "arm2.L", "palm.L", "palm1.L", "arm1.R", "arm2.R", "palm.R", "palm1.R"},
 		ARML = {"arm1.L", "arm2.L", "palm.L", "palm1.L"},
 		ARMR = {"arm1.R", "arm2.R", "palm.R", "palm1.R"},
-		BACK = {"back1", "back2", "back3"}}
+		BACK = {"back1", "back2", "back3",
+			"spine", "chest"}}
 	local w = {}
 	for k,v in pairs(self.node_weights) do
 		local replace = mapping[k]
