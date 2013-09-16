@@ -96,7 +96,7 @@ int liimg_png_load (
 	int height;
 	char* dst;
 	void* pixels;
-	FILE* file;
+	FILE* fp;
 	png_bytepp rows;
 	png_infop info;
 	png_structp png;
@@ -117,10 +117,10 @@ int liimg_png_load (
 	}
 
 	/* Open file. */
-	file = fopen (path, "rb");
-	if (file == NULL)
+	fp = fopen (file, "rb");
+	if (fp == NULL)
 	{
-		lisys_error_set (EIO, "cannot open file `%s'", path);
+		lisys_error_set (EIO, "cannot open file `%s'", file);
 		png_destroy_read_struct (&png, &info, NULL);
 		return 0;
 	}
@@ -128,19 +128,19 @@ int liimg_png_load (
 	/* Read data. */
 	if (setjmp (png_jmpbuf (png)))
 	{
-		lisys_error_set (EIO, "error while reading `%s'", path);
+		lisys_error_set (EIO, "error while reading `%s'", file);
 		png_destroy_read_struct (&png, &info, NULL);
-		fclose (file);
+		fclose (fp);
 		return 0;
 	}
-	png_init_io (png, file);
+	png_init_io (png, fp);
 	png_read_png (png, info, PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING, NULL);
 	width = png_get_image_width (png, info);
 	height = png_get_image_height (png, info);
 	rows = png_get_rows (png, info);
 	depth = png_get_rowbytes (png, info);
 	depth /= width;
-	fclose (file);
+	fclose (fp);
 
 	/* Allocate pixel data. */
 	pixels = lisys_malloc (width * height * 4);
@@ -173,7 +173,6 @@ int liimg_png_load (
 			memcpy (dst, rows[y], 4 * width);
 		}
 	}
-	lisys_free (self->pixels);
 	*result_pixels = pixels;
 	*result_width = width;
 	*result_height = height;
