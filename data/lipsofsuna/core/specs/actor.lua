@@ -1,4 +1,4 @@
---- TODO:doc
+--- Actor specification.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -11,9 +11,10 @@
 local AnimationProfileSpec = require("core/specs/animation-profile")
 local Class = require("system/class")
 local Color = require("system/color")
+local EffectProfileSpec = require("core/specs/effect-profile")
 local Spec = require("core/specs/spec")
 
---- TODO:doc
+--- Actor specification.
 -- @type Actorspec
 Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "name", type = "string", description = "Name of the spec."},
@@ -55,9 +56,7 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "dead", type = "boolean", description = "True if the actor should spawn as dead."},
 	{name = "dialog", type = "string", description = "Dialog name.", details = {spec = "Dialogspec"}},
 	{name = "difficulty", type = "number", default = 0, description = "The approximate difficulty of the actor in the range of [0,1]."},
-	{name = "effect_falling_damage", type = "string", description = "Name of the effect played when the actor takes falling damage."},
-	{name = "effect_landing", type = "string", description = "Name of the effect played when the actor lands after jumping."},
-	{name = "effect_physical_damage", type = "string", description = "Name of the effect played when the actor is hurt physically."},
+	{name = "effects", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of effect profiles.", details = {values = {spec = "EffectProfileSpec"}}},
 	{name = "equipment_class", type = "string", description = "Name of the equipment class to use for equipment models."},
 	{name = "equipment_slots", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of equipment slots."},
 	{name = "eye_color", type = "color", description = "Eye color."},
@@ -235,6 +234,22 @@ end
 -- @return String if found. Nil otherwise.
 Actorspec.get_base_texture = function(self)
 	return self.skin_textures and self.skin_textures[1]
+end
+
+--- Gets an effect by name.
+-- @param self Actor spec.
+-- @param name Effect name.
+-- @param profile Effect profile mapping, or nil for "default".
+-- @return Effect spec, or nil.
+Actorspec.get_effect = function(self, name, profile)
+	local try = function(self, p, e)
+		local pname = self.effects[p]
+		if not pname then return end
+		local profile = EffectProfileSpec:find_by_name(pname)
+		if not profile then return end
+		return profile:get_effect(e)
+	end
+	return profile and try(self, profile, name) or try(self, "default", name)
 end
 
 --- Gets a model node name for the given equipment slot.

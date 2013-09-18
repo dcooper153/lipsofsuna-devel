@@ -17,7 +17,10 @@
 			"default": "dragon"
 		},
 		"difficulty": 1,
-		"effect_physical_damage": "fleshimpact1",
+		"effects":
+		{
+			"default": "default"
+		},
 		"factions":
 		{
 			"evil": true

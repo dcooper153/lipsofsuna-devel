@@ -6,7 +6,7 @@ Actorspec{
 	ai_combat_actions = {["move forward"] = true, ["ranged spell"] = true, ["touch spell"] = true},
 	animations = {["default"] = "lizardman"}, --FIXME
 	difficulty = 0.5,
-	effect_physical_damage = "fleshimpact1",
+	effects = {["default"] = "default"},
 	actions = {["right"] = "ranged spell", ["left"] = "touch spell"},
 	mass = 100,
 	model = "lizardman2", --FIXME

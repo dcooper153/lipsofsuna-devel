@@ -18,7 +18,10 @@
 			"animal": true
 		},
 		"difficulty": 0,
-		"effect_physical_damage": "fleshimpact1",
+		"effects":
+		{
+			"default": "default"
+		},
 		"factions":
 		{
 			"neutral": true
@@ -53,7 +56,10 @@
 			"enemy": true
 		},
 		"difficulty": 0,
-		"effect_physical_damage": "fleshimpact1",
+		"effects":
+		{
+			"default": "default"
+		},
 		"factions":
 		{
 			"evil": true
@@ -88,7 +94,10 @@
 			"plague": true
 		},
 		"difficulty": 0.7,
-		"effect_physical_damage": "fleshimpact1",
+		"effects":
+		{
+			"default": "default"
+		},
 		"factions":
 		{
 			"evil": true

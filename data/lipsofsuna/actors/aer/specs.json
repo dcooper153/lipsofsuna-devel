@@ -15,12 +15,20 @@
 		"base": "race",
 		"body_scale_min": 0.8,
 		"body_scale_max": 1.2,
+		"animations":
+		{
+			"default": "default",
+			"feminine": "feminine"
+		},
 		"actions":
 		{
 			"left": "block",
 			"right": "attack"
 		},
-		"effect_falling_damage": "aerhurt1",
+		"effects":
+		{
+			"default": "aer"
+		},
 		"equipment_class": "aer",
 		"eye_style": "random",
 		"eye_styles":
@@ -57,5 +65,23 @@
 		"name": "Aer skin 1",
 		"actors": {"aer": true},
 		"textures": ["skin1"]
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "aer",
+		"effects":
+		{
+			"falling damage": "aerhurt1",
+			"damage": "fleshimpact1"
+		}
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "default",
+		"effects":
+		{
+			"attack bite": "swing1",
+			"damage": "fleshimpact1"
+		}
 	}
 ]

@@ -340,6 +340,7 @@ Actor.damaged = function(self, args)
 	if self.god then return end
 	local health = self.stats:get_value("health")
 	if not health then return end
+	local was_already_dead = self.dead
 	-- Reduce health.
 	if args.amount < 0 then
 		local max = self.stats:get_maximum("health")
@@ -373,11 +374,22 @@ Actor.damaged = function(self, args)
 	-- Play the damage effect.
 	-- TODO: Should depend on the attack type.
 	-- TODO: Should depend on the damage magnitude.
-	if args.type == "physical" and args.amount > 0 then
-		if args.point then
-			Main.vision:world_effect(args.point, self.spec.effect_physical_damage)
+	if args.amount > 0 then
+		local ename
+		if was_already_dead then
+			ename = "damage dead"
+		elseif self.dead then
+			ename = "damage death"
 		else
-			Main.vision:object_effect(self, self.spec.effect_physical_damage)
+			ename = "damage"
+		end
+		local effect = self.spec:get_effect(ename)
+		if effect then
+			if args.point then
+				Main.vision:world_effect(args.point, effect.name)
+			else
+				Main.vision:object_effect(self, effect.name)
+			end
 		end
 	end
 	-- Play the flinch animation.
@@ -647,7 +659,10 @@ Actor.update_actions = function(self, secs)
 				local damage = (diffy - limity) * self.spec.falling_damage_rate * self.attributes.falling_damage
 				if damage > 2 then
 					self:damaged{amount = damage, type = "falling"}
-					Main.vision:object_effect(self, self.spec.effect_falling_damage)
+					local effect = self.spec:get_effect("falling damage")
+					if effect then
+						Main.vision:object_effect(self, effect.name)
+					end
 				end
 			end
 		end

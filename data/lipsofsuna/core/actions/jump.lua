@@ -45,7 +45,10 @@ Actionspec{
 		-- Landing animation.
 		if not self.submerged or self.submerged < 0.3 then
 			self:animate("land ground")
-			Main.vision:object_effect(self, self.spec.effect_landing)
+			local effect = self.spec:get_effect("land ground")
+			if effect then
+				Main.vision:object_effect(self, effect.name)
+			end
 		else
 			self:animate("land water")
 		end

@@ -16,7 +16,10 @@
 			"enemy": true
 		},
 		"difficulty": 0.3,
-		"effect_physical_damage": "fleshimpact1",
+		"effects":
+		{
+			"default": "default"
+		},
 		"factions":
 		{
 			"evil": true
