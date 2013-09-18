@@ -1482,6 +1482,23 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/actors/bloodworm/slimemonster-attack1.flac",
+				"data/lipsofsuna/actors/bloodworm/slimemonster-damage1.flac",
+				"data/lipsofsuna/actors/bloodworm/slimemonster-damage2.flac"
+			],
+			"authors":
+			[
+				"qubodup"
+			],
+			"licenses":
+			[
+				"Creative Commons BY 3.0"
+			],
+			"source": "http://opengameart.org/content/slime-monster"
+		},
+		{
+			"files":
+			[
 				"data/lipsofsuna/sounds/builtrock1.ogg",
 				"data/lipsofsuna/sounds/builtwood1.ogg",
 				"data/lipsofsuna/sounds/craftmetal1.ogg",
