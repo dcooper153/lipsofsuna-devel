@@ -1,4 +1,4 @@
---- TODO:doc
+--- Animation profile specification for actors.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -11,9 +11,9 @@
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
---- TODO:doc
+--- Animation profile specification for actors.
 -- @type AnimationProfileSpec
-AnimationProfileSpec = Spec:register("AnimationProfileSpec", "animation profile", {
+local AnimationProfileSpec = Spec:register("AnimationProfileSpec", "animation profile", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation specs.", details = {values = {spec = "Animationspec"}}},
 	{name = "inherit", type = "list", list = {type = "string", details = {value = {spec = "AnimationProfileSpec"}}}, default = {}, description = "List of inherited profiles."}
@@ -47,4 +47,4 @@ AnimationProfileSpec.get_animation = function(self, name)
 	end
 end
 
-
+return AnimationProfileSpec

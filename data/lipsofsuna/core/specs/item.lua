@@ -8,6 +8,7 @@
 -- @module core.specs.item
 -- @alias Itemspec
 
+local AnimationProfileSpec = require("core/specs/animation-profile")
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 

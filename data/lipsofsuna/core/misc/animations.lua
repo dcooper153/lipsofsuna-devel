@@ -1,3 +1,5 @@
+local AnimationProfileSpec = require("core/specs/animation-profile")
+
 local frames = function(n) return n * 0.02 end
 
 Animationspec{

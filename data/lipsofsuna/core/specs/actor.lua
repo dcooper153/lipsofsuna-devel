@@ -8,6 +8,7 @@
 -- @module core.specs.actor
 -- @alias Actorspec
 
+local AnimationProfileSpec = require("core/specs/animation-profile")
 local Class = require("system/class")
 local Color = require("system/color")
 local Spec = require("core/specs/spec")

@@ -1,3 +1,4 @@
+local AnimationProfileSpec = require("core/specs/animation-profile")
 local ModifierSpec = require("core/specs/modifier")
 local MusicSpec = require("core/specs/music")
 
