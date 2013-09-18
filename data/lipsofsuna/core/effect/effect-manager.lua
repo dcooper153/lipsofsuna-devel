@@ -90,14 +90,14 @@ end
 -- @param name Effect spec name.
 EffectManager.play_global = function(self, name)
 	-- Find the effect.
-	local effect = Effectspec:find{name = name}
+	local effect = Effectspec:find_by_name(name)
 	if not effect then return end
 	-- Create the effect object.
 	if effect.sound then
 		SoundEffect{
 			sound = effect.sound,
 			sound_delay = effect.sound_delay,
-			sound_pitch = effect.sound_pitch,
+			sound_pitch = effect:get_sound_pitch(),
 			sound_positional = false,
 			sound_volume = effect.sound_volume}
 	end
@@ -109,7 +109,7 @@ end
 
 EffectManager.play_object = function(self, name, object, node)
 	-- Find the effect.
-	local effect = Effectspec:find{name = name}
+	local effect = Effectspec:find_by_name(name)
 	if not effect then return end
 	-- Find the node.
 	local p
@@ -131,7 +131,7 @@ EffectManager.play_object = function(self, name, object, node)
 			rotation_mode = (effect.rotation and "parent" or nil),
 			sound = effect.sound,
 			sound_delay = effect.sound_delay,
-			sound_pitch = effect.sound_pitch,
+			sound_pitch = effect:get_sound_pitch(),
 			sound_positional = effect.sound_positional,
 			sound_volume = effect.sound_volume}
 	end
@@ -141,7 +141,7 @@ end
 
 EffectManager.play_world = function(self, name, position)
 	-- Find the effect.
-	local effect = Effectspec:find{name = name}
+	local effect = Effectspec:find_by_name(name)
 	if not effect then return end
 	-- Create the effect object.
 	if effect.particle then
@@ -155,7 +155,7 @@ EffectManager.play_world = function(self, name, position)
 			position = position,
 			sound = effect.sound,
 			sound_delay = effect.sound_delay,
-			sound_pitch = effect.sound_pitch,
+			sound_pitch = effect:get_sound_pitch(),
 			sound_positional = effect.sound_positional,
 			sound_volume = effect.sound_volume}
 	end

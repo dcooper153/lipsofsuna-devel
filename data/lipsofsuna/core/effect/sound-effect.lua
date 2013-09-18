@@ -43,7 +43,7 @@ SoundEffect.create_source = function(self, args)
 	self.source = SoundSource(args.sound, args.sound_positional)
 	self.source:set_volume((args.sound_volume or 1) * Client.options.sound_volume)
 	if args.sound_pitch then
-		self.source:set_pitch(1 + args.sound_pitch * (math.random() - 0.5))
+		self.source:set_pitch(args.sound_pitch)
 	end
 	if self.__queued_position then
 		self.source:set_position(self.__queued_position)
