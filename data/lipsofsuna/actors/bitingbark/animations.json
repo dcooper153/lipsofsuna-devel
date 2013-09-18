@@ -1,20 +1,20 @@
 [
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bitingbark attack claw left",
 		"animation": "bitingbark1-claw-left",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bitingbark attack claw right",
 		"animation": "bitingbark1-claw-right",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bitingbark dead",
 		"animation": "bitingbark1-death",
 		"channel": 1,
@@ -23,7 +23,7 @@
 		"time": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bitingbark death",
 		"animation": "bitingbark1-death",
 		"channel": 1,
@@ -31,28 +31,28 @@
 		"repeat_start": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bitingbark idle",
 		"animation": "bitingbark1-idle",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bitingbark run",
 		"animation": "bitingbark1-run",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bitingbark walk",
 		"animation": "bitingbark1-walk",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bitingbark walk back",
 		"animation": "bitingbark1-walk-back",
 		"channel": 1,

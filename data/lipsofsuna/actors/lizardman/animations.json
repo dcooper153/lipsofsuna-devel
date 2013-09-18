@@ -1,34 +1,34 @@
 [
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "lizardman attack bite",
 		"animation": "lizardman2-bite",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "lizardman attack claw left",
 		"animation": "lizardman2-claw-left",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "lizardman attack claw right",
 		"animation": "lizardman2-claw-right",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "lizardman attack punch",
 		"animation": "lizardman2-punch",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "lizardman dead",
 		"animation": "lizardman2-death",
 		"channel": 1,
@@ -37,7 +37,7 @@
 		"time": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "lizardman death",
 		"animation": "lizardman2-death",
 		"channel": 1,
@@ -45,42 +45,42 @@
 		"repeat_start": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "lizardman idle",
 		"animation": "lizardman2-idle",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "lizardman run",
 		"animation": "lizardman2-run",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "lizardman strafe left",
 		"animation": "lizardman2-strafe-left",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "lizardman strafe right",
 		"animation": "lizardman2-strafe-right",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "lizardman walk",
 		"animation": "lizardman2-walk",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "lizardman walk back",
 		"animation": "lizardman2-walk-back",
 		"channel": 1,

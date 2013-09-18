@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "chest loot",
 		"animation": "chest1-opening",
 		"channel": 1,
@@ -8,7 +8,7 @@
 		"repeat_start": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "chest looted",
 		"animation": "chest1-opening",
 		"channel": 1,

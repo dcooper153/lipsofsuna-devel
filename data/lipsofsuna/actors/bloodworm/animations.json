@@ -1,13 +1,13 @@
 [
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bloodworm attack bite",
 		"animation": "bloodworm2-bite",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bloodworm dead",
 		"animation": "bloodworm2-death",
 		"channel": 1,
@@ -16,7 +16,7 @@
 		"time": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bloodworm death",
 		"animation": "bloodworm2-death",
 		"channel": 1,
@@ -24,14 +24,14 @@
 		"repeat_start": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bloodworm idle",
 		"animation": "bloodworm2-idle",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "bloodworm walk",
 		"animation": "bloodworm2-walk",
 		"channel": 1,

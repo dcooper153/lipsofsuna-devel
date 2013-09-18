@@ -36,7 +36,7 @@
 		"weapon_slot": "robotarm.R"
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "turret fire",
 		"animation": "turret1-fire",
 		"channel": 1

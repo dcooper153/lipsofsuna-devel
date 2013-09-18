@@ -1,13 +1,13 @@
 [
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "boomerang fly start",
 		"animation": "boomerang1-fly",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "boomerang fly stop",
 		"channel": 1,
 		"permanent": true

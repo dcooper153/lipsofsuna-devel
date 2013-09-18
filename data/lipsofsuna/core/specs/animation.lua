@@ -1,4 +1,4 @@
---- TODO:doc
+--- Animation specification.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -6,14 +6,14 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.animation
--- @alias Animationspec
+-- @alias AnimationSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
---- TODO:doc
--- @type Animationspec
-Animationspec = Spec:register("Animationspec", "animation", {
+--- Animation specification.
+-- @type AnimationSpec
+local AnimationSpec = Spec:register("AnimationSpec", "animation", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "animation", type = "string", description = "Animation file name."},
@@ -32,20 +32,20 @@ Animationspec = Spec:register("Animationspec", "animation", {
 })
 
 --- Creates a new animation spec.
--- @param clss Animationspec class.
+-- @param clss AnimationSpec class.
 -- @param args Arguments.
 -- @return Animation spec.
-Animationspec.new = function(clss, args)
+AnimationSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
 
 --- Gets the animation playback arguments of the animation.
--- @param self Animation spec.
+-- @param self AnimationSpec.
 -- @param variant Variant number, or nil.
 -- @return Table of playback arguments.
-Animationspec.get_arguments = function(self, variant)
+AnimationSpec.get_arguments = function(self, variant)
 	local res = {
 		animation = self.animation,
 		channel = self.channel,
@@ -72,9 +72,9 @@ end
 -- in the node weight list, it's replaced by this function. The returned table
 -- contains the real node weights.
 --
--- @param self Animation spec.
+-- @param self AnimationSpec.
 -- @return Node weights, or nil.
-Animationspec.get_node_weights = function(self)
+AnimationSpec.get_node_weights = function(self)
 	if not self.node_weights then return end
 	local mapping = {
 		LOWER = {"IK", "pelvis", "pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "leg1.R", "leg2.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6",
@@ -104,4 +104,4 @@ Animationspec.get_node_weights = function(self)
 	return w
 end
 
-
+return AnimationSpec

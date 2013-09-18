@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "slime dead",
 		"animation": "slime2-death",
 		"channel": 1,
@@ -9,7 +9,7 @@
 		"time": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "slime death",
 		"animation": "slime2-death",
 		"channel": 1,
@@ -17,28 +17,28 @@
 		"repeat_start": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "slime idle",
 		"animation": "slime2-idle",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "slime jump",
 		"animation": "slime2-bounce",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "slime land",
 		"animation": "slime2-bounce",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "slime tackle",
 		"animation": "slime2-tackle",
 		"channel": 2,

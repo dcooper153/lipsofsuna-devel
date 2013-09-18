@@ -1,27 +1,27 @@
 [
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "dragon attack bite",
 		"animation": "dragon1-bite",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "dragon attack left claw",
 		"animation": "dragon1-claw-left",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "dragon attack right claw",
 		"animation": "dragon1-claw-right",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "dragon dead",
 		"animation": "dragon1-death",
 		"channel": 1,
@@ -30,7 +30,7 @@
 		"time": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "dragon death",
 		"animation": "dragon1-death",
 		"channel": 1,
@@ -38,28 +38,28 @@
 		"repeat_start": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "dragon idle",
 		"animation": "dragon1-idle",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "dragon spell ranged",
 		"animation": "breathe-fire",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "dragon walk",
 		"animation": "dragon1-walk",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "dragon walk back",
 		"animation": "dragon1-walk-back",
 		"channel": 1,

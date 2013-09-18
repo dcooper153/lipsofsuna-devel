@@ -8,6 +8,7 @@
 -- @module core.specs.animation_profile
 -- @alias AnimationProfileSpec
 
+local AnimationSpec = require("core/specs/animation")
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
@@ -15,7 +16,7 @@ local Spec = require("core/specs/spec")
 -- @type AnimationProfileSpec
 local AnimationProfileSpec = Spec:register("AnimationProfileSpec", "animation profile", {
 	{name = "name", type = "string", description = "Name of the spec."},
-	{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation specs.", details = {values = {spec = "Animationspec"}}},
+	{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation specs.", details = {values = {spec = "AnimationSpec"}}},
 	{name = "inherit", type = "list", list = {type = "string", details = {value = {spec = "AnimationProfileSpec"}}}, default = {}, description = "List of inherited profiles."}
 })
 
@@ -37,7 +38,7 @@ AnimationProfileSpec.get_animation = function(self, name)
 	-- Try primary animations.
 	local aname = self.animations[name]
 	if aname then
-		return Animationspec:find{name = aname}
+		return AnimationSpec:find_by_name(aname)
 	end
 	-- Try inherited animations.
 	for k,v in pairs(self.inherit) do

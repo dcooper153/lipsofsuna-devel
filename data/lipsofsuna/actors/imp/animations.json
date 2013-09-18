@@ -1,13 +1,13 @@
 [
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "stoneimp attack bite",
 		"animation": "stoneimp1-bite",
 		"channel": 2,
 		"weight": 30
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "stoneimp dead",
 		"animation": "stoneimp1-death",
 		"channel": 1,
@@ -16,7 +16,7 @@
 		"time": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "stoneimp death",
 		"animation": "stoneimp1-death",
 		"channel": 1,
@@ -24,14 +24,14 @@
 		"repeat_start": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "stoneimp idle",
 		"animation": "stoneimp1-idle",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "stoneimp jump",
 		"animation": "stoneimp1-jump",
 		"channel": 5,
@@ -41,28 +41,28 @@
 		"weight": 10
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "stoneimp walk",
 		"animation": "stoneimp1-walk",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "stoneimp walk back",
 		"animation": "stoneimp1-walk-back",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "stoneimp strafe left",
 		"animation": "stoneimp1-strafe-left",
 		"channel": 1,
 		"permanent": true
 	},
 	{
-		"type": "Animationspec",
+		"type": "AnimationSpec",
 		"name": "stoneimp strafe right",
 		"animation": "stoneimp1-strafe-right",
 		"channel": 1,
