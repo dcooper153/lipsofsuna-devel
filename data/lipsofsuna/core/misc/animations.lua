@@ -17,8 +17,7 @@ Animationspec{
 	fade_in = 0,
 	replace = true,
 	time = frames(20),
-	weight = 1000,
-	node_weights = {LOWER = 1}}
+	weight = 1000}
 
 Animationspec{
 	name = "default attack left",
@@ -233,7 +232,7 @@ Animationspec{
 	channel = 4,
 	permanent = true,
 	repeat_start = 10,
-	weight = 5}
+	weight = 500}
 
 Animationspec{
 	name = "default dead",
@@ -280,11 +279,12 @@ Animationspec{
 	name = "default jump",
 	animation = "aer1-jump",
 	channel = 5,
+	fade_in = 0,
 	fade_out = 0.4,
 	permanent = true,
-	repeat_start = 10,
+	repeat_start = 50,
 	weight = 10,
-	node_weights = {LOWER = 1000}}
+	node_weights = {LOWER = 1000, BACK = 1000}}
 
 Animationspec{
 	name = "default land ground",

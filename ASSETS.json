@@ -336,14 +336,30 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/actors/aer/aer1.lmdl",
 				"data/lipsofsuna/actors/aer/aerbody1.lmdl",
+				"data/lipsofsuna/actors/aer/aer1.lmdl",
+				"data/lipsofsuna/actors/aer/aer1-attack-back.lani",
+				"data/lipsofsuna/actors/aer/aer1-attack-front.lani",
+				"data/lipsofsuna/actors/aer/aer1-attack-left.lani",
+				"data/lipsofsuna/actors/aer/aer1-attack-right.lani",
+				"data/lipsofsuna/actors/aer/aer1-hold-left.lani",
+				"data/lipsofsuna/actors/aer/aer1-jump.lani",
+				"data/lipsofsuna/actors/aer/aer1-pickup.lani",
+				"data/lipsofsuna/actors/aer/aer1-run-left.lani",
+				"data/lipsofsuna/actors/aer/aer1-run-right.lani",
+				"data/lipsofsuna/actors/aer/aer1-spell-self.lani",
+				"data/lipsofsuna/actors/aer/aer1-strafe-left.lani",
+				"data/lipsofsuna/actors/aer/aer1-strafe-right.lani",
+				"data/lipsofsuna/actors/aer/aer1-walk-back.lani",
+				"data/lipsofsuna/actors/aer/aer1-walk-left.lani",
+				"data/lipsofsuna/actors/aer/aer1-walk-right.lani",
 				"data/lipsofsuna/actors/aer/skin1.png",
 				"data/lipsofsuna/apparel/shirt/aerupperclothed1.lmdl",
 				"data/lipsofsuna/apparel/underwear/aerupperbra1.lmdl"
 			],
 			"files_original":
 			[
+				"data/lipsofsuna/actors/aer/anims1.blend",
 				"data/lipsofsuna/actors/aer/aerbody1.blend",
 				"data/lipsofsuna/apparel/shirt/aerbodyclothed1.blend",
 				"data/lipsofsuna/apparel/underwear/aerbodyunderwear1.blend"

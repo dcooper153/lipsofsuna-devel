@@ -81,9 +81,12 @@ Animationspec.get_node_weights = function(self)
 			"thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "hips", "hips_main"},
 		LEGS = {"pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "leg1.R", "leg2.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6",
 			"thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "hips", "hips_main"},
-		ARMS = {"arm1.L", "arm2.L", "palm.L", "palm1.L", "arm1.R", "arm2.R", "palm.R", "palm1.R"},
-		ARML = {"arm1.L", "arm2.L", "palm.L", "palm1.L"},
-		ARMR = {"arm1.R", "arm2.R", "palm.R", "palm1.R"},
+		ARMS = {"arm1.L", "arm2.L", "palm.L", "palm1.L", "arm1.R", "arm2.R", "palm.R", "palm1.R",
+			"shoulder.L", "upper_arm.L", "forearm.L", "shoulder.R", "upper_arm.R", "forearm.R"},
+		ARML = {"arm1.L", "arm2.L", "palm.L", "palm1.L",
+			"shoulder.L", "upper_arm.L", "forearm.L"},
+		ARMR = {"arm1.R", "arm2.R", "palm.R", "palm1.R",
+			"shoulder.R", "upper_arm.R", "forearm.R"},
 		BACK = {"back1", "back2", "back3",
 			"spine", "chest"}}
 	local w = {}
