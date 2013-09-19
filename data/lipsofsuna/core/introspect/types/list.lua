@@ -16,6 +16,26 @@ return {
 		end
 		return true
 	end,
+	read_json = function(self, val, field)
+		if not val then return end
+		local t = self.types_dict[field.list.type]
+		if not t.read_json then return val end
+		local res = {}
+		for k,v in ipairs(val) do
+			res[k] = t.read_json(self, v)
+		end
+		return res
+	end,
+	write_json = function(self, val, field)
+		if not val then return end
+		local t = self.types_dict[field.list.type]
+		if not t.write_json then return val end
+		local res = {}
+		for k,v in ipairs(val) do
+			res[k] = t.write_json(self, v)
+		end
+		return res
+	end,
 	write_str = function(self, val, field)
 		local t = self.types_dict[field.list.type]
 		local buf = {"{"}
