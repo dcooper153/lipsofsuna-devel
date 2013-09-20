@@ -90,6 +90,8 @@ static void RenderObject_animate (LIScrArgs* args)
 	int keep = 1;
 	float fade_in = 0.0f;
 	float fade_out = 0.0f;
+	int priority = 0;
+	int priority_scale = 0;
 	float weight = 1.0f;
 	float weight_scale = 0.0f;
 	float time = 0.0f;
@@ -114,6 +116,8 @@ static void RenderObject_animate (LIScrArgs* args)
 		keep = !keep;
 	liscr_args_gets_float (args, "time", &time);
 	liscr_args_gets_float (args, "time_scale", &time_scale);
+	liscr_args_gets_int (args, "priority", &priority);
+	liscr_args_gets_int (args, "priority_scale", &priority_scale);
 	liscr_args_gets_float (args, "weight", &weight);
 	liscr_args_gets_float (args, "weight_scale", &weight_scale);
 	if (channel < 1 || channel > 255)
@@ -132,11 +136,30 @@ static void RenderObject_animate (LIScrArgs* args)
 		chan->additive = additive;
 		chan->repeat_end = repeat_end;
 		chan->repeat_start = repeat_start;
-		chan->priority_scale = weight_scale;
-		chan->priority_transform = weight;
+		chan->priority_scale = priority_scale;
+		chan->priority_transform = priority;
+		chan->weight_scale = weight_scale;
+		chan->weight_transform = weight;
 		chan->time_scale = time_scale;
 		chan->fade_in = fade_in;
 		chan->fade_out = fade_out;
+	}
+
+	/* Handle optional per-node priorities. */
+	if (animation != NULL && liscr_args_gets_table (args, "node_priorities"))
+	{
+		lua_pushnil (args->lua);
+		while (lua_next (args->lua, -2) != 0)
+		{
+			if (lua_type (args->lua, -2) == LUA_TSTRING &&
+				lua_type (args->lua, -1) == LUA_TNUMBER)
+			{
+				limdl_pose_channel_set_node_priority (chan,
+					lua_tostring (args->lua, -2), lua_tonumber (args->lua, -1));
+			}
+			lua_pop (args->lua, 1);
+		}
+		lua_pop (args->lua, 1);
 	}
 
 	/* Handle optional per-node weights. */
@@ -148,7 +171,7 @@ static void RenderObject_animate (LIScrArgs* args)
 			if (lua_type (args->lua, -2) == LUA_TSTRING &&
 				lua_type (args->lua, -1) == LUA_TNUMBER)
 			{
-				limdl_pose_channel_set_node_priority (chan,
+				limdl_pose_channel_set_node_weight (chan,
 					lua_tostring (args->lua, -2), lua_tonumber (args->lua, -1));
 			}
 			lua_pop (args->lua, 1);
@@ -239,8 +262,10 @@ static void RenderObject_get_animation (LIScrArgs* args)
 	liscr_args_sets_float (args, "repeat_start", channel->repeat_start);
 	liscr_args_sets_float (args, "time", channel->time);
 	liscr_args_sets_float (args, "time_scale", channel->time_scale);
-	liscr_args_sets_float (args, "weight", channel->priority_transform);
-	liscr_args_sets_float (args, "weight_scale", channel->priority_scale);
+	liscr_args_sets_float (args, "priority", channel->priority_transform);
+	liscr_args_sets_float (args, "priority_scale", channel->priority_scale);
+	liscr_args_sets_float (args, "weight", channel->weight_transform);
+	liscr_args_sets_float (args, "weight_scale", channel->weight_scale);
 
 	/* Set node weight info. */
 	if (channel->weights != NULL)

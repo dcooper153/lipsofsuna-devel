@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -39,10 +39,13 @@ struct _LIMdlPoseChannel
 	float repeat_end;
 	float time;
 	float time_scale;
-	float priority_scale;
-	float priority_transform;
+	int priority_scale;
+	int priority_transform;
+	float weight_scale;
+	float weight_transform;
 	float fade_in;
 	float fade_out;
+	LIAlgStrdic* priorities;
 	LIAlgStrdic* weights;
 	LIMdlAnimation* animation;
 };
@@ -60,7 +63,21 @@ LIAPICALL (int, limdl_pose_channel_play, (
 	LIMdlPoseChannel* self,
 	float             secs));
 
+LIAPICALL (float, limdl_pose_channel_get_fading, (
+	const LIMdlPoseChannel* self));
+
+LIAPICALL (void, limdl_pose_channel_get_node_priority, (
+	LIMdlPoseChannel* self,
+	const char*       node,
+	int*              scale,
+	int*              transform));
+
 LIAPICALL (int, limdl_pose_channel_set_node_priority, (
+	LIMdlPoseChannel* self,
+	const char*       node,
+	int               value));
+
+LIAPICALL (int, limdl_pose_channel_set_node_weight, (
 	LIMdlPoseChannel* self,
 	const char*       node,
 	float             value));

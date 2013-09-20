@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -52,8 +52,10 @@ LIMdlPoseChannel* limdl_pose_channel_new (
 	}
 	self->state = LIMDL_POSE_CHANNEL_STATE_PLAYING;
 	self->animation = anim;
-	self->priority_scale = 0.0f;
-	self->priority_transform = 1.0f;
+	self->priority_scale = 0;
+	self->priority_transform = 0;
+	self->weight_scale = 0.0f;
+	self->weight_transform = 1.0f;
 	self->time_scale = 1.0f;
 	self->repeat_end = -1.0f;
 
@@ -91,6 +93,8 @@ LIMdlPoseChannel* limdl_pose_channel_new_copy (
 	self->time_scale = channel->time_scale;
 	self->priority_scale = channel->priority_scale;
 	self->priority_transform = channel->priority_transform;
+	self->weight_scale = channel->weight_scale;
+	self->weight_transform = channel->weight_transform;
 	self->fade_in = channel->fade_in;
 	self->fade_out = channel->fade_out;
 	self->animation = anim;
@@ -188,7 +192,92 @@ int limdl_pose_channel_play (
 	return 1;
 }
 
+float limdl_pose_channel_get_fading (
+	const LIMdlPoseChannel* self)
+{
+	float duration;
+	float time;
+	float end;
+
+	/* Calculate channel offset. */
+	duration = limdl_animation_get_duration (self->animation);
+	time = self->repeat * duration + self->time;
+	end = self->repeats * duration;
+
+	/* Calculate channel weight. */
+	if (!self->repeat && time < self->fade_in)
+	{
+		/* Fade in period. */
+		return private_smooth_fade (1.0f, self->fade_in - time, self->fade_in);
+	}
+	else if (self->repeats == -1 || time < end - self->fade_out)
+	{
+		/* No fade period. */
+		return 1.0f;
+	}
+	else
+	{
+		/* Fade out period. */
+		return private_smooth_fade (1.0f, time - (end - self->fade_out), self->fade_out);
+	}
+}
+
+void limdl_pose_channel_get_node_priority (
+	LIMdlPoseChannel* self,
+	const char*       node,
+	int*              scale,
+	int*              transform)
+{
+	int* value;
+
+	if (self->priorities != NULL)
+	{
+		value = lialg_strdic_find (self->priorities, node);
+		if (value != NULL)
+		{
+			*scale = *value;
+			*transform = *value;
+			return;
+		}
+	}
+	*scale = self->priority_scale;
+	*transform = self->priority_transform;
+}
+
 int limdl_pose_channel_set_node_priority (
+	LIMdlPoseChannel* self,
+	const char*       node,
+	int               value)
+{
+	int* ptr;
+
+	/* Make sure the node priority dictionary exists. */
+	if (self->priorities == NULL)
+	{
+		self->priorities = lialg_strdic_new ();
+		if (self->priorities == NULL)
+			return 0;
+	}
+
+	/* Replace or add a node priority. */
+	ptr = lialg_strdic_find (self->priorities, node);
+	if (ptr == NULL)
+	{
+		ptr = lisys_calloc (1, sizeof (int));
+		if (ptr == NULL)
+			return 0;
+		if (!lialg_strdic_insert (self->priorities, node, ptr))
+		{
+			lisys_free (ptr);
+			return 0;
+		}
+	}
+	*ptr = value;
+
+	return 1;
+}
+
+int limdl_pose_channel_set_node_weight (
 	LIMdlPoseChannel* self,
 	const char*       node,
 	float             value)
@@ -240,8 +329,8 @@ void limdl_pose_channel_get_weight (
 	end = self->repeats * duration;
 
 	/* Calculate base weights. */
-	weight_scale = self->priority_scale;
-	weight_transform = self->priority_transform;
+	weight_scale = self->weight_scale;
+	weight_transform = self->weight_transform;
 	if (node != NULL && self->weights)
 	{
 		weight_ptr = lialg_strdic_find (self->weights, node);

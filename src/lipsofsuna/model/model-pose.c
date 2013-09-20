@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -145,7 +145,12 @@ void limdl_pose_calculate_node_tranformation (
 	LIMatTransform* result_transform,
 	float*          result_scale)
 {
-	int channels;
+	int tmp1;
+	int tmp2;
+	int channels_scale;
+	int channels_transform;
+	int priority_scale;
+	int priority_transform;
 	float scale;
 	float scale1;
 	float total_scale;
@@ -161,14 +166,35 @@ void limdl_pose_calculate_node_tranformation (
 	LIMdlPoseFade* fade;
 	LIMdlPoseChannel* chan;
 
-	channels = 0;
 	scale = 0.0f;
-	total_scale = 0.0f;
-	total_transform = 0.0f;
 	position = limat_vector_init (0.0f, 0.0f, 0.0f);
 	rotation = limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f);
 
+	/* Find the minimum active priority. */
+	/* The effect of the animation priority system is such that channels not
+	   played at all if their priorities are lower than the highest priority
+	   of the non-fading channels. In other words, under the normal conditions,
+	   only the channels that have the highest priority are played. */
+	priority_scale = -65535;
+	priority_transform = -65535;
+	LIALG_U32DIC_FOREACH (iter, self->channels)
+	{
+		chan = iter.value;
+		if (limdl_pose_channel_get_fading (chan) == 1.0f)
+		{
+			limdl_pose_channel_get_node_priority (chan, node, &tmp1, &tmp2);
+			if (priority_scale < tmp1)
+				priority_scale = tmp1;
+			if (priority_transform < tmp2)
+				priority_transform = tmp2;
+		}
+	}
+
 	/* Sum channel weights. */
+	channels_scale = 0;
+	channels_transform = 0;
+	total_scale = 0.0f;
+	total_transform = 0.0f;
 	LIALG_U32DIC_FOREACH (iter, self->channels)
 	{
 		chan = iter.value;
@@ -176,10 +202,18 @@ void limdl_pose_calculate_node_tranformation (
 			continue;
 		if (limdl_animation_get_channel (chan->animation, node) != -1)
 		{
+			limdl_pose_channel_get_node_priority (chan, node, &tmp1, &tmp2);
 			limdl_pose_channel_get_weight (chan, node, &weight, &weight1);
-			total_scale += weight;
-			total_transform += weight1;
-			channels++;
+			if (tmp1 >= priority_scale)
+			{
+				total_scale += weight;
+				channels_scale++;
+			}
+			if (tmp2 >= priority_transform)
+			{
+				total_transform += weight1;
+				channels_transform++;
+			}
 		}
 	}
 
@@ -188,20 +222,30 @@ void limdl_pose_calculate_node_tranformation (
 	{
 		if (limdl_animation_get_channel (fade->animation, node) != -1)
 		{
-			total_transform += fade->current_weight_transform;
-			total_scale += fade->current_weight_scale;
-			channels++;
+			if (fade->priority_transform >= priority_transform)
+			{
+				total_transform += fade->current_weight_transform;
+				channels_transform++;
+			}
+			if (fade->priority_scale >= priority_scale)
+			{
+				total_scale += fade->current_weight_scale;
+				channels_scale++;
+			}
 		}
 	}
 
 	/* Apply valid transformation influences. */
-	if (channels && total_transform >= LIMAT_EPSILON)
+	if (channels_transform && total_transform >= LIMAT_EPSILON)
 	{
 		/* Apply channel influences. */
 		LIALG_U32DIC_FOREACH (iter, self->channels)
 		{
 			chan = iter.value;
 			if (chan->additive)
+				continue;
+			limdl_pose_channel_get_node_priority (chan, node, &tmp1, &tmp2);
+			if (tmp2 < priority_transform)
 				continue;
 			if (limdl_animation_get_transform (chan->animation, node, chan->time, &scale1, &transform))
 			{
@@ -216,6 +260,8 @@ void limdl_pose_calculate_node_tranformation (
 		/* Apply fade influences. */
 		for (fade = self->fades ; fade != NULL ; fade = fade->next)
 		{
+			if (fade->priority_transform < priority_transform)
+				continue;
 			if (limdl_animation_get_transform (fade->animation, node, fade->time, &scale1, &transform))
 			{
 				bonepos = transform.position;
@@ -228,12 +274,15 @@ void limdl_pose_calculate_node_tranformation (
 	}
 
 	/* Apply valid scale influences. */
-	if (channels && total_scale >= LIMAT_EPSILON)
+	if (channels_scale && total_scale >= LIMAT_EPSILON)
 	{
 		/* Apply channel influences. */
 		LIALG_U32DIC_FOREACH (iter, self->channels)
 		{
 			chan = iter.value;
+			limdl_pose_channel_get_node_priority (chan, node, &tmp1, &tmp2);
+			if (tmp1 < priority_scale)
+				continue;
 			if (limdl_animation_get_transform (chan->animation, node, chan->time, &scale1, &transform))
 			{
 				limdl_pose_channel_get_weight (chan, node, &weight, &weight1);
@@ -244,6 +293,8 @@ void limdl_pose_calculate_node_tranformation (
 		/* Apply fade influences. */
 		for (fade = self->fades ; fade != NULL ; fade = fade->next)
 		{
+			if (fade->priority_scale < priority_scale)
+				continue;
 			if (limdl_animation_get_transform (fade->animation, node, fade->time, &scale1, &transform))
 			{
 				weight = fade->current_weight_scale;
@@ -279,6 +330,22 @@ void limdl_pose_calculate_node_tranformation (
 }
 
 void limdl_pose_clear_channel_node_priorities (
+	LIMdlPose*  self,
+	int         channel)
+{
+	LIAlgStrdicIter iter;
+	LIMdlPoseChannel* chan;
+
+	chan = lialg_u32dic_find (self->channels, channel);
+	if (chan == NULL || chan->priorities == NULL)
+		return;
+	LIALG_STRDIC_FOREACH (iter, chan->priorities)
+		lisys_free (iter.value);
+	lialg_strdic_free (chan->priorities);
+	chan->priorities = NULL;
+}
+
+void limdl_pose_clear_channel_node_weights (
 	LIMdlPose*  self,
 	int         channel)
 {
@@ -367,12 +434,14 @@ void limdl_pose_fade_channel (
 		limdl_pose_destroy_channel (self, channel);
 		return;
 	}
-	limdl_pose_channel_get_weight (chan, NULL, &fade->priority_scale, &fade->priority_transform);
+	fade->priority_scale = chan->priority_scale;
+	fade->priority_transform = chan->priority_transform;
+	limdl_pose_channel_get_weight (chan, NULL, &fade->weight_scale, &fade->weight_transform);
 	fade->fade_out = secs;
 	fade->time = chan->time;
 	fade->time_fade = 0.0f;
-	fade->current_weight_transform = fade->priority_transform;
-	fade->current_weight_scale = fade->priority_scale;
+	fade->current_weight_transform = fade->weight_transform;
+	fade->current_weight_scale = fade->weight_scale;
 	fade->animation = limdl_animation_new_copy (chan->animation);
 	if (fade->animation == NULL)
 	{
@@ -455,17 +524,30 @@ void limdl_pose_merge_channel (
 	limdl_pose_set_channel_repeat_start (self, channel, info->repeat_start);
 	limdl_pose_set_channel_priority_scale (self, channel, info->priority_scale);
 	limdl_pose_set_channel_priority_transform (self, channel, info->priority_transform);
+	limdl_pose_set_channel_weight_scale (self, channel, info->weight_scale);
+	limdl_pose_set_channel_weight_transform (self, channel, info->weight_transform);
 	limdl_pose_set_channel_time_scale (self, channel, info->time_scale);
 	limdl_pose_set_channel_fade_in (self, channel, info->fade_in);
 	limdl_pose_set_channel_fade_out (self, channel, info->fade_out);
 
+	/* Handle optional per-node priorities. */
+	if (info->priorities != NULL)
+	{
+		limdl_pose_clear_channel_node_priorities (self, channel);
+		LIALG_STRDIC_FOREACH (iter, info->priorities)
+		{
+			limdl_pose_set_channel_priority_node (self, channel,
+				iter.key, *((int*) iter.value));
+		}
+	}
+
 	/* Handle optional per-node weights. */
 	if (info->weights != NULL)
 	{
-		limdl_pose_clear_channel_node_priorities (self, channel);
+		limdl_pose_clear_channel_node_weights (self, channel);
 		LIALG_STRDIC_FOREACH (iter, info->weights)
 		{
-			limdl_pose_set_channel_priority_node (self, channel,
+			limdl_pose_set_channel_weight_node (self, channel,
 				iter.key, *((float*) iter.value));
 		}
 	}
@@ -509,9 +591,9 @@ void limdl_pose_update (
 	{
 		/* Calculate smooth fading. */
 		fade->current_weight_scale = private_smooth_fade (
-			fade->priority_scale, fade->time_fade, fade->fade_out);
+			fade->weight_scale, fade->time_fade, fade->fade_out);
 		fade->current_weight_transform = private_smooth_fade (
-			fade->priority_transform, fade->time_fade, fade->fade_out);
+			fade->weight_transform, fade->time_fade, fade->fade_out);
 
 		/* Update time and weights. */
 		fade_next = fade->next;
@@ -753,7 +835,103 @@ void limdl_pose_set_channel_position (
 		chan->time = limdl_animation_get_duration (chan->animation);
 }
 
-float* limdl_pose_get_channel_priority_node (
+int* limdl_pose_get_channel_priority_node (
+	const LIMdlPose* self,
+	int              channel,
+	const char*      node)
+{
+	int* ptr;
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan == NULL || chan->priorities == NULL)
+		return NULL;
+	ptr = lialg_strdic_find (chan->priorities, node);
+
+	return ptr;
+}
+
+int limdl_pose_set_channel_priority_node (
+	LIMdlPose*  self,
+	int         channel,
+	const char* node,
+	int         value)
+{
+	LIMdlPoseChannel* chan;
+
+	/* Find the channel. */
+	chan = private_find_channel (self, channel);
+	if (chan == NULL)
+		return 0;
+
+	/* Replace or add a node priority. */
+	return limdl_pose_channel_set_node_priority (chan, node, value);
+}
+
+LIAlgStrdic* limdl_pose_get_channel_priority_nodes (
+	const LIMdlPose* self,
+	int              channel)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan == NULL)
+		return NULL;
+
+	return chan->priorities;
+}
+
+int limdl_pose_get_channel_priority_scale (
+	const LIMdlPose* self,
+	int              channel)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan == NULL)
+		return 0.0f;
+	return chan->priority_scale;
+}
+
+void limdl_pose_set_channel_priority_scale (
+	LIMdlPose* self,
+	int        channel,
+	int      value)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_create_channel (self, channel);
+	if (chan == NULL)
+		return;
+	chan->priority_scale = value;
+}
+
+int limdl_pose_get_channel_priority_transform (
+	const LIMdlPose* self,
+	int              channel)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan == NULL)
+		return 0.0f;
+	return chan->priority_transform;
+}
+
+void limdl_pose_set_channel_priority_transform (
+	LIMdlPose* self,
+	int        channel,
+	int      value)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_create_channel (self, channel);
+	if (chan == NULL)
+		return;
+	chan->priority_transform = value;
+}
+
+float* limdl_pose_get_channel_weight_node (
 	const LIMdlPose* self,
 	int              channel,
 	const char*      node)
@@ -769,7 +947,7 @@ float* limdl_pose_get_channel_priority_node (
 	return ptr;
 }
 
-int limdl_pose_set_channel_priority_node (
+int limdl_pose_set_channel_weight_node (
 	LIMdlPose*  self,
 	int         channel,
 	const char* node,
@@ -783,10 +961,10 @@ int limdl_pose_set_channel_priority_node (
 		return 0;
 
 	/* Replace or add a node weight. */
-	return limdl_pose_channel_set_node_priority (chan, node, value);
+	return limdl_pose_channel_set_node_weight (chan, node, value);
 }
 
-LIAlgStrdic* limdl_pose_get_channel_priority_nodes (
+LIAlgStrdic* limdl_pose_get_channel_weight_nodes (
 	const LIMdlPose* self,
 	int              channel)
 {
@@ -799,7 +977,7 @@ LIAlgStrdic* limdl_pose_get_channel_priority_nodes (
 	return chan->weights;
 }
 
-float limdl_pose_get_channel_priority_scale (
+float limdl_pose_get_channel_weight_scale (
 	const LIMdlPose* self,
 	int              channel)
 {
@@ -808,10 +986,10 @@ float limdl_pose_get_channel_priority_scale (
 	chan = private_find_channel (self, channel);
 	if (chan == NULL)
 		return 0.0f;
-	return chan->priority_scale;
+	return chan->weight_scale;
 }
 
-void limdl_pose_set_channel_priority_scale (
+void limdl_pose_set_channel_weight_scale (
 	LIMdlPose* self,
 	int        channel,
 	float      value)
@@ -821,10 +999,10 @@ void limdl_pose_set_channel_priority_scale (
 	chan = private_create_channel (self, channel);
 	if (chan == NULL)
 		return;
-	chan->priority_scale = value;
+	chan->weight_scale = value;
 }
 
-float limdl_pose_get_channel_priority_transform (
+float limdl_pose_get_channel_weight_transform (
 	const LIMdlPose* self,
 	int              channel)
 {
@@ -833,10 +1011,10 @@ float limdl_pose_get_channel_priority_transform (
 	chan = private_find_channel (self, channel);
 	if (chan == NULL)
 		return 0.0f;
-	return chan->priority_transform;
+	return chan->weight_transform;
 }
 
-void limdl_pose_set_channel_priority_transform (
+void limdl_pose_set_channel_weight_transform (
 	LIMdlPose* self,
 	int        channel,
 	float      value)
@@ -846,7 +1024,7 @@ void limdl_pose_set_channel_priority_transform (
 	chan = private_create_channel (self, channel);
 	if (chan == NULL)
 		return;
-	chan->priority_transform = value;
+	chan->weight_transform = value;
 }
 
 int limdl_pose_get_channel_repeats (
@@ -1000,8 +1178,10 @@ static LIMdlPoseChannel* private_create_channel (
 	}
 	chan->state = LIMDL_POSE_CHANNEL_STATE_PLAYING;
 	chan->animation = anim;
-	chan->priority_scale = 0.0f;
-	chan->priority_transform = 1.0f;
+	chan->priority_scale = 0;
+	chan->priority_transform = 0;
+	chan->weight_scale = 1.0f;
+	chan->weight_transform = 1.0f;
 	chan->time_scale = 1.0f;
 
 	/* Register the channel. */

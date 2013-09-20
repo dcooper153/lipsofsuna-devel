@@ -11,6 +11,20 @@
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
+local bone_chain_mapping = {
+	LOWER = {"IK", "pelvis", "pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "leg1.R", "leg2.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6",
+		"thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "hips", "hips_main"},
+	LEGS = {"pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "leg1.R", "leg2.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6",
+		"thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "hips", "hips_main"},
+	ARMS = {"arm1.L", "arm2.L", "palm.L", "palm1.L", "arm1.R", "arm2.R", "palm.R", "palm1.R",
+		"shoulder.L", "upper_arm.L", "forearm.L", "shoulder.R", "upper_arm.R", "forearm.R"},
+	ARML = {"arm1.L", "arm2.L", "palm.L", "palm1.L",
+		"shoulder.L", "upper_arm.L", "forearm.L"},
+	ARMR = {"arm1.R", "arm2.R", "palm.R", "palm1.R",
+		"shoulder.R", "upper_arm.R", "forearm.R"},
+	BACK = {"back1", "back2", "back3",
+		"spine", "chest"}}
+
 --- Animation specification.
 -- @type AnimationSpec
 local AnimationSpec = Spec:register("AnimationSpec", "animation", {
@@ -21,14 +35,17 @@ local AnimationSpec = Spec:register("AnimationSpec", "animation", {
 	{name = "channel", type = "number", description = "Channel number.", details = {integer = true, min = 0, max = 255}},
 	{name = "fade_in", type = "number", description = "Fade in duration."},
 	{name = "fade_out", type = "number", description = "Fade out duration."},
+	{name = "node_priorities", type = "dict", dict = {type = "number"}, description = "Blending priorities for individual bones."},
+	{name = "node_weights", type = "dict", dict = {type = "number"}, description = "Blending weights for individual bones."},
 	{name = "permanent", type = "boolean", description = "Enables looping of the animation."},
+	{name = "priority", type = "number", description = "Blending priority."},
 	{name = "repeat_end", type = "number", description = "Repeat range end offset."},
 	{name = "repeat_start", type = "number", description = "Repeat range start offset."},
 	{name = "replace", type = "boolean", description = "True to replace the old animation, false to inherit it when possible."},
 	{name = "time", type = "number", description = "Starting time offset."},
 	{name = "time_scale", type = "number", description = "Time scale multiplier."},
 	{name = "weight", type = "number", description = "Blending weight."},
-	{name = "node_weights", type = "dict", dict = {type = "number"}, description = "Blending weight for individual bones."},
+	{name = "weight_scale", type = "number", description = "Blending weight for scaling."}
 })
 
 --- Creates a new animation spec.
@@ -51,18 +68,47 @@ AnimationSpec.get_arguments = function(self, variant)
 		channel = self.channel,
 		fade_in = self.fade_in,
 		fade_out = self.fade_out,
+		node_priorities = self:get_node_priorities(),
+		node_weights = self:get_node_weights(),
 		permanent = self.permanent,
+		priority = self.priority,
 		repeat_end = self.repeat_end,
 		repeat_start = self.repeat_start,
 		replace = self.replace,
 		time = self.time,
 		time_scale = self.time_scale,
 		weight = self.weight,
-		node_weights = self:get_node_weights()}
+		weight_scale = self.weight_scale}
 	if variant and self.animations then
 		res.animation = self.animations[variant % #self.animations + 1]
 	end
 	return res
+end
+
+--- Gets the node priorities of the animation.
+--
+-- The node priority dictionary may contain some helper weights that set multiple
+-- real priorities at once. If one of the recognized uppercase node names is seen
+-- in the node priority list, it's replaced by this function. The returned table
+-- contains the real node priorities.
+--
+-- @param self AnimationSpec.
+-- @return Node priorities, or nil.
+AnimationSpec.get_node_priorities = function(self)
+	if not self.node_priorities then return end
+	local w = {}
+	for k,v in pairs(self.node_priorities) do
+		local replace = bone_chain_mapping[k]
+		if replace then
+			for k1,v1 in ipairs(replace) do w[v1] = v end
+		else
+			w[k] = v
+		end
+	end
+	for k in pairs(bone_chain_mapping) do
+		w[k] = nil
+	end
+	return w
 end
 
 --- Gets the node weights of the animation.
@@ -76,29 +122,16 @@ end
 -- @return Node weights, or nil.
 AnimationSpec.get_node_weights = function(self)
 	if not self.node_weights then return end
-	local mapping = {
-		LOWER = {"IK", "pelvis", "pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "leg1.R", "leg2.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6",
-			"thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "hips", "hips_main"},
-		LEGS = {"pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "leg1.R", "leg2.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6",
-			"thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "hips", "hips_main"},
-		ARMS = {"arm1.L", "arm2.L", "palm.L", "palm1.L", "arm1.R", "arm2.R", "palm.R", "palm1.R",
-			"shoulder.L", "upper_arm.L", "forearm.L", "shoulder.R", "upper_arm.R", "forearm.R"},
-		ARML = {"arm1.L", "arm2.L", "palm.L", "palm1.L",
-			"shoulder.L", "upper_arm.L", "forearm.L"},
-		ARMR = {"arm1.R", "arm2.R", "palm.R", "palm1.R",
-			"shoulder.R", "upper_arm.R", "forearm.R"},
-		BACK = {"back1", "back2", "back3",
-			"spine", "chest"}}
 	local w = {}
 	for k,v in pairs(self.node_weights) do
-		local replace = mapping[k]
+		local replace = bone_chain_mapping[k]
 		if replace then
 			for k1,v1 in ipairs(replace) do w[v1] = v end
 		else
 			w[k] = v
 		end
 	end
-	for k in pairs(mapping) do
+	for k in pairs(bone_chain_mapping) do
 		w[k] = nil
 	end
 	return w

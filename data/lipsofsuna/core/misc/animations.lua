@@ -10,8 +10,8 @@ AnimationSpec{
 	fade_in = 0,
 	replace = true,
 	time = frames(20),
-	weight = 1000,
-	node_weights = {LOWER = 1}}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default attack front",
@@ -20,7 +20,8 @@ AnimationSpec{
 	fade_in = 0,
 	replace = true,
 	time = frames(20),
-	weight = 1000}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default attack left",
@@ -29,8 +30,8 @@ AnimationSpec{
 	fade_in = 0,
 	replace = true,
 	time = frames(20),
-	weight = 1000,
-	node_weights = {LOWER = 1}}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default attack right",
@@ -39,16 +40,16 @@ AnimationSpec{
 	fade_in = 0,
 	replace = true,
 	time = frames(20),
-	weight = 1000,
-	node_weights = {LOWER = 1}}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default attack punch",
 	animation = "aer1-attack-punch",
 	channel = 2,
 	fade_out = 0.1,
-	weight = 1000,
-	node_weights = {LOWER = 1}}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default attack stand",
@@ -57,8 +58,8 @@ AnimationSpec{
 	fade_in = 0,
 	replace = true,
 	time = frames(20),
-	weight = 1000,
-	node_weights = {LOWER = 10}}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default block start",
@@ -80,7 +81,8 @@ AnimationSpec{
 	name = "default build",
 	animation = "aer1-punch",
 	channel = 2,
-	weight = 30}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default charge back",
@@ -90,8 +92,8 @@ AnimationSpec{
 	permanent = true,
 	repeat_end = frames(20),
 	repeat_start = frames(20),
-	weight = 100,
-	node_weights = {LOWER = 1}}
+	priority = 3,
+	node_priorities = {ARMS = 10}}
 
 AnimationSpec{
 	name = "default charge front",
@@ -101,8 +103,8 @@ AnimationSpec{
 	permanent = true,
 	repeat_end = frames(20),
 	repeat_start = frames(20),
-	weight = 100,
-	node_weights = {LOWER = 1}}
+	priority = 3,
+	node_priorities = {ARMS = 10}}
 
 AnimationSpec{
 	name = "default charge left",
@@ -112,8 +114,8 @@ AnimationSpec{
 	permanent = true,
 	repeat_end = frames(20),
 	repeat_start = frames(20),
-	weight = 100,
-	node_weights = {LOWER = 1}}
+	priority = 3,
+	node_priorities = {ARMS = 10}}
 
 AnimationSpec{
 	name = "default charge right",
@@ -123,8 +125,8 @@ AnimationSpec{
 	permanent = true,
 	repeat_end = frames(20),
 	repeat_start = frames(20),
-	weight = 100,
-	node_weights = {LOWER = 1}}
+	priority = 3,
+	node_priorities = {ARMS = 10}}
 
 AnimationSpec{
 	name = "default charge stand",
@@ -134,8 +136,8 @@ AnimationSpec{
 	permanent = true,
 	repeat_end = frames(20),
 	repeat_start = frames(20),
-	weight = 100,
-	node_weights = {LOWER = 10}}
+	priority = 3,
+	node_priorities = {ARMS = 10}}
 
 AnimationSpec{
 	name = "default charge cancel",
@@ -149,8 +151,8 @@ AnimationSpec{
 	permanent = true,
 	repeat_end = frames(20),
 	repeat_start = frames(20),
-	weight = 100,
-	node_weights = {LOWER = 1}}
+	priority = 3,
+	node_priorities = {ARMS = 10}}
 
 AnimationSpec{
 	name = "default charge punch",
@@ -160,8 +162,8 @@ AnimationSpec{
 	permanent = true,
 	repeat_start = 10,
 	weight = 100,
-	node_weights = {LOWER = 1,
-	ARML = 1}}
+	priority = 3,
+	node_priorities = {ARMS = 10}}
 
 AnimationSpec{
 	name = "default climb high",
@@ -187,7 +189,7 @@ AnimationSpec{
 	channel = 3,
 	permanent = true,
 	repeat_start = 10,
-	weight = 5}
+	priority = 15}
 
 AnimationSpec{
 	name = "default hold blunt",
@@ -195,7 +197,7 @@ AnimationSpec{
 	channel = 3,
 	permanent = true,
 	repeat_start = 10,
-	weight = 5}
+	priority = 15}
 
 AnimationSpec{
 	name = "default hold bulky",
@@ -203,7 +205,7 @@ AnimationSpec{
 	channel = 3,
 	permanent = true,
 	repeat_start = 10,
-	weight = 5}
+	priority = 15}
 
 AnimationSpec{
 	name = "default hold staff",
@@ -211,7 +213,7 @@ AnimationSpec{
 	channel = 3,
 	permanent = true,
 	repeat_start = 10,
-	weight = 5}
+	priority = 15}
 
 AnimationSpec{
 	name = "default hold shield",
@@ -219,7 +221,7 @@ AnimationSpec{
 	channel = 4,
 	permanent = true,
 	repeat_start = 10,
-	weight = 5}
+	priority = 15}
 
 AnimationSpec{
 	name = "default hold sword",
@@ -227,7 +229,7 @@ AnimationSpec{
 	channel = 3,
 	permanent = true,
 	repeat_start = 10,
-	weight = 5}
+	priority = 15}
 
 AnimationSpec{
 	name = "default hold torch",
@@ -235,7 +237,7 @@ AnimationSpec{
 	channel = 4,
 	permanent = true,
 	repeat_start = 10,
-	weight = 500}
+	priority = 1}
 
 AnimationSpec{
 	name = "default dead",
@@ -256,7 +258,7 @@ AnimationSpec{
 	name = "default drop",
 	animation = "aer1-pickup",
 	channel = 2,
-	weight = 10}
+	priority = 7}
 
 AnimationSpec{
 	name = "default flinch",
@@ -270,6 +272,8 @@ AnimationSpec{
 	name = "default idle",
 	animation = "aer1-idle2",
 	channel = 1,
+	priority = 1,
+	weight_scale = 1,
 	permanent = true}
 
 AnimationSpec{
@@ -286,8 +290,7 @@ AnimationSpec{
 	fade_out = 0.4,
 	permanent = true,
 	repeat_start = 50,
-	weight = 10,
-	node_weights = {LOWER = 1000, BACK = 1000}}
+	priority = 7}
 
 AnimationSpec{
 	name = "default land ground",
@@ -308,71 +311,74 @@ AnimationSpec{
 	name = "default pick up",
 	animation = "aer1-pickup",
 	channel = 2,
-	weight = 10}
+	priority = 7}
 
 AnimationSpec{
 	name = "default run",
 	animation = "aer1-run",
 	channel = 1,
 	permanent = true,
-	node_weights = {LOWER = 100}}
+	priority = 5}
 
 AnimationSpec{
 	name = "default run left",
 	animation = "aer1-run-left",
 	channel = 1,
 	permanent = true,
-	node_weights = {LOWER = 100}}
+	priority = 5}
 
 AnimationSpec{
 	name = "default run right",
 	animation = "aer1-run-right",
 	channel = 1,
 	permanent = true,
-	node_weights = {LOWER = 100}}
+	priority = 5}
 
 AnimationSpec{
 	name = "default spell ranged",
 	animation = "aer1-cast-spell",
 	channel = 2,
-	weight = 30}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default spell self",
 	animation = "aer1-spell-self",
 	channel = 2,
-	weight = 30}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default spell touch",
 	animation = "aer1-cast-spell",
 	channel = 2,
-	weight = 30}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default stagger",
 	animation = "aer1-stagger-2h", --FIXME
-	weight = 1000}
+	priority = 15}
 
 AnimationSpec{
 	name = "default strafe left",
 	animation = "aer1-strafe-left",
 	channel = 1,
 	permanent = true,
-	node_weights = {LOWER = 100}}
+	priority = 5}
 
 AnimationSpec{
 	name = "default strafe right",
 	animation = "aer1-strafe-right",
 	channel = 1,
 	permanent = true,
-	node_weights = {LOWER = 100}}
+	priority = 5}
 
 AnimationSpec{
 	name = "default talk",
 	animation = "aer1-talk1",
 	animations = {"aer1-talk1", "aer1-talk2", "aer1-talk3", "aer1-talk4", "aer1-talk5"},
-	weight = 100}
+	priority = 3}
 
 AnimationSpec{
 	name = "default throw",
@@ -382,21 +388,22 @@ AnimationSpec{
 	replace = true,
 	time = frames(20),
 	weight = 1000,
-	node_weights = {LOWER = 1}}
+	priority = 3,
+	node_priorities = {ARMS = 10}}
 
 AnimationSpec{
 	name = "default walk",
 	animation = "aer1-walk",
 	channel = 1,
 	permanent = true,
-	node_weights = {LOWER = 100}}
+	priority = 5}
 
 AnimationSpec{
 	name = "default walk back",
 	animation = "aer1-walk-back",
 	channel = 1,
 	permanent = true,
-	node_weights = {LOWER = 100}}
+	priority = 5}
 
 AnimationProfileSpec{
 	name = "default",
@@ -465,8 +472,8 @@ AnimationSpec{
 	name = "default attack bow",
 	animation = "aer1-attack-bow",
 	channel = 2,
-	weight = 1000,
-	node_weights = {LOWER = 1}}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default charge bow",
@@ -509,8 +516,8 @@ AnimationSpec{
 	fade_in = 0,
 	replace = true,
 	time = frames(20),
-	weight = 1000,
-	node_weights = {LOWER = 1}}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default charge crossbow",
@@ -552,8 +559,8 @@ AnimationSpec{
 	name = "default attack musket",
 	animation = "aer1-attack-musket",
 	channel = 2,
-	weight = 1000,
-	node_weights = {LOWER = 1}}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default charge musket",
@@ -593,8 +600,8 @@ AnimationSpec{
 	name = "default attack revolver",
 	animation = "aer1-attack-revolver",
 	channel = 2,
-	weight = 1000,
-	node_weights = {LOWER = 1}}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default charge revolver",
@@ -637,8 +644,8 @@ AnimationSpec{
 	fade_in = 0,
 	replace = true,
 	time = frames(20),
-	weight = 1000,
-	node_weights = {LOWER = 1}}
+	priority = 10,
+	node_priorities = {LOWER = 3}}
 
 AnimationSpec{
 	name = "default attack front two-handed",

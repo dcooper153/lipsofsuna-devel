@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -33,8 +33,10 @@ struct _LIMdlPoseFade
 	float time;
 	float time_fade;
 	float fade_out;
-	float priority_scale;
-	float priority_transform;
+	int priority_scale;
+	int priority_transform;
+	float weight_scale;
+	float weight_transform;
 	float current_weight_scale;
 	float current_weight_transform;
 	LIMdlPoseFade* prev;
@@ -70,6 +72,10 @@ LIAPICALL (void, limdl_pose_calculate_node_tranformation, (
 	float*          result_scale));
 
 LIAPICALL (void, limdl_pose_clear_channel_node_priorities, (
+	LIMdlPose*  self,
+	int         channel));
+
+LIAPICALL (void, limdl_pose_clear_channel_node_weights, (
 	LIMdlPose*  self,
 	int         channel));
 
@@ -162,7 +168,7 @@ LIAPICALL (void, limdl_pose_set_channel_position, (
 	int        channel,
 	float      value));
 
-LIAPICALL (float*, limdl_pose_get_channel_priority_node, (
+LIAPICALL (int*, limdl_pose_get_channel_priority_node, (
 	const LIMdlPose* self,
 	int              channel,
 	const char*      node));
@@ -171,26 +177,59 @@ LIAPICALL (int, limdl_pose_set_channel_priority_node, (
 	LIMdlPose*  self,
 	int         channel,
 	const char* node,
-	float       value));
+	int         value));
 
 LIAPICALL (LIAlgStrdic*, limdl_pose_get_channel_priority_nodes, (
 	const LIMdlPose* self,
 	int              channel));
 
-LIAPICALL (float, limdl_pose_get_channel_priority_scale, (
+LIAPICALL (int, limdl_pose_get_channel_priority_scale, (
 	const LIMdlPose* self,
 	int              channel));
 
 LIAPICALL (void, limdl_pose_set_channel_priority_scale, (
 	LIMdlPose* self,
 	int        channel,
-	float      value));
+	int        value));
 
-LIAPICALL (float, limdl_pose_get_channel_priority_transform, (
+LIAPICALL (int, limdl_pose_get_channel_priority_transform, (
 	const LIMdlPose* self,
 	int              channel));
 
 LIAPICALL (void, limdl_pose_set_channel_priority_transform, (
+	LIMdlPose* self,
+	int        channel,
+	int      value));
+
+LIAPICALL (float*, limdl_pose_get_channel_weight_node, (
+	const LIMdlPose* self,
+	int              channel,
+	const char*      node));
+
+LIAPICALL (int, limdl_pose_set_channel_weight_node, (
+	LIMdlPose*  self,
+	int         channel,
+	const char* node,
+	float       value));
+
+LIAPICALL (LIAlgStrdic*, limdl_pose_get_channel_weight_nodes, (
+	const LIMdlPose* self,
+	int              channel));
+
+LIAPICALL (float, limdl_pose_get_channel_weight_scale, (
+	const LIMdlPose* self,
+	int              channel));
+
+LIAPICALL (void, limdl_pose_set_channel_weight_scale, (
+	LIMdlPose* self,
+	int        channel,
+	float      value));
+
+LIAPICALL (float, limdl_pose_get_channel_weight_transform, (
+	const LIMdlPose* self,
+	int              channel));
+
+LIAPICALL (void, limdl_pose_set_channel_weight_transform, (
 	LIMdlPose* self,
 	int        channel,
 	float      value));
