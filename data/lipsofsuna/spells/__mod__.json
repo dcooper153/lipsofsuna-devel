@@ -1,4 +1,5 @@
 {
 	"resources": ["."],
-	"specs": ["modifiers", "spells"]
+	"specs": ["modifiers", "spells"],
+	"post_scripts": ["init"]
 }

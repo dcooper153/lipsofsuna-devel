@@ -27,6 +27,7 @@ Mod.new = function(clss)
 	self.options = {}
 	self.resources = {}
 	self.scripts = {}
+	self.post_scripts = {}
 	self.specs = {}
 	Spec:register_all()
 	return self
@@ -77,6 +78,18 @@ Mod.init_all = function(self, settings)
 					"invalid spec type \"" .. v[3] .. "\" in \"" .. v[2] .. "\"")
 			end
 			cls(v[4])
+		end
+	end
+	-- Run the post-spec scripts.
+	for k,v in ipairs(self.post_scripts) do
+		if needed_script(v[1], v[4]) then
+			local prev_name = self.name
+			local prev_path = self.path
+			self.name = v[1]
+			self.path = v[2]
+			require(v[3])
+			self.name = prev_name
+			self.path = prev_path
 		end
 	end
 end
@@ -165,6 +178,12 @@ Mod.load = function(self, name, optional)
 		local path = name .. "/"
 		for k,v in ipairs(info.scripts) do
 			table.insert(self.scripts, {name, path, name .. "/" .. v})
+		end
+	end
+	if info.post_scripts then
+		local path = name .. "/"
+		for k,v in ipairs(info.post_scripts) do
+			table.insert(self.post_scripts, {name, path, name .. "/" .. v})
 		end
 	end
 	if info.client_scripts then
