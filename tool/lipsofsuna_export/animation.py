@@ -24,6 +24,26 @@ class LIAnimation:
 			self.frame_end = 0
 		if self.frame_start < 0:
 			self.frame_start = 0
+		# Find the copy constraint target bones.
+		cp_bones = {}
+		for bone in armat.pose.bones:
+			for cons in bone.constraints:
+				if cons.type not in ['COPY_ROTATION', 'COPY_LOCATION', 'COPY_SCALE']:
+					continue
+				if cons.target != armat:
+					continue
+				if cons.subtarget in armat.pose.bones:
+					cp_bones[cons.subtarget] = armat.pose.bones[cons.subtarget]
+		# Find the IK constraint target bones.
+		ik_bones = {}
+		for bone in armat.pose.bones:
+			for cons in bone.constraints:
+				if cons.type != 'IK':
+					continue
+				if cons.target != armat:
+					continue
+				if cons.subtarget in armat.pose.bones:
+					ik_bones[cons.subtarget] = armat.pose.bones[cons.subtarget]
 		# Activate bones moved by FK.
 		self.channeldict = {}
 		self.channellist = []
@@ -34,73 +54,87 @@ class LIAnimation:
 					if chan.find("pose.bones[\"") == 0:
 						chan = chan.split("\"")[1]
 						self.add_channel(chan)
-		# Activate bones moved by copy constraints.
-		for bone in armat.pose.bones:
-			for cons in bone.constraints:
-				# Must be a copy constraint.
-				if cons.type not in ['COPY_ROTATION', 'COPY_LOCATION', 'COPY_SCALE']:
-					continue
-				# Must target the same armature.
-				if cons.target != armat:
-					continue
-				# The source bone most be animated.
-				if cons.subtarget not in self.channeldict:
-					continue
-				# Animate the target bone.
-				self.add_channel(bone.name)
-		# Activate IK bones moved indirectly by their parent bones.
-		ik_bones = {}
-		for bone in armat.pose.bones:
-			for cons in bone.constraints:
-				if cons.type != 'IK':
-					continue
-				if cons.target != armat:
-					continue
-				if cons.subtarget in armat.pose.bones:
-					ik_bones[cons.subtarget] = armat.pose.bones[cons.subtarget]
-		for name,bone in ik_bones.items():
-			# Check if any of the parent bones are animated.
-			animated = False
-			next = bone.parent
-			while next:
-				if next.name in self.channeldict:
-					animated = True
-					break
-				next = next.parent
-			# Activate the IK bone if a parent was animated.
-			if animated:
-				self.add_channel(name)
-		# Activate bones moved by IK constraints.
-		for bone in armat.pose.bones:
-			for cons in bone.constraints:
-				# Must be an IK constraint.
-				if cons.type != 'IK':
-					continue
-				# Must target the same armature.
-				if cons.target != armat:
-					continue
-				# The IK bone most be animated.
-				if cons.subtarget not in self.channeldict:
-					continue
-				# Animate the affected bone chain.
-				if cons.chain_count > 0:
-					next = bone
-					for i in range(0, cons.chain_count):
-						self.add_channel(next.name)
-						next = next.parent
-						if not next:
-							break
-				else:
-					next = bone
-					while next:
-						self.add_channel(next.name)
-						next = next.parent
+		# Iteratively activate all bones affected by constraints.
+		added_more = True
+		while added_more:
+			added_more = False
+			# Activate copy constraint bones moved indirectly by their parent bones.
+			for name,bone in cp_bones.items():
+				# Check if any of the parent bones are animated.
+				animated = False
+				next = bone.parent
+				while next:
+					if next.name in self.channeldict:
+						animated = True
+						break
+					next = next.parent
+				# Activate the IK bone if a parent was animated.
+				if animated:
+					if self.add_channel(name):
+						added_more = True
+			# Activate IK bones moved indirectly by their parent bones.
+			for name,bone in ik_bones.items():
+				# Check if any of the parent bones are animated.
+				animated = False
+				next = bone.parent
+				while next:
+					if next.name in self.channeldict:
+						animated = True
+						break
+					next = next.parent
+				# Activate the IK bone if a parent was animated.
+				if animated:
+					if self.add_channel(name):
+						added_more = True
+			# Activate bones moved by copy constraints.
+			for bone in armat.pose.bones:
+				for cons in bone.constraints:
+					# Must be a copy constraint.
+					if cons.type not in ['COPY_ROTATION', 'COPY_LOCATION', 'COPY_SCALE']:
+						continue
+					# Must target the same armature.
+					if cons.target != armat:
+						continue
+					# The source bone most be animated.
+					if cons.subtarget not in self.channeldict:
+						continue
+					# Animate the target bone.
+					if self.add_channel(bone.name):
+						added_more = True
+			# Activate bones moved by IK constraints.
+			for bone in armat.pose.bones:
+				for cons in bone.constraints:
+					# Must be an IK constraint.
+					if cons.type != 'IK':
+						continue
+					# Must target the same armature.
+					if cons.target != armat:
+						continue
+					# The IK bone most be animated.
+					if cons.subtarget not in self.channeldict:
+						continue
+					# Animate the affected bone chain.
+					if cons.chain_count > 0:
+						next = bone
+						for i in range(0, cons.chain_count):
+							if self.add_channel(next.name):
+								added_more = True
+							next = next.parent
+							if not next:
+								break
+					else:
+						next = bone
+						while next:
+							if self.add_channel(next.name):
+								added_more = True
+							next = next.parent
 
 	def add_channel(self, name):
 		if name in self.armature.data.bones:
 			if name not in self.channeldict:
 				self.channeldict[name] = True
 				self.channellist.append(name)
+				return True
 
 	def process(self):
 		if self.state == None:
