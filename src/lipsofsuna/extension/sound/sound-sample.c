@@ -238,9 +238,9 @@ static int private_load_flac (
 		format = AL_FORMAT_MONO8;
 	else if (channels == 1 && bps == 16)
 		format = AL_FORMAT_MONO16;
-	else if (channels == 1 && bps == 8)
+	else if (channels == 2 && bps == 8)
 		format = AL_FORMAT_STEREO8;
-	else if (channels == 1 && bps == 16)
+	else if (channels == 2 && bps == 16)
 		format = AL_FORMAT_STEREO16;
 	else
 	{
