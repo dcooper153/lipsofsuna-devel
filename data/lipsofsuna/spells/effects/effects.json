@@ -21,13 +21,24 @@
 	},
 	{
 		"type": "Effectspec",
+		"name": "explosion2",
+		"particle": "explosion1",
+		"particle_life": 5,
+		"quake": 1,
+		"sound": "explosion2",
+		"sound_volume": 0.5
+	},
+	{
+		"type": "Effectspec",
 		"name": "fireball1",
-		"sound": "fire-000"
+		"sound": "fireball1",
+		"sound_volume": 0.3
 	},
 	{
 		"type": "Effectspec",
 		"name": "firewall1",
 		"particle": "firewall1"
+		"sound": "fire-000"
 	},
 	{
 		"type": "Effectspec",

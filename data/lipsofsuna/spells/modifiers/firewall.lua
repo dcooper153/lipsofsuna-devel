@@ -17,6 +17,7 @@ local FirewallModifier = ModifierSpec{
 	},
 	description = "Conjure a wall of fire",
 	effect = "firewall1",
+	effect_fire = "fireball1",
 	icon = "firewall",
 	projectile = "fireball1", -- FIXME
 	spell_strength = 5,

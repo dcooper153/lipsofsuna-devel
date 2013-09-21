@@ -1482,6 +1482,36 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/spells/effects/fireball1.flac"
+			],
+			"authors":
+			[
+				"qubodup"
+			],
+			"licenses":
+			[
+				"CC0"
+			],
+			"source": "http://www.freesound.org/people/qubodup/sounds/159725/"
+		},
+		{
+			"files":
+			[
+				"data/lipsofsuna/spells/effects/explosion2.flac"
+			],
+			"authors":
+			[
+				"qubodup"
+			],
+			"licenses":
+			[
+				"CC0"
+			],
+			"source": "http://www.freesound.org/people/qubodup/sounds/189778/"
+		},
+		{
+			"files":
+			[
 				"data/lipsofsuna/actors/bloodworm/slimemonster-attack1.flac",
 				"data/lipsofsuna/actors/bloodworm/slimemonster-damage1.flac",
 				"data/lipsofsuna/actors/bloodworm/slimemonster-damage2.flac"

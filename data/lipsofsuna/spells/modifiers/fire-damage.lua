@@ -18,7 +18,8 @@ local FireDamageModifier = ModifierSpec{
 		["touch spell"] = true
 	},
 	description = "Inflict fire damage",
-	effect = "explosion1",
+	effect = "explosion2",
+	effect_fire = "fireball1",
 	icon = "modifier-fireball",
 	projectile = "fireball1",
 	spell_strength = 5,
