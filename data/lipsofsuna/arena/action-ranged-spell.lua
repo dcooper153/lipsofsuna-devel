@@ -1,3 +1,4 @@
+local Damage = require("arena/damage")
 local Spell = require("core/objects/spell")
 
 Actionspec{
@@ -38,6 +39,13 @@ Actionspec{
 		spell:set_modifiers(modifiers)
 		spell:set_owner(action.object)
 		spell:fire()
+		-- Play the firing effect.
+		local point = spell:get_position()
+		local damage = Damage()
+		damage:add_spell_modifiers(spell.modifiers)
+		for name in pairs(damage:get_firing_effects()) do
+			Main.vision:world_effect(point, name)
+		end
 	end,
 	get_range = function(action)
 		return 20

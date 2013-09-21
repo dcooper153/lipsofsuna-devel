@@ -210,13 +210,27 @@ Damage.apply_defender_vulnerabilities = function(self, object)
 	end
 end
 
+--- Gets the effects that should be played when a projectile is created for the damage.
+-- @param self Damage.
+-- @return Dictionary of effect names.
+Damage.get_firing_effects = function(self)
+	local res = {}
+	for name,value in pairs(self.modifiers) do
+		local effect = ModifierSpec:find_by_name(name)
+		if effect and effect.effect_fire then
+			res[effect.effect_fire] = true
+		end
+	end
+	return res
+end
+
 --- Gets the effects that should be played when the damage lands.
 -- @param self Damage.
 -- @return Dictionary of effect names.
 Damage.get_impact_effects = function(self)
 	local res = {}
 	for name,value in pairs(self.modifiers) do
-		local effect = ModifierSpec:find{name = name}
+		local effect = ModifierSpec:find_by_name(name)
 		if effect and effect.effect then
 			res[effect.effect] = true
 		end
