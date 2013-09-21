@@ -1,27 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local FollowModifier = ModifierSpec{
-	name = "follow",
-	categories =
-	{
-		["follow"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true,
-		["touch spell"] = true
-	},
-	description = "Forces the target to follow you",
-	effect = "light1",
-	icon = "modifier-light",
-	projectile = "magicmissile1",
-	spell_strength = 30,
-	required_stats =
-	{
-		["willpower"] = 5
-	}}
+local FollowModifier = ModifierSpec:find_by_name("follow")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

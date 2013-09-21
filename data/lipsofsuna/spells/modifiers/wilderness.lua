@@ -2,24 +2,7 @@ local ModifierSpec = require("core/specs/modifier")
 local Obstacle = require("core/objects/obstacle")
 
 -- Spawn trees and plants.
-local WildernessModifier = ModifierSpec{
-	name = "wilderness",
-	actions =
-	{
-		["self spell"] = true
-	},
-	categories =
-	{
-		["spell"] = true
-	},
-	description = "Grow plants from soil",
-	effect = "wilderness1",
-	icon = "modifier-nature",
-	spell_strength = 5,
-	required_stats =
-	{
-		["willpower"] = 5
-	}}
+local WildernessModifier = ModifierSpec:find_by_name("wilderness")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

@@ -1,30 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 
 -- Increase or decrease health.
-local PhysicalDamageModifier = ModifierSpec{
-	name = "physical damage",
-	categories =
-	{
-		["harmful"] = true,
-		["melee"] = true,
-		["physical"] = true
-	},
-	actions =
-	{
-		["bite"] = true,
-		["explode"] = true,
-		["left claw"] = true,
-		["melee"] = true,
-		["ranged"] = true,
-		["right claw"] = true,
-		["tackle"] = true
-	},
-	effect = "impact1",
-	icon = "missing1", --FIXME
-	modifiers =
-	{
-		["physical damage"] = 1
-	}}
+local PhysicalDamageModifier = ModifierSpec:find_by_name("physical damage")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

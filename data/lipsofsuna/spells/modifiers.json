@@ -1,0 +1,578 @@
+[
+	{
+		"type": "ModifierSpec",
+		"name": "berserk",
+		"categories":
+		{
+			"beneficial": true,
+			"berserk": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"self spell": true,
+			"touch spell": true
+		},
+		"description": "Inflict additional damage when in low health",
+		"effect": "berserk1",
+		"icon": "modifier-berserk",
+		"spell_strength": 60,
+		"required_stats":
+		{
+			"willpower": 5
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "black haze",
+		"categories":
+		{
+			"harmful": true,
+			"plague": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true
+		},
+		"description": "Conjure infectious plagued monsters",
+		"effect": "spell1",
+		"icon": "modifier-black haze",
+		"projectile": "fireball1",
+		"spell_strength": 1,
+		"required_stats":
+		{
+			"willpower": 20
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "bless",
+		"categories":
+		{
+			"beneficial": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"self spell": true,
+			"touch spell": true
+		},
+		"description": "Boost the maximum health and willpower of the target",
+		"effect": "spell1",
+		"icon": "modifier-heal",
+		"projectile": "fireball1",
+		"spell_strength": 60,
+		"required_stats":
+		{
+			"willpower": 10
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "burning",
+		"categories":
+		{
+			"harmful": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"self spell": true,
+			"touch spell": true
+		},
+		"description": "Inflict damage over time by putting the target on fire",
+		"effect": "berserk1",
+		"icon": "firewall",
+		"spell_strength": 10,
+		"required_stats":
+		{
+			"willpower": 5
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "cold damage",
+		"categories":
+		{
+			"cold": true,
+			"harmful": true,
+			"melee": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"self spell": true,
+			"touch spell": true
+		},
+		"description": "Inflict cold damage",
+		"effect": "explosion1",
+		"icon": "modifier-ice",
+		"projectile": "fireball1",
+		"spell_strength": 5,
+		"required_stats":
+		{
+			"willpower": 1
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "cure disease",
+		"categories":
+		{
+			"beneficial": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"self spell": true,
+			"touch spell": true
+		},
+		"description": "Cure the target of poison and diseases",
+		"effect": "spell1",
+		"icon": "modifier-heal",
+		"projectile": "fireball1",
+		"spell_strength": 1,
+		"required_stats":
+		{
+			"willpower": 10
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "curse",
+		"categories":
+		{
+			"harmful": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"self spell": true,
+			"touch spell": true
+		},
+		"description": "Damages the maximum health and willpower of the target",
+		"effect": "spell1",
+		"icon": "firewall",
+		"projectile": "fireball1",
+		"spell_strength": 60,
+		"required_stats":
+		{
+			"willpower": 10
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "dig",
+		"categories":
+		{
+			"dig": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true
+		},
+		"description": "Fire a digging ray",
+		"effect": "spell1",
+		"icon": "modifier-earthmove",
+		"projectile": "fireball1",
+		"spell_strength": 1,
+		"required_stats":
+		{
+			"willpower": 3
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "fire damage",
+		"categories":
+		{
+			"fire": true,
+			"harmful": true,
+			"melee": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"self spell": true,
+			"touch spell": true
+		},
+		"description": "Inflict fire damage",
+		"effect": "explosion2",
+		"effect_fire": "fireball1",
+		"icon": "modifier-fireball",
+		"projectile": "fireball1",
+		"spell_strength": 5,
+		"required_stats":
+		{
+			"willpower": 1
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "fire elemental",
+		"categories":
+		{
+			"spell": true,
+			"summon": true
+		},
+		"actions":
+		{
+			"self spell": true
+		},
+		"description": "Conjure a fire elemental",
+		"effect": "spell1",
+		"icon": "firewall",
+		"spell_strength": 60,
+		"required_stats":
+		{
+			"willpower": 10
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "firewall",
+		"categories":
+		{
+			"fire": true,
+			"harmful": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true
+		},
+		"description": "Conjure a wall of fire",
+		"effect": "firewall1",
+		"effect_fire": "fireball1",
+		"icon": "firewall",
+		"projectile": "fireball1",
+		"spell_strength": 5,
+		"required_stats":
+		{
+			"willpower": 1
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "follow",
+		"categories":
+		{
+			"follow": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"touch spell": true
+		},
+		"description": "Forces the target to follow you",
+		"effect": "light1",
+		"icon": "modifier-light",
+		"projectile": "magicmissile1",
+		"spell_strength": 30,
+		"required_stats":
+		{
+			"willpower": 5
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "home",
+		"categories":
+		{
+			"follow": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"self spell": true
+		},
+		"description": "Creates a home location where you can respawn from",
+		"effect": "light1",
+		"icon": "sanctuary1",
+		"spell_strength": 1,
+		"required_stats":
+		{
+			"willpower": 1
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "light",
+		"categories":
+		{
+			"beneficial": true,
+			"light": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"self spell": true
+		},
+		"description": "Illuminate your surroundings",
+		"effect": "light1",
+		"icon": "modifier-light",
+		"spell_strength": 60,
+		"required_stats":
+		{
+			"willpower": 5
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "mindless march",
+		"categories":
+		{
+			"harmful": true,
+			"push": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"touch spell": true
+		},
+		"description": "Forces the target to march forward",
+		"effect": "light1",
+		"icon": "modifier-light",
+		"projectile": "magicmissile1",
+		"spell_strength": 30,
+		"required_stats":
+		{
+			"willpower": 5
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "physical damage",
+		"categories":
+		{
+			"harmful": true,
+			"melee": true,
+			"physical": true
+		},
+		"actions":
+		{
+			"bite": true,
+			"explode": true,
+			"left claw": true,
+			"melee": true,
+			"ranged": true,
+			"right claw": true,
+			"tackle": true
+		},
+		"effect": "impact1",
+		"icon": "missing1",
+		"modifiers":
+		{
+			"physical damage": 1
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "poison",
+		"categories":
+		{
+			"harmful": true,
+			"plague": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true
+		},
+		"description": "The target takes poison damage over time",
+		"effect": "spell1",
+		"icon": "modifier-black haze",
+		"projectile": "fireball1",
+		"spell_strength": 10,
+		"required_stats":
+		{
+			"willpower": 10
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "regeneration",
+		"categories":
+		{
+			"beneficial": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"self spell": true,
+			"touch spell": true
+		},
+		"description": "Regenerate health every second",
+		"effect": "berserk1",
+		"icon": "modifier-heal",
+		"spell_strength": 60,
+		"required_stats":
+		{
+			"willpower": 15
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "respawn",
+		"modifiers":
+		{
+			"respawn": 1
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "restore health",
+		"categories":
+		{
+			"beneficial": true,
+			"heal": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"self spell": true,
+			"touch spell": true
+		},
+		"description": "Restore health",
+		"effect": "heal1",
+		"icon": "modifier-heal",
+		"spell_strength": 15,
+		"required_stats":
+		{
+			"willpower": 5
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "restore willpower",
+		"categories":
+		{
+			"beneficial": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"self spell": true,
+			"touch spell": true
+		},
+		"description": "Restore health",
+		"effect": "heal1",
+		"icon": "modifier-heal",
+		"spell_strength": 15,
+		"required_stats":
+		{
+			"willpower": 5
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "resurrect",
+		"categories":
+		{
+			"beneficial": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"touch spell": true
+		},
+		"description": "Resurrect the targeted creature",
+		"effect": "heal1",
+		"icon": "modifier-heal",
+		"spell_strength": 1,
+		"required_stats":
+		{
+			"willpower": 20
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "sanctuary",
+		"actions":
+		{
+			"self spell": true,
+			"touch spell": true
+		},
+		"categories":
+		{
+			"beneficial": true,
+			"spell": true
+		},
+		"description": "Protect from death",
+		"effect": "sanctuary1",
+		"icon": "sanctuary1",
+		"spell_strength": 30,
+		"required_stats":
+		{
+			"willpower": 20
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "travel",
+		"actions":
+		{
+			"self spell": true
+		},
+		"categories":
+		{
+			"spell": true
+		},
+		"description": "Fast travel to Lips",
+		"effect": "sanctuary1",
+		"icon": "sanctuary1",
+		"spell_strength": 30,
+		"required_stats":
+		{
+			"willpower": 10
+		}
+	},
+	{
+		"type": "ModifierSpec",
+		"name": "wilderness",
+		"actions":
+		{
+			"self spell": true
+		},
+		"categories":
+		{
+			"spell": true
+		},
+		"description": "Grow plants from soil",
+		"effect": "wilderness1",
+		"icon": "modifier-nature",
+		"spell_strength": 5,
+		"required_stats":
+		{
+			"willpower": 5
+		}
+	}
+]

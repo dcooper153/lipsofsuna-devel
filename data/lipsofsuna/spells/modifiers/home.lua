@@ -1,24 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local HomeModifier = ModifierSpec{
-	name = "home",
-	categories =
-	{
-		["follow"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["self spell"] = true
-	},
-	description = "Creates a home location where you can respawn from",
-	effect = "light1",
-	icon = "sanctuary1",
-	spell_strength = 1,
-	required_stats =
-	{
-		["willpower"] = 1
-	}}
+local HomeModifier = ModifierSpec:find_by_name("home")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

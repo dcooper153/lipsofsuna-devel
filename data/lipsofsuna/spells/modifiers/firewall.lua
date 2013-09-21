@@ -2,29 +2,7 @@ local AreaSpell = require("core/objects/areaspell")
 local Feat = FIXME
 local ModifierSpec = require("core/specs/modifier")
 
-local FirewallModifier = ModifierSpec{
-	name = "firewall",
-	categories =
-	{
-		["fire"] = true,
-		["harmful"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true
-	},
-	description = "Conjure a wall of fire",
-	effect = "firewall1",
-	effect_fire = "fireball1",
-	icon = "firewall",
-	projectile = "fireball1", -- FIXME
-	spell_strength = 5,
-	required_stats =
-	{
-		["willpower"] = 1
-	}}
+local FirewallModifier = ModifierSpec:find_by_name("firewall")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

@@ -1,25 +1,7 @@
 local Actor = require("core/objects/actor")
 local ModifierSpec = require("core/specs/modifier")
 
-local FireElementalModifier = ModifierSpec{
-	name = "fire elemental",
-	categories =
-	{
-		["spell"] = true,
-		["summon"] = true
-	},
-	actions =
-	{
-		["self spell"] = true
-	},
-	description = "Conjure a fire elemental",
-	effect = "spell1", --FIXME
-	icon = "firewall", --FIXME
-	spell_strength = 60,
-	required_stats =
-	{
-		["willpower"] = 10
-	}}
+local FireElementalModifier = ModifierSpec:find_by_name("fire elemental")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

@@ -1,29 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 
 -- Increase berserk duration.
-local BerserkModifier = ModifierSpec{
-	name = "berserk",
-	categories =
-	{
-		["beneficial"] = true,
-		["berserk"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true,
-		["self spell"] = true,
-		["touch spell"] = true
-	},
-	description = "Inflict additional damage when in low health",
-	effect = "berserk1",
-	icon = "modifier-berserk",
-	spell_strength = 60,
-	required_stats =
-	{
-		["willpower"] = 5
-	}}
+local BerserkModifier = ModifierSpec:find_by_name("berserk")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

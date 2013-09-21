@@ -3,28 +3,7 @@ local Modifier = require("core/server/modifier")
 local ModifierSpec = require("core/specs/modifier")
 
 -- Summon plagued beasts.
-local BlackHazeModifier = ModifierSpec{
-	name = "black haze",
-	categories =
-	{
-		["harmful"] = true,
-		["plague"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true
-	},
-	description = "Conjure infectious plagued monsters",
-	effect = "spell1",
-	icon = "modifier-black haze",
-	projectile = "fireball1",
-	spell_strength = 1,
-	required_stats =
-	{
-		["willpower"] = 20
-	}}
+local BlackHazeModifier = ModifierSpec:find_by_name("black haze")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

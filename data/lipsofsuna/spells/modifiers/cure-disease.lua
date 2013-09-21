@@ -1,28 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local CureDiseaseModifier = ModifierSpec{
-	name = "cure disease",
-	categories =
-	{
-		["beneficial"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true,
-		["self spell"] = true,
-		["touch spell"] = true
-	},
-	description = "Cure the target of poison and diseases",
-	effect = "spell1",
-	icon = "modifier-heal", --FIXME
-	projectile = "fireball1",
-	spell_strength = 1,
-	required_stats =
-	{
-		["willpower"] = 10
-	}}
+local CureDiseaseModifier = ModifierSpec:find_by_name("cure disease")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

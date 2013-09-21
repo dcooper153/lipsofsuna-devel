@@ -1,31 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 
 -- Decrease health.
-local ColdDamageModifier = ModifierSpec{
-	name = "cold damage",
-	categories =
-	{
-		["cold"] = true,
-		["harmful"] = true,
-		["melee"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true,
-		["self spell"] = true,
-		["touch spell"] = true
-	},
-	description = "Inflict cold damage",
-	effect = "explosion1", -- FIXME
-	icon = "modifier-ice",
-	projectile = "fireball1", -- FIXME
-	spell_strength = 5,
-	required_stats =
-	{
-		["willpower"] = 1
-	}}
+local ColdDamageModifier = ModifierSpec:find_by_name("cold damage")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

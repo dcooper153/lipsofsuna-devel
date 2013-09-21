@@ -1,0 +1,39 @@
+[
+	{
+		"type": "Actorspec",
+		"name": "fire elemental",
+		"categories":
+		{
+			"enemy": true
+		},
+		"ai_combat_actions":
+		{
+			"move forward": true,
+			"ranged spell": true,
+			"touch spell": true
+		},
+		"animations":
+		{
+			"default": "lizardman"
+		},
+		"difficulty": 0.5,
+		"effects":
+		{
+			"default": "default"
+		},
+		"actions":
+		{
+			"right": "ranged spell",
+			"left": "touch spell"
+		},
+		"mass": 100,
+		"model": "lizardman2",
+		"reagentless_spells": true,
+		"skills":
+		{
+			"Health lv2": true,
+			"Willpower lv4": true
+		},
+		"speed_walk": 10
+	}
+]

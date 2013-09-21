@@ -1,26 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local ResurrectModifier = ModifierSpec{
-	name = "resurrect",
-	categories =
-	{
-		["beneficial"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true,
-		["touch spell"] = true
-	},
-	description = "Resurrect the targeted creature",
-	effect = "heal1",
-	icon = "modifier-heal",
-	spell_strength = 1,
-	required_stats =
-	{
-		["willpower"] = 20
-	}}
+local ResurrectModifier = ModifierSpec:find_by_name("resurrect")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

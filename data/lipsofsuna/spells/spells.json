@@ -1,0 +1,25 @@
+[
+	{
+		"type": "Spellspec",
+		"name": "fireball1",
+		"model": "fireball1",
+		"particle": "fireball1"
+	},
+	{
+		"type": "Spellspec",
+		"name": "firebreath1",
+		"particle": "firebreath1"
+	},
+	{
+		"type": "Spellspec",
+		"name": "firewall1",
+		"model": "firewall1",
+		"particle": "firewall1"
+	},
+	{
+		"type": "Spellspec",
+		"name": "magicmissile1",
+		"model": "fireball1",
+		"particle": "fireball1"
+	}
+]

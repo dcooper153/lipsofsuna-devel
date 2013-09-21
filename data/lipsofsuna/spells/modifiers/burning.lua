@@ -1,27 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local BurningModifier = ModifierSpec{
-	name = "burning",
-	categories =
-	{
-		["harmful"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true,
-		["self spell"] = true,
-		["touch spell"] = true
-	},
-	description = "Inflict damage over time by putting the target on fire",
-	effect = "berserk1",
-	icon = "firewall", -- FIXME
-	spell_strength = 10,
-	required_stats =
-	{
-		["willpower"] = 5
-	}}
+local BurningModifier = ModifierSpec:find_by_name("burning")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

@@ -1,32 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 
 -- Decrease health.
-local FireDamageModifier = ModifierSpec{
-	name = "fire damage",
-	categories =
-	{
-		["fire"] = true,
-		["harmful"] = true,
-		["melee"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true,
-		["self spell"] = true,
-		["touch spell"] = true
-	},
-	description = "Inflict fire damage",
-	effect = "explosion2",
-	effect_fire = "fireball1",
-	icon = "modifier-fireball",
-	projectile = "fireball1",
-	spell_strength = 5,
-	required_stats =
-	{
-		["willpower"] = 1
-	}}
+local FireDamageModifier = ModifierSpec:find_by_name("fire damage")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

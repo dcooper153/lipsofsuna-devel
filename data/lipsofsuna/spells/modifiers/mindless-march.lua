@@ -1,28 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local MindlessMarchModifier = ModifierSpec{
-	name = "mindless march",
-	categories =
-	{
-		["harmful"] = true,
-		["push"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true,
-		["touch spell"] = true
-	},
-	description = "Forces the target to march forward",
-	effect = "light1",
-	icon = "modifier-light",
-	projectile = "magicmissile1",
-	spell_strength = 30,
-	required_stats =
-	{
-		["willpower"] = 5
-	}}
+local MindlessMarchModifier = ModifierSpec:find_by_name("mindless march")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

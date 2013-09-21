@@ -83,7 +83,6 @@
 	["load", "sounds"],
 	["load", "spells"],
 	["load", "spells/effects"],
-	["load", "unused"],
 
 	["# Global events"],
 	["load", "events"],

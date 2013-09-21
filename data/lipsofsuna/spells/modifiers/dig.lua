@@ -1,27 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 
 -- Dig terrain.
-local DigModifier = ModifierSpec{
-	name = "dig",
-	categories =
-	{
-		["dig"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true
-	},
-	description = "Fire a digging ray",
-	effect = "spell1",
-	icon = "modifier-earthmove",
-	projectile = "fireball1", -- FIXME
-	spell_strength = 1,
-	required_stats =
-	{
-		["willpower"] = 3
-	}}
+local DigModifier = ModifierSpec:find_by_name("dig")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

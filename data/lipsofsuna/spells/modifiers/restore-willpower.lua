@@ -1,25 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local RestoreWillpowerModifier = ModifierSpec{
-	name = "restore willpower",
-	categories =
-	{
-		["beneficial"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["self spell"] = true,
-		["touch spell"] = true
-	},
-	description = "Restore health",
-	effect = "heal1",
-	icon = "modifier-heal", --FIXME
-	spell_strength = 15,
-	required_stats =
-	{
-		["willpower"] = 5
-	}}
+local RestoreWillpowerModifier = ModifierSpec:find_by_name("restore willpower")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

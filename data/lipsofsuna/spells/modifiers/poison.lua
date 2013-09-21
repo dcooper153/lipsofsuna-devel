@@ -1,27 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local PoisonModifier = ModifierSpec{
-	name = "poison",
-	categories =
-	{
-		["harmful"] = true,
-		["plague"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true
-	},
-	description = "The target takes poison damage over time",
-	effect = "spell1",
-	icon = "modifier-black haze", --FIXME
-	projectile = "fireball1",
-	spell_strength = 10,
-	required_stats =
-	{
-		["willpower"] = 10
-	}}
+local PoisonModifier = ModifierSpec:find_by_name("poison")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

@@ -1,24 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 
 -- Teleport to Lips.
-local TravelModifier = ModifierSpec{
-	name = "travel",
-	actions =
-	{
-		["self spell"] = true
-	},
-	categories =
-	{
-		["spell"] = true
-	},
-	description = "Fast travel to Lips",
-	effect = "sanctuary1", -- FIXME
-	icon = "sanctuary1", -- FIXME
-	spell_strength = 30,
-	required_stats =
-	{
-		["willpower"] = 10
-	}}
+local TravelModifier = ModifierSpec:find_by_name("travel")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

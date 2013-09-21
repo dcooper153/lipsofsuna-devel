@@ -1,26 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 
 -- Increase light duration.
-local LightModifier = ModifierSpec{
-	name = "light",
-	categories =
-	{
-		["beneficial"] = true,
-		["light"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["self spell"] = true
-	},
-	description = "Illuminate your surroundings",
-	effect = "light1",
-	icon = "modifier-light",
-	spell_strength = 60,
-	required_stats =
-	{
-		["willpower"] = 5
-	}}
+local LightModifier = ModifierSpec:find_by_name("light")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

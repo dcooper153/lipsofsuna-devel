@@ -1,28 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local BlessModifier = ModifierSpec{
-	name = "bless",
-	categories =
-	{
-		["beneficial"] = true,
-		["spell"] = true
-	},
-	actions =
-	{
-		["missile spell"] = true,
-		["ranged spell"] = true,
-		["self spell"] = true,
-		["touch spell"] = true
-	},
-	description = "Boost the maximum health and willpower of the target",
-	effect = "spell1",
-	icon = "modifier-heal", --FIXME
-	projectile = "fireball1",
-	spell_strength = 60,
-	required_stats =
-	{
-		["willpower"] = 10
-	}}
+local BlessModifier = ModifierSpec:find_by_name("bless")
 
 --- Gets the attribute modifications of the modifier.
 -- @param modifier Modifier.

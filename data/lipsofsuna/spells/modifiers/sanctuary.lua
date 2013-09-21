@@ -1,26 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 
 -- Increase sanctuary duration.
-local SanctuaryModifier = ModifierSpec{
-	name = "sanctuary",
-	actions =
-	{
-		["self spell"] = true,
-		["touch spell"] = true
-	},
-	categories =
-	{
-		["beneficial"] = true,
-		["spell"] = true
-	},
-	description = "Protect from death",
-	effect = "sanctuary1",
-	icon = "sanctuary1",
-	spell_strength = 30,
-	required_stats =
-	{
-		["willpower"] = 20
-	}}
+local SanctuaryModifier = ModifierSpec:find_by_name("sanctuary")
 
 --- Applies the modifier.
 -- @param modifier Modifier.
