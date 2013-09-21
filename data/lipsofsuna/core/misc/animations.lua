@@ -280,6 +280,8 @@ AnimationSpec{
 	name = "feminine idle",
 	animation = "aer1-idle2",
 	channel = 1,
+	priority = 1,
+	weight_scale = 1,
 	permanent = true}
 
 AnimationSpec{
