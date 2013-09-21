@@ -22,8 +22,9 @@ class LIHierarchy:
 		self.armature = None
 		for node in self.nodelist:
 			if node.object and node.object.type == 'ARMATURE':
-				self.armature = node.object
-				break
+				if LIUtils.object_check_export(node.object, self.file, 'NODE'):
+					self.armature = node.object
+					break
 		# Build animations.
 		self.trackdict = {}
 		self.animlist = []
@@ -62,7 +63,9 @@ class LIHierarchy:
 	def rest_pose(self):
 		active = bpy.context.scene.objects.active
 		for obj in bpy.data.objects:
-			if obj.type == 'ARMATURE' and not obj.library:
+			if not LIUtils.object_check_export(obj, self.file, 'NODE'):
+				continue
+			if obj.type == 'ARMATURE':
 				bpy.context.scene.objects.active = obj
 				bpy.ops.object.mode_set(mode='POSE', toggle=False)
 				bpy.ops.pose.select_all(action='SELECT')

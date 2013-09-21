@@ -110,7 +110,10 @@ class LIMeshCleaner:
 				bpy.ops.mesh.quads_convert_to_tris()
 				bpy.ops.object.editmode_toggle()
 				# Tidy vertex weights.
-				bpy.ops.object.vertex_group_clean(all_groups=True)
+				try:
+					bpy.ops.object.vertex_group_clean(group_select_mode='ALL')
+				except:
+					bpy.ops.object.vertex_group_clean(all_groups=True)
 				obj.select = False
 			self.state += 1
 			return False

@@ -35,6 +35,9 @@ class LIUtils:
 				return []
 		except:
 			pass
+		# Don't export children of links or proxies.
+		if object.parent_bone and (not object.parent or not object.parent.pose):
+			return []
 		# Otherwise get the list from the file property.
 		files = getprop(object, 'file').split(',')
 		if getprop(object, 'lod') == 'true':
@@ -57,6 +60,9 @@ class LIUtils:
 				return False
 		except:
 			pass
+		# Don't export children of links or proxies.
+		if object.parent_bone and (not object.parent or not object.parent.pose):
+			return False
 		# Make sure that the filename matches.
 		files = cls.get_files_for_object(object)
 		if not files:
