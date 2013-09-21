@@ -393,7 +393,6 @@ def process(d):
 	a.parse_disk_mods()
 	a.print_errors()
 
-	# Find all specs.
 	specs = sorted([(k,v) for k,v in a.specs.items()])
 	print("Non-existing assets referenced by specs:")
 	for path,spec in specs:
@@ -406,9 +405,17 @@ def process(d):
 			texture_file1 = texture + '.dds'
 			if texture_file not in a.disk_data_names and texture_file1 not in a.disk_data_names:
 				print(" %s (%s)" % (texture_file, path))
+	print("")
 
-	# Check for unused assets.
-	# TODO
+	models = sorted([(k,v) for k,v in a.models.items()])
+	print("Non-existing assets referenced by models:")
+	for path,model in models:
+		for texture in model.textures:
+			texture_file = texture + '.png'
+			texture_file1 = texture + '.dds'
+			if texture_file not in a.disk_data_names and texture_file1 not in a.disk_data_names:
+				print(" %s (%s)" % (texture_file, path))
+	print("")
 
 with open("ASSETS.json", "r") as f:
 	data = json.load(f)
