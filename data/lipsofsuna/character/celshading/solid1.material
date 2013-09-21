@@ -3,7 +3,10 @@ import * from "celshading.template"
 pass solid1/lighting : celshading/pass
 {
 	ambient 0.7 0.7 0.7
-	shadow_caster_vertex_program_ref shadow_vert
+	vertex_program_ref solid1/vert
+	{
+	}
+	fragment_program_ref solid1/frag
 	{
 	}
 }

@@ -38,9 +38,7 @@ material glass1
 	technique
 	{
 		scheme srt_depth
-		pass dummy
-		{
-		}
+		shadow_caster_material shadowcaster1
 	}
 	technique
 	{
