@@ -1,5 +1,13 @@
 [
 	{
+		"type": "EffectProfileSpec",
+		"name": "turret",
+		"effects":
+		{
+			"damage": "metal impact 1"
+		}
+	},
+	{
 		"type": "Actorspec",
 		"name": "security robot",
 		"model": "barrel1",
@@ -7,6 +15,10 @@
 		"animations":
 		{
 			"default": "default"
+		},
+		"effects":
+		{
+			"default": "turret"
 		},
 		"equipment_slots":
 		{
@@ -71,6 +83,10 @@
 		"categories":
 		{
 			"enemy": true
+		},
+		"effects":
+		{
+			"default": "turret"
 		},
 		"factions":
 		{

@@ -15,6 +15,10 @@
 		"icon": "staff1",
 		"modifiers": {"physical damage": 10},
 		"modifiers_bonus": ["melee"],
+		"effects":
+		{
+			"default": "metal item"
+		},
 		"equipment_slot": "hand.R",
 		"mass": 15,
 		"model": "spear1"

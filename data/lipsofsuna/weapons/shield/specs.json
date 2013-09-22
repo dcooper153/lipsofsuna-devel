@@ -21,6 +21,10 @@
 		"animations_equipped": {"default": "default shield equipped"},
 		"armor_class": 0.08,
 		"categories": {"shield": true},
+		"effects":
+		{
+			"default": "wooden item"
+		},
 		"equipment_slot": "hand.L",
 		"icon": "woodshield1",
 		"mass": 24,
@@ -40,6 +44,10 @@
 		"animations_equipped": {"default": "default shield equipped"},
 		"armor_class": 0.08,
 		"categories": {"shield": true},
+		"effects":
+		{
+			"default": "wooden item"
+		},
 		"equipment_slot": "hand.L",
 		"icon": "woodshield2",
 		"mass": 7,

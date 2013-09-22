@@ -7,5 +7,13 @@
 		"light_equation": [1,1,1],
 		"node": "#flame",
 		"particle": "torchfx1"
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "imp",
+		"effects":
+		{
+			"damage": "stone impact 1"
+		}
 	}
 ]

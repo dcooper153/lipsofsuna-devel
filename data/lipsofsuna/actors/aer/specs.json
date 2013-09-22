@@ -72,7 +72,7 @@
 		"effects":
 		{
 			"falling damage": "aerhurt1",
-			"damage": "fleshimpact1"
+			"damage": "flesh impact 1"
 		}
 	},
 	{
@@ -81,7 +81,7 @@
 		"effects":
 		{
 			"attack bite": "swing1",
-			"damage": "fleshimpact1"
+			"damage": "flesh impact 1"
 		}
 	}
 ]

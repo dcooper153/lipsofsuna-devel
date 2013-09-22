@@ -12,6 +12,10 @@
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
 		"damage_mining": 1,
+		"effects":
+		{
+			"default": "wooden item"
+		},
 		"equipment_slot": "hand.R",
 		"health": 100,
 		"icon": "mace1",

@@ -24,6 +24,10 @@
 		"type": "Itemspec",
 		"name": "arena chest",
 		"model": "chest1",
+		"effects":
+		{
+			"default": "wooden item"
+		},
 		"inventory_size": 10,
 		"inventory_type": "chest",
 		"inventory_items":

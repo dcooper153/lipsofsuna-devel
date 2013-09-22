@@ -9,6 +9,16 @@
 		"name": "crossbow",
 		"effects":
 		{
+			"damage": "metal impact 1",
+			"ranged attack": "crossbow1"
+		}
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "wooden crossbow",
+		"effects":
+		{
+			"damage": "wood impact 1",
 			"ranged attack": "crossbow1"
 		}
 	},
@@ -136,7 +146,7 @@
 		"animations_equipped": {"default": "default crossbow equipped"},
 		"effects":
 		{
-			"default": "crossbow"
+			"default": "wooden crossbow"
 		},
 		"icon": "crossbow1",
 		"modifiers": {"physical damage": 2},

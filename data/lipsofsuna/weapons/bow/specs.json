@@ -26,6 +26,15 @@
 		"light_equation": [1,0.1,0.01]
 	},
 	{
+		"type": "EffectProfileSpec",
+		"name": "bow",
+		"effects":
+		{
+			"damage": "wood impact 1",
+			"ranged attack": "crossbow1"
+		}
+	},
+	{
 		"type": "CraftingRecipeSpec",
 		"name": "arrow",
 		"count": 10,
@@ -100,6 +109,10 @@
 		"actions": {"right": "ranged", "left": "cancel ranged"},
 		"ammo_type": "arrow",
 		"animations_equipped": {"default": "default bow equipped"},
+		"effects":
+		{
+			"default": "bow"
+		},
 		"equipment_anchor_rotation": [0.0102222, -0.388443, 0.051111, 0.919997],
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved": {"hand.L": true},
@@ -124,6 +137,10 @@
 		"actions": {"right": "ranged", "left": "cancel ranged"},
 		"ammo_type": "fire arrow",
 		"animations_equipped": {"default": "default bow equipped"},
+		"effects":
+		{
+			"default": "bow"
+		},
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved": {"hand.L": true},
 		"icon": "bow2",
@@ -147,6 +164,10 @@
 		"actions": {"right": "ranged", "left": "cancel ranged"},
 		"ammo_type": "explosive arrow",
 		"animations_equipped": {"default": "default bow equipped"},
+		"effects":
+		{
+			"default": "bow"
+		},
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved": {"hand.L": true},
 		"icon": "bow2",

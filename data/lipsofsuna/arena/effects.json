@@ -9,13 +9,6 @@
 	},
 	{
 		"type": "Effectspec",
-		"name": "fleshimpact1",
-		"particle": "impact1",
-		"particle_life": 5,
-		"sound": "thud-000"
-	},
-	{
-		"type": "Effectspec",
 		"name": "growl1",
 		"sound": "growl-000",
 		"sound_pitch_min": 0.9,
@@ -32,6 +25,51 @@
 	},
 	{
 		"type": "Effectspec",
+		"name": "flesh impact 1",
+		"particle": "impact1",
+		"particle_life": 5,
+		"sound": "impact-meat1",
+		"sound_pitch_min": 0.9,
+		"sound_pitch_max": 1.1
+	},
+	{
+		"type": "Effectspec",
+		"name": "flesh impact 2",
+		"particle": "impact1",
+		"particle_life": 5,
+		"sound": "impact-meat2",
+		"sound_pitch_min": 0.9,
+		"sound_pitch_max": 1.1
+	},
+	{
+		"type": "Effectspec",
+		"name": "metal impact 1",
+		"particle": "impact1",
+		"particle_life": 5,
+		"sound": "impact-metal1",
+		"sound_pitch_min": 0.9,
+		"sound_pitch_max": 1.1
+	},
+	{
+		"type": "Effectspec",
+		"name": "stone impact 1",
+		"particle": "impact1",
+		"particle_life": 5,
+		"sound": "impact-stone1",
+		"sound_pitch_min": 0.9,
+		"sound_pitch_max": 1.1
+	},
+	{
+		"type": "Effectspec",
+		"name": "wood impact 1",
+		"particle": "impact1",
+		"particle_life": 5,
+		"sound": "impact-wood1",
+		"sound_pitch_min": 0.9,
+		"sound_pitch_max": 1.1
+	},
+	{
+		"type": "Effectspec",
 		"name": "swing1",
 		"sound": "swing-000"
 	},
@@ -39,5 +77,29 @@
 		"type": "Effectspec",
 		"name": "wield1",
 		"sound": "wield-000"
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "wooden item",
+		"effects":
+		{
+			"damage": "wood impact 1"
+		}
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "metal item",
+		"effects":
+		{
+			"damage": "metal impact 1"
+		}
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "stone item",
+		"effects":
+		{
+			"damage": "stone impact 1"
+		}
 	}
 ]

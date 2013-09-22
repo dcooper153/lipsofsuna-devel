@@ -17,6 +17,10 @@
 		"categories": {"hatchet": true, "melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
 		"animations_equipped": {"default": "default axe equipped"},
+		"effects":
+		{
+			"default": "metal item"
+		},
 		"equipment_slot": "hand.R",
 		"icon": "axe3",
 		"modifiers": {"hatchet": 10, "physical damage": 10},
@@ -38,6 +42,10 @@
 		"actions": {"right": "attack", "left": "block weapon"},
 		"animations_equipped": {"default": "default axe equipped"},
 		"damage_mining": 1,
+		"effects":
+		{
+			"default": "metal item"
+		},
 		"equipment_slot": "hand.R",
 		"icon": "axe2",
 		"modifiers": {"cold damage": 4, "hatchet": 7, "physical damage": 4},
@@ -60,6 +68,10 @@
 		"actions": {"right": "attack", "left": "block weapon"},
 		"animations_equipped": {"default": "default axe equipped"},
 		"damage_mining": 1,
+		"effects":
+		{
+			"default": "metal item"
+		},
 		"equipment_slot": "hand.R",
 		"health": 500,
 		"icon": "axe2",
@@ -82,6 +94,10 @@
 		"actions": {"right": "attack", "left": "block weapon"},
 		"animations_equipped": {"default": "default axe equipped"},
 		"damage_mining": 1,
+		"effects":
+		{
+			"default": "metal item"
+		},
 		"equipment_slot": "hand.R",
 		"health": 220,
 		"icon": "axe2",
@@ -104,6 +120,10 @@
 		"actions": {"right": "attack", "left": "block weapon"},
 		"animations_equipped": {"default": "default axe equipped"},
 		"damage_mining": 1,
+		"effects":
+		{
+			"default": "stone item"
+		},
 		"equipment_slot": "hand.R",
 		"health": 130,
 		"icon": "axe1",
@@ -127,6 +147,10 @@
 		"animations_equipped": {"default": "default axe equipped"},
 		"damage_mining": 1,
 		"effect_attack_speedline": true,
+		"effects":
+		{
+			"default": "wooden item"
+		},
 		"equipment_slot": "hand.R",
 		"health": 100,
 		"icon": "axe1",

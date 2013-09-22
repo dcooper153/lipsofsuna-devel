@@ -13,6 +13,10 @@
 		"actions": {"right": "attack", "left": "block weapon"},
 		"animations_equipped": {"default": "default two-handed equipped"},
 		"effect_attack_speedline": true,
+		"effects":
+		{
+			"default": "metal item"
+		},
 		"equipment_slot": "hand.R",
 		"icon": "sword3",
 		"modifiers": {"physical damage": 20},
@@ -35,6 +39,10 @@
 		"animations_equipped": {"default": "default sword equipped"},
 		"damage_mining": 1,
 		"effect_attack_speedline": true,
+		"effects":
+		{
+			"default": "metal item"
+		},
 		"equipment_slot": "hand.R",
 		"health": 500,
 		"icon": "sword2",
@@ -58,6 +66,10 @@
 		"animations_equipped": {"default": "default sword equipped"},
 		"damage_mining": 1,
 		"effect_attack_speedline": true,
+		"effects":
+		{
+			"default": "metal item"
+		},
 		"equipment_slot": "hand.R",
 		"health": 500,
 		"icon": "sword2",
@@ -81,6 +93,10 @@
 		"animations_equipped": {"default": "default sword equipped"},
 		"damage_mining": 1,
 		"effect_attack_speedline": true,
+		"effects":
+		{
+			"default": "metal item"
+		},
 		"equipment_slot": "hand.R",
 		"health": 220,
 		"icon": "sword2",
@@ -104,6 +120,10 @@
 		"animations_equipped": {"default": "default sword equipped"},
 		"damage_mining": 1,
 		"effect_attack_speedline": true,
+		"effects":
+		{
+			"default": "stone item"
+		},
 		"equipment_slot": "hand.R",
 		"health": 130,
 		"icon": "sword1",
@@ -127,6 +147,10 @@
 		"animations_equipped": {"default": "default sword equipped"},
 		"damage_mining": 1,
 		"effect_attack_speedline": true,
+		"effects":
+		{
+			"default": "wooden item"
+		},
 		"equipment_slot": "hand.R",
 		"health": 100,
 		"icon": "sword1",

@@ -25,6 +25,10 @@
 			"right": "bite",
 			"left": "tackle"
 		},
+		"effects":
+		{
+			"default": "imp"
+		},
 		"equipment_slots":
 		{
 			"hand.R": "#hand.R",
@@ -77,6 +81,10 @@
 		{
 			"right": "bite",
 			"left": "explode"
+		},
+		"effects":
+		{
+			"default": "imp"
 		},
 		"jump_force": 4,
 		"model": "stoneimp2",

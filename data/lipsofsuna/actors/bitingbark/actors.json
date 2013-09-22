@@ -1,5 +1,14 @@
 [
 	{
+		"type": "EffectProfileSpec",
+		"name": "bitingbark",
+		"effects":
+		{
+			"attack bite": "swing1",
+			"damage": "wood impact 1"
+		}
+	},
+	{
 		"type": "Actorspec",
 		"name": "bitingbark",
 		"ai_enable_strafe": false,
@@ -18,7 +27,7 @@
 		"difficulty": 0.3,
 		"effects":
 		{
-			"default": "default"
+			"default": "bitingbark"
 		},
 		"factions":
 		{

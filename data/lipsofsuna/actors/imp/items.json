@@ -11,6 +11,10 @@
 		{
 			"default": "default stone equipped"
 		},
+		"effects":
+		{
+			"default": "stone item"
+		},
 		"equipment_slot": "hand.R",
 		"icon": "stone1",
 		"modifiers":
@@ -39,6 +43,10 @@
 			"explode"
 		],
 		"destroy_timer": 5,
+		"effects":
+		{
+			"default": "stone item"
+		},
 		"equipment_slot": "hand.R",
 		"health": 1,
 		"icon": "stone2",

@@ -36,7 +36,14 @@
 		"type": "Itemspec",
 		"name": "chest",
 		"categories": {"container": true, "generate": true},
-		"animations": {"default": "chest"},
+		"animations":
+		{
+			"default": "chest"
+		},
+		"effects":
+		{
+			"default": "wooden item"
+		},
 		"model": "chest1",
 		"icon": "chest1",
 		"mass": 30,
@@ -53,7 +60,14 @@
 		"type": "Itemspec",
 		"name": "treasure chest",
 		"categories": {"container": true},
-		"animations": {"default": "chest"},
+		"animations":
+		{
+			"default": "chest"
+		},
+		"effects":
+		{
+			"default": "wooden item"
+		},
 		"icon": "chest1",
 		"mass": 30,
 		"model": "chest1",
