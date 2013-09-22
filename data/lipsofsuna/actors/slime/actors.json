@@ -1,5 +1,14 @@
 [
 	{
+		"type": "EffectProfileSpec",
+		"name": "slime",
+		"effects":
+		{
+			"damage death": "slime impact 2",
+			"physical damage": "slime impact 1"
+		}
+	},
+	{
 		"type": "Actorspec",
 		"name": "slime",
 		"categories":
@@ -21,20 +30,24 @@
 			"combat": true,
 			"idle": true
 		},
+		"actions":
+		{
+			"right": "tackle"
+		},
 		"animations":
 		{
 			"default": "slime"
 		},
 		"difficulty": 0,
+		"effects":
+		{
+			"default": "slime"
+		},
 		"factions":
 		{
 			"evil": true
 		},
 		"falling_damage_rate": 0,
-		"actions":
-		{
-			"right": "tackle"
-		},
 		"inventory_size": 0,
 		"jump_force": 7,
 		"model": "slime2",
@@ -70,20 +83,24 @@
 			"combat": true,
 			"idle": true
 		},
+		"actions":
+		{
+			"right": "tackle"
+		},
 		"animations":
 		{
 			"default": "slime"
 		},
 		"difficulty": 0.7,
+		"effects":
+		{
+			"default": "slime"
+		},
 		"factions":
 		{
 			"evil": true
 		},
 		"falling_damage_rate": 0,
-		"actions":
-		{
-			"right": "tackle"
-		},
 		"inventory_size": 0,
 		"jump_force": 7,
 		"model": "slime2",

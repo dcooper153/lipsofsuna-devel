@@ -1484,8 +1484,8 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/arena/impact-meat1.flac",
-				"data/lipsofsuna/arena/impact-meat2.flac",
+				"data/lipsofsuna/arena/impact-slime1.flac",
+				"data/lipsofsuna/arena/impact-slime2.flac",
 				"data/lipsofsuna/arena/impact-metal1.flac",
 				"data/lipsofsuna/arena/impact-stone1.flac",
 				"data/lipsofsuna/arena/impact-wood1.flac"
@@ -1499,6 +1499,21 @@
 				"CC0"
 			],
 			"source": "http://opengameart.org/content/impact"
+		},
+		{
+			"files":
+			[
+				"data/lipsofsuna/arena/impact-flesh1.flac"
+			],
+			"authors":
+			[
+				"qubodup"
+			],
+			"licenses":
+			[
+				"CC0"
+			],
+			"source": "http://opengameart.org/content/punch"
 		},
 		{
 			"files":

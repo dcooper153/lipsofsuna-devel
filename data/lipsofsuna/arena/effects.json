@@ -28,16 +28,25 @@
 		"name": "flesh impact 1",
 		"particle": "impact1",
 		"particle_life": 5,
-		"sound": "impact-meat1",
+		"sound": "impact-flesh1",
 		"sound_pitch_min": 0.9,
 		"sound_pitch_max": 1.1
 	},
 	{
 		"type": "Effectspec",
-		"name": "flesh impact 2",
+		"name": "slime impact 1",
 		"particle": "impact1",
 		"particle_life": 5,
-		"sound": "impact-meat2",
+		"sound": "impact-slime1",
+		"sound_pitch_min": 0.9,
+		"sound_pitch_max": 1.1
+	},
+	{
+		"type": "Effectspec",
+		"name": "slime impact 2",
+		"particle": "impact1",
+		"particle_life": 5,
+		"sound": "impact-slime2",
 		"sound_pitch_min": 0.9,
 		"sound_pitch_max": 1.1
 	},
