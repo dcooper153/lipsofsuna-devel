@@ -94,15 +94,38 @@
 		{
 			"aer":
 			{
-				"upper_safe": "",
+				"shirt": "aerupperclothed1",
 				"upper1": "aerupperplate1"
 			}
 		},
-		"equipment_slot": "upperbody",
-		"equipment_slots_reserved":
+		"equipment_textures":
 		{
-			"lowerbody": true
+			"aer":
+			{
+				"skin1": "aerbreastplate1"
+			}
 		},
+		"equipment_slot": "upperbody",
+		"mass": 25
+	},
+	{
+		"type": "Itemspec",
+		"name": "iron skirt",
+		"model": "lowerplate1",
+		"icon": "metalarmor1",
+		"armor_class": 0.18,
+		"categories":
+		{
+			"armor": true
+		},
+		"equipment_models":
+		{
+			"aer":
+			{
+				"lower1": "aerlowerplate1"
+			}
+		},
+		"equipment_slot": "lowerbody",
 		"mass": 25
 	}
 ]

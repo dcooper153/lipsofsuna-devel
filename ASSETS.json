@@ -945,15 +945,16 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/apparel/platearmor/aerbreastplate1.png",
 				"data/lipsofsuna/apparel/platearmor/aerarmplate1.lmdl",
 				"data/lipsofsuna/apparel/platearmor/aerlegplate1.lmdl",
 				"data/lipsofsuna/apparel/platearmor/aerlowerplate1.lmdl",
 				"data/lipsofsuna/apparel/platearmor/aerupperplate1.lmdl",
 				"data/lipsofsuna/apparel/platearmor/armplate1.lmdl",
 				"data/lipsofsuna/apparel/platearmor/legplate1.lmdl",
+				"data/lipsofsuna/apparel/platearmor/lowerplate1.lmdl",
 				"data/lipsofsuna/apparel/platearmor/upperplate1.lmdl",
-				"data/lipsofsuna/apparel/platearmor/platemail1.png",
-				"data/lipsofsuna/apparel/platearmor/platemail1n.png"
+				"data/lipsofsuna/apparel/platearmor/platemail1.png"
 			],
 			"files_original":
 			[
