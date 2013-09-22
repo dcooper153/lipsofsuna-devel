@@ -9,7 +9,7 @@
 		"name": "crossbow",
 		"effects":
 		{
-			"damage": "metal impact 1",
+			"physical damage": "metal impact 1",
 			"ranged attack": "crossbow1"
 		}
 	},
@@ -18,7 +18,7 @@
 		"name": "wooden crossbow",
 		"effects":
 		{
-			"damage": "wood impact 1",
+			"physical damage": "wood impact 1",
 			"ranged attack": "crossbow1"
 		}
 	},

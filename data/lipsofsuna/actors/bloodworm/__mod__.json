@@ -3,6 +3,7 @@
 	"specs":
 	[
 		"actors",
-		"animations"
+		"animations",
+		"effects"
 	]
 }

@@ -13,7 +13,7 @@
 		"name": "imp",
 		"effects":
 		{
-			"damage": "stone impact 1"
+			"physical damage": "stone impact 1"
 		}
 	}
 ]

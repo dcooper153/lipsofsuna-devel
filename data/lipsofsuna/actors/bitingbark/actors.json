@@ -5,7 +5,7 @@
 		"effects":
 		{
 			"attack bite": "swing1",
-			"damage": "wood impact 1"
+			"physical damage": "wood impact 1"
 		}
 	},
 	{

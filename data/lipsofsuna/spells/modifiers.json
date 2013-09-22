@@ -383,7 +383,7 @@
 			"tackle": true
 		},
 		"effect": "impact1",
-		"effect_target": "damage",
+		"effect_target": "physical damage",
 		"icon": "missing1",
 		"modifiers":
 		{

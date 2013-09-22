@@ -4,7 +4,7 @@
 		"name": "turret",
 		"effects":
 		{
-			"damage": "metal impact 1"
+			"physical damage": "metal impact 1"
 		}
 	},
 	{

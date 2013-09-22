@@ -40,36 +40,5 @@
 			"Nerf combat lv1": true
 		},
 		"speed_walk": 2
-	},
-	{
-		"type": "Effectspec",
-		"name": "bloodworm bite",
-		"sound": "slimemonster-attack1",
-		"sound_pitch_min": 0.8,
-		"sound_pitch_max": 1.2
-	},
-	{
-		"type": "Effectspec",
-		"name": "bloodworm damage",
-		"sound": "slimemonster-damage2",
-		"sound_pitch_min": 0.8,
-		"sound_pitch_max": 1.2
-	},
-	{
-		"type": "Effectspec",
-		"name": "bloodworm damage death",
-		"sound": "slimemonster-damage1",
-		"sound_pitch_min": 0.8,
-		"sound_pitch_max": 1.2
-	},
-	{
-		"type": "EffectProfileSpec",
-		"name": "bloodworm",
-		"effects":
-		{
-			"attack bite": "bloodworm bite",
-			"damage": "bloodworm damage",
-			"damage death": "bloodworm damage death"
-		}
 	}
 ]

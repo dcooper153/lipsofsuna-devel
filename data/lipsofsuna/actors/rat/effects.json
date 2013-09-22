@@ -26,7 +26,7 @@
 		"effects":
 		{
 			"falling damage": "aerhurt1",
-			"damage": "flesh impact 1"
+			"physical damage": "flesh impact 1"
 		}
 	},
 	{
@@ -37,7 +37,7 @@
 			"attack bite": "rat attack 1",
 			"damage": "rat damage 1",
 			"damage death": "rat death 1",
-			"damage dead": "flesh impact 1"
+			"physical damage": "flesh impact 1"
 		}
 	}
 ]
