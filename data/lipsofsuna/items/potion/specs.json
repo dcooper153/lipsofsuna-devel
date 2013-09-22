@@ -1,8 +1,16 @@
 [
 	{
 		"type": "Effectspec",
-		"name": "potiondrink1",
+		"name": "drink potion 1",
 		"sound": "potiondrink1"
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "potion",
+		"effects":
+		{
+			"use": "drink potion 1"
+		}
 	},
 	{
 		"type": "CraftingRecipeSpec",
@@ -34,7 +42,10 @@
 		"model": "potion1",
 		"mass": 2,
 		"categories": {"potion": true},
-		"effect_use": "potiondrink1",
+		"effects":
+		{
+			"default": "potion"
+		},
 		"icon": "potion2",
 		"potion_effects": {"cure disease": 1},
 		"stacking": true,
@@ -54,7 +65,10 @@
 		"mass": 2,
 		"categories": {"potion": true},
 		"description": "Drink to heal yourself.",
-		"effect_use": "potiondrink1",
+		"effects":
+		{
+			"default": "potion"
+		},
 		"icon": "potion1",
 		"potion_effects": {"restore health": 20},
 		"stacking": true,
@@ -74,7 +88,10 @@
 		"mass": 2,
 		"categories": {"potion": true},
 		"description": "Drink to replenish your willpower.",
-		"effect_use": "potiondrink1",
+		"effects":
+		{
+			"default": "potion"
+		},
 		"icon": "potion2",
 		"potion_effects": {"restore willpower": 20},
 		"stacking": true,
@@ -93,7 +110,10 @@
 		"model": "potion2",
 		"mass": 2,
 		"categories": {"potion": true},
-		"effect_use": "potiondrink1",
+		"effects":
+		{
+			"default": "potion"
+		},
 		"icon": "potion2",
 		"potion_effects": {"poison": 10},
 		"stacking": true,

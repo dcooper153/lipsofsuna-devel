@@ -1,5 +1,13 @@
 [
 	{
+		"type": "EffectProfileSpec",
+		"name": "turret",
+		"effects":
+		{
+			"ranged attack": "musket1"
+		}
+	},
+	{
 		"type": "Itemspec",
 		"name": "security robot arm",
 		"model": "musket1",
@@ -10,7 +18,10 @@
 			"ranged": true,
 			"weapon": true
 		},
-		"effect_attack": "musket1",
+		"effects":
+		{
+			"default": "turret"
+		},
 		"modifiers":
 		{
 			"physical damage": 30
@@ -29,7 +40,10 @@
 			"ranged": true,
 			"weapon": true
 		},
-		"effect_attack": "musket1",
+		"effects":
+		{
+			"default": "turret"
+		},
 		"modifiers":
 		{
 			"physical damage": 15

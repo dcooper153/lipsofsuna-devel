@@ -6,7 +6,10 @@ Actionspec{
 	start = function(action, item)
 		if not item then return end
 		-- Play the use effect.
-		Main.vision:object_effect(action.object, item.spec.effect_use)
+		local effect = item.spec:get_effect("use")
+		if effect then
+			Main.vision:object_effect(action.object, effect.name)
+		end
 		-- Apply the spell effects.
 		local damage = Damage()
 		damage:add_spell_modifiers(item.spec.potion_effects)

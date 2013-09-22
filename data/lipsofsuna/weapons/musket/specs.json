@@ -5,6 +5,14 @@
 		"sound": "weaponmusket1"
 	},
 	{
+		"type": "EffectProfileSpec",
+		"name": "musket",
+		"effects":
+		{
+			"ranged attack": "musket1"
+		}
+	},
+	{
 		"type": "CraftingRecipeSpec",
 		"name": "adamantium musket",
 		"effect": "craftmetal1",
@@ -90,7 +98,10 @@
 		{
 			"default": "default musket equipped"
 		},
-		"effect_attack": "musket1",
+		"effects":
+		{
+			"default": "musket"
+		},
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved":
 		{
@@ -146,7 +157,10 @@
 		{
 			"default": "default musket equipped"
 		},
-		"effect_attack": "musket1",
+		"effects":
+		{
+			"default": "musket"
+		},
 		"icon": "musket1",
 		"modifiers":
 		{
@@ -202,7 +216,10 @@
 		{
 			"default": "default musket equipped"
 		},
-		"effect_attack": "musket1",
+		"effects":
+		{
+			"default": "musket"
+		},
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved":
 		{

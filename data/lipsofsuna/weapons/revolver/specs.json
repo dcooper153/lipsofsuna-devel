@@ -5,6 +5,14 @@
 		"sound": "weaponmusket1"
 	},
 	{
+		"type": "EffectProfileSpec",
+		"name": "revolver",
+		"effects":
+		{
+			"ranged attack": "revolver1"
+		}
+	},
+	{
 		"type": "AnimationProfileSpec",
 		"name": "default revolver equipped",
 		"animations":
@@ -36,7 +44,10 @@
 		"actions": {"right": "ranged", "left": "cancel ranged"},
 		"ammo_type": "bullet",
 		"animations_equipped": {"default": "default revolver equipped"},
-		"effect_attack": "revolver1",
+		"effects":
+		{
+			"default": "revolver"
+		},
 		"icon": "revolver1",
 		"modifiers": {"physical damage": 18},
 		"modifiers_bonus": ["ranged", "guns"],
@@ -59,7 +70,10 @@
 		"actions": {"right": "ranged", "left": "cancel ranged"},
 		"ammo_type": "bullet",
 		"animations_equipped": {"default": "default revolver equipped"},
-		"effect_attack": "revolver1",
+		"effects":
+		{
+			"default": "revolver"
+		},
 		"icon": "revolver1",
 		"modifiers": {"cold damage": 7, "physical damage": 7},
 		"modifiers_bonus": ["ranged", "guns"],
@@ -82,7 +96,10 @@
 		"actions": {"right": "ranged", "left": "cancel ranged"},
 		"ammo_type": "bullet",
 		"animations_equipped": {"default": "default revolver equipped"},
-		"effect_attack": "revolver1",
+		"effects":
+		{
+			"default": "revolver"
+		},
 		"icon": "revolver1",
 		"modifiers": {"fire damage": 7, "physical damage": 7},
 		"modifiers_bonus": ["ranged", "guns"],
@@ -105,7 +122,10 @@
 		"actions": {"right": "ranged", "left": "cancel ranged"},
 		"ammo_type": "bullet",
 		"animations_equipped": {"default": "default revolver equipped"},
-		"effect_attack": "revolver1",
+		"effects":
+		{
+			"default": "revolver"
+		},
 		"icon": "revolver1",
 		"modifiers": {"physical damage": 10},
 		"modifiers_bonus": ["ranged", "guns"],

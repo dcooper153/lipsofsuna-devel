@@ -53,8 +53,9 @@ Actionspec{
 			end
 			local projectile = ammo:split()
 			-- Play the attack effect.
-			if weapon.spec.effect_attack then
-				Main.vision:object_effect(action.object, weapon.spec.effect_attack)
+			local effect = weapon.spec:get_effect("ranged attack")
+			if effect then
+				Main.vision:object_effect(action.object, effect.name)
 			end
 			Main.vision:object_event(action.object, "object attack", {move = "stand", variant = math.random(0, 255)})
 			-- Calculate the base damage.

@@ -472,16 +472,18 @@ Actor.handle_inventory_event = function(self, args)
 	-- Update achored equipment or the actor model.
 	if args.type == "inventory-equipped" then
 		self.render:handle_inventory_equip(args.slot, args.object)
-		if args.object.spec.effect_equip then
+		local effect = args.object.spec:get_effect("equip")
+		if effect then
 			if not Operators.play:is_startup_period() then
-				Client.effects:play_object(args.object.spec.effect_equip, self, node)
+				Client.effects:play_object(effect.name, self, node)
 			end
 		end
 	elseif args.type == "inventory-unequipped" then
 		self.render:handle_inventory_unequip(args.slot, args.object)
-		if args.object.spec.effect_equip then
+		local effect = args.object.spec:get_effect("unequip")
+		if effect then
 			if not Operators.play:is_startup_period() then
-				Client.effects:play_object(args.object.spec.effect_unequip, self, node)
+				Client.effects:play_object(effect.name, self, node)
 			end
 		end
 	end

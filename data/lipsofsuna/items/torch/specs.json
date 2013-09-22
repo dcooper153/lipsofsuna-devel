@@ -1,7 +1,7 @@
 [
 	{
 		"type": "Effectspec",
-		"name": "torch1",
+		"name": "torch lit 1",
 		"sound": "torchlit1"
 	},
 	{
@@ -12,6 +12,15 @@
 		"light_equation": [2,0.1,0.1],
 		"node": "#flame",
 		"particle": "torchfx1"
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "torch",
+		"effects":
+		{
+			"equip": "torch lit 1",
+			"unequip": "torch lit 1"
+		}
 	},
 	{
 		"type": "AnimationProfileSpec",
@@ -42,8 +51,10 @@
 		{
 			"default": "default torch equipped"
 		},
-		"effect_equip": "torch1",
-		"effect_unequip": "torch1",
+		"effects":
+		{
+			"default": "torch"
+		},
 		"equipment_slot": "hand.L",
 		"icon": "torch1",
 		"mass": 3,

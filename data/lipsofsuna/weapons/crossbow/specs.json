@@ -5,6 +5,14 @@
 		"sound": "weaponcrossbow1"
 	},
 	{
+		"type": "EffectProfileSpec",
+		"name": "crossbow",
+		"effects":
+		{
+			"ranged attack": "crossbow1"
+		}
+	},
+	{
 		"type": "CraftingRecipeSpec",
 		"name": "adamantium crossbow",
 		"effect": "craftmetal1",
@@ -18,7 +26,10 @@
 		"actions": {"right": "ranged", "left": "cancel ranged"},
 		"ammo_type": "arrow",
 		"animations_equipped": {"default": "default crossbow equipped"},
-		"effect_attack": "crossbow1",
+		"effects":
+		{
+			"default": "crossbow"
+		},
 		"icon": "crossbow2",
 		"modifiers": {"physical damage": 15},
 		"modifiers_bonus": ["ranged"],
@@ -42,7 +53,10 @@
 		"actions": {"right": "ranged", "left": "cancel ranged"},
 		"ammo_type": "arrow",
 		"animations_equipped": {"default": "default crossbow equipped"},
-		"effect_attack": "crossbow1",
+		"effects":
+		{
+			"default": "crossbow"
+		},
 		"icon": "crossbow1",
 		"modifiers": {"cold damage": 6, "physical damage": 2},
 		"modifiers_bonus": ["ranged"],
@@ -66,7 +80,10 @@
 		"actions": {"right": "ranged", "left": "cancel ranged"},
 		"ammo_type": "arrow",
 		"animations_equipped": {"default": "default crossbow equipped"},
-		"effect_attack": "crossbow1",
+		"effects":
+		{
+			"default": "crossbow"
+		},
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved": {"hand.L": true},
 		"icon": "crossbow1",
@@ -90,7 +107,10 @@
 		"actions": {"right": "ranged", "left": "cancel ranged"},
 		"ammo_type": "arrow",
 		"animations_equipped": {"default": "default crossbow equipped"},
-		"effect_attack": "crossbow1",
+		"effects":
+		{
+			"default": "crossbow"
+		},
 		"icon": "crossbow1",
 		"modifiers": {"physical damage": 4},
 		"modifiers_bonus": ["ranged"],
@@ -114,7 +134,10 @@
 		"actions": {"right": "ranged", "left": "cancel ranged"},
 		"ammo_type": "arrow",
 		"animations_equipped": {"default": "default crossbow equipped"},
-		"effect_attack": "crossbow1",
+		"effects":
+		{
+			"default": "crossbow"
+		},
 		"icon": "crossbow1",
 		"modifiers": {"physical damage": 2},
 		"modifiers_bonus": ["ranged"],

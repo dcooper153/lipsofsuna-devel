@@ -1,4 +1,4 @@
---- TODO:doc
+--- Item speficification.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -10,9 +10,10 @@
 
 local AnimationProfileSpec = require("core/specs/animation-profile")
 local Class = require("system/class")
+local EffectProfileSpec = require("core/specs/effect-profile")
 local Spec = require("core/specs/spec")
 
---- TODO:doc
+--- Item speficification.
 -- @type Itemspec
 Itemspec = Spec:register("Itemspec", "item", {
 	{name = "name", type = "string", description = "Name of the spec."},
@@ -31,11 +32,8 @@ Itemspec = Spec:register("Itemspec", "item", {
 	{name = "destroy_actions", type = "list", list = {type = "string"}, default = {}, description = "List of actions to perform when the item is destroyed."},
 	{name = "destroy_timer", type = "number", description = "Time in seconds after which to destruct when thrown."},
 	{name = "dialog", type = "string", description = "Dialog name.", details = {spec = "Dialogspec"}},
-	{name = "effect_attack", type = "string", description = "Name of the effect to play when the item is used for attacking."},
 	{name = "effect_attack_speedline", type = "boolean", description = "True to enable the speed line effect for attacks."},
-	{name = "effect_equip", type = "string", description = "Name of the effect to play when the item is equiped."},
-	{name = "effect_unequip", type = "string", description = "Name of the effect to play when the item is unequiped."},
-	{name = "effect_use", type = "string", description = "Name of the effect to play when the item is used."},
+	{name = "effects", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of effect profiles.", details = {values = {spec = "EffectProfileSpec"}}},
 	{name = "equipment_anchor", type = "string", description = "Name of the node snapped to the hand of the actor when wielded."},
 	{name = "equipment_anchor_position", type = "vector", description = "Positional displacement of the model when equipped."},
 	{name = "equipment_anchor_rotation", type = "quaternion", description = "Rotational displacement of the model when equipped."},
@@ -143,6 +141,22 @@ Itemspec.get_animation_arguments_equipped = function(self, name, profile, varian
 	return args
 end
 
+--- Gets an effect by name.
+-- @param self Itemspec.
+-- @param name Effect name.
+-- @param profile Effect profile name. Nil for "default".
+-- @return Effect spec, or nil.
+Itemspec.get_effect = function(self, name, profile)
+	local try = function(self, p, e)
+		local pname = self.effects[p]
+		if not pname then return end
+		local profile = EffectProfileSpec:find_by_name(pname)
+		if not profile then return end
+		return profile:get_effect(e)
+	end
+	return profile and try(self, profile, name) or try(self, "default", name)
+end
+
 --- Finds the equipment models of the item for the given race.
 -- @param self Itemspec.
 -- @param name Name of the equipment class matching the race.
@@ -242,3 +256,5 @@ Itemspec.get_use_actions = function(self)
 	end
 	return res
 end
+
+return Itemspec
