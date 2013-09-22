@@ -20,7 +20,7 @@
 		"difficulty": 0,
 		"effects":
 		{
-			"default": "default"
+			"default": "rat"
 		},
 		"factions":
 		{
@@ -58,7 +58,7 @@
 		"difficulty": 0,
 		"effects":
 		{
-			"default": "default"
+			"default": "rat"
 		},
 		"factions":
 		{
@@ -96,7 +96,7 @@
 		"difficulty": 0.7,
 		"effects":
 		{
-			"default": "default"
+			"default": "rat"
 		},
 		"factions":
 		{

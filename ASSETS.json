@@ -1503,6 +1503,23 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/actors/rat/rat-attack1.flac",
+				"data/lipsofsuna/actors/rat/rat-death1.flac",
+				"data/lipsofsuna/actors/rat/rat-pain1.flac"
+			],
+			"authors":
+			[
+				"qubodup"
+			],
+			"licenses":
+			[
+				"CC0"
+			],
+			"source": "http://opengameart.org/content/squeaky-rat"
+		},
+		{
+			"files":
+			[
 				"data/lipsofsuna/spells/effects/fireball1.flac"
 			],
 			"authors":

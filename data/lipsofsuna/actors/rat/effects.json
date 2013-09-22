@@ -1,0 +1,43 @@
+[
+	{
+		"type": "Effectspec",
+		"name": "rat attack 1",
+		"sound": "rat-attack1",
+		"sound_pitch_min": 0.8,
+		"sound_pitch_max": 1.2
+	},
+	{
+		"type": "Effectspec",
+		"name": "rat damage 1",
+		"sound": "rat-pain1",
+		"sound_pitch_min": 0.8,
+		"sound_pitch_max": 1.2
+	},
+	{
+		"type": "Effectspec",
+		"name": "rat death 1",
+		"sound": "rat-death1",
+		"sound_pitch_min": 0.8,
+		"sound_pitch_max": 1.2
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "aer",
+		"effects":
+		{
+			"falling damage": "aerhurt1",
+			"damage": "flesh impact 1"
+		}
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "rat",
+		"effects":
+		{
+			"attack bite": "rat attack 1",
+			"damage": "rat damage 1",
+			"damage death": "rat death 1",
+			"damage dead": "flesh impact 1"
+		}
+	}
+]
