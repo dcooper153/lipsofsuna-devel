@@ -226,13 +226,29 @@ end
 
 --- Gets the effects that should be played when the damage lands.
 -- @param self Damage.
+-- @param target Target object is available. Nil otherwise.
 -- @return Dictionary of effect names.
-Damage.get_impact_effects = function(self)
+Damage.get_impact_effects = function(self, target)
 	local res = {}
 	for name,value in pairs(self.modifiers) do
-		local effect = ModifierSpec:find_by_name(name)
-		if effect and effect.effect then
-			res[effect.effect] = true
+		local modifier = ModifierSpec:find_by_name(name)
+		if modifier then
+			-- Try actor specific effects.
+			local effect
+			if target and target.spec.get_effect and modifier.effect_target then
+				local spec = target.spec:get_effect(modifier.effect_target, target.effect_profile)
+				if spec then
+					effect = spec.name
+				end
+			end
+			-- Try modifier specific effects.
+			if not effect then
+				effect = modifier.effect
+			end
+			-- Add the effect if found.
+			if effect then
+				res[effect] = true
+			end
 		end
 	end
 	return res

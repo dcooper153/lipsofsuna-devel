@@ -239,7 +239,7 @@ end
 --- Gets an effect by name.
 -- @param self Actor spec.
 -- @param name Effect name.
--- @param profile Effect profile mapping, or nil for "default".
+-- @param profile Effect profile name. Nil for "default".
 -- @return Effect spec, or nil.
 Actorspec.get_effect = function(self, name, profile)
 	local try = function(self, p, e)

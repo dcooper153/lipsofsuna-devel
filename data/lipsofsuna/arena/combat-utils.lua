@@ -51,7 +51,7 @@ CombatUtils.apply_damage_to_actor = function(self, caster, target, damage, point
 	if not point then
 		point = target:get_position()
 	end
-	for name in pairs(damage:get_impact_effects()) do
+	for name in pairs(damage:get_impact_effects(target)) do
 		Main.vision:world_effect(point, name)
 	end
 	-- Knockback the defender.
