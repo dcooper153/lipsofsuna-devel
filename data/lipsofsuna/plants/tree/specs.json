@@ -11,6 +11,10 @@
 		},
 		"construct_tile": "wood1",
 		"construct_tile_count": 1,
+		"effects":
+		{
+			"default": "wooden item"
+		},
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved":
 		{
@@ -33,6 +37,10 @@
 		},
 		"construct_tile": "wood1",
 		"construct_tile_count": 1,
+		"effects":
+		{
+			"default": "wooden item"
+		},
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved":
 		{
@@ -58,6 +66,10 @@
 			["log", [0,2,0]],
 			["log", [0,3,0]]
 		],
+		"effects":
+		{
+			"default": "wooden item"
+		},
 		"health": 50,
 		"interactive": false,
 		"vulnerabilities":
@@ -82,6 +94,10 @@
 			["log", [0,2,0]],
 			["log", [0,3,0]]
 		],
+		"effects":
+		{
+			"default": "wooden item"
+		},
 		"health": 50,
 		"interactive": false,
 		"vulnerabilities":

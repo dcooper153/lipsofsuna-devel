@@ -1,4 +1,4 @@
---- TODO:doc
+--- Obstacle specification.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -9,9 +9,10 @@
 -- @alias Obstaclespec
 
 local Class = require("system/class")
+local EffectProfileSpec = require("core/specs/effect-profile")
 local Spec = require("core/specs/spec")
 
---- TODO:doc
+--- Obstacle specification.
 -- @type Obstaclespec
 Obstaclespec = Spec:register("Obstaclespec", "obstacle", {
 	{name = "name", type = "string", description = "Name of the spec."},
@@ -20,6 +21,7 @@ Obstaclespec = Spec:register("Obstaclespec", "obstacle", {
 	{name = "collision_mask", type = "number", default = 0xFF, description = "Collision mask."},
 	{name = "constraints", type = "list", list = {type = "string", details = {spec = "Constraintspec"}}, default = {}, description = "List of constraints."},
 	{name = "dialog", type = "string", description = "Dialog name.", details = {spec = "Dialogspec"}},
+	{name = "effects", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of effect profiles.", details = {values = {spec = "EffectProfileSpec"}}},
 	{name = "harvest_behavior", type = "string", default = "keep", description = "Harvest behavior: keep/destroy."},
 	{name = "harvest_effect", type = "string", description = "Effect to play when harvested."},
 	{name = "harvest_materials", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of harvestable materials.", details = {keys = {spec = "Itemspec"}}},
@@ -62,6 +64,22 @@ Obstaclespec.get_constraints = function(self)
 	end
 	if #res == 0 then return end
 	return res
+end
+
+--- Gets an effect by name.
+-- @param self Itemspec.
+-- @param name Effect name.
+-- @param profile Effect profile name. Nil for "default".
+-- @return Effect spec, or nil.
+Obstaclespec.get_effect = function(self, name, profile)
+	local try = function(self, p, e)
+		local pname = self.effects[p]
+		if not pname then return end
+		local profile = EffectProfileSpec:find_by_name(pname)
+		if not profile then return end
+		return profile:get_effect(e)
+	end
+	return profile and try(self, profile, name) or try(self, "default", name)
 end
 
 --- Finds the special effects of the obstacle.
@@ -109,4 +127,4 @@ Obstaclespec.random = function(clss, args)
 	return clss.dict_id[math.random(#clss.dict_id)]
 end
 
-
+return Obstaclespec
