@@ -261,7 +261,7 @@
 			"ranged spell": true
 		},
 		"description": "Conjure a wall of fire",
-		"effect": "firewall1",
+		"effect": "firewall start 1",
 		"effect_fire": "fireball1",
 		"icon": "firewall",
 		"projectile": "fireball1",

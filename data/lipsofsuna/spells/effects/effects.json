@@ -36,9 +36,19 @@
 	},
 	{
 		"type": "Effectspec",
-		"name": "firewall1",
+		"name": "firewall start 1",
 		"particle": "firewall1",
 		"sound": "fire-000"
+	},
+	{
+		"type": "Effectspec",
+		"name": "firewall burning 1",
+		"particle": "firewall1",
+		"sound": "firewall-burning1",
+		"sound_loop": true,
+		"sound_pitch_min": 0.8,
+		"sound_pitch_max": 1.2,
+		"sound_volume": 0.3
 	},
 	{
 		"type": "Effectspec",

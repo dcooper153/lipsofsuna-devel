@@ -1582,6 +1582,21 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/spells/effects/firewall-burning1.ogg"
+			],
+			"authors":
+			[
+				"qubodup"
+			],
+			"licenses":
+			[
+				"Creative Commons BY 3.0"
+			],
+			"source": "http://opengameart.org/content/fire-loop"
+		},
+		{
+			"files":
+			[
 				"data/lipsofsuna/sounds/builtrock1.ogg",
 				"data/lipsofsuna/sounds/builtwood1.ogg",
 				"data/lipsofsuna/sounds/craftmetal1.ogg",
