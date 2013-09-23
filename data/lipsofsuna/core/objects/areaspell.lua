@@ -1,4 +1,4 @@
---- TODO:doc
+--- Area spell object.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -9,31 +9,22 @@
 -- @alias AreaSpell
 
 local Class = require("system/class")
+local Damage = require("arena/damage")
 local Spell = require("core/objects/spell")
 
---- TODO:doc
+--- Area spell object.
 -- @type AreaSpell
 local AreaSpell = Class("AreaSpell", Spell)
 
 --- Creates a new area spell.
 -- @param clss Area spell class.
 -- @param manager Object manager.
--- @param args Arguments.<ul>
---   <li>duration: Duration of the spell.</li>
---   <li>feat: Feat invoking the spell.</li>
---   <li>owner: Caster of the spell.</li>
---   <li>position: Position in world space.</li>
---   <li>spec: Spell spec.</li></ul>
--- @return Spell.
-AreaSpell.new = function(clss, manager, args)
-	local self = Spell.new(clss, manager, {feat = args.feat, owner = args.owner, spec = args.spec})
-	self.physics:set_collision_mask(0)
+-- @return AreaSpell.
+AreaSpell.new = function(clss, manager)
+	local self = Spell.new(clss, manager)
 	self.timer = 1
+	self.physics:set_collision_mask(0)
 	self.physics:set_physics("static")
-	self.radius = args.radius
-	self.duration = args.duration
-	self:set_position(args.position)
-	self:set_visible(args.realized)
 	return self
 end
 
@@ -41,6 +32,7 @@ AreaSpell.contact_cb = function(self, args)
 end
 
 AreaSpell.update = function(self, secs)
+	if not self:get_visible() then return end
 	if self:has_server_data() then
 		-- Update periodically.
 		self.timer = self.timer + secs
@@ -50,11 +42,10 @@ AreaSpell.update = function(self, secs)
 		local objs = Main.objects:find_by_point(self:get_position():copy():add_xyz(0,1,0), self.radius)
 		for k,v in pairs(objs) do
 			if v:get_visible() and v.class_name ~= "AreaSpell" then
-				self.feat:apply{
-					object = v,
-					owner = self.owner,
-					point = v.position,
-					projectile = self}
+				local damage = Damage()
+				damage:add_spell_modifiers(self.modifiers)
+				damage:apply_defender_vulnerabilities(v)
+				Main.combat_utils:apply_damage_to_actor(self.owner, v, damage, v:get_position())
 			end
 		end
 		-- Detach after timeout.
@@ -63,10 +54,6 @@ AreaSpell.update = function(self, secs)
 			self:detach()
 		end
 	end
-	-- Update the base class.
-	Spell.update(self, secs)
 end
 
 return AreaSpell
-
-

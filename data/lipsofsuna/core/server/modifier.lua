@@ -31,13 +31,21 @@ Modifier.new = function(clss, spec, object, owner, point)
 	return self
 end
 
---- Starts the modifier
+--- Starts the modifier.
 -- @param self Modifier.
 -- @param value Strength of the modifier.
 -- @return True to enable effect-over-time updates. False otherwise.
 Modifier.start = function(self, value)
 	if not self.spec.start then return end
 	return self.spec.start(self, value)
+end
+
+--- Starts the modifier.
+-- @param self Modifier.
+-- @param value Strength of the modifier.
+Modifier.start_terrain = function(self, value)
+	if not self.spec.start_terrain then return end
+	return self.spec.start_terrain(self, value)
 end
 
 --- Updates the modifier

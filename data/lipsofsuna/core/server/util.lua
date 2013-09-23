@@ -79,18 +79,15 @@ Utils.find_build_point = function(clss, point, user)
 	return t,p
 end
 
---- Finds empty ground below the given point.
+--- Finds empty ground directly below the given point.
 -- @param clss Utils class.
 -- @param point Point in world space.
--- @return Point in world units, or nil.
+-- @return Point in world space. Nil if not found.
 Utils.find_empty_ground = function(clss, point)
-	local t,c = Voxel:find_tile{match = "empty", point = point}
-	if not t then return end
-	for i=1,5 do
-		if Voxel:get_tile(c + Vector(0,-i)) ~= 0 then
-			return (c + Vector(0.5,1-i,0.5)) * Voxel.tile_size
-		end
-	end
+	local x,z = Main.terrain:get_chunk_xz_by_point(point.x, point.z)
+	local y = Main.terrain.terrain:find_nearest_empty_stick(x, z, point.y)
+	if math.abs(y - point.y) > 5 then return end
+	return Vector(point.x, y, point.z)
 end
 
 --- Finds a drop point suitable for an item.

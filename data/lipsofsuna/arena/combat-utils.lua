@@ -93,6 +93,14 @@ CombatUtils.apply_damage_to_terrain = function(self, caster, tile, damage, point
 	for name in pairs(damage:get_impact_effects()) do
 		Main.vision:world_effect(point, name)
 	end
+	-- Apply the damage.
+	for name,value in pairs(damage.modifiers) do
+		local spec = ModifierSpec:find_by_name(name)
+		if spec then
+			local modifier = Modifier(spec, nil, caster, point)
+			modifier:start_terrain(value)
+		end
+	end
 end
 
 --- Checks if the actor is wielding a ranged weapon.

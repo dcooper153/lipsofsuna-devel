@@ -281,7 +281,7 @@ end
 -- @param z Grid Z coordinate.
 -- @param y Reference Y offset.
 -- @param h Minimum stick height. Nil for zero.
--- @return True on success.
+-- @return Y offset in world units.
 Terrain.find_nearest_empty_stick = function(self, x, z, y, h)
 	return Los.terrain_find_nearest_empty_stick(self.handle, x, z, y, h)
 end
