@@ -97,6 +97,7 @@ EffectManager.play_global = function(self, name)
 		SoundEffect{
 			sound = effect.sound,
 			sound_delay = effect.sound_delay,
+			sound_loop = effect.sound_loop,
 			sound_pitch = effect:get_sound_pitch(),
 			sound_positional = false,
 			sound_volume = effect.sound_volume}
@@ -125,12 +126,13 @@ EffectManager.play_object = function(self, name, object, node)
 			rotation_mode = (effect.rotation and "parent" or nil)}
 	end
 	if effect.sound then
-		SoundEffect{
+		local e = SoundEffect{
 			object = object,
 			node = p and n,
 			rotation_mode = (effect.rotation and "parent" or nil),
 			sound = effect.sound,
 			sound_delay = effect.sound_delay,
+			sound_loop = effect.sound_loop,
 			sound_pitch = effect:get_sound_pitch(),
 			sound_positional = effect.sound_positional,
 			sound_volume = effect.sound_volume}
@@ -155,6 +157,7 @@ EffectManager.play_world = function(self, name, position)
 			position = position,
 			sound = effect.sound,
 			sound_delay = effect.sound_delay,
+			sound_loop = effect.sound_loop,
 			sound_pitch = effect:get_sound_pitch(),
 			sound_positional = effect.sound_positional,
 			sound_volume = effect.sound_volume}

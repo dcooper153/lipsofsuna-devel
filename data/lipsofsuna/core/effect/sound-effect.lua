@@ -45,6 +45,9 @@ SoundEffect.create_source = function(self, args)
 	if args.sound_pitch then
 		self.source:set_pitch(args.sound_pitch)
 	end
+	if args.sound_loop then
+		self.source:set_looping(true)
+	end
 	if self.__queued_position then
 		self.source:set_position(self.__queued_position)
 		self.__queued_position = nil

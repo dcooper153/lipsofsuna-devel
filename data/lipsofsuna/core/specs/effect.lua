@@ -1,4 +1,4 @@
---- TODO:doc
+--- Audiovisual effect specification.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -11,7 +11,7 @@
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
---- TODO:doc
+--- Audiovisual effect specification.
 -- @type Effectspec
 Effectspec = Spec:register("Effectspec", "effect", {
 	{name = "name", type = "string", description = "Name of the spec."},
@@ -28,6 +28,7 @@ Effectspec = Spec:register("Effectspec", "effect", {
 	{name = "rotation", type = "string", description = "False to not inherit rotation from the parent object."},
 	{name = "sound", type = "string", description = "Sound effect to play."},
 	{name = "sound_delay", type = "string", description = "Delay of the sound start, in seconds."},
+	{name = "sound_loop", type = "boolean", description = "True to make the sound effect loop."},
 	{name = "sound_pitch_min", type = "number", default = 1, description = "Minimum pitch of the sound effect."},
 	{name = "sound_pitch_max", type = "number", default = 1, description = "Maximum pitch of the sound effect."},
 	{name = "sound_volume", type = "number", description = "Volume level of the sound effect."},
