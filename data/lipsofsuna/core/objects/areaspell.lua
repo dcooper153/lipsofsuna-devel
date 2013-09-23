@@ -36,8 +36,8 @@ AreaSpell.update = function(self, secs)
 	if self:has_server_data() then
 		-- Update periodically.
 		self.timer = self.timer + secs
-		if self.timer < 1 then return end
-		self.timer = self.timer - 1
+		if self.timer < 0.5 then return end
+		self.timer = self.timer - 0.5
 		-- Apply the feat to each nearby object.
 		local objs = Main.objects:find_by_point(self:get_position():copy():add_xyz(0,1,0), self.radius)
 		for k,v in pairs(objs) do
@@ -49,9 +49,18 @@ AreaSpell.update = function(self, secs)
 			end
 		end
 		-- Detach after timeout.
-		self.duration = self.duration - 1
+		self.duration = self.duration - 0.5
 		if self.duration <= 0 then
 			self:detach()
+		end
+	end
+	-- Play the starting effect.
+	if self:has_client_data() then
+		if not self.started then
+			self.started = true
+			if self.spec.effect then
+				Client.effects:play_object(self.spec.effect, self)
+			end
 		end
 	end
 end
