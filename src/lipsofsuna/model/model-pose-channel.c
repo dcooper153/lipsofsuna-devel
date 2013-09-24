@@ -153,6 +153,16 @@ int limdl_pose_channel_play (
 	float duration;
 	float start;
 
+	/* Update fading. */
+	if (self->fading)
+	{
+		self->time += secs;
+		self->fade_time += secs;
+		if (self->fade_time >= self->fade_out)
+			return 0;
+		return 1;
+	}
+
 	/* Skip empty. */
 	duration = limdl_animation_get_duration (self->animation);
 	if (self->repeat_end >= 0.0f)

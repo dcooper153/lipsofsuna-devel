@@ -37,8 +37,8 @@ struct _LIMdlPoseVertex
 
 struct _LIMdlPose
 {
+	LIAlgRandom random;
 	LIAlgU32dic* channels;
-	LIMdlPoseChannel* fades;
 };
 
 LIAPICALL (LIMdlPose*, limdl_pose_new, ());
