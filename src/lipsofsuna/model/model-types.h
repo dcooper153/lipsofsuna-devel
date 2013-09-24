@@ -48,7 +48,6 @@ typedef struct _LIMdlParticleSystem LIMdlParticleSystem;
 typedef struct _LIMdlPose LIMdlPose;
 typedef struct _LIMdlPoseChannel LIMdlPoseChannel;
 typedef int LIMdlPoseChannelState;
-typedef struct _LIMdlPoseFade LIMdlPoseFade;
 typedef struct _LIMdlWeightGroup LIMdlWeightGroup;
 
 #endif

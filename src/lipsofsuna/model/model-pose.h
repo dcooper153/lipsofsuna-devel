@@ -28,22 +28,6 @@
 
 #define LIMDL_POSE_FADE_AUTOMATIC -1.0f
 
-struct _LIMdlPoseFade
-{
-	float time;
-	float time_fade;
-	float fade_out;
-	int priority_scale;
-	int priority_transform;
-	float weight_scale;
-	float weight_transform;
-	float current_weight_scale;
-	float current_weight_transform;
-	LIMdlPoseFade* prev;
-	LIMdlPoseFade* next;
-	LIMdlAnimation* animation;
-};
-
 typedef struct _LIMdlPoseVertex LIMdlPoseVertex;
 struct _LIMdlPoseVertex
 {
@@ -54,7 +38,7 @@ struct _LIMdlPoseVertex
 struct _LIMdlPose
 {
 	LIAlgU32dic* channels;
-	LIMdlPoseFade* fades;
+	LIMdlPoseChannel* fades;
 };
 
 LIAPICALL (LIMdlPose*, limdl_pose_new, ());

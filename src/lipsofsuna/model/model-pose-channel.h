@@ -26,12 +26,13 @@ enum _LIMdlPoseChannelState
 {
 	LIMDL_POSE_CHANNEL_STATE_INVALID,
 	LIMDL_POSE_CHANNEL_STATE_PLAYING,
-	LIMDL_POSE_CHANNEL_STATE_PAUSED,
+	LIMDL_POSE_CHANNEL_STATE_PAUSED
 };
 
 struct _LIMdlPoseChannel
 {
 	int additive;
+	int fading;
 	int state;
 	int repeat;
 	int repeats;
@@ -48,6 +49,10 @@ struct _LIMdlPoseChannel
 	LIAlgStrdic* priorities;
 	LIAlgStrdic* weights;
 	LIMdlAnimation* animation;
+
+	float fade_time;
+	LIMdlPoseChannel* fade_prev;
+	LIMdlPoseChannel* fade_next;
 };
 
 LIAPICALL (LIMdlPoseChannel*, limdl_pose_channel_new, (
