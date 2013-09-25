@@ -96,6 +96,7 @@ static void RenderObject_animate (LIScrArgs* args)
 	float weight_scale = 0.0f;
 	float time = 0.0f;
 	float time_scale = 1.0f;
+	const char* str;
 	LIExtRenderObject* object;
 	LIMdlAnimation* animation = NULL;
 	LIMdlPoseChannel* chan = NULL;
@@ -141,8 +142,28 @@ static void RenderObject_animate (LIScrArgs* args)
 		chan->weight_scale = weight_scale;
 		chan->weight_transform = weight;
 		chan->time_scale = time_scale;
-		chan->fade_in = fade_in;
-		chan->fade_out = fade_out;
+		chan->fade_in.duration = fade_in;
+		chan->fade_out.duration = fade_out;
+		if (liscr_args_gets_string (args, "fade_in_mode", &str))
+		{
+			if (!strcmp (str, "after start"))
+				chan->fade_in.mode = LIMDL_POSE_FADE_IN_AFTER_START;
+			else if (!strcmp (str, "before start"))
+				chan->fade_in.mode = LIMDL_POSE_FADE_IN_AFTER_START;
+			else if (!strcmp (str, "instant"))
+				chan->fade_in.mode = LIMDL_POSE_FADE_IN_INSTANT;
+		}
+		if (liscr_args_gets_string (args, "fade_out_mode", &str))
+		{
+			if (!strcmp (str, "after end"))
+				chan->fade_in.mode = LIMDL_POSE_FADE_OUT_AFTER_END;
+			else if (!strcmp (str, "after end repeat"))
+				chan->fade_in.mode = LIMDL_POSE_FADE_OUT_AFTER_END_REPEAT;
+			else if (!strcmp (str, "before end"))
+				chan->fade_in.mode = LIMDL_POSE_FADE_OUT_BEFORE_END;
+			else if (!strcmp (str, "instant"))
+				chan->fade_in.mode = LIMDL_POSE_FADE_OUT_INSTANT;
+		}
 	}
 
 	/* Handle optional per-node priorities. */
@@ -256,8 +277,8 @@ static void RenderObject_get_animation (LIScrArgs* args)
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
 	liscr_args_sets_string (args, "animation", channel->animation->name);
 	liscr_args_sets_int (args, "channel", chan + 1);
-	liscr_args_sets_float (args, "fade_in", channel->fade_in);
-	liscr_args_sets_float (args, "fade_out", channel->fade_out);
+	liscr_args_sets_float (args, "fade_in", channel->fade_in.duration);
+	liscr_args_sets_float (args, "fade_out", channel->fade_out.duration);
 	liscr_args_sets_bool (args, "permanent", channel->repeats == -1);
 	liscr_args_sets_float (args, "repeat_start", channel->repeat_start);
 	liscr_args_sets_float (args, "time", channel->time);

@@ -364,19 +364,20 @@ void limdl_pose_fade_channel (
 
 	/* Handle auto rate. */
 	if (secs == LIMDL_POSE_FADE_AUTOMATIC)
-		secs = chan->fade_out;
+		secs = chan->fade_out.duration;
 
 	/* Destroy immediately the fade time is zero. */
-	if (chan->fade_out < LIMAT_EPSILON)
+	if (secs < LIMAT_EPSILON)
 	{
 		limdl_pose_destroy_channel (self, channel);
 		return;
 	}
 
 	/* Set fade information. */
-	chan->fading = 1;
-	chan->fade_out = secs;
-	chan->fade_time = 0.0f;
+	chan->fade_in.active = 0;
+	chan->fade_out.active = 1;
+	chan->fade_out.duration = secs;
+	chan->fade_timer = 0.0f;
 
 	/* Choose a random channel number. */
 	id = lialg_random_range (&self->random, 0xFFFF, 0x1FFFFFFF);
@@ -454,8 +455,8 @@ void limdl_pose_merge_channel (
 	limdl_pose_set_channel_weight_scale (self, channel, info->weight_scale);
 	limdl_pose_set_channel_weight_transform (self, channel, info->weight_transform);
 	limdl_pose_set_channel_time_scale (self, channel, info->time_scale);
-	limdl_pose_set_channel_fade_in (self, channel, info->fade_in);
-	limdl_pose_set_channel_fade_out (self, channel, info->fade_out);
+	limdl_pose_set_channel_fade_in (self, channel, info->fade_in.duration);
+	limdl_pose_set_channel_fade_out (self, channel, info->fade_out.duration);
 
 	/* Handle optional per-node priorities. */
 	if (info->priorities != NULL)
@@ -571,8 +572,8 @@ void limdl_pose_set_channel_animation (
 		return;
 	}
 	chan->time = 0.0f;
-	chan->fade_in = 0.0f;
-	chan->fade_out = 0.0f;
+	chan->fade_in.duration = 0.0f;
+	chan->fade_out.duration = 0.0f;
 	limdl_animation_free (chan->animation);
 	chan->animation = anim;
 }
@@ -660,7 +661,7 @@ float limdl_pose_get_channel_fade_in (
 	chan = private_find_channel (self, channel);
 	if (chan == NULL)
 		return 0.0f;
-	return chan->fade_in;
+	return chan->fade_in.duration;
 }
 
 void limdl_pose_set_channel_fade_in (
@@ -672,7 +673,7 @@ void limdl_pose_set_channel_fade_in (
 
 	chan = private_find_channel (self, channel);
 	if (chan != NULL)
-		chan->fade_in = value;
+		chan->fade_in.duration = value;
 }
 
 float limdl_pose_get_channel_fade_out (
@@ -684,7 +685,7 @@ float limdl_pose_get_channel_fade_out (
 	chan = private_find_channel (self, channel);
 	if (chan == NULL)
 		return 0.0f;
-	return chan->fade_out;
+	return chan->fade_out.duration;
 }
 
 void limdl_pose_set_channel_fade_out (
@@ -696,7 +697,7 @@ void limdl_pose_set_channel_fade_out (
 
 	chan = private_find_channel (self, channel);
 	if (chan != NULL)
-		chan->fade_out = value;
+		chan->fade_out.duration = value;
 }
 
 const char* limdl_pose_get_channel_name (

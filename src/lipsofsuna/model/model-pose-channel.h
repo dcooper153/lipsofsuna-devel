@@ -29,10 +29,24 @@ enum _LIMdlPoseChannelState
 	LIMDL_POSE_CHANNEL_STATE_PAUSED
 };
 
+enum _LIMdlFadeInMode
+{
+	LIMDL_POSE_FADE_IN_AFTER_START,
+	LIMDL_POSE_FADE_IN_BEFORE_START,
+	LIMDL_POSE_FADE_IN_INSTANT
+};
+
+enum _LIMdlFadeOutMode
+{
+	LIMDL_POSE_FADE_OUT_AFTER_END,
+	LIMDL_POSE_FADE_OUT_AFTER_END_REPEAT,
+	LIMDL_POSE_FADE_OUT_BEFORE_END,
+	LIMDL_POSE_FADE_OUT_INSTANT
+};
+
 struct _LIMdlPoseChannel
 {
 	int additive;
-	int fading;
 	int state;
 	int repeat;
 	int repeats;
@@ -44,15 +58,22 @@ struct _LIMdlPoseChannel
 	int priority_transform;
 	float weight_scale;
 	float weight_transform;
-	float fade_in;
-	float fade_out;
+	float fade_timer;
+	struct
+	{
+		int active;
+		int mode;
+		float duration;
+	} fade_in;
+	struct
+	{
+		int active;
+		int mode;
+		float duration;
+	} fade_out;
 	LIAlgStrdic* priorities;
 	LIAlgStrdic* weights;
 	LIMdlAnimation* animation;
-
-	float fade_time;
-	LIMdlPoseChannel* fade_prev;
-	LIMdlPoseChannel* fade_next;
 };
 
 LIAPICALL (LIMdlPoseChannel*, limdl_pose_channel_new, (

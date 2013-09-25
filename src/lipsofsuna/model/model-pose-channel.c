@@ -25,13 +25,11 @@
 #include "lipsofsuna/system.h"
 #include "model-pose-channel.h"
 
-static float private_smooth_fade (
-	float channel_weight,
-	float fade_offset,
-	float fade_length);
-
-/*****************************************************************************/
-
+/**
+ * \brief Creates a new pose channel.
+ * \param animation Animation.
+ * \return New pose channel.
+ */
 LIMdlPoseChannel* limdl_pose_channel_new (
 	LIMdlAnimation* animation)
 {
@@ -54,14 +52,21 @@ LIMdlPoseChannel* limdl_pose_channel_new (
 	self->animation = anim;
 	self->priority_scale = 0;
 	self->priority_transform = 0;
-	self->weight_scale = 0.0f;
+	self->weight_scale = 1.0f;
 	self->weight_transform = 1.0f;
 	self->time_scale = 1.0f;
 	self->repeat_end = -1.0f;
+	self->fade_in.mode = LIMDL_POSE_FADE_IN_AFTER_START;
+	self->fade_out.mode = LIMDL_POSE_FADE_OUT_AFTER_END;
 
 	return self;
 }
 
+/**
+ * \brief Creates a deep copy of the pose channel.
+ * \param channel Pose channel.
+ * \return Pose channel.
+ */
 LIMdlPoseChannel* limdl_pose_channel_new_copy (
 	LIMdlPoseChannel* channel)
 {
@@ -130,6 +135,10 @@ LIMdlPoseChannel* limdl_pose_channel_new_copy (
 	return self;
 }
 
+/**
+ * \brief Frees the pose channel.
+ * \param self Pose channel.
+ */
 void limdl_pose_channel_free (
 	LIMdlPoseChannel* self)
 {
@@ -145,6 +154,12 @@ void limdl_pose_channel_free (
 	lisys_free (self);
 }
 
+/**
+ * \brief Advances the playback of the pose channel.
+ * \param self Pose channel.
+ * \param secs Seconds since the last update.
+ * \return One if the channel is active. Zero if playback has finished.
+ */
 int limdl_pose_channel_play (
 	LIMdlPoseChannel* self,
 	float             secs)
@@ -154,11 +169,11 @@ int limdl_pose_channel_play (
 	float start;
 
 	/* Update fading. */
-	if (self->fading)
+	if (self->fade_out.active)
 	{
 		self->time += secs;
-		self->fade_time += secs;
-		if (self->fade_time >= self->fade_out)
+		self->fade_timer += secs;
+		if (self->fade_timer >= self->fade_out.duration)
 			return 0;
 		return 1;
 	}
@@ -202,36 +217,71 @@ int limdl_pose_channel_play (
 	return 1;
 }
 
+/**
+ * \brief Gets the fading weight of the channel.
+ * \param self Pose channel.
+ * \return Fading weight.
+ */
 float limdl_pose_channel_get_fading (
 	const LIMdlPoseChannel* self)
 {
 	float duration;
 	float time;
 	float end;
+	float weight1;
+	float weight2;
 
-	/* Calculate channel offset. */
+	/* Calculate the channel offset. */
 	duration = limdl_animation_get_duration (self->animation);
 	time = self->repeat * duration + self->time;
 	end = self->repeats * duration;
 
-	/* Calculate channel weight. */
-	if (!self->repeat && time < self->fade_in)
+	/* Handle fade in. */
+	weight1 = 1.0f;
+	switch (self->fade_in.mode)
 	{
-		/* Fade in period. */
-		return private_smooth_fade (1.0f, self->fade_in - time, self->fade_in);
+		case LIMDL_POSE_FADE_IN_AFTER_START:
+			if (time < self->fade_in.duration)
+				weight1 = time / self->fade_in.duration;
+			break;
+		case LIMDL_POSE_FADE_IN_BEFORE_START:
+			if (self->fade_in.active)
+				weight1 = self->fade_timer / self->fade_in.duration;
+			break;
+		case LIMDL_POSE_FADE_IN_INSTANT:
+				weight1 = 1.0f;
+			break;
 	}
-	else if (self->repeats == -1 || time < end - self->fade_out)
+
+	/* Handle fade out. */
+	weight2 = 1.0f;
+	switch (self->fade_out.mode)
 	{
-		/* No fade period. */
-		return 1.0f;
+		case LIMDL_POSE_FADE_OUT_AFTER_END:
+		case LIMDL_POSE_FADE_OUT_AFTER_END_REPEAT:
+			if (self->fade_out.active)
+				weight2 = 1.0f - self->fade_timer / self->fade_out.duration;
+			break;
+		case LIMDL_POSE_FADE_OUT_BEFORE_END:
+			if (time > end - self->fade_out.duration)
+				weight2 = time - (end - self->fade_out.duration) / self->fade_out.duration;
+			break;
+		case LIMDL_POSE_FADE_OUT_INSTANT:
+			if (self->fade_out.active)
+				weight2 = 0.0f;
+			break;
 	}
-	else
-	{
-		/* Fade out period. */
-		return private_smooth_fade (1.0f, time - (end - self->fade_out), self->fade_out);
-	}
+
+	return LIMAT_MIN (weight1, weight2);
 }
 
+/**
+ * \brief Gets the priority of the given node.
+ * \param self Pose channel.
+ * \param node Node name.
+ * \param scale Return location for the scale priority.
+ * \param transform Return location for the transform priority.
+ */
 void limdl_pose_channel_get_node_priority (
 	LIMdlPoseChannel* self,
 	const char*       node,
@@ -254,6 +304,13 @@ void limdl_pose_channel_get_node_priority (
 	*transform = self->priority_transform;
 }
 
+/**
+ * \brief Sets the priority of the given node.
+ * \param self Pose channel.
+ * \param node Node name.
+ * \param value Priority.
+ * \return One on success. Zero otherwise.
+ */
 int limdl_pose_channel_set_node_priority (
 	LIMdlPoseChannel* self,
 	const char*       node,
@@ -326,19 +383,12 @@ void limdl_pose_channel_get_weight (
 	float*                  scale,
 	float*                  transform)
 {
-	float end;
-	float time;
-	float duration;
+	float weight_fading;
 	float weight_scale;
 	float weight_transform;
 	float* weight_ptr;
 
-	/* Calculate channel offset. */
-	duration = limdl_animation_get_duration (self->animation);
-	time = self->repeat * duration + self->time;
-	end = self->repeats * duration;
-
-	/* Calculate base weights. */
+	/* Calculate the base weights. */
 	weight_scale = self->weight_scale;
 	weight_transform = self->weight_transform;
 	if (node != NULL && self->weights)
@@ -348,54 +398,12 @@ void limdl_pose_channel_get_weight (
 			weight_transform = *weight_ptr;
 	}
 
+	/* Calculate the fading weight. */
+	weight_fading = limdl_pose_channel_get_fading (self);
+
 	/* Calculate channel weight. */
-	if (!self->repeat && time < self->fade_in)
-	{
-		/* Fade in period. */
-		*scale = private_smooth_fade (weight_scale,
-			self->fade_in - time, self->fade_in);
-		*transform = private_smooth_fade (weight_transform,
-			self->fade_in - time, self->fade_in);
-	}
-	else if (self->repeats == -1 || time < end - self->fade_out)
-	{
-		/* No fade period. */
-		*scale = weight_scale;
-		*transform = weight_transform;
-	}
-	else
-	{
-		/* Fade out period. */
-		*scale = private_smooth_fade (weight_scale,
-			time - (end - self->fade_out), self->fade_out);
-		*transform = private_smooth_fade (weight_transform,
-			time - (end - self->fade_out), self->fade_out);
-	}
-}
-
-/*****************************************************************************/
-
-static float private_smooth_fade (
-	float channel_weight,
-	float fade_offset,
-	float fade_length)
-{
-	float weight_base;
-	float weight_scaled;
-	float weight_smoothing;
-
-	/* Calculates smooth fading. */
-	/* Linear fading of channels with wildly different weights doesn't
-	   look nice because the channel with the largest weight dominates.
-	   This is particularly problematic with cross-fading since there's
-	   no cross-fading at all without compensating for the difference. */
-	/* We reduce the problem by applying smoothstep() to the excess weight.
-	   This compensates for the weight difference by smoothly bringing the
-	   weight of the sequence closer to the [0,1] range. */
-	weight_base = 1.0f - (fade_offset / fade_length);
-	weight_scaled = weight_base * channel_weight;
-	weight_smoothing = 1.0f - limat_smoothstep (fade_offset, 0.0f, fade_length);
-	return weight_base + (weight_scaled - weight_base) * weight_smoothing;
+	*scale = weight_scale * weight_fading;
+	*transform = weight_transform * weight_fading;
 }
 
 /** @} */
