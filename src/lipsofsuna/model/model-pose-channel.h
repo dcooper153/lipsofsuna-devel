@@ -92,6 +92,12 @@ LIAPICALL (int, limdl_pose_channel_play, (
 LIAPICALL (float, limdl_pose_channel_get_fading, (
 	const LIMdlPoseChannel* self));
 
+LIAPICALL (float, limdl_pose_channel_get_current_time, (
+	const LIMdlPoseChannel* self));
+
+LIAPICALL (float, limdl_pose_channel_get_total_time, (
+	const LIMdlPoseChannel* self));
+
 LIAPICALL (void, limdl_pose_channel_get_node_priority, (
 	LIMdlPoseChannel* self,
 	const char*       node,

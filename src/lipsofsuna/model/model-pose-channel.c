@@ -56,6 +56,7 @@ LIMdlPoseChannel* limdl_pose_channel_new (
 	self->weight_transform = 1.0f;
 	self->time_scale = 1.0f;
 	self->repeat_end = -1.0f;
+	self->fade_in.active = 1;
 	self->fade_in.mode = LIMDL_POSE_FADE_IN_AFTER_START;
 	self->fade_out.mode = LIMDL_POSE_FADE_OUT_AFTER_END;
 
@@ -164,55 +165,110 @@ int limdl_pose_channel_play (
 	LIMdlPoseChannel* self,
 	float             secs)
 {
-	int cycles;
-	float duration;
-	float start;
+	float time;
+	float end;
+	float repeat_start;
+	float repeat_end;
 
-	/* Update fading. */
-	if (self->fade_out.active)
+	/* Advance fade in. */
+	switch (self->fade_in.mode)
 	{
-		self->time += secs;
-		self->fade_timer += secs;
-		if (self->fade_timer >= self->fade_out.duration)
-			return 0;
-		return 1;
+		case LIMDL_POSE_FADE_IN_AFTER_START:
+			self->fade_in.active = 0;
+			break;
+		case LIMDL_POSE_FADE_IN_BEFORE_START:
+			if (self->fade_in.active)
+			{
+				self->fade_timer += self->time_scale * secs;
+				if (self->fade_timer >= self->fade_in.duration)
+					self->fade_in.active = 0;
+				else
+					return 1;
+			}
+			break;
+		case LIMDL_POSE_FADE_IN_INSTANT:
+			self->fade_in.active = 0;
+			break;
 	}
 
-	/* Skip empty. */
-	duration = limdl_animation_get_duration (self->animation);
-	if (self->repeat_end >= 0.0f)
-		duration = LIMAT_MIN (self->repeat_end, duration);
-	if (duration < LIMAT_EPSILON)
+	/* Normal playback. */
+	if (!self->fade_out.active || self->fade_out.mode == LIMDL_POSE_FADE_OUT_AFTER_END_REPEAT)
 	{
-		self->time = 0.0f;
-		if (self->repeats == -1)
-			return 1;
-		return 0;
-	}
+		/* Get the looping range. */
+		repeat_end = limdl_animation_get_duration (self->animation);
+		if (self->repeat_end >= 0.0f)
+			repeat_end = LIMAT_MIN (self->repeat_end, repeat_end);
+		repeat_start = LIMAT_CLAMP (self->repeat_start, 0.0f, repeat_end);
 
-	/* Advance time. */
-	self->time += self->time_scale * secs;
-
-	/* Handle looping. */
-	if (self->time > duration)
-	{
-		start = LIMAT_CLAMP (self->repeat_start, 0.0f, duration);
-		if (start < duration)
+		/* Advance time. */
+		self->time += self->time_scale * secs;
+		while (self->time > repeat_end)
 		{
-			cycles = (int) floor ((self->time - start) / (duration - start));
-			self->time = self->time - (duration - start) * cycles;
-			self->repeat += cycles;
+			if (repeat_end - repeat_start < LIMAT_EPSILON)
+			{
+				self->time = repeat_start;
+				if (self->repeats != -1)
+					self->repeat = self->repeats;
+			}
+			else
+			{
+				self->time -= repeat_end;
+				self->time += repeat_start;
+				self->repeat++;
+			}
 		}
-		else
-		{
-			self->time = duration;
-			self->repeat++;
-		}
+
+		/* Calculate the absolute playback offset. */
+		time = limdl_pose_channel_get_current_time (self);
+		end = limdl_pose_channel_get_total_time (self);
 	}
 
-	/* Handle ending. */
-	if (self->repeats != -1 && self->repeat >= self->repeats)
-		return 0;
+	/* Advance fade out. */
+	switch (self->fade_out.mode)
+	{
+		case LIMDL_POSE_FADE_OUT_AFTER_END:
+			if (!self->fade_out.active && time >= end)
+			{
+				self->fade_out.active = 1;
+				self->fade_timer = 0.0f;
+			}
+			if (self->fade_out.active)
+			{
+				self->fade_timer += self->time_scale * secs;
+				if (self->fade_timer >= self->fade_out.duration)
+					return 0;
+				return 1;
+			}
+		case LIMDL_POSE_FADE_OUT_AFTER_END_REPEAT:
+			if (!self->fade_out.active && time >= end)
+			{
+				self->fade_out.active = 1;
+				self->fade_timer = 0.0f;
+			}
+			if (self->fade_out.active)
+			{
+				self->fade_timer += self->time_scale * secs;
+				if (self->fade_timer >= self->fade_out.duration)
+					return 0;
+			}
+			break;
+		case LIMDL_POSE_FADE_OUT_BEFORE_END:
+			if (time >= end)
+				return 0;
+			if (self->fade_out.active)
+			{
+				self->fade_timer += self->time_scale * secs;
+				if (self->fade_timer >= self->fade_out.duration)
+					return 0;
+			}
+			break;
+		case LIMDL_POSE_FADE_OUT_INSTANT:
+			if (time >= end)
+				return 0;
+			if (self->fade_out.active)
+				return 0;
+			break;
+	}
 
 	return 1;
 }
@@ -225,16 +281,14 @@ int limdl_pose_channel_play (
 float limdl_pose_channel_get_fading (
 	const LIMdlPoseChannel* self)
 {
-	float duration;
-	float time;
 	float end;
+	float time;
 	float weight1;
 	float weight2;
 
 	/* Calculate the channel offset. */
-	duration = limdl_animation_get_duration (self->animation);
-	time = self->repeat * duration + self->time;
-	end = self->repeats * duration;
+	end = limdl_pose_channel_get_total_time (self);
+	time = limdl_pose_channel_get_current_time (self);
 
 	/* Handle fade in. */
 	weight1 = 1.0f;
@@ -249,7 +303,6 @@ float limdl_pose_channel_get_fading (
 				weight1 = self->fade_timer / self->fade_in.duration;
 			break;
 		case LIMDL_POSE_FADE_IN_INSTANT:
-				weight1 = 1.0f;
 			break;
 	}
 
@@ -264,7 +317,10 @@ float limdl_pose_channel_get_fading (
 			break;
 		case LIMDL_POSE_FADE_OUT_BEFORE_END:
 			if (time > end - self->fade_out.duration)
-				weight2 = time - (end - self->fade_out.duration) / self->fade_out.duration;
+			{
+				weight2 = time - (end - self->fade_out.duration);
+				weight2 /= self->fade_out.duration;
+			}
 			break;
 		case LIMDL_POSE_FADE_OUT_INSTANT:
 			if (self->fade_out.active)
@@ -273,6 +329,92 @@ float limdl_pose_channel_get_fading (
 	}
 
 	return LIMAT_MIN (weight1, weight2);
+}
+
+/**
+ * \brief Gets the number of seconds played so far.
+ * 
+ * Gets the number of seconds played so far. The return value is comparable
+ * to that returned by limdl_pose_channel_get_total_time().
+ *
+ * Time scaling is not included, nor are the potential starting
+ * or ending delays caused be some of the fading modes.
+ * 
+ * \param self Pose channel.
+ * \return Time in seconds.
+ */
+float limdl_pose_channel_get_current_time (
+	const LIMdlPoseChannel* self)
+{
+	float duration;
+	float time;
+	float start;
+	float end;
+
+	/* Get the played animation range. */
+	duration = limdl_animation_get_duration (self->animation);
+	start = LIMAT_CLAMP (self->repeat_start, 0.0f, duration);
+	if (self->repeat_end < 0.0f)
+		end = duration;
+	else
+		end = LIMAT_CLAMP (self->repeat_end, start, duration);
+
+	/* Add the current position. */
+	if (self->repeat)
+		time = self->time - start;
+	else
+		time = self->time;
+
+	/* Add the first repeat. */
+	if (self->repeat)
+		time += end;
+
+	/* Add the subsequent repeats. */
+	if (self->repeat > 1)
+		time += (self->repeat - 1) * (end - start);
+
+	return time;
+}
+
+/**
+ * \brief Gets the total duration of the animation.
+ * 
+ * Gets the number of seconds playing the animation will take when repeating
+ * is included.
+ * 
+ * Time scaling is not included, nor are the potential starting
+ * or ending delays caused be some of the fading modes.
+ * 
+ * \param self Pose channel.
+ * \return Duration in seconds.
+ */
+float limdl_pose_channel_get_total_time (
+	const LIMdlPoseChannel* self)
+{
+	float duration;
+	float time;
+	float start;
+	float end;
+
+	/* Handle infinite repeating. */
+	if (self->repeats == -1)
+		return 1000000.0f;
+
+	/* Get the played animation range. */
+	duration = limdl_animation_get_duration (self->animation);
+	start = LIMAT_CLAMP (self->repeat_start, 0.0f, duration);
+	if (self->repeat_end < 0.0f)
+		end = duration;
+	else
+		end = LIMAT_CLAMP (self->repeat_end, start, duration);
+
+	/* Add the first repeat. */
+	time = end;
+
+	/* Add the subsequent repeats. */
+	time += self->repeats * (end - start);
+
+	return time;
 }
 
 /**

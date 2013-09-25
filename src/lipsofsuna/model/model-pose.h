@@ -128,6 +128,7 @@ LIAPICALL (float, limdl_pose_get_channel_fade_in, (
 LIAPICALL (void, limdl_pose_set_channel_fade_in, (
 	LIMdlPose* self,
 	int        channel,
+	int        mode,
 	float      value));
 
 LIAPICALL (float, limdl_pose_get_channel_fade_out, (
@@ -137,6 +138,7 @@ LIAPICALL (float, limdl_pose_get_channel_fade_out, (
 LIAPICALL (void, limdl_pose_set_channel_fade_out, (
 	LIMdlPose* self,
 	int        channel,
+	int        mode,
 	float      value));
 
 LIAPICALL (const char*, limdl_pose_get_channel_name, (

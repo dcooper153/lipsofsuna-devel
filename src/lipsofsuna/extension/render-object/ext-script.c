@@ -132,7 +132,7 @@ static void RenderObject_animate (LIScrArgs* args)
 	if (animation != NULL)
 	{
 		chan = limdl_pose_channel_new (animation);
-		chan->repeats = repeat? -1 : 1;
+		chan->repeats = repeat? -1 : 0;
 		chan->time = time;
 		chan->additive = additive;
 		chan->repeat_end = repeat_end;
@@ -156,13 +156,13 @@ static void RenderObject_animate (LIScrArgs* args)
 		if (liscr_args_gets_string (args, "fade_out_mode", &str))
 		{
 			if (!strcmp (str, "after end"))
-				chan->fade_in.mode = LIMDL_POSE_FADE_OUT_AFTER_END;
+				chan->fade_out.mode = LIMDL_POSE_FADE_OUT_AFTER_END;
 			else if (!strcmp (str, "after end repeat"))
-				chan->fade_in.mode = LIMDL_POSE_FADE_OUT_AFTER_END_REPEAT;
+				chan->fade_out.mode = LIMDL_POSE_FADE_OUT_AFTER_END_REPEAT;
 			else if (!strcmp (str, "before end"))
-				chan->fade_in.mode = LIMDL_POSE_FADE_OUT_BEFORE_END;
+				chan->fade_out.mode = LIMDL_POSE_FADE_OUT_BEFORE_END;
 			else if (!strcmp (str, "instant"))
-				chan->fade_in.mode = LIMDL_POSE_FADE_OUT_INSTANT;
+				chan->fade_out.mode = LIMDL_POSE_FADE_OUT_INSTANT;
 		}
 	}
 

@@ -61,7 +61,9 @@ end
 --   <li>animation: Animation name.</li>
 --   <li>channel: Channel number.</li>
 --   <li>fade_in: Fade in duration in seconds.</li>
+--   <li>fade_in_mode: Fade in mode as a string.</li>
 --   <li>fade_out: Fade out duration in seconds.</li>
+--   <li>fade_out_mode: Fade in mode as a string.</li>
 --   <li>node_weight: Sets blending weight multipliers for individual nodes.</li>
 --   <li>weight: Blending weight.</li>
 --   <li>time: Starting time.</li>
