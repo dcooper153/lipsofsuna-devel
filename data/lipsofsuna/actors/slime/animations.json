@@ -28,21 +28,21 @@
 		"name": "slime jump",
 		"animation": "slime2-bounce",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "slime land",
 		"animation": "slime2-bounce",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "slime tackle",
 		"animation": "slime2-tackle",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationProfileSpec",

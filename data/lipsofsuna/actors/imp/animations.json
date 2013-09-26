@@ -4,7 +4,7 @@
 		"name": "stoneimp attack bite",
 		"animation": "stoneimp1-bite",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
@@ -38,7 +38,7 @@
 		"fade_out": 0.4,
 		"permanent": true,
 		"repeat_start": 10,
-		"weight": 10
+		"priority": 10
 	},
 	{
 		"type": "AnimationSpec",

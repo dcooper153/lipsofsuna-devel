@@ -180,7 +180,6 @@
 		"fade_out": 0.1,
 		"permanent": true,
 		"repeat_start": 10,
-		"weight": 100,
 		"priority": 3,
 		"node_priorities": {"ARMS": 10}
 	},
@@ -189,21 +188,21 @@
 		"name": "default climb high",
 		"animation": "aer1-climb-high",
 		"channel": 5,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "default climb low",
 		"animation": "aer1-climb-low",
 		"channel": 5,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "default hang",
 		"animation": "aer1-hang",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
@@ -299,7 +298,7 @@
 		"animations": ["aer1-flinch1", "aer1-flinch2"],
 		"fade_in": 0.1,
 		"fade_out": 0.1,
-		"weight": 1000
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
@@ -438,7 +437,6 @@
 		"fade_in": 0,
 		"replace": true,
 		"time_frames": 20,
-		"weight": 1000,
 		"priority": 3,
 		"node_priorities": {"ARMS": 10}
 	},

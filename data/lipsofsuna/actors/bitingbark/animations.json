@@ -4,14 +4,14 @@
 		"name": "bitingbark attack claw left",
 		"animation": "bitingbark1-claw-left",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "bitingbark attack claw right",
 		"animation": "bitingbark1-claw-right",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",

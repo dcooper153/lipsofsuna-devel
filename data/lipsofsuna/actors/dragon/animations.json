@@ -4,21 +4,21 @@
 		"name": "dragon attack bite",
 		"animation": "dragon1-bite",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "dragon attack left claw",
 		"animation": "dragon1-claw-left",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "dragon attack right claw",
 		"animation": "dragon1-claw-right",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
@@ -49,7 +49,7 @@
 		"name": "dragon spell ranged",
 		"animation": "breathe-fire",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",

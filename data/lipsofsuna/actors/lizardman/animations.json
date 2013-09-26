@@ -4,28 +4,28 @@
 		"name": "lizardman attack bite",
 		"animation": "lizardman2-bite",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "lizardman attack claw left",
 		"animation": "lizardman2-claw-left",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "lizardman attack claw right",
 		"animation": "lizardman2-claw-right",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "lizardman attack punch",
 		"animation": "lizardman2-punch",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",

@@ -4,7 +4,7 @@
 		"name": "rat attack bite",
 		"animation": "plaguerat1-bite",
 		"channel": 2,
-		"weight": 30
+		"priority": 30
 	},
 	{
 		"type": "AnimationSpec",
