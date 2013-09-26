@@ -85,11 +85,11 @@ LIAPICALL (void, limdl_pose_update, (
 	LIMdlPose* self,
 	float      secs));
 
-LIAPICALL (int, limdl_pose_get_channel_additive, (
+LIAPICALL (int, limdl_pose_get_channel_blend_mode, (
 	const LIMdlPose* self,
 	int              channel));
 
-LIAPICALL (void, limdl_pose_set_channel_additive, (
+LIAPICALL (void, limdl_pose_set_channel_blend_mode, (
 	LIMdlPose* self,
 	int        channel,
 	int        value));

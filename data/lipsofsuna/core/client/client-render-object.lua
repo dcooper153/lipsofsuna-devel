@@ -383,8 +383,8 @@ ClientRenderObject.set_tilt = function(self, nodes, value)
 	for k,v in pairs(nodes) do
 		anim:set_transform{frame = 1, node = v, rotation = rot}
 	end
-	self:animate{animation = anim, channel = Animation.CHANNEL_TILT, additive = true,
-		fade_in = 0, fade_out = 0, permanent = true, replace = true, weight = 1}
+	self:animate{animation = anim, channel = Animation.CHANNEL_TILT, blend_mode = "add",
+		fade_in = 0, fade_out = 0, permanent = true, priority = 1000, replace = true, weight = 1}
 end
 
 return ClientRenderObject

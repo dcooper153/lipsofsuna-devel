@@ -32,6 +32,7 @@ local AnimationSpec = Spec:register("AnimationSpec", "animation", {
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "animation", type = "string", description = "Animation file name."},
 	{name = "animations", type = "list", list = {type = "string"}, description = "List of animation file names."},
+	{name = "blend_mode", type = "string", description = "Blending mode."},
 	{name = "channel", type = "number", description = "Channel number.", details = {integer = true, min = 0, max = 255}},
 	{name = "fade_in", type = "number", description = "Fade in duration."},
 	{name = "fade_in_mode", type = "string", description = "Fade in mode."},
@@ -67,6 +68,7 @@ end
 AnimationSpec.get_arguments = function(self, variant)
 	local res = {
 		animation = self.animation,
+		blend_mode = self.blend_mode,
 		channel = self.channel,
 		fade_in = self.fade_in,
 		fade_in_mode = self.fade_in_mode,

@@ -29,6 +29,13 @@ enum _LIMdlPoseChannelState
 	LIMDL_POSE_CHANNEL_STATE_PAUSED
 };
 
+enum _LIMdlPoseBlendMode
+{
+	LIMDL_POSE_BLEND_ADD,
+	LIMDL_POSE_BLEND_MIX,
+	LIMDL_POSE_BLEND_REPLACE
+};
+
 enum _LIMdlFadeInMode
 {
 	LIMDL_POSE_FADE_IN_AFTER_START,
@@ -46,7 +53,7 @@ enum _LIMdlFadeOutMode
 
 struct _LIMdlPoseChannel
 {
-	int additive;
+	int blend_mode;
 	int state;
 	int repeat;
 	int repeats;

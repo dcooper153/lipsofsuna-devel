@@ -48,6 +48,7 @@ LIMdlPoseChannel* limdl_pose_channel_new (
 		limdl_animation_free (anim);
 		return NULL;
 	}
+	self->blend_mode = LIMDL_POSE_BLEND_MIX;
 	self->state = LIMDL_POSE_CHANNEL_STATE_PLAYING;
 	self->animation = anim;
 	self->priority_scale = 0;
@@ -89,7 +90,7 @@ LIMdlPoseChannel* limdl_pose_channel_new_copy (
 		limdl_animation_free (anim);
 		return NULL;
 	}
-	self->additive = channel->additive;
+	self->blend_mode = channel->blend_mode;
 	self->state = channel->state;
 	self->repeat = channel->repeat;
 	self->repeats = channel->repeats;

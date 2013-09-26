@@ -82,7 +82,7 @@ static void RenderObject_add_texture_alias (LIScrArgs* args)
 
 static void RenderObject_animate (LIScrArgs* args)
 {
-	int additive = 0;
+	int blend_mode = LIMDL_POSE_BLEND_MIX;
 	int repeat = 0;
 	float repeat_start = 0.0f;
 	float repeat_end = -1.0f;
@@ -104,7 +104,15 @@ static void RenderObject_animate (LIScrArgs* args)
 
 	/* Handle arguments. */
 	object = args->self;
-	liscr_args_gets_bool (args, "additive", &additive);
+	if (liscr_args_gets_string (args, "blend_mode", &str))
+	{
+		if (!strcmp (str, "add"))
+			blend_mode = LIMDL_POSE_BLEND_ADD;
+		else if (!strcmp (str, "mix"))
+			blend_mode = LIMDL_POSE_BLEND_MIX;
+		else if (!strcmp (str, "replace"))
+			blend_mode = LIMDL_POSE_BLEND_REPLACE;
+	}
 	if (liscr_args_gets_data (args, "animation", LIEXT_SCRIPT_ANIMATION, &data))
 		animation = liscr_data_get_data (data);
 	liscr_args_gets_int (args, "channel", &channel);
@@ -134,7 +142,7 @@ static void RenderObject_animate (LIScrArgs* args)
 		chan = limdl_pose_channel_new (animation);
 		chan->repeats = repeat? -1 : 0;
 		chan->time = time;
-		chan->additive = additive;
+		chan->blend_mode = blend_mode;
 		chan->repeat_end = repeat_end;
 		chan->repeat_start = repeat_start;
 		chan->priority_scale = priority_scale;

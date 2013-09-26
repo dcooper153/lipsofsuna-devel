@@ -189,8 +189,27 @@ void limdl_pose_calculate_node_tranformation (
 		if (limdl_animation_get_transform (chan->animation, node, chan->time, &node_scale, &node_transform))
 		{
 			limdl_pose_channel_get_weight (chan, node, &weight1, &weight);
-			result_transform->rotation = limat_quaternion_nlerp (node_transform.rotation, result_transform->rotation, weight);
-			result_transform->position = limat_vector_lerp (node_transform.position, result_transform->position, weight);
+			switch (chan->blend_mode)
+			{
+				case LIMDL_POSE_BLEND_ADD:
+					node_transform.position = limat_vector_multiply (node_transform.position, weight);
+					node_transform.rotation = limat_quaternion_nlerp (node_transform.rotation, limat_quaternion_identity (), weight);
+					result_transform->rotation = limat_quaternion_multiply (
+						result_transform->rotation, node_transform.rotation);
+					result_transform->position = limat_vector_add (
+						result_transform->position, node_transform.position);
+					break;
+				case LIMDL_POSE_BLEND_MIX:
+					result_transform->rotation = limat_quaternion_nlerp (
+						node_transform.rotation, result_transform->rotation, weight);
+					result_transform->position = limat_vector_lerp (
+						node_transform.position, result_transform->position, weight);
+					break;
+				case LIMDL_POSE_BLEND_REPLACE:
+					result_transform->rotation = node_transform.rotation;
+					result_transform->position = node_transform.position;
+					break;
+			}
 		}
 	}
 
@@ -201,7 +220,18 @@ void limdl_pose_calculate_node_tranformation (
 		if (limdl_animation_get_transform (chan->animation, node, chan->time, &node_scale, &node_transform))
 		{
 			limdl_pose_channel_get_weight (chan, node, &weight, &weight1);
-			*result_scale = (*result_scale) * (1.0 - weight) + node_scale * weight;
+			switch (chan->blend_mode)
+			{
+				case LIMDL_POSE_BLEND_ADD:
+					*result_scale += (node_scale - 1.0f);
+					break;
+				case LIMDL_POSE_BLEND_MIX:
+					*result_scale = (*result_scale) * (1.0 - weight) + node_scale * weight;
+					break;
+				case LIMDL_POSE_BLEND_REPLACE:
+					*result_scale = node_scale;
+					break;
+			}
 		}
 	}
 
@@ -386,7 +416,7 @@ void limdl_pose_merge_channel (
 		limdl_pose_set_channel_position (self, channel, info->time);
 		limdl_pose_set_channel_state (self, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
 	}
-	limdl_pose_set_channel_additive (self, channel, info->additive);
+	limdl_pose_set_channel_blend_mode (self, channel, info->blend_mode);
 	limdl_pose_set_channel_repeat_end (self, channel, info->repeat_end);
 	limdl_pose_set_channel_repeat_start (self, channel, info->repeat_start);
 	limdl_pose_set_channel_priority_scale (self, channel, info->priority_scale);
@@ -452,7 +482,7 @@ void limdl_pose_update (
 	}
 }
 
-int limdl_pose_get_channel_additive (
+int limdl_pose_get_channel_blend_mode (
 	const LIMdlPose* self,
 	int              channel)
 {
@@ -461,10 +491,10 @@ int limdl_pose_get_channel_additive (
 	chan = private_find_channel (self, channel);
 	if (chan == NULL)
 		return 0;
-	return chan->additive;
+	return chan->blend_mode;
 }
 
-void limdl_pose_set_channel_additive (
+void limdl_pose_set_channel_blend_mode (
 	LIMdlPose* self,
 	int        channel,
 	int        value)
@@ -474,7 +504,7 @@ void limdl_pose_set_channel_additive (
 	chan = private_create_channel (self, channel);
 	if (chan == NULL)
 		return;
-	chan->additive = value;
+	chan->blend_mode = value;
 }
 
 LIMdlAnimation* limdl_pose_get_channel_animation (

@@ -59,18 +59,23 @@ end
 -- @param self Object.
 -- @param args Arguments.<ul>
 --   <li>animation: Animation name.</li>
+--   <li>blend_mode: Blending mode.</li>
 --   <li>channel: Channel number.</li>
 --   <li>fade_in: Fade in duration in seconds.</li>
 --   <li>fade_in_mode: Fade in mode as a string.</li>
 --   <li>fade_out: Fade out duration in seconds.</li>
 --   <li>fade_out_mode: Fade in mode as a string.</li>
+--   <li>node_priorities: Sets blending priorities for individual nodes.</li>
 --   <li>node_weight: Sets blending weight multipliers for individual nodes.</li>
---   <li>weight: Blending weight.</li>
+--   <li>permanent: True if should keep repeating.</li>
+--   <li>priority: Blending priority of rotation and translation.</li>
+--   <li>priority_scale: Blending priority of scaling.</li></ul>
+--   <li>repeat_start: Starting time when repeating.</li>
+--   <li>replace: Completely replace the overwritten animation.</li>
 --   <li>time: Starting time.</li>
 --   <li>time_scale: Time scaling factor.</li>
---   <li>permanent: True if should keep repeating.</li>
---   <li>repeat_start: Starting time when repeating.</li>
---   <li>replace: Completely replace the overwritten animation.</li></ul>
+--   <li>weight: Blending weight of rotation and translation.</li>
+--   <li>weight_scale: Blending weight of scaling.</li></ul>
 -- @return True if started a new animation.
 RenderObject.animate = function(self, args)
 	if type(args.animation) == "string" then
