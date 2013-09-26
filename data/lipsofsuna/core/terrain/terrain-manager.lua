@@ -359,6 +359,17 @@ TerrainManager.get_chunk_xz_range_by_point = function(self, point, radius)
 	return x0, z0, x1, z1
 end
 
+--- Maps a world space point to grid coordinates.
+-- @param self TerrainManager.
+-- @param x X coordinate in world units.
+-- @param z Z coordinate in world units.
+-- @return Grid coordinates.
+TerrainManager.get_column_xz_by_point = function(self, x, z)
+	local x = math.floor(x / self.grid_size)
+	local z = math.floor(z / self.grid_size)
+	return x, z
+end
+
 --- Enables or disables terrain generation.
 -- @param self TerrainManager.
 -- @param value True to enable. False otherwise.

@@ -1,5 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 local Obstacle = require("core/objects/obstacle")
+local TerrainMaterialSpec = require("core/specs/terrain-material")
 
 -- Spawn trees and plants.
 local WildernessModifier = ModifierSpec:find_by_name("wilderness")
@@ -9,55 +10,40 @@ local WildernessModifier = ModifierSpec:find_by_name("wilderness")
 -- @param value Strength of the modifier.
 -- @return True to enable effect-over-time updates. False otherwise.
 WildernessModifier.start = function(modifier, value)
-	-- FIXME: Not migrated yet.
-	do return end
-	-- Calculate spell radius.
-	local s = math.min(args.value, 100) / 100
-	local r = 4 * s
-	if args.owner.spec.categories["devora"] then
-		r = math.ceil(r * 1.5)
-	end
-	r = 2 + math.max(r,1)
-	-- Create grass from soil.
-	local soil = Material:find{name = "soil1"}
-	local grass = Material:find{name = "grass1"}
-	local org = (args.point * Voxel.tile_scale):floor()
-	local pos = Vector()
+	-- Find an empty ground spot under the player.
+	local org = Utils:find_empty_ground(modifier.point)
+	if not org then return end
+	-- Find empty ground spots around the player.
+	local r = 5
+	local pos = org:copy()
 	local hits = {}
-	for x=org.x-r,org.x+r do
-		pos.x = x
-		for z=org.z-r,org.z+r do
-			pos.z = z
-			local blocked = true
-			for y=org.y+r+1,org.y-r,-1 do
-				pos.y = y
-				local tile = Voxel:get_tile(pos)
-				if not blocked then
-					if tile == soil:get_id() then
-						Voxel:set_tile(pos, grass:get_id())
-					end
-					if tile == soil:get_id() or tile == grass:get_id() then
-						local vec = Vector(x,y,z)
-						table.insert(hits, vec)
-					end
+	for x=-r,r do
+		pos.x = org.x + Main.terrain.grid_size * x
+		for z=-r,r do
+			pos.z = org.z + Main.terrain.grid_size * z
+			local ground = Utils:find_empty_ground(pos)
+			if ground then
+				local gx,gz = Main.terrain:get_column_xz_by_point(ground.x, ground.z)
+				local y,h,mat = Main.terrain.terrain:get_stick(gx, gz, ground.y - 0.01)
+				local matspec = TerrainMaterialSpec:find_by_id(mat)
+				if matspec and (matspec.name == "soil" or matspec.name == "grass") then
+					table.insert(hits, ground)
 				end
-				blocked = (tile ~= 0)
 			end
 		end
 	end
 	-- Create wilderness obstacles.
-	if #hits then
-		for i=1,math.ceil(s/25) do
+	if #hits > 0 then
+		for i=1,5 do
 			local k = math.random(1,#hits)
 			local p = hits[k]
 			if p then
 				hits[k] = nil
 				local obstspec = Obstaclespec:random{category = "wilderness"}
 				if obstspec then
-					local pos = (p + Vector(0.5,0.5,0.5)) * Voxel.tile_size
-					if Utils:check_room(pos, obstspec.model) then
-						local o = Obstacle(args.owner.manager)
-						o:set_position(pos)
+					if Utils:check_room(p, obstspec.model) then
+						local o = Obstacle(modifier.owner.manager)
+						o:set_position(p)
 						o:set_spec(obstspec)
 						o:set_visible(true)
 					end
