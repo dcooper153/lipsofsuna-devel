@@ -336,6 +336,10 @@ ClientRenderObject.update_scale = function(self)
 	if args then
 		self:animate(args)
 	end
+	local args = RenderUtils:create_breast_animation(self.object)
+	if args then
+		self:animate(args)
+	end
 end
 
 --- Sets the beheading state of the object.
@@ -383,10 +387,8 @@ ClientRenderObject.set_tilt = function(self, nodes, value)
 	for k,v in pairs(nodes) do
 		anim:set_transform{frame = 1, node = v, rotation = rot}
 	end
-	self:animate{animation = anim, channel = Animation.CHANNEL_TILT, blend_mode = "add",
+	self:animate{animation = anim, channel = 127, blend_mode = "add",
 		fade_in = 0, fade_out = 0, permanent = true, priority = 1000, replace = true, weight = 1}
 end
 
 return ClientRenderObject
-
-

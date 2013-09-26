@@ -21,10 +21,6 @@ end
 local Animation = Class("Animation")
 Animation.dict_name = setmetatable({}, {__mode = "v"})
 
--- FIXME
-Animation.CHANNEL_TILT = 127
-Animation.CHANNEL_CUSTOMIZE = 128
-
 --- Creates an empty animation.
 -- @param clss Animation class.
 -- @param name Animation name.

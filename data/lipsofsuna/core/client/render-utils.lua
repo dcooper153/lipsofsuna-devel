@@ -17,6 +17,30 @@ local ParticleEffect = require("core/effect/particle-effect") --FIXME
 -- @type RenderUtils
 local RenderUtils = Class("RenderUtils")
 
+--- Creates a breast animation for an actor.
+-- @param self Render utils.
+-- @param actor Actor.
+-- @return Animation arguments, or nil.
+RenderUtils.create_breast_animation = function(self, actor)
+	-- Get the breast size.
+	if not actor.body_style then return end
+	local size = actor.body_style[3]
+	if not size then return end
+	size = size / 255
+	-- Determine the damping factor.
+	local curve = {[0.0] = 1, 0.8, 0.6, 0.4, 0.3, 0.2, 0.1, 0, 0, 0, 0, 0}
+	local index = math.floor(size * 10)
+	local mixing = 10 * size - index
+	local weight = (1 - mixing) * curve[index] + mixing * curve[index + 1]
+	--local weight = math.min(1, 1 - (size / 0.5))
+	-- Create the animation.
+	local anim = Animation("breast")
+	anim:set_transform{frame = 1, node = "breast.L"}
+	anim:set_transform{frame = 1, node = "breast.R"}
+	return {channel = 126, animation = anim,
+		fade_in = 0, fade_out = 0, permanent = true, priority = 999, replace = true, weight = weight}
+end
+
 --- Creates a scale animation for an actor.
 -- @param self Render utils.
 -- @param spec Actor spec.
@@ -43,7 +67,7 @@ RenderUtils.create_scale_animation = function(self, spec, scale_body, scale_head
 			anim:set_transform{frame = 1, node = "head", scale = s}
 		end
 	end
-	return {channel = Animation.CHANNEL_CUSTOMIZE, animation = anim, fade_in = 0,
+	return {channel = 127, animation = anim, fade_in = 0,
 		fade_out = 0, permanent = true, replace = true, weight = 0, weight_scale = 1000}
 end
 
