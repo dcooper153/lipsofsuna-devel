@@ -39,7 +39,7 @@
 			"ranged spell": true
 		},
 		"description": "Conjure infectious plagued monsters",
-		"effect": "spell1",
+		"effect": "FIXME",
 		"icon": "modifier-black haze",
 		"projectile": "fireball1",
 		"spell_strength": 1,
@@ -64,7 +64,7 @@
 			"touch spell": true
 		},
 		"description": "Boost the maximum health and willpower of the target",
-		"effect": "spell1",
+		"effect": "FIXME",
 		"icon": "modifier-heal",
 		"projectile": "fireball1",
 		"spell_strength": 60,
@@ -140,7 +140,7 @@
 			"touch spell": true
 		},
 		"description": "Cure the target of poison and diseases",
-		"effect": "spell1",
+		"effect": "FIXME",
 		"icon": "modifier-heal",
 		"projectile": "fireball1",
 		"spell_strength": 1,
@@ -165,7 +165,7 @@
 			"touch spell": true
 		},
 		"description": "Damages the maximum health and willpower of the target",
-		"effect": "spell1",
+		"effect": "FIXME",
 		"icon": "firewall",
 		"projectile": "fireball1",
 		"spell_strength": 60,
@@ -188,7 +188,7 @@
 			"ranged spell": true
 		},
 		"description": "Fire a digging ray",
-		"effect": "spell1",
+		"effect": "FIXME",
 		"icon": "modifier-earthmove",
 		"projectile": "fireball1",
 		"spell_strength": 1,
@@ -238,7 +238,7 @@
 			"self spell": true
 		},
 		"description": "Conjure a fire elemental",
-		"effect": "spell1",
+		"effect": "FIXME",
 		"icon": "firewall",
 		"spell_strength": 60,
 		"required_stats":
@@ -405,7 +405,7 @@
 			"ranged spell": true
 		},
 		"description": "The target takes poison damage over time",
-		"effect": "spell1",
+		"effect": "FIXME",
 		"icon": "modifier-black haze",
 		"projectile": "fireball1",
 		"spell_strength": 10,

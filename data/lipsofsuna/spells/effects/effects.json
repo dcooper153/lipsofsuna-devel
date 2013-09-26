@@ -1,6 +1,13 @@
 [
 	{
 		"type": "Effectspec",
+		"name": "FIXME",
+		"particle": "spell1",
+		"particle_life": 5,
+		"sound": "spellberserk1"
+	},
+	{
+		"type": "Effectspec",
 		"name": "berserk1",
 		"particle": "spell1",
 		"particle_life": 5,
