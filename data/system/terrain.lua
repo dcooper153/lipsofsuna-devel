@@ -459,6 +459,16 @@ Terrain.get_nearest_chunk_with_outdated_model = function(self, x, z)
 	return Los.terrain_get_nearest_chunk_with_outdated_model(self.handle, x, z)
 end
 
+--- Gets a stick.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @param y World unit Y offset.
+-- @return Starting Y offset, height and material.
+Terrain.get_stick = function(self, x, z, y)
+	return Los.terrain_get_stick(self.handle, x, z, y)
+end
+
 --- Returns an iterator for sticks in the given sphere.
 -- @param self Terrain.
 -- @param point Point in world units.

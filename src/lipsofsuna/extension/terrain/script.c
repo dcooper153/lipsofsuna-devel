@@ -885,6 +885,48 @@ static void Terrain_get_nearest_chunk_with_outdated_model (LIScrArgs* args)
 	liscr_args_seti_int (args, result_z);
 }
 
+static void Terrain_get_stick (LIScrArgs* args)
+{
+	int grid_x;
+	int grid_z;
+	float y;
+	float ref_y;
+	LIExtTerrainColumn* column;
+	LIExtTerrainStick* stick;
+
+	/* Get the arguments. */
+	if (!liscr_args_geti_int (args, 0, &grid_x) || grid_x < 0)
+		return;
+	if (!liscr_args_geti_int (args, 1, &grid_z) || grid_z < 0)
+		return;
+	if (!liscr_args_geti_float (args, 2, &ref_y))
+		return;
+
+	/* Get the column. */
+	column = liext_terrain_get_column (args->self, grid_x, grid_z);
+	if (column == NULL)
+		return;
+
+	/* Find the stick. */
+	y = 0.0f;
+	for (stick = column->sticks ; stick != NULL ; stick = stick->next)
+	{
+		if (ref_y < y + stick->height)
+		{
+			liscr_args_seti_float (args, y);
+			liscr_args_seti_float (args, stick->height);
+			liscr_args_seti_int (args, stick->material);
+			return;
+		}
+		y += stick->height;
+	}
+
+	/* Return the infinite end stick. */
+	liscr_args_seti_float (args, y);
+	liscr_args_seti_float (args, 1000000.0f);
+	liscr_args_seti_int (args, 0);
+}
+
 /*****************************************************************************/
 
 void liext_script_terrain (
@@ -921,6 +963,7 @@ void liext_script_terrain (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_set_material_textures", Terrain_set_material_textures);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_memory_used", Terrain_get_memory_used);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_nearest_chunk_with_outdated_model", Terrain_get_nearest_chunk_with_outdated_model);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_get_stick", Terrain_get_stick);
 }
 
 /** @} */
