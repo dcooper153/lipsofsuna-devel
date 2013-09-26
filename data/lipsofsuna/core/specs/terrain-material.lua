@@ -22,7 +22,9 @@ local TerrainMaterialSpec = Spec:register("TerrainMaterialSpec", "terrain materi
 	{name = "top_texture", type = "number", description = "Texture number of the top surface"},
 	{name = "bottom_texture", type = "number", description = "Texture number of the bottom surface"},
 	{name = "side_texture", type = "number", description = "Texture number of the side surfaces"},
-	{name = "decoration_texture", type = "number", description = "Texture number of the decoration"}
+	{name = "decoration_texture", type = "number", description = "Texture number of the decoration"},
+	{name = "decoration_type", type = "number", description = "Decoration type"},
+	{name = "stick_type", type = "number", description = "Stick type"}
 })
 
 --- Creates a new terrain material specification.

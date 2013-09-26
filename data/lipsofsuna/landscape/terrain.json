@@ -1,0 +1,25 @@
+[
+	{
+		"type": "TerrainMaterialSpec",
+		"name": "sand",
+		"top_texture": 0,
+		"bottom_texture": 0,
+		"side_texture": 0
+	},
+	{
+		"type": "TerrainMaterialSpec",
+		"name": "grass",
+		"top_texture": 1,
+		"bottom_texture": 1,
+		"side_texture": 1,
+		"decoration_texture": 3,
+		"decoration_type": 1
+	},
+	{
+		"type": "TerrainMaterialSpec",
+		"name": "granite",
+		"top_texture": 2,
+		"bottom_texture": 2,
+		"side_texture": 2
+	}
+]
