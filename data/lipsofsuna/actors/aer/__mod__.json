@@ -1,4 +1,4 @@
 {
 	"resources": ["."],
-	"specs": ["specs", "presets"]
+	"specs": ["animations", "specs", "presets"]
 }
