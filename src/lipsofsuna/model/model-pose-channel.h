@@ -85,6 +85,14 @@ LIAPICALL (LIMdlPoseChannel*, limdl_pose_channel_new_copy, (
 LIAPICALL (void, limdl_pose_channel_free, (
 	LIMdlPoseChannel* self));
 
+LIAPICALL (int, limdl_pose_channel_compare_scale, (
+	const LIMdlPoseChannel* self,
+	const LIMdlPoseChannel* chan));
+
+LIAPICALL (int, limdl_pose_channel_compare_transform, (
+	const LIMdlPoseChannel* self,
+	const LIMdlPoseChannel* chan));
+
 LIAPICALL (int, limdl_pose_channel_play, (
 	LIMdlPoseChannel* self,
 	float             secs));

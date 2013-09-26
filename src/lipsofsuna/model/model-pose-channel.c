@@ -137,6 +137,48 @@ LIMdlPoseChannel* limdl_pose_channel_new_copy (
 }
 
 /**
+ * \brief Compares the channels according to scale priority.
+ * \param self Pose channel.
+ * \param chan Pose channel.
+ * \return -1 if self has lower priority. 1 if greater. 0 if equal.
+ */
+int limdl_pose_channel_compare_scale (
+	const LIMdlPoseChannel* self,
+	const LIMdlPoseChannel* chan)
+{
+	if (self->priority_scale < chan->priority_scale)
+		return -1;
+	if (self->priority_scale > chan->priority_scale)
+		return 1;
+	if (self->fade_out.active && !chan->fade_out.active)
+		return -1;
+	if (!self->fade_out.active && chan->fade_out.active)
+		return 1;
+	return strcmp (self->animation->name, chan->animation->name);
+}
+
+/**
+ * \brief Compares the channels according to transform priority.
+ * \param self Pose channel.
+ * \param chan Pose channel.
+ * \return -1 if self has lower priority. 1 if greater. 0 if equal.
+ */
+int limdl_pose_channel_compare_transform (
+	const LIMdlPoseChannel* self,
+	const LIMdlPoseChannel* chan)
+{
+	if (self->priority_transform < chan->priority_transform)
+		return -1;
+	if (self->priority_transform > chan->priority_transform)
+		return 1;
+	if (self->fade_out.active && !chan->fade_out.active)
+		return -1;
+	if (!self->fade_out.active && chan->fade_out.active)
+		return 1;
+	return strcmp (self->animation->name, chan->animation->name);
+}
+
+/**
  * \brief Frees the pose channel.
  * \param self Pose channel.
  */

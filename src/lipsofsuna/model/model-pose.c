@@ -134,140 +134,79 @@ void limdl_pose_calculate_node_tranformation (
 	LIMatTransform* result_transform,
 	float*          result_scale)
 {
+	int i;
 	int tmp1;
 	int tmp2;
-	int channels_scale;
-	int channels_transform;
-	int priority_scale;
-	int priority_transform;
-	float scale;
-	float scale1;
-	float total_scale;
-	float total_transform;
+	float node_scale;
 	float weight;
 	float weight1;
 	LIAlgU32dicIter iter;
-	LIMatQuaternion bonerot;
-	LIMatQuaternion rotation;
-	LIMatTransform transform;
-	LIMatVector bonepos;
-	LIMatVector position;
+	LIMatTransform node_transform;
 	LIMdlPoseChannel* chan;
+	LIMdlPoseChannel* channels_s;
+	LIMdlPoseChannel* channels_t;
 
-	scale = 0.0f;
-	position = limat_vector_init (0.0f, 0.0f, 0.0f);
-	rotation = limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f);
+	/* Start from the identity transformation. */
+	*result_scale = 1.0f;
+	result_transform->position = limat_vector_init (0.0f, 0.0f, 0.0f);
+	result_transform->rotation = limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f);
 
-	/* Find the minimum active priority. */
-	/* The effect of the animation priority system is such that channels not
-	   played at all if their priorities are lower than the highest priority
-	   of the non-fading channels. In other words, under the normal conditions,
-	   only the channels that have the highest priority are played. */
-	priority_scale = -65535;
-	priority_transform = -65535;
+	/* Return immediately if no channels exist. */
+	if (!self->channels->size)
+		return;
+
+	/* Allocate space for the channels. */
+	channels_s = lisys_calloc (self->channels->size * 2, sizeof (LIMdlPoseChannel));
+	if (channels_s == NULL)
+		return;
+	channels_t = channels_s + self->channels->size;
+
+	/* Create shallow copies of the channels. */
+	i = 0;
 	LIALG_U32DIC_FOREACH (iter, self->channels)
 	{
 		chan = iter.value;
-		if (limdl_pose_channel_get_fading (chan) == 1.0f)
+		limdl_pose_channel_get_node_priority (chan, node, &tmp1, &tmp2);
+		channels_s[i] = *chan;
+		channels_s[i].priority_scale = tmp1;
+		channels_s[i].priority_transform = tmp2;
+		channels_t[i] = *chan;
+		channels_t[i].priority_scale = tmp1;
+		channels_t[i].priority_transform = tmp2;
+		i++;
+	}
+
+	/* Sort the channels by priority. */
+	qsort (channels_s, self->channels->size, sizeof (LIMdlPoseChannel),
+		(int(*)(const void*, const void*)) limdl_pose_channel_compare_scale);
+	qsort (channels_t, self->channels->size, sizeof (LIMdlPoseChannel),
+		(int(*)(const void*, const void*)) limdl_pose_channel_compare_transform);
+
+	/* Apply the transformation influences. */
+	for (i = 0 ; i < self->channels->size ; i++)
+	{
+		chan = channels_t + i;
+		if (limdl_animation_get_transform (chan->animation, node, chan->time, &node_scale, &node_transform))
 		{
-			limdl_pose_channel_get_node_priority (chan, node, &tmp1, &tmp2);
-			if (priority_scale < tmp1)
-				priority_scale = tmp1;
-			if (priority_transform < tmp2)
-				priority_transform = tmp2;
+			limdl_pose_channel_get_weight (chan, node, &weight1, &weight);
+			result_transform->rotation = limat_quaternion_nlerp (node_transform.rotation, result_transform->rotation, weight);
+			result_transform->position = limat_vector_lerp (node_transform.position, result_transform->position, weight);
 		}
 	}
 
-	/* Sum channel weights. */
-	channels_scale = 0;
-	channels_transform = 0;
-	total_scale = 0.0f;
-	total_transform = 0.0f;
-	LIALG_U32DIC_FOREACH (iter, self->channels)
+	/* Apply the scaling influences. */
+	for (i = 0 ; i < self->channels->size ; i++)
 	{
-		chan = iter.value;
-		if (chan->additive)
-			continue;
-		if (limdl_animation_get_channel (chan->animation, node) != -1)
+		chan = channels_s + i;
+		if (limdl_animation_get_transform (chan->animation, node, chan->time, &node_scale, &node_transform))
 		{
-			limdl_pose_channel_get_node_priority (chan, node, &tmp1, &tmp2);
 			limdl_pose_channel_get_weight (chan, node, &weight, &weight1);
-			if (tmp1 >= priority_scale)
-			{
-				total_scale += weight;
-				channels_scale++;
-			}
-			if (tmp2 >= priority_transform)
-			{
-				total_transform += weight1;
-				channels_transform++;
-			}
+			*result_scale = (*result_scale) * (1.0 - weight) + node_scale * weight;
 		}
 	}
 
-	/* Apply valid transformation influences. */
-	if (channels_transform && total_transform >= LIMAT_EPSILON)
-	{
-		LIALG_U32DIC_FOREACH (iter, self->channels)
-		{
-			chan = iter.value;
-			if (chan->additive)
-				continue;
-			limdl_pose_channel_get_node_priority (chan, node, &tmp1, &tmp2);
-			if (tmp2 < priority_transform)
-				continue;
-			if (limdl_animation_get_transform (chan->animation, node, chan->time, &scale1, &transform))
-			{
-				bonepos = transform.position;
-				bonerot = transform.rotation;
-				limdl_pose_channel_get_weight (chan, node, &weight1, &weight);
-				rotation = limat_quaternion_nlerp (bonerot, rotation, weight / total_transform);
-				position = limat_vector_lerp (bonepos, position, weight / total_transform);
-			}
-		}
-	}
-
-	/* Apply valid scale influences. */
-	if (channels_scale && total_scale >= LIMAT_EPSILON)
-	{
-		LIALG_U32DIC_FOREACH (iter, self->channels)
-		{
-			chan = iter.value;
-			limdl_pose_channel_get_node_priority (chan, node, &tmp1, &tmp2);
-			if (tmp1 < priority_scale)
-				continue;
-			if (limdl_animation_get_transform (chan->animation, node, chan->time, &scale1, &transform))
-			{
-				limdl_pose_channel_get_weight (chan, node, &weight, &weight1);
-				scale += scale1 * weight / total_scale;
-			}
-		}
-	}
-	else
-		scale = 1.0f;
-
-	/* Apply additive transformations and scaling. */
-	/* Additive channels aren't normalized against the total weight but applied as
-	   is on top of other transformations. The weight of additive channels has no
-	   effect on the result. */
-	LIALG_U32DIC_FOREACH (iter, self->channels)
-	{
-		chan = iter.value;
-		if (!chan->additive)
-			continue;
-		if (limdl_animation_get_transform (chan->animation, node, chan->time, &scale1, &transform))
-		{
-			bonepos = transform.position;
-			bonerot = transform.rotation;
-			rotation = limat_quaternion_multiply (bonerot, rotation);
-			position = limat_vector_add (bonepos, position);
-			scale *= scale1;
-		}
-	}
-
-	/* Return the transformation. */
-	*result_transform = limat_transform_init (position, rotation);
-	*result_scale = scale;
+	/* Free the shallow copies. */
+	lisys_free (channels_s);
 }
 
 void limdl_pose_clear_channel_node_priorities (
