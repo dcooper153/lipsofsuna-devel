@@ -35,17 +35,22 @@ local AnimationSpec = Spec:register("AnimationSpec", "animation", {
 	{name = "blend_mode", type = "string", description = "Blending mode."},
 	{name = "channel", type = "number", description = "Channel number.", details = {integer = true, min = 0, max = 255}},
 	{name = "fade_in", type = "number", description = "Fade in duration."},
+	{name = "fade_in_frames", type = "number", description = "Fade in duration in frames."},
 	{name = "fade_in_mode", type = "string", description = "Fade in mode."},
 	{name = "fade_out", type = "number", description = "Fade out duration."},
 	{name = "fade_out_mode", type = "string", description = "Fade out mode."},
+	{name = "fade_out_frames", type = "number", description = "Fade out duration in frames."},
 	{name = "node_priorities", type = "dict", dict = {type = "number"}, description = "Blending priorities for individual bones."},
 	{name = "node_weights", type = "dict", dict = {type = "number"}, description = "Blending weights for individual bones."},
 	{name = "permanent", type = "boolean", description = "Enables looping of the animation."},
 	{name = "priority", type = "number", description = "Blending priority."},
 	{name = "repeat_end", type = "number", description = "Repeat range end offset."},
+	{name = "repeat_end_frames", type = "number", description = "Repeat range end offset in frames."},
 	{name = "repeat_start", type = "number", description = "Repeat range start offset."},
+	{name = "repeat_start_frames", type = "number", description = "Repeat range start offset in frames."},
 	{name = "replace", type = "boolean", description = "True to replace the old animation, false to inherit it when possible."},
 	{name = "time", type = "number", description = "Starting time offset."},
+	{name = "time_frames", type = "number", description = "Starting time offset in frames."},
 	{name = "time_scale", type = "number", description = "Time scale multiplier."},
 	{name = "weight", type = "number", description = "Blending weight."},
 	{name = "weight_scale", type = "number", description = "Blending weight for scaling."}
@@ -58,6 +63,12 @@ local AnimationSpec = Spec:register("AnimationSpec", "animation", {
 AnimationSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
+	local s = 0.02
+	if self.fade_in_frames then self.fade_in = self.fade_in_frames * s end
+	if self.fade_out_frames then self.fade_out = self.fade_out_frames * s end
+	if self.repeat_end_frames then self.repeat_end = self.repeat_end_frames * s end
+	if self.repeat_start_frames then self.repeat_start = self.repeat_start_frames * s end
+	if self.time_frames then self.time = self.time_frames * s end
 	return self
 end
 

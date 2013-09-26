@@ -1,15 +1,13 @@
 local AnimationProfileSpec = require("core/specs/animation-profile")
 local AnimationSpec = require("core/specs/animation")
 
-local frames = function(n) return n * 0.02 end
-
 AnimationSpec{
 	name = "default attack back",
 	animation = "aer1-attack-back",
 	channel = 2,
 	fade_in_mode = "instant",
 	replace = true,
-	time = frames(20),
+	time_frames = 20,
 	priority = 10,
 	node_priorities = {LOWER = 3}}
 
@@ -19,7 +17,7 @@ AnimationSpec{
 	channel = 2,
 	fade_in_mode = "instant",
 	replace = true,
-	time = frames(20),
+	time_frames = 20,
 	priority = 10,
 	node_priorities = {LOWER = 3}}
 
@@ -29,7 +27,7 @@ AnimationSpec{
 	channel = 2,
 	fade_in_mode = "instant",
 	replace = true,
-	time = frames(20),
+	time_frames = 20,
 	priority = 10,
 	node_priorities = {LOWER = 3}}
 
@@ -39,7 +37,7 @@ AnimationSpec{
 	channel = 2,
 	fade_in_mode = "instant",
 	replace = true,
-	time = frames(20),
+	time_frames = 20,
 	priority = 10,
 	node_priorities = {LOWER = 3}}
 
@@ -58,7 +56,7 @@ AnimationSpec{
 	channel = 2,
 	fade_in_mode = "instant",
 	replace = true,
-	time = frames(20),
+	time_frames = 20,
 	priority = 10,
 	node_priorities = {LOWER = 3}}
 
@@ -92,8 +90,8 @@ AnimationSpec{
 	fade_in = 0.1,
 	fade_out_mode = "instant",
 	permanent = true,
-	repeat_end = frames(20),
-	repeat_start = frames(20),
+	repeat_end_frames = 20,
+	repeat_start_frames = 20,
 	priority = 3,
 	node_priorities = {ARMS = 10}}
 
@@ -104,8 +102,8 @@ AnimationSpec{
 	fade_in = 0.1,
 	fade_out_mode = "instant",
 	permanent = true,
-	repeat_end = frames(20),
-	repeat_start = frames(20),
+	repeat_end_frames = 20,
+	repeat_start_frames = 20,
 	priority = 3,
 	node_priorities = {ARMS = 10}}
 
@@ -116,8 +114,8 @@ AnimationSpec{
 	fade_in = 0.1,
 	fade_out_mode = "instant",
 	permanent = true,
-	repeat_end = frames(20),
-	repeat_start = frames(20),
+	repeat_end_frames = 20,
+	repeat_start_frames = 20,
 	priority = 3,
 	node_priorities = {ARMS = 10}}
 
@@ -128,8 +126,8 @@ AnimationSpec{
 	fade_in = 0.1,
 	fade_out_mode = "instant",
 	permanent = true,
-	repeat_end = frames(20),
-	repeat_start = frames(20),
+	repeat_end_frames = 20,
+	repeat_start_frames = 20,
 	priority = 3,
 	node_priorities = {ARMS = 10}}
 
@@ -140,8 +138,8 @@ AnimationSpec{
 	fade_in = 0.1,
 	fade_out_mode = "instant",
 	permanent = true,
-	repeat_end = frames(20),
-	repeat_start = frames(20),
+	repeat_end_frames = 20,
+	repeat_start_frames = 20,
 	priority = 3,
 	node_priorities = {ARMS = 10}}
 
@@ -155,8 +153,8 @@ AnimationSpec{
 	channel = 2,
 	fade_in = 0.1,
 	permanent = true,
-	repeat_end = frames(20),
-	repeat_start = frames(20),
+	repeat_end_frames = 20,
+	repeat_start_frames = 20,
 	priority = 3,
 	node_priorities = {ARMS = 10}}
 
@@ -394,7 +392,7 @@ AnimationSpec{
 	channel = 2,
 	fade_in = 0,
 	replace = true,
-	time = frames(20),
+	time_frames = 20,
 	weight = 1000,
 	priority = 3,
 	node_priorities = {ARMS = 10}}
@@ -523,7 +521,7 @@ AnimationSpec{
 	channel = 2,
 	fade_in = 0,
 	replace = true,
-	time = frames(20),
+	time_frames = 20,
 	priority = 10,
 	node_priorities = {LOWER = 3}}
 
@@ -533,8 +531,8 @@ AnimationSpec{
 	channel = 2,
 	fade_in = 0.1,
 	permanent = true,
-	repeat_end = frames(50),
-	repeat_start = frames(50),
+	repeat_end_frames = 50,
+	repeat_start_frames = 50,
 	weight = 5000,
 	node_weights = {LOWER = 1}}
 
@@ -651,7 +649,7 @@ AnimationSpec{
 	channel = 2,
 	fade_in = 0,
 	replace = true,
-	time = frames(20),
+	time_frames = 20,
 	priority = 10,
 	node_priorities = {LOWER = 3}}
 
@@ -661,7 +659,7 @@ AnimationSpec{
 	channel = 2,
 	fade_in = 0,
 	replace = true,
-	time = frames(20),
+	time_frames = 20,
 	weight = 1000,
 	node_weights = {LOWER = 1}}
 
@@ -671,7 +669,7 @@ AnimationSpec{
 	channel = 2,
 	fade_in = 0,
 	replace = true,
-	time = frames(20),
+	time_frames = 20,
 	weight = 1000,
 	node_weights = {LOWER = 1}}
 
