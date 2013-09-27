@@ -34,7 +34,7 @@ WildernessModifier.start = function(modifier, value)
 	end
 	-- Create wilderness obstacles.
 	if #hits > 0 then
-		for i=1,5 do
+		for i=1,3 do
 			local k = math.random(1,#hits)
 			local p = hits[k]
 			if p then
@@ -46,9 +46,17 @@ WildernessModifier.start = function(modifier, value)
 						o:set_position(p)
 						o:set_spec(obstspec)
 						o:set_visible(true)
+						Main.vision:world_effect(p, "wilderness growth 1")
 					end
 				end
 			end
 		end
 	end
+end
+
+--- Applies the modifier.
+-- @param modifier Modifier.
+-- @param value Strength of the modifier.
+WildernessModifier.start_terrain = function(modifier, value)
+	WildernessModifier.start(modifier, value)
 end

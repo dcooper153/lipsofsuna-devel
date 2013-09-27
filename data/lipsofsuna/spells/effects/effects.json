@@ -85,5 +85,20 @@
 		"particle": "particle1",
 		"particle_life": 5,
 		"sound": "selfdestructcountdown1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "wilderness 1",
+		"particle": "particle1",
+		"particle_life": 5,
+		"sound": "wilderness1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "wilderness growth 1",
+		"particle": "particle1",
+		"particle_life": 5,
+		"sound": "wilderness-growth1",
+		"sound_delay": 2
 	}
 ]

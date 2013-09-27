@@ -561,6 +561,7 @@
 		"name": "wilderness",
 		"actions":
 		{
+			"ranged spell": true,
 			"self spell": true
 		},
 		"categories":
@@ -568,7 +569,7 @@
 			"spell": true
 		},
 		"description": "Grow plants from soil",
-		"effect": "wilderness1",
+		"effect": "wilderness 1",
 		"icon": "modifier-nature",
 		"spell_strength": 5,
 		"required_stats":
