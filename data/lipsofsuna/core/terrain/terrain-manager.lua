@@ -17,7 +17,6 @@ local PhysicsConsts = require("core/server/physics-consts")
 local Program = require("system/core")
 local Terrain = require("system/terrain")
 local TerrainChunk = require("core/terrain/terrain-chunk")
-local TerrainChunkLoader = require("core/terrain/terrain-chunk-loader")
 local TerrainMaterialSpec = require("core/specs/terrain-material")
 
 --- Manages terrain chunks.
@@ -34,16 +33,13 @@ local TerrainManager = Class("TerrainManager", ChunkManager)
 -- @param graphics True to enable graphics.
 -- @return TerrainManager.
 TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, generate, graphics)
-	local self = ChunkManager.new(clss, chunk_size, grid_size)
+	local create = function(m, x, z) return TerrainChunk(m, x, z) end
+	local self = ChunkManager.new(clss, chunk_size, grid_size, create)
 	self.database = database
 	self.generate = generate
 	self.graphics = graphics
-	self.loaders = {}
-	self.chunks = {}
 	self.unload_time = unloading and 10
 	self.unload_time_model = 3
-	self.chunk_size = chunk_size
-	self.grid_size = grid_size
 	self.generate_hooks = Hooks()
 	self.__view_distance = 48
 	self.terrain = Terrain(chunk_size, grid_size)
@@ -69,50 +65,11 @@ TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, 
 	return self
 end
 
---- Returns true if the chunk has finished loading.
--- @param self TerrainManager.
--- @param x X coordinate in grid units.
--- @param z Z coordinate in grid units.
-TerrainManager.is_chunk_loaded = function(self, x, z)
-	local id = self:get_chunk_id_by_xz(x, z)
-	if not self.chunks[id] then return end
-	if self.loaders[id] then return end
-	return true
-end
-
---- Returns true if the point has finished loading.
--- @param self TerrainManager.
--- @param point Point vector in world units.
-TerrainManager.is_point_loaded = function(self, point)
-	local id = self:get_chunk_id_by_point(point.x, point.z)
-	if not self.chunks[id] then return end
-	if self.loaders[id] then return end
-	return true
-end
-
---- Loads a chunk.
--- @param self TerrainManager.
--- @param x X coordinate in grid units.
--- @param z Z coordinate in grid units.
--- @return True if loaded, false if already loaded.
-TerrainManager.load_chunk = function(self, x, z)
-	-- Only load once.
-	local id = self:get_chunk_id_by_xz(x, z)
-	if self.chunks[id] then return end
-	-- Create the chunk.
-	self.chunks[id] = TerrainChunk(self, x, z)
-	self.chunks_iterator = nil
-	-- Create a chunk loader.
-	self.loaders[id] = TerrainChunkLoader(self, id, x, z)
-	self.loaders_iterator = nil
-	return true
-end
-
 --- Increases the timestamp of the chunks inside the given sphere.
 -- @param self TerrainManager.
 -- @param point Point in world space.
 -- @param radius Radius in world units.
-TerrainManager.refresh_chunks_by_point = function(self, point, radius, model)
+TerrainManager.refresh_chunks_by_point = function(self, point, radius)
 	local x0,z0,x1,z1 = self:get_chunk_xz_range_by_point(point, radius)
 	local t = Program:get_time()
 	for z = z0,z1,self.chunk_size do
@@ -151,22 +108,6 @@ TerrainManager.register_generate_hook = function(self, priority, hook)
 	self.generate_hooks:register(priority, hook)
 end
 
---- Loads or reloads a chunk.
--- @param self TerrainManager.
--- @param x X coordinate in grid units.
--- @param z Z coordinate in grid units.
-TerrainManager.reload_chunk = function(self, x, z)
-	-- Create the chunk.
-	local id = self:get_chunk_id_by_xz(x, z)
-	if not self.chunks[id] then
-		self.chunks[id] = TerrainChunk(self, x, z)
-		self.chunks_iterator = nil
-	end
-	-- Create a chunk loader.
-	self.loaders[id] = TerrainChunkLoader(self, id, x, z)
-	self.loaders_iterator = nil
-end
-
 --- Saves a chunk to the database.
 -- @param self TerrainManager.
 -- @param x X coordinate in grid units.
@@ -174,7 +115,9 @@ end
 TerrainManager.save_chunk = function(self, x, z)
 	if not self.database then return end
 	local id = self:get_chunk_id_by_xz(x, z)
-	if self.loaders[id] then return end
+	-- Skip chunks that are still loading.
+	local chunk = self.chunks[id]
+	if not chunk or chunk.loader then return end
 	-- Write terrain.
 	local data = Packet(1)
 	if not self.terrain:get_chunk_data(x, z, data) then
@@ -199,9 +142,8 @@ TerrainManager.save_all = function(self, erase)
 		self.database:query([[DELETE FROM terrain_chunks;]])
 	end
 	-- Write each chunk.
-	for id in pairs(self.chunks) do
-		local x,z = self:get_chunk_xz_by_id(id)
-		self:save_chunk(x, z)
+	for id,chunk in pairs(self.chunks) do
+		self:save_chunk(chunk.x, chunk.z)
 	end
 	self.database:query([[END TRANSACTION;]])
 end
@@ -217,89 +159,29 @@ TerrainManager.unload_all = function(self)
 		self.terrain:unload_chunk(self:get_chunk_xz_by_id(id))
 	end
 	-- Clear the dictionaries.
-	self.loaders = {}
-	self.loaders_iterator = nil
 	self.chunks = {}
 	self.chunks_iterator = nil
 end
 
---- Unloads a chunk without saving.
--- @param self TerrainManager.
--- @param x X coordinate in grid units.
--- @param z Z coordinate in grid units.
-TerrainManager.unload_chunk = function(self, x, z)
-	-- Unload the chunk.
-	local id = self:get_chunk_id_by_xz(x, z)
-	local chunk = self.chunks[id]
-	if not chunk then return end
-	if self.graphics then
-		chunk:detach_render_object()
-	end
-	self.terrain:unload_chunk(x, z)
-	-- Remove from the dictionaries.
-	self.chunks[id] = nil
-	self.chunks_iterator = nil
-	self.loaders[id] = nil
-	self.loaders_iterator = nil
-end
-
---- Unloads chunks that have been inactive long enough.
+--- Updates the state of the chunks.
 -- @param self TerrainManager.
 -- @param secs Seconds since the last update.
 TerrainManager.update = function(self, secs)
-	-- Update chunk loaders.
-	for i = 1,3 do
-		local key,loader = next(self.loaders, self.loaders_iterator)
-		self.loaders_iterator = key
-		if loader and not loader:update(secs) then
-			self.loaders[key] = nil
-		end
-	end
-	-- Update chunk models.
+	-- Load and unload chunks on demand.
+	ChunkManager.update(self, secs)
+	-- Build chunk models on demand.
 	if self.graphics and self.__view_center then
-		-- Mark chunks that require models.
-		self:refresh_models_by_point(self.__view_center, self.__view_distance)
 		-- Find the closest chunk that needs a model built.
+		self:refresh_models_by_point(self.__view_center, self.__view_distance)
 		local fx,fz = self:get_chunk_xz_by_point(self.__view_center.x, self.__view_center.z)
 		local gx,gz = self.terrain:get_nearest_chunk_with_outdated_model(fx, fz)
+		if not gx then return end
 		-- Build the model of the chunk.
-		if gx then
-			local id = self:get_chunk_id_by_xz(gx, gz)
-			local chunk = self.chunks[id]
-			if chunk and not self.loaders[id] then
-				if chunk.object or chunk.time_model then
-					chunk:create_render_object()
-				end
-			end
-		end
-	end
-	-- Unload unused chunks.
-	local t = Program:get_time()
-	for i = 1,8 do
-		local key,chunk = next(self.chunks, self.chunks_iterator)
-		self.chunks_iterator = key
-		if chunk then
-			if self.unload_time and t - chunk.time > self.unload_time then
-				-- Save fully loaded chunks.
-				local x,z = self:get_chunk_xz_by_id(key)
-				if self.loaders[key] then
-					self.loaders[key] = nil
-					self.loaders_iterator = nil
-				else
-					self:save_chunk(x, z)
-				end
-				-- Detach the render object.
-				if self.graphics then
-					chunk:detach_render_object()
-				end
-				-- Unload the chunk data.
-				self.terrain:unload_chunk(x, z)
-				self.chunks[key] = nil
-			elseif chunk.time_model and t - chunk.time_model >= self.unload_time_model then
-				-- Detach the render object.
-				local x,z = self:get_chunk_xz_by_id(key)
-				chunk:detach_render_object()
-				self.terrain:clear_chunk_model(x, z)
+		local id = self:get_chunk_id_by_xz(gx, gz)
+		local chunk = self.chunks[id]
+		if chunk and not chunk.loader then
+			if chunk.object or chunk.time_model then
+				chunk:create_render_object()
 			end
 		end
 	end

@@ -37,15 +37,6 @@ SectorManager.new = function(clss, grid_size, database, unloading)
 	return self
 end
 
---- Returns true if the sector has finished loading.
--- @param self SectorManager.
--- @param sector Sector ID.
-SectorManager.is_sector_loaded = function(self, sector)
-	if not self.sectors[sector] then return end
-	if self.loaders[sector] then return end
-	return true
-end
-
 --- Reads a sector from the database.
 -- @param self SectorManager.
 -- @param sector Sector ID.
@@ -67,6 +58,14 @@ end
 -- @param radius Refresh radius, in world units.
 SectorManager.refresh = function(self, point, radius)
 	Sectors:refresh(point, radius or 10)
+	do return end
+	local x0,z0,x1,z1 = self:get_chunk_xz_range_by_point(point, radius)
+	for x = x0,x1 do
+		for z = z0,z1 do
+			local id = self:get_chunk_id_by_xz(x, z)
+			Sectors:refresh(point, radius or 10)
+		end
+	end
 end
 
 --- Saves a sector to the database.
@@ -157,7 +156,7 @@ end
 SectorManager.update = function(self, secs)
 	-- Load sectors for players.
 	--
-	-- Sectors populared by players need extra priority because it's
+	-- Sectors populated by players need extra priority because it's
 	-- necessary that the terrain exists when players enter. Otherwise,
 	-- they could fall to emptiness when there are a lot of sectors
 	-- being loaded simulataneously.
