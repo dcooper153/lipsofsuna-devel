@@ -62,7 +62,7 @@ end
 --- Closes the subgame.
 -- @param self Crafting.
 Crafting.close = function(self)
-	Main.terrain:unload_all()
+	Main.terrain:unload_all_chunks()
 	Main.terrain = nil
 	Physics:set_enable_simulation(false)
 	ServerUtils:set_player_spawn_point()

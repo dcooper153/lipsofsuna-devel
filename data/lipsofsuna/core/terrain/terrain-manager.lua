@@ -12,7 +12,6 @@ local Class = require("system/class")
 local ChunkManager = require("system/chunk-manager")
 local Hooks = require("system/hooks")
 local PhysicsTerrain = require("system/physics-terrain")
-local Packet = require("system/packet")
 local PhysicsConsts = require("core/server/physics-consts")
 local Program = require("system/core")
 local Terrain = require("system/terrain")
@@ -108,29 +107,6 @@ TerrainManager.register_generate_hook = function(self, priority, hook)
 	self.generate_hooks:register(priority, hook)
 end
 
---- Saves a chunk to the database.
--- @param self TerrainManager.
--- @param x X coordinate in grid units.
--- @param z Z coordinate in grid units.
-TerrainManager.save_chunk = function(self, x, z)
-	if not self.database then return end
-	local id = self:get_chunk_id_by_xz(x, z)
-	-- Skip chunks that are still loading.
-	local chunk = self.chunks[id]
-	if not chunk or chunk.loader then return end
-	-- Write terrain.
-	local data = Packet(1)
-	if not self.terrain:get_chunk_data(x, z, data) then
-		print("ERROR: Could not save terrain")
-	end
-	self.database:query([[
-		DELETE FROM terrain_chunks
-		WHERE id=?;]], {id})
-	self.database:query([[
-		INSERT INTO terrain_chunks (id,data)
-		VALUES (?,?);]], {id, data})
-end
-
 --- Saves all active chunks to the database.
 -- @param self TerrainManager.
 -- @param erase True to completely erase the old map.
@@ -143,24 +119,9 @@ TerrainManager.save_all = function(self, erase)
 	end
 	-- Write each chunk.
 	for id,chunk in pairs(self.chunks) do
-		self:save_chunk(chunk.x, chunk.z)
+		chunk:save()
 	end
 	self.database:query([[END TRANSACTION;]])
-end
-
---- Unloads the world without saving.<br/>
--- @param self TerrainManager.
-TerrainManager.unload_all = function(self)
-	-- Unload the chunks.
-	for id,chunk in pairs(self.chunks) do
-		if self.graphics then
-			chunk:detach_render_object()
-		end
-		self.terrain:unload_chunk(self:get_chunk_xz_by_id(id))
-	end
-	-- Clear the dictionaries.
-	self.chunks = {}
-	self.chunks_iterator = nil
 end
 
 --- Updates the state of the chunks.

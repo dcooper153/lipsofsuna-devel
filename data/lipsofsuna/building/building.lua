@@ -60,7 +60,7 @@ end
 --- Closes the subgame.
 -- @param self Building.
 Building.close = function(self)
-	Main.terrain:unload_all();
+	Main.terrain:unload_all_chunks();
 	Main.terrain = nil
 	ServerUtils:set_player_spawn_point()
 end

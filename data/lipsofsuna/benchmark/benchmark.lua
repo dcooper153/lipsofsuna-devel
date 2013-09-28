@@ -67,7 +67,7 @@ end
 --- Removes benchmark objects from the scene.
 -- @param self Benchmark.
 Benchmark.close = function(self)
-	Main.terrain:unload_all()
+	Main.terrain:unload_all_chunks()
 	Main.terrain = nil
 end
 

@@ -9,11 +9,12 @@
 -- @alias TerrainChunk
 
 local Class = require("system/class")
+local Packet = require("system/packet")
 local Program = require("system/core")
 local TerrainChunkLoader = require("core/terrain/terrain-chunk-loader")
 local Vector = require("system/math/vector")
 
---- Manages terrain chunks.
+--- Stores information on a terrain chunk.
 -- @type TerrainChunk
 local TerrainChunk = Class("TerrainChunk")
 
@@ -79,8 +80,18 @@ end
 --- Saves the chunk.
 -- @param self TerrainChunk.
 TerrainChunk.save = function(self)
+	-- Skip chunks that are still loading.
+	if not self.manager.database then return end
 	if self.loader then return end
-	self.manager:save_chunk(self.x, self.z)
+	-- Write the chunk data.
+	local data = Packet(1)
+	if self.manager.terrain:get_chunk_data(self.x, self.z, data) then
+		self.manager.database:query([[
+			REPLACE INTO terrain_chunks (id,data)
+			VALUES (?,?);]], {self.id, data})
+	else
+		print("ERROR: Could not save terrain")
+	end
 end
 
 --- Updates the chunk.

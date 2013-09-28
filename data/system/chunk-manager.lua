@@ -71,6 +71,18 @@ ChunkManager.unload_chunk = function(self, x, z)
 	self.chunks_iterator = nil
 end
 
+--- Unloads all the chunks.
+-- @param self ChunkManager.
+ChunkManager.unload_all_chunks = function(self)
+	-- Unload the chunks.
+	for id,chunk in pairs(self.chunks) do
+		chunk:detach()
+	end
+	-- Clear the dictionaries.
+	self.chunks = {}
+	self.chunks_iterator = nil
+end
+
 --- Updates the state of the chunks.
 -- @param self ChunkManager.
 -- @param secs Seconds since the last update.

@@ -10,7 +10,7 @@ end)
 
 Main.game_end_hooks:register(100, function()
 	if not Main.terrain then return end
-	Main.terrain:unload_all()
+	Main.terrain:unload_all_chunks()
 	Main.terrain = nil
 end)
 
