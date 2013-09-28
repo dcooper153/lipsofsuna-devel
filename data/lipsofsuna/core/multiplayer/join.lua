@@ -51,8 +51,6 @@ Join.join_game = function(self, addr, port)
 	self.data.state = "init"
 	self.data.remote = self.data.address .. ":" .. self.data.port
 	self.data.status = "Joining the server at " .. self.data.remote .. "..."
-	-- Clear the world.
-	Sectors:unload_all()
 	-- Initialize the game.
 	Main.game = Game("join", nil, self.data.port)
 	Main.game:start()

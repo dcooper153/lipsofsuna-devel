@@ -40,7 +40,6 @@ Host.host_game = function(self, file, port)
 	self.data.state = "init"
 	self.data.status = "Starting the server on " .. self.data.port .. "..."
 	-- Start the server.
-	Sectors:unload_all()
 	Main.game = Game("host", self.data.file, self.data.port)
 	if not Main.game:start() then
 		print("ERROR: Unsupported save file.")

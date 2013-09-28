@@ -211,7 +211,6 @@ end
 -- @param self Client.
 Client.start_single_player = function(self)
 	-- Start the server.
-	Sectors:unload_all()
 	Main.game = Game("single", Main.settings.file)
 	if not Main.game:start() then
 		print("ERROR: Unsupported save file.")
