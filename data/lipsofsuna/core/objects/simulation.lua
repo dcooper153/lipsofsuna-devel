@@ -520,12 +520,20 @@ SimulationObject.get_bounding_box = function(self)
 	return Object.get_bounding_box(self)
 end
 
+--- Gets the model of the object.
+-- @param self Object.
+-- @return Model.
+Object.get_model = function(self)
+	return self.__model
+end
+
 --- Sets the model of the object.
 -- @param self Object.
--- @param v Model, or nil.
-SimulationObject.set_model = function(self, v)
-	Object.set_model(self, v)
-	self.physics:set_model(v)
+-- @param value Model to set. Nil to unset.
+SimulationObject.set_model = function(self, value)
+	self.__model = value
+	self.__particle = nil
+	self.physics:set_model(value)
 end
 
 --- Gets the model name of the object.

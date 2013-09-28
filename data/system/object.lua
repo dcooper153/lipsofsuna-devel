@@ -62,7 +62,7 @@ end
 -- @param self Object.
 -- @return Aabb.
 Object.get_bounding_box = function(self)
-	local m = rawget(self, "__model")
+	local m = self.__model
 	if not m then return Aabb{point = Vector(-0.1,-0.1,-0.1), size = Vector(0.2,0.2,0.2)} end
 	return m:get_bounding_box()
 end
@@ -71,7 +71,7 @@ end
 -- @param self Object.
 -- @return Vector
 Object.get_center_offset = function(self)
-	local m = rawget(self, "__model")
+	local m = self.__model
 	if not m then return Vector() end
 	return m:get_center_offset()
 end
@@ -88,22 +88,6 @@ end
 -- @param value Number
 Object.set_id = function(self, value)
 	Los.object_set_id(self.handle, value)
-end
-
---- Gets the model of the object.
--- @param self Object.
--- @return Model.
-Object.get_model = function(self)
-	return rawget(self, "__model")
-end
-
---- Sets the model of the object.
--- @param self Object.
--- @param value Model.
-Object.set_model = function(self, value)
-	self.__model = value
-	self.__particle = nil
-	Los.object_set_model(self.handle, value and value.handle)
 end
 
 --- Gets the position of the object.
@@ -201,5 +185,3 @@ end
 __objects_realized = {}
 
 return Object
-
-

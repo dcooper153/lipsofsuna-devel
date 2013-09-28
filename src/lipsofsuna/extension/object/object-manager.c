@@ -26,12 +26,6 @@
 #include "object-manager.h"
 #include "object-sector.h"
 
-static void private_model_free (
-	LIObjManager* self,
-	LIMdlModel*   model);
-
-/*****************************************************************************/
-
 LIMaiExtensionInfo liext_object_info =
 {
 	LIMAI_EXTENSION_VERSION, "Object",
@@ -78,9 +72,6 @@ LIObjManager* liobj_manager_new (
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_OBJECT, self);
 	liext_script_object (program->script);
 
-	/* Register callback handlers. */
-	lical_callbacks_insert (program->callbacks, "model-free", 0, private_model_free, self, self->calls + 0);
-
 	return self;
 }
 
@@ -126,27 +117,6 @@ LIObjObject* liobj_manager_find_object (
 	uint32_t      id)
 {
 	return lialg_u32dic_find (self->objects, id);
-}
-
-/*****************************************************************************/
-
-static void private_model_free (
-	LIObjManager* self,
-	LIMdlModel*   model)
-{
-	LIAlgU32dicIter iter;
-	LIObjObject* object;
-
-	/* Remove from objects. */
-	/* Models can become subject to garbage collection even when used by an
-	   object if scripts don't reference them. To handle the removal
-	   gracefully, we remove the deleted model from objects. */
-	LIALG_U32DIC_FOREACH (iter, self->objects)
-	{
-		object = iter.value;
-		if (object->model == model)
-			object->model = NULL;
-	}
 }
 
 /** @} */

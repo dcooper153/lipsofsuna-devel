@@ -64,9 +64,6 @@ LIObjObject* liobj_object_new (
 		return 0;
 	}
 
-	/* Invoke program->callbacks. */
-	lical_callbacks_call (manager->program->callbacks, "object-new", lical_marshal_DATA_PTR, self);
-
 	return self;
 }
 
@@ -84,29 +81,11 @@ void liobj_object_free (
 	if (liobj_object_get_realized (self))
 		liobj_object_set_realized (self, 0);
 
-	/* Invoke program->callbacks. */
-	lical_callbacks_call (self->manager->program->callbacks, "object-free", lical_marshal_DATA_PTR, self);
-
 	/* Remove from the manager. */
 	lialg_u32dic_remove (self->manager->objects, self->id);
 
 	/* Free all memory. */
 	lisys_free (self);
-}
-
-/**
- * \brief Gets the bounding box size of the object.
- * \param self Object.
- * \param bounds Return location for the bounding box.
- */
-void liobj_object_get_bounds (
-	const LIObjObject* self,
-	LIMatAabb*         bounds)
-{
-	if (self->model != NULL)
-		*bounds = self->model->bounds;
-	else
-		limat_aabb_init (bounds);
 }
 
 /**
@@ -155,25 +134,6 @@ void liobj_object_set_external_id (
 	int          value)
 {
 	self->external_id = value;
-}
-
-/**
- * \brief Replaces the current model of the object.
- * \param self Object.
- * \param model Model or NULL.
- * \return Nonzero on success.
- */
-int liobj_object_set_model (
-	LIObjObject* self,
-	LIMdlModel*  model)
-{
-	/* Switch the model. */
-	self->model = model;
-
-	/* Invoke program->callbacks. */
-	lical_callbacks_call (self->manager->program->callbacks, "object-model", lical_marshal_DATA_PTR_PTR, self, model);
-
-	return 1;
 }
 
 /**

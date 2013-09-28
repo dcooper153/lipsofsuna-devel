@@ -112,16 +112,6 @@ static void Object_set_id (LIScrArgs* args)
 		liobj_object_set_external_id (self, value);
 }
 
-static void Object_set_model (LIScrArgs* args)
-{
-	LIScrData* value;
-
-	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &value))
-		liobj_object_set_model (args->self, liscr_data_get_data (value));
-	else
-		liobj_object_set_model (args->self, NULL);
-}
-
 static void Object_get_position (LIScrArgs* args)
 {
 	LIMatTransform tmp;
@@ -223,7 +213,6 @@ void liext_script_object (
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_OBJECT, "object_new", Object_new);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_id", Object_get_id);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_id", Object_set_id);
-	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_model", Object_set_model);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_position", Object_get_position);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_position", Object_set_position);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_realized", Object_get_realized);

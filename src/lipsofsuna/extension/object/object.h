@@ -37,7 +37,6 @@ struct _LIObjObject
 	uint32_t id;
 	int external_id;
 	int flags;
-	LIMdlModel* model;
 	LIObjManager* manager;
 	LIObjSector* sector;
 	LIMatTransform transform;
