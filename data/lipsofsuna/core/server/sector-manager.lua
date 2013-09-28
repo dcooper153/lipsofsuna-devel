@@ -9,21 +9,23 @@
 -- @alias SectorManager
 
 local Class = require("system/class")
+local ChunkManager = require("system/chunk-manager")
 local SectorLoader = require("core/server/sector-loader")
 local Sectors = require("system/sectors")
 local Timer = require("system/timer")
 
 --- Manages map sectors.
 -- @type SectorManager
-local SectorManager = Class("SectorManager")
+local SectorManager = Class("SectorManager", ChunkManager)
 
 --- Creates a new sector manager.
 -- @param clss SectorManager class.
+-- @param grid_size Chunk side length in world units.
 -- @param database Database, or nil.
 -- @param unloading True to unable unloading.
 -- @return SectorManager.
-SectorManager.new = function(clss, database, unloading)
-	local self = Class.new(clss)
+SectorManager.new = function(clss, grid_size, database, unloading)
+	local self = ChunkManager.new(clss, 1, grid_size)
 	self.database = database
 	self.loaders = {}
 	self.sectors = {}
@@ -87,7 +89,7 @@ SectorManager.save_world = function(self, erase, progress)
 	if not self.database then return end
 	self.database:query("BEGIN TRANSACTION;")
 	-- Write the new world data.
-	local sectors = Sectors:get_sectors()
+	local sectors = self:get_sectors()
 	if progress then
 		-- Write with progress updates.
 		local total = 0
@@ -198,7 +200,7 @@ SectorManager.update = function(self, secs)
 	if self.unload_time then
 		local key = next(self.sectors, self.sectors_iterator)
 		self.sectors_iterator = key
-		local age = key and Sectors:get_sector_idle(key)
+		local age = key and self:get_sector_idle(key)
 		if age and age > self.unload_time then
 			if self.database and not self.loaders[key] then
 				self:save_sector(key)
@@ -224,6 +226,14 @@ end
 -- @return Dictionary of sectors.
 SectorManager.get_sectors = function(self)
 	return Sectors:get_sectors()
+end
+
+--- Waits for a sector to finish loading.
+-- @param self SectorManager.
+-- @param sector Sector ID.
+-- @return Idle time in seconds.
+SectorManager.get_sector_idle = function(self, sector)
+	return Sectors:get_sector_idle(sector)
 end
 
 return SectorManager

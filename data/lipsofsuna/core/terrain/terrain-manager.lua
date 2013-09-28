@@ -9,6 +9,7 @@
 -- @alias TerrainManager
 
 local Class = require("system/class")
+local ChunkManager = require("system/chunk-manager")
 local Hooks = require("system/hooks")
 local PhysicsTerrain = require("system/physics-terrain")
 local Packet = require("system/packet")
@@ -21,7 +22,7 @@ local TerrainMaterialSpec = require("core/specs/terrain-material")
 
 --- Manages terrain chunks.
 -- @type TerrainManager
-local TerrainManager = Class("TerrainManager")
+local TerrainManager = Class("TerrainManager", ChunkManager)
 
 --- Creates a new terrain manager.
 -- @param clss TerrainManager class.
@@ -33,7 +34,7 @@ local TerrainManager = Class("TerrainManager")
 -- @param graphics True to enable graphics.
 -- @return TerrainManager.
 TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, generate, graphics)
-	local self = Class.new(clss)
+	local self = ChunkManager.new(clss, chunk_size, grid_size)
 	self.database = database
 	self.generate = generate
 	self.graphics = graphics
@@ -302,72 +303,6 @@ TerrainManager.update = function(self, secs)
 			end
 		end
 	end
-end
-
---- Maps a world space point to a chunk ID.
--- @param self TerrainManager.
--- @param x X coordinate in world units.
--- @param z Z coordinate in world units.
--- @return Chunk ID.
-TerrainManager.get_chunk_id_by_point = function(self, x, z)
-	local chunk_width = self.chunk_size * self.grid_size
-	local x = math.floor(x / chunk_width)
-	local z = math.floor(z / chunk_width)
-	return x + z * 0xFFFF
-end
-
---- Maps grid coordinates to an internal chunk ID.
--- @param self TerrainManager.
--- @param x X coordinate in grid units.
--- @param z Z coordinate in grid units.
--- @return Chunk ID.
-TerrainManager.get_chunk_id_by_xz = function(self, x, z)
-	return math.floor(x / self.chunk_size) + math.floor(z / self.chunk_size) * 0xFFFF
-end
-
---- Maps an internal chunk ID to grid coordinates.
--- @param self TerrainManager.
--- @param id Chunk ID.
--- @return Grid coordinates.
-TerrainManager.get_chunk_xz_by_id = function(self, id)
-	return (id % 0xFFFF) * self.chunk_size, math.floor(id / 0xFFFF) * self.chunk_size
-end
-
---- Maps a world space point to grid coordinates.
--- @param self TerrainManager.
--- @param x X coordinate in world units.
--- @param z Z coordinate in world units.
--- @return Grid coordinates.
-TerrainManager.get_chunk_xz_by_point = function(self, x, z)
-	local chunk_width = self.chunk_size * self.grid_size
-	local x = math.floor(x / chunk_width) * self.chunk_size
-	local z = math.floor(z / chunk_width) * self.chunk_size
-	return x, z
-end
-
---- Gets the XZ grid point range of chunks inside the given sphere.
--- @param self TerrainManager.
--- @param point Point in world space.
--- @param radius Radius in world units.
--- @return X min, Z min, X max, Z max
-TerrainManager.get_chunk_xz_range_by_point = function(self, point, radius)
-	local chunk_width = self.chunk_size * self.grid_size
-	local x0 = math.max(0, math.floor((point.x - radius) / chunk_width)) * self.chunk_size
-	local z0 = math.max(0, math.floor((point.z - radius) / chunk_width)) * self.chunk_size
-	local x1 = math.max(0, math.floor((point.x + radius) / chunk_width)) * self.chunk_size
-	local z1 = math.max(0, math.floor((point.z + radius) / chunk_width)) * self.chunk_size
-	return x0, z0, x1, z1
-end
-
---- Maps a world space point to grid coordinates.
--- @param self TerrainManager.
--- @param x X coordinate in world units.
--- @param z Z coordinate in world units.
--- @return Grid coordinates.
-TerrainManager.get_column_xz_by_point = function(self, x, z)
-	local x = math.floor(x / self.grid_size)
-	local z = math.floor(z / self.grid_size)
-	return x, z
 end
 
 --- Enables or disables terrain generation.

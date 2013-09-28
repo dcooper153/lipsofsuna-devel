@@ -23,7 +23,7 @@ WildernessModifier.start = function(modifier, value)
 			pos.z = org.z + Main.terrain.grid_size * z
 			local ground = Utils:find_empty_ground(pos)
 			if ground then
-				local gx,gz = Main.terrain:get_column_xz_by_point(ground.x, ground.z)
+				local gx,gz = Main.terrain:get_grid_xz_by_point(ground.x, ground.z)
 				local y,h,mat = Main.terrain.terrain:get_stick(gx, gz, ground.y - 0.01)
 				local matspec = TerrainMaterialSpec:find_by_id(mat)
 				if matspec and (matspec.name == "soil" or matspec.name == "grass") then

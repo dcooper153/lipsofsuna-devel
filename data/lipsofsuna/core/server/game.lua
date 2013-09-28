@@ -38,7 +38,7 @@ Game.new = function(clss, mode, save)
 		self.database:query("PRAGMA synchronous=OFF;")
 		self.database:query("PRAGMA count_changes=OFF;")
 	end
-	self.sectors = SectorManager(self.database, self.enable_unloading)
+	self.sectors = SectorManager(12, self.database, self.enable_unloading)
 	-- Initialize the options database.
 	if save then
 		self.options = OptionsDatabase(self.database)

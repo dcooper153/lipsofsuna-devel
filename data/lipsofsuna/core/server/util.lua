@@ -84,7 +84,7 @@ end
 -- @param point Point in world space.
 -- @return Point in world space. Nil if not found.
 Utils.find_empty_ground = function(clss, point)
-	local x,z = Main.terrain:get_column_xz_by_point(point.x, point.z)
+	local x,z = Main.terrain:get_grid_xz_by_point(point.x, point.z)
 	local y = Main.terrain.terrain:find_nearest_empty_stick(x, z, point.y)
 	if math.abs(y - point.y) > 5 then return end
 	return Vector(point.x, y, point.z)
