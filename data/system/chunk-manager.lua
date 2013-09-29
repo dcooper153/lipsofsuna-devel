@@ -132,7 +132,18 @@ end
 -- @return Vector.
 ChunkManager.get_chunk_center_by_id = function(self, id)
 	local x,z = self:get_chunk_xz_by_id(id)
-	return Vector(x + 0.5, 0, z + 0.5):multiply(self.chunk_size * self.grid_size)
+	return self:get_chunk_center_by_xz(x, z)
+end
+
+--- Gets the center of the chunk that has the given ID.
+-- @param self ChunkManager.
+-- @param x X coordinate in grid units.
+-- @param z Z coordinate in grid units.
+-- @return Vector.
+ChunkManager.get_chunk_center_by_xz = function(self, x, z)
+	local cx = math.floor(x / self.chunk_size)
+	local cz = math.floor(z / self.chunk_size)
+	return Vector(cx + 0.5, 0, cz + 0.5):multiply(self.chunk_size * self.grid_size)
 end
 
 --- Maps a world space point to a chunk ID.

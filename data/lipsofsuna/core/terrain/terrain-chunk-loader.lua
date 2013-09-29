@@ -41,6 +41,7 @@ end
 -- @param yield Function.
 TerrainChunkLoader.execute = function(self, yield)
 	-- Read the chunk from the database.
+	local loaded
 	if self.manager.database then
 		local rows = self.manager.database:query([[
 			SELECT * FROM terrain_chunks
@@ -52,20 +53,29 @@ TerrainChunkLoader.execute = function(self, yield)
 				local data = v[2]
 				data:read()
 				if self.manager.terrain:set_chunk_data(self.x, self.z, data) then
-					return
+					loaded = true
+					break
 				end
 			end
 		end
 	end
 	-- Create new chunk contents.
-	if self.manager.generate then
-		-- Generate a random chunk.
-		self.manager.terrain:load_chunk(self.x, self.z)
-		self.manager.generate_hooks:call(self)
-		yield()
-	else
-		-- Create an empty chunk.
-		self.manager.terrain:load_chunk(self.x, self.z)
+	if not loaded then
+		if self.manager.generate then
+			-- Generate a random chunk.
+			self.manager.terrain:load_chunk(self.x, self.z)
+			self.manager.generate_hooks:call(self)
+			yield()
+		else
+			-- Create an empty chunk.
+			self.manager.terrain:load_chunk(self.x, self.z)
+		end
+	end
+	-- Chain load the object chunk.
+	if Main.objects then
+		local p = self.manager:get_chunk_center_by_xz(self.x, self.z)
+		local id = Main.objects.chunks:get_chunk_id_by_point(p.x, p.z)
+		Main.objects:load_chunk(id)
 	end
 end
 

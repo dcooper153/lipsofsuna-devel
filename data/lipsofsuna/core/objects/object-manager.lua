@@ -117,7 +117,7 @@ end
 -- @param self ObjectManager.
 -- @param id Chunk ID.
 ObjectManager.load_chunk = function(self, id)
-	local x,z = self:get_chunk_xz_by_id(id)
+	local x,z = self.chunks:get_chunk_xz_by_id(id)
 	self.chunks:load_chunk(x, z)
 end
 
