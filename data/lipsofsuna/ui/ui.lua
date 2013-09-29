@@ -289,6 +289,7 @@ Ui.command = function(self, cmd, press)
 	elseif cmd == "right" then
 		self.input:handle_right(press)
 	end
+	self.input:set_mouse_focus()
 end
 
 --- Disables a heads over display widget.
@@ -364,6 +365,8 @@ Ui.get_widget_under_cursor = function(self, filter)
 		if cursor.y < y or y + h <= cursor.y then return end
 		if not filter or filter(widget) then return true end
 	end
+	-- Check for mouse focus mode.
+	if not self.input:get_mouse_focus() then return end
 	local c = Input:get_pointer_position()
 	-- Try UI widgets.
 	local w = self.widgets:get_widget_by_point(c, filter)
@@ -390,6 +393,9 @@ Ui.handle_event = function(self, args)
 	if args.type == "mousepress" or args.type == "mouserelease" or
 	   args.type == "mousescroll" or args.type == "mousemotion" then
 		mouse_event = true
+		self.input:set_mouse_focus(true)
+	else
+		self.input:set_mouse_focus()
 	end
 	-- Trigger the back action if the cursor hit the left edge.
 	if mouse_mode and args.type == "mousemotion" then
@@ -415,11 +421,13 @@ Ui.handle_event = function(self, args)
 		return true
 	end
 	-- Call the event handler of the widget under the cursor.
-	local widget = self:get_widget_under_cursor(function(widget)
-		if not widget.handle_event then return end
-		return widget:handle_event(args)
-	end)
-	if widget then return end
+	if self.input:get_mouse_focus() then
+		local widget = self:get_widget_under_cursor(function(widget)
+			if not widget.handle_event then return end
+			return widget:handle_event(args)
+		end)
+		if widget then return end
+	end
 	-- Call the post event handler functions of the state.
 	for k,v in pairs(state_.input_post) do
 		if not v(args) then return end

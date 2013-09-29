@@ -25,6 +25,7 @@ InputHandler.new = function(clss, bindings, box)
 	self.__bindings = bindings
 	self.__box = box
 	self.__enabled = true
+	self.__mouse_focus = true
 	return self
 end
 
@@ -42,6 +43,13 @@ InputHandler.handle_event = function(self, args)
 	-- Copy the event just in case.
 	local a = {}
 	for k,v in pairs(args) do a[k] = v end
+	-- Check the mouse event handling mode.
+	if args.type == "mousepress" or args.type == "mouserelease" or
+	   args.type == "mousescroll" or args.type == "mousemotion" then
+		self.__mouse_focus = true
+	else
+		self.__mouse_focus = nil
+	end
 	-- Trigger standard action.
 	-- TODO: Others.
 	local action1 = self.__bindings:find_by_name("menu_up")
@@ -95,7 +103,7 @@ InputHandler.handle_event = function(self, args)
 		return
 	end
 	-- Trigger widget specific actions.
-	if self.__box then
+	if self.__box and self.__mouse_focus then
 		local c = Input:get_pointer_position()
 		local widget = self.__box:get_widget_by_point(c)
 		if widget and widget.handle_event then
@@ -260,7 +268,7 @@ InputHandler.update = function(self, secs)
 		Ui:scroll(speed * (20 + cursor.y - Ui.size.y))
 	end
 	-- Update mouse focus.
-	if self.__box then
+	if self.__box and self.__mouse_focus then
 		local focus = self.__box:get_widget_by_point(cursor)
 		if focus then
 			local found,changed = self.__box:focus_widget(focus)
@@ -273,7 +281,7 @@ end
 
 --- Checks if the handler is enabled.
 -- @param self InputHandler.
--- @param value True to enable. False to disable.
+-- @param value True if enabled. False otherwise.
 InputHandler.get_enabled = function(self)
 	return self.__enabled
 end
@@ -283,6 +291,20 @@ end
 -- @param value True to enable. False to disable.
 InputHandler.set_enabled = function(self, value)
 	self.__enabled = value
+end
+
+--- Gets whether the focus following the mouse cursor.
+-- @param self InputHandler.
+-- @param value True if enabled. False otherwise.
+InputHandler.get_mouse_focus = function(self)
+	return self.__mouse_focus
+end
+
+--- Toggles the focus following the mouse cursor.
+-- @param self InputHandler.
+-- @param value True to enable. False to disable.
+InputHandler.set_mouse_focus = function(self, value)
+	self.__mouse_focus = value
 end
 
 return InputHandler
