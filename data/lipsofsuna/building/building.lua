@@ -41,7 +41,7 @@ Building.new = function(clss)
 		local t = self.manager.terrain
 		for z = 0,w-1 do
 			for x = 0,w-1 do
-				t:add_stick_corners(self.x + x, self.z + z, 0, 0, 0, 0, 100, 100, 100, 100, 3)
+				t:add_stick(self.x + x, self.z + z, 0, 100, 3)
 			end
 		end
 		for x = self.x-1,self.x+w do
