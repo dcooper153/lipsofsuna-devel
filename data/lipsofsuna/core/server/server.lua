@@ -181,12 +181,7 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 		home = player:set_spawn_point(spawnpoint)
 		player:teleport{position = home}
 		-- Spawn the player.
-		local spec = ModifierSpec:find_by_name("respawn")
-		if not spec then return end
-		local modifier = Modifier(spec, player, player)
-		if modifier:start(1) then
-			player:add_modifier(modifier)
-		end
+		player:add_modifier("respawn", 1)
 	end
 	player:set_client(client)
 	player:set_visible(true)

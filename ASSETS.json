@@ -814,11 +814,12 @@
 			"files":
 			[
 				"data/lipsofsuna/ui/icons1.png",
-				"data/lipsofsuna/ui/icons2.dds"
+				"data/lipsofsuna/ui/icons2.png"
 			],
 			"files_original":
 			[
-				"data/lipsofsuna/ui/icons1.xcf"
+				"data/lipsofsuna/ui/icons1.xcf",
+				"data/lipsofsuna/ui/icons2.xcf"
 			],
 			"authors":
 			[
@@ -829,7 +830,7 @@
 				"Creative Commons BY-SA 3.0"
 			],
 			"source": "http://opengameart.org/content/420-pixel-art-icons-medievalfantasy-rpg",
-			"comment": "The icons are scaled down from 34x34."
+			"comment": "The icons in icons1 are scaled down from 34x34."
 		},
 		{
 			"files":

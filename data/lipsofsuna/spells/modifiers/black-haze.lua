@@ -9,7 +9,9 @@ local BlackHazeModifier = ModifierSpec:find_by_name("black haze")
 -- @param modifier Modifier.
 -- @param value Strength of the modifier.
 -- @return True to enable effect-over-time updates. False otherwise.
-BlackHazeModifier.start = function(modifier)
+BlackHazeModifier.start = function(modifier, value)
+	-- Handle the infection mode.
+	if not value then return true end
 	-- Choose a random plague monster.
 	local s = Actorspec:random{category = "plague"}
 	if not s then return end
@@ -24,9 +26,14 @@ BlackHazeModifier.start = function(modifier)
 	o:randomize()
 	o:set_visible(true)
 	-- Add the plague modifier to the monster.
-	local m = Modifier(modifier.spec, o)
-	m.timer = 0
-	o:add_modifier(m)
+	o:add_modifier(modifier.spec.name)
+end
+
+--- Applies the modifier.
+-- @param modifier Modifier.
+-- @param value Strength of the modifier.
+BlackHazeModifier.start_terrain = function(modifier, value)
+	BlackHazeModifier.start(modifier, value)
 end
 
 --- Updates the modifier for effect-over-time.
@@ -44,9 +51,7 @@ BlackHazeModifier.update = function(modifier, secs)
 	local near = modifier.object.manager:find_by_point(modifier.object:get_position(), 5)
 	for k,v in pairs(near) do
 		if math.random() > 0.1 then
-			local m = Modifier(modifier.spec, v)
-			m.timer = 0
-			v:add_modifier(m)
+			local m = v:add_modifier(modifier.spec.name)
 		end
 	end
 	return true

@@ -476,6 +476,12 @@ Iconspec{
 	size = {34,34}}
 
 Iconspec{
+	name = "burdening",
+	image = "icons2",
+	offset = {102,34},
+	size = {34,34}}
+
+Iconspec{
 	name = "modifier-ice",
 	image = "icons2",
 	offset = {0,68},

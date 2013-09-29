@@ -31,6 +31,21 @@ Modifier.new = function(clss, spec, object, owner, point)
 	return self
 end
 
+--- Restarts the modifier with a new value.
+-- @param self Modifier.
+-- @param value Strength of the modifier.
+-- @return True to enable effect-over-time updates. False otherwise.
+Modifier.restart = function(self, value)
+	if self.spec.restart then
+		return self.spec.restart(self, value)
+	else
+		if value or self.strength then
+			self.strength = math.max(self.strength or 0, value or 0)
+		end
+		return true
+	end
+end
+
 --- Starts the modifier.
 -- @param self Modifier.
 -- @param value Strength of the modifier.
@@ -63,6 +78,14 @@ end
 Modifier.get_attributes = function(self, attr)
 	if not self.spec.attributes then return end
 	self.spec.attributes(self, attr)
+end
+
+--- Gets the duration of the modifier.
+-- @param self Modifier.
+-- @return Duration in seconds. Nil for infinite.
+Modifier.get_duration = function(self)
+	if not self.spec.get_duration then return self.strength end
+	return self.spec.get_duration(self)
 end
 
 return Modifier

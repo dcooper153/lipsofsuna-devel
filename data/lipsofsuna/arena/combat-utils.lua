@@ -66,26 +66,9 @@ CombatUtils.apply_damage_to_actor = function(self, caster, target, damage, point
 		end
 	end
 	-- Apply the damage.
-	--
-	-- For each modifier type in the damage, we create a new modifier and
-	-- let it modifier the target object. Modifiers may either apply their
-	-- effects immediately or request us to add them to the target object so
-	-- that they can perform effect-over-time updates.
-	local absorb = true
 	for name,value in pairs(damage.modifiers) do
-		local spec = ModifierSpec:find_by_name(name)
-		if spec then
-			local modifier = Modifier(spec, target, caster, point)
-			local ret = modifier:start(value)
-			if ret then
-				absorb = false
-				if ret == true then
-					target:add_modifier(modifier)
-				end
-			end
-		end
+		target:add_modifier(name, value, caster, point)
 	end
-	return not absorb
 end
 
 CombatUtils.apply_damage_to_terrain = function(self, caster, tile, damage, point)

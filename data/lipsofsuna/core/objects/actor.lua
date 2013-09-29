@@ -11,6 +11,8 @@
 local Class = require("system/class")
 local Coroutine = require("system/coroutine")
 local Item = require("core/objects/item")
+local Modifier = require("core/server/modifier")
+local ModifierSpec = require("core/specs/modifier")
 local ObjectSerializer = require("core/objects/object-serializer")
 local Physics = require("system/physics")
 local SimulationObject = require("core/objects/simulation")
@@ -157,13 +159,31 @@ end
 
 --- Adds a modifier to the object.
 -- @param self Actor.
--- @param modifier Modifier.
-Actor.add_modifier = function(self, modifier)
+-- @param name Modifier name.
+-- @param strength Strength.
+-- @param caster Caster object. Nil for self.
+-- @param point Impact point. Nil for default.
+-- @return Modifier if effect-over-time. Nil otherwise.
+Actor.add_modifier = function(self, name, strength, caster, point)
 	if not self.modifiers then self.modifiers = {} end
 	local old = self.modifiers[name]
-	if not old or old.strength < modifier.strength then
-		self.modifiers[modifier.name] = modifier
+	if old then
+		-- TODO: What to do with caster and point?
+		local ret = old:restart(strength)
+		if not ret then
+			self.modifiers[name] = nil
+		end
 		self:update_skills()
+		if not ret then return end
+		return old
+	else
+		local spec = ModifierSpec:find_by_name(name)
+		if not spec then return end
+		local m = Modifier(spec, self, caster or self, point or self:get_position())
+		if not m:start(strength) then return end
+		self.modifiers[name] = m
+		self:update_skills()
+		return m
 	end
 end
 
@@ -704,13 +724,9 @@ Actor.update_burdening = function(self, secs)
 		self.burden_limit = curr_limit
 		Main.messaging:server_event("inventory weight", self.client, curr_weight, curr_limit)
 	end
-	local curr_burden = self:get_burdened()
-	if prev_burden ~= curr_burden then
-		if curr_burden then
-			self:send_message("You're now burdened.")
-		else
-			self:send_message("You're no longer burdened.")
-		end
+	local curr_burden = (self.carried_weight > self:get_burden_limit())
+	if curr_burden and not prev_burden then
+		self:add_modifier("burdening")
 	end
 	-- Update speed.
 	-- Skill regeneration affects speed too so this needs to be recalculated
@@ -844,9 +860,10 @@ end
 
 --- Returns true if the actor is burdened.
 -- @param self Actor.
--- @return True if burdened.
+-- @return True if burdened. False otherwise.
 Actor.get_burdened = function(self)
-	return self.carried_weight > self:get_burden_limit()
+	if self:get_modifier("burdening") then return true end
+	return false
 end
 
 --- Gets the hint on whether the actor is hostile at someone.

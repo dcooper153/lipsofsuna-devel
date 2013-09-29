@@ -34,10 +34,16 @@ end
 
 --- Adds a modifier to the object.
 -- @param self Object.
--- @param modifier Modifier.
-Player.add_modifier = function(self, modifier)
-	Main.messaging:server_event("add modifier", self.client, modifier.name, modifier.strength or -1)
-	return Actor.add_modifier(self, modifier)
+-- @param name Modifier name.
+-- @param strength Strength.
+-- @param caster Caster object. Nil for self.
+-- @param point Impact point. Nil for default.
+-- @return Modifier if effect-over-time. Nil otherwise.
+Player.add_modifier = function(self, name, strength, caster, point)
+	local m = Actor.add_modifier(self, name, strength, caster, point)
+	if not m then return end
+	Main.messaging:server_event("add modifier", self.client, name, m:get_duration() or 1000000)
+	return m
 end
 
 --- Causes the player to die and respawn.
@@ -124,12 +130,7 @@ Player.respawn = function(self)
 	-- Resurrect the player.
 	self:action("resurrect")
 	-- Spawn the player.
-	local spec = ModifierSpec:find_by_name("respawn")
-	if not spec then return end
-	local modifier = Modifier(spec, self, self)
-	if modifier:start(1) then
-		self:add_modifier(modifier)
-	end
+	self:add_modifier("respawn", 1)
 end
 
 --- Updates the state of the player.

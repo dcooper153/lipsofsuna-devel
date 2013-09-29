@@ -75,6 +75,31 @@
 	},
 	{
 		"type": "ModifierSpec",
+		"name": "burdening",
+		"categories":
+		{
+			"harmful": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"self spell": true,
+			"touch spell": true
+		},
+		"description": "Makes the target heavy and slow",
+		"effect": "FIXME",
+		"icon": "burdening",
+		"projectile": "fireball1",
+		"spell_strength": 5,
+		"required_stats":
+		{
+			"willpower": 10
+		}
+	},
+	{
+		"type": "ModifierSpec",
 		"name": "burning",
 		"categories":
 		{
