@@ -9,6 +9,7 @@
 -- @alias Client
 
 local Class = require("system/class")
+local ControlState = require("core/client/control-state")
 local File = require("system/file")
 local Game = require("core/server/game")
 local Hooks = require("system/hooks")
@@ -42,6 +43,7 @@ File:require_directory("core/client/operators")
 
 Client.init = function(self)
 	-- Initialize input.
+	self.control_state = ControlState()
 	self.player_state = PlayerState()
 	-- Initialize options.
 	self.options = Options()
@@ -179,6 +181,7 @@ end
 
 Client.update = function(self, secs)
 	self.update_hooks:call(secs)
+	self.control_state:update(secs)
 end
 
 --- Sets or unsets the text of the action label.

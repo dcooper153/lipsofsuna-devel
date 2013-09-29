@@ -68,7 +68,7 @@ Client:register_init_hook(500, function()
 	Client.input:register_binding{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
 		if not Client.player_object then return end
 		if not Ui:get_pointer_grab() then return end
-		Main.messaging:client_event("walk", math.max(-1, math.min(1, -v)))
+		Client.control_state:set_movement(v)
 	end}
 
 	Client.input:register_binding{name = "options", mode = "press", key1 = Keysym.o, func = function()
@@ -118,7 +118,7 @@ Client:register_init_hook(500, function()
 	Client.input:register_binding{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
 		if not Ui:get_pointer_grab() then return end
 		if not Client.player_object then return end
-		Main.messaging:client_event("sidestep", v)
+		Client.control_state:set_sidestep(v)
 	end}
 
 	Client.input:register_binding{name = "use", mode = "press", key1 = Keysym.b, func = function()
