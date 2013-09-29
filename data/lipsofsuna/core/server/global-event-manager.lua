@@ -11,7 +11,6 @@
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Coroutine = require("system/coroutine")
-local Sector = require("system/sector")
 
 --- TODO:doc
 -- @type GlobalEventManager
@@ -72,17 +71,17 @@ GlobalEventManager.find_actor_spawn_point = function(self)
 	if not spawn then return end
 	-- Ensure that the point is in a loaded sector.
 	-- FIXME: Why is the sector never loaded?
-	--if not Main.game.sectors:is_point_loaded(spawn) then return end
+	--if not Main.objects.chunks:is_point_loaded(spawn) then return end
 	return spawn
 end
 
---- Finds players near the given sector.
+--- Finds players near the given chunk.
 -- @param self GlobalEventManager.
--- @param id Sector ID.
+-- @param id Chunk ID.
 -- @return Dictionary of players mapped to player states.
 GlobalEventManager.find_players_exploring_sector = function(self, id)
 	-- Find the closest player.
-	local c = Sector:get_center_by_id(id)
+	local c = Main.objects.chunks:get_chunk_center_by_id(id)
 	local nearest_dist
 	local nearest_player
 	for k,v in pairs(Server.players_by_client) do
@@ -163,14 +162,14 @@ GlobalEventManager.notify_action = function(self, action, player)
 	end
 end
 
---- Called when a sector is created or loaded.
+--- Called when a chunk is created or loaded.
 -- @param self GlobalEventManager.
--- @param id Sector ID.
+-- @param id Chunk ID.
 -- @param loaded True for loaded, false for newly created.
 -- @param objects List of objects in the sector.
 GlobalEventManager.sector_created = function(self, id, loaded, objects)
 	-- Find the player who most likely triggered the creation.
-	local c = Sector:get_center_by_id(id)
+	local c = Main.objects.chunks:get_chunk_center_by_id(id)
 	local nearest_dist
 	local nearest_player
 	for k,v in pairs(Server.players_by_client) do
@@ -249,5 +248,3 @@ GlobalEventManager.update = function(self, secs)
 end
 
 return GlobalEventManager
-
-

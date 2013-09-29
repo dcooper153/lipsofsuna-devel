@@ -1,28 +1,28 @@
---- Implements asynchronous sector loading.
+--- Loads object chunk data asynchronously.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.server.sector_loader
--- @alias SectorLoader
+-- @module core.objects.object_chunk_loader
+-- @alias ObjectChunkLoader
 
 local Class = require("system/class")
 
---- Loads sector data asynchronously.
--- @type SectorLoader
-local SectorLoader = Class("SectorLoader")
+--- Loads object chunk data asynchronously.
+-- @type ObjectChunkLoader
+local ObjectChunkLoader = Class("ObjectChunkLoader")
 
 --- Creates a new sector loader.
--- @param clss SectorLoader class.
--- @param manager SectorManager.
--- @param sector Sector ID.
--- @return SectorLoader.
-SectorLoader.new = function(clss, manager, sector)
+-- @param clss ObjectChunkLoader class.
+-- @param manager ObjectChunkManager.
+-- @param chunk Chunk ID.
+-- @return ObjectChunkLoader.
+ObjectChunkLoader.new = function(clss, manager, chunk)
 	local self = Class.new(clss)
 	self.routine = coroutine.create(function()
-		self:execute(manager, sector, coroutine.yield)
+		self:execute(manager, chunk, coroutine.yield)
 	end)
 	return self
 end
@@ -34,31 +34,31 @@ end
 -- should be used. When running synchronously, a dummy function should be
 -- used.
 --
--- @param clss SectorLoader class.
--- @param manager SectorManager.
--- @param sector Sector ID.
+-- @param clss ObjectChunkLoader class.
+-- @param manager ObjectChunkManager.
+-- @param chunk Chunk ID.
 -- @param yield Function.
-SectorLoader.execute = function(clss, manager, sector, yield)
+ObjectChunkLoader.execute = function(clss, manager, chunk, yield)
 	-- Load objects.
-	local objects = Server.object_database:load_sector_objects(sector)
+	local objects = Server.object_database:load_sector_objects(chunk)
 	yield()
 	-- Trigger global events.
-	Server.events:sector_created(sector, terrain, objects)
+	Server.events:sector_created(chunk, terrain, objects)
 	yield()
 end
 
 --- Forces the loader to run until finished.
--- @param self SectorLoader.
-SectorLoader.finish = function(self)
+-- @param self ObjectChunkLoader.
+ObjectChunkLoader.finish = function(self)
 	repeat until not self:update(1)
 	self.routine = nil
 end
 
---- Updates the sector loader.
--- @param self SectorLoader.
+--- Updates the loader.
+-- @param self ObjectChunkLoader.
 -- @param secs Seconds since the last update.
 -- @return True if still loading, false if finished.
-SectorLoader.update = function(self, secs)
+ObjectChunkLoader.update = function(self, secs)
 	if not self.routine then return end
 	local ret,err = coroutine.resume(self.routine, secs)
 	if not ret then print(debug.traceback(self.routine, err)) end
@@ -69,4 +69,4 @@ SectorLoader.update = function(self, secs)
 	return true
 end
 
-return SectorLoader
+return ObjectChunkLoader

@@ -37,7 +37,7 @@ end
 --- Called when a new sector is created or loaded.
 -- @param clss Globaleventspec class.
 -- @param event Global event instance.
--- @param id Sector ID.
+-- @param id Chunk ID.
 -- @param loaded True for loaded, false for newly created.
 -- @param objects List of objects in the sector.
 -- @return True to prevent other events from running the same function.

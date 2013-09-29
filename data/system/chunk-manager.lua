@@ -119,6 +119,22 @@ ChunkManager.is_point_loaded = function(self, point)
 	return true
 end
 
+--- Gets the dictionary of loaded chunks.
+-- @param self ObjectChunkManager.
+-- @return Dictionary of chunks.
+ChunkManager.get_chunks = function(self)
+	return self.chunks
+end
+
+--- Gets the center of the chunk that has the given ID.
+-- @param self ChunkManager.
+-- @param id Chunk ID.
+-- @return Vector.
+ChunkManager.get_chunk_center_by_id = function(self, id)
+	local x,z = self:get_chunk_xz_by_id(id)
+	return Vector(x + 0.5, 0, z + 0.5):multiply(self.chunk_size * self.grid_size)
+end
+
 --- Maps a world space point to a chunk ID.
 -- @param self ChunkManager.
 -- @param x X coordinate in world units.

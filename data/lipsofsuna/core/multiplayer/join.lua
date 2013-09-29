@@ -13,7 +13,6 @@ local Client = require("core/client/client")
 local Game = require("core/server/game")
 local Hooks = require("system/hooks")
 local Network = require("system/network")
-local Sectors = require("system/sectors")
 local Ui = require("ui/ui")
 
 --- Joins multiplayer games.

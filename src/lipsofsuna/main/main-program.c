@@ -40,14 +40,6 @@ static void private_model_removed (
 	void*       data,
 	LIMdlModel* model);
 
-static void private_sector_free (
-	void*        data,
-	LIAlgSector* sector);
-
-static void private_sector_load (
-	void*        data,
-	LIAlgSector* sector);
-
 static int private_tick (
 	LIMaiProgram* self,
 	float         secs);
@@ -110,10 +102,6 @@ void limai_program_free (
 	if (self->callbacks != NULL)
 		lical_callbacks_call (self->callbacks, "program-shutdown", lical_marshal_DATA);
 
-	/* Clear all sector data. */
-	if (self->sectors != NULL)
-		lialg_sectors_clear (self->sectors);
-
 	/* Free script. */
 	if (self->script != NULL)
 		liscr_script_free (self->script);
@@ -153,8 +141,6 @@ void limai_program_free (
 		lical_callbacks_free (self->callbacks);
 	}
 
-	if (self->sectors != NULL)
-		lialg_sectors_free (self->sectors);
 	if (self->paths != NULL)
 		lipth_paths_free (self->paths);
 
@@ -671,7 +657,6 @@ int limai_program_update (
 	self->tick = self->tick / LIMAI_PROGRAM_FPS_TICKS;
 
 	/* Update subsystems. */
-	lialg_sectors_update (self->sectors, secs);
 	liscr_script_update (self->script, secs);
 	lical_callbacks_update (self->callbacks);
 	lical_callbacks_call (self->callbacks, "tick", lical_marshal_DATA_FLT, secs);
@@ -729,16 +714,6 @@ static int private_init (
 	if (self->callbacks == NULL)
 		return 0;
 
-	/* Initialize sectors. */
-#warning Hardcoded sector size
-	self->sectors = lialg_sectors_new (128, 16.0f);
-	if (self->sectors == NULL)
-		return 0;
-	self->sectors->sector_free_callback.callback = private_sector_free;
-	self->sectors->sector_free_callback.userdata = self;
-	self->sectors->sector_load_callback.callback = private_sector_load;
-	self->sectors->sector_load_callback.userdata = self;
-
 	/* Allocate the model manager. */
 	self->models = limdl_manager_new ();
 	if (self->models == NULL)
@@ -795,32 +770,6 @@ static void private_model_removed (
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->callbacks, "model-free", lical_marshal_DATA_PTR, model);
-}
-
-static void private_sector_free (
-	void*        data,
-	LIAlgSector* sector)
-{
-	LIMaiProgram* self = data;
-
-	/* Invoke callbacks. */
-	lical_callbacks_call (self->callbacks, "sector-free", lical_marshal_DATA_INT, sector->index);
-
-	/* Inform scripts. */
-	limai_program_event (self, "sector-free", "sector", LIMAI_FIELD_INT, sector->index, NULL);
-}
-
-static void private_sector_load (
-	void*        data,
-	LIAlgSector* sector)
-{
-	LIMaiProgram* self = data;
-
-	/* Invoke callbacks. */
-	lical_callbacks_call (self->callbacks, "sector-load", lical_marshal_DATA_INT, sector->index);
-
-	/* Inform scripts. */
-	limai_program_event (self, "sector-load", "sector", LIMAI_FIELD_INT, sector->index, NULL);
 }
 
 static int private_tick (

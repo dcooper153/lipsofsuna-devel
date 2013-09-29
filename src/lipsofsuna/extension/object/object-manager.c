@@ -52,15 +52,6 @@ LIObjManager* liobj_manager_new (
 		return NULL;
 	}
 
-	/* Create sector data. */
-	if (!lialg_sectors_insert_content (program->sectors, LIALG_SECTORS_CONTENT_ENGINE, self,
-	     (LIAlgSectorFreeFunc) liobj_sector_free,
-	     (LIAlgSectorLoadFunc) liobj_sector_new))
-	{
-		liobj_manager_free (self);
-		return NULL;
-	}
-
 	/* Register the component. */
 	if (!limai_program_insert_component (program, "object", self))
 	{
@@ -96,9 +87,6 @@ void liobj_manager_free (
 		}
 		lialg_u32dic_free (self->objects);
 	}
-
-	/* Free sector data. */
-	lialg_sectors_remove_content (self->program->sectors, LIALG_SECTORS_CONTENT_ENGINE);
 
 	/* Unregister the component. */
 	limai_program_remove_component (self->program, "object");

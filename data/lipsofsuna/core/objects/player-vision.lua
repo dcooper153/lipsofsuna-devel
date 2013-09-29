@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local Packet = require("system/packet")
-local Sector = require("system/sector")
 local Vision = require("system/vision")
 
 --- Player vision updater.

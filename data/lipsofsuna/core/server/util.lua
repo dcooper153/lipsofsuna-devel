@@ -11,7 +11,6 @@
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Item = require("core/objects/item")
-local Sector = require("system/sector")
 local Vector = require("system/math/vector")
 
 -- FIXME: These need to be cleaned up.
@@ -138,11 +137,11 @@ end
 
 --- Finds spawns point suitable for actors.
 -- @param clss Utils class.
--- @param sector Sector ID.
+-- @param chunk Chunk ID.
 -- @param count Spawn point count.
 -- @param allow_yield True to allow yielding.
 -- @return List of vectors in world units.
-Utils.find_spawn_points_in_sector = function(clss, sector, count, allow_yield)
+Utils.find_spawn_points_in_sector = function(clss, chunk, count, allow_yield)
 	-- FIXME: Stick terrain.
 	return {}
 end

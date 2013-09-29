@@ -11,7 +11,6 @@
 local Class = require("system/class")
 local Client = require("core/client/client")
 local Game = require("core/server/game")
-local Sectors = require("system/sectors")
 local Ui = require("ui/ui")
 
 --- Hosts multiplayer games.

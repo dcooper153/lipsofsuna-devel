@@ -34,7 +34,7 @@ static void Sectors_refresh (LIScrArgs* args)
 	if (!liscr_args_geti_vector (args, 0, &position) ||
 	    !liscr_args_geti_float (args, 1, &radius))
 		return;
-	lialg_sectors_refresh_point (module->program->sectors, &position, radius);
+	lialg_sectors_refresh_point (module->sectors, &position, radius);
 }
 
 static void Sectors_unload_all (LIScrArgs* args)
@@ -42,7 +42,7 @@ static void Sectors_unload_all (LIScrArgs* args)
 	LIExtSectorsModule* module;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SECTORS);
-	lialg_sectors_clear (module->program->sectors);
+	lialg_sectors_clear (module->sectors);
 }
 
 static void Sectors_unload_sector (LIScrArgs* args)
@@ -52,7 +52,17 @@ static void Sectors_unload_sector (LIScrArgs* args)
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SECTORS);
 	if (liscr_args_gets_int (args, "sector", &sector))
-		lialg_sectors_remove (module->program->sectors, sector);
+		lialg_sectors_remove (module->sectors, sector);
+}
+
+static void Sectors_update (LIScrArgs* args)
+{
+	float secs;
+	LIExtSectorsModule* module;
+
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SECTORS);
+	if (liscr_args_geti_float (args, 0, &secs))
+		liext_sectors_update (module, secs);
 }
 
 static void Sectors_get_sectors (LIScrArgs* args)
@@ -64,7 +74,7 @@ static void Sectors_get_sectors (LIScrArgs* args)
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SECTORS);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-	LIALG_U32DIC_FOREACH (iter, module->program->sectors->sectors)
+	LIALG_U32DIC_FOREACH (iter, module->sectors->sectors)
 	{
 		sector = iter.value;
 		idle = lisys_time (NULL) - (time_t) sector->stamp;
@@ -81,7 +91,7 @@ static void Sectors_get_sector_idle (LIScrArgs* args)
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SECTORS);
 	if (!liscr_args_geti_int (args, 0, &id))
 		return;
-	sector = lialg_u32dic_find (module->program->sectors->sectors, id);
+	sector = lialg_u32dic_find (module->sectors->sectors, id);
 	if (sector != NULL)
 		liscr_args_seti_int (args, lisys_time (NULL) - (time_t) sector->stamp);
 }
@@ -91,7 +101,7 @@ static void Sectors_get_sector_size (LIScrArgs* args)
 	LIExtSectorsModule* module;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SECTORS);
-	liscr_args_seti_float (args, module->program->sectors->width);
+	liscr_args_seti_float (args, module->sectors->width);
 }
 
 /*****************************************************************************/
@@ -102,6 +112,7 @@ void liext_script_sectors (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SECTORS, "sectors_refresh", Sectors_refresh);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SECTORS, "sectors_unload_all", Sectors_unload_all);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SECTORS, "sectors_unload_sector", Sectors_unload_sector);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SECTORS, "sectors_update", Sectors_update);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SECTORS, "sectors_get_sectors", Sectors_get_sectors);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SECTORS, "sectors_get_sector_idle", Sectors_get_sector_idle);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SECTORS, "sectors_get_sector_size", Sectors_get_sector_size);

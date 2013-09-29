@@ -38,7 +38,6 @@ struct _LIObjObject
 	int external_id;
 	int flags;
 	LIObjManager* manager;
-	LIObjSector* sector;
 	LIMatTransform transform;
 	LIMatTransform transform_event;
 	LIScrData* script;
@@ -82,9 +81,6 @@ LIAPICALL (int, liobj_object_get_realized, (
 LIAPICALL (int, liobj_object_set_realized, (
 	LIObjObject* self,
 	int          value));
-
-LIAPICALL (LIObjSector*, liobj_object_get_sector, (
-	LIObjObject* self));
 
 LIAPICALL (int, liobj_object_get_static, (
 	const LIObjObject* self));

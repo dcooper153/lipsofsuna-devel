@@ -132,13 +132,6 @@ Object.set_rotation = function(self, value)
 	Los.object_set_rotation(self.handle, value.handle)
 end
 
---- Gets the sector ID of the object.
--- @param self Object.
--- @return Number, or nil
-Object.get_sector = function(self)
-	return Los.object_get_sector(self.handle)
-end
-
 --- Returns true if the object is static.
 -- @param self Object.
 -- @return True if static, false if not.

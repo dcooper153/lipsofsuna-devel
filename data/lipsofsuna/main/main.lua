@@ -101,10 +101,11 @@ Main.main = function(self)
 		self.timing:start_action("event")
 		Eventhandler:update()
 		-- Update the logic.
-		self.timing:start_action("sectors")
-		if self.game then
-			self.game.sectors:update(tick)
+		self.timing:start_action("objects")
+		if self.objects then
+			self.objects:update(tick)
 		end
+		self.timing:start_action("hooks")
 		self.update_hooks:call(tick)
 		self.timing:start_action("resources")
 		self.images:update(tick)

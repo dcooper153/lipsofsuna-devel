@@ -382,9 +382,7 @@ end
 -- @param self Object.
 -- @param radius Refresh radius, or 0 for default.
 SimulationObject.refresh = function(self, radius)
-	if Main.game.sectors then
-		Main.game.sectors:refresh(self:get_position(), radius)
-	end
+	self.manager:refresh_point(self:get_position(), radius)
 	if Main.terrain then
 		Main.terrain:refresh_chunks_by_point(self:get_position(), radius or 16)
 	end
@@ -605,6 +603,15 @@ SimulationObject.set_rotation = function(self, value, predict)
 			self.render:set_rotation(value)
 		end
 	end
+end
+
+--- Gets the sector ID of the object.
+-- @param self Object.
+-- @return Number, or nil
+Object.get_sector = function(self)
+	if not self:get_visible() then return end
+	local p = self:get_position()
+	return self.manager.chunks:get_chunk_id_by_point(p.x, p.z)
 end
 
 --- Gets the strafing rate of the object.

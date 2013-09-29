@@ -10,7 +10,7 @@ Main.game_modes:register("Character", function()
 	-- FIXME: Initialize the game.
 	Main.game = Game("benchmark")
 	Main.game:start()
-	Main.game.sectors.unload_time = nil
+	Main.objects:set_unloading()
 	-- Start the subsystems.
 	Client.chargen:init(true)
 	Ui:set_state("chargen")

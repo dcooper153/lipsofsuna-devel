@@ -86,7 +86,7 @@ Main.messaging:register_message{
 		end
 		-- Count sectors.
 		local num_sectors = 0
-		for k,v in pairs(Main.game.sectors.sectors) do
+		for k,v in pairs(Main.objects.chunks:get_chunks()) do
 			num_sectors = num_sectors + 1
 		end
 		-- Send stats.

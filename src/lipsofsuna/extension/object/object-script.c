@@ -31,14 +31,12 @@
 
 static void Object_find (LIScrArgs* args)
 {
-	int id;
 	float radius = 32.0f;
 	LIAlgU32dicIter iter1;
 	LIMatVector center;
 	LIMatVector diff;
 	LIObjObject* object;
 	LIObjManager* manager;
-	LIObjSector* sector;
 
 	/* Find class data. */
 	manager = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_OBJECT);
@@ -54,21 +52,6 @@ static void Object_find (LIScrArgs* args)
 			diff = limat_vector_subtract (center, object->transform.position);
 			if (limat_vector_get_length (diff) < radius)
 				liscr_args_seti_data (args, object->script);
-		}
-	}
-
-	/* Sector find mode. */
-	else if (liscr_args_gets_int (args, "sector", &id))
-	{
-		sector = lialg_sectors_data_index (manager->program->sectors, LIALG_SECTORS_CONTENT_ENGINE, id, 0);
-		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-		if (sector != NULL)
-		{
-			LIALG_U32DIC_FOREACH (iter1, sector->objects)
-			{
-				object = iter1.value;
-				liscr_args_seti_data (args, object->script);
-			}
 		}
 	}
 }
@@ -180,14 +163,6 @@ static void Object_set_rotation (LIScrArgs* args)
 	}
 }
 
-static void Object_get_sector (LIScrArgs* args)
-{
-	LIObjObject* self = args->self;
-
-	if (self->sector != NULL)
-		liscr_args_seti_int (args, self->sector->sector->index);
-}
-
 static void Object_get_static (LIScrArgs* args)
 {
 	LIObjObject* self = args->self;
@@ -219,7 +194,6 @@ void liext_script_object (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_realized", Object_set_realized);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_rotation", Object_get_rotation);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_rotation", Object_set_rotation);
-	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_sector", Object_get_sector);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_static", Object_get_static);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_static", Object_set_static);
 }

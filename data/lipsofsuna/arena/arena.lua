@@ -33,7 +33,7 @@ Arena.new = function(clss)
 	Main.messaging:set_transmit_mode(true, true)
 	Main.game = Game("benchmark")
 	Main.game:start()
-	Main.game.sectors.unload_time = nil
+	Main.objects:set_unloading()
 	ServerUtils:set_player_spawn_point(Vector(500,101,500))
 	-- Initialize the terrain.
 	Main.terrain:set_view_center(Vector(500, 0, 500))

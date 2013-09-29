@@ -33,7 +33,7 @@ Main.game_save_hooks:register(0, function(db, erase)
 	if erase then
 		Main.server.object_database:clear_objects()
 	end
-	Main.game.sectors:save_world(erase)
+	Main.objects:save_world(erase)
 	if not erase then
 		Main.server.object_database:update_world_decay()
 		Main.server.object_database:clear_unused_objects()

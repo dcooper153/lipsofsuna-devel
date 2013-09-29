@@ -62,7 +62,7 @@ end}
 
 Eventhandler{type = "sector-load", func = function(self, args)
 	if Main.game then
-		Main.game.sectors:load_sector(args.sector)
+		Main.objects:load_chunk(args.sector)
 	end
 end}
 

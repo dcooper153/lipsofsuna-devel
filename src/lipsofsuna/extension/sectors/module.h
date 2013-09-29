@@ -25,14 +25,19 @@
 typedef struct _LIExtSectorsModule LIExtSectorsModule;
 struct _LIExtSectorsModule
 {
+	LIAlgSectors* sectors;
 	LIMaiProgram* program;
 };
 
-LIExtSectorsModule* liext_sectors_new (
-	LIMaiProgram* program);
+LIAPICALL (LIExtSectorsModule*, liext_sectors_new, (
+	LIMaiProgram* program));
 
-void liext_sectors_free (
-	LIExtSectorsModule* self);
+LIAPICALL (void, liext_sectors_free, (
+	LIExtSectorsModule* self));
+
+LIAPICALL (void, liext_sectors_update, (
+	LIExtSectorsModule* self,
+	float               secs));
 
 /*****************************************************************************/
 

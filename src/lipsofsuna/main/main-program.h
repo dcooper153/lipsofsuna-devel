@@ -44,7 +44,6 @@ struct _LIMaiProgram
 	LISysTimeval curr_tick;
 	LISysTimeval prev_tick;
 	LIAlgRandom random;
-	LIAlgSectors* sectors;
 	LIAlgStrdic* components;
 	LICalCallbacks* callbacks;
 	LICalHandle calls[1];

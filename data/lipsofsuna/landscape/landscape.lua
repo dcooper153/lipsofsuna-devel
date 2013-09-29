@@ -27,7 +27,7 @@ Landscape.new = function(clss)
 	Main.messaging:set_transmit_mode(true, true)
 	Main.game = Game("benchmark")
 	Main.game:start()
-	Main.game.sectors.unload_time = nil
+	Main.objects:set_unloading()
 	Main.terrain:set_enable_generation(true)
 	return self
 end

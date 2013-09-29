@@ -25,12 +25,6 @@
 #include "object.h"
 #include "object-sector.h"
 
-static int private_warp (
-	LIObjObject*       self,
-	const LIMatVector* position);
-
-/*****************************************************************************/
-
 /**
  * \brief Creates a new object.
  * \param manager Object manager.
@@ -168,20 +162,12 @@ int liobj_object_set_realized (
 	LIObjObject* self,
 	int          value)
 {
-	LIMatTransform transform;
-
 	if (value == liobj_object_get_realized (self))
 		return 1;
 	if (value)
 	{
-		/* Link to the map. */
-		liobj_object_get_transform (self, &transform);
+		/* Add to the map. */
 		self->flags |= LIENG_OBJECT_FLAG_REALIZED;
-		if (!private_warp (self, &transform.position))
-		{
-			self->flags &= ~LIENG_OBJECT_FLAG_REALIZED;
-			return 0;
-		}
 
 		/* Invoke program->callbacks. */
 		lical_callbacks_call (self->manager->program->callbacks, "object-visibility", lical_marshal_DATA_PTR_INT, self, 1);
@@ -192,26 +178,10 @@ int liobj_object_set_realized (
 		lical_callbacks_call (self->manager->program->callbacks, "object-visibility", lical_marshal_DATA_PTR_INT, self, 0);
 
 		/* Remove from the map. */
-		if (self->sector != NULL)
-		{
-			lialg_u32dic_remove (self->sector->objects, self->id);
-			self->sector = NULL;
-		}
 		self->flags &= ~LIENG_OBJECT_FLAG_REALIZED;
 	}
 
 	return 1;
-}
-
-/**
- * \brief Returns the current sector of the object.
- * \param self Object.
- * \return Sector or NULL.
- */
-LIObjSector* liobj_object_get_sector (
-	LIObjObject* self)
-{
-	return self->sector;
 }
 
 /**
@@ -234,23 +204,10 @@ void liobj_object_set_static (
 	LIObjObject* self,
 	int          value)
 {
-	LIMatTransform transform;
-
 	if (value)
-	{
 		self->flags |= LIENG_OBJECT_FLAG_STATIC;
-		if (self->sector != NULL)
-		{
-			lialg_u32dic_remove (self->sector->objects, self->id);
-			self->sector = NULL;
-		}
-	}
 	else
-	{
 		self->flags &= ~LIENG_OBJECT_FLAG_STATIC;
-		liobj_object_get_transform (self, &transform);
-		private_warp (self, &transform.position);
-	}
 }
 
 /**
@@ -275,55 +232,11 @@ int liobj_object_set_transform (
 	LIObjObject*          self,
 	const LIMatTransform* value)
 {
-	/* Warp to new position. */
-	if (!private_warp (self, &value->position))
-		return 0;
+	/* Set the position. */
 	self->transform = *value;
 
 	/* Invoke program->callbacks. */
 	lical_callbacks_call (self->manager->program->callbacks, "object-transform", lical_marshal_DATA_PTR_PTR, self, value);
-
-	return 1;
-}
-
-/*****************************************************************************/
-
-static int private_warp (
-	LIObjObject*       self,
-	const LIMatVector* position)
-{
-	LIObjSector* dst;
-	LIObjSector* src;
-
-	/* Do not warp hidden objects. */
-	if (!(self->flags & LIENG_OBJECT_FLAG_REALIZED))
-	{
-		lisys_assert (self->sector == NULL);
-		return 1;
-	}
-
-	/* Do not add static objects to sectors. */
-	if (self->flags & LIENG_OBJECT_FLAG_STATIC)
-	{
-		lisys_assert (self->sector == NULL);
-		return 1;
-	}
-
-	/* Get the source and destination sectors. */
-	src = self->sector;
-	dst = lialg_sectors_data_point (self->manager->program->sectors, LIALG_SECTORS_CONTENT_ENGINE, position, 1);
-	if (dst == NULL)
-		return 0;
-
-	/* Move between the sectors. */
-	if (src != dst)
-	{
-		if (lialg_u32dic_insert (dst->objects, self->id, self) == NULL)
-			return 0;
-		if (src != NULL)
-			lialg_u32dic_remove (src->objects, self->id);
-		self->sector = dst;
-	}
 
 	return 1;
 }

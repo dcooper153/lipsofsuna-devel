@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Hooks = require("system/hooks")
+local ObjectChunkManager = require("core/objects/object-chunk-manager")
 
 --- Manages the objects of the game.
 -- @type ObjectManager
@@ -17,8 +18,10 @@ local ObjectManager = Class("ObjectManager")
 
 --- Creates a new object manager.
 -- @param clss ObjectManager class.
+-- @param chunk_size Chunk size.
+-- @param grid_size Grid size.
 -- @return ObjectManager.
-ObjectManager.new = function(clss)
+ObjectManager.new = function(clss, chunk_size, grid_size)
 	local self = Class.new(clss)
 	-- Initialize the object tables.
 	self.active_by_id = setmetatable({}, {__mode = "v"})
@@ -27,6 +30,8 @@ ObjectManager.new = function(clss)
 	self.object_created_hooks = Hooks()
 	self.object_detached_hooks = Hooks()
 	self.object_update_hooks = Hooks()
+	-- Initialize the sector manager.
+	self.chunks = ObjectChunkManager(self, chunk_size, grid_size)
 	return self
 end
 
@@ -53,16 +58,6 @@ end
 -- @param object Object.
 ObjectManager.add = function(self, object)
 	self.objects_by_id[object:get_id()] = object
-end
-
---- Detaches all objects.
--- @param self ObjectManager.
-ObjectManager.detach_all = function(self)
-	for k,v in pairs(self.objects_by_id) do
-		v:detach()
-		self.objects_by_id[k] = nil
-	end
-	self.active_by_id = {}
 end
 
 --- Finds an object by its ID.
@@ -93,11 +88,10 @@ end
 -- @param self ObjectManager.
 -- @param point Center point for radius search.
 -- @param radius Search radius for radius search.
--- @param sector Sector ID, or nil for all sectors.
 -- @return Dictionary of objects.
-ObjectManager.find_by_point = function(self, point, radius, sector)
+ObjectManager.find_by_point = function(self, point, radius)
 	local dict = {}
-	local list = Los.object_find{point = point.handle, radius = radius, sector = sector}
+	local list = Los.object_find{point = point.handle, radius = radius}
 	for k,v in pairs(list) do
 		local o = __userdata_lookup[v]
 		dict[o:get_id()] = o
@@ -111,20 +105,54 @@ end
 -- @return Dictionary of objects.
 ObjectManager.find_by_sector = function(self, sector)
 	local dict = {}
-	local list = Los.object_find{sector = sector}
-	if list then
-		for k,v in pairs(list) do
-			local o = __userdata_lookup[v]
-			dict[o:get_id()] = o
+	for k,v in pairs(self.objects_by_id) do
+		if v:get_sector() == sector then
+			dict[v:get_id()] = v
 		end
 	end
 	return dict
+end
+
+--- Loads a chunk.
+-- @param self ObjectManager.
+-- @param id Chunk ID.
+ObjectManager.load_chunk = function(self, id)
+	local x,z = self:get_chunk_xz_by_id(id)
+	self.chunks:load_chunk(x, z)
+end
+
+--- Unloads all the objects.
+-- @param self ObjectManager.
+ObjectManager.unload_all = function(self)
+	-- Unload the objects.
+	for k,v in pairs(self.objects_by_id) do
+		v:detach()
+		self.objects_by_id[k] = nil
+	end
+	self.active_by_id = {}
+	-- Unload the chunks.
+	self.chunks:unload_all_chunks()
+end
+
+--- Refreshes objects.
+-- @param self ObjectManager.
+-- @param point Point.
+-- @param radius Radius.
+ObjectManager.refresh_point = function(self, point, radius)
+	self.chunks:refresh(point, radius)
+end
+
+--- Saves all active sectors to the database.
+-- @param self ObjectManager.
+ObjectManager.save_world = function(self)
+	self.chunks:save_world()
 end
 
 --- Updates active objects.
 -- @param self ObjectManager.
 -- @param secs Seconds since the last update.
 ObjectManager.update = function(self, secs)
+	self.chunks:update(secs)
 	-- FIXME: Updates all objects due to terrain and object loading not being
 	-- in sync currently. The update is required by SimulationObject.update()
 	-- to freeze object physics until the terrain has been loaded.
@@ -139,6 +167,16 @@ end
 -- @return Dictionary.
 ObjectManager.get_active_objects = function(self)
 	return self.active_by_id
+end
+
+--- Sets the database used by the manager.
+-- @param self ObjectManager.
+-- @param value Database to set. Nil to unset.
+ObjectManager.set_database = function(self, value)
+	if value then
+		value:query("CREATE TABLE IF NOT EXISTS objects (id INTEGER PRIMARY KEY,sector UNSIGNED INTEGER,data TEXT);")
+	end
+	self.chunks.database = value
 end
 
 --- Gets a free object ID.
@@ -162,6 +200,14 @@ ObjectManager.get_free_id = function(self)
 			end
 		end
 	end
+end
+
+--- Toggles automatic chunk unloading.
+-- @param self ObjectManager.
+-- @param value True to enable. False to disable.
+ObjectManager.set_unloading = function(self, value)
+	self.chunks.enable_unloading = value
+	self.chunks.unload_time = value and 10
 end
 
 return ObjectManager

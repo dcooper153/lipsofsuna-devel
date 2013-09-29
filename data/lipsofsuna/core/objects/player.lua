@@ -14,7 +14,6 @@ local Modifier = require("core/server/modifier")
 local ModifierSpec = require("core/specs/modifier")
 local Packet = require("system/packet")
 local PlayerVision = require("core/objects/player-vision")
-local Sector = require("system/sector")
 
 --- Player object.
 -- @type Player

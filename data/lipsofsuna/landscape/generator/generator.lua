@@ -49,13 +49,13 @@ Generator.generate = function(self, args)
 	-- Reset the world.
 	self:update_status(0, "Resetting world")
 	Main.markers:reset()
-	Main.game.sectors:unload_all()
+	Main.objects:unload_all()
 	self:reset()
 	-- Save the map.
 	self:update_status(0, "Saving the map")
 	Server.object_database:clear_objects()
-	Main.game.sectors:save_world(true, function(p) self:update_status(p) end)
-	Main.game.sectors:unload_all()
+	Main.objects:save_world(true, function(p) self:update_status(p) end)
+	Main.objects:unload_all()
 	Server.object_database:save_static_objects()
 	-- Save map markers.
 	self:update_status(0, "Saving quests")

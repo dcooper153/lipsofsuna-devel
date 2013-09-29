@@ -13,7 +13,6 @@ local Database = require("system/database")
 local Network = require("system/network")
 local OptionsDatabase = require("core/server/options-database")
 local Physics = require("system/physics")
-local SectorManager = require("core/server/sector-manager")
 
 --- Base game state.
 -- @type Game
@@ -38,7 +37,8 @@ Game.new = function(clss, mode, save)
 		self.database:query("PRAGMA synchronous=OFF;")
 		self.database:query("PRAGMA count_changes=OFF;")
 	end
-	self.sectors = SectorManager(12, self.database, self.enable_unloading)
+	Main.objects:set_database(self.database)
+	Main.objects:set_unloading(self.unloading)
 	-- Initialize the options database.
 	if save then
 		self.options = OptionsDatabase(self.database)
@@ -58,9 +58,8 @@ Game.free = function(self)
 		Server:deinit()
 	end
 	-- Detach all objects.
-	self.sectors.database = nil
-	Main.objects:detach_all()
-	self.sectors:unload_all()
+	Main.objects:set_database(nil)
+	Main.objects:unload_all()
 	self.static_objects_by_id = nil
 	-- Shutdown networking.
 	Network:shutdown()
