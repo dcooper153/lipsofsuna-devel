@@ -10,6 +10,8 @@
 
 local Class = require("system/class")
 local Item = require("core/objects/item")
+local Modifier = require("core/server/modifier")
+local ModifierSpec = require("core/specs/modifier")
 local ObjectSerializer = require("core/objects/object-serializer")
 local SimulationObject = require("core/objects/simulation")
 
@@ -69,6 +71,20 @@ Obstacle.clone = function(self)
 	o.health = self.health
 	o.physics:set_angular(self.physics:get_angular())
 	return o
+end
+
+--- Adds a modifier to the object.
+-- @param self Obstacle.
+-- @param name Modifier name.
+-- @param strength Strength.
+-- @param caster Caster object. Nil for self.
+-- @param point Impact point. Nil for default.
+-- @return Modifier if effect-over-time. Nil otherwise.
+Obstacle.add_modifier = function(self, name, strength, caster, point)
+	local spec = ModifierSpec:find_by_name(name)
+	if not spec then return end
+	local m = Modifier(spec, self, caster or self, point or self:get_position())
+	m:start(strength)
 end
 
 --- Causes the object to take damage.
