@@ -55,7 +55,8 @@
 			"adamantium sword": 1,
 			"iron breastplate": 1,
 			"iron greaves": 1,
-			"iron gauntlets": 1
+			"iron skirt": 1,
+			"leather pants": 1
 		},
 		"loot_categories":
 		[
@@ -103,10 +104,6 @@
 		],
 		"loot_count_min": 2,
 		"loot_count_max": 4,
-		"skills":
-		{
-			"Health lv1": true
-		},
 		"personality": "savage",
 		"preset": "Female 3"
 	},
@@ -131,6 +128,8 @@
 			"iron breastplate": 1,
 			"iron greaves": 1,
 			"iron gauntlets": 1,
+			"iron skirt": 1,
+			"leather pants": 1
 			"arrow": 40
 		},
 		"loot_categories":
@@ -143,7 +142,7 @@
 		"loot_count_max": 4,
 		"skills":
 		{
-			"Health lv3": true
+			"Health lv1": true
 		},
 		"personality": "savage",
 		"preset": "Female 1"
