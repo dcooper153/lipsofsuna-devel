@@ -5,7 +5,8 @@
 		"model": "furnace1",
 		"categories":
 		{
-			"prop": true
+			"civilization": true,
+			"furniture": true
 		},
 		"health": 200,
 		"interactive": true

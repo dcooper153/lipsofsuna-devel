@@ -1,14 +1,15 @@
 [
 	{
-		"type": "Staticspec",
+		"type": "Obstaclespec",
 		"name": "obelisk",
 		"model": "obelisk1",
 		"categories":
 		{
-			"obelisk": true,
-			"special": true
+			"civilization": true,
+			"obelisk": true
 		},
 		"dialog": "obelisk",
+		"interactive": true
 		"usages":
 		{
 			"examine": true

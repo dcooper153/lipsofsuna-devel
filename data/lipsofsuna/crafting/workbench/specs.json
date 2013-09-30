@@ -4,6 +4,7 @@
 		"name": "alchemy table",
 		"categories":
 		{
+			"civilization": true,
 			"furniture": true
 		},
 		"collision_mask": 65535,
@@ -20,6 +21,7 @@
 		"name": "workbench",
 		"categories":
 		{
+			"civilization": true,
 			"furniture": true
 		},
 		"collision_mask": 65535,

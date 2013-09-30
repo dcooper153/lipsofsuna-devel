@@ -2,6 +2,11 @@
 	{
 		"type": "Obstaclespec",
 		"name": "spell table",
+		"categories":
+		{
+			"civilization": true,
+			"furniture": true
+		},
 		"collision_mask": 65535,
 		"mass": 100,
 		"model": "spelltable1",

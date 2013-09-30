@@ -4,6 +4,7 @@
 		"name": "anvil",
 		"categories":
 		{
+			"civilization": true,
 			"furniture": true
 		},
 		"collision_mask": 65535,

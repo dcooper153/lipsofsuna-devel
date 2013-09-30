@@ -90,6 +90,12 @@ TerrainGenerator.generate = function(self, chunk)
 			i = i + 5
 		end
 	end
+	-- Randomize civilization obstacles.
+	local civ_x,civ_y,civ_z
+	if math.random() < 0.05 then
+		civ_x = math.random(0, w-1)
+		civ_z = math.random(0, w-1)
+	end
 	-- Generate the surface.
 	local p = Vector()
 	local stride = 5 * (w + 1)
@@ -115,8 +121,12 @@ TerrainGenerator.generate = function(self, chunk)
 			local d10,e10 = get_dungeon_at(x + 1, z)
 			local d01,e01 = get_dungeon_at(x, z + 1)
 			local d11,e11 = get_dungeon_at(x + 1, z + 1)
+			-- Sample the civilization obstacle position.
+			if civ_x == x and civ_z == z then
+				local y0,y1,y2,y3 = a00 + b00 + c00, a10 + b10 + c10, a01 + b01 + c01, a11 + b11 + c11
+				civ_y = (y0 + y1 + y2 + y3) / 4
 			-- Generate the grass.
-			if c00 > 0 or c10 > 0 or c01 > 0 or c11 > 0 then
+			elseif c00 > 0 or c10 > 0 or c01 > 0 or c11 > 0 then
 				local y0,y1,y2,y3 = a00 + b00 + c00, a10 + b10 + c10, a01 + b01 + c01, a11 + b11 + c11
 				t:add_stick_corners(chunk.x + x, chunk.z + z, 0, 0, 0, 0, y0, y1, y2, y3, 2)
 				-- Generate plants.
@@ -155,6 +165,15 @@ TerrainGenerator.generate = function(self, chunk)
 		for z = chunk.z-1,chunk.z+w do
 			t:calculate_smooth_normals(x, z)
 		end
+	end
+	-- Generate civilization obstacles.
+	if civ_y then
+		-- Calculate the position.
+		p:set_xyz(chunk.x + civ_x + 0.5, 0.0, chunk.z + civ_z + 0.5)
+		p:multiply(chunk.manager.grid_size)
+		p:add_xyz(0, civ_y, 0)
+		-- Choose and create the obstacle.
+		MapUtils:place_obstacle{point = p, category = "civilization"}
 	end
 end
 
