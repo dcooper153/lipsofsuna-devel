@@ -9,6 +9,7 @@
 -- @alias Item
 
 local Class = require("system/class")
+local Json = require("system/json")
 local ObjectSerializer = require("core/objects/object-serializer")
 local SimulationObject = require("core/objects/simulation")
 
@@ -43,6 +44,22 @@ Item.serializer = ObjectSerializer(
 	{
 		name = "looted",
 		type = "boolean"
+	},
+	{
+		name = "spell_action",
+		type = "string"
+	},
+	{
+		name = "spell_modifiers",
+		type = "string",
+		get = function(self)
+			if not self.spell_modifiers then return end
+			return Json:encode(self.spell_modifiers)
+		end,
+		set = function(self, v)
+			if not v or v == "" then return end
+			self.spell_modifiers = Json:decode(v)
+		end
 	},
 	{
 		name = "position",
