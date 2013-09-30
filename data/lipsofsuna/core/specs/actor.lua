@@ -12,6 +12,7 @@ local AnimationProfileSpec = require("core/specs/animation-profile")
 local Class = require("system/class")
 local Color = require("system/color")
 local EffectProfileSpec = require("core/specs/effect-profile")
+local HairStyleSpec = require("core/specs/hair-style")
 local Spec = require("core/specs/spec")
 
 --- Actor specification.
@@ -329,10 +330,13 @@ Actorspec.get_random_hair_style = function(self)
 	local style = self.hair_style
 	if not style then return end
 	if style == "random" then
-		if not self.hair_styles then return end
+		local c = self.equipment_class
+		if not c then return end
 		local lst = {}
-		for k,v in pairs(self.hair_styles) do
-			table.insert(lst, v)
+		for k,v in pairs(HairStyleSpec.dict_name) do
+			if v:get_equipment_models(c) then
+				table.insert(lst, k)
+			end
 		end
 		local l = #lst
 		if l == 0 then return end
