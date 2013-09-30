@@ -25,9 +25,6 @@ PlayerState.new = function(clss)
 	self.tilt_state = 0
 	self.turn_speed = 0
 	self.turn_state = 0
-	self.rotation_curr = Quaternion()
-	self.rotation_prev = Quaternion()
-	self.rotation_sync_timer = 0
 	return self
 end
 
@@ -81,7 +78,7 @@ end
 -- @param self PlayerState.
 -- @return Number.
 PlayerState.get_turn_angle = function(self)
-	return self.rotation_curr.euler[1]
+	return self.turn_state
 end
 
 --- Gets the object currently under the crosshair.
