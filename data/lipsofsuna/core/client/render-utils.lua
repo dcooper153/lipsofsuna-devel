@@ -67,8 +67,8 @@ RenderUtils.create_scale_animation = function(self, spec, scale_body, scale_head
 			anim:set_transform{frame = 1, node = "head", scale = s}
 		end
 	end
-	return {channel = 127, animation = anim, fade_in = 0,
-		fade_out = 0, permanent = true, replace = true, weight = 0, weight_scale = 1000}
+	return {channel = 127, animation = anim, fade_in = 0, priority = 1000,
+		fade_out = 0, permanent = true, replace = true, weight = 0, weight_scale = 1}
 end
 
 --- Creates special effects for an object spec.
