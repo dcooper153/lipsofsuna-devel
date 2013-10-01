@@ -54,16 +54,6 @@ btScalar LIPhyConvexResultCallback::addSingleResult (btCollisionWorld::LocalConv
 		liphy_contact_init (&this->result);
 		this->result.object_id = liphy_object_get_external_id (object);
 	}
-	else if (pointer->type == LIPHY_POINTER_TYPE_VOXEL)
-	{
-		/* Voxels. */
-		ret = ClosestConvexResultCallback::addSingleResult (result, world);
-		liphy_contact_init (&this->result);
-		this->result.voxels_id = 1;
-		this->result.terrain_tile[0] = pointer->tile[0];
-		this->result.terrain_tile[1] = pointer->tile[1];
-		this->result.terrain_tile[2] = pointer->tile[2];
-	}
 	else
 	{
 		/* Terrain. */

@@ -472,11 +472,6 @@ static bool private_contact_processed (
 			contact.object_id = liphy_object_get_external_id (object0);
 			physics = object0->physics;
 		}
-		else if (pointer0->type == LIPHY_POINTER_TYPE_VOXEL)
-		{
-			contact.voxels_id = 1;
-			memcpy (contact.terrain_tile, pointer0->tile, 3 * sizeof (int));
-		}
 		else
 		{
 			contact.terrain_id = pointer0->id;
@@ -490,11 +485,6 @@ static bool private_contact_processed (
 			object1 = (LIPhyObject*) pointer1->pointer;
 			contact.object1_id = liphy_object_get_external_id (object1);
 			physics = object1->physics;
-		}
-		else if (pointer1->type == LIPHY_POINTER_TYPE_VOXEL)
-		{
-			contact.voxels_id = 1;
-			memcpy (contact.terrain_tile, pointer1->tile, 3 * sizeof (int));
 		}
 		else
 		{

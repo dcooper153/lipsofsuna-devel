@@ -103,9 +103,6 @@ static void Physics_cast_ray (LIScrArgs* args)
 		if (result.terrain_id)
 		{
 			liscr_args_sets_int (args, "terrain", result.terrain_id);
-		}
-		if (result.voxels_id || result.terrain_id)
-		{
 			vector.x = result.terrain_tile[0];
 			vector.y = result.terrain_tile[1];
 			vector.z = result.terrain_tile[2];
@@ -149,9 +146,6 @@ static void Physics_cast_sphere (LIScrArgs* args)
 		if (result.terrain_id)
 		{
 			liscr_args_sets_int (args, "terrain", result.terrain_id);
-		}
-		if (result.voxels_id || result.terrain_id)
-		{
 			vector.x = result.terrain_tile[0];
 			vector.y = result.terrain_tile[1];
 			vector.z = result.terrain_tile[2];

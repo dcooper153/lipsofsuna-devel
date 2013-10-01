@@ -105,14 +105,6 @@ static void private_object_contact (
 		/* Object -> object */
 		limai_program_event (self->program, "object-contact", "impulse", LIMAI_FIELD_FLOAT, contact->impulse, "normal", LIMAI_FIELD_VECTOR, &contact->normal, "object", LIMAI_FIELD_INT, contact->object1_id, "point", LIMAI_FIELD_VECTOR, &contact->point, "self", LIMAI_FIELD_INT, contact->object_id, NULL);
 	}
-	else if (contact->voxels_id)
-	{
-		/* Object -> voxels */
-		vector.x = contact->terrain_tile[0];
-		vector.y = contact->terrain_tile[1];
-		vector.z = contact->terrain_tile[2];
-		limai_program_event (self->program, "object-contact", "impulse", LIMAI_FIELD_FLOAT, contact->impulse, "normal", LIMAI_FIELD_VECTOR, &contact->normal,  "point", LIMAI_FIELD_VECTOR, &contact->point, "tile", LIMAI_FIELD_VECTOR, &vector, "self", LIMAI_FIELD_INT, contact->object_id, NULL);
-	}
 	else if (contact->terrain_id)
 	{
 		/* Object -> terrain */
