@@ -115,6 +115,25 @@ LIScrScript* liscr_script_new ()
 	lua_call (self->lua, 1, 0);
 #endif
 
+	/* Load sandbox breakin libraries. */
+#ifdef LI_DISABLE_SCRIPT_SANDBOX
+#if LUA_VERSION_NUM > 501
+	luaL_requiref (self->lua, LUA_OSLIBNAME, luaopen_os, 1);
+	lua_pop (self->lua, 1);
+	luaL_requiref (self->lua, LUA_LOADLIBNAME, luaopen_package, 1);
+	lua_pop (self->lua, 1);
+#else
+	lua_pushcfunction (self->lua, luaopen_os);
+	lua_pushstring (self->lua, LUA_OSLIBNAME);
+	lua_call (self->lua, 1, 0);
+	lua_pushcfunction (self->lua, luaopen_package);
+	lua_pushstring (self->lua, LUA_LOADLIBNAME);
+	lua_call (self->lua, 1, 0);
+#endif
+	lua_getglobal (self->lua, "require");
+	lua_setglobal (self->lua, "require_insecure");
+#endif
+
 	/* Create shortcut to self. */
 	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_SELF);
 	lua_pushlightuserdata (self->lua, self);

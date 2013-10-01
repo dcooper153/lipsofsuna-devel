@@ -27,6 +27,7 @@ def options(opt):
 	gr.add_option('--ogre-plugindir', action='store', default=False, help='override the default Ogre plugin directory')
 	gr.add_option('--disable-relpath', action='store_false', default=True, dest='relpath', help='disable relative data and library paths')
 	gr.add_option('--disable-graphics', action='store_false', default=True, dest='graphics', help='compile without graphics support')
+	gr.add_option('--disable-script-sandbox', action='store_false', default=True, dest='sandbox', help='expose insecure scripting features')
 	gr.add_option('--disable-sound', action='store_false', default=True, dest='sound', help='compile without sound support')
 	gr.add_option('--disable-luajit', action='store_false', default=True, dest='luajit', help='disable compilation against LuaJIT')
 	gr.add_option('--disable-input-grabs', action='store_false', default=True, dest='grabs', help='disable input grabbing for debug purposes [default: false]')
@@ -105,6 +106,8 @@ def configure(conf):
 	conf.define('LI_ENABLE_ERROR', 1)
 	if not Options.options.grabs:
 		conf.define('LI_DISABLE_INPUT_GRABS', 1)
+	if not Options.options.sandbox:
+		conf.define('LI_DISABLE_SCRIPT_SANDBOX', 1)
 	if not Options.options.graphics:
 		conf.define('LI_DISABLE_GRAPHICS', 1)
 		conf.env.GRAPHICS = False
@@ -162,6 +165,8 @@ def configure(conf):
 		print("\tgraphics support")
 	if Options.options.sound:
 		print("\tsound support")
+	if not Options.options.sandbox:
+		print("\tscript sandbox disabled")
 	if conf.env.CURL:
 		print("\tmaster server connectivity")
 	if conf.env.FREEIMAGE:
