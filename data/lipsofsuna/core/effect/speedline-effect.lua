@@ -26,7 +26,7 @@ local SpeedlineEffect = Class("SpeedlineEffect")
 --   <li>object: Object.</li></ul>
 -- @return Speedline effect.
 SpeedlineEffect.new = function(clss, args)
-	self = Class.new(clss)
+	local self = Class.new(clss)
 	self.object = args.object
 	self.path = {}
 	self.verts = {}
