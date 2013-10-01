@@ -36,10 +36,6 @@ static int private_model_new (
 	LIExtPhysicsModule* self,
 	LIMdlModel*         model);
 
-static int private_tick (
-	LIExtPhysicsModule* self,
-	float               secs);
-
 /*****************************************************************************/
 
 LIMaiExtensionInfo liext_physics_info =
@@ -82,8 +78,7 @@ LIExtPhysicsModule* liext_physics_new (
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (program->callbacks, "model-changed", 1, private_model_changed, self, self->calls + 0) ||
 	    !lical_callbacks_insert (program->callbacks, "model-free", 1, private_model_free, self, self->calls + 1) ||
-	    !lical_callbacks_insert (program->callbacks, "model-new", 1, private_model_new, self, self->calls + 2) ||
-	    !lical_callbacks_insert (program->callbacks, "tick", -65535, private_tick, self, self->calls + 3))
+	    !lical_callbacks_insert (program->callbacks, "model-new", 1, private_model_new, self, self->calls + 2))
 	{
 		liext_physics_free (self);
 		return NULL;
@@ -163,17 +158,6 @@ static int private_model_new (
 		if (model_ != NULL)
 			liphy_model_set_model (model_, model);
 	}
-
-	return 1;
-}
-
-static int private_tick (
-	LIExtPhysicsModule* self,
-	float               secs)
-{
-	/* Update physics. */
-	if (self->simulate)
-		liphy_physics_update (self->physics, secs);
 
 	return 1;
 }

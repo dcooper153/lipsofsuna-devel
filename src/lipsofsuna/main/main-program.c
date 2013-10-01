@@ -657,7 +657,6 @@ int limai_program_update (
 	self->tick = self->tick / LIMAI_PROGRAM_FPS_TICKS;
 
 	/* Update subsystems. */
-	liscr_script_update (self->script, secs);
 	lical_callbacks_update (self->callbacks);
 	lical_callbacks_call (self->callbacks, "tick", lical_marshal_DATA_FLT, secs);
 

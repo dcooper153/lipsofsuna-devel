@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -160,6 +160,21 @@ static void Physics_cast_sphere (LIScrArgs* args)
 	}
 }
 
+static void Physics_update (LIScrArgs* args)
+{
+	float secs;
+	LIExtPhysicsModule* module;
+
+	/* Handle arguments. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS);
+	if (!liscr_args_geti_float (args, 0, &secs))
+		return;
+
+	/* Update physics. */
+	if (module->simulate)
+		liphy_physics_update (module->physics, secs);
+}
+
 static void Physics_get_enable_simulation (LIScrArgs* args)
 {
 	LIExtPhysicsModule* module;
@@ -184,6 +199,7 @@ void liext_script_physics (
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_cast_ray", Physics_cast_ray);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_cast_sphere", Physics_cast_sphere);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_update", Physics_update);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_get_enable_simulation", Physics_get_enable_simulation);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_set_enable_simulation", Physics_set_enable_simulation);
 }

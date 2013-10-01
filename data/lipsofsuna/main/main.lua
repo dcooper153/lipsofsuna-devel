@@ -18,6 +18,7 @@ local Log = require("main/log")
 local Messaging = require("main/messaging")
 local ModelManager = require("main/model-manager")
 local Mod = require("main/mod")
+local Physics = require("system/physics")
 local Settings = require("main/settings")
 local Timing = require("main/timing")
 local Watchdog = require("system/watchdog")
@@ -93,6 +94,10 @@ Main.main = function(self)
 			Watchdog:start(30)
 		end
 		Program:update()
+		-- Update physics.
+		self.timing:start_action("physics")
+		Physics:update(tick)
+		-- Update the scene.
 		if self.client then
 			self.timing:start_action("scene")
 			Program:update_scene(tick)

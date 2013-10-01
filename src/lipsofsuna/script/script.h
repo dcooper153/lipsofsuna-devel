@@ -50,10 +50,6 @@ LIAPICALL (void, liscr_script_insert_mfunc, (
 	const char*   name,
 	LIScrArgsFunc func));
 
-LIAPICALL (void, liscr_script_update, (
-	LIScrScript* self,
-	float        secs));
-
 LIAPICALL (lua_State*, liscr_script_get_lua, (
 	LIScrScript* self));
 

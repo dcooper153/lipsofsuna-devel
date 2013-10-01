@@ -64,6 +64,13 @@ Physics.cast_sphere = function(self, src, dst, radius, mask, ignore)
 	return r
 end
 
+--- Updates the simulation.
+-- @param self Physics class.
+-- @param secs Seconds since the last update.
+Physics.update = function(self, secs)
+	Los.physics_update(secs)
+end
+
 --- Gets the physics simulation enable status.
 -- @param self Physics class.
 -- @return Boolean.

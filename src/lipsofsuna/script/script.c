@@ -268,17 +268,6 @@ int liscr_script_load_string (
 	return 1;
 }
 
-/**
- * \brief Updates the script.
- * \param self Script.
- * \param secs Duration of the tick in seconds.
- */
-void liscr_script_update (
-	LIScrScript* self,
-	float        secs)
-{
-}
-
 lua_State* liscr_script_get_lua (
 	LIScrScript* self)
 {
