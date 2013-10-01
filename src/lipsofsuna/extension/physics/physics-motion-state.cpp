@@ -46,9 +46,13 @@ void LIPhyMotionState::setWorldTransform (
 	this->current = transform;
 	if (this->object->control != NULL)
 	{
-		this->previous = this->current;
-		this->object->control->update ();
-		lical_callbacks_call (this->object->physics->callbacks, "physics-transform", lical_marshal_DATA_PTR, this->object);
+		if ((this->current.getOrigin() - this->previous.getOrigin()).length() > 0.01f ||
+		    (this->current.getRotation() - this->previous.getRotation()).length() > 0.01f)
+		{
+			this->object->control->update ();
+			lical_callbacks_call (this->object->physics->callbacks, "physics-transform", lical_marshal_DATA_PTR, this->object);
+			this->previous = this->current;
+		}
 	}
 }
 
