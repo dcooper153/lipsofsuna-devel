@@ -48,7 +48,8 @@ struct _LIMaiProgram
 	LICalCallbacks* callbacks;
 	LICalHandle calls[1];
 	LIMaiExtension* extensions;
-	LIMaiEvent* events;
+	LIMaiEvent* events_first;
+	LIMaiEvent* events_last;
 	LIMaiMessage* messages[LIMAI_MESSAGE_QUEUE_MAX];
 	LIMaiProgram* parent;
 	LIMdlManager* models;

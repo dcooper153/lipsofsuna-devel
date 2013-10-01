@@ -157,7 +157,7 @@ void limai_program_free (
 	}
 
 	/* Free events. */
-	for (event = self->events ; event != NULL ; event = event_next)
+	for (event = self->events_first ; event != NULL ; event = event_next)
 	{
 		event_next = event->next;
 		limai_event_free (event);
@@ -437,12 +437,14 @@ LIMaiEvent* limai_program_pop_event (
 {
 	LIMaiEvent* event;
 
-	event = self->events;
+	event = self->events_first;
 	if (event != NULL)
 	{
 		if (event->next != NULL)
 			event->next->prev = NULL;
-		self->events = event->next;
+		self->events_first = event->next;
+		if (event->next == NULL)
+			self->events_last = NULL;
 	}
 
 	return event;
@@ -538,17 +540,18 @@ void limai_program_push_event (
 	LIMaiProgram* self,
 	LIMaiEvent*   event)
 {
-	LIMaiEvent* ptr;
-
-	if (self->events != NULL)
+	if (self->events_last != NULL)
 	{
-		for (ptr = self->events ; ptr->next != NULL ; ptr = ptr->next)
-			{}
-		ptr->next = event;
-		event->prev = ptr;
+		event->prev = self->events_last;
+		if (self->events_last != NULL)
+			self->events_last->next = event;
+		self->events_last = event;
 	}
 	else
-		self->events = event;
+	{
+		self->events_first = event;
+		self->events_last = event;
+	}
 }
 
 /**
