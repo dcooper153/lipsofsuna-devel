@@ -24,8 +24,8 @@ local ObjectManager = Class("ObjectManager")
 ObjectManager.new = function(clss, chunk_size, grid_size)
 	local self = Class.new(clss)
 	-- Initialize the object tables.
-	self.active_by_id = setmetatable({}, {__mode = "v"})
 	self.objects_by_id = setmetatable({}, {__mode = "v"})
+	self.visible_by_id = setmetatable({}, {__mode = "v"})
 	-- Initialize the hooks.
 	self.object_created_hooks = Hooks()
 	self.object_detached_hooks = Hooks()
@@ -33,24 +33,6 @@ ObjectManager.new = function(clss, chunk_size, grid_size)
 	-- Initialize the sector manager.
 	self.chunks = ObjectChunkManager(self, chunk_size, grid_size)
 	return self
-end
-
---- Marks an object as active or inactive.<br/>
---
--- Inactive objects do not consume any time during the update cycle so
--- properly activating and deactivating objects can improve performance
--- significantly when there are lots of inventory items or other objects
--- that do not require processing.
---
--- @param self ObjectManager.
--- @param object Object.
--- @param value True for active, false for inactive.
-ObjectManager.activate_object = function(self, object, value)
-	if value then
-		self.active_by_id[object:get_id()] = object
-	else
-		self.active_by_id[object:get_id()] = nil
-	end
 end
 
 --- Adds an object to the manager.
@@ -105,7 +87,7 @@ end
 -- @return Dictionary of objects.
 ObjectManager.find_by_sector = function(self, sector)
 	local dict = {}
-	for k,v in pairs(self.objects_by_id) do
+	for k,v in pairs(self.visible_by_id) do
 		if v:get_sector() == sector then
 			dict[v:get_id()] = v
 		end
@@ -121,15 +103,32 @@ ObjectManager.load_chunk = function(self, id)
 	self.chunks:load_chunk(x, z)
 end
 
+--- Marks an object as visible or hidden.<br/>
+--
+-- Hidden objects do not consume any time during the update cycle so properly
+-- showing and hiding objects can improve performance significantly when
+-- there are, for example, lots of inventory items.
+--
+-- @param self ObjectManager.
+-- @param object Object.
+-- @param value True for visible, false for hidden.
+ObjectManager.mark_visible = function(self, object, value)
+	if value then
+		self.visible_by_id[object:get_id()] = object
+	else
+		self.visible_by_id[object:get_id()] = nil
+	end
+end
+
 --- Unloads all the objects.
 -- @param self ObjectManager.
 ObjectManager.unload_all = function(self)
 	-- Unload the objects.
-	for k,v in pairs(self.objects_by_id) do
+	for k,v in pairs(self.visible_by_id) do
 		v:detach()
-		self.objects_by_id[k] = nil
 	end
-	self.active_by_id = {}
+	self.objects_by_id = setmetatable({}, {__mode = "v"})
+	self.visible_by_id = setmetatable({}, {__mode = "v"})
 	-- Unload the chunks.
 	self.chunks:unload_all_chunks()
 end
@@ -153,20 +152,9 @@ end
 -- @param secs Seconds since the last update.
 ObjectManager.update = function(self, secs)
 	self.chunks:update(secs)
-	-- FIXME: Updates all objects due to terrain and object loading not being
-	-- in sync currently. The update is required by SimulationObject.update()
-	-- to freeze object physics until the terrain has been loaded.
-	for k,v in pairs(self.objects_by_id) do
-	--for k,v in pairs(self.active_by_id) do
+	for k,v in pairs(self.visible_by_id) do
 		v:update(secs)
 	end
-end
-
---- Gets the dictionary of active objects.
--- @param self ObjectManager.
--- @return Dictionary.
-ObjectManager.get_active_objects = function(self)
-	return self.active_by_id
 end
 
 --- Sets the database used by the manager.
@@ -208,6 +196,13 @@ end
 ObjectManager.set_unloading = function(self, value)
 	self.chunks.enable_unloading = value
 	self.chunks.unload_time = value and 10
+end
+
+--- Gets the dictionary of visible objects.
+-- @param self ObjectManager.
+-- @return Dictionary.
+ObjectManager.get_visible_objects = function(self)
+	return self.visible_by_id
 end
 
 return ObjectManager

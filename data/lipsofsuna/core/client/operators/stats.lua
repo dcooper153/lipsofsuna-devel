@@ -55,9 +55,9 @@ stats.texture_memory / 1000, stats.material_count_loaded, stats.material_count)
 			table.insert(listtype, string.format("%s: %d", k, v))
 		end
 		table.sort(listtype)
-		local numactive = 0
-		for k in pairs(Main.objects:get_active_objects()) do
-			numactive = numactive + 1
+		local numvisible = 0
+		for k in pairs(Main.objects:get_visible_objects()) do
+			numvisible = numvisible + 1
 		end
 		local objects = ""
 		for k,v in ipairs(listtype) do
@@ -65,9 +65,9 @@ stats.texture_memory / 1000, stats.material_count_loaded, stats.material_count)
 		end
 		self.data.client_stats = string.format([[
 %s
-Active objects: %d
+Visible objects: %d
 Userdata: %d
 %s
-]], self.data.client_stats, numactive, userdata, objects)
+]], self.data.client_stats, numvisible, userdata, objects)
 	end
 end

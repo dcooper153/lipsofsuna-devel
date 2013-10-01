@@ -638,7 +638,7 @@ SimulationObject.set_visible = function(self, value)
 	-- Set the visibilty of the physics object.
 	self.physics:set_visible(value)
 	-- Set the activation status.
-	Main.objects:activate_object(self, value)
+	self.manager:mark_visible(self, value)
 	-- Ensure that visible objects have their models loaded.
 	if value and not self:get_model() then
 		local name = self:get_model_name()
