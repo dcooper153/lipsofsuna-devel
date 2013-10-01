@@ -25,7 +25,7 @@ ObjectManager.new = function(clss, chunk_size, grid_size)
 	local self = Class.new(clss)
 	-- Initialize the object tables.
 	self.objects_by_id = setmetatable({}, {__mode = "v"})
-	self.visible_by_id = setmetatable({}, {__mode = "v"})
+	self.visible_by_id = {}
 	-- Initialize the hooks.
 	self.object_created_hooks = Hooks()
 	self.object_detached_hooks = Hooks()
@@ -76,7 +76,9 @@ ObjectManager.find_by_point = function(self, point, radius)
 	local list = Los.object_find{point = point.handle, radius = radius}
 	for k,v in pairs(list) do
 		local o = self.objects_by_id[v]
-		dict[o:get_id()] = o
+		if o then
+			dict[o:get_id()] = o
+		end
 	end
 	return dict
 end
@@ -128,7 +130,7 @@ ObjectManager.unload_all = function(self)
 		v:detach()
 	end
 	self.objects_by_id = setmetatable({}, {__mode = "v"})
-	self.visible_by_id = setmetatable({}, {__mode = "v"})
+	self.visible_by_id = {}
 	-- Unload the chunks.
 	self.chunks:unload_all_chunks()
 end

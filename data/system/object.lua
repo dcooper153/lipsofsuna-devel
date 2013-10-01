@@ -155,8 +155,7 @@ end
 -- @param self Object.
 -- @return True if visible, false if not.
 Object.get_visible = function(self)
-	return __objects_realized[self]
-	--return Los.object_get_visible(self.handle)
+	return self.__visible
 end
 
 --- Sets the visiblity of the object.
@@ -164,16 +163,14 @@ end
 -- @param v True for visible, false for not.
 Object.set_visible = function(self, v)
 	if v then
-		if __objects_realized[self] then return end
-		__objects_realized[self] = true
+		if self.__visible then return end
+		self.__visible = true
 		Los.object_set_realized(self.handle, true)
 	else
-		if not __objects_realized[self] then return end
-		__objects_realized[self] = nil
+		if not self.__visible then return end
+		self.__visible = nil
 		Los.object_set_realized(self.handle, false)
 	end
 end
-
-__objects_realized = {}
 
 return Object

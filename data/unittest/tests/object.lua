@@ -28,15 +28,17 @@ Unittest:add(1, "system", "object", function()
 		assert(obj.name == nil)
 		collectgarbage()
 	end
-	-- Keeping realized objects.
+	-- Garbage collection.
+	local objs = setmetatable({}, {__mode = "v"})
 	for i = 1,100 do
 		local o = Object()
 		o:set_model(Model())
 		o:set_position(Vector(10*i,50,50))
 		o:set_visible(true)
+		objs[i] = o
 	end
 	collectgarbage()
 	local num = 0
-	for k,v in pairs(__objects_realized) do num = num + 1 end
-	assert(num == 100)
+	for k,v in pairs(objs) do num = num + 1 end
+	assert(num == 0)
 end)
