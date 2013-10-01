@@ -57,9 +57,17 @@ end
 --- Detaches the chunk from the scene.
 -- @param self TerrainChunk.
 TerrainChunk.detach = function(self)
+	-- Chain detach the object chunk.
+	if Main.objects then
+		local p = self.manager:get_chunk_center_by_xz(self.x, self.z)
+		local x,z = Main.objects.chunks:get_chunk_xz_by_point(p.x, p.z)
+		Main.objects.chunks:unload_chunk(x, z)
+	end
+	-- Detach the render object.
 	if self.manager.graphics then
 		self:detach_render_object()
 	end
+	-- Unload the terrain chunk.
 	self.manager.terrain:unload_chunk(self.x, self.z)
 end
 
