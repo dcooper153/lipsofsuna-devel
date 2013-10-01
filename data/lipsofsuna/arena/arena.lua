@@ -22,7 +22,7 @@ local Vector = require("system/math/vector")
 
 --- Arena subgame.
 -- @type Arena
-Arena = Class("Arena")
+local Arena = Class("Arena")
 
 --- Creates the arena subgame.
 -- @param clss Arena class.

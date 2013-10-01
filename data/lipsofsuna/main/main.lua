@@ -165,7 +165,6 @@ Main.enable_manual_gc = function(self)
 	self.__collect_time = 0.001
 	self.__collect_rate = (memory0 - memory1) / (time1 - time0)
 	self.__collect_thresh = memory1 * 1.5
-	manualgcenable=true
 end
 
 --- Collects garbage manually.

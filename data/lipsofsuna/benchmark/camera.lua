@@ -15,7 +15,7 @@ local Vector = require("system/math/vector")
 
 --- Camera for the benchmark.
 -- @type BenchmarkCamera
-BenchmarkCamera = Class("BenchmarkCamera", Camera)
+local BenchmarkCamera = Class("BenchmarkCamera", Camera)
 
 --- Creates a new benchmark camera.
 -- @param clss BenchmarkCamera class.

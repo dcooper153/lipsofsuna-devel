@@ -20,7 +20,7 @@ local Vector = require("system/math/vector")
 
 --- Provides a simple graphical benchmark.
 -- @type Benchmark
-Benchmark = Class("Benchmark")
+local Benchmark = Class("Benchmark")
 
 --- Creates the benchmark.
 -- @param clss Benchmark class.

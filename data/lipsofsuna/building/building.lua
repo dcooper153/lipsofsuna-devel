@@ -20,7 +20,7 @@ local Vector = require("system/math/vector")
 
 --- Building subgame.
 -- @type Building
-Building = Class("Building")
+local Building = Class("Building")
 
 --- Creates the building subgame.
 -- @param clss Building class.

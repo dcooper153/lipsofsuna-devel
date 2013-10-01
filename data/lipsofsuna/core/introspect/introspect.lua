@@ -14,10 +14,10 @@ local Spec = require("core/specs/spec")
 
 --- Introspection and validation for specs and other custom types.
 -- @type Introspect
-Introspect = Class("Introspect")
-Introspect.types_dict = {}
+local Introspect = Class("Introspect")
 
 -- Got to load the types this way to avoid problems with unittests.
+Introspect.types_dict = {}
 for k,v in pairs{"boolean", "color", "dialog-tree", "dict", "generic", "ignore",
 	"list", "map-object-list", "map-object", "map-tile-list", "map-tile",
 	"number", "quaternion", "spawn", "string", "table", "todo", "vector"} do

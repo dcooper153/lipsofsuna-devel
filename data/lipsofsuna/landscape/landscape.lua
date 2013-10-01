@@ -16,7 +16,7 @@ local Vector = require("system/math/vector")
 
 --- Landscape subgame.
 -- @type Landscape
-Landscape = Class("Landscape")
+local Landscape = Class("Landscape")
 
 --- Creates the landscape subgame.
 -- @param clss Landscape class.

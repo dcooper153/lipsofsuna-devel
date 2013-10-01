@@ -21,7 +21,7 @@ end
 
 --- Collision detection for the stick-like terrain system.
 -- @type PhysicsTerrain
-PhysicsTerrain = Class("PhysicsTerrain")
+local PhysicsTerrain = Class("PhysicsTerrain")
 
 --- Creates a new physics terrain.
 -- @param clss PhysicsTerrain class.
