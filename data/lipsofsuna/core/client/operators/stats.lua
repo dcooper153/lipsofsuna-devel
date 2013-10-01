@@ -45,7 +45,7 @@ stats.texture_memory / 1000, stats.material_count_loaded, stats.material_count)
 	if show_objects then
 		local userdata = 0
 		local dicttype = {}
-		for k,v in pairs(__userdata_lookup) do
+		for k,v in pairs(Main.objects.objects_by_id) do
 			local type = v.class_name or "???"
 			userdata = userdata + 1
 			dicttype[type] = (dicttype[type] or 0) + 1
@@ -66,7 +66,7 @@ stats.texture_memory / 1000, stats.material_count_loaded, stats.material_count)
 		self.data.client_stats = string.format([[
 %s
 Visible objects: %d
-Userdata: %d
+Total objects: %d
 %s
 ]], self.data.client_stats, numvisible, userdata, objects)
 	end

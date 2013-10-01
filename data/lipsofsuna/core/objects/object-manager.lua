@@ -75,7 +75,7 @@ ObjectManager.find_by_point = function(self, point, radius)
 	local dict = {}
 	local list = Los.object_find{point = point.handle, radius = radius}
 	for k,v in pairs(list) do
-		local o = __userdata_lookup[v]
+		local o = self.objects_by_id[v]
 		dict[o:get_id()] = o
 	end
 	return dict

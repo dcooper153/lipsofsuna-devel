@@ -31,7 +31,6 @@ Object.new = function(clss)
 	-- Create the object.
 	local self = Class.new(clss)
 	self.handle = Los.object_new()
-	__userdata_lookup[self.handle] = self
 	return self
 end
 

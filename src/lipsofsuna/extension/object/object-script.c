@@ -51,7 +51,7 @@ static void Object_find (LIScrArgs* args)
 			object = iter1.value;
 			diff = limat_vector_subtract (center, object->transform.position);
 			if (limat_vector_get_length (diff) < radius)
-				liscr_args_seti_data (args, object->script);
+				liscr_args_seti_int (args, liobj_object_get_external_id (object));
 		}
 	}
 }
