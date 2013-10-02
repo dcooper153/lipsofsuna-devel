@@ -35,7 +35,7 @@ Client:register_init_hook(500, function()
 	Client.input:register_binding{name = "zoom", mode = "analog", key1 = "mousez", key2 = "", func = function(v)
 		if not Client.player_object then return end
 		if Ui:get_state() ~= "play" then return end
-		Client.camera_manager:zoom(v)
+		Client.camera_manager:zoom(0.25 * v)
 	end}
 
 end)
