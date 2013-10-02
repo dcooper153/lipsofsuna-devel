@@ -155,6 +155,63 @@ void liimg_image_add_hsv (
 }
 
 /**
+ * \brief Adds HSV color with V channel weighting.
+ * \param self Image.
+ * \param hue_add Amount to add to hue. The hue range is [0,1].
+ * \param sat_add Amount to add to saturation. The saturation range is [0,1].
+ * \param val_add Amount to add to value. The value range is [0,1].
+ * \param val_range Value ranged affected by weighting.
+ */
+void liimg_image_add_hsv_weightv (
+	LIImgImage* self,
+	float       hue_add,
+	float       sat_add,
+	float       val_add,
+	float       val_range)
+{
+	int x;
+	int y;
+	float w;
+	uint8_t* dst;
+	LIImgColor rgb;
+	LIImgColorHSV hsv;
+
+	for (y = 0 ; y < self->height ; y++)
+	{
+		for (x = 0 ; x < self->width ; x++)
+		{
+			/* Get the pixel. */
+			dst = self->pixels + 4 * (x + y * self->width);
+
+			/* Calculate the HSV color. */
+			rgb.r = dst[0];
+			rgb.g = dst[1];
+			rgb.b = dst[2];
+			liimg_color_rgb_to_hsv (&rgb, &hsv);
+
+			/* Calculate the weight. */
+			if (hsv.v < val_range)
+				w = limat_smoothstep (hsv.v, 0.0f, val_range);
+			else if (1.0f - hsv.v < val_range)
+				w = limat_smoothstep (1.0f - hsv.v, 0.0f, val_range);
+			else
+				w = 1.0f;
+
+			/* Perform the HSV modification. */
+			hsv.h = fmodf (hsv.h + hue_add, 1.0f);
+			hsv.s = LIMAT_CLAMP (hsv.s + w * sat_add, 0.0f, 1.0f);
+			hsv.v = LIMAT_CLAMP (hsv.v + w * val_add, 0.0f, 1.0f);
+			liimg_color_hsv_to_rgb (&hsv, &rgb);
+
+			/* Replace the old pixel. */
+			dst[0] = rgb.r;
+			dst[1] = rgb.g;
+			dst[2] = rgb.b;
+		}
+	}
+}
+
+/**
  * \brief Allocates or reallocates the pixels.
  * \param self Image.
  * \param w Width.
@@ -259,6 +316,72 @@ void liimg_image_blit_hsv_add (
 			hsv.h = fmodf (hsv.h + hue_add, 1.0f);
 			hsv.s = LIMAT_CLAMP (hsv.s + sat_add, 0.0f, 1.0f);
 			hsv.v = LIMAT_CLAMP (hsv.v + val_add, 0.0f, 1.0f);
+			liimg_color_hsv_to_rgb (&hsv, &rgb);
+
+			/* Blit to the destination image. */
+			a1 = src[3];
+			a2 = 256 - a1;
+			dst[0] = (rgb.r * a1 + dst[0] * a2) >> 8;
+			dst[1] = (rgb.g * a1 + dst[1] * a2) >> 8;
+			dst[2] = (rgb.b * a1 + dst[2] * a2) >> 8;
+			dst[3] = LIMAT_MIN (255, dst[3] + a1);
+		}
+	}
+}
+
+/**
+ * \brief Blits an HSV altered image over this one, using V channel weighting.
+ * \param self Image.
+ * \param image Image.
+ * \param hue_add Amount to add to hue. The hue range is [0,1].
+ * \param sat_add Amount to add to saturation. The saturation range is [0,1].
+ * \param val_add Amount to add to value. The value range is [0,1].
+ * \param val_range Value ranged affected by weighting.
+ */
+void liimg_image_blit_hsv_add_weightv (
+	LIImgImage* self,
+	LIImgImage* image,
+	float       hue_add,
+	float       sat_add,
+	float       val_add,
+	float       val_range)
+{
+	int x;
+	int y;
+	int a1;
+	int a2;
+	float w;
+	uint8_t* src;
+	uint8_t* dst;
+	LIImgColor rgb;
+	LIImgColorHSV hsv;
+
+	for (y = 0 ; y < self->height && y < image->height ; y++)
+	{
+		for (x = 0 ; x < self->width && x < image->width ; x++)
+		{
+			/* Get the pixels. */
+			src = image->pixels + 4 * (x + y * image->width);
+			dst = self->pixels + 4 * (x + y * self->width);
+
+			/* Calculate the HSV color. */
+			rgb.r = src[0];
+			rgb.g = src[1];
+			rgb.b = src[2];
+			liimg_color_rgb_to_hsv (&rgb, &hsv);
+
+			/* Calculate the weight. */
+			if (hsv.v < val_range)
+				w = limat_smoothstep (hsv.v, 0.0f, val_range);
+			else if (1.0f - hsv.v < val_range)
+				w = limat_smoothstep (1.0f - hsv.v, 0.0f, val_range);
+			else
+				w = 1.0f;
+
+			/* Perform the HSV modification. */
+			hsv.h = fmodf (hsv.h + hue_add, 1.0f);
+			hsv.s = LIMAT_CLAMP (hsv.s + w * sat_add, 0.0f, 1.0f);
+			hsv.v = LIMAT_CLAMP (hsv.v + w * val_add, 0.0f, 1.0f);
 			liimg_color_hsv_to_rgb (&hsv, &rgb);
 
 			/* Blit to the destination image. */

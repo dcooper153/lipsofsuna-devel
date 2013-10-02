@@ -63,6 +63,27 @@ static void ImageMerger_add_hsv (LIScrArgs* args)
 	liimg_async_merger_add_hsv (self, &hsv);
 }
 
+static void ImageMerger_add_hsv_weightv (LIScrArgs* args)
+{
+	float val_range;
+	LIImgAsyncMerger* self;
+	LIImgColorHSV hsv;
+
+	/* Get arguments. */
+	self = args->self;
+	if (!liscr_args_geti_float (args, 0, &hsv.h))
+		hsv.h = 0.0f;
+	if (!liscr_args_geti_float (args, 1, &hsv.s))
+		hsv.s = 0.0f;
+	if (!liscr_args_geti_float (args, 2, &hsv.v))
+		hsv.v = 0.0f;
+	if (!liscr_args_geti_float (args, 3, &val_range))
+		val_range = 0.2f;
+
+	/* Add the task. */
+	liimg_async_merger_add_hsv_weightv (self, &hsv, val_range);
+}
+
 static void ImageMerger_blit (LIScrArgs* args)
 {
 	LIImgAsyncMerger* self;
@@ -100,6 +121,32 @@ static void ImageMerger_blit_hsv_add (LIScrArgs* args)
 
 	/* Add the task. */
 	liimg_async_merger_blit_hsv_add (self, image, &hsv);
+}
+
+static void ImageMerger_blit_hsv_add_weightv (LIScrArgs* args)
+{
+	float val_range;
+	LIImgAsyncMerger* self;
+	LIImgColorHSV hsv;
+	LIImgImage* image;
+	LIScrData* data;
+
+	/* Get arguments. */
+	self = args->self;
+	if (!liscr_args_geti_data (args, 0, LIEXT_SCRIPT_IMAGE, &data))
+		return;
+	if (!liscr_args_geti_float (args, 1, &hsv.h))
+		hsv.h = 0.0f;
+	if (!liscr_args_geti_float (args, 2, &hsv.s))
+		hsv.s = 0.0f;
+	if (!liscr_args_geti_float (args, 3, &hsv.v))
+		hsv.v = 0.0f;
+	if (!liscr_args_geti_float (args, 4, &val_range))
+		val_range = 0.2f;
+	image = liscr_data_get_data (data);
+
+	/* Add the task. */
+	liimg_async_merger_blit_hsv_add_weightv (self, image, &hsv, val_range);
 }
 
 static void ImageMerger_finish (LIScrArgs* args)
@@ -160,8 +207,10 @@ void liext_script_image_merger (
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_IMAGE_MERGER, "image_merger_new", ImageMerger_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE_MERGER, "image_merger_add_hsv", ImageMerger_add_hsv);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE_MERGER, "image_merger_add_hsv_weightv", ImageMerger_add_hsv_weightv);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE_MERGER, "image_merger_blit", ImageMerger_blit);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE_MERGER, "image_merger_blit_hsv_add", ImageMerger_blit_hsv_add);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE_MERGER, "image_merger_blit_hsv_add_weightv", ImageMerger_blit_hsv_add_weightv);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE_MERGER, "image_merger_finish", ImageMerger_finish);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE_MERGER, "image_merger_pop_image", ImageMerger_pop_image);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE_MERGER, "image_merger_replace", ImageMerger_replace);

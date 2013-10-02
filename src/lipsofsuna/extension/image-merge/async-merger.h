@@ -24,8 +24,10 @@
 enum
 {
 	LIIMG_ASYNC_MERGER_ADD_HSV,
+	LIIMG_ASYNC_MERGER_ADD_HSV_WEIGHTV,
 	LIIMG_ASYNC_MERGER_BLIT,
 	LIIMG_ASYNC_MERGER_BLIT_HSV_ADD,
+	LIIMG_ASYNC_MERGER_BLIT_HSV_ADD_WEIGHTV,
 	LIIMG_ASYNC_MERGER_FINISH,
 	LIIMG_ASYNC_MERGER_REPLACE
 };
@@ -44,6 +46,13 @@ union _LIImgAsyncMergerTask
 	{
 		int type;
 		LIImgImage* image;
+		LIImgColorHSV hsv;
+		float val_range;
+	} add_hsv_weightv;
+	struct
+	{
+		int type;
+		LIImgImage* image;
 		LIImgImage* blit;
 	} blit;
 	struct
@@ -53,6 +62,14 @@ union _LIImgAsyncMergerTask
 		LIImgImage* blit;
 		LIImgColorHSV hsv;
 	} blit_hsv_add;
+	struct
+	{
+		int type;
+		LIImgImage* image;
+		LIImgImage* blit;
+		LIImgColorHSV hsv;
+		float val_range;
+	} blit_hsv_add_weightv;
 	struct
 	{
 		int type;
@@ -82,6 +99,11 @@ LIAPICALL (int, liimg_async_merger_add_hsv, (
 	LIImgAsyncMerger*    self,
 	const LIImgColorHSV* hsv));
 
+LIAPICALL (int, liimg_async_merger_add_hsv_weightv, (
+	LIImgAsyncMerger*    self,
+	const LIImgColorHSV* hsv,
+	float                val_range));
+
 LIAPICALL (int, liimg_async_merger_blit, (
 	LIImgAsyncMerger* self,
 	const LIImgImage* image));
@@ -90,6 +112,12 @@ LIAPICALL (int, liimg_async_merger_blit_hsv_add, (
 	LIImgAsyncMerger*    self,
 	const LIImgImage*    image,
 	const LIImgColorHSV* hsv));
+
+LIAPICALL (int, liimg_async_merger_blit_hsv_add_weightv, (
+	LIImgAsyncMerger*    self,
+	const LIImgImage*    image,
+	const LIImgColorHSV* hsv,
+	float                val_range));
 
 LIAPICALL (int, liimg_async_merger_finish, (
 	LIImgAsyncMerger* self));

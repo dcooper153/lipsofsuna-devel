@@ -39,6 +39,16 @@ ImageMerger.add_hsv = function(self, h, s, v)
 	Los.image_merger_add_hsv(self.handle, h, s, v)
 end
 
+--- Adds a HSV color to the image.
+-- @param self ImageMerger.
+-- @param h Hue to add.
+-- @param s Saturation to add.
+-- @param v Value to add.
+-- @param vw Value weighting range.
+ImageMerger.add_hsv_weightv = function(self, h, s, v, vw)
+	Los.image_merger_add_hsv_weightv(self.handle, h, s, v, vw)
+end
+
 --- Blits an image.
 -- @param self ImageMerger.
 -- @param image Image to blit.
@@ -54,6 +64,17 @@ end
 -- @param v Value to add.
 ImageMerger.blit_hsv_add = function(self, image, h, s, v)
 	Los.image_merger_blit_hsv_add(self.handle, image.handle, h, s, v)
+end
+
+--- Blits an HSV adjusted image with value weighting.
+-- @param self ImageMerger.
+-- @param image Image to blit.
+-- @param h Hue to add.
+-- @param s Saturation to add.
+-- @param v Value to add.
+-- @param vw Value weighting range.
+ImageMerger.blit_hsv_add_weightv = function(self, image, h, s, v, vw)
+	Los.image_merger_blit_hsv_add_weightv(self.handle, image.handle, h, s, v, vw)
 end
 
 --- Queues finishing the build.

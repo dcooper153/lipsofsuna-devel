@@ -57,6 +57,16 @@ Image.add_hsv = function(self, hue_add, sat_add, val_add)
 	Los.image_add_hsv(self.handle, hue_add, sat_add, val_add)
 end
 
+--- Alters the color of the image in the HSV color space, using value weighting.
+-- @param self Image.
+-- @param hue_add Amount to add to hue. The hue range is [0,1].
+-- @param sat_add Amount to add to saturation. The saturation range is [0,1].
+-- @param val_add Amount to add to value. The value range is [0,1].
+-- @param val_range Value weighting range. The value range is [0,0.5].
+Image.add_hsv_weightv = function(self, hue_add, sat_add, val_add, val_range)
+	Los.image_add_hsv_weightv(self.handle, hue_add, sat_add, val_add, val_range)
+end
+
 --- Blits an image.
 -- @param self Image.
 -- @param image Image.
@@ -72,6 +82,17 @@ end
 -- @param val_add Amount to add to value. The value range is [0,1].
 Image.blit_hsv_add = function(self, image, hue_add, sat_add, val_add)
 	Los.image_blit_hsv_add(self.handle, image.handle, hue_add, sat_add, val_add)
+end
+
+--- Blits an HSV altered image over this one, using value weighting.
+-- @param self Image.
+-- @param image Image.
+-- @param hue_add Amount to add to hue. The hue range is [0,1].
+-- @param sat_add Amount to add to saturation. The saturation range is [0,1].
+-- @param val_add Amount to add to value. The value range is [0,1].
+-- @param val_range Value weighting range. The value range is [0,0.5].
+Image.blit_hsv_add_weightv = function(self, image, hue_add, sat_add, val_add, val_range)
+	Los.image_blit_hsv_add_weightv(self.handle, image.handle, hue_add, sat_add, val_add, val_range)
 end
 
 --- Copies the image.

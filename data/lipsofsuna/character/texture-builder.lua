@@ -121,7 +121,7 @@ TextureBuilder.build_with_merger = function(clss, merger, args, hash)
 	if not base then return end
 	merger:replace(base)
 	if args.skin_color then
-		merger:add_hsv(args.skin_color[1], -1 + 2 * args.skin_color[2], -1 + 2 * args.skin_color[3])
+		merger:add_hsv_weightv(args.skin_color[1], -1 + 2 * args.skin_color[2], -1 + 2 * args.skin_color[3])
 	end
 	-- Blit the face texture.
 	local face = args.face_texture or "aerface1" --FIXME
@@ -137,7 +137,7 @@ TextureBuilder.build_with_merger = function(clss, merger, args, hash)
 		local blit = Main.images:copy_by_name(eye)
 		if blit then
 			if args.eye_color then
-				merger:blit_hsv_add(blit, args.eye_color[1], -1 + 2 * args.eye_color[2], -1 + 2 * args.eye_color[3])
+				merger:blit_hsv_add_weightv(blit, args.eye_color[1], -1 + 2 * args.eye_color[2], -1 + 2 * args.eye_color[3])
 			else
 				merger:blit(blit)
 			end
