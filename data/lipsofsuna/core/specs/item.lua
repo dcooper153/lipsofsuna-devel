@@ -25,7 +25,7 @@ Itemspec = Spec:register("Itemspec", "item", {
 	{name = "armor_class", type = "number", default = 0, description = "How much protection the item offers when equipped."},
 	{name = "book_text", type = "string", description = "Content of player readable items."},
 	{name = "collision_group", type = "number", default = 0x0002, description = "Collision group."},
-	{name = "construct_tile", type = "string", description = "Tile type to construct when used."},
+	{name = "construct_tile", type = "string", description = "Tile type to construct when used.", details = {spec = "TerrainMaterialSpec"}},
 	{name = "construct_tile_count", type = "number", description = "Material count required by tile construction.", details = {integer = true, min = 1}},
 	{name = "damage_mining", type = "number", description = "Damage the item takes from mining."},
 	{name = "description", type = "string", description = "Description of the item."},
