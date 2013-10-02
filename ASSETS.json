@@ -1614,6 +1614,36 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/crafting/spelltable/enchant1.flac"
+			],
+			"authors":
+			[
+				"qubodup"
+			],
+			"licenses":
+			[
+				"Creative Commons BY 3.0"
+			],
+			"source": "http://freesound.org/people/qubodup/sounds/202147/"
+		},
+		{
+			"files":
+			[
+				"data/lipsofsuna/crafting/spelltable/disenchant1.flac"
+			],
+			"authors":
+			[
+				"qubodup"
+			],
+			"licenses":
+			[
+				"Creative Commons BY 3.0"
+			],
+			"source": "http://freesound.org/people/qubodup/sounds/202148/"
+		},
+		{
+			"files":
+			[
 				"data/lipsofsuna/sounds/builtrock1.ogg",
 				"data/lipsofsuna/sounds/builtwood1.ogg",
 				"data/lipsofsuna/sounds/craftmetal1.ogg",

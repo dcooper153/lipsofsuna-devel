@@ -33,5 +33,15 @@
 		"type": "Effectspec",
 		"name": "harvest1",
 		"sound": "scissor1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "enchant",
+		"sound": "enchant1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "disenchant",
+		"sound": "disenchant1"
 	}
 ]

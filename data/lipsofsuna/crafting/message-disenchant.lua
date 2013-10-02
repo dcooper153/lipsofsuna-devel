@@ -21,5 +21,6 @@ Main.messaging:register_message{
 		if not weapon then return end
 		-- TODO: Validate.
 		Main.crafting_utils:disenchant_item(weapon)
+		Main.vision:object_effect(player, "disenchant")
 		Main.messaging:server_event("message", client, "You have disenchanted your " .. weapon.spec.name .. ".")
 	end}

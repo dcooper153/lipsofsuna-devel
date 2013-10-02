@@ -37,6 +37,7 @@ Main.messaging:register_message{
 		if not weapon then return end
 		-- TODO: Validate.
 		Main.crafting_utils:enchant_item(weapon, action, modifiers)
+		Main.vision:object_effect(player, "enchant")
 		Main.messaging:server_event("message", client, "You have enchanted your " .. weapon.spec.name .. ".")
 	end,
 	server_to_client_encode = function(self, enable)
