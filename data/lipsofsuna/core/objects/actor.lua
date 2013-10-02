@@ -60,6 +60,11 @@ Actor.serializer = ObjectSerializer(
 		type = "number list"
 	},
 	{
+		name = "dead",
+		type = "boolean",
+		set = function(self, v) if v then self:set_dead_state() end end
+	},
+	{
 		name = "eye_color",
 		type = "number list"
 	},
