@@ -9,7 +9,7 @@
 			"obelisk": true
 		},
 		"dialog": "obelisk",
-		"interactive": true
+		"interactive": true,
 		"usages":
 		{
 			"examine": true
