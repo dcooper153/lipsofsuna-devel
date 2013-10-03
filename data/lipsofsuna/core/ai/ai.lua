@@ -237,15 +237,22 @@ Ai.find_best_action = function(self, args)
 	-- Score each action and choose the best one.
 	local actions = {}
 	local total = 0
-	for k,name in pairs(self.object.spec.actions) do
-		local spec = Actionspec:find_by_name(name)
-		if spec and spec.categories[args.category] then
-			local score = process_action(spec)
-			if score then
-				actions[spec] = score
-				total = total + score
+	local process_spec = function(spec)
+		if not spec.actions then return end
+		for k,name in pairs(spec.actions) do
+			local aspec = Actionspec:find_by_name(name)
+			if aspec and aspec.categories[args.category] then
+				local score = process_action(aspec)
+				if score then
+					actions[aspec] = score
+					total = total + score
+				end
 			end
 		end
+	end
+	process_spec(self.object.spec)
+	if args.weapon and args.weapon.spec.actions then
+		process_spec(args.weapon.spec)
 	end
 	-- Choose a random action weighted by the score.
 	local val = total * math.random()

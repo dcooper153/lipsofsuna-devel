@@ -1,5 +1,11 @@
 Actionspec{
 	name = "attack",
+	categories =
+	{
+		["melee"] = true,
+		["ranged"] = true,
+		["throw"] = true
+	},
 	start = function(action)
 		-- Prevent during cooldown.
 		if action.object.cooldown then return end
