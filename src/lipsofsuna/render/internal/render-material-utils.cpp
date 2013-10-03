@@ -95,19 +95,19 @@ Ogre::MaterialPtr LIRenMaterialUtils::create_material (
 	{
 		for (int i = 0 ; i < material->getNumTechniques () ; i++)
 		{
+			// Override passes.
 			Ogre::Technique* technique = material->getTechnique (i);
-			if (existing)
+			override_technique (mat, technique, existing);
+
+			// Override shadow caster materials.
+			Ogre::MaterialPtr caster = technique->getShadowCasterMaterial ();
+			if (!caster.isNull () && check_material_override (caster))
 			{
-				for (int j = 0 ; j < technique->getNumPasses () ; j++)
-				{
-					Ogre::Pass* pass = technique->getPass (j);
-					override_pass (mat, pass);
-				}
-			}
-			else
-			{
-				Ogre::Pass* pass = technique->getPass (0);
-				initialize_pass (mat, pass);
+				Ogre::String unique_caster = render->id.next ();
+				Ogre::MaterialPtr new_caster = caster->clone (unique_caster, true, LIREN_RESOURCES_TEMPORARY);
+				for (int i = 0 ; i < new_caster->getNumTechniques () ; i++)
+					override_technique (mat, new_caster->getTechnique (i), true);
+				technique->setShadowCasterMaterial (new_caster);
 			}
 		}
 	}
@@ -192,25 +192,30 @@ void LIRenMaterialUtils::replace_texture (Ogre::MaterialPtr& material, const Ogr
  * \return True if overridable. False otherwise.
  */
 bool LIRenMaterialUtils::check_material_override (
-	Ogre::MaterialPtr& material)
+	const Ogre::MaterialPtr& material)
 {
 	for (int k = 0 ; k < material->getNumTechniques () ; k++)
 	{
 		Ogre::Technique* tech = material->getTechnique (k);
 		for (int i = 0 ; i < tech->getNumPasses () ; i++)
 		{
-			/* Check if the pass needs to be overridden. */
+			// Check if the pass needs to be overridden.
 			Ogre::Pass* pass = tech->getPass (i);
 			if (check_name_override (pass->getName ()))
 				return true;
 
-			/* Check if any textures need to be overridden. */
+			// Check if any textures need to be overridden.
 			for (int i = 0 ; i < pass->getNumTextureUnitStates () ; i++)
 			{
 				Ogre::TextureUnitState* state = pass->getTextureUnitState (i);
 				if (check_name_override (state->getName ()))
 					return true;
 			}
+
+			// Check if the shadow caster material needs to be overridden.
+			const Ogre::MaterialPtr caster = tech->getShadowCasterMaterial ();
+			if (!caster.isNull () && check_material_override (caster))
+				return true;
 		}
 	}
 
@@ -225,6 +230,26 @@ bool LIRenMaterialUtils::check_name_override (
 	if (name[0] != 'L' || name[1] != 'O' || name[2] != 'S')
 		return 0;
 	return 1;
+}
+
+void LIRenMaterialUtils::override_technique (
+	LIMdlMaterial*   mat,
+	Ogre::Technique* technique,
+	bool             existing)
+{
+	if (existing)
+	{
+		for (int j = 0 ; j < technique->getNumPasses () ; j++)
+		{
+			Ogre::Pass* pass = technique->getPass (j);
+			override_pass (mat, pass);
+		}
+	}
+	else
+	{
+		Ogre::Pass* pass = technique->getPass (0);
+		initialize_pass (mat, pass);
+	}
 }
 
 void LIRenMaterialUtils::initialize_pass (

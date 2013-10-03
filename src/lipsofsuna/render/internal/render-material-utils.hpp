@@ -34,8 +34,9 @@ public:
 	bool has_overridable_texture (const Ogre::MaterialPtr& material, const Ogre::String& name);
 	void replace_texture (Ogre::MaterialPtr& material, const Ogre::String& name, const Ogre::String& new_name);
 public:
-	bool check_material_override (Ogre::MaterialPtr& material);
+	bool check_material_override (const Ogre::MaterialPtr& material);
 	bool check_name_override (const Ogre::String& name);
+	void override_technique (LIMdlMaterial* mat, Ogre::Technique* technique, bool existing);
 	void initialize_pass (LIMdlMaterial* mat, Ogre::Pass* pass);
 	void override_pass (LIMdlMaterial* mat, Ogre::Pass* pass);
 	Ogre::String texture_name_to_filename(const Ogre::String& name);
