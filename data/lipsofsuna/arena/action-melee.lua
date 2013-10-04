@@ -48,7 +48,7 @@ Actionspec{
 			Main.combat_utils:apply_damage(attacker, defender, r.tile, damage, r.point)
 		end
 		-- Wait for the next sweep.
-		action.object.cooldown = 0.3
+		action.object.cooldown = 1
 		action.time = action.time + secs
 		local frame = action.time / action.duration * #action.path + 1
 		if frame <= action.frame then return true end

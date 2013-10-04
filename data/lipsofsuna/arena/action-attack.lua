@@ -7,24 +7,7 @@ Actionspec{
 		["throw"] = true
 	},
 	start = function(action)
-		-- Prevent during cooldown.
-		if action.object.cooldown then return end
-		-- Trigger special actions.
-		local special = Main.combat_utils:get_combat_action_for_actor(action.object, "right")
-		if special and special.name ~= "attack" then
-			action.object:action(special.name)
-			return
-		end
-		-- Find the finish action.
-		local finish = Actionspec:find_by_name("melee")
-		if not finish then return end
-		-- Start the charge animation.
-		local move = Main.combat_utils:get_melee_move_of_actor(action.object)
-		action.object:animate("charge " .. move, true)
 		-- Enable effect-over-time updates.
-		action.finish_action = finish
-		action.charge_move = move
-		action.charge_value = 0
 		return true
 	end,
 	update = function(action, secs)
@@ -33,6 +16,28 @@ Actionspec{
 			action.object.cooldown = 0.4
 			action.object:animate("charge cancel")
 			return
+		end
+		-- Check for charge start.
+		if not action.charge_value then
+			-- Check for release before the last cooldown ended.
+			if action.object.cooldown then return true end
+			if not action.object.control_right then return end
+			-- Trigger special actions.
+			local special = Main.combat_utils:get_combat_action_for_actor(action.object, "right")
+			if special and special.name ~= "attack" then
+				action.object:action(special.name)
+				return
+			end
+			-- Find the finish action.
+			local finish = Actionspec:find_by_name("melee")
+			if not finish then return end
+			-- Start the charge animation.
+			local move = Main.combat_utils:get_melee_move_of_actor(action.object)
+			action.object:animate("charge " .. move, true)
+			-- Initialize the charge timer.
+			action.finish_action = finish
+			action.charge_move = move
+			action.charge_value = 0
 		end
 		-- Check for charge finish.
 		if not action.object.control_right then
