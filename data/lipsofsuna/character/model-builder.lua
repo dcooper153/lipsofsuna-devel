@@ -146,7 +146,10 @@ ModelBuilder.build_with_merger = function(clss, merger, args, hash)
 		clss:build_submesh(merger, k, v, args)
 	end
 	-- Colorize materials.
-	merger:replace_material{match_material = "animhair1", diffuse = args.hair_color}
+	if args.hair_color then
+		local rgb = Color:hsv_to_rgb(args.hair_color)
+		merger:replace_material{match_material = "animhair1", diffuse = rgb}
+	end
 	-- Queue the build.
 	merger:finish()
 	return hash1
