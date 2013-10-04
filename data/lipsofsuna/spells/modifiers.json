@@ -146,7 +146,7 @@
 		"spell_strength": 5,
 		"required_stats":
 		{
-			"willpower": 1
+			"willpower": 7
 		}
 	},
 	{
@@ -219,7 +219,7 @@
 		"spell_strength": 1,
 		"required_stats":
 		{
-			"willpower": 3
+			"willpower": 5
 		}
 	},
 	{
@@ -247,7 +247,7 @@
 		"spell_strength": 5,
 		"required_stats":
 		{
-			"willpower": 1
+			"willpower": 7
 		}
 	},
 	{
@@ -293,7 +293,7 @@
 		"spell_strength": 5,
 		"required_stats":
 		{
-			"willpower": 1
+			"willpower": 15
 		}
 	},
 	{
@@ -599,7 +599,7 @@
 		"spell_strength": 5,
 		"required_stats":
 		{
-			"willpower": 5
+			"willpower": 15
 		}
 	}
 ]
