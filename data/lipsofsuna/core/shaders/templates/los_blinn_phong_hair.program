@@ -1,0 +1,4 @@
+fragment_program los_blinn_phong_hair glsl
+{
+	source los_blinn_phong_hair.frag
+}

@@ -1,5 +1,65 @@
-import * from "animtwoside1.material"
+import * from "celshading.template"
 
-material animhair1 : animtwoside1
+pass animhair1/lighting : celshading/pass
 {
+	ambient 0.7 0.7 0.7
+	cull_hardware none
+	vertex_program_ref animdiff1/vert
+	{
+	}
+	fragment_program_ref hair1/frag
+	{
+	}
+}
+
+material animhair1
+{
+	receive_shadows off
+	technique
+	{
+		scheme mrt
+		shadow_caster_material animshadowcaster1
+		pass LOS1 : animhair1/lighting
+		{
+			fragment_program_ref hair1/frag/mrt
+			{
+			}
+		}
+	}
+	technique
+	{
+		scheme srt_color
+		shadow_caster_material animshadowcaster1
+		pass LOS1 : animhair1/lighting
+		{
+		}
+	}
+	technique
+	{
+		scheme srt_depth
+		shadow_caster_material animshadowcaster1
+		pass LOS1 : animhair1/lighting
+		{
+			vertex_program_ref animdepth1/vert
+			{
+			}
+			fragment_program_ref depth1/frag
+			{
+			}
+		}
+	}
+	technique
+	{
+		scheme fixed
+		pass LOS1
+		{
+			ambient 0.3 0.3 0.3
+			diffuse 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 1.0 1
+			cull_hardware none
+			texture_unit LOS1
+			{
+			}
+		}
+	}
 }
