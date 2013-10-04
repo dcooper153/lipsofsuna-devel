@@ -555,11 +555,13 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/items/chest/chest1.lmdl"
+				"data/lipsofsuna/items/chest/chest1.lmdl",
+				"data/lipsofsuna/items/chest/chest1.png"
 			],
 			"files_original":
 			[
-				"data/lipsofsuna/items/chest/chest1.blend"
+				"data/lipsofsuna/items/chest/chest1.blend",
+				"data/lipsofsuna/items/chest/chest1.xcf"
 			],
 			"authors":
 			[
