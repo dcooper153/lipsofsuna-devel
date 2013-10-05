@@ -1,0 +1,13 @@
+[
+	{
+		"type": "Helpspec",
+		"name": "contributing",
+		"title": "Manual: Contributing",
+		"text":
+		[
+			["paragraph", "If the game sparked your interest, you are encouraged to give us feedback or contribute to development."],
+			["paragraph", "We looking for contributors who enjoy 3D modeling, sound engineering, programming or other things relevant to the game."],
+			["paragraph", "Contact us by going to the project home page at http://lipsofsuna.org and clicking the forums link."]
+		]
+	}
+]

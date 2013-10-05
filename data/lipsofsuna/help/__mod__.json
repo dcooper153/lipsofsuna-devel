@@ -1,4 +1,16 @@
 {
-	"resources": ["."],
-	"scripts": ["init"]
+	"specs":
+	[
+		"about",
+		"contributing",
+		"crafting",
+		"index",
+		"inventory",
+		"playing",
+		"spells"
+	],
+	"client_scripts":
+	[
+		"ui"
+	]
 }

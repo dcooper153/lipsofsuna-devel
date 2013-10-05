@@ -1,0 +1,14 @@
+[
+	{
+		"type": "Helpspec",
+		"name": "about",
+		"title": "Manual: About",
+		"text":
+		[
+			["paragraph", "Lips of Suna is a tongue-in-cheek action RPG."],
+			["paragraph", "It is still pre-alpha: unstable and incomplete. Event though lots of features and content are absent and there are several known bugs, we hope that you're able to see what the game is aiming for."],
+			["paragraph", "Lips of Suna is free software, open source and open content. All the source code is licensed under the GNU LGPL v3 or compatible, and all the artwork is licensed under the CC BY-SA 3.0 or compatible license."],
+			["paragraph", "For more information and a way to contact the developers, visit the project website at http://lipsofsuna.org"]
+		]
+	}
+]

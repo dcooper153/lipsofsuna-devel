@@ -1,0 +1,14 @@
+[
+	{
+		"type": "Helpspec",
+		"name": "playing",
+		"title": "Manual: Playing",
+		"text":
+		[
+			["paragraph", "Start by punching down the nearest tree and pick up the logs. Depending on what you want to do next, use the crafting menu to either craft a wooden mattock or a wooden sword."],
+			["paragraph", "If you crafted a mattock, wield it and hit some ore veins that you can see here and there. Once you have collected enough ore, find an anvil and craft powerful weapons or armor."],
+			["paragraph", "If you crafted a sword, wield it. Go to the skills menu and enable some skills useful for combat before starting to fight with monsters. Be careful, some enemies you encounter are pretty strong!"],
+			["paragraph", "If you find a spell table and want to become a spell caster, enchant your weapon. Visit obelisks to unlock more spells."]
+		]
+	}
+]

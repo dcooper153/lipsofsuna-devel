@@ -1,0 +1,16 @@
+[
+	{
+		"type": "Helpspec",
+		"name": "index",
+		"title": "Manual",
+		"text":
+		[
+			["link", "Playing", "playing"],
+			["link", "Inventory", "inventory"],
+			["link", "Crafting", "crafting"],
+			["link", "Spells", "spells"],
+			["link", "About", "about"],
+			["link", "Contributing", "contributing"]
+		]
+	}
+]

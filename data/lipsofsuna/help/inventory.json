@@ -1,0 +1,12 @@
+[
+	{
+		"type": "Helpspec",
+		"name": "inventory",
+		"title": "Manual: Inventory",
+		"text":
+		[
+			["paragraph", "You can obtain items by picking up loose ones, looting them from corpses or harvesting them from plants."],
+			["paragraph", "You can view and use your items in the inventory screen. Click the inventory item to displays a menu of possible ways how to use the item."]
+		]
+	}
+]

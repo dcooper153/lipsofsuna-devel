@@ -1,0 +1,14 @@
+[
+	{
+		"type": "Helpspec",
+		"name": "crafting",
+		"title": "Manual: Crafting",
+		"text":
+		[
+			["paragraph", "Use the crafting view to craft items from raw materials. Before you can craft anything you need mine, loot or harvest the required materials."],
+			["paragraph", "The crafting view shows a list of items that can be crafted from the materials you have in your inventory. To craft an item, click on the corresponding item in the list."],
+			["paragraph", "You need to user a special crafting device to craft any advanced items. For example, most metallic items can only be crafted with an anvil, and many wooden items are crafted with the workbench."],
+			["paragraph", "Crafting devices occasionally appear in random parts of the map. Explore the world to find them."]
+		]
+	}
+]

@@ -1,0 +1,13 @@
+[
+	{
+		"type": "Helpspec",
+		"name": "spells",
+		"title": "Manual: Spells",
+		"text":
+		[
+			["paragraph", "Spells are cast with enchanted weapons. The easiest way to get access to spells is to find an enchantment table and enchant your weapon with it."],
+			["paragraph", "With the enchament table, you can choose how spells are cast with the weapon and what effects the spell have. Your repertuary of spells is initially very limited, but you can unlock more spells by visiting obelisks."],
+			["paragraph", "Willpower is needed for casting spells. Your willpower is consumed in proportion to the strength of the spell you cast. Your willpower may run out if you cast too many spells. If that happens, you will have to wait for your willpower to regenerate until you are able to cast more spells."]
+		]
+	}
+]
