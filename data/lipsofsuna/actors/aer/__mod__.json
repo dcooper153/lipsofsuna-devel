@@ -1,4 +1,14 @@
 {
 	"resources": ["."],
-	"specs": ["animations", "specs", "presets"]
+	"specs":
+	[
+		"animations",
+		"presets",
+		"specs"
+	],
+	"mods":
+	[
+		["load", "actors/aer/face"],
+		["load", "actors/aer/hair"]
+	]
 }

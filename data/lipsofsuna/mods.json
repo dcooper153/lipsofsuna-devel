@@ -9,7 +9,6 @@
 	["load", "actors/brigand"],
 	["load", "actors/dragon"],
 	["load", "actors/fire-elemental"],
-	["load", "actors/hair"],
 	["load", "actors/imp"],
 	["load", "actors/lizardman"],
 	["load", "actors/rat"],

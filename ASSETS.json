@@ -234,27 +234,27 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/actors/aer/aereye1.png",
-				"data/lipsofsuna/actors/aer/aereye2.png",
-				"data/lipsofsuna/actors/aer/aerface1.png",
-				"data/lipsofsuna/actors/hair/aershorthair1.png",
-				"data/lipsofsuna/actors/hair/aerpigtails1.lmdl",
-				"data/lipsofsuna/actors/hair/aerpigtails1.png",
-				"data/lipsofsuna/actors/hair/aerhairfrontshort1.lmdl",
-				"data/lipsofsuna/actors/hair/aerhairponytail1.lmdl",
-				"data/lipsofsuna/actors/hair/aerhairbackshort2.lmdl",
-				"data/lipsofsuna/actors/hair/aerhairbacksmooth1.lmdl",
-				"data/lipsofsuna/actors/hair/aerhairbackshort1.lmdl",
-				"data/lipsofsuna/actors/hair/aerponytail1.png",
-				"data/lipsofsuna/actors/hair/hair1.dds",
-				"data/lipsofsuna/actors/hair/hair1.png",
-				"data/lipsofsuna/actors/hair/hair1n.dds",
-				"data/lipsofsuna/actors/hair/hair1.lmdl",
-				"data/lipsofsuna/actors/hair/hair2.lmdl",
-				"data/lipsofsuna/actors/hair/hair4.lmdl",
-				"data/lipsofsuna/actors/hair/hair5.lmdl",
-				"data/lipsofsuna/actors/hair/hair6.lmdl",
-				"data/lipsofsuna/actors/hair/ribbon1.png",
+				"data/lipsofsuna/actors/aer/face/aereye1.png",
+				"data/lipsofsuna/actors/aer/face/aereye2.png",
+				"data/lipsofsuna/actors/aer/face/aerface1.png",
+				"data/lipsofsuna/actors/aer/hair/aershorthair1.png",
+				"data/lipsofsuna/actors/aer/hair/aerpigtails1.lmdl",
+				"data/lipsofsuna/actors/aer/hair/aerpigtails1.png",
+				"data/lipsofsuna/actors/aer/hair/aerhairfrontshort1.lmdl",
+				"data/lipsofsuna/actors/aer/hair/aerhairponytail1.lmdl",
+				"data/lipsofsuna/actors/aer/hair/aerhairbackshort2.lmdl",
+				"data/lipsofsuna/actors/aer/hair/aerhairbacksmooth1.lmdl",
+				"data/lipsofsuna/actors/aer/hair/aerhairbackshort1.lmdl",
+				"data/lipsofsuna/actors/aer/hair/aerponytail1.png",
+				"data/lipsofsuna/actors/aer/hair/hair1.dds",
+				"data/lipsofsuna/actors/aer/hair/hair1.png",
+				"data/lipsofsuna/actors/aer/hair/hair1n.dds",
+				"data/lipsofsuna/actors/aer/hair/hair1.lmdl",
+				"data/lipsofsuna/actors/aer/hair/hair2.lmdl",
+				"data/lipsofsuna/actors/aer/hair/hair4.lmdl",
+				"data/lipsofsuna/actors/aer/hair/hair5.lmdl",
+				"data/lipsofsuna/actors/aer/hair/hair6.lmdl",
+				"data/lipsofsuna/actors/aer/hair/ribbon1.png",
 				"data/lipsofsuna/apparel/bloomers/aerbloomers1.lmdl",
 				"data/lipsofsuna/apparel/bloomers/aerbloomers1.png",
 				"data/lipsofsuna/apparel/bloomers/aerbloomerstop1.lmdl",
@@ -296,14 +296,14 @@
 			],
 			"files_original":
 			[
-				"data/lipsofsuna/actors/aer/aereye1.svg",
-				"data/lipsofsuna/actors/aer/aereye2.svg",
-				"data/lipsofsuna/actors/aer/aerface1.svg",
-				"data/lipsofsuna/actors/hair/aerpigtails1.blend",
-				"data/lipsofsuna/actors/hair/aerhairponytail1.blend",
-				"data/lipsofsuna/actors/hair/aershorthair1.blend",
-				"data/lipsofsuna/actors/hair/hair2.blend",
-				"data/lipsofsuna/actors/hair/hair5.blend",
+				"data/lipsofsuna/actors/aer/face/aereye1.svg",
+				"data/lipsofsuna/actors/aer/face/aereye2.svg",
+				"data/lipsofsuna/actors/aer/face/aerface1.svg",
+				"data/lipsofsuna/actors/aer/hair/aerpigtails1.blend",
+				"data/lipsofsuna/actors/aer/hair/aerhairponytail1.blend",
+				"data/lipsofsuna/actors/aer/hair/aershorthair1.blend",
+				"data/lipsofsuna/actors/aer/hair/hair2.blend",
+				"data/lipsofsuna/actors/aer/hair/hair5.blend",
 				"data/lipsofsuna/apparel/dress/aerdress1.svg",
 				"data/lipsofsuna/apparel/dress/aerdress2.svg",
 				"data/lipsofsuna/apparel/bloomers/bloomers1.blend",
@@ -792,13 +792,13 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/actors/hair/hair3.lmdl",
-				"data/lipsofsuna/actors/hair/hair2.png",
-				"data/lipsofsuna/actors/hair/hair2n.png"
+				"data/lipsofsuna/actors/aer/hair/hair3.lmdl",
+				"data/lipsofsuna/actors/aer/hair/hair2.png",
+				"data/lipsofsuna/actors/aer/hair/hair2n.png"
 			],
 			"files_original":
 			[
-				"data/lipsofsuna/actors/hair/hair1.blend"
+				"data/lipsofsuna/actors/aer/hair/hair1.blend"
 			],
 			"authors":
 			[
