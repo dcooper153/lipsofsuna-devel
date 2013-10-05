@@ -34,6 +34,7 @@ ThirdPersonCamera.new = function(clss, args)
 	self.timer = 1/60
 	self.tick = 1/60
 	self.__zoom = 4
+	self.__death_ipol = 1
 	return self
 end
 
@@ -118,8 +119,9 @@ end
 -- @return Vector, quaternion, quaternion, vector, quaternion.
 ThirdPersonCamera.get_center_transform = function(self)
 	-- Calculate the initial rotation.
-	local turn = self.turn_state + self.object:get_turn_angle()
-	local tilt = self.tilt_state + self.object:get_tilt_angle()
+	local ipol = self.__death_ipol
+	local turn = self.turn_state + self.object:get_turn_angle() * (1 - ipol)
+	local tilt = (self.tilt_state + self.object:get_tilt_angle()) * (1 - ipol) - 0.7 * ipol
 	local rot = Quaternion{euler = {turn, 0, tilt}}
 	local turn1 = Quaternion{euler = {turn}}
 	-- Calculate the initial center position.
@@ -198,10 +200,18 @@ ThirdPersonCamera.update = function(self, secs)
 			end
 		end
 	end
+	-- Update the death camera.
+	local ipol = self.__death_ipol
+	local zoom = ipol * 10 + (1 - ipol) * self.__zoom
+	if self.object.dead then
+		self.__death_ipol = math.min(ipol + 2 * secs, 1)
+	else
+		self.__death_ipol = math.max(ipol - 2 * secs, 0)
+	end
 	-- Calculate the final transformation.
 	local pos,rot = self:get_eye_transform()
 	local dist = self:calculate_3rd_person_clipped_distance(pos, rot,
-		self.__zoom, self:get_collision_group(), self:get_collision_mask())
+		zoom, self:get_collision_group(), self:get_collision_mask())
 	dist = math.max(dist - 1.5, 0)
 	pos,rot = self:calculate_3rd_person_transform(pos, rot, dist)
 	-- Mix in the camera quake.
