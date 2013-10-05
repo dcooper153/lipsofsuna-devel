@@ -11,6 +11,7 @@
 local Class = require("system/class")
 local MapUtils = require("core/server/map-utils")
 local Noise = require("system/noise")
+local TerrainMaterialSpec = require("core/specs/terrain-material")
 local Vector = require("system/math/vector")
 
 --- Procedural terrain generator.
@@ -154,6 +155,18 @@ TerrainGenerator.generate = function(self, chunk)
 			end
 			-- Generate the stone.
 			t:add_stick_corners(chunk.x + x, chunk.z + z, 0, 0, 0, 0, a00, a10, a01, a11, 3)
+			-- Generate ore.
+			local ore = math.random() * 300
+			if ore < 3 and ore > 0.1 then
+				local y0,y1,y2,y3 = a00 + b00 + c00, a10 + b10 + c10, a01 + b01 + c01, a11 + b11 + c11
+				local mat
+				if math.random() < 0.75 then
+					mat = TerrainMaterialSpec:random{category = "common ore"}
+				else
+					mat = TerrainMaterialSpec:random{category = "rare ore"}
+				end
+				t:add_stick_corners(chunk.x + x, chunk.z + z, y0 - ore, y1 - ore, y2 - ore, y3 - ore, y0, y1, y2, y3, mat.id)
+			end
 			-- Generate the dungeon.
 			if d00 < e00 and d10 < e10 and d01 < e01 and d11 < e11 then
 				t:add_stick_corners(chunk.x + x, chunk.z + z, d00, d10, d01, d11, e00, e10, e01, e11, 0)

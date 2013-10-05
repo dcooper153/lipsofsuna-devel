@@ -44,6 +44,10 @@
 	{
 		"type": "TerrainMaterialSpec",
 		"name": "ferrostone",
+		"categories":
+		{
+			"common ore": true
+		},
 		"mining_item": "ferrostone",
 		"top_texture": 6,
 		"bottom_texture": 6,
@@ -52,6 +56,10 @@
 	{
 		"type": "TerrainMaterialSpec",
 		"name": "aquanite",
+		"categories":
+		{
+			"rare ore": true
+		},
 		"mining_item": "aquanite stone",
 		"top_texture": 7,
 		"bottom_texture": 7,
@@ -60,6 +68,10 @@
 	{
 		"type": "TerrainMaterialSpec",
 		"name": "crimson",
+		"categories":
+		{
+			"rare ore": true
+		},
 		"mining_item": "crimson stone",
 		"top_texture": 8,
 		"bottom_texture": 8,
@@ -68,6 +80,10 @@
 	{
 		"type": "TerrainMaterialSpec",
 		"name": "adamantium",
+		"categories":
+		{
+			"rare ore": true
+		},
 		"mining_item": "adamantium",
 		"top_texture": 9,
 		"bottom_texture": 9,
