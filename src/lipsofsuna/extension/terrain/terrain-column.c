@@ -562,14 +562,14 @@ int liext_terrain_column_add_stick_corners (
 	top = (top00 + top10 + top01 + top11) / 4.0f;
 	if (bot >= top)
 		return 0;
-	slope_bot[0] = bot00 - bot;
-	slope_bot[1] = bot10 - bot;
-	slope_bot[2] = bot01 - bot;
-	slope_bot[3] = bot11 - bot;
-	slope_top[0] = top00 - top;
-	slope_top[1] = top10 - top;
-	slope_top[2] = top01 - top;
-	slope_top[3] = top11 - top;
+	slope_bot[0] = LIMAT_MIN (bot00, top) - bot;
+	slope_bot[1] = LIMAT_MIN (bot10, top) - bot;
+	slope_bot[2] = LIMAT_MIN (bot01, top) - bot;
+	slope_bot[3] = LIMAT_MIN (bot11, top) - bot;
+	slope_top[0] = LIMAT_MAX (top00, bot + slope_bot[0]) - top;
+	slope_top[1] = LIMAT_MAX (top10, bot + slope_bot[1]) - top;
+	slope_top[2] = LIMAT_MAX (top01, bot + slope_bot[2]) - top;
+	slope_top[3] = LIMAT_MAX (top11, bot + slope_bot[3]) - top;
 
 	/* Create the stick. */
 	return liext_terrain_column_add_stick (self, bot, top - bot, slope_bot, slope_top, material, filter_func, filter_data);
