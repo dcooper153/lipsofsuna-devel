@@ -52,6 +52,7 @@ end
 -- @param self QuestDatabase.
 QuestDatabase.load_quests = function(self)
 	local r = self.db:query([[SELECT name,status,desc,marker FROM quests;]])
+	if not r then return end
 	for k,v in ipairs(r) do
 		local quest = Quest(self, unpack(v))
 		self.quests_by_name[quest.name] = quest
