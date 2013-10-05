@@ -1,5 +1,6 @@
 local Client = require("core/client/client")
 local HairStyleSpec = require("core/specs/hair-style")
+local UiRadioMenu = require("ui/widgets/radio-menu")
 local UiScrollFloat = require("ui/widgets/scrollfloat")
 
 local chargen_input = function(args)
@@ -33,7 +34,22 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "chargen",
-	widget = function() return Widgets.Uitransition("Preset", "chargen/presets") end}
+	widget = function()
+		return UiRadioMenu("Preset", function(self)
+			-- Find and sort the presets.
+			local lst = Client.chargen:get_presets()
+			-- Create the popup widgets.
+			self:clear()
+			for k,v in ipairs(lst) do
+				self:add_item(v.name, false, function(w)
+					Client.chargen:set_preset(v)
+				end)
+			end
+			self:add_widget(Widgets.Uibutton("Save the current character", function()
+				Client.chargen:save()
+			end))
+		end)
+	end}
 
 Ui:add_widget{
 	state = "chargen",
@@ -65,34 +81,6 @@ Ui:add_widget{
 ------------------------------------------------------------------------------
 
 Ui:add_state{
-	state = "chargen/presets",
-	label = "Select preset",
-	init = function()
-		-- Create the preset radio buttons.
-		local widgets = {}
-		local presets = Client.chargen:get_presets()
-		for k,v in ipairs(presets) do
-			local widget = Widgets.Uiradio(v.name, "preset", function(w)
-				Client.chargen:set_preset(w.preset)
-			end)
-			widget.preset = v
-			table.insert(widgets, widget)
-		end
-		return widgets
-	end,
-	input_post = chargen_input,
-	update = chargen_update}
-
-Ui:add_widget{
-	state = "chargen/presets",
-	widget = function() return Widgets.Uibutton("Save the current character", function()
-			Client.chargen:save()
-		end)
-	end}
-
-------------------------------------------------------------------------------
-
-Ui:add_state{
 	state = "chargen/body",
 	label = "Customize body",
 	input_post = chargen_input,
@@ -100,7 +88,20 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "chargen/body",
-	widget = function() return Widgets.Uitransition("Skin style", "chargen/body/skinstyle") end}
+	widget = function()
+		return UiRadioMenu("Skin style", function(self)
+			-- Create the popup widgets.
+			local widgets = {}
+			local race = Client.chargen:get_race()
+			local specs = Actorskinspec:find_by_actor(race)
+			for k,v in ipairs(specs) do
+				local active = Client.chargen:get_skin_style() == v.name
+				self:add_item(v.name, active, function(w)
+					Client.chargen:set_skin_style(v.name)
+				end)
+			end
+		end)
+	end}
 
 Ui:add_widget{
 	state = "chargen/body",
@@ -129,30 +130,6 @@ Ui:add_widget{
 ------------------------------------------------------------------------------
 
 Ui:add_state{
-	state = "chargen/body/skinstyle",
-	label = "Select skin style",
-	init = function()
-		local widgets = {}
-		local race = Client.chargen:get_race()
-		local specs = Actorskinspec:find_by_actor(race)
-		for k,v in ipairs(specs) do
-			local widget = Widgets.Uiradio(v.name, "skin", function(w)
-				Client.chargen:set_skin_style(w.style)
-			end)
-			widget.style = v.name
-			if Client.chargen:get_skin_style() == widget.style then
-				widget.value = true
-			end
-			table.insert(widgets, widget)
-		end
-		return widgets
-	end,
-	input_post = chargen_input,
-	update = chargen_update}
-
-------------------------------------------------------------------------------
-
-Ui:add_state{
 	state = "chargen/head",
 	label = "Customize head",
 	input_post = chargen_input,
@@ -160,11 +137,49 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "chargen/head",
-	widget = function() return Widgets.Uitransition("Head style", "chargen/head/headstyle") end}
+	widget = function()
+		return UiRadioMenu("Head style", function(self)
+			-- Find and sort the head styles.
+			local race = Client.chargen:get_race()
+			local spec = Actorspec:find_by_name(race)
+			if not spec.head_styles then return end
+			local lst = {}
+			for k,v in pairs(spec.head_styles) do
+				table.insert(lst, {k, v})
+			end
+			table.sort(lst, function(a,b) return a[1] < b[1] end)
+			-- Create the popup widgets.
+			self:clear()
+			for k,v in ipairs(lst) do
+				local active = Client.chargen:get_head_style() == v[2]
+				self:add_item(v[1], active, function(w)
+					Client.chargen:set_head_style(v[2])
+					self:set_menu_opened(false)
+				end)
+			end
+		end)
+	end}
 
 Ui:add_widget{
 	state = "chargen/head",
-	widget = function() return Widgets.Uitransition("Hair style", "chargen/head/hairstyle") end}
+	widget = function()
+		return UiRadioMenu("Hair style", function(self)
+			-- Find and sort the hair styles.
+			local lst = {}
+			for k,v in pairs(HairStyleSpec.dict_name) do
+				table.insert(lst, {k, k})
+			end
+			table.sort(lst, function(a,b) return a[1] < b[1] end)
+			-- Create the popup widgets.
+			self:clear()
+			for k,v in ipairs(lst) do
+				local active = Client.chargen:get_head_style() == v[2]
+				self:add_item(v[1], active, function(w)
+					Client.chargen:set_hair_style(v[2])
+				end)
+			end
+		end)
+	end}
 
 Ui:add_widget{
 	state = "chargen/head",
@@ -205,63 +220,6 @@ Ui:add_widget{
 ------------------------------------------------------------------------------
 
 Ui:add_state{
-	state = "chargen/head/hairstyle",
-	label = "Select hair style",
-	init = function()
-		local lst = {}
-		for k,v in pairs(HairStyleSpec.dict_name) do
-			table.insert(lst, {k, k})
-		end
-		table.sort(lst, function(a,b) return a[1] < b[1] end)
-		local widgets = {}
-		for k,v in ipairs(lst) do
-			local widget = Widgets.Uiradio(v[1], "hair", function(w)
-				Client.chargen:set_hair_style(w.style)
-			end)
-			widget.style = v[2]
-			if Client.chargen:get_hair_style() == widget.style then
-				widget.value = true
-			end
-			table.insert(widgets, widget)
-		end
-		return widgets
-	end,
-	input_post = chargen_input,
-	update = chargen_update}
-
-------------------------------------------------------------------------------
-
-Ui:add_state{
-	state = "chargen/head/headstyle",
-	label = "Select head style",
-	init = function()
-		local widgets = {}
-		local race = Client.chargen:get_race()
-		local spec = Actorspec:find{name = race}
-		if not spec.head_styles then return end
-		local lst = {}
-		for k,v in pairs(spec.head_styles) do
-			table.insert(lst, {k, v})
-		end
-		table.sort(lst, function(a,b) return a[1] < b[1] end)
-		for k,v in ipairs(lst) do
-			local widget = Widgets.Uiradio(v[1], "head", function(w)
-				Client.chargen:set_head_style(w.style)
-			end)
-			widget.style = v[2]
-			if Client.chargen:get_head_style() == widget.style then
-				widget.value = true
-			end
-			table.insert(widgets, widget)
-		end
-		return widgets
-	end,
-	input_post = chargen_input,
-	update = chargen_update}
-
-------------------------------------------------------------------------------
-
-Ui:add_state{
 	state = "chargen/face",
 	label = "Customize face",
 	input_post = chargen_input,
@@ -269,7 +227,27 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "chargen/face",
-	widget = function() return Widgets.Uitransition("Eye style", "chargen/face/eyestyle") end}
+	widget = function()
+		return UiRadioMenu("Eye style", function(self)
+			-- Find and sort the eye styles.
+			local race = Client.chargen:get_race()
+			local spec = Actorspec:find{name = race}
+			if not spec.head_styles then return end
+			local lst = {}
+			for k,v in pairs(spec.eye_styles) do
+				table.insert(lst, {k, v})
+			end
+			table.sort(lst, function(a,b) return a[1] < b[1] end)
+			-- Create the popup widgets.
+			self:clear()
+			for k,v in ipairs(lst) do
+				local active = Client.chargen:get_eye_style() == v[2]
+				self:add_item(v[1], active, function(w)
+					Client.chargen:set_eye_style(v[2])
+				end)
+			end
+		end)
+	end}
 
 Ui:add_widget{
 	state = "chargen/face",
@@ -316,36 +294,6 @@ Ui:add_widget{
 ------------------------------------------------------------------------------
 
 Ui:add_state{
-	state = "chargen/face/eyestyle",
-	label = "Select eye style",
-	init = function()
-		local widgets = {}
-		local race = Client.chargen:get_race()
-		local spec = Actorspec:find{name = race}
-		if not spec.head_styles then return end
-		local lst = {}
-		for k,v in pairs(spec.eye_styles) do
-			table.insert(lst, {k, v})
-		end
-		table.sort(lst, function(a,b) return a[1] < b[1] end)
-		for k,v in ipairs(lst) do
-			local widget = Widgets.Uiradio(v[1], "eye", function(w)
-				Client.chargen:set_eye_style(w.style)
-			end)
-			widget.style = v[2]
-			if Client.chargen:get_eye_style() == widget.style then
-				widget.value = true
-			end
-			table.insert(widgets, widget)
-		end
-		return widgets
-	end,
-	input_post = chargen_input,
-	update = chargen_update}
-
-------------------------------------------------------------------------------
-
-Ui:add_state{
 	state = "chargen/misc",
 	label = "Customize other",
 	input_post = chargen_input,
@@ -353,7 +301,27 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "chargen/misc",
-	widget = function() return Widgets.Uitransition("Animation profile", "chargen/misc/animation") end}
+	widget = function()
+		return UiRadioMenu("Animation profile", function(self)
+			-- Find and sort the profiles.
+			local race = Client.chargen:get_race()
+			local spec = Actorspec:find{name = race}
+			if not spec.animations then return end
+			local lst = {}
+			for k,v in pairs(spec.animations) do
+				table.insert(lst, {k, v})
+			end
+			table.sort(lst, function(a,b) return a[1] < b[1] end)
+			-- Create the popup widgets.
+			self:clear()
+			for k,v in ipairs(lst) do
+				local active = Client.chargen:get_animation_profile() == v[2]
+				self:add_item(v[1], active, function(w)
+					Client.chargen:set_animation_profile(v[2])
+				end)
+			end
+		end)
+	end}
 
 Ui:add_widget{
 	state = "chargen/misc",
@@ -381,33 +349,3 @@ Ui:add_widget{
 			Client.chargen:set_skin_color(3, w.value)
 		end)
 	end}
-
-------------------------------------------------------------------------------
-
-Ui:add_state{
-	state = "chargen/misc/animation",
-	label = "Select animation",
-	init = function()
-		local widgets = {}
-		local race = Client.chargen:get_race()
-		local spec = Actorspec:find{name = race}
-		if not spec.animations then return end
-		local lst = {}
-		for k,v in pairs(spec.animations) do
-			table.insert(lst, {k, v})
-		end
-		table.sort(lst, function(a,b) return a[1] < b[1] end)
-		for k,v in ipairs(lst) do
-			local widget = Widgets.Uiradio(v[1], "animations", function(w)
-				Client.chargen:set_animation_profile(w.profile)
-			end)
-			widget.profile = v[2]
-			if Client.chargen:get_animation_profile() == widget.style then
-				widget.value = true
-			end
-			table.insert(widgets, widget)
-		end
-		return widgets
-	end,
-	input_post = chargen_input,
-	update = chargen_update}

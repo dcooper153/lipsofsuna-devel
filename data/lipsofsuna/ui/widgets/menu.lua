@@ -46,10 +46,23 @@ UiMenu.new = function(clss, widgets)
 	return self
 end
 
+--- Adds a widget to the menu.
+-- @param self UiMenu.
+-- @param widget Widget.
+UiMenu.add_widget = function(self, widget)
+	self.__box:add_child(widget)
+end
+
 --- Handles the apply command.
 -- @param self UiMenu.
 UiMenu.apply = function(self)
 	self:set_menu_opened(true)
+end
+
+--- Clears the widgets of the menu.
+-- @param self UiMenu.
+UiMenu.clear = function(self)
+	self.__box:clear()
 end
 
 --- Handles an event.
