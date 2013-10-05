@@ -92,11 +92,11 @@ end
 BuildingUtils.__create_terrain_mining_items = function(self, attacker, materials)
 	for k,v in pairs(materials) do
 		local mat = TerrainMaterialSpec:find_by_id(k)
-		if mat and mat.mining_item and v >= 0.5 then
+		if mat and mat.mining_item and v >= 0.1 then
 			local spec = Itemspec:find_by_name(mat.mining_item)
 			local item = Item(Main.objects)
 			item:set_spec(spec)
-			item:set_count(math.floor(v + 0.5))
+			item:set_count(math.floor(v / 10) * 10 + 0.1)
 			attacker.inventory:merge_or_drop_object(item)
 		end
 	end

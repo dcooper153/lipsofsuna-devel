@@ -27,8 +27,6 @@
 		"name": "iron ingot",
 		"categories": {"build": true, "material": true},
 		"icon": "ingot1",
-		"construct_tile": "iron1",
-		"construct_tile_count": 1,
 		"equipment_slot": "hand.R",
 		"mass": 2,
 		"model": "ingot1",

@@ -1,7 +1,8 @@
 [
 	{
 		"type": "TerrainMaterialSpec",
-		"name": "sand",
+		"name": "soil",
+		"mining_item": "soil chunk",
 		"top_texture": 0,
 		"bottom_texture": 0,
 		"side_texture": 0
@@ -9,6 +10,7 @@
 	{
 		"type": "TerrainMaterialSpec",
 		"name": "grass",
+		"mining_item": "soil chunk",
 		"top_texture": 1,
 		"bottom_texture": 1,
 		"side_texture": 1,
@@ -18,8 +20,57 @@
 	{
 		"type": "TerrainMaterialSpec",
 		"name": "granite",
+		"mining_item": "granite stone",
 		"top_texture": 2,
 		"bottom_texture": 2,
 		"side_texture": 2
+	},
+	{
+		"type": "TerrainMaterialSpec",
+		"name": "plank",
+		"mining_item": "log",
+		"top_texture": 4,
+		"bottom_texture": 4,
+		"side_texture": 4
+	},
+	{
+		"type": "TerrainMaterialSpec",
+		"name": "sand",
+		"mining_item": "sand chunk",
+		"top_texture": 5,
+		"bottom_texture": 5,
+		"side_texture": 5
+	},
+	{
+		"type": "TerrainMaterialSpec",
+		"name": "ferrostone",
+		"mining_item": "ferrostone",
+		"top_texture": 6,
+		"bottom_texture": 6,
+		"side_texture": 6
+	},
+	{
+		"type": "TerrainMaterialSpec",
+		"name": "aquanite",
+		"mining_item": "aquanite stone",
+		"top_texture": 7,
+		"bottom_texture": 7,
+		"side_texture": 7
+	},
+	{
+		"type": "TerrainMaterialSpec",
+		"name": "crimson",
+		"mining_item": "crimson stone",
+		"top_texture": 8,
+		"bottom_texture": 8,
+		"side_texture": 8
+	},
+	{
+		"type": "TerrainMaterialSpec",
+		"name": "adamantium",
+		"mining_item": "adamantium",
+		"top_texture": 9,
+		"bottom_texture": 9,
+		"side_texture": 9
 	}
 ]

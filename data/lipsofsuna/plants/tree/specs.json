@@ -4,38 +4,16 @@
 		"name": "log",
 		"model": "log1",
 		"icon": "log1",
+		"actions":
+		{
+			"right": "build"
+		},
 		"categories":
 		{
 			"build": true,
 			"material": true
 		},
-		"construct_tile": "wood1",
-		"construct_tile_count": 1,
-		"effects":
-		{
-			"default": "wooden item"
-		},
-		"equipment_slot": "hand.R",
-		"equipment_slots_reserved":
-		{
-			"hand.L": true
-		},
-		"health": 50,
-		"mass": 5,
-		"stacking": true
-	},
-	{
-		"type": "Itemspec",
-		"name": "another log",
-		"model": "log2",
-		"icon": "log1",
-		"categories":
-		{
-			"build": true,
-			"material": true,
-			"throwable": true
-		},
-		"construct_tile": "wood1",
+		"construct_tile": "plank",
 		"construct_tile_count": 1,
 		"effects":
 		{
