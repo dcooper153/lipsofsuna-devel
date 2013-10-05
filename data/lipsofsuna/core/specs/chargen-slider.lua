@@ -13,7 +13,7 @@ local Spec = require("core/specs/spec")
 
 --- Character creator slider spec.
 -- @type ChargenSliderSpec
-ChargenSliderSpec = Spec:register("ChargenSliderSpec", "chargen slider", {
+local ChargenSliderSpec = Spec:register("ChargenSliderSpec", "chargen slider", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories. Used in the user interface for grouping."},
 	{name = "default", type = "number", default = 0, description = "Default value."},

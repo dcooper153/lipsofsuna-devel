@@ -1,3 +1,4 @@
+local ChargenSliderSpec = require("core/specs/chargen-slider")
 local Client = require("core/client/client")
 local HairStyleSpec = require("core/specs/hair-style")
 local UiRadioMenu = require("ui/widgets/radio-menu")

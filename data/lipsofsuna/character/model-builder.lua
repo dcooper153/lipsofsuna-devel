@@ -8,6 +8,7 @@
 -- @module character.model_builder
 -- @alias ModelBuilder
 
+local ChargenSliderSpec = require("core/specs/chargen-slider")
 local Class = require("system/class")
 local Color = require("system/color")
 local HairStyleSpec = require("core/specs/hair-style")

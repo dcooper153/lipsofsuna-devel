@@ -10,6 +10,7 @@
 
 local Actor = require("core/objects/actor")
 local ChargenCamera = require("character/camera")
+local ChargenSliderSpec = require("core/specs/chargen-slider")
 local Class = require("system/class")
 local Color = require("system/color")
 local Hooks = require("system/hooks")
