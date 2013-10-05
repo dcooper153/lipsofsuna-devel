@@ -36,6 +36,7 @@
 			"Default": "aereye1",
 			"Angled": "aereye2"
 		},
+		"falling_damage_rate": 3,
 		"hair_style": "random",
 		"head_scale_min": 0.8,
 		"head_scale_max": 1.2,
