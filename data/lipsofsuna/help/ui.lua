@@ -1,3 +1,4 @@
+local HelpSpec = require("core/specs/help")
 local UiLabel = require("ui/widgets/label")
 local UiHelpLink = require("help/ui-help-link")
 local UiHelpText = require("help/ui-help-text")
@@ -7,7 +8,7 @@ Ui:add_state{
 	label = "Help",
 	init = function()
 		-- Find the help text.
-		local help = Helpspec:find_by_name(Client.data.help.page)
+		local help = HelpSpec:find_by_name(Client.data.help.page)
 		if not help then return end
 		-- Create the widgets.
 		local widgets = {UiLabel(help.title)}

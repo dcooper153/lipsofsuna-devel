@@ -9,6 +9,7 @@
 -- @alias UiHelpLink
 
 local Class = require("system/class")
+local HelpSpec = require("core/specs/help")
 local UiHelpText = require("help/ui-help-text")
 local UiMenu = require("ui/widgets/menu")
 
@@ -33,7 +34,7 @@ end
 -- @param self UiMenu.
 UiHelpLink.apply = function(self)
 	-- Find the help text.
-	local help = Helpspec:find_by_name(self.link)
+	local help = HelpSpec:find_by_name(self.link)
 	if not help then return end
 	-- Create the widgets.
 	local widgets = {}

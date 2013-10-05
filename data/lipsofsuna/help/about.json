@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Helpspec",
+		"type": "HelpSpec",
 		"name": "about",
 		"title": "Manual: About",
 		"text":
