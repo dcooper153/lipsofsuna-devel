@@ -40,7 +40,8 @@
 		"particle": "explosion1",
 		"particle_life": 5,
 		"quake": 1,
-		"sound": "explosion1"
+		"sound": "explosion1",
+		"sound_rolloff": 0.2
 	},
 	{
 		"type": "Effectspec",
