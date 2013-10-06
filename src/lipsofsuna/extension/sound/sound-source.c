@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -56,6 +56,9 @@ LISndSource* lisnd_source_new (
 	self->offset = 0.0f;
 	self->playing = 0;
 	self->pitch = 1.0f;
+	self->rolloff = 1.0f;
+	self->ref_dist = 1.0f;
+	self->max_dist = 100.0f;
 	self->volume = 1.0f;
 	self->stereo = stereo;
 	self->manager = manager;
@@ -240,6 +243,20 @@ void lisnd_source_set_looping (
 }
 
 /**
+ * \brief Sets the maximum distance of the source.
+ * \param self Sound source.
+ * \param value Scalar.
+ */
+void lisnd_source_set_max_dist (
+	LISndSource* self,
+	float        value)
+{
+	self->ref_dist = value;
+	if (self->source)
+		alSourcef (self->source, AL_MAX_DISTANCE, value);
+}
+
+/**
  * \brief Gets the playback offset of the source.
  * \param self Sond source.
  * \return Offset in seconds.
@@ -343,6 +360,34 @@ void lisnd_source_set_position (
 }
 
 /**
+ * \brief Sets the reference distance of the source.
+ * \param self Sound source.
+ * \param value Scalar.
+ */
+void lisnd_source_set_ref_dist (
+	LISndSource* self,
+	float        value)
+{
+	self->ref_dist = value;
+	if (self->source)
+		alSourcef (self->source, AL_REFERENCE_DISTANCE, value);
+}
+
+/**
+ * \brief Sets the roll-off factor of the source.
+ * \param self Sound source.
+ * \param value Scalar.
+ */
+void lisnd_source_set_rolloff (
+	LISndSource* self,
+	float        value)
+{
+	self->rolloff = value;
+	if (self->source)
+		alSourcef (self->source, AL_ROLLOFF_FACTOR, value);
+}
+
+/**
  * \brief Checks if the source has stereo sound.
  * \param self Sound source.
  * \return Nonzero if stereo.
@@ -391,12 +436,13 @@ static int private_init_source (
 	alGenSources (1, &self->source);
 	if (alGetError() != AL_NO_ERROR)
 		return 0;
-	alSourcef (self->source, AL_REFERENCE_DISTANCE, 1.0f);
-	alSourcef (self->source, AL_MAX_DISTANCE, 100.0f);
+	alSourcef (self->source, AL_REFERENCE_DISTANCE, self->ref_dist);
+	alSourcef (self->source, AL_MAX_DISTANCE, self->max_dist);
 	alSourcef (self->source, AL_GAIN, self->fade_value * self->volume);
 	alSourcei (self->source, AL_LOOPING, self->looping);
 	alSourcef (self->source, AL_SEC_OFFSET, self->offset);
 	alSourcef (self->source, AL_PITCH, self->pitch);
+	alSourcef (self->source, AL_ROLLOFF_FACTOR, self->rolloff);
 	alSource3f (self->source, AL_POSITION, -self->position.x, self->position.y, -self->position.z);
 	alSource3f (self->source, AL_VELOCITY, self->velocity.x, self->velocity.y, self->velocity.z);
 	alSourcef (self->source, AL_GAIN, self->fade_value * self->volume);

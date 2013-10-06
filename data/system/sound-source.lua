@@ -1,4 +1,4 @@
---- TODO:doc
+--- Sound source.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -17,7 +17,7 @@ end
 
 ------------------------------------------------------------------------------
 
---- TODO:doc
+--- Sound source.
 -- @type SoundSource
 local SoundSource = Class("SoundSource")
 
@@ -54,6 +54,21 @@ end
 SoundSource.set_looping = function(self, value)
 	self.__looping = value
 	Los.sound_source_set_looping(self.handle, value)
+end
+
+--- Returns the maximum hearing distance of the source.
+-- @param self Sound source.
+-- @return Number.
+SoundSource.get_max_dist = function(self)
+	return self.__maxdist or 100
+end
+
+--- Sets the maximum hearing distance of the source.
+-- @param self Sound source.
+-- @param value Number.
+SoundSource.set_max_dist = function(self, value)
+	self.__maxdist = value
+	Los.sound_source_set_max_dist(self.handle, value)
 end
 
 --- Returns the pitch multiplier of the source.
@@ -103,6 +118,36 @@ SoundSource.set_position = function(self, value)
 	Los.sound_source_set_position(self.handle, value.handle)
 end
 
+--- Returns the reference hearing distance of the source.
+-- @param self Sound source.
+-- @return Number.
+SoundSource.get_ref_dist = function(self)
+	return self.__refdist or 1
+end
+
+--- Sets the reference hearing distance of the source.
+-- @param self Sound source.
+-- @param value Number.
+SoundSource.set_ref_dist = function(self, value)
+	self.__refdist = value
+	Los.sound_source_set_ref_dist(self.handle, value)
+end
+
+--- Returns the roll-off rate of the source.
+-- @param self Sound source.
+-- @return Number.
+SoundSource.get_rolloff = function(self)
+	return self.__rolloff or 1
+end
+
+--- Sets the roll-off rate of the source.
+-- @param self Sound source.
+-- @param value Number.
+SoundSource.set_rolloff = function(self, value)
+	self.__rolloff = value
+	Los.sound_source_set_rolloff(self.handle, value)
+end
+
 --- Returns the name of the sample used by the source.
 -- @param self Sound source.
 -- @return String.
@@ -144,5 +189,3 @@ SoundSource.set_volume = function(self, value)
 end
 
 return SoundSource
-
-

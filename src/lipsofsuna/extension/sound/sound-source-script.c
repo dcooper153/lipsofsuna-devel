@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -87,6 +87,16 @@ static void SoundSource_set_looping (LIScrArgs* args)
 #endif
 }
 
+static void SoundSource_set_max_dist (LIScrArgs* args)
+{
+#ifndef LI_DISABLE_SOUND
+	float value;
+
+	if (liscr_args_geti_float (args, 0, &value))
+		lisnd_source_set_max_dist (args->self, value);
+#endif
+}
+
 static void SoundSource_set_pitch (LIScrArgs* args)
 {
 #ifndef LI_DISABLE_SOUND
@@ -123,6 +133,26 @@ static void SoundSource_set_position (LIScrArgs* args)
 #endif
 }
 
+static void SoundSource_set_ref_dist (LIScrArgs* args)
+{
+#ifndef LI_DISABLE_SOUND
+	float value;
+
+	if (liscr_args_geti_float (args, 0, &value))
+		lisnd_source_set_ref_dist (args->self, value);
+#endif
+}
+
+static void SoundSource_set_rolloff (LIScrArgs* args)
+{
+#ifndef LI_DISABLE_SOUND
+	float value;
+
+	if (liscr_args_geti_float (args, 0, &value))
+		lisnd_source_set_rolloff (args->self, value);
+#endif
+}
+
 static void SoundSource_set_velocity (LIScrArgs* args)
 {
 #ifndef LI_DISABLE_SOUND
@@ -151,10 +181,13 @@ void liext_script_sound_source (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SOUND_SOURCE, "sound_source_new", SoundSource_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOUND_SOURCE, "sound_source_get_ended", SoundSource_get_ended);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOUND_SOURCE, "sound_source_set_looping", SoundSource_set_looping);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOUND_SOURCE, "sound_source_set_max_dist", SoundSource_set_max_dist);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOUND_SOURCE, "sound_source_set_pitch", SoundSource_set_pitch);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOUND_SOURCE, "sound_source_get_playing", SoundSource_get_playing);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOUND_SOURCE, "sound_source_set_playing", SoundSource_set_playing);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOUND_SOURCE, "sound_source_set_position", SoundSource_set_position);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOUND_SOURCE, "sound_source_set_ref_dist", SoundSource_set_ref_dist);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOUND_SOURCE, "sound_source_set_rolloff", SoundSource_set_rolloff);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOUND_SOURCE, "sound_source_set_velocity", SoundSource_set_velocity);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOUND_SOURCE, "sound_source_set_volume", SoundSource_set_volume);
 }

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -57,6 +57,17 @@ LIAPICALL (void, lisnd_source_set_looping, (
 	LISndSource* self,
 	int          looping));
 
+LIAPICALL (void, lisnd_source_set_max_dist, (
+	LISndSource* self,
+	float        value));
+
+LIAPICALL (float, lisnd_source_get_offset, (
+	LISndSource* self));
+
+LIAPICALL (void, lisnd_source_set_offset, (
+	LISndSource* self,
+	float        secs));
+
 LIAPICALL (void, lisnd_source_set_pitch, (
 	LISndSource* self,
 	float        value));
@@ -68,16 +79,17 @@ LIAPICALL (void, lisnd_source_set_playing, (
 	LISndSource* self,
 	int          playing));
 
-LIAPICALL (float, lisnd_source_get_offset, (
-	LISndSource* self));
-
-LIAPICALL (void, lisnd_source_set_offset, (
-	LISndSource* self,
-	float        secs));
-
 LIAPICALL (void, lisnd_source_set_position, (
 	LISndSource*       self,
 	const LIMatVector* value));
+
+LIAPICALL (void, lisnd_source_set_ref_dist, (
+	LISndSource* self,
+	float        value));
+
+LIAPICALL (void, lisnd_source_set_rolloff, (
+	LISndSource* self,
+	float        value));
 
 LIAPICALL (int, lisnd_source_get_stereo, (
 	LISndSource* self));

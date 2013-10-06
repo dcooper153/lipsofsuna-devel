@@ -50,6 +50,9 @@ struct _LISndSource
 	float looping;
 	float offset;
 	float pitch;
+	float max_dist;
+	float ref_dist;
+	float rolloff;
 	float volume;
 	ALuint source;
 	ALint queued;
