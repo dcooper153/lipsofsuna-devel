@@ -15,6 +15,22 @@
 	},
 	{
 		"type": "Effectspec",
+		"name": "cold damage",
+		"particle": "explosion1",
+		"particle_life": 5,
+		"quake": 0.2,
+		"sound": "cold-spell1",
+		"sound_rolloff": 0.2
+		"sound_volume": 0.5
+	},
+	{
+		"type": "Effectspec",
+		"name": "cold damage cast",
+		"sound": "cold-spell-cast1"
+		"sound_volume": 0.2
+	},
+	{
+		"type": "Effectspec",
 		"name": "disease1",
 		"sound": "diseasecontact1"
 	},

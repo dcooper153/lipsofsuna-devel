@@ -140,7 +140,8 @@
 			"touch spell": true
 		},
 		"description": "Inflict cold damage",
-		"effect": "explosion1",
+		"effect": "cold damage",
+		"effect_fire": "cold damage cast",
 		"icon": "modifier-ice",
 		"projectile": "fireball1",
 		"spell_strength": 5,

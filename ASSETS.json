@@ -1651,6 +1651,22 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/spells/effects/cold-spell1.flac",
+				"data/lipsofsuna/spells/effects/cold-spell-cast1.flac"
+			],
+			"authors":
+			[
+				"qubodup"
+			],
+			"licenses":
+			[
+				"Creative Commons BY 3.0"
+			],
+			"source": "http://opengameart.org/content/ice-electricity-magic"
+		},
+		{
+			"files":
+			[
 				"data/lipsofsuna/sounds/builtrock1.ogg",
 				"data/lipsofsuna/sounds/builtwood1.ogg",
 				"data/lipsofsuna/sounds/craftmetal1.ogg",
