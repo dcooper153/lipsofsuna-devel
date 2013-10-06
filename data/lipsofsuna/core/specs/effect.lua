@@ -28,9 +28,12 @@ Effectspec = Spec:register("Effectspec", "effect", {
 	{name = "rotation", type = "string", description = "False to not inherit rotation from the parent object."},
 	{name = "sound", type = "string", description = "Sound effect to play."},
 	{name = "sound_delay", type = "string", description = "Delay of the sound start, in seconds."},
+	{name = "sound_dist_max", type = "number", description = "Maximum hearing distance of the sound effect."},
+	{name = "sound_dist_ref", type = "number", description = "Reference hearing distance of the sound effect."},
 	{name = "sound_loop", type = "boolean", description = "True to make the sound effect loop."},
 	{name = "sound_pitch_min", type = "number", default = 1, description = "Minimum pitch of the sound effect."},
 	{name = "sound_pitch_max", type = "number", default = 1, description = "Maximum pitch of the sound effect."},
+	{name = "sound_rolloff", type = "number", description = "Roll-off rate of the sound effect."},
 	{name = "sound_volume", type = "number", description = "Volume level of the sound effect."},
 	{name = "sound_positional", type = "boolean", description = "False to make the sound non-positional."}
 })

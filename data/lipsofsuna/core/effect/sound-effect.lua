@@ -48,6 +48,15 @@ SoundEffect.create_source = function(self, args)
 	if args.sound_loop then
 		self.source:set_looping(true)
 	end
+	if args.sound_dist_max then
+		self.source:set_ref_dist(args.sound_dist_max)
+	end
+	if args.sound_dist_ref then
+		self.source:set_ref_dist(args.sound_dist_ref)
+	end
+	if args.sound_rolloff then
+		self.source:set_rolloff(args.sound_rolloff)
+	end
 	if self.__queued_position then
 		self.source:set_position(self.__queued_position)
 		self.__queued_position = nil

@@ -97,9 +97,12 @@ EffectManager.play_global = function(self, name)
 		SoundEffect{
 			sound = effect.sound,
 			sound_delay = effect.sound_delay,
+			sound_dist_max = effect.sound_dist_max,
+			sound_dist_ref = effect.sound_dist_ref,
 			sound_loop = effect.sound_loop,
 			sound_pitch = effect:get_sound_pitch(),
 			sound_positional = false,
+			sound_rolloff = effect.sound_rolloff,
 			sound_volume = effect.sound_volume}
 	end
 	-- Quake the camera.
@@ -132,9 +135,12 @@ EffectManager.play_object = function(self, name, object, node)
 			rotation_mode = (effect.rotation and "parent" or nil),
 			sound = effect.sound,
 			sound_delay = effect.sound_delay,
+			sound_dist_max = effect.sound_dist_max,
+			sound_dist_ref = effect.sound_dist_ref,
 			sound_loop = effect.sound_loop,
 			sound_pitch = effect:get_sound_pitch(),
 			sound_positional = effect.sound_positional,
+			sound_rolloff = effect.sound_rolloff,
 			sound_volume = effect.sound_volume}
 	end
 	-- Quake the camera.
@@ -157,9 +163,12 @@ EffectManager.play_world = function(self, name, position)
 			position = position,
 			sound = effect.sound,
 			sound_delay = effect.sound_delay,
+			sound_dist_max = effect.sound_dist_max,
+			sound_dist_ref = effect.sound_dist_ref,
 			sound_loop = effect.sound_loop,
 			sound_pitch = effect:get_sound_pitch(),
 			sound_positional = effect.sound_positional,
+			sound_rolloff = effect.sound_rolloff,
 			sound_volume = effect.sound_volume}
 	end
 	-- Quake the camera.
