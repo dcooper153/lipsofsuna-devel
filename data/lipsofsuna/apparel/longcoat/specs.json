@@ -20,12 +20,27 @@
 		{
 			"aer":
 			{
-				"upper1": "longcoat1"
+				"belt": "aercoatbelt1",
+				"collar": "aercoatcollar1",
+				"lower2": "aercoatlower1",
+				"sleeves": "aercoatsleeve1",
+				"upper": "aerupperclothed1"
+			}
+		},
+		"equipment_textures":
+		{
+			"aer":
+			{
+				"skin1": "aerlongcoat1"
 			}
 		},
 		"equipment_slot": "upperbody",
+		"equipment_slots_reserved":
+		{
+			"lowerbody": true
+		}
 		"icon": "lizardboot1",
 		"mass": 4,
-		"model": "longcoat1"
+		"model": "leggings1"
 	}
 ]
