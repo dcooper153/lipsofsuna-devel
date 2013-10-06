@@ -1,4 +1,4 @@
 {
 	"resources": ["."],
-	"specs": ["specs"]
+	"specs": ["items", "recipes"]
 }

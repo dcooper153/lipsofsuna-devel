@@ -3,7 +3,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "adamantium sword",
 		"effect": "craftmetal1",
-		"materials": {"adamantium": 3},
+		"materials": {"adamantium ingot": 3},
 		"modes": {"metal": true}
 	},
 	{
@@ -28,7 +28,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "aquanite sword",
 		"effect": "craftmetal1",
-		"materials": {"aquanite stone": 3},
+		"materials": {"aquanite ingot": 3},
 		"modes": {"metal": true}
 	},
 	{
@@ -55,7 +55,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "crimson sword",
 		"effect": "craftmetal1",
-		"materials": {"crimson stone": 3},
+		"materials": {"crimson ingot": 3},
 		"modes": {"metal": true}
 	},
 	{

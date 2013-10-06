@@ -34,7 +34,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "adamantium revolver",
 		"effect": "craftmetal1",
-		"materials": {"adamantium": 10, "log": 1},
+		"materials": {"adamantium ingot": 3, "log": 1},
 		"modes": {"metal": true}
 	},
 	{
@@ -60,7 +60,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "aquanite revolver",
 		"effect": "craftmetal1",
-		"materials": {"aquanite stone": 10, "log": 1},
+		"materials": {"aquanite ingot": 3, "log": 1},
 		"modes": {"metal": true}
 	},
 	{
@@ -86,7 +86,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "crimson revolver",
 		"effect": "craftmetal1",
-		"materials": {"crimson stone": 10, "log": 1},
+		"materials": {"crimson ingot": 3, "log": 1},
 		"modes": {"metal": true}
 	},
 	{
@@ -112,7 +112,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "iron revolver",
 		"effect": "craftmetal1",
-		"materials": {"iron ingot": 4, "log": 1},
+		"materials": {"iron ingot": 3, "log": 1},
 		"modes": {"metal": true}
 	},
 	{

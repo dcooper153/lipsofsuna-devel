@@ -26,7 +26,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "adamantium crossbow",
 		"effect": "craftmetal1",
-		"materials": {"adamantium": 9},
+		"materials": {"adamantium ingot": 3},
 		"modes": {"metal": true}
 	},
 	{
@@ -53,7 +53,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "aquanite crossbow",
 		"effect": "craftmetal1",
-		"materials": {"aquanite stone": 9},
+		"materials": {"aquanite ingot": 3},
 		"modes": {"metal": true}
 	},
 	{
@@ -80,7 +80,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "crimson crossbow",
 		"effect": "craftmetal1",
-		"materials": {"crimson stone": 9},
+		"materials": {"crimson ingot": 3},
 		"modes": {"metal": true}
 	},
 	{

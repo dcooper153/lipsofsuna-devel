@@ -21,8 +21,8 @@
 		"inventory_items":
 		{
 			"adamantium": 30,
-			"aquanite stone": 30,
-			"crimson stone": 30,
+			"aquanite ore": 30,
+			"crimson ore": 30,
 			"log": 50
 		},
 		"stacking": false,

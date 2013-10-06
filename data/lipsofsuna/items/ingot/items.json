@@ -1,0 +1,67 @@
+[
+	{
+		"type": "Itemspec",
+		"name": "adamantium ingot",
+		"categories":
+		{
+			"material": true
+		},
+		"health": 10,
+		"icon": "ingot1",
+		"mass": 1.5,
+		"model": "ingot1",
+		"stacking": true
+	},
+	{
+		"type": "Itemspec",
+		"name": "aquanite ingot",
+		"categories":
+		{
+			"material": true
+		},
+		"health": 10,
+		"icon": "ingot1",
+		"mass": 1.5,
+		"model": "ingot1",
+		"stacking": true
+	},
+	{
+		"type": "Itemspec",
+		"name": "crimson ingot",
+		"categories":
+		{
+			"material": true
+		},
+		"health": 10,
+		"icon": "ingot1",
+		"mass": 1.5,
+		"model": "ingot1",
+		"stacking": true
+	},
+	{
+		"type": "Itemspec",
+		"name": "glass ingot",
+		"categories":
+		{
+			"material": true
+		},
+		"health": 10,
+		"icon": "ingot1",
+		"mass": 1.5,
+		"model": "ingot1",
+		"stacking": true
+	},
+	{
+		"type": "Itemspec",
+		"name": "iron ingot",
+		"categories":
+		{
+			"material": true
+		},
+		"icon": "ingot1",
+		"equipment_slot": "hand.R",
+		"mass": 2,
+		"model": "ingot1",
+		"stacking": true
+	}
+]

@@ -8,7 +8,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "adamantium hatchet",
 		"effect": "craftmetal1",
-		"materials": {"adamantium": 3},
+		"materials": {"adamantium ingot": 2},
 		"modes": {"metal": true}
 	},
 	{
@@ -32,7 +32,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "aquanite hatchet",
 		"effect": "craftmetal1",
-		"materials": {"aquanite stone": 3},
+		"materials": {"aquanite ingot": 2},
 		"modes": {"metal": true}
 	},
 	{
@@ -58,7 +58,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "crimson hatchet",
 		"effect": "craftmetal1",
-		"materials": {"crimson stone": 3},
+		"materials": {"crimson ingot": 2},
 		"modes": {"metal": true}
 	},
 	{

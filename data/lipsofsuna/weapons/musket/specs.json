@@ -18,7 +18,7 @@
 		"effect": "craftmetal1",
 		"materials":
 		{
-			"adamantium": 15,
+			"adamantium ingot": 5,
 			"log": 2
 		},
 		"modes":
@@ -72,7 +72,7 @@
 		"effect": "craftmetal1",
 		"materials":
 		{
-			"aquanite stone": 15,
+			"aquanite ingot": 5,
 			"log": 2
 		},
 		"modes":
@@ -131,7 +131,7 @@
 		"effect": "craftmetal1",
 		"materials":
 		{
-			"crimson stone": 15,
+			"crimson ingot": 5,
 			"log": 2
 		},
 		"modes":

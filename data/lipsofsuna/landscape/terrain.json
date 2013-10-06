@@ -60,7 +60,7 @@
 		{
 			"rare ore": true
 		},
-		"mining_item": "aquanite stone",
+		"mining_item": "aquanite ore",
 		"top_texture": 7,
 		"bottom_texture": 7,
 		"side_texture": 7
@@ -72,7 +72,7 @@
 		{
 			"rare ore": true
 		},
-		"mining_item": "crimson stone",
+		"mining_item": "crimson ore",
 		"top_texture": 8,
 		"bottom_texture": 8,
 		"side_texture": 8

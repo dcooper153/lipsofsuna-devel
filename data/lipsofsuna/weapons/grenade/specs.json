@@ -8,7 +8,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "aquanite grenade",
 		"effect": "craftmetal1",
-		"materials": {"aquanite stone": 1, "iron ingot": 1},
+		"materials": {"aquanite ingot": 1, "iron ingot": 1},
 		"modes": {"metal": true}
 	},
 	{
@@ -33,7 +33,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "crimson grenade",
 		"effect": "craftmetal1",
-		"materials": {"crimson stone": 1, "iron ingot": 1},
+		"materials": {"crimson ingot": 1, "iron ingot": 1},
 		"modes": {"metal": true}
 	},
 	{

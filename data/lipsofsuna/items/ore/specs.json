@@ -70,7 +70,7 @@
 	},
 	{
 		"type": "Itemspec",
-		"name": "aquanite stone",
+		"name": "aquanite ore",
 		"categories": {"material": true},
 		"actions": {"right": "build"},
 		"construct_tile": "aquanite",
@@ -84,7 +84,7 @@
 	},
 	{
 		"type": "Itemspec",
-		"name": "crimson stone",
+		"name": "crimson ore",
 		"categories": {"material": true},
 		"actions": {"right": "build"},
 		"construct_tile": "crimson",

@@ -50,7 +50,7 @@
 		"type": "CraftingRecipeSpec",
 		"name": "luminous staff",
 		"effect": "craftwood1",
-		"materials": {"log": 4, "crimson stone": 2},
+		"materials": {"log": 4, "crimson ingot": 2},
 		"modes": {"wood": true}
 	},
 	{

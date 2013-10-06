@@ -1,11 +1,11 @@
 [
 	{
 		"type": "CraftingRecipeSpec",
-		"name": "adamantium mattock",
+		"name": "adamantium ingot",
 		"effect": "craftmetal1",
 		"materials":
 		{
-			"adamantium ingot": 3
+			"adamantium": 1
 		},
 		"modes":
 		{
@@ -14,11 +14,11 @@
 	},
 	{
 		"type": "CraftingRecipeSpec",
-		"name": "aquanite mattock",
+		"name": "aquanite ingot",
 		"effect": "craftmetal1",
 		"materials":
 		{
-			"aquanite ingot": 3
+			"aquanite ore": 1
 		},
 		"modes":
 		{
@@ -27,11 +27,11 @@
 	},
 	{
 		"type": "CraftingRecipeSpec",
-		"name": "crimson mattock",
+		"name": "crimson ingot",
 		"effect": "craftmetal1",
 		"materials":
 		{
-			"crimson ingot": 3
+			"crimson ore": 1
 		},
 		"modes":
 		{
@@ -40,43 +40,24 @@
 	},
 	{
 		"type": "CraftingRecipeSpec",
-		"name": "iron mattock",
+		"name": "glass ingot",
 		"effect": "craftmetal1",
 		"materials":
 		{
-			"iron ingot": 3
+			"sand chunk": 1
+		}
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "iron ingot",
+		"effect": "craftmetal1",
+		"materials":
+		{
+			"ferrostone": 1
 		},
 		"modes":
 		{
 			"metal": true
-		}
-	},
-	{
-		"type": "CraftingRecipeSpec",
-		"name": "stone mattock",
-		"effect": "craftmetal1",
-		"materials":
-		{
-			"granite stone": 4
-		},
-		"modes":
-		{
-			"metal": true,
-			"default": true
-		}
-	},
-	{
-		"type": "CraftingRecipeSpec",
-		"name": "wooden mattock",
-		"effect": "craftwood1",
-		"materials":
-		{
-			"log": 4
-		},
-		"modes":
-		{
-			"wood": true,
-			"default": true
 		}
 	}
 ]
