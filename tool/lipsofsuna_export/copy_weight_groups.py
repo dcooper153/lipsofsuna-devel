@@ -18,25 +18,29 @@ class LICopyWeightGroups:
 		return True
 
 	@classmethod
-	def transfer_group(cls, srcobj, srcgrp, dstobj, dstgrp, closest):
+	def transfer_group(cls, srcobj, srcgrp, dstobj, dstgrp, closest, vertex):
 		for i in range(len(closest)):
-			cls.transfer_vertex(srcobj, srcgrp, dstobj, dstgrp, closest, i)
+			cls.transfer_vertex(srcobj, srcgrp, dstobj, dstgrp, closest, i, vertex)
 
 	@classmethod
-	def transfer_vertex(cls, srcobj, srcgrp, dstobj, dstgrp, closest, index):
+	def transfer_vertex(cls, srcobj, srcgrp, dstobj, dstgrp, closest, index, vertex):
 		mapping = closest[index]
 		if mapping['type'] == 'vertex':
 			weight = cls.get_weight(srcgrp, mapping['vertex'])
-		else:
+		elif not vertex:
 			face = srcobj.data.polygons[mapping['face']]
 			coords = [mathutils.Vector(srcobj.data.vertices[v].co) for v in face.vertices]
 			weights = [cls.get_weight(srcgrp, v) for v in face.vertices]
 			weight = LIUtilsGeometry.interpolate_face(coords, mapping['point'], weights)
+		else:
+			weight = 0
 		if weight > 0.01:
 			dstgrp.add([index], weight, 'REPLACE')
+		elif not vertex or mapping['type'] == 'vertex':
+			dstgrp.remove([index])
 
 	@classmethod
-	def run(cls, srcobj, dstobj):
+	def run(cls, srcobj, dstobj, vertex, overwrite):
 		# Disable undo.
 		bpy.context.user_preferences.edit.use_global_undo = False
 		toggled = False
@@ -49,12 +53,14 @@ class LICopyWeightGroups:
 		closest = LIUtilsGeometry.find_closest_points(srcobj, dstobj)
 		if closest:
 			for name,srcgrp in srcobj.vertex_groups.items():
-				if not dstobj.vertex_groups or name not in dstobj.vertex_groups:
+				exists = dstobj.vertex_groups and name in dstobj.vertex_groups
+				if overwrite or not exists:
 					dict_added[name] = True
 					count_added += 1
-					dstobj.vertex_groups.new(name=name)
+					if not exists:
+						dstobj.vertex_groups.new(name=name)
 					dstgrp = dstobj.vertex_groups[name]
-					cls.transfer_group(srcobj, srcgrp, dstobj, dstgrp, closest)
+					cls.transfer_group(srcobj, srcgrp, dstobj, dstgrp, closest, vertex)
 		# Remove useless weight groups.
 		if count_added:
 			i = 0
