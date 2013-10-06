@@ -22,7 +22,7 @@
 	["load", "apparel/headband"],
 	["load", "apparel/longcoat"],
 	["load", "apparel/leggings"],
-	["load", "apparel/lizardarmor"],
+	["#load", "apparel/lizardarmor"],
 	["load", "apparel/platearmor"],
 	["load", "apparel/shirt"],
 	["load", "apparel/skirt"],
