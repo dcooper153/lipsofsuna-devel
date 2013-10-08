@@ -11,7 +11,10 @@ local BlackHazeModifier = ModifierSpec:find_by_name("black haze")
 -- @return True to enable effect-over-time updates. False otherwise.
 BlackHazeModifier.start = function(modifier, value)
 	-- Handle the infection mode.
-	if not value then return true end
+	if not value then
+		modifier.timer = 0
+		return true
+	end
 	-- Choose a random plague monster.
 	local s = Actorspec:random{category = "plague"}
 	if not s then return end
