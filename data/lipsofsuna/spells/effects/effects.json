@@ -61,7 +61,6 @@
 	{
 		"type": "Effectspec",
 		"name": "firewall start 1",
-		"particle": "firewall1",
 		"sound": "fire-000"
 	},
 	{
