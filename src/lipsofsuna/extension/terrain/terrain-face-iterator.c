@@ -144,8 +144,11 @@ void liext_terrain_face_iterator_emit (
 	   culled. Otherwise, there is an error in the iteration logic. */
 	DEBUGPRINT ("\nSTART y=%f,%f face_bot=%f,%f face_top=%f,%f\n",
 		self->stick_y0, self->stick_y1, bot0->y, bot1->y, top0->y, top1->y);
-	lisys_assert (self->stick_y0 <= bot0->y);
-	lisys_assert (self->stick_y1 <= bot1->y);
+	if (self->stick_y0 > bot0->y || self->stick_y1 > bot1->y)
+	{
+		printf ("WARNING: Terrain stick bug: iter=(%f,%f) bot=(%f,%f) top=(%f,%f)\n",
+			self->stick_y0, self->stick_y1, bot0->y, bot1->y, top0->y, top1->y);
+	}
 
 	/* Move the stick pointer to the first stick that intersects with the
 	   wall. This may save significant amount of culling work if the
