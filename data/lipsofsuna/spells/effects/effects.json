@@ -16,8 +16,8 @@
 	{
 		"type": "Effectspec",
 		"name": "cold damage",
-		"particle": "explosion1",
-		"particle_life": 5,
+		"particle": "cold-damage1",
+		"particle_life": 1,
 		"quake": 0.2,
 		"sound": "cold-spell1",
 		"sound_rolloff": 0.2,
@@ -45,8 +45,8 @@
 	},
 	{
 		"type": "Effectspec",
-		"name": "explosion2",
-		"particle": "explosion1",
+		"name": "fire damage",
+		"particle": "fire-damage1",
 		"particle_life": 5,
 		"quake": 1,
 		"sound": "explosion2",
