@@ -16,12 +16,27 @@
 	},
 	{
 		"type": "HairStyleSpec",
+		"name": "Pigtails 2",
+		"equipment_models":
+		{
+			"aer":
+			{
+				"hair": "aerhairpigtails2",
+				"hair_back": "aerhairbacksmooth1",
+				"hair_front": "aerhairfrontshort2"
+			}
+		}
+	},
+	{
+		"type": "HairStyleSpec",
 		"name": "Drill 1",
 		"equipment_models":
 		{
 			"aer":
 			{
-				"hair": "hair4"
+				"hair": "aerhairtwindrill1",
+				"hair_back": "aerhairbacksmooth1",
+				"hair_front": "aerhairfrontshort2"
 			}
 		}
 	},
@@ -32,7 +47,7 @@
 		{
 			"aer":
 			{
-				"hair_back": "aerhairbackshort1",
+				"hair_back": "aerhairbackshort2",
 				"hair_front": "aerhairfrontshort1"
 			}
 		}
@@ -44,8 +59,8 @@
 		{
 			"aer":
 			{
-				"hair_back": "aerhairbackshort2",
-				"hair_front": "aerhairfrontshort1"
+				"hair_back": "aerhairbackshort1",
+				"hair_front": "aerhairfrontshort2"
 			}
 		}
 	},
