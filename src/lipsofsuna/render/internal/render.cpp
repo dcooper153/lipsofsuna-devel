@@ -59,6 +59,7 @@
 int LIRenRender::init (
 	LIRenVideomode* mode)
 {
+	char* log1;
 	Ogre::Real w;
 	Ogre::Real h;
 	Ogre::String data1 (paths->module_data);
@@ -69,7 +70,14 @@ int LIRenRender::init (
 
 	/* Disable console output. */
 	log = new Ogre::LogManager ();
-	log->createLog ("render.log", true, false, false);
+	log1 = lisys_path_concat (paths->module_data_save, "render.log", NULL);
+	if (log1 != NULL)
+	{
+		log->createLog (log1, true, false, false);
+		lisys_free (log1);
+	}
+	else
+		log->createLog ("render.log", true, false, false);
 
 	/* Create the window. */
 	Ogre::RenderSystemCapabilities* retry = NULL;
