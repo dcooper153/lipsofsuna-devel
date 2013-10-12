@@ -24,7 +24,10 @@ Unittest:add(2, "system", "physics object", function()
 	Physics:set_enable_simulation(true)
 	Program:discard_events()
 	local start = Program:get_time()
-	repeat
+	local curr = start
+	local prev = start - 0.01
+	while curr < start + 0.2 do
+		Physics:update(curr - prev)
 		Program:update()
 		local e = Program:pop_event()
 		while e do
@@ -37,7 +40,9 @@ Unittest:add(2, "system", "physics object", function()
 			end
 			e = Program:pop_event()
 		end
-	until Program:get_time() > start + 0.2
+		prev = curr
+		curr = Program:get_time()
+	end
 	assert(o:get_position().x == 1000)
 	assert(o:get_position().y < 1100)
 	assert(o:get_position().z == 1200)
