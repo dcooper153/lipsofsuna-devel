@@ -142,9 +142,9 @@ TerrainGenerator.generate = function(self, chunk)
 						local f = Noise:plasma_noise_2d(self.seed5 + 0.005 * x, self.seed6 + 0.005 * z, 2)
 						-- Choose and create the obstacle.
 						if r > f * 0.01 then
-							MapUtils:place_obstacle{point = p, category = "tree"}
+							MapUtils:place_obstacle{point = p, category = "tree", rotation = math.random() * math.pi * 2}
 						else
-							MapUtils:place_obstacle{point = p, category = "small-plant"}
+							MapUtils:place_obstacle{point = p, category = "small-plant", rotation = math.random() * math.pi * 2}
 						end
 					end
 				end
