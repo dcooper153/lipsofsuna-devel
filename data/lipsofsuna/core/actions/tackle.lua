@@ -45,7 +45,7 @@ Actionspec{
 	end,
 	update = function(action, secs)
 		-- Check for cancellation.
-		action.object.cooldown = 1 + 3 * math.random()
+		action.object.cooldown = 10 + 3 * math.random()
 		if not action.object:get_visible() then return end
 		if action.object.contact_cb ~= callback then return end
 		-- Wait for the next tick.
