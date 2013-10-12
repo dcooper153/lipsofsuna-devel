@@ -578,7 +578,7 @@ int liext_terrain_column_add_stick_corners (
 /**
  * \brief Builds the model of the column.
  * \param self Terrain column.
- * \param material Terrain materials.
+ * \param materials Terrain materials.
  * \param sticks_back Neighbour sticks used for culling.
  * \param sticks_front Neighbour sticks used for culling.
  * \param sticks_left Neighbour sticks used for culling.

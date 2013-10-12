@@ -307,7 +307,6 @@ void liext_terrain_stick_reset_vertices (
 /**
  * \brief Subtracts a stick from this one.
  * \param self Terrain stick.
- * \param prev Previous terrain stick.
  * \param y Vertical offset of the subtracted stick, relative to the stick bottom.
  * \param h Height of the subtracted stick.
  * \param bot00 Bottom surface vertex offsets, relative to the bottom of the subtracted stick.
@@ -336,7 +335,7 @@ int liext_terrain_stick_subtract (
 	LIExtTerrainStick* stick;
 
 	/* A) Is the stick completely below us?
-	 * 
+	 *
 	 * .....SSSSSSSSSS.....
 	 * XXX??...............
 	 */
@@ -349,7 +348,7 @@ int liext_terrain_stick_subtract (
 	}
 
 	/* B) Is the stick completely above us?
-	 * 
+	 *
 	 * .....SSSSSSSSSS.....
 	 * ...............??XXX
 	 */
@@ -367,7 +366,7 @@ int liext_terrain_stick_subtract (
 	}
 
 	/* C) Does the stick replace us completely?
-	 * 
+	 *
 	 * .....SSSSSSSSSS.....
 	 * ..???XXXXXXXXXX???..
 	 */
@@ -380,7 +379,7 @@ int liext_terrain_stick_subtract (
 	}
 
 	/* D) Does the stick replace part of the bottom?
-	 * 
+	 *
 	 * .....SSSSSSSSSS.....
 	 * ..???XXXXX..........
 	 */
@@ -405,7 +404,7 @@ int liext_terrain_stick_subtract (
 	}
 
 	/* E) Does the stick replace part of the top?
-	 * 
+	 *
 	 * .....SSSSSSSSSS.....
 	 * ..........XXXXX???..
 	 */
@@ -429,7 +428,7 @@ int liext_terrain_stick_subtract (
 	}
 
 	/* F) Does the stick replace part of the middle?
-	 * 
+	 *
 	 * .....SSSSSSSSSS.....
 	 * ........XXXX........
 	 */
@@ -640,6 +639,9 @@ void liext_terrain_stick_get_normal (
 /**
  * \brief Calculates the face normal of the stick when one vertex is overridden.
  * \param self Terrain stick.
+ * \param vertex_x Index of the overridden vertex.
+ * \param vertex_y Index of the overridden vertex.
+ * \param vertex_offset Overridden vertex offset.
  * \param result Return location for the vector.
  */
 void liext_terrain_stick_get_normal_override (

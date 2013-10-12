@@ -505,7 +505,6 @@ int LIRenObject::set_particle (
 
 /**
  * \brief Enables or disables particle emission.
- * \param self Object.
  * \param value Nonzero to enable, zero to disable.
  */
 void LIRenObject::set_particle_emitting (
@@ -530,7 +529,6 @@ int LIRenObject::set_visible (
 
 /**
  * \brief Sets the render distance of the object.
- * \param self Object.
  * \param value Render distance.
  */
 void LIRenObject::set_render_distance (

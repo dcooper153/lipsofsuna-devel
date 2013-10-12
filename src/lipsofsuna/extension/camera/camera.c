@@ -105,8 +105,6 @@ void liext_camera_free (
 /**
  * \brief Calculates the world space transformation for the first person driver.
  * \param self Camera.
- * \param center Center position and rotation.
- * \param distance Distance from the center.
  * \param result Return location for the transformation.
  */
 void liext_camera_calculate_1st_person_transform (

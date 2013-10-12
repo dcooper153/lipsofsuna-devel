@@ -111,6 +111,7 @@ int liren_render_model_get_loaded (
 
 /**
  * \brief Replaces the contents of the model.
+ * \param self Renderer.
  * \param id Model ID.
  * \param model Model.
  */

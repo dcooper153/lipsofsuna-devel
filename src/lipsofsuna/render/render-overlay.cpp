@@ -187,8 +187,10 @@ void liren_render_overlay_remove_overlay (
 		liren_overlay_remove_overlay (overlay1, overlay2);
 }
 
-/** Sets the multiplicative alpha of the overlay.
- * \param self Overlay.
+/**
+ * \brief Sets the multiplicative alpha of the overlay.
+ * \param self Renderer.
+ * \param id Overlay ID.
  * \param value Alpha in the range [0,1].
  */
 void liren_render_overlay_set_alpha (

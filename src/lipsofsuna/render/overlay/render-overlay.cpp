@@ -20,7 +20,7 @@
  * @{
  * \addtogroup LIRenOverlay Overlay
  * @{
- * \addtogroup LIRenOverlay Overlay
+ * \addtogroup LIRenOverlay_ Overlay
  * @{
  */
 

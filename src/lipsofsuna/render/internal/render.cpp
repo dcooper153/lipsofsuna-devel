@@ -465,7 +465,6 @@ void LIRenRender::set_camera_transform (
 
 /**
  * \brief Sets the name of the preferred Ogre material scheme.
- * \param self Renderer.
  * \param value Material scheme name.
  */
 void LIRenRender::set_material_scheme (
@@ -474,6 +473,10 @@ void LIRenRender::set_material_scheme (
 	viewport->setMaterialScheme (value);
 }
 
+/**
+ * \brief Sets the ambient color.
+ * \param value Array of 3 floats.
+ */
 void LIRenRender::set_scene_ambient (
 	const float* value)
 {

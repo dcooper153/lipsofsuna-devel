@@ -27,7 +27,7 @@
 
 /**
  * \brief Creates a new physics terrain.
- * \param physics Physics engine.
+ * \param module Module.
  * \param terrain Terrain.
  * \param collision_group Collision group.
  * \param collision_mask Collision mask.

@@ -201,7 +201,7 @@ int liext_terrain_chunk_add_stick_corners (
 /**
  * \brief Builds the model of the chunk.
  * \param self Terrain chunk.
- * \param material Terrain materials.
+ * \param materials Terrain materials.
  * \param chunk_back Neighbour chunk used for culling.
  * \param chunk_front Neighbour chunk used for culling.
  * \param chunk_left Neighbour chunk used for culling.
@@ -213,7 +213,7 @@ int liext_terrain_chunk_add_stick_corners (
 int liext_terrain_chunk_build_model (
 	LIExtTerrainChunk*          self,
 	const LIExtTerrainMaterial* materials,
-	LIExtTerrainChunk*          chunk_back, 
+	LIExtTerrainChunk*          chunk_back,
 	LIExtTerrainChunk*          chunk_front,
 	LIExtTerrainChunk*          chunk_left,
 	LIExtTerrainChunk*          chunk_right,
@@ -344,8 +344,8 @@ int liext_terrain_chunk_build_model (
 /**
  * \brief Clears the stick at the given grid point.
  * \param self Terrain chunk.
- * \param grid_x X coordinate in grid units.
- * \param grid_z Z coordinate in grid units.
+ * \param column_x X coordinate in grid units.
+ * \param column_z Z coordinate in grid units.
  */
 void liext_terrain_chunk_clear_column (
 	LIExtTerrainChunk* self,

@@ -149,6 +149,8 @@ static const LIMatVtxops limat_vtxops_t2n3v3 =
 	__limat_vtxops_t2n3v3_setcoord
 };
 
+/** @} */
+
 /*****************************************************************************/
 
 /**

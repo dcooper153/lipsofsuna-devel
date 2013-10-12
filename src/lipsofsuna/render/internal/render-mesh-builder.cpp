@@ -122,8 +122,7 @@ LIMdlModel* LIRenMeshBuilder::get_model () const
  * Materials are also loaded here. They are loaded in yet another background
  * loader. The function waits for the background loading of the materials to
  * finish, but since this is done in a background thread, the main thread will
- * never stall.#include <OgreHardwareBufferManager.h>
-
+ * never stall.
  *
  * \param mesh Ogre mesh to prepare.
  */

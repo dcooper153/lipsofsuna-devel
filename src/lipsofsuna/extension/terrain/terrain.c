@@ -161,8 +161,8 @@ int liext_terrain_add_stick (
 /**
  * \brief Draws a stick at the given grid point with the given vertex offsets.
  * \param self Terrain chunk.
- * \param column_x X coordinate of the column, in grid units within the chunk.
- * \param column_z Z coordinate of the column, in grid units within the chunk.
+ * \param grid_x X coordinate of the column, in grid units within the chunk.
+ * \param grid_z Z coordinate of the column, in grid units within the chunk.
  * \param bot00 Bottom vertex Y coordinate, in world units.
  * \param bot10 Bottom vertex Y coordinate, in world units.
  * \param bot01 Bottom vertex Y coordinate, in world units.

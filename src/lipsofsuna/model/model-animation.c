@@ -283,7 +283,7 @@ void limdl_animation_clear (
  * \brief Reads the animation from a stream.
  * \param self Animation.
  * \param reader Stream reader.
- * \param format Format version.
+ * \param version Format version.
  * \return Nonzero on success.
  */
 int limdl_animation_read (
