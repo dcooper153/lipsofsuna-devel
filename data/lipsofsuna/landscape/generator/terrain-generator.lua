@@ -168,8 +168,40 @@ TerrainGenerator.generate = function(self, chunk)
 				t:add_stick_corners(chunk.x + x, chunk.z + z, y0 - ore, y1 - ore, y2 - ore, y3 - ore, y0, y1, y2, y3, mat.id)
 			end
 			-- Generate the dungeon.
-			if d00 < e00 and d10 < e10 and d01 < e01 and d11 < e11 then
-				t:add_stick_corners(chunk.x + x, chunk.z + z, d00, d10, d01, d11, e00, e10, e01, e11, 0)
+			--if d00 < e00 and d10 < e10 and d01 < e01 and d11 < e11 then
+			--	t:add_stick_corners(chunk.x + x, chunk.z + z, d00, d10, d01, d11, e00, e10, e01, e11, 0)
+			--end
+		end
+	end
+	-- Generate dungeons.
+	local dt,dy1,dy2,dy3,dy4,dh1,dh2,dh3,dh4 = self:get_dungeon_type(chunk.manager, chunk.x, chunk.z)
+	if dt then
+		-- Calculate smooth floor vertices.
+		local dt1,dt2,dt3,dt4 = dy1+dh1,dy2+dh2,dy3+dh3,dy4+dh4
+		local bot = {}
+		local top = {}
+		local s = w + 1
+		for z = 0,w do
+			local az = z/w
+			local bl = dy3 * (1-az) + dy1 * az
+			local br = dy4 * (1-az) + dy2 * az
+			local tl = dt3 * (1-az) + dt1 * az
+			local tr = dt4 * (1-az) + dt2 * az
+			for x = 0,w do
+				local ax = x/w
+				bot[x + z * s] = bl * (1-ax) + br * ax
+				top[x + z * s] = tl * (1-ax) + tr * ax
+			end
+		end
+		-- Generate the floor.
+		for z = 0,w-1 do
+			for x = 0,w-1 do
+				t:add_stick_corners(chunk.x + x, chunk.z + z,
+					bot[x +  z    * s], bot[(x+1) +  z    * s],
+					bot[x + (z+1) * s], bot[(x+1) + (z+1) * s],
+					top[x +  z    * s], top[(x+1) +  z    * s],
+					top[x + (z+1) * s], top[(x+1) + (z+1) * s],
+					0)
 			end
 		end
 	end
@@ -187,6 +219,54 @@ TerrainGenerator.generate = function(self, chunk)
 		p:add_xyz(0, civ_y, 0)
 		-- Choose and create the obstacle.
 		MapUtils:place_obstacle{point = p, category = "civilization"}
+	end
+end
+
+--- Gets the dungeon type of the given chunk.
+-- @param self TerrainGenerator.
+-- @param manager TerrainManager.
+-- @param x Chunk offset in grid units.
+-- @param z Chunk offset in grid units.
+-- @return Chunk type, Y offset and height. Nil if no dungeon exists.
+TerrainGenerator.get_dungeon_type = function(self, manager, x, z)
+	local cx = math.floor(x / manager.chunk_size)
+	local cz = math.floor(z / manager.chunk_size)
+	if cx % 2 == 0 and cz % 2 == 0 then
+		-- Choose the dungeon amount of the region.
+		local r = Noise:plasma_noise_2d(self.seed1 + 0.01 * x, self.seed1 + 0.01 * z, 3)
+		if r < 0 then return end
+		-- Choose the room height.
+		local h = math.abs(Noise:plasma_noise_2d(self.seed1 + 0.035 * x, self.seed1 + 0.035 * z, 2))
+		if h < 0.15 then return end
+		h = h * 8 + 8
+		-- Choose the roughness of the dungeon.
+		local r = Noise:plasma_noise_2d(self.seed1 + 0.01 * x, self.seed1 + 0.01 * z, 2)
+		local p = 0.5 + 0.35 * r
+		-- Choose the vertical offset.
+		local y1 = math.abs(Noise:harmonic_noise_2d(self.seed1 + 0.002 * x, self.seed1 + 0.002 * z, 6, 1.3, p))
+		local y2 = math.abs(Noise:harmonic_noise_2d(self.seed1 + 0.0002 * x, self.seed1 + 0.0002 * z, 6, 1.3, 0.5))
+		local y = 120 + 70 * y1 - 140 * y2
+		-- TODO: Choose the dungeon type.
+		local t = 1
+		return t,y,y,y,y,h,h,h,h
+	elseif cx % 2 == 0 and cz % 2 == 1 then
+		-- Vertical connection dungeon.
+		local at,ay1,ay2,ay3,ay4,ah1,ah2,ah3,ah4 = self:get_dungeon_type(manager, x, z + manager.chunk_size)
+		if not at then return end
+		local bt,by1,by2,by3,by4,bh1,bh2,bh3,bh4 = self:get_dungeon_type(manager, x, z - manager.chunk_size)
+		if not bt then return end
+		-- TODO: Choose the dungeon type.
+		local t = 2
+		return t,ay3,ay4,by1,by2,ah3,ah4,bh1,bh2
+	elseif cx % 2 == 1 and cz % 2 == 0 then
+		-- Horizontal connection dungeon.
+		local at,ay1,ay2,ay3,ay4,ah1,ah2,ah3,ah4 = self:get_dungeon_type(manager, x + manager.chunk_size, z)
+		if not at then return end
+		local bt,by1,by2,by3,by4,bh1,bh2,bh3,bh4 = self:get_dungeon_type(manager, x - manager.chunk_size, z)
+		if not bt then return end
+		-- TODO: Choose the dungeon type.
+		local t = 3
+		return t,by2,ay1,by4,ay3,bh2,ah1,bh4,ah3
 	end
 end
 
