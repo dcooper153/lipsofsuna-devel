@@ -1,6 +1,5 @@
 Unittest:add(1, "system", "object", function()
 	local Object = require("system/object")
-	local Model = require("system/model")
 	local Quaternion = require("system/math/quaternion")
 	local Vector = require("system/math/vector")
 	-- Getters and setters.
@@ -12,9 +11,8 @@ Unittest:add(1, "system", "object", function()
 		assert(obj:get_position().x == 1 and obj:get_position().y == 2 and obj:get_position().z == 3)
 		assert(obj:get_rotation().class == Quaternion)
 		assert(obj:get_visible())
-		assert(obj:get_sector() == 0)
 		obj:set_visible(false)
-		assert(obj:get_sector() == nil)
+		assert(not obj:get_visible())
 		collectgarbage()
 	end
 	-- Name field.
@@ -32,7 +30,6 @@ Unittest:add(1, "system", "object", function()
 	local objs = setmetatable({}, {__mode = "v"})
 	for i = 1,100 do
 		local o = Object()
-		o:set_model(Model())
 		o:set_position(Vector(10*i,50,50))
 		o:set_visible(true)
 		objs[i] = o
