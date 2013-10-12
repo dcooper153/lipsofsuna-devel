@@ -107,7 +107,6 @@
 		"speed_walk": 5,
 		"skills":
 		{
-			"Health lv2": true,
 			"Nerf combat lv1": true
 		},
 		"vulnerabilities":

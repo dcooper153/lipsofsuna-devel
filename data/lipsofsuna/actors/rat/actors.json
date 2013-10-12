@@ -111,7 +111,6 @@
 		"model": "plaguerat1",
 		"skills":
 		{
-			"Health lv2": true,
 			"Nerf combat lv1": true
 		},
 		"speed_walk": 4
