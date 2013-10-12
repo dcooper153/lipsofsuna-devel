@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -47,10 +47,6 @@ static int private_get_line_width (
 	LIFntLayout* self,
 	int          start,
 	int*         end);
-
-static int private_get_white_length (
-	LIFntLayout* self,
-	int          start);
 
 /*****************************************************************************/
 
@@ -226,22 +222,6 @@ static void private_layout (
 			h += private_get_line_height (self, start, end);
 	}
 	self->height = y;
-}
-
-static int private_get_white_length (
-	LIFntLayout* self,
-	int          start)
-{
-	int i;
-	LIFntLayoutGlyph* glyph;
-
-	for (i = 0 ; i < self->n_glyphs ; i++)
-	{
-		glyph = self->glyphs + i;
-		if (!iswspace (glyph->glyph))
-			break;
-	}
-	return i;
 }
 
 static int private_get_line_ascent (
