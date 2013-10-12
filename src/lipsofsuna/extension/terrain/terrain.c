@@ -146,11 +146,11 @@ int liext_terrain_add_stick (
 		material, filter_func, filter_data);
 
 	/* Mark neighbor chunks dirty on border updates. */
-	if (column_x == 0 && grid_x > 0)
+	if (column_x == 0)
 		private_mark_column_dirty (self, grid_x - 1, grid_z);
 	if (column_x == self->chunk_size - 1)
 		private_mark_column_dirty (self, grid_x + 1, grid_z);
-	if (column_z == 0 && grid_z > 0)
+	if (column_z == 0)
 		private_mark_column_dirty (self, grid_x, grid_z - 1);
 	if (column_z == self->chunk_size - 1)
 		private_mark_column_dirty (self, grid_x, grid_z + 1);
@@ -209,11 +209,11 @@ int liext_terrain_add_stick_corners (
 		material, filter_func, filter_data);
 
 	/* Mark neighbor chunks dirty on border updates. */
-	if (column_x == 0 && grid_x > 0)
+	if (column_x == 0)
 		private_mark_column_dirty (self, grid_x - 1, grid_z);
 	if (column_x == self->chunk_size - 1)
 		private_mark_column_dirty (self, grid_x + 1, grid_z);
-	if (column_z == 0 && grid_z > 0)
+	if (column_z == 0)
 		private_mark_column_dirty (self, grid_x, grid_z - 1);
 	if (column_z == self->chunk_size - 1)
 		private_mark_column_dirty (self, grid_x, grid_z + 1);
@@ -337,6 +337,16 @@ int liext_terrain_clear_column (
 
 	/* Clear the column. */
 	liext_terrain_chunk_clear_column (chunk, column_x, column_z);
+
+	/* Mark neighbor chunks dirty on border updates. */
+	if (column_x == 0)
+		private_mark_column_dirty (self, grid_x - 1, grid_z);
+	if (column_x == self->chunk_size - 1)
+		private_mark_column_dirty (self, grid_x + 1, grid_z);
+	if (column_z == 0)
+		private_mark_column_dirty (self, grid_x, grid_z - 1);
+	if (column_z == self->chunk_size - 1)
+		private_mark_column_dirty (self, grid_x, grid_z + 1);
 
 	return 1;
 }
@@ -472,11 +482,14 @@ int liext_terrain_load_chunk (
 	int           grid_x,
 	int           grid_z)
 {
+	int i;
+	int column_x;
+	int column_z;
 	LIExtTerrainChunkID id;
 	LIExtTerrainChunk* chunk;
 
-	/* Check for an existing chunk. */
-	id = private_get_chunk_id (self, grid_x, grid_z);
+	/* Get the chunk. */
+	id = private_get_chunk_id_and_column (self, grid_x, grid_z, &column_x, &column_z);
 	chunk = lialg_u32dic_find (self->chunks, id);
 	if (chunk != NULL)
 		return 1;
@@ -491,6 +504,17 @@ int liext_terrain_load_chunk (
 	{
 		liext_terrain_chunk_free (chunk);
 		return 0;
+	}
+
+	/* Mark neighbor chunks dirty. */
+	grid_x -= column_x;
+	grid_z -= column_z;
+	for (i = 0 ; i < self->chunk_size ; ++i)
+	{
+		private_mark_column_dirty (self, grid_x - 1               , grid_z + i);
+		private_mark_column_dirty (self, grid_x + self->chunk_size, grid_z + i);
+		private_mark_column_dirty (self, grid_x + i               , grid_z - 1);
+		private_mark_column_dirty (self, grid_x + i               , grid_z + self->chunk_size);
 	}
 
 	return 1;
@@ -647,14 +671,34 @@ int liext_terrain_set_chunk_data (
 	int           grid_z,
 	LIArcReader*  reader)
 {
+	int i;
+	int ret;
+	int column_x;
+	int column_z;
+	LIExtTerrainChunkID id;
 	LIExtTerrainChunk* chunk;
 
-	/* Get the column. */
-	chunk = liext_terrain_get_chunk (self, grid_x, grid_z);
+	/* Get the chunk. */
+	id = private_get_chunk_id_and_column (self, grid_x, grid_z, &column_x, &column_z);
+	chunk = lialg_u32dic_find (self->chunks, id);
 	if (chunk == NULL)
 		return 0;
 
-	return liext_terrain_chunk_set_data (chunk, reader);
+	/* Set the data. */
+	ret = liext_terrain_chunk_set_data (chunk, reader);
+
+	/* Mark neighbor chunks dirty. */
+	grid_x -= column_x;
+	grid_z -= column_z;
+	for (i = 0 ; i < self->chunk_size ; ++i)
+	{
+		private_mark_column_dirty (self, grid_x - 1               , grid_z + i);
+		private_mark_column_dirty (self, grid_x + self->chunk_size, grid_z + i);
+		private_mark_column_dirty (self, grid_x + i               , grid_z - 1);
+		private_mark_column_dirty (self, grid_x + i               , grid_z + self->chunk_size);
+	}
+
+	return ret;
 }
 
 /**
@@ -740,11 +784,11 @@ int liext_terrain_set_column_data (
 	chunk->stamp++;
 
 	/* Mark neighbor chunks dirty on border updates. */
-	if (column_x == 0 && grid_x > 0)
+	if (column_x == 0)
 		private_mark_column_dirty (self, grid_x - 1, grid_z);
 	if (column_x == self->chunk_size - 1)
 		private_mark_column_dirty (self, grid_x + 1, grid_z);
-	if (column_z == 0 && grid_z > 0)
+	if (column_z == 0)
 		private_mark_column_dirty (self, grid_x, grid_z - 1);
 	if (column_z == self->chunk_size - 1)
 		private_mark_column_dirty (self, grid_x, grid_z + 1);
@@ -859,6 +903,8 @@ static void private_mark_column_dirty (
 	LIExtTerrainChunk* chunk;
 	LIExtTerrainColumn* column;
 
+	if (grid_x < 0 || grid_z < 0)
+		return;
 	id = private_get_chunk_id_and_column (self, grid_x, grid_z, &column_x, &column_z);
 	chunk = lialg_u32dic_find (self->chunks, id);
 	if (chunk != NULL)
