@@ -36,8 +36,14 @@ ShortcutManager.activate = function(self, index)
 	local w = Ui:get_focused_widget()
 	if w and w.class_name == "UiInvItem" then
 		if w.inventory_id == id and w.index then
-			Client:append_log(string.format("Shortcut #%d set to use item #%d.", index, w.index))
-			self:record_shortcut(index, w.index, "auto")
+			local old = self.__shortcuts[index]
+			if old and old[1] == w.index and old[2] == "auto" then
+				Client:append_log(string.format("Shortcut #%d cleared.", index, w.index))
+				self:clear_shortcut(index)
+			else
+				Client:append_log(string.format("Shortcut #%d set to use item #%d.", index, w.index))
+				self:record_shortcut(index, w.index, "auto")
+			end
 			return
 		end
 	end
@@ -57,6 +63,7 @@ end
 ShortcutManager.clear_shortcut = function(self, index)
 	self.__shortcuts[index] = nil
 	Main.messaging:client_event("shortcut", index)
+	Client.effects:play_global("clear item shortcut")
 end
 
 --- Loads the shortcuts from data obtained from the server.
@@ -122,6 +129,7 @@ end
 ShortcutManager.record_shortcut = function(self, index, item, action)
 	self.__shortcuts[index] = {item, action}
 	Main.messaging:client_event("shortcut", index, item, action)
+	Client.effects:play_global("bind item shortcut")
 end
 
 --- Updates the shortcuts after an inventory item move.

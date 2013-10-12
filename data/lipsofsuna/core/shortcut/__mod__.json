@@ -1,4 +1,16 @@
 {
-	"server": false,
-	"scripts": ["main", "bindings", "message-shortcut"]
+	"resources":
+	[
+		"."
+	],
+	"specs":
+	[
+		"effects"
+	],
+	"client_scripts":
+	[
+		"main",
+		"bindings",
+		"message-shortcut"
+	]
 }

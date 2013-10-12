@@ -1666,6 +1666,22 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/core/shortcut/bind-item-shortcut1.flac",
+				"data/lipsofsuna/core/shortcut/clear-item-shortcut1.flac"
+			],
+			"authors":
+			[
+				"qubodup"
+			],
+			"licenses":
+			[
+				"Creative Commons BY 3.0"
+			],
+			"source": "http://opengameart.org/content/item-handling"
+		},
+		{
+			"files":
+			[
 				"data/lipsofsuna/sounds/builtrock1.ogg",
 				"data/lipsofsuna/sounds/builtwood1.ogg",
 				"data/lipsofsuna/sounds/craftmetal1.ogg",
