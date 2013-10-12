@@ -15,11 +15,9 @@ Unittest:add(1, "lipsofsuna", "terrain manager: loading and unloading", function
 	local mgr = TerrainManager(16, 2, nil, false, true, true)
 	mgr:load_chunk(0, 0)
 	assert(type(mgr.chunks[0]) == "table")
-	assert(type(mgr.loaders[0]) == "table")
 	-- Unloading.
 	mgr:unload_chunk(0, 0)
 	assert(type(mgr.chunks[0]) == "nil")
-	assert(type(mgr.loaders[0]) == "nil")
 	-- Refreshing.
 	mgr:refresh_chunks_by_point(Vector(16, 0, 16), 32)
 	assert(type(mgr.chunks[0]) == "table")
