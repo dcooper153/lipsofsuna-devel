@@ -5,6 +5,15 @@ local ModifierSpec = require("core/specs/modifier")
 -- Summon plagued beasts.
 local BlackHazeModifier = ModifierSpec:find_by_name("black haze")
 
+--- Gets the attribute modifications of the modifier.
+-- @param modifier Modifier.
+-- @param attr Dictionary of attributes.
+BlackHazeModifier.attributes = function(modifier, attr)
+	if modifier.health_damage then
+		attr.max_health = attr.max_health - math.floor(modifier.health_damage)
+	end
+end
+
 --- Applies the modifier.
 -- @param modifier Modifier.
 -- @param value Strength of the modifier.
@@ -12,7 +21,9 @@ local BlackHazeModifier = ModifierSpec:find_by_name("black haze")
 BlackHazeModifier.start = function(modifier, value)
 	-- Handle the infection mode.
 	if not value then
+		modifier.object:send_message("You have been diseased.")
 		modifier.timer = 0
+		modifier.health_damage = 1
 		return true
 	end
 	-- Choose a random plague monster.
@@ -46,14 +57,20 @@ end
 BlackHazeModifier.update = function(modifier, secs)
 	-- Wait five seconds.
 	modifier.timer = modifier.timer + secs
-	if modifier.timer < 5 then return true end
-	modifier.timer = modifier.timer - 5
-	-- Damage the actor.
-	modifier.object:damaged{amount = 5, type = "disease"}
+	if modifier.timer < 10 then return true end
+	modifier.timer = modifier.timer - 10
+	-- Damage the maximum health of the actor.
+	local prev = modifier.health_damage
+	modifier.health_damage = modifier.health_damage + 0.1
+	if math.floor(prev) < math.floor(modifier.health_damage) then
+		modifier.object:send_message("The dread disease is slowly draining your life force...")
+		modifier.object:update_skills()
+		modifier.object:damaged{amount = 2, type = "disease"}
+	end
 	-- Infect nearby actors.
 	local near = modifier.object.manager:find_by_point(modifier.object:get_position(), 5)
 	for k,v in pairs(near) do
-		if math.random() > 0.1 then
+		if math.random() > 0.2 then
 			local m = v:add_modifier(modifier.spec.name)
 		end
 	end
