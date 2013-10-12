@@ -19,7 +19,7 @@ BlackHazeModifier.start = function(modifier, value)
 	local s = Actorspec:random{category = "plague"}
 	if not s then return end
 	-- Spawn the monster.
-	local p = modifier.owner:get_position() + Vector(
+	local p = modifier.point + Vector(
 		-1 + 2 * math.random(),
 		-1 + 2 * math.random(),
 		-1 + 2 * math.random())
