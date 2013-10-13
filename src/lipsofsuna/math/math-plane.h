@@ -146,6 +146,47 @@ static inline float limat_plane_signed_distance_to_point (
 }
 
 /**
+ * \brief Casts a sphere on the plane and returns the collision distance.
+ *
+ * NOTE: This function always finds the intersection point on the positive
+ *       side of plane. Approaching from the negative side will pass through
+ *       the plane before finding the intersection point.
+ *
+ * \param self Plane.
+ * \param start Starting point.
+ * \param end End point.
+ * \param radius Sphere radius.
+ * \return Hit fraction between [0,1] if hit. Otherwise, negative, greater than 1 or infinite.
+ */
+static inline float limat_plane_cast_sphere (
+	const LIMatPlane*  self,
+	const LIMatVector* start,
+	const LIMatVector* end,
+	float              radius)
+{
+	float d0;
+	float d1;
+
+	/* Calculate the start and end distances. */
+	d0 = limat_plane_signed_distance_to_point (self, start);
+	if (LIMAT_ABS (d0) <= radius)
+		return 0.0f;
+	d1 = limat_plane_signed_distance_to_point (self, end);
+	if (LIMAT_ABS (d0 - d1) < LIMAT_EPSILON)
+		return LIMAT_INFINITE;
+
+	/* Linear interpolation. */
+	/* Since both the plane equation and the line equation are linear and the
+	 * radius is constant, this is a simple linear interpolation problem of
+	 * finding the parameter for which distance == radius.
+	 *
+	 * r = d0 + (d1-d0)*t   <=>
+	 * t = (r-d0)/(d1-d0)
+	*/
+	return (radius - d0) / (d1 - d0);
+}
+
+/**
  * \brief Gets the intersection point of a plane and a line.
  *
  * Lines coinciding with the plane are not considered to intersect.

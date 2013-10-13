@@ -19,6 +19,7 @@
 #define __EXT_TERRAIN_STICK_H__
 
 #include "lipsofsuna/archive.h"
+#include "lipsofsuna/math.h"
 #include "terrain-vertex.h"
 
 typedef struct _LIExtTerrainStick LIExtTerrainStick;
@@ -36,6 +37,22 @@ LIAPICALL (LIExtTerrainStick*, liext_terrain_stick_new, (
 
 LIAPICALL (void, liext_terrain_stick_free, (
 	LIExtTerrainStick* self));
+
+LIAPICALL (int, liext_terrain_stick_cast_sphere, (
+	const LIExtTerrainStick* self,
+	float                    grid_size,
+	float                    bot00,
+	float                    bot10,
+	float                    bot01,
+	float                    bot11,
+	float                    top00,
+	float                    top10,
+	float                    top01,
+	float                    top11,
+	const LIMatVector*       sphere_rel_cast_start,
+	const LIMatVector*       sphere_rel_cast_end,
+	float                    sphere_radius,
+	float*                   result_fraction));
 
 LIAPICALL (void, liext_terrain_stick_clamp_vertices, (
 	LIExtTerrainStick* self,

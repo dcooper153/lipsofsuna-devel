@@ -65,6 +65,163 @@ void liext_terrain_stick_free (
 }
 
 /**
+ * \brief Casts a sphere against the stick and returns the hit fraction.
+ * \param self Terrain stick.
+ * \param grid_size Grid size of the terrain.
+ * \param sphere_rel_cast_start Cast start position of the sphere, in grid units relative to the stick origin.
+ * \param sphere_rel_cast_end Cast ed position of the sphere, in grid units relative to the stick origin.
+ * \param sphere_radius Sphere radius, in grid units.
+ * \param result_fraction Return location for the hit fraction.
+ * \return Nonzero if hit. Zero otherwise.
+ */
+int liext_terrain_stick_cast_sphere (
+	const LIExtTerrainStick* self,
+	float                    grid_size,
+	float                    bot00,
+	float                    bot10,
+	float                    bot01,
+	float                    bot11,
+	float                    top00,
+	float                    top10,
+	float                    top01,
+	float                    top11,
+	const LIMatVector*       sphere_rel_cast_start,
+	const LIMatVector*       sphere_rel_cast_end,
+	float                    sphere_radius,
+	float*                   result_fraction)
+{
+	float best;
+	float frac;
+	float min;
+	float max;
+	LIMatVector v;
+	LIMatVector vtx[3];
+	LIMatVector point;
+	LIMatPlane plane;
+
+	best = LIMAT_INFINITE;
+	v = limat_vector_subtract (*sphere_rel_cast_end, *sphere_rel_cast_start);
+
+	/* Left. */
+	limat_plane_init (&plane, -1.0f, 0.0f, 0.0f, 0.0f);
+	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac >= 0.0f && best > frac)
+	{
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
+		if (point.z >= 0 && point.z <= grid_size)
+		{
+			min = limat_mix (bot00, bot01, point.z / grid_size);
+			max = limat_mix (top00, top01, point.z / grid_size);
+			if (min <= point.y && point.y <= max)
+				best = frac;
+		}
+	}
+
+	/* Right. */
+	limat_plane_init (&plane, 1.0f, 0.0f, 0.0f, grid_size);
+	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac >= 0.0f && best > frac)
+	{
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
+		if (point.z >= 0 && point.z <= grid_size)
+		{
+			min = limat_mix (bot10, bot11, point.z / grid_size);
+			max = limat_mix (top10, top11, point.z / grid_size);
+			if (min <= point.y && point.y <= max)
+				best = frac;
+		}
+	}
+
+	/* Front. */
+	limat_plane_init (&plane, 0.0f, 0.0f, -1.0f, 0.0f);
+	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac >= 0.0f && best > frac)
+	{
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
+		if (point.x >= 0 && point.x <= grid_size)
+		{
+			min = limat_mix (bot00, bot10, point.z / grid_size);
+			max = limat_mix (top00, top10, point.z / grid_size);
+			if (min <= point.y && point.y <= max)
+				best = frac;
+		}
+	}
+
+	/* Back. */
+	limat_plane_init (&plane, 0.0f, 0.0f, 1.0f, grid_size);
+	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac >= 0.0f && best > frac)
+	{
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
+		if (point.x >= 0 && point.x <= grid_size)
+		{
+			min = limat_mix (bot01, bot11, point.z / grid_size);
+			max = limat_mix (top01, top11, point.z / grid_size);
+			if (min <= point.y && point.y <= max)
+				best = frac;
+		}
+	}
+
+	/* Bottom. */
+	vtx[2] = limat_vector_init (0.0f, bot00, 0.0f);
+	vtx[1] = limat_vector_init (0.0f, bot01, grid_size);
+	vtx[0] = limat_vector_init (grid_size, bot11, grid_size);
+	limat_plane_init_from_points (&plane, vtx + 0, vtx + 1, vtx + 2);
+	lisys_assert (plane.y < 0.0f);
+	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac >= 0.0f && best > frac)
+	{
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
+		if (point.x >= 0.0f && point.z >= 0.0f && point.z <= 1.0f && point.z >= point.x)
+			best = frac;
+	}
+	vtx[2] = limat_vector_init (0.0f, bot00, 0.0f);
+	vtx[1] = limat_vector_init (grid_size, bot11, grid_size);
+	vtx[0] = limat_vector_init (grid_size, bot10, 0.0f);
+	limat_plane_init_from_points (&plane, vtx + 0, vtx + 1, vtx + 2);
+	lisys_assert (plane.y < 0.0f);
+	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac >= 0.0f && best > frac)
+	{
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
+		if (point.x >= 0.0f && point.z >= 0.0f && point.x <= 1.0f && point.x >= point.z)
+			best = frac;
+	}
+
+	/* Top. */
+	vtx[2] = limat_vector_init (0.0f, top00, 0.0f);
+	vtx[1] = limat_vector_init (grid_size, top10, 0.0f);
+	vtx[0] = limat_vector_init (grid_size, top11, grid_size);
+	limat_plane_init_from_points (&plane, vtx + 0, vtx + 1, vtx + 2);
+	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	lisys_assert (plane.y > 0.0f);
+	if (frac >= 0.0f && best > frac)
+	{
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
+		if (point.x >= 0.0f && point.z >= 0.0f && point.x <= 1.0f && point.x >= point.z)
+			best = frac;
+	}
+	vtx[2] = limat_vector_init (0.0f, top00, 0.0f);
+	vtx[1] = limat_vector_init (grid_size, top11, grid_size);
+	vtx[0] = limat_vector_init (0.0f, top10, grid_size);
+	limat_plane_init_from_points (&plane, vtx + 0, vtx + 1, vtx + 2);
+	lisys_assert (plane.y > 0.0f);
+	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac >= 0.0f && best > frac)
+	{
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
+		if (point.x >= 0.0f && point.z >= 0.0f && point.z <= 1.0f && point.z >= point.x)
+			best = frac;
+	}
+
+	/* Check whether a collision occurred. */
+	if (best > 1.0f)
+		return 0;
+	*result_fraction = best;
+	return 1;
+}
+
+/**
  * \brief Clamps the vertices of the stick so that they fit below the next stick's vertices.
  * \param self Terrain stick.
  * \param next Terrain stick.
