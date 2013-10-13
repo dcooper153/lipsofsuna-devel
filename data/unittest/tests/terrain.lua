@@ -612,6 +612,23 @@ Unittest:add(1, "system", "terrain: ray cast", function()
 	assert(not t:cast_ray(Vector(-10,40,-10), Vector(10,45,10)))
 end)
 
+Unittest:add(1, "system", "terrain: sphere cast", function()
+	local Terrain = require("system/terrain")
+	local Vector = require("system/math/vector")
+	local t = Terrain(32, 2)
+	t:load_chunk(0, 0)
+	t:add_stick(1, 1, 0, 40, 3)
+	-- Hit.
+	local f = t:cast_sphere(Vector(-10,1,-10), Vector(10,1,10), 1)
+	assert(f)
+	assert(math.abs(f - 0.55) < 0.00001)
+	-- Miss.
+	assert(not t:cast_sphere(Vector(-10,1,-10), Vector(-1,1,-1)), 1)
+	assert(not t:cast_sphere(Vector(5,1,5), Vector(10,1,10)), 1)
+	assert(not t:cast_sphere(Vector(-13,1,-10), Vector(7,1,10)), 1)
+	assert(not t:cast_sphere(Vector(-10,40,-10), Vector(10,45,10)), 1)
+end)
+
 Unittest:add(1, "system", "terrain: saving and loading", function()
 	local Packet = require("system/packet")
 	local Terrain = require("system/terrain")

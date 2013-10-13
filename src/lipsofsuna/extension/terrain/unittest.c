@@ -31,8 +31,8 @@
 void liext_terrain_unittest ()
 {
 	int ret;
-	float frac;
 	LIMatVector v[2];
+	LIExtTerrainCollision frac;
 	LIExtTerrainStick* stick;
 	LIExtTerrainStick tmp;
 
@@ -185,25 +185,25 @@ void liext_terrain_unittest ()
 	/* Left face 1. */
 	v[0] = limat_vector_init (-2.0f, 5.0f, 0.5f);
 	v[1] = limat_vector_init (-1.0f, 5.0f, 0.5f);
-	ret = liext_terrain_stick_cast_sphere (stick, 1.0f, 
+	ret = liext_terrain_stick_cast_sphere (stick,
 		0.0f, 1.0f, 0.0f, 1.0f,
 		9.0f, 10.0f, 9.0f, 10.0f,   v + 0, v + 1, 1.0f, &frac);
 	lisys_assert (ret == 1);
-	lisys_assert (LIMAT_ABS (frac - 1.0f) < 0.001f);
+	lisys_assert (LIMAT_ABS (frac.fraction - 1.0f) < 0.001f);
 
 	/* Left face 2. */
 	v[0] = limat_vector_init (-1000.0f, 1000.0f, 1000.0f);
 	v[1] = limat_vector_init (-1.0f, 5.0f, 0.5f);
-	ret = liext_terrain_stick_cast_sphere (stick, 1.0f, 
+	ret = liext_terrain_stick_cast_sphere (stick,
 		0.0f, 1.0f, 0.0f, 1.0f,
 		9.0f, 10.0f, 9.0f, 10.0f,   v + 0, v + 1, 1.0f, &frac);
 	lisys_assert (ret == 1);
-	lisys_assert (LIMAT_ABS (frac - 1.0f) < 0.001f);
+	lisys_assert (LIMAT_ABS (frac.fraction - 1.0f) < 0.001f);
 
 	/* Left face 3. */
 	v[0] = limat_vector_init (-1000.0f, 1000.0f, 1000.0f);
 	v[1] = limat_vector_init (-1.01f, 5.0f, 0.5f);
-	ret = liext_terrain_stick_cast_sphere (stick, 1.0f, 
+	ret = liext_terrain_stick_cast_sphere (stick,
 		0.0f, 1.0f, 0.0f, 1.0f,
 		9.0f, 10.0f, 9.0f, 10.0f,   v + 0, v + 1, 1.0f, &frac);
 	lisys_assert (ret == 0);
@@ -211,34 +211,34 @@ void liext_terrain_unittest ()
 	/* Back face 1. */
 	v[0] = limat_vector_init (0.5f, 5.0f, 2.0f);
 	v[1] = limat_vector_init (0.5f, 5.0f, 1.0f);
-	ret = liext_terrain_stick_cast_sphere (stick, 1.0f, 
+	ret = liext_terrain_stick_cast_sphere (stick,
 		0.0f, 1.0f, 0.0f, 1.0f,
 		9.0f, 10.0f, 9.0f, 10.0f,   v + 0, v + 1, 1.0f, &frac);
 	lisys_assert (ret == 1);
-	lisys_assert (LIMAT_ABS (frac - 0.0f) < 0.001f);
+	lisys_assert (LIMAT_ABS (frac.fraction - 0.0f) < 0.001f);
 
 	/* Back face 2. */
 	v[0] = limat_vector_init (0.5f, 5.0f, 0.5f);
 	v[1] = limat_vector_init (0.5f, 5.0f, 0.5f);
-	ret = liext_terrain_stick_cast_sphere (stick, 1.0f, 
+	ret = liext_terrain_stick_cast_sphere (stick,
 		0.0f, 1.0f, 0.0f, 1.0f,
 		9.0f, 10.0f, 9.0f, 10.0f,   v + 0, v + 1, 1.0f, &frac);
 	lisys_assert (ret == 1);
-	lisys_assert (frac == 0.0f);
+	lisys_assert (frac.fraction == 0.0f);
 
 	/* Back face 3. */
 	v[0] = limat_vector_init (1000.0f, 1000.0f, 1000.0f);
 	v[1] = limat_vector_init (0.5f, 5.0f, 2.0f);
-	ret = liext_terrain_stick_cast_sphere (stick, 1.0f, 
+	ret = liext_terrain_stick_cast_sphere (stick,
 		0.0f, 1.0f, 0.0f, 1.0f,
 		9.0f, 10.0f, 9.0f, 10.0f,   v + 0, v + 1, 1.0f, &frac);
 	lisys_assert (ret == 1);
-	lisys_assert (LIMAT_ABS (frac - 1.0f) < 0.001f);
+	lisys_assert (LIMAT_ABS (frac.fraction - 1.0f) < 0.001f);
 
 	/* Back face 4. */
 	v[0] = limat_vector_init (1000.0f, 1000.0f, 1000.0f);
 	v[1] = limat_vector_init (0.5f, 5.0f, 2.01f);
-	ret = liext_terrain_stick_cast_sphere (stick, 1.0f, 
+	ret = liext_terrain_stick_cast_sphere (stick,
 		0.0f, 1.0f, 0.0f, 1.0f,
 		9.0f, 10.0f, 9.0f, 10.0f,   v + 0, v + 1, 1.0f, &frac);
 	lisys_assert (ret == 0);
@@ -246,22 +246,22 @@ void liext_terrain_unittest ()
 	/* Top face 1. */
 	v[0] = limat_vector_init (0.5f, 100.0f, 0.5f);
 	v[1] = limat_vector_init (0.5f, -100.0f, 0.5f);
-	ret = liext_terrain_stick_cast_sphere (stick, 1.0f, 
+	ret = liext_terrain_stick_cast_sphere (stick,
 		0.0f, 1.0f, 0.0f, 1.0f,
 		9.0f, 10.0f, 9.0f, 10.0f,   v + 0, v + 1, 1.0f, &frac);
 	lisys_assert (ret == 1);
-	lisys_assert (frac >= (90.0f - 1.0f) / 200.0f);
-	lisys_assert (frac <= (91.0f - 1.0f) / 200.0f);
+	lisys_assert (frac.fraction >= (90.0f - 1.0f) / 200.0f);
+	lisys_assert (frac.fraction <= (91.0f - 1.0f) / 200.0f);
 
 	/* Bottom face 1. */
 	v[0] = limat_vector_init (0.5f, -100.0f, 0.5f);
 	v[1] = limat_vector_init (0.5f, 100.0f, 0.5f);
-	ret = liext_terrain_stick_cast_sphere (stick, 1.0f, 
+	ret = liext_terrain_stick_cast_sphere (stick,
 		0.0f, 1.0f, 0.0f, 1.0f,
 		9.0f, 10.0f, 9.0f, 10.0f,   v + 0, v + 1, 1.0f, &frac);
 	lisys_assert (ret == 1);
-	lisys_assert (frac >= (100.0f - 1.0f) / 200.0f);
-	lisys_assert (frac <= (101.0f - 1.0f) / 200.0f);
+	lisys_assert (frac.fraction >= (100.0f - 1.0f) / 200.0f);
+	lisys_assert (frac.fraction <= (101.0f - 1.0f) / 200.0f);
 
 	liext_terrain_stick_free (stick);
 }

@@ -27,6 +27,7 @@ public:
 	LIExtPhysicsTerrainRaycastHook (LIExtPhysicsTerrain* terrain);
 	virtual ~LIExtPhysicsTerrainRaycastHook ();
 	virtual void rayTest (const btVector3& rayFromWorld, const btVector3& rayToWorld, btCollisionWorld::RayResultCallback& resultCallback) const;
+	virtual void sphereSweepTest (float radius, const btVector3& rayFromWorld, const btVector3& rayToWorld, btCollisionWorld::ConvexResultCallback& resultCallback);
 private:
 	LIExtPhysicsTerrain* terrain;
 };

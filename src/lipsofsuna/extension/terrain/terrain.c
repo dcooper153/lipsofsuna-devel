@@ -26,9 +26,9 @@
 #include "terrain.h"
 
 static LIExtTerrainChunkID private_get_chunk_id (
-	LIExtTerrain* self,
-	int           chunk_x,
-	int           chunk_z);
+	const LIExtTerrain* self,
+	int                 grid_x,
+	int                 grid_z);
 
 static LIExtTerrainChunkID private_get_chunk_id_and_column (
 	LIExtTerrain* self,
@@ -309,6 +309,81 @@ int liext_terrain_calculate_smooth_normals (
 	chunk[0][1]->stamp++;
 	chunk[1][1]->stamp++;
 
+	return 1;
+}
+
+/**
+ * \brief Casts a sphere against the terrain and returns the hit fraction.
+ * \param self Terrain.
+ * \param sphere_cast_start Cast start position of the sphere, in grid units.
+ * \param sphere_cast_end Cast end position of the sphere, in grid units.
+ * \param sphere_radius Sphere radius, in grid units.
+ * \param result Return location for the hit fraction.
+ * \return Nonzero if hit. Zero otherwise.
+ */
+int liext_terrain_cast_sphere (
+	const LIExtTerrain*    self,
+	const LIMatVector*     sphere_cast_start,
+	const LIMatVector*     sphere_cast_end,
+	float                  sphere_radius,
+	LIExtTerrainCollision* result)
+{
+	int i;
+	int j;
+	int min_x;
+	int max_x;
+	int min_z;
+	int max_z;
+	LIExtTerrainChunk* chunk;
+	LIExtTerrainChunkID id;
+	LIExtTerrainCollision best;
+	LIExtTerrainCollision frac;
+	LIMatVector pos;
+	LIMatVector cast1;
+	LIMatVector cast2;
+
+	best.fraction = LIMAT_INFINITE;
+	min_x = (int)((LIMAT_MIN (sphere_cast_start->x, sphere_cast_end->x) - sphere_radius) / self->chunk_size);
+	max_x = (int)((LIMAT_MAX (sphere_cast_start->x, sphere_cast_end->x) + sphere_radius) / self->chunk_size);
+	min_z = (int)((LIMAT_MIN (sphere_cast_start->z, sphere_cast_end->z) - sphere_radius) / self->chunk_size);
+	max_z = (int)((LIMAT_MAX (sphere_cast_start->z, sphere_cast_end->z) + sphere_radius) / self->chunk_size);
+	min_x = LIMAT_MAX (min_x, 0);
+	max_x = LIMAT_MIN (max_x, 0xFFFF);
+	min_z = LIMAT_MAX (min_z, 0);
+	max_z = LIMAT_MIN (max_z, 0xFFFF);
+
+	for (j = min_z ; j <= max_z ; j++)
+	{
+		for (i = min_x ; i <= max_x ; i++)
+		{
+			/* Find the chunk. */
+			id = private_get_chunk_id (self, i * self->chunk_size, j * self->chunk_size);
+			chunk = lialg_u32dic_find (self->chunks, id);
+			if (chunk == NULL)
+				continue;
+
+			/* Transform the coordinates to the chunk space. */
+			pos = limat_vector_init (i * self->chunk_size, 0.0f, j * self->chunk_size);
+			cast1 = limat_vector_subtract (*sphere_cast_start, pos);
+			cast2 = limat_vector_subtract (*sphere_cast_end, pos);
+
+			/* Cast against the chunk. */
+			if (liext_terrain_chunk_cast_sphere (chunk, &cast1, &cast2, sphere_radius, &frac))
+			{
+				if (best.fraction > frac.fraction)
+				{
+					best = frac;
+					best.x += i;
+					best.z += j;
+					best.point = limat_vector_add (best.point, pos);
+				}
+			}
+		}
+	}
+
+	if (best.fraction > 1.0f)
+		return 0;
+	*result = best;
 	return 1;
 }
 
@@ -866,9 +941,9 @@ int liext_terrain_get_nearest_chunk_with_outdated_model (
 /*****************************************************************************/
 
 static LIExtTerrainChunkID private_get_chunk_id (
-	LIExtTerrain* self,
-	int           grid_x,
-	int           grid_z)
+	const LIExtTerrain* self,
+	int                 grid_x,
+	int                 grid_z)
 {
 	int chunk_x = grid_x / self->chunk_size;
 	int chunk_z = grid_z / self->chunk_size;

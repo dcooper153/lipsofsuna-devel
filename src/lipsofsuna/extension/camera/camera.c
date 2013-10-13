@@ -137,7 +137,6 @@ float liext_camera_calculate_3rd_person_clipped_distance (
 	int                   collision_mask)
 {
 	int hit;
-	float frac;
 	LIMatTransform center1;
 	LIMatTransform target;
 	LIPhyContact tmp;
@@ -172,8 +171,6 @@ float liext_camera_calculate_3rd_person_clipped_distance (
 		return distance * tmp.fraction;
 	else
 		return distance;
-
-	return distance * frac;
 }
 
 /**

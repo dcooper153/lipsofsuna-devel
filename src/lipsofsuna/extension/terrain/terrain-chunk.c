@@ -342,6 +342,72 @@ int liext_terrain_chunk_build_model (
 }
 
 /**
+ * \brief Casts a sphere against the chunk and returns the hit fraction.
+ * \param self Terrain chunk.
+ * \param sphere_rel_cast_start Cast start position of the sphere, in grid units relative to the chunk origin.
+ * \param sphere_rel_cast_end Cast end position of the sphere, in grid units relative to the chunk origin.
+ * \param sphere_radius Sphere radius, in grid units.
+ * \param result Return location for the hit fraction.
+ * \return Nonzero if hit. Zero otherwise.
+ */
+int liext_terrain_chunk_cast_sphere (
+	const LIExtTerrainChunk* self,
+	const LIMatVector*       sphere_rel_cast_start,
+	const LIMatVector*       sphere_rel_cast_end,
+	float                    sphere_radius,
+	LIExtTerrainCollision*   result)
+{
+	int i;
+	int j;
+	int min_x;
+	int max_x;
+	int min_z;
+	int max_z;
+	LIMatVector pos;
+	LIMatVector cast1;
+	LIMatVector cast2;
+	LIExtTerrainColumn* column;
+	LIExtTerrainCollision best;
+	LIExtTerrainCollision frac;
+
+	best.fraction = LIMAT_INFINITE;
+	min_x = (int)(LIMAT_MIN (sphere_rel_cast_start->x, sphere_rel_cast_end->x) - sphere_radius);
+	max_x = (int)(LIMAT_MAX (sphere_rel_cast_start->x, sphere_rel_cast_end->x) + sphere_radius);
+	min_z = (int)(LIMAT_MIN (sphere_rel_cast_start->z, sphere_rel_cast_end->z) - sphere_radius);
+	max_z = (int)(LIMAT_MAX (sphere_rel_cast_start->z, sphere_rel_cast_end->z) + sphere_radius);
+	min_x = LIMAT_MAX (min_x, 0);
+	max_x = LIMAT_MIN (max_x, self->size - 1);
+	min_z = LIMAT_MAX (min_z, 0);
+	max_z = LIMAT_MIN (max_z, self->size - 1);
+
+	for (j = min_z ; j <= max_z ; j++)
+	{
+		for (i = min_x ; i <= max_x ; i++)
+		{
+			column = self->columns + i + j * self->size;
+			pos = limat_vector_init (i, 0.0f, j);
+			cast1 = limat_vector_subtract (*sphere_rel_cast_start, pos);
+			cast2 = limat_vector_subtract (*sphere_rel_cast_end, pos);
+			if (liext_terrain_column_cast_sphere (column, &cast1, &cast2, sphere_radius, &frac))
+			{
+				if (best.fraction > frac.fraction)
+				{
+					best = frac;
+					best.x = i;
+					best.z = j;
+					best.point = limat_vector_add (best.point, pos);
+				}
+			}
+		}
+	}
+
+	if (best.fraction > 1.0f)
+		return 0;
+	*result = best;
+	return 1;
+}
+
+/**
  * \brief Clears the stick at the given grid point.
  * \param self Terrain chunk.
  * \param column_x X coordinate in grid units.

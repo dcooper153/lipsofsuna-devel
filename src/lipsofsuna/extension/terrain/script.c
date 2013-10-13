@@ -346,6 +346,38 @@ static void Terrain_cast_ray (LIScrArgs* args)
 	liscr_args_seti_float (args, normal.z);
 }
 
+static void Terrain_cast_sphere (LIScrArgs* args)
+{
+	float radius;
+	LIExtTerrain* self;
+	LIMatVector src;
+	LIMatVector dst;
+	LIExtTerrainCollision result;
+
+	/* Get the arguments. */
+	self = args->self;
+	if (!liscr_args_geti_vector (args, 0, &src))
+		return;
+	if (!liscr_args_geti_vector (args, 1, &dst))
+		return;
+	if (!liscr_args_geti_float (args, 2, &radius))
+		return;
+	if (radius <= LIMAT_EPSILON)
+		return;
+
+	/* Convert into grid coordinates. */
+	src.x /= self->grid_size;
+	src.z /= self->grid_size;
+	dst.x /= self->grid_size;
+	dst.z /= self->grid_size;
+	radius /= self->grid_size;
+
+	/* Cast the sphere. */
+	if (!liext_terrain_cast_sphere (self, &src, &dst, radius, &result))
+		return;
+	liscr_args_seti_float (args, result.fraction);
+}
+
 static void Terrain_clear_chunk_model (LIScrArgs* args)
 {
 	int grid_x;
@@ -943,6 +975,7 @@ void liext_script_terrain (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_build_chunk_model", Terrain_build_chunk_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_calculate_smooth_normals", Terrain_calculate_smooth_normals);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_cast_ray", Terrain_cast_ray);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_cast_sphere", Terrain_cast_sphere);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_clear_chunk_model", Terrain_clear_chunk_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_clear_column", Terrain_clear_column);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_TERRAIN, "terrain_count_column_materials", Terrain_count_column_materials);

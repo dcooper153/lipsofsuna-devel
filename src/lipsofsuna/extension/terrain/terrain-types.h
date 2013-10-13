@@ -26,4 +26,14 @@
 typedef struct _LIExtTerrain LIExtTerrain;
 typedef struct _LIExtTerrainModule LIExtTerrainModule;
 
+typedef struct _LIExtTerrainCollision LIExtTerrainCollision;
+struct _LIExtTerrainCollision
+{
+	int x;
+	int z;
+	float fraction;
+	LIMatVector point;
+	LIMatVector normal;
+};
+
 #endif

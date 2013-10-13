@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -52,4 +52,21 @@ void LIPhyDynamicsWorld::rayTest (const btVector3& rayFromWorld, const btVector3
 void LIPhyDynamicsWorld::removeCollisionObject (btCollisionObject* collisionObject)
 {
 	btDiscreteDynamicsWorld::removeCollisionObject (collisionObject);
+}
+
+void LIPhyDynamicsWorld::sphereSweepTest (float radius, const btTransform& rayFromWorld, const btTransform& rayToWorld, ConvexResultCallback& resultCallback) const
+{
+	LIPhyRaycastHook* hook;
+
+	/* Test against normal objects. */
+	btSphereShape shape (radius);
+	convexSweepTest (&shape, rayFromWorld, rayToWorld, resultCallback);
+
+	/* Test against raycast hooks. */
+	btVector3 src = rayFromWorld.getOrigin();
+	btVector3 dst = rayToWorld.getOrigin();
+	for (hook = raycast_hooks ; hook != NULL ; hook = hook->next)
+	{
+		hook->sphereSweepTest (radius, src, dst, resultCallback);
+	}
 }

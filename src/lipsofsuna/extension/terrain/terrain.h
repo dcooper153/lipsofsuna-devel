@@ -79,6 +79,13 @@ LIAPICALL (int, liext_terrain_calculate_smooth_normals, (
 	int           grid_x,
 	int           grid_z));
 
+LIAPICALL (int, liext_terrain_cast_sphere, (
+	const LIExtTerrain*    self,
+	const LIMatVector*     sphere_cast_start,
+	const LIMatVector*     sphere_cast_end,
+	float                  sphere_radius,
+	LIExtTerrainCollision* result));
+
 LIAPICALL (int, liext_terrain_clear_column, (
 	LIExtTerrain* self,
 	int           grid_x,

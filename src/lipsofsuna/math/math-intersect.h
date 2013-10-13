@@ -284,6 +284,58 @@ static inline int limat_intersect_aabb_line_near (
 	return hit;
 }
 
+/**
+ * \brief Gets the intersection points of an AABB and a line.
+ * \param point Point position.
+ * \param start Sphere cast start position.
+ * \param end Sphere cast end position.
+ * \param radius Sphere radius.
+ * \param result_fraction Return location for the hit fraction.
+ * \return Nonzero if hit. Zero if missed.
+ */
+static inline int limat_intersect_point_cast_sphere (
+	const LIMatVector* point,
+	const LIMatVector* start,
+	const LIMatVector* end,
+	float              radius,
+	float*             result_fraction)
+{
+	float a;
+	float b;
+	float c;
+	float det;
+	float frac1;
+	float frac2;
+	LIMatVector dir;
+	LIMatVector pos;
+
+	/* Move the cast starting point to the origin. */
+	dir = limat_vector_subtract (*end, *start);
+	pos = limat_vector_subtract (*point, *start);
+
+	/* The 2D version of the problem is the following. The 3D version is
+	 * generalized by using vector maths to express the variables of the
+	 * quadratic equation.
+	 * 
+	 * (p_x-t*d_x)^2 + (p_y-t*d_y)^2 = r^2
+	 * t^2*[d_x^2+d_z^2] - 2*t*[d_x*p_x + d_y*p_y] + [p_x^2 + p_y^2 - r^2] = 0
+	 */
+	a = limat_vector_dot (dir, dir);
+	b = -2.0f * limat_vector_dot (dir, pos);
+	c = limat_vector_dot (pos, pos) - radius * radius;
+	det = b*b - 4 * a * c;
+	if (det < 0.0f)
+		return 0;
+	frac1 = (-b + sqrtf (det)) / (2.0f * a);
+	frac2 = (-b - sqrtf (det)) / (2.0f * a);
+	if (frac1 >= 0.0f || frac2 >= 0.0f)
+		*result_fraction = LIMAT_MIN (frac1, frac2);
+	else
+		*result_fraction = LIMAT_MAX (frac1, frac2);
+
+	return 1;
+}
+
 #endif
 
 /** @} */

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,6 +27,7 @@ public:
 	LIPhyRaycastHook () {}
 	virtual ~LIPhyRaycastHook () {}
 	virtual void rayTest (const btVector3& rayFromWorld, const btVector3& rayToWorld, btCollisionWorld::RayResultCallback& resultCallback) const = 0;
+	virtual void sphereSweepTest (float radius, const btVector3& rayFromWorld, const btVector3& rayToWorld, btCollisionWorld::ConvexResultCallback& resultCallback) {}
 public:
 	LIPhyRaycastHook* next;
 };

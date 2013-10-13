@@ -64,3 +64,35 @@ void LIExtPhysicsTerrainRaycastHook::rayTest (const btVector3& rayFromWorld, con
 		}
 	}
 }
+
+void LIExtPhysicsTerrainRaycastHook::sphereSweepTest (float radius, const btVector3& rayFromWorld, const btVector3& rayToWorld, btCollisionWorld::ConvexResultCallback& resultCallback)
+{
+	LIMatVector start;
+	LIMatVector end;
+	LIExtTerrainCollision result;
+
+	/* Check that the terrain exists. */
+	if (terrain->terrain == NULL)
+		return;
+
+	/* Check for the collision mask. */
+	if (!terrain->realized)
+		return;
+	if (!(terrain->collision_group & resultCallback.m_collisionFilterMask) ||
+	    !(terrain->collision_mask & resultCallback.m_collisionFilterGroup))
+		return;
+
+	/* Cast the sphere against the terrain. */
+	start = limat_vector_init (rayFromWorld[0], rayFromWorld[1], rayFromWorld[2]);
+	end = limat_vector_init (rayToWorld[0], rayToWorld[1], rayToWorld[2]);
+	if (liext_terrain_cast_sphere (terrain->terrain, &start, &end, radius, &result))
+	{
+		if (result.fraction < resultCallback.m_closestHitFraction)
+		{
+			btVector3 point (result.point.x, result.point.y, result.point.z);
+			btVector3 normal (result.normal.x, result.normal.y, result.normal.z);
+			btCollisionWorld::LocalConvexResult conres (terrain->object, NULL, point, normal, result.fraction);
+			resultCallback.addSingleResult (conres, true);
+		}
+	}
+}

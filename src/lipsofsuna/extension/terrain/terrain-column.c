@@ -952,6 +952,71 @@ void liext_terrain_column_calculate_smooth_normals (
 }
 
 /**
+ * \brief Casts a sphere against the column and returns the hit fraction.
+ * \param self Terrain column.
+ * \param sphere_rel_cast_start Cast start position of the sphere, in grid units relative to the column origin.
+ * \param sphere_rel_cast_end Cast end position of the sphere, in grid units relative to the column origin.
+ * \param sphere_radius Sphere radius, in grid units.
+ * \param result Return location for the hit fraction.
+ * \return Nonzero if hit. Zero otherwise.
+ */
+int liext_terrain_column_cast_sphere (
+	const LIExtTerrainColumn* self,
+	const LIMatVector*        sphere_rel_cast_start,
+	const LIMatVector*        sphere_rel_cast_end,
+	float                     sphere_radius,
+	LIExtTerrainCollision*    result)
+{
+	float y;
+	float min_y;
+	float max_y;
+	float bot[4];
+	float top[4];
+	LIExtTerrainStick* stick;
+	LIExtTerrainCollision best;
+	LIExtTerrainCollision frac;
+
+	best.fraction = LIMAT_INFINITE;
+	y = 0.0f;
+	bot[0] = 0.0f;
+	bot[1] = 0.0f;
+	bot[2] = 0.0f;
+	bot[3] = 0.0f;
+	min_y = LIMAT_MIN (sphere_rel_cast_start->y, sphere_rel_cast_end->y) - sphere_radius;
+	max_y = LIMAT_MAX (sphere_rel_cast_start->y, sphere_rel_cast_end->y) + sphere_radius;
+
+	for (stick = self->sticks ; stick != NULL ; stick = stick->next)
+	{
+		if (bot[0] > max_y && bot[1] > max_y && bot[2] > max_y && bot[3] > max_y)
+			break;
+		y += stick->height;
+		top[0] = y + stick->vertices[0][0].offset;
+		top[1] = y + stick->vertices[1][0].offset;
+		top[2] = y + stick->vertices[0][1].offset;
+		top[3] = y + stick->vertices[1][1].offset;
+		if (stick->material && (top[0] >= min_y || top[1] >= min_y || top[2] >= min_y || top[3] >= min_y))
+		{
+			if (liext_terrain_stick_cast_sphere (stick,
+					bot[0], bot[1], bot[2], bot[3], top[0], top[1], top[2], top[3],
+					sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius, &frac))
+			{
+				if (frac.fraction >= 0.0f && frac.fraction < best.fraction)
+					best = frac;
+			}
+		}
+		bot[0] = top[0];
+		bot[1] = top[1];
+		bot[2] = top[2];
+		bot[3] = top[3];
+	}
+
+	if (best.fraction > 1.0f)
+		return 0;
+	*result = best;
+	return 1;
+}
+
+/**
  * \brief Frees all the sticks of the column.
  * \param self Terrain column.
  */

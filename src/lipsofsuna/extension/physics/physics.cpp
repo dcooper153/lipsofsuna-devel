@@ -288,10 +288,8 @@ int liphy_physics_cast_sphere (
 	int                 ignore_count,
 	LIPhyContact*       result)
 {
-	btCollisionWorld* collision;
 	btTransform btstart (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (start->x, start->y, start->z));
 	btTransform btend (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (end->x, end->y, end->z));
-	btSphereShape shape (radius);
 
 	/* Initialize sweep. */
 	LIPhyConvexResultCallback test (ignore_array, ignore_count);
@@ -299,8 +297,7 @@ int liphy_physics_cast_sphere (
 	test.m_collisionFilterMask = mask;
 
 	/* Sweep the shape. */
-	collision = self->dynamics->getCollisionWorld ();
-	collision->convexSweepTest (&shape, btstart, btend, test);
+	self->dynamics->sphereSweepTest (radius, btstart, btend, test);
 	if (test.m_hitCollisionObject != NULL && test.m_closestHitFraction < 1.0f)
 	{
 		*result = test.result;

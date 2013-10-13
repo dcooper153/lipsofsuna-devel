@@ -66,17 +66,26 @@ void liext_terrain_stick_free (
 
 /**
  * \brief Casts a sphere against the stick and returns the hit fraction.
+ *
+ * FIXME: Doesn't work yet.
+ *
  * \param self Terrain stick.
- * \param grid_size Grid size of the terrain.
- * \param sphere_rel_cast_start Cast start position of the sphere, in grid units relative to the stick origin.
- * \param sphere_rel_cast_end Cast ed position of the sphere, in grid units relative to the stick origin.
+ * \param bot00 Bottom surface Y offset.
+ * \param bot10 Bottom surface Y offset.
+ * \param bot01 Bottom surface Y offset.
+ * \param bot11 Bottom surface Y offset.
+ * \param top00 Top surface Y offset.
+ * \param top10 Top surface Y offset.
+ * \param top01 Top surface Y offset.
+ * \param top11 Top surface Y offset.
+ * \param sphere_rel_cast_start Cast start position of the sphere, in grid units relative to the column origin.
+ * \param sphere_rel_cast_end Cast end position of the sphere, in grid units relative to the column origin.
  * \param sphere_radius Sphere radius, in grid units.
- * \param result_fraction Return location for the hit fraction.
+ * \param result Return location for the hit fraction.
  * \return Nonzero if hit. Zero otherwise.
  */
 int liext_terrain_stick_cast_sphere (
 	const LIExtTerrainStick* self,
-	float                    grid_size,
 	float                    bot00,
 	float                    bot10,
 	float                    bot01,
@@ -88,136 +97,249 @@ int liext_terrain_stick_cast_sphere (
 	const LIMatVector*       sphere_rel_cast_start,
 	const LIMatVector*       sphere_rel_cast_end,
 	float                    sphere_radius,
-	float*                   result_fraction)
+	LIExtTerrainCollision*   result)
 {
-	float best;
-	float frac;
 	float min;
 	float max;
+	LIExtTerrainCollision best;
+	LIExtTerrainCollision frac;
 	LIMatVector v;
 	LIMatVector vtx[3];
 	LIMatVector point;
 	LIMatPlane plane;
 
-	best = LIMAT_INFINITE;
+
+	best.fraction = LIMAT_INFINITE;
 	v = limat_vector_subtract (*sphere_rel_cast_end, *sphere_rel_cast_start);
 
 	/* Left. */
 	limat_plane_init (&plane, -1.0f, 0.0f, 0.0f, 0.0f);
-	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
-	if (frac >= 0.0f && best > frac)
+	frac.fraction = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac.fraction >= 0.0f && best.fraction > frac.fraction)
 	{
-		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
-		if (point.z >= 0 && point.z <= grid_size)
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac.fraction));
+		min = limat_mix (bot00, bot01, point.z);
+		max = limat_mix (top00, top01, point.z);
+		if (point.z >= 0 && point.z <= 1.0f && min <= point.y && point.y <= max)
 		{
-			min = limat_mix (bot00, bot01, point.z / grid_size);
-			max = limat_mix (top00, top01, point.z / grid_size);
-			if (min <= point.y && point.y <= max)
-				best = frac;
+			/* Direct face hit. */
+			best = frac;
+			best.normal = limat_vector_init (-1.0f, 0.0f, 0.0f);
+			best.point = limat_vector_init (0.0f, point.y, point.z);
+		}
+		else
+		{
+			/* Potential edge hit. */
+			point.z = LIMAT_CLAMP (point.z, 0.0f, 1.0f);
+			min = limat_mix (bot00, bot01, point.z);
+			max = limat_mix (top00, top01, point.z);
+			point.y = LIMAT_CLAMP (point.y, min, max);
+			if (limat_intersect_point_cast_sphere (&point, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius, &frac.fraction))
+			{
+				if (frac.fraction >= 0.0f && best.fraction > frac.fraction)
+				{
+					best = frac;
+					best.normal = limat_vector_init (-1.0f, 0.0f, 0.0f);
+					best.point = limat_vector_init (0.0f, point.y, point.z);
+				}
+			}
 		}
 	}
 
 	/* Right. */
-	limat_plane_init (&plane, 1.0f, 0.0f, 0.0f, grid_size);
-	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
-	if (frac >= 0.0f && best > frac)
+	limat_plane_init (&plane, 1.0f, 0.0f, 0.0f, 1.0f);
+	frac.fraction = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac.fraction >= 0.0f && best.fraction > frac.fraction)
 	{
-		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
-		if (point.z >= 0 && point.z <= grid_size)
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac.fraction));
+		min = limat_mix (bot10, bot11, point.z);
+		max = limat_mix (top10, top11, point.z);
+		if (point.z >= 0 && point.z <= 1.0f && min <= point.y && point.y <= max)
 		{
-			min = limat_mix (bot10, bot11, point.z / grid_size);
-			max = limat_mix (top10, top11, point.z / grid_size);
-			if (min <= point.y && point.y <= max)
-				best = frac;
+			/* Direct face hit. */
+			best = frac;
+			best.normal = limat_vector_init (1.0f, 0.0f, 0.0f);
+			best.point = limat_vector_init (1.0f, point.y, point.z);
+		}
+		else
+		{
+			/* Potential edge hit. */
+			point.z = LIMAT_CLAMP (point.z, 0.0f, 1.0f);
+			min = limat_mix (bot10, bot11, point.z);
+			max = limat_mix (top10, top11, point.z);
+			point.y = LIMAT_CLAMP (point.y, min, max);
+			if (limat_intersect_point_cast_sphere (&point, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius, &frac.fraction))
+			{
+				if (frac.fraction >= 0.0f && best.fraction > frac.fraction)
+				{
+					best = frac;
+					best.normal = limat_vector_init (1.0f, 0.0f, 0.0f);
+					best.point = limat_vector_init (1.0f, point.y, point.z);
+				}
+			}
 		}
 	}
 
 	/* Front. */
 	limat_plane_init (&plane, 0.0f, 0.0f, -1.0f, 0.0f);
-	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
-	if (frac >= 0.0f && best > frac)
+	frac.fraction = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac.fraction >= 0.0f && best.fraction > frac.fraction)
 	{
-		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
-		if (point.x >= 0 && point.x <= grid_size)
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac.fraction));
+		min = limat_mix (bot00, bot10, point.z);
+		max = limat_mix (top00, top10, point.z);
+		if (point.x >= 0 && point.x <= 1.0f && min <= point.y && point.y <= max)
 		{
-			min = limat_mix (bot00, bot10, point.z / grid_size);
-			max = limat_mix (top00, top10, point.z / grid_size);
-			if (min <= point.y && point.y <= max)
-				best = frac;
+			/* Direct face hit. */
+			best = frac;
+			best.normal = limat_vector_init (0.0f, 0.0f, -1.0f);
+			best.point = limat_vector_init (point.x, point.y, 0.0f);
+		}
+		else
+		{
+			/* Potential edge hit. */
+			point.x = LIMAT_CLAMP (point.x, 0.0f, 1.0f);
+			min = limat_mix (bot00, bot10, point.z);
+			max = limat_mix (top00, top10, point.z);
+			point.y = LIMAT_CLAMP (point.y, min, max);
+			if (limat_intersect_point_cast_sphere (&point, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius, &frac.fraction))
+			{
+				if (frac.fraction >= 0.0f && best.fraction > frac.fraction)
+				{
+					best = frac;
+					best.normal = limat_vector_init (0.0f, 0.0f, -1.0f);
+					best.point = limat_vector_init (point.x, point.y, 0.0f);
+				}
+			}
 		}
 	}
 
 	/* Back. */
-	limat_plane_init (&plane, 0.0f, 0.0f, 1.0f, grid_size);
-	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
-	if (frac >= 0.0f && best > frac)
+	limat_plane_init (&plane, 0.0f, 0.0f, 1.0f, 1.0f);
+	frac.fraction = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac.fraction >= 0.0f && best.fraction > frac.fraction)
 	{
-		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
-		if (point.x >= 0 && point.x <= grid_size)
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac.fraction));
+		min = limat_mix (bot01, bot11, point.z);
+		max = limat_mix (top01, top11, point.z);
+		if (point.x >= 0 && point.x <= 1.0f && min <= point.y && point.y <= max)
 		{
-			min = limat_mix (bot01, bot11, point.z / grid_size);
-			max = limat_mix (top01, top11, point.z / grid_size);
-			if (min <= point.y && point.y <= max)
-				best = frac;
+			/* Direct face hit. */
+			best = frac;
+			best.normal = limat_vector_init (0.0f, 0.0f, 1.0f);
+			best.point = limat_vector_init (point.x, point.y, 1.0f);
+		}
+		else
+		{
+			/* Potential edge hit. */
+			point.x = LIMAT_CLAMP (point.x, 0.0f, 1.0f);
+			min = limat_mix (bot01, bot11, point.z);
+			max = limat_mix (top01, top11, point.z);
+			point.y = LIMAT_CLAMP (point.y, min, max);
+			if (limat_intersect_point_cast_sphere (&point, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius, &frac.fraction))
+			{
+				if (frac.fraction >= 0.0f && best.fraction > frac.fraction)
+				{
+					best = frac;
+					best.normal = limat_vector_init (0.0f, 0.0f, 1.0f);
+					best.point = limat_vector_init (point.x, point.y, 1.0f);
+				}
+			}
 		}
 	}
 
 	/* Bottom. */
 	vtx[2] = limat_vector_init (0.0f, bot00, 0.0f);
-	vtx[1] = limat_vector_init (0.0f, bot01, grid_size);
-	vtx[0] = limat_vector_init (grid_size, bot11, grid_size);
+	vtx[1] = limat_vector_init (0.0f, bot01, 1.0f);
+	vtx[0] = limat_vector_init (1.0f, bot11, 1.0f);
 	limat_plane_init_from_points (&plane, vtx + 0, vtx + 1, vtx + 2);
 	lisys_assert (plane.y < 0.0f);
-	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
-	if (frac >= 0.0f && best > frac)
+	frac.fraction = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac.fraction >= 0.0f && best.fraction > frac.fraction)
 	{
-		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac.fraction));
 		if (point.x >= 0.0f && point.z >= 0.0f && point.z <= 1.0f && point.z >= point.x)
+		{
+			/* Direct face hit. */
 			best = frac;
+			limat_plane_get_normal (&plane, &best.normal);
+			best.point = limat_vector_add (point, limat_vector_multiply (best.normal, -sphere_radius));
+		}
+		else
+		{
+			/* TODO: Potential edge hit. */
+		}
 	}
 	vtx[2] = limat_vector_init (0.0f, bot00, 0.0f);
-	vtx[1] = limat_vector_init (grid_size, bot11, grid_size);
-	vtx[0] = limat_vector_init (grid_size, bot10, 0.0f);
+	vtx[1] = limat_vector_init (1.0f, bot11, 1.0f);
+	vtx[0] = limat_vector_init (1.0f, bot10, 0.0f);
 	limat_plane_init_from_points (&plane, vtx + 0, vtx + 1, vtx + 2);
 	lisys_assert (plane.y < 0.0f);
-	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
-	if (frac >= 0.0f && best > frac)
+	frac.fraction = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac.fraction >= 0.0f && best.fraction > frac.fraction)
 	{
-		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac.fraction));
 		if (point.x >= 0.0f && point.z >= 0.0f && point.x <= 1.0f && point.x >= point.z)
+		{
+			/* Direct face hit. */
 			best = frac;
+			limat_plane_get_normal (&plane, &best.normal);
+			best.point = limat_vector_add (point, limat_vector_multiply (best.normal, -sphere_radius));
+		}
+		else
+		{
+			/* TODO: Potential edge hit. */
+		}
 	}
 
 	/* Top. */
 	vtx[2] = limat_vector_init (0.0f, top00, 0.0f);
-	vtx[1] = limat_vector_init (grid_size, top10, 0.0f);
-	vtx[0] = limat_vector_init (grid_size, top11, grid_size);
+	vtx[1] = limat_vector_init (1.0f, top10, 0.0f);
+	vtx[0] = limat_vector_init (1.0f, top11, 1.0f);
 	limat_plane_init_from_points (&plane, vtx + 0, vtx + 1, vtx + 2);
-	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	frac.fraction = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
 	lisys_assert (plane.y > 0.0f);
-	if (frac >= 0.0f && best > frac)
+	if (frac.fraction >= 0.0f && best.fraction > frac.fraction)
 	{
-		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac.fraction));
 		if (point.x >= 0.0f && point.z >= 0.0f && point.x <= 1.0f && point.x >= point.z)
+		{
+			/* Direct face hit. */
 			best = frac;
+			limat_plane_get_normal (&plane, &best.normal);
+			best.point = limat_vector_add (point, limat_vector_multiply (best.normal, -sphere_radius));
+		}
+		else
+		{
+			/* TODO: Potential edge hit. */
+		}
 	}
 	vtx[2] = limat_vector_init (0.0f, top00, 0.0f);
-	vtx[1] = limat_vector_init (grid_size, top11, grid_size);
-	vtx[0] = limat_vector_init (0.0f, top10, grid_size);
+	vtx[1] = limat_vector_init (1.0f, top11, 1.0f);
+	vtx[0] = limat_vector_init (0.0f, top10, 1.0f);
 	limat_plane_init_from_points (&plane, vtx + 0, vtx + 1, vtx + 2);
 	lisys_assert (plane.y > 0.0f);
-	frac = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
-	if (frac >= 0.0f && best > frac)
+	frac.fraction = limat_plane_cast_sphere (&plane, sphere_rel_cast_start, sphere_rel_cast_end, sphere_radius);
+	if (frac.fraction >= 0.0f && best.fraction > frac.fraction)
 	{
-		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac));
+		point = limat_vector_add (*sphere_rel_cast_start, limat_vector_multiply (v, frac.fraction));
 		if (point.x >= 0.0f && point.z >= 0.0f && point.z <= 1.0f && point.z >= point.x)
+		{
+			/* Direct face hit. */
 			best = frac;
+			limat_plane_get_normal (&plane, &best.normal);
+			best.point = limat_vector_add (point, limat_vector_multiply (best.normal, -sphere_radius));
+		}
+		else
+		{
+			/* TODO: Potential edge hit. */
+		}
 	}
 
 	/* Check whether a collision occurred. */
-	if (best > 1.0f)
+	if (best.fraction > 1.0f || best.fraction == LIMAT_INFINITE)
 		return 0;
-	*result_fraction = best;
+	*result = best;
 	return 1;
 }
 

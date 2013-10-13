@@ -228,6 +228,16 @@ Terrain.cast_ray = function(self, src, dst)
 	return Vector(px,py,pz),Vector(nx,ny,nz),gx,gy
 end
 
+--- Casts a sphere against the terrain.
+-- @param self Terrain.
+-- @param src Source point, in world units.
+-- @param dst Destination point, in world units.
+-- @param radius Sphere radius, in world units.
+-- @return Hit fraction if hit. Nil if no hit.
+Terrain.cast_sphere = function(self, src, dst, radius)
+	return Los.terrain_cast_sphere(self.handle, src.handle, dst.handle, radius)
+end
+
 --- Clears the model of the chunk.
 -- @param self Terrain.
 -- @param x Grid X coordinate.

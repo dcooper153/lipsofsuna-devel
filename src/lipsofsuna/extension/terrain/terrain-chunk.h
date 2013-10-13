@@ -76,6 +76,13 @@ LIAPICALL (int, liext_terrain_chunk_build_model, (
 	float                       grid_size,
 	const LIMatVector*          offset));
 
+LIAPICALL (int, liext_terrain_chunk_cast_sphere, (
+	const LIExtTerrainChunk* self,
+	const LIMatVector*       sphere_rel_cast_start,
+	const LIMatVector*       sphere_rel_cast_end,
+	float                    sphere_radius,
+	LIExtTerrainCollision*   result));
+
 LIAPICALL (void, liext_terrain_chunk_clear_column, (
 	LIExtTerrainChunk* self,
 	int                column_x,
