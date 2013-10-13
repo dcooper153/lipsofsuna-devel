@@ -57,6 +57,9 @@ btScalar LIPhyConvexResultCallback::addSingleResult (btCollisionWorld::LocalConv
 	else
 	{
 		/* Terrain. */
+		/* FIXME: Doesn't work. Does the terrain collision algorithm need to do something more? */
+		if (m_closestHitFraction >= 1.0f)
+			return 1.0f;
 		ret = ClosestConvexResultCallback::addSingleResult (result, world);
 		liphy_contact_init (&this->result);
 		this->result.terrain_id = pointer->id;

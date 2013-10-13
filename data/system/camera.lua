@@ -45,12 +45,13 @@ end
 -- @param center_pos Center position vector.
 -- @param center_rot Center rotation quaternion.
 -- @param distance Distance to the center.
+-- @param radius Radius of the collision shape. Nil for default.
 -- @param collision_group Collision group. Nil for default.
 -- @param collision_mask Collision mask. Nil for default.
 -- @return Number.
-Camera.calculate_3rd_person_clipped_distance = function(self, center_pos, center_rot, distance, collision_mask, collision_group)
+Camera.calculate_3rd_person_clipped_distance = function(self, center_pos, center_rot, distance, radius, collision_mask, collision_group)
 	return Los.camera_calculate_3rd_person_clipped_distance(
-		self.handle, center_pos.handle, center_rot.handle, distance, collision_mask, collision_group)
+		self.handle, center_pos.handle, center_rot.handle, distance, radius, collision_mask, collision_group)
 end
 
 --- Calculates the 3rd person camera transformation.

@@ -122,6 +122,7 @@ void liext_camera_calculate_1st_person_transform (
  * \brief Calculates the 3rd person camera distance after collisions.
  * \param self Camera.
  * \param center Center position and rotation.
+ * \param radius Camera object radius.
  * \param distance Distance from the center.
  * \param collision_group Collision group.
  * \param collision_mask Collision mask.
@@ -131,6 +132,7 @@ float liext_camera_calculate_3rd_person_clipped_distance (
 	LIExtCamera*          self,
 	const LIMatTransform* center,
 	float                 distance,
+	float                 radius,
 	int                   collision_group,
 	int                   collision_mask)
 {
@@ -153,12 +155,17 @@ float liext_camera_calculate_3rd_person_clipped_distance (
 	/* Calculate the unclipped target transformation. */
 	liext_camera_calculate_3rd_person_transform (self, center, distance, &target);
 
-	/* Find the clip distance with a ray cast. */
-	/* A convex cast might sound like a better idea but it makes the behavior
-	   less predictable so scripting will suffer. The gain is also relatively
-	   small so we just use a ray cast now. */
-	hit = liphy_physics_cast_ray (physics, &center1.position, &target.position,
-		collision_group, collision_mask, NULL, 0, &tmp);
+	/* Find the clip distance with a ray/sphere cast. */
+	if (radius >= 0.001f)
+	{
+		hit = liphy_physics_cast_sphere (physics, &center1.position, &target.position,
+			radius, collision_group, collision_mask, NULL, 0, &tmp);
+	}
+	else
+	{
+		hit = liphy_physics_cast_ray (physics, &center1.position, &target.position,
+			collision_group, collision_mask, NULL, 0, &tmp);
+	}
 
 	/* Return the clip distance. */
 	if (hit)
@@ -728,7 +735,7 @@ static void private_update_3rd_person (
 	float        dist)
 {
 	dist = liext_camera_calculate_3rd_person_clipped_distance (
-		self, &self->transform.center, dist,
+		self, &self->transform.center, dist, 0.0f,
 		self->config.collision_group, self->config.collision_mask);
 	liext_camera_calculate_3rd_person_transform (
 		self, &self->transform.center,

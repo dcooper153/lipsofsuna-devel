@@ -73,6 +73,7 @@ static void Camera_calculate_3rd_person_clipped_distance (LIScrArgs* args)
 	int group = 0xFFFF;
 	int mask = 0xFFFF;
 	float distance;
+	float radius;
 	float result;
 	LIMatTransform center;
 
@@ -82,11 +83,13 @@ static void Camera_calculate_3rd_person_clipped_distance (LIScrArgs* args)
 		return;
 	if (!liscr_args_geti_float (args, 2, &distance))
 		return;
-	liscr_args_geti_int (args, 3, &group);
-	liscr_args_geti_int (args, 4, &mask);
+	if (!liscr_args_geti_float (args, 3, &radius))
+		radius = 0.0f;
+	liscr_args_geti_int (args, 4, &group);
+	liscr_args_geti_int (args, 5, &mask);
 
 	result = liext_camera_calculate_3rd_person_clipped_distance (
-		args->self, &center, distance, group, mask);
+		args->self, &center, distance, radius, group, mask);
 	liscr_args_seti_float (args, result);
 }
 

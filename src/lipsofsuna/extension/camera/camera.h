@@ -83,6 +83,7 @@ LIAPICALL (float, liext_camera_calculate_3rd_person_clipped_distance, (
 	LIExtCamera*          self,
 	const LIMatTransform* center,
 	float                 distance,
+	float                 radius,
 	int                   collision_group,
 	int                   collision_mask));
 
