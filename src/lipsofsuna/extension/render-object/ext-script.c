@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -432,6 +432,16 @@ static void RenderObject_get_render_loaded (LIScrArgs* args)
 		liscr_args_seti_bool (args, 1);
 }
 
+static void RenderObject_set_render_queue (LIScrArgs* args)
+{
+	const char* value;
+	LIExtRenderObject* object;
+
+	object = args->self;
+	if (liscr_args_geti_string (args, 0, &value))
+		liren_render_object_set_render_queue (object->render, object->id, value);
+}
+
 static void RenderObject_set_shadow_casting (LIScrArgs* args)
 {
 	int value;
@@ -501,6 +511,7 @@ void liext_script_render_object (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_position", RenderObject_set_position);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_render_distance", RenderObject_set_render_distance);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_get_render_loaded", RenderObject_get_render_loaded);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_render_queue", RenderObject_set_render_queue);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_rotation", RenderObject_set_rotation);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_shadow_casting", RenderObject_set_shadow_casting);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_visible", RenderObject_set_visible);

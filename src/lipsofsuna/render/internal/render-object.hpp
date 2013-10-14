@@ -124,6 +124,11 @@ public:
 	void set_render_distance (
 		float value);
 
+	int get_render_queue () const { return render_queue; }
+
+	void set_render_queue (
+		const char* value);
+
 	int get_shadow_casting () const { return shadow_casting; }
 
 	void set_shadow_casting (
@@ -162,6 +167,7 @@ private:
 private:
 	int id;
 	int visible;
+	int render_queue;
 	int shadow_casting;
 	int skeleton_rebuild_needed;
 	float render_distance;

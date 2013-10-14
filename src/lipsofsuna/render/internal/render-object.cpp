@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -45,6 +45,7 @@ LIRenObject::LIRenObject (
 	/* Allocate self. */
 	this->id = id;
 	visible = 0;
+	render_queue = Ogre::RENDER_QUEUE_MAIN;
 	shadow_casting = 0;
 	skeleton_rebuild_needed = 0;
 	render_distance = -1.0f;
@@ -535,6 +536,42 @@ void LIRenObject::set_render_distance (
 	float value)
 {
 	render_distance = value;
+	update_entity_settings ();
+}
+
+/**
+ * \brief Sets the render queue of the object.
+ * \param value Render queue name.
+ */
+void LIRenObject::set_render_queue (
+	const char* value)
+{
+	if (!strcmp (value, "background"))
+		render_queue = Ogre::RENDER_QUEUE_BACKGROUND;
+	else if (!strcmp (value, "skies_early"))
+		render_queue = Ogre::RENDER_QUEUE_SKIES_EARLY;
+	else if (!strcmp (value, "1"))
+		render_queue = Ogre::RENDER_QUEUE_1;
+	else if (!strcmp (value, "2"))
+		render_queue = Ogre::RENDER_QUEUE_2;
+	else if (!strcmp (value, "3"))
+		render_queue = Ogre::RENDER_QUEUE_3;
+	else if (!strcmp (value, "4"))
+		render_queue = Ogre::RENDER_QUEUE_4;
+	else if (!strcmp (value, "main"))
+		render_queue = Ogre::RENDER_QUEUE_MAIN;
+	else if (!strcmp (value, "6"))
+		render_queue = Ogre::RENDER_QUEUE_6;
+	else if (!strcmp (value, "7"))
+		render_queue = Ogre::RENDER_QUEUE_7;
+	else if (!strcmp (value, "8"))
+		render_queue = Ogre::RENDER_QUEUE_8;
+	else if (!strcmp (value, "9"))
+		render_queue = Ogre::RENDER_QUEUE_9;
+	else if (!strcmp (value, "skies_late"))
+		render_queue = Ogre::RENDER_QUEUE_SKIES_LATE;
+	else if (!strcmp (value, "overlay"))
+		render_queue = Ogre::RENDER_QUEUE_OVERLAY;
 	update_entity_settings ();
 }
 

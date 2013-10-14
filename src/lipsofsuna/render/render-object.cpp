@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -423,6 +423,24 @@ void liren_render_object_set_render_distance (
 	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
 		object->set_render_distance (value);
+}
+
+/**
+ * \brief Sets the render queue of the object.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \param value Queue name.
+ */
+void liren_render_object_set_render_queue (
+	LIRenRender* self,
+	int          id,
+	const char*  value)
+{
+	LIRenObject* object;
+
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		object->set_render_queue (value);
 }
 
 /**

@@ -278,6 +278,21 @@ RenderObject.set_render_distance = function(self, v)
 	Los.render_object_set_render_distance(self.handle, v)
 end
 
+--- Gets the render queue of the object.
+-- @param self Object.
+-- @return Queue name.
+RenderObject.get_render_queue = function(self)
+	return self.__render_queue or "main"
+end
+
+--- Sets the render queue of the object.
+-- @param self Object.
+-- @param value Queue name.
+RenderObject.set_render_queue = function(self, value)
+	self.__render_queue = value
+	Los.render_object_set_render_queue(self.handle, value)
+end
+
 --- Enables or disables shadow casting for the object.
 -- @param self Object.
 -- @param v True to enable, false to disable.
