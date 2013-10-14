@@ -160,6 +160,17 @@ RenderObject.replace_texture = function(self, name, image)
 	Los.render_object_replace_texture(self.handle, name, image.handle)
 end
 
+--- Sets a custom shader parameter.
+-- @param self Object.
+-- @param index Parameter index.
+-- @param r Parameter value.
+-- @param g Parameter value.
+-- @param b Parameter value.
+-- @param a Parameter value.
+RenderObject.set_custom_param = function(self, index, r, g, b, a)
+	Los.render_object_set_custom_param(self.handle, index, r, g, b, a)
+end
+
 --- Set or clears the additional effect layer of the object.
 -- @param self Object.
 -- @param ... Arguments.<ul>

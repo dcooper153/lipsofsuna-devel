@@ -97,6 +97,15 @@ LIAPICALL (void, liren_render_object_replace_texture, (
 	int          height,
 	const void*  pixels));
 
+LIAPICALL (void, liren_render_object_set_custom_param, (
+	LIRenRender* self,
+	int          id,
+	int          index,
+	float        r,
+	float        g,
+	float        b,
+	float        a));
+
 LIAPICALL (void, liren_render_object_set_effect, (
 	LIRenRender* self,
 	int          id,

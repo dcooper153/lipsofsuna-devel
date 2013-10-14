@@ -418,6 +418,25 @@ void LIRenObject::update (
 }
 
 /**
+ * \brief Sets a custom shader parameter.
+ * \param index Parameter index.
+ * \param r Parameter value.
+ * \param g Parameter value.
+ * \param b Parameter value.
+ * \param a Parameter value.
+ */
+void LIRenObject::set_custom_param (
+	int   index,
+	float r,
+	float g,
+	float b,
+	float a)
+{
+	custom_params[index] = Ogre::Vector4 (r, g, b, a);
+	update_entity_settings ();
+}
+
+/**
  * \brief Sets the effect layer of the object.
  * \param shader Shader name or NULL to disable the effect.
  * \param params Effect parameters or NULL.

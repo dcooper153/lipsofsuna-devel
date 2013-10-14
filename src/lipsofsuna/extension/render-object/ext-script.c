@@ -376,6 +376,28 @@ static void RenderObject_replace_texture (LIScrArgs* args)
 	}
 }
 
+static void RenderObject_set_custom_param (LIScrArgs* args)
+{
+	int index;
+	float params[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	LIExtRenderObject* object;
+
+	/* Get arguments. */
+	if (!liscr_args_geti_int (args, 0, &index))
+		return;
+	if (index < 0 || index >= 8)
+		return;
+	liscr_args_geti_float (args, 1, params + 0);
+	liscr_args_geti_float (args, 2, params + 1);
+	liscr_args_geti_float (args, 3, params + 2);
+	liscr_args_geti_float (args, 4, params + 3);
+
+	/* Set the parameter. */
+	object = args->self;
+	liren_render_object_set_custom_param (object->render, object->id, index,
+		params[0], params[1], params[2], params[3]);
+}
+
 static void RenderObject_set_effect (LIScrArgs* args)
 {
 	float params[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -505,6 +527,7 @@ void liext_script_render_object (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_remove_model", RenderObject_remove_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_replace_model", RenderObject_replace_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_replace_texture", RenderObject_replace_texture);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_custom_param", RenderObject_set_custom_param);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_effect", RenderObject_set_effect);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_particle", RenderObject_set_particle);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_set_particle_emitting", RenderObject_set_particle_emitting);

@@ -293,6 +293,32 @@ void liren_render_object_remove_model (
 }
 
 /**
+ * \brief Sets a custom shader parameter.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \param index Parameter index.
+ * \param r Parameter value.
+ * \param g Parameter value.
+ * \param b Parameter value.
+ * \param a Parameter value.
+ */
+void liren_render_object_set_custom_param (
+	LIRenRender* self,
+	int          id,
+	int          index,
+	float        r,
+	float        g,
+	float        b,
+	float        a)
+{
+	LIRenObject* object;
+
+	object = (LIRenObject*) lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		object->set_custom_param (index, r, g, b, a);
+}
+
+/**
  * \brief Sets the effect layer of the object.
  * \param self Renderer.
  * \param id Object ID.

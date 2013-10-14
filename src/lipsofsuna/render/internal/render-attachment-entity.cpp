@@ -292,6 +292,16 @@ void LIRenAttachmentEntity::update_settings ()
 
 	entity->setCastShadows (object->get_shadow_casting ());
 	entity->setRenderQueueGroup (object->get_render_queue ());
+
+	// Set the custom parameters of subentities.
+	const std::map<int, Ogre::Vector4>& params = object->get_custom_params ();
+	for (size_t subent_idx = 0 ; subent_idx < entity->getNumSubEntities () ; ++subent_idx)
+	{
+		Ogre::SubEntity* subent = entity->getSubEntity (subent_idx);
+		std::map<int, Ogre::Vector4>::const_iterator iter;
+		for (iter = params.begin () ; iter != params.end () ; iter++)
+			subent->setCustomParameter (iter->first, iter->second);
+	}
 }
 
 bool LIRenAttachmentEntity::create_skeleton ()

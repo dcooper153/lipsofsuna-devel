@@ -23,6 +23,7 @@
 #include <map>
 #include <vector>
 #include <OgreTexture.h>
+#include <OgreVector4.h>
 
 class LIRenAttachment;
 class LIRenModel;
@@ -103,6 +104,15 @@ public:
 
 	int get_attachment_count () const { return attachments.size (); }
 
+	const std::map<int, Ogre::Vector4> get_custom_params () const { return custom_params; }
+
+	void set_custom_param (
+		int   index,
+		float r,
+		float g,
+		float b,
+		float a);
+
 	int get_id () const;
 
 	int get_loaded () const;
@@ -174,6 +184,7 @@ private:
 	LIMatTransform transform;
 	LIMdlPose* pose;
 	std::vector<LIRenAttachment*> attachments;
+	std::map<int, Ogre::Vector4> custom_params;
 	std::map<Ogre::String, Ogre::TexturePtr> texture_aliases;
 
 // FIXME
