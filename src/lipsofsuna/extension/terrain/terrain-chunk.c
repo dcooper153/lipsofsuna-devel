@@ -334,9 +334,9 @@ int liext_terrain_chunk_build_model (
 	self->stamp_model = self->stamp;
 
 	/* Sanity checks. */
-	lisys_assert (self->model->materials.count <= 1);
+	lisys_assert (self->model->materials.count <= 2);
 	lisys_assert (self->model->lod.count == 1);
-	lisys_assert (self->model->lod.array[0].face_groups.count <= 1);
+	lisys_assert (self->model->lod.array[0].face_groups.count <= 2);
 
 	return 1;
 }

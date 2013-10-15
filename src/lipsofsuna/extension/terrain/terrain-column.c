@@ -70,6 +70,7 @@ static void private_generate_grass (
 
 static void private_insert_quad (
 	LIMdlBuilder* builder,
+	int           material,
 	LIMdlVertex*  quad);
 
 static void private_insert_stick (
@@ -610,7 +611,8 @@ int liext_terrain_column_build_model (
 	LIExtColumnVertex top[2][2];
 	LIMatVector normal;
 	LIMdlBuilder* builder;
-	LIMdlMaterial model_material;
+	LIMdlMaterial material1;
+	LIMdlMaterial material2;
 	LIMdlVertex quad[4];
 
 	/* Check if changes are needed. */
@@ -628,11 +630,24 @@ int liext_terrain_column_build_model (
 		limdl_model_clear (self->model);
 
 	/* Allocate the material. */
-	if (!limdl_material_init (&model_material))
+	if (!limdl_material_init (&material1))
 		return 0;
-	if (!limdl_material_set_material (&model_material, "stickterrain1"))
+	if (!limdl_material_set_material (&material1, "stickterrain1"))
 	{
-		limdl_material_free (&model_material);
+		limdl_material_free (&material1);
+		return 0;
+	}
+
+	/* Allocate the two-side material. */
+	if (!limdl_material_init (&material2))
+	{
+		limdl_material_free (&material1);
+		return 0;
+	}
+	if (!limdl_material_set_material (&material2, "stickterraintwoside1"))
+	{
+		limdl_material_free (&material1);
+		limdl_material_free (&material2);
 		return 0;
 	}
 
@@ -640,16 +655,20 @@ int liext_terrain_column_build_model (
 	builder = limdl_builder_new (self->model);
 	if (builder == NULL)
 	{
-		limdl_material_free (&model_material);
+		limdl_material_free (&material1);
+		limdl_material_free (&material2);
 		return 0;
 	}
-	if (!limdl_builder_insert_material (builder, &model_material))
+	if (!limdl_builder_insert_material (builder, &material1) ||
+	    !limdl_builder_insert_material (builder, &material2))
 	{
-		limdl_material_free (&model_material);
+		limdl_material_free (&material1);
+		limdl_material_free (&material2);
 		limdl_builder_free (builder);
 		return 0;
 	}
-	limdl_material_free (&model_material);
+	limdl_material_free (&material1);
+	limdl_material_free (&material2);
 
 	/* Initialize the bottom surface data. */
 	y = 0.0f;
@@ -737,7 +756,7 @@ int liext_terrain_column_build_model (
 				quad[1].color[1] = 255 * (int)(1.0f - bot[1][0].splatting);
 				quad[2].color[1] = 255 * (int)(1.0f - bot[1][1].splatting);
 				quad[3].color[1] = 255 * (int)(1.0f - bot[0][1].splatting);
-				private_insert_quad (builder, quad);
+				private_insert_quad (builder, 0, quad);
 			}
 
 			/* Top face. */
@@ -756,7 +775,7 @@ int liext_terrain_column_build_model (
 				quad[1].color[1] = 255 * (int)(1.0f - stick->vertices[0][1].splatting);
 				quad[2].color[1] = 255 * (int)(1.0f - stick->vertices[1][1].splatting);
 				quad[3].color[1] = 255 * (int)(1.0f - stick->vertices[1][0].splatting);
-				private_insert_quad (builder, quad);
+				private_insert_quad (builder, 0, quad);
 
 				/* Grass. */
 				if (material->decoration_type == LIEXT_TERRAIN_DECORATION_TYPE_GRASS)
@@ -1379,7 +1398,7 @@ static void private_generate_grass (
 	quad[1].color[0] = material->texture_decoration;
 	quad[2].color[0] = material->texture_decoration;
 	quad[3].color[0] = material->texture_decoration;
-	private_insert_quad (builder, quad);
+	private_insert_quad (builder, 1, quad);
 
 	/* Diagonal. */
 	normal = limat_vector_init (0.707f, 0.0f, 0.707f);
@@ -1395,7 +1414,7 @@ static void private_generate_grass (
 	quad[1].color[0] = material->texture_decoration;
 	quad[2].color[0] = material->texture_decoration;
 	quad[3].color[0] = material->texture_decoration;
-	private_insert_quad (builder, quad);
+	private_insert_quad (builder, 1, quad);
 
 	/* Front. */
 	normal = limat_vector_init (0.0f, 0.0f, 1.0f);
@@ -1411,7 +1430,7 @@ static void private_generate_grass (
 	quad[1].color[0] = material->texture_decoration;
 	quad[2].color[0] = material->texture_decoration;
 	quad[3].color[0] = material->texture_decoration;
-	private_insert_quad (builder, quad);
+	private_insert_quad (builder, 1, quad);
 
 	/* Right. */
 	normal = limat_vector_init (1.0f, 0.0f, 0.0f);
@@ -1427,11 +1446,12 @@ static void private_generate_grass (
 	quad[1].color[0] = material->texture_decoration;
 	quad[2].color[0] = material->texture_decoration;
 	quad[3].color[0] = material->texture_decoration;
-	private_insert_quad (builder, quad);
+	private_insert_quad (builder, 1, quad);
 }
 
 static void private_insert_quad (
 	LIMdlBuilder* builder,
+	int           material,
 	LIMdlVertex*  quad)
 {
 	LIMdlVertex vertices[3];
@@ -1443,11 +1463,11 @@ static void private_insert_quad (
 	vertices[0] = quad[0];
 	vertices[1] = quad[1];
 	vertices[2] = quad[2];
-	limdl_builder_insert_face (builder, 0, 0, vertices, NULL);
+	limdl_builder_insert_face (builder, 0, material, vertices, NULL);
 	vertices[0] = quad[0];
 	vertices[1] = quad[2];
 	vertices[2] = quad[3];
-	limdl_builder_insert_face (builder, 0, 0, vertices, NULL);
+	limdl_builder_insert_face (builder, 0, material, vertices, NULL);
 }
 
 static void private_insert_stick (
