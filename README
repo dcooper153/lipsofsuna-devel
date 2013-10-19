@@ -5,7 +5,7 @@ Lips of Suna is a tongue-in-cheek action RPG.
 
 Website: http://lipsofsuna.org/
 Forums: http://forum.freegamedev.net/viewforum.php?f=25
-Wiki: http://sourceforge.net/apps/trac/lipsofsuna/wiki/
+Wiki: http://lipsofsuna.org/wiki/index
 
 
 System requirements
@@ -22,24 +22,26 @@ screen, you may be able to play with a less powerful graphics cards.
 Dependencies
 ============
 
- * Python            http://www.python.org/
- * Ogre    >= 1.7.0  http://www.ogre3d.org/
- * OIS     >= 1.3.0  http://sourceforge.net/projects/wgois/
- * Bullet  >= 2.77   http://www.bulletphysics.com/
- * ENet    >= 1.2.2  http://enet.bespin.org/
- * Lua     >= 5.1    http://www.lua.org/
- * SQLite  >= 3.6    http://www.sqlite.org/
- * OpenAL            http://www.openal.org/
- * libogg            http://xiph.org/downloads/
- * libvorbis         http://xiph.org/downloads/
- * libflac           http://flac.sourceforge.net/
+ * Python              http://www.python.org/
+ * Ogre      >= 1.7.0  http://www.ogre3d.org/
+ * OIS       >= 1.3.0  http://sourceforge.net/projects/wgois/
+ * FreeImage => 3.15   http://freeimage.sourceforge.net/
+ * Bullet    >= 2.77   http://www.bulletphysics.com/
+ * ENet      >= 1.2.2  http://enet.bespin.org/
+ * Lua       >= 5.1    http://www.lua.org/
+ * SQLite    >= 3.6    http://www.sqlite.org/
+ * OpenAL              http://www.openal.org/
+ * libogg              http://xiph.org/downloads/
+ * libvorbis           http://xiph.org/downloads/
+ * libflac             http://flac.sourceforge.net/
+ * libcurl             http://curl.haxx.se/libcurl/c/
 
 In Ubuntu and Mint, you can install the dependencies with the following
 command pasted to the terminal:
 
 sudo apt-get install build-essential libopenal-dev libogg-dev \
   libvorbis-dev libflac-dev liblua5.1-0-dev libsqlite3-dev libbullet-dev \
-  libenet-dev libcurl4-openssl-dev libogre-dev libpng12-dev libois-dev
+  libenet-dev libcurl4-openssl-dev libogre-dev libois-dev libfreeimage-dev
 
 
 Compiling
