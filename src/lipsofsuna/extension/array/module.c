@@ -18,39 +18,39 @@
 /**
  * \addtogroup LIExt Extension
  * @{
- * \addtogroup LIExtSkeleton Skeleton
+ * \addtogroup LIExtArray Array
  * @{
  */
 
 #include "module.h"
 
-LIMaiExtensionInfo liext_skeleton_info =
+LIMaiExtensionInfo liext_array_info =
 {
-	LIMAI_EXTENSION_VERSION, "Skeleton",
-	liext_skeleton_module_new,
-	liext_skeleton_module_free
+	LIMAI_EXTENSION_VERSION, "Array",
+	liext_array_module_new,
+	liext_array_module_free
 };
 
-LIExtSkeletonModule* liext_skeleton_module_new (
+LIExtArrayModule* liext_array_module_new (
 	LIMaiProgram* program)
 {
-	LIExtSkeletonModule* self;
+	LIExtArrayModule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIExtSkeletonModule));
+	self = lisys_calloc (1, sizeof (LIExtArrayModule));
 	if (self == NULL)
 		return NULL;
 	self->program = program;
 
 	/* Register classes. */
-	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_SKELETON, self);
-	liext_script_skeleton (program->script);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_NUMBER_ARRAY_2D, self);
+	liext_script_number_array_2d (program->script);
 
 	return self;
 }
 
-void liext_skeleton_module_free (
-	LIExtSkeletonModule* self)
+void liext_array_module_free (
+	LIExtArrayModule* self)
 {
 	lisys_free (self);
 }

@@ -15,28 +15,28 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_SKELETON_MODULE_H__
-#define __EXT_SKELETON_MODULE_H__
+#ifndef __EXT_ARRAY_MODULE_H__
+#define __EXT_ARRAY_MODULE_H__
 
 #include "lipsofsuna/extension.h"
 
-#define LIEXT_SCRIPT_SKELETON "Skeleton"
+#define LIEXT_SCRIPT_NUMBER_ARRAY_2D "NubmerArray2d"
 
-typedef struct _LIExtSkeletonModule LIExtSkeletonModule;
-struct _LIExtSkeletonModule
+typedef struct _LIExtArrayModule LIExtArrayModule;
+struct _LIExtArrayModule
 {
 	LIMaiProgram* program;
 };
 
-LIAPICALL (LIExtSkeletonModule*, liext_skeleton_module_new, (
+LIAPICALL (LIExtArrayModule*, liext_array_module_new, (
 	LIMaiProgram* program));
 
-LIAPICALL (void, liext_skeleton_module_free, (
-	LIExtSkeletonModule* self));
+LIAPICALL (void, liext_array_module_free, (
+	LIExtArrayModule* self));
 
 /*****************************************************************************/
 
-LIAPICALL (void, liext_script_skeleton, (
+LIAPICALL (void, liext_script_number_array_2d, (
 	LIScrScript* self));
 
 #endif
