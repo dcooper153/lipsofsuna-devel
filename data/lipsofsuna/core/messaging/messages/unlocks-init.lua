@@ -49,7 +49,8 @@ Main.messaging:register_message{
 			for name in pairs(names) do
 				Client.data.unlocks:lock(type, name)
 				if not Operators.play:is_startup_period() then
-					Client:append_log("Locked " .. type .. ": " .. name)
+					local type1 = (type == "modifier" and "enchantment" or type)
+					Client:append_log("Locked " .. type1 .. ": " .. name)
 				end
 			end
 		end
@@ -59,7 +60,8 @@ Main.messaging:register_message{
 				if not Client.data.unlocks:get(type, name) then
 					Client.data.unlocks:unlock(type, name)
 					if not Operators.play:is_startup_period() then
-						Client:append_log("Unlocked " .. type .. ": " .. name)
+						local type1 = (type == "modifier" and "enchantment" or type)
+						Client:append_log("Unlocked " .. type1 .. ": " .. name)
 					end
 				end
 			end
