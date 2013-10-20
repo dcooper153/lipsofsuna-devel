@@ -30,7 +30,7 @@ void main()
 	 * shader.
 	 */
 	int material = int(255.0 * colour.x + 0.5);
-	F_texatlas = vec2(mod(material, 4), floor(material / 4)) * 0.25 + vec2(0.008);
+	F_texatlas = vec2(mod(material, 4), floor(material / 4)) * 0.25 + vec2(0.0625);
 
 	/* Grass animation. */
 	vec3 t_vertex = vertex + tangent.x * vec3(LOS_time.y, 0.0, LOS_time.z);

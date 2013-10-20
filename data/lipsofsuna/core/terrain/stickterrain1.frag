@@ -27,7 +27,7 @@ void main()
 {
 	/* Texture atlas fitting. */
 	vec2 uv_atlas = F_texatlas;
-	vec2 uv = mod(F_texcoord, 1.0) * 0.234;
+	vec2 uv = fract(F_texcoord) * 0.125;
 
 	/* Texture splatting.
 	 *

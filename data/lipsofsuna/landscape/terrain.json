@@ -37,9 +37,9 @@
 		"type": "TerrainMaterialSpec",
 		"name": "sand",
 		"mining_item": "sand chunk",
-		"top_texture": 5,
-		"bottom_texture": 5,
-		"side_texture": 5
+		"top_texture": 13,
+		"bottom_texture": 13,
+		"side_texture": 13
 	},
 	{
 		"type": "TerrainMaterialSpec",
@@ -49,9 +49,9 @@
 			"common ore": true
 		},
 		"mining_item": "ferrostone",
-		"top_texture": 6,
-		"bottom_texture": 6,
-		"side_texture": 6
+		"top_texture": 15,
+		"bottom_texture": 15,
+		"side_texture": 15
 	},
 	{
 		"type": "TerrainMaterialSpec",
@@ -73,9 +73,9 @@
 			"rare ore": true
 		},
 		"mining_item": "crimson ore",
-		"top_texture": 8,
-		"bottom_texture": 8,
-		"side_texture": 8
+		"top_texture": 12,
+		"bottom_texture": 12,
+		"side_texture": 12
 	},
 	{
 		"type": "TerrainMaterialSpec",
@@ -85,8 +85,16 @@
 			"rare ore": true
 		},
 		"mining_item": "adamantium",
-		"top_texture": 9,
-		"bottom_texture": 9,
-		"side_texture": 9
+		"top_texture": 7,
+		"bottom_texture": 7,
+		"side_texture": 7
+	},
+	{
+		"type": "TerrainMaterialSpec",
+		"name": "brick",
+		"mining_item": "granite stone",
+		"top_texture": 8,
+		"bottom_texture": 8,
+		"side_texture": 8
 	}
 ]
