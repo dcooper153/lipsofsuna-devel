@@ -226,10 +226,13 @@ void LIRenMeshBuilder::step_1_bg (Ogre::Mesh* mesh)
 	/* The index buffer cannot be prepared yet since it doesn't exist. */
 	for (int i = 0 ; i < lod->face_groups.count ; i++)
 	{
-		Ogre::SubMesh* submesh = mesh->createSubMesh ();
-		submesh->useSharedVertices = true;
-		submesh->indexData->indexStart = lod->face_groups.array[i].start;
-		submesh->indexData->indexCount = lod->face_groups.array[i].count;
+		if (lod->face_groups.array[i].count)
+		{
+			Ogre::SubMesh* submesh = mesh->createSubMesh ();
+			submesh->useSharedVertices = true;
+			submesh->indexData->indexStart = lod->face_groups.array[i].start;
+			submesh->indexData->indexCount = lod->face_groups.array[i].count;
+		}
 	}
 
 	/* Set the bounding box. */
@@ -249,22 +252,28 @@ void LIRenMeshBuilder::step_2_fg (Ogre::Mesh* mesh)
 {
 	if (!model->vertices.count || !model->lod.count)
 		return;
+	LIMdlLod* lod = model->lod.array;
 
+	int j = 0;
 	for (int i = 0 ; i < model->materials.count ; i++)
 	{
-		/* Create the material. */
-		Ogre::MaterialPtr material = render->material_utils->create_material (model->materials.array + i);
+		if (lod->face_groups.array[i].count)
+		{
+			/* Create the material. */
+			Ogre::MaterialPtr material = render->material_utils->create_material (model->materials.array + i);
 
-		/* Set the material name of the submesh. */
-		Ogre::SubMesh* submesh = mesh->getSubMesh (i);
-		submesh->setMaterialName (material->getName ());
+			/* Set the material name of the submesh. */
+			Ogre::SubMesh* submesh = mesh->getSubMesh (j);
+			submesh->setMaterialName (material->getName ());
+			j++;
 
-		/* Reference the material. */
-		/* Ogre meshes don't reference the material, instead only storing
-		   its name. Since the mesh can have temporary materials that would
-		   be subject to garbage collection without a reference, we need to
-		   add keep one here. */
-		materials.push_back (material);
+			/* Reference the material. */
+			/* Ogre meshes don't reference the material, instead only storing
+			   its name. Since the mesh can have temporary materials that would
+			   be subject to garbage collection without a reference, we need to
+			   add keep one here. */
+			materials.push_back (material);
+		}
 	}
 }
 
@@ -312,10 +321,15 @@ void LIRenMeshBuilder::step_3_fg (Ogre::Mesh* mesh)
 
 	/* Complete submeshes. */
 	/* The index buffer needs to be setup here since prepare couldn't do it. */
+	int j = 0;
 	for (int i = 0 ; i < lod->face_groups.count ; i++)
 	{
-		Ogre::SubMesh* submesh = mesh->getSubMesh (i);
-		submesh->indexData->indexBuffer = index_buffer;
+		if (lod->face_groups.array[i].count)
+		{
+			Ogre::SubMesh* submesh = mesh->getSubMesh (j);
+			submesh->indexData->indexBuffer = index_buffer;
+			j++;
+		}
 	}
 }
 
