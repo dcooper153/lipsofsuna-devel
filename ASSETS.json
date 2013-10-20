@@ -1682,6 +1682,22 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/spells/effects/dig-spell1.ogg",
+				"data/lipsofsuna/spells/effects/dig-spell-cast1.ogg"
+			],
+			"authors":
+			[
+				"qubodup"
+			],
+			"licenses":
+			[
+				"Creative Commons BY 3.0"
+			],
+			"source": "http://opengameart.org/content/shovel-spell"
+		},
+		{
+			"files":
+			[
 				"data/lipsofsuna/sounds/builtrock1.ogg",
 				"data/lipsofsuna/sounds/builtwood1.ogg",
 				"data/lipsofsuna/sounds/craftmetal1.ogg",

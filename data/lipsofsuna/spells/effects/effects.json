@@ -31,6 +31,18 @@
 	},
 	{
 		"type": "Effectspec",
+		"name": "dig spell",
+		"sound": "dig-spell1",
+		"sound_rolloff": 0.2
+	},
+	{
+		"type": "Effectspec",
+		"name": "dig spell cast",
+		"sound": "dig-spell-cast1",
+		"sound_rolloff": 0.5
+	},
+	{
+		"type": "Effectspec",
 		"name": "disease1",
 		"sound": "diseasecontact1"
 	},

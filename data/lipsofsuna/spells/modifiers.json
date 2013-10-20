@@ -214,7 +214,8 @@
 			"ranged spell": true
 		},
 		"description": "Fire a digging ray",
-		"effect": "FIXME",
+		"effect": "dig spell",
+		"effect_fire": "dig spell cast",
 		"icon": "modifier-earthmove",
 		"projectile": "fireball1",
 		"spell_strength": 1,
