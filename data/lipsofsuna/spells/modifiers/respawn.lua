@@ -29,7 +29,7 @@ RespawnModifier.update = function(modifier, secs)
 	-- Try another position if failed.
 	if not p then
 		dst.x = src.x + 10 * math.random()
-		dst.y = 1000
+		dst.y = 50000
 		dst.z = src.z + 10 * math.random()
 		modifier.object:set_position(dst)
 		modifier.object.physics:set_velocity(Vector())
