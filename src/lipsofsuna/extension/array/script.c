@@ -83,6 +83,58 @@ static void NumberArray2d_get (LIScrArgs* args)
 	liscr_args_seti_float (args, self->values[x + y * self->width]);
 }
 
+static void NumberArray2d_get_bilinear (LIScrArgs* args)
+{
+	int x;
+	int y;
+	float b;
+	float fx;
+	float fy;
+	float v[4];
+	LIExtNumberArray2d* self;
+
+	self = args->self;
+	if (!liscr_args_geti_float (args, 0, &fx))
+		return;
+	if (!liscr_args_geti_float (args, 1, &fy))
+		return;
+	fx = LIMAT_CLAMP (fx, 0.0f, self->width - 1.0f);
+	fy = LIMAT_CLAMP (fy, 0.0f, self->height - 1.0f);
+	x = (int) fx;
+	y = (int) fy;
+
+	if (x == self->width - 1 && y == self->height - 1)
+	{
+		liscr_args_seti_float (args, self->values[x + y * self->width]);
+	}
+	else if (x == self->width - 1)
+	{
+		b = fy - y;
+		v[0] = self->values[x + y * self->width];
+		v[1] = self->values[x + (y+1) * self->width];
+		liscr_args_seti_float (args, (1.0f - b) * v[0] + b * v[1]);
+	}
+	else if (y == self->height - 1)
+	{
+		b = fx - x;
+		v[0] = self->values[x + y * self->width];
+		v[1] = self->values[(x+1) + y * self->width];
+		liscr_args_seti_float (args, (1.0f - b) * v[0] + b * v[1]);
+	}
+	else
+	{
+		b = fx - x;
+		v[0] = self->values[x + y * self->width];
+		v[1] = self->values[(x+1) + y * self->width];
+		v[2] = self->values[x + (y+1) * self->width];
+		v[3] = self->values[(x+1) + (y+1) * self->width];
+		v[0] = (1.0f - b) * v[0] + b * v[1];
+		v[1] = (1.0f - b) * v[2] + b * v[3];
+		b = fy - y;
+		liscr_args_seti_float (args, (1.0f - b) * v[0] + b * v[1]);
+	}
+}
+
 static void NumberArray2d_set (LIScrArgs* args)
 {
 	int x;
@@ -108,6 +160,7 @@ void liext_script_number_array_2d (
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_new", NumberArray2d_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get", NumberArray2d_get);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get_bilinear", NumberArray2d_get_bilinear);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_set", NumberArray2d_set);
 }
 

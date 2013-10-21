@@ -43,6 +43,15 @@ NumberArray2d.get = function(self, x, y)
 	return Los.number_array_2d_get(self.handle, x, y)
 end
 
+--- Gets a bilinearly interpolated value.
+-- @param self NumberArray2d.
+-- @param x X floating point offset.
+-- @param y Y floating point offset.
+-- @return Number.
+NumberArray2d.get_bilinear = function(self, x, y)
+	return Los.number_array_2d_get_bilinear(self.handle, x, y)
+end
+
 --- Sets a value.
 -- @param self NumberArray2d.
 -- @param x X index.
