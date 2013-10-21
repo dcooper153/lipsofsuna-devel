@@ -61,7 +61,7 @@ TerrainGenerator.generate = function(self, chunk)
 			-- Calculate the position.
 			local civ_x = math.random(0, w-1)
 			local civ_z = math.random(0, w-1)
-			local civ_y = surface:get_column_height(civ_x, civ_z)
+			local civ_y = surface:get_height_bilinear(civ_x + 0.5, civ_z + 0.5)
 			local p = Vector(chunk.x + civ_x + 0.5, 0.0, chunk.z + civ_z + 0.5)
 			p:multiply(chunk.manager.grid_size)
 			p:add_xyz(0, civ_y, 0)
@@ -234,7 +234,7 @@ TerrainGenerator.__generate_default_plants = function(self, chunk, surface)
 				-- Calculate the position.
 				p:set_xyz(cx + 0.5, 0.0, cz + 0.5)
 				p:multiply(chunk.manager.grid_size)
-				p:add_xyz(0, surface:get_column_height(x, z), 0)
+				p:add_xyz(0, surface:get_height_bilinear(x + 0.5, z + 0.5), 0)
 				-- Calculate the forest ratio.
 				local r = math.random()
 				local f = Noise:plasma_noise_2d(self.seeds[5] + 0.005 * cx, self.seeds[6] + 0.005 * cz, 2)

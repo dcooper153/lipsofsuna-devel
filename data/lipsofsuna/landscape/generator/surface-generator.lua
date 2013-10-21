@@ -71,35 +71,16 @@ SurfaceGenerator.get = function(self, x, z)
 	return self.__a:get(x, z), self.__b:get(x, z), self.__c:get(x, z)
 end
 
---- Gets the average height of the given column.
--- @param self SurfaceGenerator.
--- @param x Column offset in grid units relative to the chunk origin.
--- @param z Column offset in grid units relative to the chunk origin.
--- @return Height in world units.
-SurfaceGenerator.get_column_height = function(self, x, z)
-	local h00 = self.__a:get(x, z)
-	local h10 = self.__a:get(x + 1, z)
-	local h01 = self.__a:get(x, z + 1)
-	local h11 = self.__a:get(x + 1, z + 1)
-	return (h00 + h10 + h01 + h11) / 4
-end
-
 --- Gets the ground type of the given column.
 -- @param self SurfaceGenerator.
 -- @param x Point relative to the chunk origin.
 -- @param z Point relative to the chunk origin.
 -- @return Height in world units.
 SurfaceGenerator.get_column_type = function(self, x, z)
-	local c00 = self.__c:get(x, z)
-	local c10 = self.__c:get(x + 1, z)
-	local c01 = self.__c:get(x, z + 1)
-	local c11 = self.__c:get(x + 1, z + 1)
-	if c00 > 0 or c10 > 0 or c01 > 0 or c11 > 0 then return "grass" end
-	local b00 = self.__b:get(x, z)
-	local b10 = self.__b:get(x + 1, z)
-	local b01 = self.__b:get(x, z + 1)
-	local b11 = self.__b:get(x + 1, z + 1)
-	if b00 > 0 or b10 > 0 or b01 > 0 or b11 > 0 then return "soil" end
+	local c = self.__c:get_bilinear(x + 0.5, z + 0.5)
+	if c > 0 then return "grass" end
+	local b = self.__b:get_bilinear(x + 0.5, z + 0.5)
+	if b > 0 then return "soil" end
 	return "rock"
 end
 
@@ -110,6 +91,15 @@ end
 -- @return Height in world units.
 SurfaceGenerator.get_height = function(self, x, z)
 	return self.__a:get(x, z) + self.__b:get(x, z) + self.__c:get(x, z)
+end
+
+--- Gets the total surface height of the bilinearly interpolated point.
+-- @param self SurfaceGenerator.
+-- @param x Point relative to the chunk origin.
+-- @param z Point relative to the chunk origin.
+-- @return Height in world units.
+SurfaceGenerator.get_height_bilinear = function(self, x, z)
+	return self.__a:get_bilinear(x, z) + self.__b:get_bilinear(x, z) + self.__c:get_bilinear(x, z)
 end
 
 return SurfaceGenerator
