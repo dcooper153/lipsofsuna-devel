@@ -31,21 +31,22 @@ end
 -- @param self DiamondSquare.
 -- @param seeds Array of seeds.
 DiamondSquare.calculate = function(self, seeds)
-	local b = 2000
+	local b = 5000
 	local e = 500
 	local m = self.__size
 	-- Height sampling function.
 	local height = function(x, z, b, e)
-		return b + e * Noise:plasma_noise_2d(seeds[1] + x, seeds[2] + z, 2)
+		local f = 4 * Noise:plasma_noise_2d(seeds[2] + 0.1 * x, seeds[1] + 0.1 * z, 2)
+		return b + f * e * Noise:plasma_noise_2d(seeds[1] + 0.01 * x, seeds[2] + 0.01 * z, 2)
 	end
 	-- Generate the corner vertices.
 	local w = m
 	local d = m / 2
 	local a = self.__a
-	a:set(0, 0, height(0, 0, b, 2*e))
-	a:set(m, 0, height(m, 0, b, 2*e))
-	a:set(0, m, height(0, m, b, 2*e))
-	a:set(m, m, height(m, m, b, 2*e))
+	a:set(0, 0, b)
+	a:set(m, 0, b)
+	a:set(0, m, b)
+	a:set(m, m, b)
 	-- Generate the other vertices.
 	--
 	-- P--d--P--d--P    P: Vertex from the previous level
@@ -99,6 +100,15 @@ DiamondSquare.print = function(self)
 		end
 		print(table.concat(r, " "))
 	end
+end
+
+--- Gets the bilinearly interpolated height at the given point.
+-- @param self DiamondSquare.
+-- @param x X floating point offset.
+-- @param z Z floating point offset.
+-- @return Height.
+DiamondSquare.get_height = function(self, x, z)
+	return self.__a:get_bilinear(x, z)
 end
 
 return DiamondSquare

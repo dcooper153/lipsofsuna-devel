@@ -18,6 +18,7 @@ Main.game_modes:register("Server", function()
 	Main.messaging:set_transmit_mode(true, false, port)
 	-- Load the save file.
 	if Main.settings.generate then
+		Main.game_create_hooks:call()
 		Main.game:save(true)
 	else
 		Main.game:load()

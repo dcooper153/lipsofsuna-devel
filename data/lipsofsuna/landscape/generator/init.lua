@@ -1,6 +1,12 @@
 local File = require("system/file")
 local TerrainGenerator = require("landscape/generator/terrain-generator")
 
+Main.game_create_hooks:register(5, function()
+	if Main.terrain_generator then
+		Main.terrain_generator:initialize()
+	end
+end)
+
 Main.game_start_hooks:register(5, function()
 	if Main.terrain then
 		Main.terrain_generator = TerrainGenerator(Main.terrain)

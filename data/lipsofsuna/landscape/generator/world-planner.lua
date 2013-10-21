@@ -9,6 +9,7 @@
 -- @alias WorldPlanner
 
 local Class = require("system/class")
+local DiamondSquare = require("landscape/generator/diamond-square")
 local MapUtils = require("core/server/map-utils")
 local Noise = require("system/noise")
 local SurfaceGenerator = require("landscape/generator/surface-generator")
@@ -46,13 +47,8 @@ WorldPlanner.new = function(clss, terrain, generator)
 	self.__regions = {}
 	self.__terrain = terrain
 	self.__generator = generator
+	self.__heights = DiamondSquare(1024)
 	return self
-end
-
---- Positions the initial places on the map at world creation.
--- @param self WorldPlanner.
-WorldPlanner.create_places = function(self)
-	-- TODO
 end
 
 --- Positions an individual place on the map.
@@ -70,7 +66,7 @@ WorldPlanner.create_place = function(self, x, z)
 	if a[1] == "castle" then
 		local t = self.__terrain
 		local c = {manager = t, x = x * t.chunk_size, z = z * t.chunk_size}
-		local s = SurfaceGenerator(c, self.__generator.seeds)
+		local s = self:get_chunk_surface(c)
 		local y = s:get(0, 0)
 		params = {type, y, 10}
 	else
@@ -118,6 +114,12 @@ WorldPlanner.create_region = function(self, x, z)
 	end
 end
 
+--- Generates the initial plan at game start.
+-- @param self TerrainGenerator.
+WorldPlanner.initialize = function(self)
+	self.__heights:calculate(self.__generator.seeds)
+end
+
 --- Checks if any places intersect with the given rectangle.
 -- @param self WorldPlanner.
 -- @param x Rectangle offset in chunks.
@@ -132,6 +134,16 @@ WorldPlanner.intersects = function(self, x, z, sx, sz)
 			if self.__chunks[id] then return true end
 		end
 	end
+end
+
+--- Gets the surface heights of the chunk.
+-- @param self WorldPlanner.
+-- @param chunk Chunk.
+-- @return Surface heights.
+WorldPlanner.get_chunk_surface = function(self, chunk)
+	local s = SurfaceGenerator(chunk.manager.chunk_size)
+	s:generate(chunk, self.__heights, self.__generator.seeds)
+	return s
 end
 
 --- Gets the type of the chunk.
@@ -243,8 +255,6 @@ WorldPlanner.save = function(self, db, erase)
 			a REAL, b REAL, c REAL, d REAL,
 			e REAL, f REAL, g REAL, h REAL,
 			PRIMARY KEY (x,z));]])
-		-- Initialize places.
-		self:create_places()
 	end
 	-- Save regions.
 	for k,v in pairs(self.__regions) do

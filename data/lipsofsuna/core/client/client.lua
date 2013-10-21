@@ -222,6 +222,7 @@ Client.start_single_player = function(self)
 	Main.messaging:set_transmit_mode(true, true, nil)
 	Server:init(false, true)
 	if Main.settings.generate then
+		Main.game_create_hooks:call()
 		Main.game:save(true)
 	else
 		Main.game:load()

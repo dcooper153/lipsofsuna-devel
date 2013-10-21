@@ -31,6 +31,7 @@ Building.new = function(clss)
 	Main.messaging:set_transmit_mode(true, true)
 	Main.game = Game("benchmark")
 	Main.game:start()
+	Main.game_create_hooks:call()
 	Main.objects:set_unloading()
 	ServerUtils:set_player_spawn_point(Vector(500,101,500))
 	-- Initialize the terrain.

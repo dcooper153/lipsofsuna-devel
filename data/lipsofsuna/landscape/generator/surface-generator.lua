@@ -18,17 +18,21 @@ local SurfaceGenerator = Class("SurfaceGenerator")
 
 --- Creates a new overworld surface generator.
 -- @param clss SurfaceGenerator class.
--- @param chunk Chunk whose surface to generate.
--- @param seeds Array of seeds.
 -- @return SurfaceGenerator.
-SurfaceGenerator.new = function(clss, chunk, seeds)
+SurfaceGenerator.new = function(clss, size)
 	local self = Class.new(clss)
+	self.__a = NumberArray2d(size+1, size+1)
+	self.__b = NumberArray2d(size+1, size+1)
+	self.__c = NumberArray2d(size+1, size+1)
+	return self
+end
+
+--- Generates the surface for the given chunk.
+-- @param chunk Chunk whose surface to generate.
+-- @param heights Diamond-Square generator.
+-- @param seeds Array of seeds.
+SurfaceGenerator.generate = function(self, chunk, heights, seeds)
 	local w = chunk.manager.chunk_size
-	local h = {}
-	local i = 0
-	self.__a = NumberArray2d(w+1, w+1)
-	self.__b = NumberArray2d(w+1, w+1)
-	self.__c = NumberArray2d(w+1, w+1)
 	for z = 0,w do
 		local cz = chunk.z + z
 		for x = 0,w do
@@ -40,10 +44,13 @@ SurfaceGenerator.new = function(clss, chunk, seeds)
 			local p = 0.75 + 0.15 * r
 			-- Choose the height of the region.
 			-- This is affected by both the position and the bumpiness.
-			local n1 = Noise:harmonic_noise_2d(seeds[1] + 0.001 * cx, seeds[2] + 0.001 * cz, 6, 1.3, p)
+			--local n1 = Noise:harmonic_noise_2d(seeds[1] + 0.001 * cx, seeds[2] + 0.001 * cz, 6, 1.3, p)
+			local n1a = heights:get_height(cx / w, cz / w)
+			local n1b = Noise:harmonic_noise_2d(seeds[1] + 0.001 * cx, seeds[2] + 0.001 * cz, 6, 1.3, p)
+			local n1 = n1a + 50 * n1b
 			-- Choose the soil layer height.
 			-- This is affected by the height and the bumpiness.
-			local s_base = 0.3 - 0.7 * (r + n1)
+			local s_base = 0.3 - 0.7 * (r + n1b)
 			local s_rand = Noise:harmonic_noise_2d(seeds[3] + 0.02 * cx, seeds[4] + 0.02 * cz, 3, 1.3, 1 - 0.25 * (n1 + r))
 			local n2 = math.max(0, 0.5 * (s_base + s_rand))
 			-- Choose the grass layer height.
@@ -51,15 +58,11 @@ SurfaceGenerator.new = function(clss, chunk, seeds)
 			local g = Noise:plasma_noise_2d(seeds[1] + 0.03 * cx, seeds[2] + 0.03 * cz, 3 - r)
 			local n3 = math.max(0, g) * n2
 			-- Store the heights.
-			self.__a:set(x, z, 100 + 100 * n1)
+			self.__a:set(x, z, n1)
 			self.__b:set(x, z, 2 * n2)
 			self.__c:set(x, z, 0.5 * n3)
 		end
 	end
-	self.h = h
-	self.sx = 3
-	self.sz = 3 * (w + 1)
-	return self
 end
 
 --- Gets the surface heights by grid point.

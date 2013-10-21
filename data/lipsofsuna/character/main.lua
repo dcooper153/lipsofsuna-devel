@@ -10,6 +10,7 @@ Main.game_modes:register("Character", function()
 	-- FIXME: Initialize the game.
 	Main.game = Game("benchmark")
 	Main.game:start()
+	Main.game_create_hooks:call()
 	Main.objects:set_unloading()
 	-- Start the subsystems.
 	Client.chargen:init(true)
