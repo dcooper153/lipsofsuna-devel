@@ -231,6 +231,16 @@ WorldPlanner.load = function(self, db)
 			self.__chunks[self:__xz_to_id(x, z)] = v
 		end
 	end
+	-- Load heights.
+	local rows = db:query([[
+		SELECT x,z,data
+		FROM planned_heights;]])
+	if rows then
+		for k,v in ipairs(rows) do
+			v[3]:read()
+			self.__heights:set_data(v[3])
+		end
+	end
 end
 
 --- Saves the planner state.
@@ -255,6 +265,13 @@ WorldPlanner.save = function(self, db, erase)
 			a REAL, b REAL, c REAL, d REAL,
 			e REAL, f REAL, g REAL, h REAL,
 			PRIMARY KEY (x,z));]])
+		-- Erase heights.
+		db:query([[DROP TABLE IF EXISTS planned_heights;]])
+		db:query([[CREATE TABLE planned_heights (
+			x INTEGER NOT NULL,
+			z INTEGER NOT NULL,
+			data BLOB,
+			PRIMARY KEY (x,z));]])
 	end
 	-- Save regions.
 	for k,v in pairs(self.__regions) do
@@ -274,6 +291,12 @@ WorldPlanner.save = function(self, db, erase)
 			VALUES (?,?,?,?,?,?,?,?,?,?,?);]],
 			{x, z, v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9]})
 	end
+	-- Save heights.
+	db:query([[
+		REPLACE INTO planned_heights
+		(x,z,data)
+		VALUES (?,?,?);]],
+		{0, 0, self.__heights:get_data()})
 	db:query("END TRANSACTION;")
 end
 

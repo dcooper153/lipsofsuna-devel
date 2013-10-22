@@ -102,6 +102,21 @@ DiamondSquare.print = function(self)
 	end
 end
 
+--- Gets the raw height data.
+-- @param self DiamondSquare.
+-- @return Data.
+DiamondSquare.get_data = function(self)
+	return self.__a:get_data()
+end
+
+--- Sets the raw height data.
+-- @param self DiamondSquare.
+-- @param data Data.
+-- @return True on success. False otherwise.
+DiamondSquare.set_data = function(self, data)
+	return self.__a:set_data(data)
+end
+
 --- Gets the bilinearly interpolated height at the given point.
 -- @param self DiamondSquare.
 -- @param x X floating point offset.
