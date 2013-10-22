@@ -7,7 +7,18 @@ local Ui = require("ui/ui")
 
 Main.game_modes:register("Landscape", function()
 	Main.landscape = Landscape()
+	Main.game_create_hooks:call()
 	Ui:set_state("landscape")
+end)
+
+Main.game_create_hooks:register(10, function(secs)
+	if Main.landscape then
+		local camera = Main.client.camera_manager:find_camera_by_type("landscape")
+		if not camera then return end
+		camera.position.y = 20 + Main.terrain_generator.world_planner:get_height(
+			camera.position.x / Main.terrain.grid_size,
+			camera.position.z / Main.terrain.grid_size)
+	end
 end)
 
 Main.game_end_hooks:register(0, function(secs)

@@ -205,6 +205,16 @@ WorldPlanner.get_dungeon_type = function(self, x, z)
 	end
 end
 
+--- Gets the approximate surface height at the given point.
+-- @param self WorldPlanner.
+-- @param x X coordinate in grid units.
+-- @param z Z coordinate in grid units.
+-- @return Surface height.
+WorldPlanner.get_height = function(self, x, z)
+	local w = self.__terrain.terrain.chunk_size
+	return self.__heights:get_height(x / w, z / w)
+end
+
 --- Loads the planner state.
 -- @param self WorldPlanner.
 -- @param db Database.
