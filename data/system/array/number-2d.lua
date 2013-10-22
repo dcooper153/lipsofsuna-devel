@@ -43,6 +43,15 @@ NumberArray2d.get = function(self, x, y)
 	return Los.number_array_2d_get(self.handle, x, y)
 end
 
+--- Sets a value.
+-- @param self NumberArray2d.
+-- @param x X index.
+-- @param y Y index.
+-- @param value Number.
+NumberArray2d.set = function(self, x, y, value)
+	Los.number_array_2d_set(self.handle, x, y, value)
+end
+
 --- Gets a bilinearly interpolated value.
 -- @param self NumberArray2d.
 -- @param x X floating point offset.
@@ -52,13 +61,27 @@ NumberArray2d.get_bilinear = function(self, x, y)
 	return Los.number_array_2d_get_bilinear(self.handle, x, y)
 end
 
---- Sets a value.
--- @param self NumberArray2d.
--- @param x X index.
--- @param y Y index.
--- @param value Number.
-NumberArray2d.set = function(self, x, y, value)
-	Los.number_array_2d_set(self.handle, x, y, value)
+--- Writes the contents of the array to a packet.
+-- @param self Terrain.
+-- @param packet Packet. Nil to create a new one.
+-- @return Packet on success. Nil otherwise.
+NumberArray2d.get_data = function(self, packet)
+	if not packet then
+		local Packet = require("system/packet")
+		packet = Packet(1)
+		return Los.number_array_2d_get_data(self.handle, packet.handle) and packet
+	else
+		return Los.number_array_2d_get_data(self.handle, packet.handle) and packet
+	end
+	return p
+end
+
+--- Reads the contents of the array from a packet.
+-- @param self Terrain.
+-- @param packet Packet.
+-- @return True on success. False otherwise.
+NumberArray2d.set_data = function(self, packet)
+	return Los.number_array_2d_set_data(self.handle, packet.handle)
 end
 
 return NumberArray2d

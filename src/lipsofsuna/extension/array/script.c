@@ -32,6 +32,36 @@ struct _LIExtNumberArray2d
 	float values[1];
 };
 
+static int liext_number_array_2d_get_data (
+	LIExtNumberArray2d* self,
+	LIArcWriter*        writer)
+{
+	int i;
+
+	for (i = 0 ; i < self->width * self->height ; i++)
+	{
+		if (!liarc_writer_append_float (writer, self->values[i]))
+			return 0;
+	}
+
+	return 1;
+}
+
+static int liext_number_array_2d_set_data (
+	LIExtNumberArray2d* self,
+	LIArcReader*        reader)
+{
+	int i;
+
+	for (i = 0 ; i < self->width * self->height ; i++)
+	{
+		if (!liarc_reader_get_float (reader, self->values + i))
+			return 0;
+	}
+
+	return 1;
+}
+
 /*****************************************************************************/
 
 static void NumberArray2d_new (LIScrArgs* args)
@@ -81,6 +111,24 @@ static void NumberArray2d_get (LIScrArgs* args)
 		return;
 
 	liscr_args_seti_float (args, self->values[x + y * self->width]);
+}
+
+static void NumberArray2d_set (LIScrArgs* args)
+{
+	int x;
+	int y;
+	float value;
+	LIExtNumberArray2d* self;
+
+	self = args->self;
+	if (!liscr_args_geti_int (args, 0, &x) || x < 0 || x >= self->width)
+		return;
+	if (!liscr_args_geti_int (args, 1, &y) || y < 0 || y >= self->height)
+		return;
+	if (!liscr_args_geti_float (args, 2, &value))
+		return;
+
+	self->values[x + y * self->width] = value;
 }
 
 static void NumberArray2d_get_bilinear (LIScrArgs* args)
@@ -135,22 +183,47 @@ static void NumberArray2d_get_bilinear (LIScrArgs* args)
 	}
 }
 
-static void NumberArray2d_set (LIScrArgs* args)
+static void NumberArray2d_get_data (LIScrArgs* args)
 {
-	int x;
-	int y;
-	float value;
-	LIExtNumberArray2d* self;
+	LIArcPacket* packet;
+	LIScrData* data;
 
-	self = args->self;
-	if (!liscr_args_geti_int (args, 0, &x) || x < 0 || x >= self->width)
+	/* Get the packet writer. */
+	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_PACKET, &data))
 		return;
-	if (!liscr_args_geti_int (args, 1, &y) || y < 0 || y >= self->height)
-		return;
-	if (!liscr_args_geti_float (args, 2, &value))
+	packet = liscr_data_get_data (data);
+	if (packet->writer == NULL)
 		return;
 
-	self->values[x + y * self->width] = value;
+	/* Read the data. */
+	liscr_args_seti_bool (args, liext_number_array_2d_get_data (args->self, packet->writer));
+}
+
+static void NumberArray2d_set_data (LIScrArgs* args)
+{
+	LIArcPacket* packet;
+	LIArcReader* reader;
+	LIScrData* data;
+
+	/* Get the packet reader. */
+	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_PACKET, &data))
+		return;
+	packet = liscr_data_get_data (data);
+
+	/* Write the data. */
+	if (packet->reader != NULL)
+		liscr_args_seti_bool (args, liext_number_array_2d_set_data (args->self, packet->reader));
+	else
+	{
+		reader = liarc_reader_new (
+			liarc_writer_get_buffer (packet->writer),
+			liarc_writer_get_length (packet->writer));
+		if (reader == NULL)
+			return;
+		reader->pos = 1; /* FIXME! */
+		liscr_args_seti_bool (args, liext_number_array_2d_set_data (args->self, reader));
+		liarc_reader_free (reader);
+	}
 }
 
 /*****************************************************************************/
@@ -160,8 +233,10 @@ void liext_script_number_array_2d (
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_new", NumberArray2d_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get", NumberArray2d_get);
-	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get_bilinear", NumberArray2d_get_bilinear);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_set", NumberArray2d_set);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get_bilinear", NumberArray2d_get_bilinear);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get_data", NumberArray2d_get_data);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_set_data", NumberArray2d_set_data);
 }
 
 /** @} */

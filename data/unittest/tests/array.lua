@@ -42,3 +42,22 @@ Unittest:add(1, "system", "array: out of memory", function()
 	local ok,e = pcall(NumberArray2d.new, NumberArray2d, 0xFFFF, 0xFFFF)
 	assert(not ok)
 end)
+
+Unittest:add(1, "system", "array: serialization", function()
+	local NumberArray2d = require("system/array/number-2d")
+	local a = NumberArray2d(10, 10)
+	local b = NumberArray2d(10, 10)
+	for x=0,9 do
+		for z=0,9 do
+			a:set(x, z, math.random())
+		end
+	end
+	local d = a:get_data()
+	d:read("uint8")
+	b:set_data(d)
+	for x=0,9 do
+		for z=0,9 do
+			assert(a:get(x, z) == b:get(x, z))
+		end
+	end
+end)
