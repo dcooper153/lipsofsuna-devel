@@ -93,4 +93,13 @@ NumberArray2d.get_gradient = function(self, x, y)
 	return Los.number_array_2d_get_gradient(self.handle, x, y)
 end
 
+--- Gets a bilinearly interpolated gradient.
+-- @param self NumberArray2d.
+-- @param x X floating point offset.
+-- @param y Y floating point offset.
+-- @return Horizontal, vertical, magnitude and angle.
+NumberArray2d.get_gradient_bilinear = function(self, x, y)
+	return Los.number_array_2d_get_gradient_bilinear(self.handle, x, y)
+end
+
 return NumberArray2d

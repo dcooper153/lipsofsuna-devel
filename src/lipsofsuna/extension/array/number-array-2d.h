@@ -28,6 +28,11 @@ struct _LIExtNumberArray2d
 	float values[1];
 };
 
+LIAPICALL (float, liext_number_array_2d_get_bilinear, (
+	const LIExtNumberArray2d* self,
+	float                     fx,
+	float                     fy));
+
 LIAPICALL (int, liext_number_array_2d_get_data, (
 	const LIExtNumberArray2d* self,
 	LIArcWriter*              writer));
@@ -40,6 +45,13 @@ LIAPICALL (void, liext_number_array_2d_get_gradient, (
 	const LIExtNumberArray2d* self,
 	int                       x,
 	int                       y,
+	float*                    result_x,
+	float*                    result_y));
+
+LIAPICALL (void, liext_number_array_2d_get_gradient_bilinear, (
+	const LIExtNumberArray2d* self,
+	float                     fx,
+	float                     fy,
 	float*                    result_x,
 	float*                    result_y));
 

@@ -22,7 +22,62 @@
  * @{
  */
 
+#include "lipsofsuna/math.h"
 #include "number-array-2d.h"
+
+/**
+ * \brief Gets a bilinearly interpolated value.
+ * \param self Array.
+ * \param fx Floating point X coordinate.
+ * \param fy Floating point Y coordinate.
+ * \return Value.
+ */
+float liext_number_array_2d_get_bilinear (
+	const LIExtNumberArray2d* self,
+	float                     fx,
+	float                     fy)
+{
+	int x;
+	int y;
+	float b;
+	float v[4];
+
+	fx = LIMAT_CLAMP (fx, 0.0f, self->width - 1.0f);
+	fy = LIMAT_CLAMP (fy, 0.0f, self->height - 1.0f);
+	x = (int) fx;
+	y = (int) fy;
+
+	if (x == self->width - 1 && y == self->height - 1)
+	{
+		return self->values[x + y * self->width];
+	}
+	else if (x == self->width - 1)
+	{
+		b = fy - y;
+		v[0] = self->values[x + y * self->width];
+		v[1] = self->values[x + (y+1) * self->width];
+		return (1.0f - b) * v[0] + b * v[1];
+	}
+	else if (y == self->height - 1)
+	{
+		b = fx - x;
+		v[0] = self->values[x + y * self->width];
+		v[1] = self->values[(x+1) + y * self->width];
+		return (1.0f - b) * v[0] + b * v[1];
+	}
+	else
+	{
+		b = fx - x;
+		v[0] = self->values[x + y * self->width];
+		v[1] = self->values[(x+1) + y * self->width];
+		v[2] = self->values[x + (y+1) * self->width];
+		v[3] = self->values[(x+1) + (y+1) * self->width];
+		v[0] = (1.0f - b) * v[0] + b * v[1];
+		v[1] = (1.0f - b) * v[2] + b * v[3];
+		b = fy - y;
+		return (1.0f - b) * v[0] + b * v[1];
+	}
+}
 
 /**
  * \brief Writes the raw data to an archive.
@@ -107,6 +162,69 @@ void liext_number_array_2d_get_gradient (
 	/* Calculate the gradient using Sobel. */
 	*result_x = ((v[0][0] - v[2][0]) + 2 * (v[0][1] - v[2][1]) + (v[0][2] - v[2][2])) / 4.0f;
 	*result_y = ((v[0][0] - v[0][2]) + 2 * (v[1][0] - v[1][2]) + (v[2][0] - v[2][2])) / 4.0f;
+}
+
+/**
+ * \brief Samples the gradient at the given index.
+ * \param self Array.
+ * \param x X coordinate.
+ * \param y Y coordinate.
+ * \param result_x Return location for the horizontal gradient.
+ * \param result_y Return location for the vertical gradient.
+ */
+void liext_number_array_2d_get_gradient_bilinear (
+	const LIExtNumberArray2d* self,
+	float                     fx,
+	float                     fy,
+	float*                    result_x,
+	float*                    result_y)
+{
+	int x;
+	int y;
+	float b;
+	float gx[4];
+	float gy[4];
+
+	fx = LIMAT_CLAMP (fx, 0.0f, self->width - 1.0f);
+	fy = LIMAT_CLAMP (fy, 0.0f, self->height - 1.0f);
+	x = (int) fx;
+	y = (int) fy;
+
+	if (x == self->width - 1 && y == self->height - 1)
+	{
+		liext_number_array_2d_get_gradient (self, 0, 0, result_x, result_y);
+	}
+	else if (x == self->width - 1)
+	{
+		b = fy - y;
+		liext_number_array_2d_get_gradient (self, x, y, gx, gy);
+		liext_number_array_2d_get_gradient (self, x, y + 1, gx + 1, gy + 1);
+		*result_x = (1.0f - b) * gx[0] + b * gx[1];
+		*result_y = (1.0f - b) * gy[0] + b * gy[1];
+	}
+	else if (y == self->height - 1)
+	{
+		b = fx - x;
+		liext_number_array_2d_get_gradient (self, x, y, gx, gy);
+		liext_number_array_2d_get_gradient (self, x + 1, y, gx + 1, gy + 1);
+		*result_x = (1.0f - b) * gx[0] + b * gx[1];
+		*result_y = (1.0f - b) * gy[0] + b * gy[1];
+	}
+	else
+	{
+		b = fx - x;
+		liext_number_array_2d_get_gradient (self, x, y, gx, gy);
+		liext_number_array_2d_get_gradient (self, x + 1, y, gx + 1, gy + 1);
+		liext_number_array_2d_get_gradient (self, x, y + 1, gx + 2, gy + 2);
+		liext_number_array_2d_get_gradient (self, x + 1, y + 1, gx + 3, gy + 3);
+		gx[0] = (1.0f - b) * gx[0] + b * gx[1];
+		gx[1] = (1.0f - b) * gx[2] + b * gx[3];
+		gy[0] = (1.0f - b) * gy[0] + b * gy[1];
+		gy[1] = (1.0f - b) * gy[2] + b * gy[3];
+		b = fy - y;
+		*result_x = (1.0f - b) * gx[0] + b * gx[1];
+		*result_y = (1.0f - b) * gy[0] + b * gy[1];
+	}
 }
 
 /** @} */
