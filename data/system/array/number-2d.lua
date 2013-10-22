@@ -84,4 +84,13 @@ NumberArray2d.set_data = function(self, packet)
 	return Los.number_array_2d_set_data(self.handle, packet.handle)
 end
 
+--- Gets the gradient at the given point.
+-- @param self NumberArray2d.
+-- @param x X index.
+-- @param y Y index.
+-- @return Horizontal, vertical, magnitude and angle.
+NumberArray2d.get_gradient = function(self, x, y)
+	return Los.number_array_2d_get_gradient(self.handle, x, y)
+end
+
 return NumberArray2d

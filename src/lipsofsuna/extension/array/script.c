@@ -23,46 +23,7 @@
  */
 
 #include "module.h"
-
-typedef struct _LIExtNumberArray2d LIExtNumberArray2d;
-struct _LIExtNumberArray2d
-{
-	int width;
-	int height;
-	float values[1];
-};
-
-static int liext_number_array_2d_get_data (
-	LIExtNumberArray2d* self,
-	LIArcWriter*        writer)
-{
-	int i;
-
-	for (i = 0 ; i < self->width * self->height ; i++)
-	{
-		if (!liarc_writer_append_float (writer, self->values[i]))
-			return 0;
-	}
-
-	return 1;
-}
-
-static int liext_number_array_2d_set_data (
-	LIExtNumberArray2d* self,
-	LIArcReader*        reader)
-{
-	int i;
-
-	for (i = 0 ; i < self->width * self->height ; i++)
-	{
-		if (!liarc_reader_get_float (reader, self->values + i))
-			return 0;
-	}
-
-	return 1;
-}
-
-/*****************************************************************************/
+#include "number-array-2d.h"
 
 static void NumberArray2d_new (LIScrArgs* args)
 {
@@ -226,6 +187,27 @@ static void NumberArray2d_set_data (LIScrArgs* args)
 	}
 }
 
+static void NumberArray2d_get_gradient (LIScrArgs* args)
+{
+	int x;
+	int y;
+	float gx;
+	float gy;
+	LIExtNumberArray2d* self;
+
+	self = args->self;
+	if (!liscr_args_geti_int (args, 0, &x) || x < 0 || x >= self->width)
+		return;
+	if (!liscr_args_geti_int (args, 1, &y) || y < 0 || y >= self->height)
+		return;
+
+	liext_number_array_2d_get_gradient (args->self, x, y, &gx, &gy);
+	liscr_args_seti_float (args, gx);
+	liscr_args_seti_float (args, gy);
+	liscr_args_seti_float (args, sqrtf (gx * gx + gy * gy));
+	liscr_args_seti_float (args, atan2f (gx, gy));
+}
+
 /*****************************************************************************/
 
 void liext_script_number_array_2d (
@@ -237,6 +219,7 @@ void liext_script_number_array_2d (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get_bilinear", NumberArray2d_get_bilinear);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get_data", NumberArray2d_get_data);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_set_data", NumberArray2d_set_data);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get_gradient", NumberArray2d_get_gradient);
 }
 
 /** @} */
