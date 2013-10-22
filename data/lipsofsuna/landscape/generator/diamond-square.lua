@@ -117,6 +117,15 @@ DiamondSquare.set_data = function(self, data)
 	return self.__a:set_data(data)
 end
 
+--- Gets the bilinearly interpolated gradient at the given point.
+-- @param self DiamondSquare.
+-- @param x X floating point offset.
+-- @param z Z floating point offset.
+-- @return Horizontal, vertical, magnitude and angle.
+DiamondSquare.get_gradient = function(self, x, z)
+	return self.__a:get_gradient_bilinear(x, z)
+end
+
 --- Gets the bilinearly interpolated height at the given point.
 -- @param self DiamondSquare.
 -- @param x X floating point offset.

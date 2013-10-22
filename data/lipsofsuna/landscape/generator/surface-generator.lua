@@ -38,25 +38,27 @@ SurfaceGenerator.generate = function(self, chunk, heights, seeds)
 		for x = 0,w do
 			local cx = chunk.x + x
 			-- Choose the bumpiness of the region.
+			-- This is affected by the slope steepness.
 			-- p=0.7: Very smooth.
 			-- p=0.9: Very bumpy.
-			local r = Noise:plasma_noise_2d(seeds[1] + 0.01 * cx, seeds[2] + 0.01 * cz, 2)
-			local p = 0.75 + 0.15 * r
+			local gx,gy,gv = heights:get_gradient(cx / w, cz / w)
+			local g = math.min(gv/50, 1)
+			local r = math.abs(Noise:plasma_noise_2d(seeds[1] + 0.01 * cx, seeds[2] + 0.01 * cz, 2))
+			local p = math.min(0.9, 0.7 + 0.1 * r + 0.25 * g)
 			-- Choose the height of the region.
 			-- This is affected by both the position and the bumpiness.
-			--local n1 = Noise:harmonic_noise_2d(seeds[1] + 0.001 * cx, seeds[2] + 0.001 * cz, 6, 1.3, p)
 			local n1a = heights:get_height(cx / w, cz / w)
 			local n1b = Noise:harmonic_noise_2d(seeds[1] + 0.001 * cx, seeds[2] + 0.001 * cz, 6, 1.3, p)
 			local n1 = n1a + 50 * n1b
 			-- Choose the soil layer height.
-			-- This is affected by the height and the bumpiness.
-			local s_base = 0.3 - 0.7 * (r + n1b)
-			local s_rand = Noise:harmonic_noise_2d(seeds[3] + 0.02 * cx, seeds[4] + 0.02 * cz, 3, 1.3, 1 - 0.25 * (n1 + r))
-			local n2 = math.max(0, 0.5 * (s_base + s_rand))
+			-- This is affected by the bumpiness and the slope steepness.
+			local n2a = Noise:harmonic_noise_2d(seeds[3] + 0.02 * cx, seeds[4] + 0.02 * cz, 3, 1.3, 0.5 + g)
+			local n2b = Noise:plasma_noise_2d(seeds[1] + 0.02 * cx, seeds[2] + 0.02 * cz, 3 - r)
+			local n2 = 10 * math.max(0, 1 - 0.5 * g - 0.8 + 0.2 * n2a)
 			-- Choose the grass layer height.
 			-- This is mostly just random on any areas with soil.
-			local g = Noise:plasma_noise_2d(seeds[1] + 0.03 * cx, seeds[2] + 0.03 * cz, 3 - r)
-			local n3 = math.max(0, g) * n2
+			local gr = Noise:plasma_noise_2d(seeds[1] + 0.03 * cx, seeds[2] + 0.03 * cz, 3 - r)
+			local n3 = math.max(0, gr) * n2
 			-- Store the heights.
 			self.__a:set(x, z, n1)
 			self.__b:set(x, z, 2 * n2)
