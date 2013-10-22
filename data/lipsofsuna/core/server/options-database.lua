@@ -21,7 +21,7 @@ local OptionsDatabase = Class("OptionsDatabase")
 OptionsDatabase.new = function(clss, db)
 	local self = Class.new(clss)
 	self.__db = db
-	self.__version = "8"
+	self.__version = "9"
 	return self
 end
 
