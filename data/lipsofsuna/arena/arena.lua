@@ -70,8 +70,6 @@ end
 -- @param self Arena.
 -- @param secs Seconds since the last update.
 Arena.update = function(self, secs)
-	-- Update terrain.
-	Main.terrain:refresh_chunks_by_point(Vector(500, 0, 500), 20)
 	-- Initialize the player.
 	if not self.player then
 		self.player = Player(Main.objects)

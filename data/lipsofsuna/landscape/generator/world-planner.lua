@@ -82,7 +82,8 @@ WorldPlanner.create_place = function(self, x, z)
 	-- Create the center of the place.
 	if a[6] then
 		local id = self:__xz_to_id(x, z)
-		self.__chunks[id][1] = a[6]
+		local old = self.__chunks[id]
+		self.__chunks[id] = {a[6], old[2], old[3]}
 	end
 	return true
 end

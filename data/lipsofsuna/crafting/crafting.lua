@@ -37,9 +37,9 @@ Crafting.new = function(clss)
 	Main.objects:set_unloading()
 	ServerUtils:set_player_spawn_point(Vector(500,101,500))
 	-- Initialize the terrain.
-	self.terrain = TerrainManager(12, 1, nil, false, true, true)
-	self.terrain:set_view_center(Vector(500, 0, 500))
-	self.terrain.generate_hooks:register(0, function(self)
+	Main.terrain:set_view_center(Vector(500, 0, 500))
+	Main.terrain:set_enable_generation(true)
+	Main.terrain.generate_hooks:register(0, function(self)
 		local w = self.manager.chunk_size
 		local t = self.manager.terrain
 		for z = 0,w-1 do
@@ -54,7 +54,6 @@ Crafting.new = function(clss)
 		end
 		return Hooks.STOP
 	end)
-	Main.terrain = self.terrain --FIXME
 	-- Enable the simulation.
 	Physics:set_enable_simulation(true)
 	return self
@@ -73,8 +72,6 @@ end
 -- @param self Crafting.
 -- @param secs Seconds since the last update.
 Crafting.update = function(self, secs)
-	-- Update terrain.
-	self.terrain:refresh_chunks_by_point(Vector(500, 0, 500), 20)
 	-- Initialize the player.
 	if not self.player then
 		self.player = Player(Main.objects)
