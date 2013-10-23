@@ -165,7 +165,7 @@ end
 -- @param self Utils class.
 -- @return Vector.
 Utils.get_player_spawn_point = function(self)
-	return self.__player_spawn_point or Vector(500,50000,500)
+	return self.__player_spawn_point or Vector(5000,50000,5000)
 end
 
 Utils.set_player_spawn_point = function(self, value)
