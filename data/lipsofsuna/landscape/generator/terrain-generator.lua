@@ -21,6 +21,7 @@ local TerrainGenerator = Class("TerrainGenerator")
 
 --- Creates a new terrain generator.
 -- @param clss TerrainGenerator class.
+-- @param terrain Terrain.
 -- @return TerrainGenerator.
 TerrainGenerator.new = function(clss, terrain)
 	local self = Class.new(clss)
@@ -37,6 +38,7 @@ TerrainGenerator.new = function(clss, terrain)
 		math.random(100, 600),
 		math.random(100, 600)
 	}
+	self.terrain = terrain
 	self.world_planner = WorldPlanner(terrain, self)
 	return self
 end
@@ -134,49 +136,9 @@ end
 -- @param chunk TerrainChunk.
 -- @param params Castle parameters.
 TerrainGenerator.__generate_castle = function(self, chunk, params)
-	-- TODO
-	local w = chunk.manager.chunk_size
-	local t = chunk.manager.terrain
-	local m = TerrainMaterialSpec:find_by_name("brick")
-	m = m and m.id
-	-- Create the floor.
-	for z = 0,w-1 do
-		for x = 0,w-1 do
-			t:add_stick(chunk.x + x, chunk.z + z, 0, params[2], 3)
-			t:add_stick(chunk.x + x, chunk.z + z, params[2], 1, m)
-		end
-	end
-	-- Create the west wall.
-	local t1,p1 = self.world_planner:get_chunk_type(chunk.x / w - 1, chunk.z / w)
-	if t1 ~= "castle" or p1[2] ~= params[2] then
-		for z = 0,w-1 do
-			t:add_stick(chunk.x, chunk.z + z, params[2], params[3] + (z % 2), m)
-		end
-	end
-	-- Create the east wall.
-	local t2,p2 = self.world_planner:get_chunk_type(chunk.x / w + 1, chunk.z / w)
-	if t2 ~= "castle" or p2[2] ~= params[2]  then
-		for z = 0,w-1 do
-			t:add_stick(chunk.x + w - 1, chunk.z + z, params[2], params[3] + (z % 2), m)
-		end
-	end
-	-- Create the south wall.
-	local t3,p3 = self.world_planner:get_chunk_type(chunk.x / w, chunk.z / w - 1)
-	if t3 ~= "castle" or p3[2] ~= params[2]  then
-		for x = 0,w-1 do
-			t:add_stick(chunk.x + x, chunk.z, params[2], params[3] + (x % 2), m)
-		end
-	end
-	-- Create the north wall.
-	local t4,p4 = self.world_planner:get_chunk_type(chunk.x / w, chunk.z / w + 1)
-	if t4 ~= "castle" or p4[2] ~= params[2]  then
-		for x = 0,w-1 do
-			t:add_stick(chunk.x + x, chunk.z + w - 1, params[2], params[3] + (x % 2), m)
-		end
-		local door = chunk.x + math.floor(w/2)
-		t:add_stick(door, chunk.z + w - 1, params[2] + 1, params[3]/2, 0)
-		t:add_stick(door+1, chunk.z + w - 1, params[2] + 1, params[3]/2, 0)
-	end
+	local PlaceCastle = require("landscape/generator/place-castle")
+	local p = PlaceCastle(self, self.world_planner)
+	p:generate(chunk, params)
 end
 
 TerrainGenerator.__generate_chasm = function(self, chunk)

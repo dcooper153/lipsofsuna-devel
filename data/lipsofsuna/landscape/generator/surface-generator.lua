@@ -49,7 +49,7 @@ SurfaceGenerator.generate = function(self, chunk, heights, seeds)
 			-- This is affected by both the position and the bumpiness.
 			local n1a = heights:get_height(cx / w, cz / w)
 			local n1b = Noise:harmonic_noise_2d(seeds[1] + 0.001 * cx, seeds[2] + 0.001 * cz, 6, 1.3, p)
-			local n1 = n1a + 50 * n1b
+			local n1 = n1a + 20 * n1b
 			-- Choose the soil layer height.
 			-- This is affected by the bumpiness and the slope steepness.
 			local n2a = Noise:harmonic_noise_2d(seeds[3] + 0.02 * cx, seeds[4] + 0.02 * cz, 3, 1.3, 0.5 + g)

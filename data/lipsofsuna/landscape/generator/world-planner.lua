@@ -24,13 +24,14 @@ WorldPlanner.__types =
 {
 	{"castle", -1, -1, 2, 4},
 	{"castle", -2, -2, 3, 3},
-	{"castle", -2, -2, 4, 2},
+	{"castle", -2, -2, 4, 2},--[[
 	{"dungeon", -2, -2, 5, 5, 100},
 	{"dungeon", -4, -4, 9, 9, 100},
 	{"house", 0, 0, 1, 2},
 	{"house", 0, 0, 2, 1},
 	{"house", 0, 0, 2, 2},
-	[100] = {"dungeon_entrance"}
+	[100] = {"dungeon_entrance"},--]]
+	[101] = {"perimeter"}
 }
 local type_num = #WorldPlanner.__types
 
@@ -42,13 +43,22 @@ local type_num = #WorldPlanner.__types
 WorldPlanner.new = function(clss, terrain, generator)
 	local self = Class.new(clss)
 	self.__region_size = 16
-	self.__region_places = 8
+	self.__region_places = 32
 	self.__chunks = {}
 	self.__regions = {}
 	self.__terrain = terrain
 	self.__generator = generator
 	self.__heights = DiamondSquare(1024)
 	return self
+end
+
+--- Marks a chunk as planned.
+-- @param x Chunk X coordinate.
+-- @param z Chunk Z coordinate.
+-- @param params Chunk parameters.
+WorldPlanner.create_chunk = function(self, x, z, params)
+	local id = self:__xz_to_id(x, z)
+	self.__chunks[id] = params or {101}
 end
 
 --- Positions an individual place on the map.
@@ -58,20 +68,17 @@ end
 WorldPlanner.create_place = function(self, x, z)
 	-- Choose the type of the place.
 	local type = math.random(1, type_num)
-	-- Check for intersections.
 	local a = self.__types[type]
+	-- TODO
+	if a[1] == "castle" then
+		local PlaceCastle = require("landscape/generator/place-castle")
+		local p = PlaceCastle(self.__generator, self)
+		return p:plan(x, z)
+	end
+	-- Check for intersections.
 	if self:intersects(x+a[2], z+a[3], a[4], a[5]) then return end
 	-- Choose the parameters.
-	local params
-	if a[1] == "castle" then
-		local t = self.__terrain
-		local c = {manager = t, x = x * t.chunk_size, z = z * t.chunk_size}
-		local s = self:get_chunk_surface(c)
-		local y = s:get(0, 0)
-		params = {type, y, 10}
-	else
-		params = {type}
-	end
+	local params = {type}
 	-- Create the surrounding place.
 	for pz = z+a[3],z+a[3]+a[5]-1 do
 		for px = x+a[2],x+a[2]+a[4]-1 do
