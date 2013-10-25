@@ -12,6 +12,7 @@ local Class = require("system/class")
 local DiamondSquare = require("landscape/generator/diamond-square")
 local MapUtils = require("core/server/map-utils")
 local Noise = require("system/noise")
+local PlaceCastle = require("landscape/generator/place-castle")
 local SurfaceGenerator = require("landscape/generator/surface-generator")
 local TerrainMaterialSpec = require("core/specs/terrain-material")
 local Vector = require("system/math/vector")
@@ -19,21 +20,6 @@ local Vector = require("system/math/vector")
 --- Procedural world layout planner.
 -- @type WorldPlanner
 local WorldPlanner = Class("WorldPlanner")
-
-WorldPlanner.__types =
-{
-	{"castle", -1, -1, 2, 4},
-	{"castle", -2, -2, 3, 3},
-	{"castle", -2, -2, 4, 2},--[[
-	{"dungeon", -2, -2, 5, 5, 100},
-	{"dungeon", -4, -4, 9, 9, 100},
-	{"house", 0, 0, 1, 2},
-	{"house", 0, 0, 2, 1},
-	{"house", 0, 0, 2, 2},
-	[100] = {"dungeon_entrance"},--]]
-	[101] = {"perimeter"}
-}
-local type_num = #WorldPlanner.__types
 
 --- Creates a new terrain generator.
 -- @param clss WorldPlanner class.
@@ -49,6 +35,14 @@ WorldPlanner.new = function(clss, terrain, generator)
 	self.__terrain = terrain
 	self.__generator = generator
 	self.__heights = DiamondSquare(1024)
+	self.__place_types =
+	{
+		["castle"] = PlaceCastle(self.__generator, self)
+	}
+	self.__chunk_types =
+	{
+		[1] = "castle"
+	}
 	return self
 end
 
@@ -58,7 +52,7 @@ end
 -- @param params Chunk parameters.
 WorldPlanner.create_chunk = function(self, x, z, params)
 	local id = self:__xz_to_id(x, z)
-	self.__chunks[id] = params or {101}
+	self.__chunks[id] = params or {999}
 end
 
 --- Positions an individual place on the map.
@@ -66,33 +60,21 @@ end
 -- @param x Chunk X coordinate.
 -- @param z Chunk Z coordinate.
 WorldPlanner.create_place = function(self, x, z)
-	-- Choose the type of the place.
-	local type = math.random(1, type_num)
-	local a = self.__types[type]
-	-- TODO
-	if a[1] == "castle" then
-		local PlaceCastle = require("landscape/generator/place-castle")
-		local p = PlaceCastle(self.__generator, self)
-		return p:plan(x, z)
-	end
-	-- Check for intersections.
-	if self:intersects(x+a[2], z+a[3], a[4], a[5]) then return end
-	-- Choose the parameters.
-	local params = {type}
-	-- Create the surrounding place.
-	for pz = z+a[3],z+a[3]+a[5]-1 do
-		for px = x+a[2],x+a[2]+a[4]-1 do
-			local id = self:__xz_to_id(px, pz)
-			self.__chunks[id] = params
+	-- Find all the fitting place types.
+	local fit = {}
+	for k,v in pairs(self.__place_types) do
+		local types = v:check(x, z)
+		for k1,v1 in pairs(types) do
+			table.insert(fit, {k,k1,v1})
 		end
 	end
-	-- Create the center of the place.
-	if a[6] then
-		local id = self:__xz_to_id(x, z)
-		local old = self.__chunks[id]
-		self.__chunks[id] = {a[6], old[2], old[3]}
-	end
-	return true
+	-- Choose a random place type.
+	local num = #fit
+	if #fit == 0 then return end
+	local type = fit[math.random(1, num)]
+	-- Plan the chosen place.
+	local generator = self.__place_types[type[1]]
+	return generator:plan(x, z, type[2], type[3])
 end
 
 --- Populates the regions around the given chunk.
@@ -144,6 +126,17 @@ WorldPlanner.intersects = function(self, x, z, sx, sz)
 	end
 end
 
+--- Gets the generator for the given chunk type.
+-- @param self WorldPlanner.
+-- @param x Chunk offset.
+-- @param z Chunk offset.
+-- @return PlaceGenerator and parameters if applicable. Nil otherwise.
+WorldPlanner.get_chunk_generator = function(self, x, z)
+	local name,params = self:get_chunk_type(x, z)
+	if not name then return end
+	return self.__place_types[name],params
+end
+
 --- Gets the surface heights of the chunk.
 -- @param self WorldPlanner.
 -- @param chunk Chunk.
@@ -164,7 +157,8 @@ WorldPlanner.get_chunk_type = function(self, x, z)
 	local id = self:__xz_to_id(x, z)
 	local t = self.__chunks[id]
 	if not t then return end
-	return self.__types[t[1]][1], t
+	local c = self.__chunk_types[t[1]]
+	return c, t
 end
 
 --- Gets the dungeon type of the given chunk.

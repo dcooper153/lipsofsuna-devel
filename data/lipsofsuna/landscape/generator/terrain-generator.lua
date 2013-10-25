@@ -49,9 +49,9 @@ end
 TerrainGenerator.generate = function(self, chunk)
 	-- Choose the chunk type.
 	local w = chunk.manager.chunk_size
-	local t,params = self.world_planner:get_chunk_type(chunk.x / w, chunk.z / w)
-	if t == "castle" then
-		self:__generate_castle(chunk, params)
+	local generator,params = self.world_planner:get_chunk_generator(chunk.x / w, chunk.z / w)
+	if generator then
+		generator:generate(chunk, params)
 	else
 		-- Generate the surface.
 		local surface = self.world_planner:get_chunk_surface(chunk)
@@ -129,16 +129,6 @@ TerrainGenerator.save = function(self, db, erase)
 	db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed10", tostring(self.seeds[10])})
 	db:query("END TRANSACTION;")
 	self.world_planner:save(db, erase)
-end
-
---- Generates a castle chunk.
--- @param self TerrainGenerator.
--- @param chunk TerrainChunk.
--- @param params Castle parameters.
-TerrainGenerator.__generate_castle = function(self, chunk, params)
-	local PlaceCastle = require("landscape/generator/place-castle")
-	local p = PlaceCastle(self, self.world_planner)
-	p:generate(chunk, params)
 end
 
 TerrainGenerator.__generate_chasm = function(self, chunk)

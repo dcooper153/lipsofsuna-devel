@@ -26,19 +26,29 @@ PlaceGenerator.new = function(clss, generator, planner)
 	return self
 end
 
---- Generates a chunk of the place.
+--- Checks whether the place fits in the given position.
 -- @param self PlaceGenerator.
--- @param chunk TerrainChunk.
--- @param params Place parameters.
-PlaceGenerator.generate = function(self, chunk, params)
+-- @param x Chunk X coordinate.
+-- @param z Chunk Z coordinate.
+-- @return Dictionary of places that fit.
+PlaceGenerator.check = function(self, x, z)
 end
 
 --- Plans the place.
 -- @param self PlaceGenerator.
 -- @param x Chunk X coordinate.
 -- @param z Chunk Z coordinate.
+-- @param place The type of the place as set by check().
+-- @param params The parameters of the place as set by check().
 -- @return True if planning succeded. False otherwise.
-PlaceGenerator.plan = function(self, x, z)
+PlaceGenerator.plan = function(self, x, z, place, params)
+end
+
+--- Generates a chunk of the place.
+-- @param self PlaceGenerator.
+-- @param chunk TerrainChunk.
+-- @param params Place parameters as set by plan().
+PlaceGenerator.generate = function(self, chunk, params)
 end
 
 return PlaceGenerator
