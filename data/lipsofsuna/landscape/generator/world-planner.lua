@@ -13,6 +13,8 @@ local DiamondSquare = require("landscape/generator/diamond-square")
 local MapUtils = require("core/server/map-utils")
 local Noise = require("system/noise")
 local PlaceCastle = require("landscape/generator/place-castle")
+local PlaceDefault = require("landscape/generator/place-default")
+local PlaceDungeon = require("landscape/generator/place-dungeon")
 local SurfaceGenerator = require("landscape/generator/surface-generator")
 local TerrainMaterialSpec = require("core/specs/terrain-material")
 local Vector = require("system/math/vector")
@@ -37,11 +39,14 @@ WorldPlanner.new = function(clss, terrain, generator)
 	self.__heights = DiamondSquare(1024)
 	self.__place_types =
 	{
-		["castle"] = PlaceCastle(self.__generator, self)
+		["castle"] = PlaceCastle(self.__generator, self),
+		["default"] = PlaceDefault(self.__generator, self),
+		["dungeon"] = PlaceDungeon(self.__generator, self)
 	}
 	self.__chunk_types =
 	{
-		[1] = "castle"
+		[1] = "castle",
+		[2] = "dungeon"
 	}
 	return self
 end
@@ -64,8 +69,10 @@ WorldPlanner.create_place = function(self, x, z)
 	local fit = {}
 	for k,v in pairs(self.__place_types) do
 		local types = v:check(x, z)
-		for k1,v1 in pairs(types) do
-			table.insert(fit, {k,k1,v1})
+		if types then
+			for k1,v1 in pairs(types) do
+				table.insert(fit, {k,k1,v1})
+			end
 		end
 	end
 	-- Choose a random place type.
@@ -133,8 +140,7 @@ end
 -- @return PlaceGenerator and parameters if applicable. Nil otherwise.
 WorldPlanner.get_chunk_generator = function(self, x, z)
 	local name,params = self:get_chunk_type(x, z)
-	if not name then return end
-	return self.__place_types[name],params
+	return self.__place_types[name or "default"], params
 end
 
 --- Gets the surface heights of the chunk.
