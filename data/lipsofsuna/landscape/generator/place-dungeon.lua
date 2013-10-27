@@ -60,7 +60,7 @@ PlaceDungeon.check = function(self, x, z)
 			local h_zm = self.__planner:get_height(fx * s, (fz-1) * s)
 			local h_zp = self.__planner:get_height(fx * s, (fz+1) * s)
 			local h_max = math.max(h_xm, h_xp, h_zm, h_zp)
-			if h_min + 8 < h_max then
+			if h_min + 15 < h_max then
 				res[name] = h_min
 			end
 		end

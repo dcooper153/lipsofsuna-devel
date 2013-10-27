@@ -29,40 +29,18 @@ end
 
 --- Generates the surface for the given chunk.
 -- @param chunk Chunk whose surface to generate.
--- @param heights Diamond-Square generator.
+-- @param planner WorldPlanner.
 -- @param seeds Array of seeds.
-SurfaceGenerator.generate = function(self, chunk, heights, seeds)
+SurfaceGenerator.generate = function(self, chunk, planner)
 	local w = chunk.manager.chunk_size
 	for z = 0,w do
 		local cz = chunk.z + z
 		for x = 0,w do
 			local cx = chunk.x + x
-			-- Choose the bumpiness of the region.
-			-- This is affected by the slope steepness.
-			-- p=0.7: Very smooth.
-			-- p=0.9: Very bumpy.
-			local gx,gy,gv = heights:get_gradient(cx / w, cz / w)
-			local g = math.min(gv/50, 1)
-			local r = math.abs(Noise:plasma_noise_2d(seeds[1] + 0.01 * cx, seeds[2] + 0.01 * cz, 2))
-			local p = math.min(0.9, 0.7 + 0.1 * r + 0.25 * g)
-			-- Choose the height of the region.
-			-- This is affected by both the position and the bumpiness.
-			local n1a = heights:get_height(cx / w, cz / w)
-			local n1b = Noise:harmonic_noise_2d(seeds[1] + 0.001 * cx, seeds[2] + 0.001 * cz, 6, 1.3, p)
-			local n1 = n1a + 20 * n1b
-			-- Choose the soil layer height.
-			-- This is affected by the bumpiness and the slope steepness.
-			local n2a = Noise:harmonic_noise_2d(seeds[3] + 0.02 * cx, seeds[4] + 0.02 * cz, 3, 1.3, 0.5 + g)
-			local n2b = Noise:plasma_noise_2d(seeds[1] + 0.02 * cx, seeds[2] + 0.02 * cz, 3 - r)
-			local n2 = 10 * math.max(0, 1 - 0.5 * g - 0.8 + 0.2 * n2a)
-			-- Choose the grass layer height.
-			-- This is mostly just random on any areas with soil.
-			local gr = Noise:plasma_noise_2d(seeds[1] + 0.03 * cx, seeds[2] + 0.03 * cz, 3 - r)
-			local n3 = math.max(0, gr) * n2
-			-- Store the heights.
-			self.__a:set(x, z, n1)
-			self.__b:set(x, z, 2 * n2)
-			self.__c:set(x, z, 0.5 * n3)
+			local t,a,b,c = planner:get_height(cx, cz)
+			self.__a:set(x, z, a)
+			self.__b:set(x, z, b)
+			self.__c:set(x, z, c)
 		end
 	end
 end

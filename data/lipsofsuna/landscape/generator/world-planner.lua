@@ -176,7 +176,7 @@ end
 -- @return Surface heights.
 WorldPlanner.get_chunk_surface = function(self, chunk)
 	local s = SurfaceGenerator(chunk.manager.chunk_size)
-	s:generate(chunk, self.__heights, self.__generator.seeds)
+	s:generate(chunk, self)
 	return s
 end
 
@@ -196,14 +196,41 @@ WorldPlanner.get_chunk_type = function(self, x, z, create)
 	return c, t
 end
 
---- Gets the approximate surface height at the given point.
+--- Gets the exact surface height of the default terrain at the given point.
 -- @param self WorldPlanner.
 -- @param x X coordinate in grid units.
 -- @param z Z coordinate in grid units.
--- @return Surface height.
+-- @return Total height, rock height, soil height, grass height.
 WorldPlanner.get_height = function(self, x, z)
 	local w = self.__terrain.terrain.chunk_size
-	return self.__heights:get_height(x / w, z / w)
+	local seeds = self.__generator.seeds
+	-- Choose the bumpiness of the region.
+	-- This is affected by the slope steepness.
+	-- p=0.7: Very smooth.
+	-- p=0.9: Very bumpy.
+	local gx,gy,gv = self.__heights:get_gradient(x / w, z / w)
+	local g = math.min(gv/50, 1)
+	local r = math.abs(Noise:plasma_noise_2d(seeds[1] + 0.01 * x, seeds[2] + 0.01 * z, 2))
+	local p = math.min(0.9, 0.7 + 0.1 * r + 0.25 * g)
+	-- Choose the height of the region.
+	-- This is affected by both the position and the bumpiness.
+	local n1a = self.__heights:get_height(x / w, z / w)
+	local n1b = Noise:harmonic_noise_2d(seeds[1] + 0.001 * x, seeds[2] + 0.001 * z, 6, 1.3, p)
+	local n1 = n1a + 20 * n1b
+	-- Choose the soil layer height.
+	-- This is affected by the bumpiness and the slope steepness.
+	local n2a = Noise:harmonic_noise_2d(seeds[3] + 0.02 * x, seeds[4] + 0.02 * z, 3, 1.3, 0.5 + g)
+	local n2b = Noise:plasma_noise_2d(seeds[1] + 0.02 * x, seeds[2] + 0.02 * z, 3 - r)
+	local n2 = 10 * math.max(0, 1 - 0.5 * g - 0.8 + 0.2 * n2a)
+	-- Choose the grass layer height.
+	-- This is mostly just random on any areas with soil.
+	local gr = Noise:plasma_noise_2d(seeds[1] + 0.03 * x, seeds[2] + 0.03 * z, 3 - r)
+	local n3 = math.max(0, gr) * n2
+	-- Return the heights.
+	local a = n1
+	local b = 2 * n2
+	local c = 0.5 * n3
+	return a+b+c, a, b, c
 end
 
 --- Loads the planner state.

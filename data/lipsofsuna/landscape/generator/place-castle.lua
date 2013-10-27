@@ -55,7 +55,7 @@ PlaceCastle.check = function(self, x, z)
 			local hmin = math.min(h00, h10, h01, h11)
 			local hmax = math.max(h00, h10, h01, h11)
 			if hmax - hmin <= 10 then
-				res[name] = hmax + 5
+				res[name] = (hmin + hmax) / 2
 			end
 		end
 	end
@@ -72,6 +72,7 @@ end
 PlaceCastle.plan = function(self, x, z, place, params)
 	-- Get the place information.
 	local shape = self.__shapes[place]
+	local y = params
 	local rx = shape[1] + x
 	local rz = shape[2] + z
 	local rw = shape[3]
@@ -86,7 +87,7 @@ PlaceCastle.plan = function(self, x, z, place, params)
 		self.__planner:create_chunk(px, rz+rh)
 	end
 	-- Create the content.
-	local params = {1, params, 10}
+	local params = {1, y, 10}
 	for pz = rz,rz+rh-1 do
 		for px = rx,rx+rw-1 do
 			self.__planner:create_chunk(px, pz, params)
