@@ -46,7 +46,8 @@ WorldPlanner.new = function(clss, terrain, generator)
 	self.__chunk_types =
 	{
 		[1] = "castle",
-		[2] = "dungeon"
+		[2] = "dungeon",
+		[3] = "dungeon"
 	}
 	return self
 end
@@ -89,25 +90,51 @@ end
 -- @param x Chunk X coordinate.
 -- @param z Chunk Z coordinate.
 WorldPlanner.create_region = function(self, x, z)
+	-- Calculate the range of regions.
 	local s = self.__region_size
-	local p = self.__region_places
 	local maxx = math.floor(x / s) + 1
 	local maxz = math.floor(z / s) + 1
 	local minx = math.max(0, maxx - 2)
 	local minz = math.max(0, maxz - 2)
+	-- Create the regions.
+	local queued = self.__recurse or {}
 	for rz = minz,maxz do
 		local id = minx + rz * 0xFFFF
 		for rx = minx,maxx do
 			if not self.__regions[id] then
 				self.__regions[id] = true
-				for i = 1,p do
-					local px = rx*s + math.random(0,s-1)
-					local pz = rz*s + math.random(0,s-1)
-					self:create_place(px, pz)
-				end
+				queued[id] = {rx,rz}
 			end
 			id = id + 1
 		end
+	end
+	-- Create the places of the regions.
+	if not self.__recurse then
+		self.__recurse = {}
+		while true do
+			local more = false
+			for id,region in pairs(queued) do
+				self:create_region_places(region[1], region[2])
+				more = true
+			end
+			if not more then break end
+			queued = self.__recurse
+			self.__recurse = {}
+		end
+		self.__recurse = nil
+	end
+end
+
+--- Creates the places of the region.
+-- @param self WorldPlanner.
+-- @param x Region X coordinate.
+-- @param z Region Z coordinate.
+WorldPlanner.create_region_places = function(self, x, z)
+	local s = self.__region_size
+	for i = 1,self.__region_places do
+		local px = x*s + math.random(0,s-1)
+		local pz = z*s + math.random(0,s-1)
+		self:create_place(px, pz)
 	end
 end
 
@@ -158,59 +185,15 @@ end
 -- @param x Chunk offset.
 -- @param z Chunk offset.
 -- @return Chunk name if special. Nil for a normal chunk.
-WorldPlanner.get_chunk_type = function(self, x, z)
-	self:create_region(x, z)
+WorldPlanner.get_chunk_type = function(self, x, z, create)
+	if create ~= false then
+		self:create_region(x, z)
+	end
 	local id = self:__xz_to_id(x, z)
 	local t = self.__chunks[id]
 	if not t then return end
 	local c = self.__chunk_types[t[1]]
 	return c, t
-end
-
---- Gets the dungeon type of the given chunk.
--- @param self WorldPlanner.
--- @param x Chunk offset.
--- @param z Chunk offset.
--- @return Chunk type, Y offsets and heights. Nil if no dungeon exists.
-WorldPlanner.get_dungeon_type = function(self, x, z)
-	local gen = self.__generator
-	if x % 2 == 0 and z % 2 == 0 then
-		-- Choose the dungeon amount of the region.
-		--local r = Noise:plasma_noise_2d(gen.seed1 + 0.1 * x, gen.seed1 + 0.1 * z, 3)
-		--if r < 0 then return end
-		-- Choose the room height.
-		local h = math.abs(Noise:plasma_noise_2d(gen.seed1 + 0.35 * x, gen.seed1 + 0.35 * z, 2))
-		if h < 0.15 then return end
-		h = h * 8 + 8
-		-- Choose the roughness of the dungeon.
-		local r = Noise:plasma_noise_2d(gen.seed1 + 0.1 * x, gen.seed1 + 0.1 * z, 2)
-		local p = 0.5 + 0.35 * r
-		-- Choose the vertical offset.
-		local y1 = math.abs(Noise:harmonic_noise_2d(gen.seed1 + 0.02 * x, gen.seed1 + 0.02 * z, 6, 1.3, p))
-		local y2 = math.abs(Noise:harmonic_noise_2d(gen.seed1 + 0.002 * x, gen.seed1 + 0.002 * z, 6, 1.3, 0.5))
-		local y = 120 + 70 * y1 - 140 * y2
-		-- TODO: Choose the dungeon type.
-		local t = 1
-		return t,y,y,y,y,h,h,h,h
-	elseif x % 2 == 0 and z % 2 == 1 then
-		-- Vertical connection dungeon.
-		local at,ay1,ay2,ay3,ay4,ah1,ah2,ah3,ah4 = self:get_dungeon_type(x, z + 1)
-		if not at then return end
-		local bt,by1,by2,by3,by4,bh1,bh2,bh3,bh4 = self:get_dungeon_type(x, z - 1)
-		if not bt then return end
-		-- TODO: Choose the dungeon type.
-		local t = 2
-		return t,ay3,ay4,by1,by2,ah3,ah4,bh1,bh2
-	elseif x % 2 == 1 and z % 2 == 0 then
-		-- Horizontal connection dungeon.
-		local at,ay1,ay2,ay3,ay4,ah1,ah2,ah3,ah4 = self:get_dungeon_type(x + 1, z)
-		if not at then return end
-		local bt,by1,by2,by3,by4,bh1,bh2,bh3,bh4 = self:get_dungeon_type(x - 1, z)
-		if not bt then return end
-		-- TODO: Choose the dungeon type.
-		local t = 3
-		return t,by2,ay1,by4,ay3,bh2,ah1,bh4,ah3
-	end
 end
 
 --- Gets the approximate surface height at the given point.
