@@ -26,7 +26,7 @@ LandscapeCamera.new = function(clss)
 	self:set_far(1000)
 	self:set_near(0.3)
 	self:set_mode("first-person")
-	self.position = Vector(525,5000,510)
+	self.position = Vector(5000,5000,5000)
 	self.rotation = Quaternion:new_from_dir(Vector(-20,-70,-10), Vector(0,1,0))
 	self.turning = 0
 	self.tilting = 0
