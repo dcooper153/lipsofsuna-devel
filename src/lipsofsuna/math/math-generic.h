@@ -70,6 +70,27 @@ static inline float limat_quantize (
 }
 
 /**
+ * \brief Bilinear sampling.
+ * \param
+ * \return Sampled value.
+ */
+static inline float limat_number_bilinear (
+	float x,
+	float z,
+	float v00,
+	float v10,
+	float v01,
+	float v11)
+{
+	float t0;
+	float t1;
+
+	t0 = (1.0f - x) * v00 + x * v10;
+	t1 = (1.0f - x) * v01 + x * v11;
+	return (1.0f - z) * t0 + z * t1;
+}
+
+/**
  * \brief Returns one if the number is finite.
  * \return One if finite. Zero otherwise.
  */

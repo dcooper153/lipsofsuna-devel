@@ -108,6 +108,118 @@ void liext_terrain_free (
 }
 
 /**
+ * \brief Draws a box of sticks at the given grid points.
+ * \param self Terrain.
+ * \param grid_x1 Minimum X coordinate in grid units.
+ * \param grid_z1 Minimum Z coordinate in grid units.
+ * \param grid_x2 Maximum X coordinate in grid units.
+ * \param grid_z2 Maximum Z coordinate in grid units.
+ * \param world_y Y offset of the box in world units.
+ * \param world_h Y height of the box in world units.
+ * \param material Terrain material ID.
+ * \param filter_func Filter function for choosing what sticks to modify.
+ * \param filter_data Userdata to be passed to the filter function.
+ * \return Number of successful stick insertions.
+ */
+int liext_terrain_add_box (
+	LIExtTerrain*           self,
+	int                     grid_x1,
+	int                     grid_z1,
+	int                     grid_x2,
+	int                     grid_z2,
+	float                   world_y,
+	float                   world_h,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data)
+{
+	int x;
+	int z;
+	int ret = 0;
+
+	for (z = grid_z1 ; z <= grid_z2 ; z++)
+	{
+		for (x = grid_x1 ; x <= grid_x2 ; x++)
+		{
+			ret += liext_terrain_add_stick (self, x, z, world_y, world_h,
+				material, filter_func, filter_data);
+		}
+	}
+
+	return ret;
+}
+
+/**
+ * \brief Draws a sloped box of sticks at the given grid points.
+ * \param self Terrain.
+ * \param grid_x1 Minimum X coordinate in grid units.
+ * \param grid_z1 Minimum Z coordinate in grid units.
+ * \param grid_x2 Maximum X coordinate in grid units.
+ * \param grid_z2 Maximum Z coordinate in grid units.
+ * \param bot00 Y offset of the box in world units.
+ * \param top00 Y height of the box in world units.
+ * \param bot10 Y offset of the box in world units.
+ * \param top10 Y height of the box in world units.
+ * \param bot01 Y offset of the box in world units.
+ * \param top01 Y height of the box in world units.
+ * \param bot11 Y offset of the box in world units.
+ * \param top11 Y height of the box in world units.
+ * \param material Terrain material ID.
+ * \param filter_func Filter function for choosing what sticks to modify.
+ * \param filter_data Userdata to be passed to the filter function.
+ * \return Number of successful stick insertions.
+ */
+int liext_terrain_add_box_corners (
+	LIExtTerrain*           self,
+	int                     grid_x1,
+	int                     grid_z1,
+	int                     grid_x2,
+	int                     grid_z2,
+	float                   bot00,
+	float                   bot10,
+	float                   bot01,
+	float                   bot11,
+	float                   top00,
+	float                   top10,
+	float                   top01,
+	float                   top11,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data)
+{
+	int x;
+	int z;
+	int sx;
+	int sz;
+	float b00, b10, b01, b11;
+	float t00, t10, t01, t11;
+	int ret = 0;
+
+	sx = grid_x2 - grid_x1 + 1;
+	sz = grid_z2 - grid_z1 + 1;
+	for (z = 0 ; z < sz ; z++)
+	{
+		for (x = 0 ; x < sx ; x++)
+		{
+			b00 = limat_number_bilinear ((float) x    / sx, (float) z    / sz, bot00, bot10, bot01, bot11);
+			b10 = limat_number_bilinear ((float)(x+1) / sx, (float) z    / sz, bot00, bot10, bot01, bot11);
+			b01 = limat_number_bilinear ((float) x    / sx, (float)(z+1) / sz, bot00, bot10, bot01, bot11);
+			b11 = limat_number_bilinear ((float)(x+1) / sx, (float)(z+1) / sz, bot00, bot10, bot01, bot11);
+			t00 = limat_number_bilinear ((float) x    / sx, (float) z    / sz, top00, top10, top01, top11);
+			t10 = limat_number_bilinear ((float)(x+1) / sx, (float) z    / sz, top00, top10, top01, top11);
+			t01 = limat_number_bilinear ((float) x    / sx, (float)(z+1) / sz, top00, top10, top01, top11);
+			t11 = limat_number_bilinear ((float)(x+1) / sx, (float)(z+1) / sz, top00, top10, top01, top11);
+			ret += liext_terrain_add_stick_corners (self,
+				grid_x1 + x, grid_z1 + z,
+				b00, b10, b01, b11, t00, t10, t01, t11,
+				material, filter_func, filter_data);
+		}
+	}
+
+	return ret;
+}
+
+/**
  * \brief Draws a stick at the given grid point and Y offset.
  * \param self Terrain.
  * \param grid_x X coordinate in grid units.

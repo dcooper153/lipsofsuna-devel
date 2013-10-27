@@ -42,6 +42,36 @@ LIAPICALL (LIExtTerrain*, liext_terrain_new, (
 LIAPICALL (void, liext_terrain_free, (
 	LIExtTerrain* self));
 
+LIAPICALL (int, liext_terrain_add_box, (
+	LIExtTerrain*           self,
+	int                     grid_x1,
+	int                     grid_z1,
+	int                     grid_x2,
+	int                     grid_z2,
+	float                   world_y,
+	float                   world_h,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data));
+
+LIAPICALL (int, liext_terrain_add_box_corners, (
+	LIExtTerrain*           self,
+	int                     grid_x1,
+	int                     grid_z1,
+	int                     grid_x2,
+	int                     grid_z2,
+	float                   bot00,
+	float                   bot10,
+	float                   bot01,
+	float                   bot11,
+	float                   top00,
+	float                   top10,
+	float                   top01,
+	float                   top11,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data));
+
 LIAPICALL (int, liext_terrain_add_stick, (
 	LIExtTerrain*           self,
 	int                     grid_x,
