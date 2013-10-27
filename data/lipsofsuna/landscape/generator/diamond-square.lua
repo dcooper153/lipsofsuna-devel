@@ -32,7 +32,7 @@ end
 -- @param seeds Array of seeds.
 DiamondSquare.calculate = function(self, seeds)
 	local b = 5000
-	local e = 500
+	local e = 280
 	local m = self.__size
 	-- Height sampling function.
 	local height = function(x, z, b, e)
@@ -85,7 +85,7 @@ DiamondSquare.calculate = function(self, seeds)
 		-- Next level.
 		w = d
 		d = d/2
-		e = e/2
+		e = e/1.85
 	end
 end
 
