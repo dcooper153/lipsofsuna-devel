@@ -47,7 +47,8 @@ WorldPlanner.new = function(clss, terrain, generator)
 	{
 		[1] = "castle",
 		[2] = "dungeon",
-		[3] = "dungeon"
+		[3] = "dungeon",
+		[4] = "dungeon"
 	}
 	return self
 end

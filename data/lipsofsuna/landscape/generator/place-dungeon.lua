@@ -104,6 +104,30 @@ PlaceDungeon.plan = function(self, x, z, place, params)
 		-- Return the y range.
 		return min_y, max_y
 	end
+	local check_room = function(x, z, wp, h, dir)
+		local sx = math.random(1,3)
+		local sz = math.random(1,3)
+		local px,pz
+		if dir == 1 then
+			px = x - sx + 1
+			pz = z - math.random(0, sz - 1)
+		elseif dir == 2 then
+			px = x
+			pz = z - math.random(0, sz - 1)
+		elseif dir == 3 then
+			px = x - math.random(0, sx - 1)
+			pz = z - sz + 1
+		else
+			px = x - math.random(0, sx - 1)
+			pz = z
+		end
+		for cz = pz,pz+sz-1 do
+			for cx = px,px+sx-1 do
+				if not check_waypoint(cx, cz, wp, h) then return end
+			end
+		end
+		return px,pz,sx,sz
+	end
 	local create_waypoint = function(type, x, z, y, h)
 		local new = {x = x, z = z, y = y, h = h, dirs = {1,2,3,4}, conn = {}, type = type}
 		table.insert(waypoints, new)
@@ -138,14 +162,35 @@ PlaceDungeon.plan = function(self, x, z, place, params)
 			local next_z = wp.z + dirs_dz[dir]
 			local min_y,max_y = check_waypoint(next_x, next_z, wp, h)
 			if min_y then
-				-- Create the waypoint.
 				local rnd1 = math.abs(Noise:plasma_noise_2d(seeds[1] + wp.x, seeds[1] + wp.z, 2))
 				local next_y = min_y + rnd1 * math.min(7, max_y - min_y)
-				local wp1 = create_waypoint("corridor", next_x, next_z, next_y, h)
-				-- Update the chunks.
-				connect_waypoint(wp, dir)
-				connect_waypoint(wp1, dirs_inv[dir])
-				return true
+				if wp.type == "room" then next_y = wp.y end
+				local room_h = math.random(5,8)
+				local room_x,room_z,room_sx,room_sz = check_room(next_x, next_z, wp, room_h, dir)
+				if room_x and math.random() < 0.2 then
+					-- Create a room.
+					next_y = wp.y
+					for z = room_z,room_z+room_sz-1 do
+						for x = room_x,room_x+room_sx-1 do
+							self.__planner:create_chunk(x, z, {4, next_y, room_h, 0})
+							local wp1 = create_waypoint("room", x, z, next_y, room_h)
+							if x > room_x then connect_waypoint(wp1, 1) end
+							if x < room_x+room_sx-1 then connect_waypoint(wp1, 2) end
+							if z > room_z then connect_waypoint(wp1, 3) end
+							if z < room_z+room_sz-1 then connect_waypoint(wp1, 4) end
+							if x == next_x and z == next_z then
+								connect_waypoint(wp1, dirs_inv[dir])
+							end
+						end
+					end
+					connect_waypoint(wp, dir)
+				else
+					-- Create a corridor.
+					local wp1 = create_waypoint("corridor", next_x, next_z, next_y, h)
+					connect_waypoint(wp, dir)
+					connect_waypoint(wp1, dirs_inv[dir])
+					return true
+				end
 			end
 		end
 		delete_waypoint(i)
@@ -155,7 +200,7 @@ PlaceDungeon.plan = function(self, x, z, place, params)
 	create_waypoint("entrance", x, z, params, 10)
 	local created = 1
 	-- Create the content.
-	while waypoints_num > 0 and created < 32 do
+	while waypoints_num > 0 and created < 64 do
 		local rnd = math.random(1, waypoints_num)
 		if expand_waypoint(rnd, waypoints[rnd]) then
 			created = created + 1
@@ -174,7 +219,7 @@ PlaceDungeon.generate = function(self, chunk, params)
 	elseif params[1] == 3 then
 		self:generate_entrance(chunk, params)
 	else
-		-- TODO: rooms
+		self:generate_room(chunk, params)
 	end
 end
 
@@ -314,50 +359,52 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 	end
 end
 
---- Gets the dungeon type of the given chunk.
+--- Generates a dungeon room chunk.
 -- @param self PlaceDungeon.
--- @param x Chunk offset.
--- @param z Chunk offset.
--- @return Chunk type, Y offsets and heights. Nil if no dungeon exists.
-PlaceDungeon.get_dungeon_type = function(self, x, z)
-	local gen = self.__generator
-	local seeds = gen.seeds
-	if x % 2 == 0 and z % 2 == 0 then
-		-- Choose the dungeon amount of the region.
-		--local r = Noise:plasma_noise_2d(seeds[1] + 0.1 * x, seeds[1] + 0.1 * z, 3)
-		--if r < 0 then return end
-		-- Choose the room height.
-		local h = math.abs(Noise:plasma_noise_2d(seeds[1] + 0.35 * x, seeds[1] + 0.35 * z, 2))
-		if h < 0.15 then return end
-		h = h * 8 + 8
-		-- Choose the roughness of the dungeon.
-		local r = Noise:plasma_noise_2d(seeds[1] + 0.1 * x, seeds[1] + 0.1 * z, 2)
-		local p = 0.5 + 0.35 * r
-		-- Choose the vertical offset.
-		local y1 = math.abs(Noise:harmonic_noise_2d(seeds[1] + 0.02 * x, seeds[1] + 0.02 * z, 6, 1.3, p))
-		local y2 = math.abs(Noise:harmonic_noise_2d(seeds[1] + 0.002 * x, seeds[1] + 0.002 * z, 6, 1.3, 0.5))
-		local y = 120 + 70 * y1 - 140 * y2
-		-- TODO: Choose the dungeon type.
-		local t = 1
-		return t,y,y,y,y,h,h,h,h
-	elseif x % 2 == 0 and z % 2 == 1 then
-		-- Vertical connection dungeon.
-		local at,ay1,ay2,ay3,ay4,ah1,ah2,ah3,ah4 = self:get_dungeon_type(x, z + 1)
-		if not at then return end
-		local bt,by1,by2,by3,by4,bh1,bh2,bh3,bh4 = self:get_dungeon_type(x, z - 1)
-		if not bt then return end
-		-- TODO: Choose the dungeon type.
-		local t = 2
-		return t,ay3,ay4,by1,by2,ah3,ah4,bh1,bh2
-	elseif x % 2 == 1 and z % 2 == 0 then
-		-- Horizontal connection dungeon.
-		local at,ay1,ay2,ay3,ay4,ah1,ah2,ah3,ah4 = self:get_dungeon_type(x + 1, z)
-		if not at then return end
-		local bt,by1,by2,by3,by4,bh1,bh2,bh3,bh4 = self:get_dungeon_type(x - 1, z)
-		if not bt then return end
-		-- TODO: Choose the dungeon type.
-		local t = 3
-		return t,by2,ay1,by4,ay3,bh2,ah1,bh4,ah3
+-- @param chunk TerrainChunk.
+-- @param params Place parameters as set by plan().
+PlaceDungeon.generate_room = function(self, chunk, params)
+	local w = chunk.manager.chunk_size
+	local t = chunk.manager.terrain
+	local ms = TerrainMaterialSpec:find_by_name("brick")
+	local m = ms and ms.id
+	local y = params[2]
+	local h = params[3]
+	local mask = params[4]
+	local cx = chunk.x
+	local cz = chunk.z
+	-- Generate the surface normally.
+	local surface = self.__planner:get_chunk_surface(chunk)
+	self:generate_terrain(chunk, surface)
+	-- Create the floor and ceiling.
+	t:add_box(cx, cz, cx+w-1, cz+w-1, y-1, h+2, m)
+	t:add_box(cx, cz, cx+w-1, cz+w-1, y, h, 0)
+	-- Create the walls.
+	local conn_xm = Bitwise:bchk(mask, 0x01)
+	local conn_xp = Bitwise:bchk(mask, 0x02)
+	local conn_zm = Bitwise:bchk(mask, 0x04)
+	local conn_zp = Bitwise:bchk(mask, 0x08)
+	if not conn_xm then t:add_box(cx    , cz    , cx    , cz+w-1, y, h, m) end
+	if not conn_xp then t:add_box(cx+w-1, cz    , cx+w-1, cz+w-1, y, h, m) end
+	if not conn_zm then t:add_box(cx    , cz    , cx+w-1, cz    , y, h, m) end
+	if not conn_zp then t:add_box(cx    , cz+w-1, cx+w-1, cz+w-1, y, h, m) end
+	-- Smoothen the surface.
+	for x = cx-1,cx+w do
+		for z = cz-1,cz+w do
+			t:calculate_smooth_normals(x, z)
+		end
+	end
+	-- Generate a civilization obstacle.
+	if math.random() < 0.5 then
+		-- Calculate the position.
+		local civ_x = math.random(1, w-2)
+		local civ_z = math.random(1, w-2)
+		local civ_y = y
+		local p = Vector(chunk.x + civ_x + 0.5, 0.0, chunk.z + civ_z + 0.5)
+		p:multiply(chunk.manager.grid_size)
+		p:add_xyz(0, civ_y, 0)
+		-- Choose and create the obstacle.
+		MapUtils:place_obstacle{point = p, category = "civilization"}
 	end
 end
 
