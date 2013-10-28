@@ -47,6 +47,7 @@ TerrainChunk.create_render_object = function(self)
 	self.model = self.manager.terrain:build_chunk_model(self.x, self.z)
 	-- Assign the model.
 	if prev_model then
+		self.__prev_model = prev_model
 		self.object:replace_model(prev_model:get_render(), self.model:get_render())
 	else
 		self.object:add_model(self.model:get_render())
@@ -81,6 +82,7 @@ TerrainChunk.detach_render_object = function(self)
 	end
 	self.manager.terrain:clear_chunk_model(self.x, self.z)
 	self.model = nil
+	self.__prev_model = nil
 	-- Clear the timestamp.
 	self.time_model = nil
 end
@@ -113,6 +115,19 @@ TerrainChunk.update = function(self, secs)
 		self:detach()
 		self.manager.chunks[self.id] = nil
 		return
+	end
+	-- Remove replaced models.
+	if self.__prev_model then
+		local loaded
+		if self.model then
+			local r = self.model:get_render()
+			loaded = not r or r:get_loaded()
+		else
+			loaded = true
+		end
+		if loaded then
+			self.__prev_model = nil
+		end
 	end
 	-- Unload unused models.
 	if self.time_model and t - self.time_model >= self.manager.unload_time_model then
