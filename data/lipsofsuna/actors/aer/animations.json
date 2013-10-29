@@ -72,7 +72,7 @@
 		"fade_in": 0.6,
 		"fade_out": 0.6,
 		"permanent": true,
-		"repeat_start": 10,
+		"repeat_start_frames": 20,
 		"priority": 10,
 		"node_priorities": {"LOWER": 3}
 	},
@@ -294,11 +294,11 @@
 	{
 		"type": "AnimationSpec",
 		"name": "default flinch",
-		"animation": "aer1-flinch1",
-		"animations": ["aer1-flinch1", "aer1-flinch2"],
+		"animation": "aer1-stagger",
 		"fade_in": 0.1,
 		"fade_out": 0.1,
-		"priority": 30
+		"priority": 30,
+		"node_priorities": {"LEGS": 4}
 	},
 	{
 		"type": "AnimationSpec",
@@ -403,8 +403,9 @@
 	{
 		"type": "AnimationSpec",
 		"name": "default stagger",
-		"animation": "aer1-stagger-2h",
-		"priority": 15
+		"animation": "aer1-stagger",
+		"priority": 15,
+		"node_priorities": {"LEGS": 4}
 	},
 	{
 		"type": "AnimationSpec",
@@ -517,11 +518,30 @@
 		"permanent": true
 	},
 	{
+		"type": "AnimationSpec",
+		"name": "feminine spell self",
+		"animation": "aer1-spell-self-feminine",
+		"channel": 2,
+		"fade_out": 0.5,
+		"priority": 10,
+		"node_priorities": {"LOWER": 3}
+	},
+	{
+		"type": "AnimationSpec",
+		"name": "feminine walk",
+		"animation": "aer1-walk-feminine",
+		"channel": 1,
+		"permanent": true,
+		"priority": 5
+	},
+	{
 		"type": "AnimationProfileSpec",
 		"name": "feminine",
 		"animations":
 		{
-			"idle": "feminine idle"
+			"idle": "feminine idle",
+			"spell self": "feminine spell self",
+			"walk": "feminine walk"
 		},
 		"inherit": ["default"]
 	},
@@ -579,9 +599,9 @@
 	{
 		"type": "AnimationSpec",
 		"name": "default attack crossbow",
-		"animation": "aer1-attack-crossbow",
+		"animation": "aer1-attack-musket",
 		"channel": 2,
-		"fade_in": 0,
+		"fade_in_mode": "instant",
 		"replace": true,
 		"time_frames": 20,
 		"priority": 10,
@@ -590,23 +610,22 @@
 	{
 		"type": "AnimationSpec",
 		"name": "default charge crossbow",
-		"animation": "aer1-attack-crossbow",
+		"animation": "aer1-attack-musket",
 		"channel": 2,
-		"fade_in": 0.1,
 		"permanent": true,
-		"repeat_end_frames": 50,
-		"repeat_start_frames": 50,
+		"repeat_end_frames": 20,
+		"repeat_start_frames": 20,
 		"priority": 3,
 		"node_priorities": {"ARMS": 10}
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "default hold crossbow",
-		"animation": "aer1-hold-crossbow",
+		"animation": "aer1-hold-musket",
 		"channel": 3,
 		"permanent": true,
-		"repeat_start": 10,
-		"priority": 1
+		"priority": 1,
+		"node_priorities": {"ARMS": 7}
 	},
 	{
 		"type": "AnimationProfileSpec",
@@ -634,18 +653,22 @@
 		"name": "default attack musket",
 		"animation": "aer1-attack-musket",
 		"channel": 2,
+		"fade_in_mode": "instant",
+		"replace": true,
+		"time_frames": 20,
 		"priority": 10,
-		"node_priorities": {"LOWER": 3}
+		"node_priorities": {"LEGS": 3}
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "default charge musket",
-		"animation": "aer1-charge-musket",
+		"animation": "aer1-attack-musket",
 		"channel": 2,
 		"permanent": true,
-		"repeat_start": 10,
+		"repeat_end_frames": 20,
+		"repeat_start_frames": 20,
 		"priority": 3,
-		"node_priorities": {"ARMS": 10}
+		"node_priorities": {"ARMS": 10, "BACK": 10}
 	},
 	{
 		"type": "AnimationSpec",
@@ -653,8 +676,8 @@
 		"animation": "aer1-hold-musket",
 		"channel": 3,
 		"permanent": true,
-		"repeat_start": 10,
-		"priority": 1
+		"priority": 1,
+		"node_priorities": {"ARMS": 7}
 	},
 	{
 		"type": "AnimationProfileSpec",
@@ -682,16 +705,20 @@
 		"name": "default attack revolver",
 		"animation": "aer1-attack-revolver",
 		"channel": 2,
+		"fade_in_mode": "instant",
+		"replace": true,
+		"time_frames": 20,
 		"priority": 10,
 		"node_priorities": {"LOWER": 3}
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "default charge revolver",
-		"animation": "aer1-charge-revolver",
+		"animation": "aer1-attack-revolver",
 		"channel": 2,
 		"permanent": true,
-		"repeat_start": 10,
+		"repeat_end_frames": 20,
+		"repeat_start_frames": 20,
 		"priority": 3,
 		"node_priorities": {"ARMS": 10}
 	},

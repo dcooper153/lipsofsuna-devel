@@ -17,11 +17,11 @@ local bone_chain_mapping = {
 	LEGS = {"pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "leg1.R", "leg2.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6",
 		"thigh.L", "thigh.R", "shin.L", "shin.R", "foot.L", "foot.R", "hips", "hips_main"},
 	ARMS = {"arm1.L", "arm2.L", "palm.L", "palm1.L", "arm1.R", "arm2.R", "palm.R", "palm1.R",
-		"shoulder.L", "upper_arm.L", "forearm.L", "shoulder.R", "upper_arm.R", "forearm.R"},
+		"shoulder.L", "upper_arm.L", "forearm.L", "shoulder.R", "upper_arm.R", "forearm.R", "hand.L", "hand.R"},
 	ARML = {"arm1.L", "arm2.L", "palm.L", "palm1.L",
-		"shoulder.L", "upper_arm.L", "forearm.L"},
+		"shoulder.L", "upper_arm.L", "forearm.L", "hand.L"},
 	ARMR = {"arm1.R", "arm2.R", "palm.R", "palm1.R",
-		"shoulder.R", "upper_arm.R", "forearm.R"},
+		"shoulder.R", "upper_arm.R", "forearm.R", "hand.R"},
 	BACK = {"back1", "back2", "back3",
 		"spine", "chest"}}
 
