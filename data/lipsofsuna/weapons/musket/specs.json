@@ -54,6 +54,8 @@
 			"ranged",
 			"guns"
 		],
+		"equipment_anchor_position": [0, 0, -0.15],
+		"equipment_anchor_rotation": [0, 1, 0, 0],
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved":
 		{
@@ -102,6 +104,8 @@
 		{
 			"default": "musket"
 		},
+		"equipment_anchor_position": [0, 0, -0.15],
+		"equipment_anchor_rotation": [0, 1, 0, 0],
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved":
 		{
@@ -172,6 +176,8 @@
 			"ranged",
 			"guns"
 		],
+		"equipment_anchor_position": [0, 0, -0.15],
+		"equipment_anchor_rotation": [0, 1, 0, 0],
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved":
 		{
@@ -220,6 +226,8 @@
 		{
 			"default": "musket"
 		},
+		"equipment_anchor_position": [0, 0, -0.15],
+		"equipment_anchor_rotation": [0, 1, 0, 0],
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved":
 		{

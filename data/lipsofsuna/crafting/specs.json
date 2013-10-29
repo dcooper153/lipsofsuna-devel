@@ -3,6 +3,7 @@
 		"type": "Actorspec",
 		"name": "crafting player",
 		"base": "aer-player",
+		"preset": "Male 1",
 		"inventory_items":
 		{
 			"dress": 1,

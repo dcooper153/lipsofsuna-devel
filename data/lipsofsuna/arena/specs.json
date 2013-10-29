@@ -3,6 +3,7 @@
 		"type": "Actorspec",
 		"name": "arena player",
 		"base": "aer-player",
+		"preset": "Female 3",
 		"inventory_items":
 		{
 			"iron sword": 1,
