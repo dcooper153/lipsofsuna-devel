@@ -255,9 +255,15 @@ int limdl_pose_channel_play (
 			}
 			else
 			{
-				self->time -= repeat_end;
-				self->time += repeat_start;
-				self->repeat++;
+				if (self->repeats == -1 || self->repeat < self->repeats - 1 ||
+				    self->fade_out.mode == LIMDL_POSE_FADE_OUT_AFTER_END_REPEAT)
+				{
+					self->time -= repeat_end;
+					self->time += repeat_start;
+					self->repeat++;
+				}
+				else
+					self->time = repeat_end;
 			}
 		}
 
@@ -282,6 +288,7 @@ int limdl_pose_channel_play (
 					return 0;
 				return 1;
 			}
+			break;
 		case LIMDL_POSE_FADE_OUT_AFTER_END_REPEAT:
 			if (!self->fade_out.active && time >= end)
 			{
