@@ -109,16 +109,20 @@ end
 -- @param self Object to kill.
 Obstacle.die = function(self)
 	for k,v in ipairs(self.spec.destroy_items) do
-		local spec = Itemspec:find{name = v[1]}
+		local spec = Itemspec:find_by_name(v.name)
 		if spec then
-			local p = self:transform_local_to_global(v[2])
-			local r = self:get_rotation() * (v[3] or Quaternion())
+			local p = self:transform_local_to_global(v.position or Vector())
+			local r = self:get_rotation():copy():concat(v.rotation or Quaternion())
 			local item = Item(self.manager)
 			item:set_spec(spec)
 			item:set_position(p)
 			item:set_rotation(r)
 			item:randomize()
 			item:set_visible(true)
+			if v.copy_velocity then
+				item.physics:set_angular(self.physics:get_angular())
+				item.physics:set_velocity(self.physics:get_velocity())
+			end
 		end
 	end
 	SimulationObject.die(self)

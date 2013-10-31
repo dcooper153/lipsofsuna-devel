@@ -39,10 +39,10 @@
 		},
 		"destroy_items":
 		[
-			["log", [0,0,0]],
-			["log", [0,1,0]],
-			["log", [0,2,0]],
-			["log", [0,3,0]]
+			{"name": "log", "position": [0,0,0]},
+			{"name": "log", "position": [0,1,0]},
+			{"name": "log", "position": [0,2,0]},
+			{"name": "log", "position": [0,3,0]}
 		],
 		"effects":
 		{
@@ -67,10 +67,10 @@
 		},
 		"destroy_items":
 		[
-			["log", [0,0,0]],
-			["log", [0,1,0]],
-			["log", [0,2,0]],
-			["log", [0,3,0]]
+			{"name": "log", "position": [0,0,0]},
+			{"name": "log", "position": [0,1,0]},
+			{"name": "log", "position": [0,2,0]},
+			{"name": "log", "position": [0,3,0]}
 		],
 		"effects":
 		{

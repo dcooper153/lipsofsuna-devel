@@ -21,7 +21,13 @@ Obstaclespec{
 	name = "wooden fence",
 	model = "fence1",
 	categories = {["prop"] = true},
-	destroy_items = {{"broken wooden fence",Vector(0,0,0)}},
+	destroy_items =
+	{
+		{
+			["name"] = "broken wooden fence",
+			["position"] = Vector(0,0,0)
+		}
+	},
 	health = 50,
 	interactive = false}
 

@@ -27,7 +27,7 @@ Obstaclespec = Spec:register("Obstaclespec", "obstacle", {
 	{name = "harvest_materials", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of harvestable materials.", details = {keys = {spec = "Itemspec"}}},
 	{name = "important", type = "boolean", default = true, description = "True to not allow the objectacle to be cleaned up from the map."},
 	{name = "destroy_actions", type = "list", list = {type = "string"}, default = {}, description = "List of actions to perform when the obstacle is destroyed."},
-	{name = "destroy_items", type = "list", list = {type = "spawn"}, default = {}, description = "List of items to spawn when the obstacle is destroyed."},
+	{name = "destroy_items", type = "list", list = {type = "struct", struct = {copy_velocity = {type = "boolean"}, name = {type = "string"}, position = {type = "vector"}}}, default = {}, description = "List of items to spawn when the obstacle is destroyed."},
 	{name = "health", type = "number", description = "Number of hit points the obstacle has."},
 	{name = "interactive", type = "boolean", default = true, description = "False to make the object not appear interactive."},
 	{name = "marker", type = "string", description = "Map marker name."},
