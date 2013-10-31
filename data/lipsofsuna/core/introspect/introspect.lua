@@ -20,7 +20,7 @@ local Introspect = Class("Introspect")
 Introspect.types_dict = {}
 for k,v in pairs{"boolean", "color", "dialog-tree", "dict", "generic", "ignore",
 	"list", "map-object-list", "map-object", "map-tile-list", "map-tile",
-	"number", "quaternion", "spawn", "string", "table", "todo", "vector"} do
+	"number", "quaternion", "spawn", "string", "struct", "table", "todo", "vector"} do
 	local res = require("core/introspect/types/" .. v)
 	Introspect.types_dict[res.name] = res
 end
@@ -91,7 +91,7 @@ Introspect.read_table = function(self, data, tbl)
 		if type.read_json then
 			local ok,ret = pcall(type.read_json, self, value, field)
 			if not ok then
-				error(string.format("invalid value in field %q", tostring(k)))
+				error(string.format("type %q: invalid value in field %q", self.name, field.name))
 			end
 			value = ret
 		end

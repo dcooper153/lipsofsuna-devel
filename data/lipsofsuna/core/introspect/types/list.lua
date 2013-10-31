@@ -22,7 +22,7 @@ return {
 		if not t.read_json then return val end
 		local res = {}
 		for k,v in ipairs(val) do
-			res[k] = t.read_json(self, v)
+			res[k] = t.read_json(self, v, field.list)
 		end
 		return res
 	end,
@@ -32,7 +32,7 @@ return {
 		if not t.write_json then return val end
 		local res = {}
 		for k,v in ipairs(val) do
-			res[k] = t.write_json(self, v)
+			res[k] = t.write_json(self, v, field.list)
 		end
 		return res
 	end,
