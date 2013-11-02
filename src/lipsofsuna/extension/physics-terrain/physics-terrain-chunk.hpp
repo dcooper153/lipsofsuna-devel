@@ -15,26 +15,40 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_PHYSICS_TERRAIN_PHYSICS_TERRAIN_HPP__
-#define __EXT_PHYSICS_TERRAIN_PHYSICS_TERRAIN_HPP__
+#ifndef __EXT_PHYSICS_TERRAIN_PHYSICS_TERRAIN_CHUNK_HPP__
+#define __EXT_PHYSICS_TERRAIN_PHYSICS_TERRAIN_CHUNK_HPP__
 
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/extension/physics/physics-private.h"
 #include "physics-terrain.h"
-#include "physics-terrain-chunk.hpp"
 #include <btBulletCollisionCommon.h>
 
-struct _LIExtPhysicsTerrain
+class LIExtPhysicsTerrainChunk
 {
-	int collision_group;
-	int collision_mask;
-	int realized;
-	int unloaded_collision;
-	float friction;
-	LIAlgU32dic* chunks;
+public:
+	LIExtPhysicsTerrainChunk(LIExtPhysicsTerrain* terrain, LIExtTerrainChunk* chunk, int x, int z, int size);
+	~LIExtPhysicsTerrainChunk();
+	void update();
+	void set_collision_group(int value);
+	void set_collision_mask(int value);
+	void set_friction(float value);
+	void set_visible(bool value);
+private:
+	void create_object ();
+	void create_shape ();
+	void delete_object ();
+	void delete_shape ();
+private:
+	int x;
+	int z;
+	int size;
+	int stamp;
+	bool realized;
+	btCollisionObject* object;
+	btCompoundShape* shape;
+	LIExtPhysicsTerrain* terrain;
+	LIExtTerrainChunk* chunk;
 	LIPhyPointer* pointer;
-	LIExtPhysicsTerrainModule* module;
-	LIExtTerrain* terrain;
 };
 
 #endif

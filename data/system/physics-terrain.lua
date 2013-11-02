@@ -36,6 +36,12 @@ PhysicsTerrain.new = function(clss, terrain)
 	return self
 end
 
+--- Updates the physics terrain.
+-- @param self PhysicsTerrain.
+PhysicsTerrain.update = function(self)
+	Los.physics_terrain_update(self.handle)
+end
+
 --- Gets the collision group of the physics terrain.
 -- @param self PhysicsTerrain.
 -- @return Number.

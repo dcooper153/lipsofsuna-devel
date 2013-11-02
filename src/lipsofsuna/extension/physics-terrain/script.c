@@ -51,6 +51,11 @@ static void PhysicsTerrain_new (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
+static void PhysicsTerrain_update (LIScrArgs* args)
+{
+	liext_physics_terrain_update (args->self, 0.0f);
+}
+
 static void PhysicsTerrain_set_collision_group (LIScrArgs* args)
 {
 	int value;
@@ -123,6 +128,7 @@ void liext_script_physics_terrain (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_new", PhysicsTerrain_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_update", PhysicsTerrain_update);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_set_collision_group", PhysicsTerrain_set_collision_group);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_set_collision_mask", PhysicsTerrain_set_collision_mask);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PHYSICS_TERRAIN, "physics_terrain_set_friction", PhysicsTerrain_set_friction);

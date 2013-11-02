@@ -18,6 +18,7 @@
 #include "physics-private.h"
 #include "physics-object.h"
 #include "physics-ray-result-callback.hpp"
+#include "lipsofsuna/extension/physics-terrain/physics-terrain.h"
 
 LIPhyRayResultCallback::LIPhyRayResultCallback (LIPhyObject** ignore_array, int ignore_count, const btVector3& src, const btVector3& dst) :
 	btCollisionWorld::ClosestRayResultCallback (src, dst)
@@ -37,13 +38,13 @@ btScalar LIPhyRayResultCallback::addSingleResult (btCollisionWorld::LocalRayResu
 
 	if (pointer == NULL)
 	{
-		/* Heightmap. */
+		// Heightmap.
 		ret = btCollisionWorld::ClosestRayResultCallback::addSingleResult (result, world);
 		liphy_contact_init (&this->result);
 	}
 	else if (pointer->type == LIPHY_POINTER_TYPE_OBJECT)
 	{
-		/* Object. */
+		// Object.
 		object = (LIPhyObject*) pointer->pointer;
 		for (i = 0 ; i < ignore_count ; i++)
 		{
@@ -56,13 +57,16 @@ btScalar LIPhyRayResultCallback::addSingleResult (btCollisionWorld::LocalRayResu
 	}
 	else
 	{
-		/* Terrain. */
+		// Terrain.
+		lisys_assert (pointer->type == LIPHY_POINTER_TYPE_TERRAIN);
 		ret = btCollisionWorld::ClosestRayResultCallback::addSingleResult (result, world);
 		liphy_contact_init (&this->result);
 		this->result.terrain_id = pointer->id;
-		this->result.terrain_tile[0] = pointer->tile[0];
-		this->result.terrain_tile[1] = pointer->tile[1];
-		this->result.terrain_tile[2] = pointer->tile[2];
+		liext_physics_terrain_get_column_by_object (
+			(LIExtPhysicsTerrain*) pointer->pointer,
+			(void*) result.m_collisionObject,
+			result.m_localShapeInfo->m_triangleIndex,
+			this->result.terrain_tile);
 	}
 	this->result.fraction = m_closestHitFraction;
 	this->result.point = limat_vector_init (m_hitPointWorld[0], m_hitPointWorld[1], m_hitPointWorld[2]);

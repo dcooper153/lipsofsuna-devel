@@ -27,7 +27,7 @@ typedef struct _LIExtPhysicsTerrainModule LIExtPhysicsTerrainModule;
 struct _LIExtPhysicsTerrainModule
 {
 	LIAlgPtrdic* terrains;
-	LICalHandle calls[1];
+	LICalHandle calls[2];
 	LIMaiProgram* program;
 	LIPhyPhysics* physics;
 	void* collision_algorithm;

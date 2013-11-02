@@ -24,6 +24,7 @@
 
 #include "module.h"
 #include "physics-terrain.hpp"
+#include "physics-terrain-stick-shape.hpp"
 
 /**
  * \brief Creates a new physics terrain.
@@ -51,6 +52,7 @@ LIExtPhysicsTerrain* liext_physics_terrain_new (
 	self->terrain = terrain;
 	self->collision_group = collision_group;
 	self->collision_mask = collision_mask;
+	self->friction = 1.0f;
 
 	/* Prepare collision object to tile index lookup. */
 	self->pointer = (LIPhyPointer*) lisys_calloc (1, sizeof (LIPhyPointer));
@@ -63,21 +65,13 @@ LIExtPhysicsTerrain* liext_physics_terrain_new (
 	self->pointer->type = LIPHY_POINTER_TYPE_TERRAIN;
 	self->pointer->pointer = self;
 
-	/* Create the collision shape. */
-	self->shape = new LIExtPhysicsTerrainShape (self);
-
-	/* Create the collision object. */
-	self->object = new btCollisionObject ();
-	self->object->setCollisionFlags (btCollisionObject::CF_STATIC_OBJECT);
-	self->object->setActivationState (DISABLE_DEACTIVATION);
-	self->object->setCollisionShape (self->shape);
-	self->object->setWorldTransform (btTransform (r, p));
-	self->object->setUserPointer (self->pointer);
-	self->object->setFriction (1.0f);
-
-	/* Create the raycast hook. */
-	self->raycast_hook = new LIExtPhysicsTerrainRaycastHook (self);
-	liphy_physics_add_raycast_hook (self->module->physics, self->raycast_hook);
+	/* Create the chunk dictionary. */
+	self->chunks = lialg_u32dic_new ();
+	if (self->chunks == NULL)
+	{
+		liext_physics_terrain_free (self);
+		return NULL;
+	}
 
 	/* Add to the terrain dictionary. */
 	if (!lialg_ptrdic_insert (module->terrains, self, self))
@@ -100,6 +94,13 @@ void liext_physics_terrain_free (
 	if (self->terrain != NULL)
 	{
 		liext_physics_terrain_remove (self, self->terrain);
+	}
+	if (self->chunks != NULL)
+	{
+		LIAlgU32dicIter iter;
+		LIALG_U32DIC_FOREACH (iter, self->chunks)
+			delete ((LIExtPhysicsTerrainChunk*) iter.value);
+		lialg_u32dic_free (self->chunks);
 	}
 	lisys_free (self->pointer);
 	lisys_free (self);
@@ -178,20 +179,55 @@ void liext_physics_terrain_remove (
 	if (self->terrain != terrain)
 		return;
 
-	/* Remove the raycast hook. */
-	if (self->raycast_hook != NULL)
+	/* Mark as hidden. */
+	liext_physics_terrain_set_visible (self, 0);
+
+	/* Delete the chunks. */
+	LIAlgU32dicIter iter;
+	LIALG_U32DIC_FOREACH (iter, self->chunks)
+		delete ((LIExtPhysicsTerrainChunk*) iter.value);
+	lialg_u32dic_clear (self->chunks);
+
+	self->terrain = NULL;
+}
+
+void liext_physics_terrain_update (
+	LIExtPhysicsTerrain* self,
+	float                secs)
+{
+	LIAlgU32dicIter iter;
+
+	// Update existing chunks.
+	LIALG_U32DIC_FOREACH (iter, self->chunks)
 	{
-		liphy_physics_remove_raycast_hook (self->module->physics, self->raycast_hook);
-		delete self->raycast_hook;
+		LIExtPhysicsTerrainChunk* pchunk = (LIExtPhysicsTerrainChunk*) iter.value;
+		LIExtTerrainChunk* tchunk = (LIExtTerrainChunk*) lialg_u32dic_find (self->terrain->chunks, iter.key);
+		if (!tchunk)
+		{
+			lialg_u32dic_remove (self->chunks, iter.key);
+			delete pchunk;
+		}
+		else
+			pchunk->update();
 	}
 
-	/* Delete the physics object. */
-	liext_physics_terrain_set_visible (self, 0);
-	delete self->object;
-	delete self->shape;
-	self->object = NULL;
-	self->shape = NULL;
-	self->terrain = NULL;
+	// Create new chunks.
+	LIALG_U32DIC_FOREACH (iter, self->terrain->chunks)
+	{
+		LIExtTerrainChunk* tchunk = (LIExtTerrainChunk*) iter.value;
+		LIExtPhysicsTerrainChunk* pchunk = (LIExtPhysicsTerrainChunk*) lialg_u32dic_find (self->chunks, iter.key);
+		if (!pchunk)
+		{
+			int chunk_sz = self->terrain->chunk_size;
+			int chunk_x = (iter.key % 0xFFFF) * chunk_sz;
+			int chunk_z = (iter.key / 0xFFFF) * chunk_sz;
+			pchunk = new LIExtPhysicsTerrainChunk(self, tchunk, chunk_x, chunk_z, chunk_sz);
+			if (lialg_u32dic_insert (self->chunks, iter.key, pchunk))
+				pchunk->set_visible(self->realized);
+			else
+				delete pchunk;
+		}
+	}
 }
 
 /**
@@ -212,11 +248,12 @@ void liext_physics_terrain_set_collision_group (
 		return;
 	self->collision_group = value;
 
-	/* Refresh the physics world. */
+	/* Update the chunks. */
 	if (self->realized)
 	{
-		self->module->physics->dynamics->removeCollisionObject (self->object);
-		self->module->physics->dynamics->addCollisionObject (self->object, self->collision_group, self->collision_mask);
+		LIAlgU32dicIter iter;
+		LIALG_U32DIC_FOREACH (iter, self->chunks)
+			((LIExtPhysicsTerrainChunk*) iter.value)->set_collision_group(value);
 	}
 }
 
@@ -238,12 +275,50 @@ void liext_physics_terrain_set_collision_mask (
 		return;
 	self->collision_mask = value;
 
-	/* Refresh the physics world. */
+	/* Update the chunks. */
 	if (self->realized)
 	{
-		self->module->physics->dynamics->removeCollisionObject (self->object);
-		self->module->physics->dynamics->addCollisionObject (self->object, self->collision_group, self->collision_mask);
+		LIAlgU32dicIter iter;
+		LIALG_U32DIC_FOREACH (iter, self->chunks)
+			((LIExtPhysicsTerrainChunk*) iter.value)->set_collision_mask(value);
 	}
+}
+
+/**
+ * \brief Gets the grid position of the given collision object.
+ * \param self Terrain.
+ * \param object Internal collision object.
+ * \param part Internal collision object part ID.
+ * \param result Return location of 3 integers for the grid position.
+ */
+void liext_physics_terrain_get_column_by_object (
+	const LIExtPhysicsTerrain* self,
+	void*                      object,
+	int                        part,
+	int*                       result)
+{
+	btCollisionObject* cobj = (btCollisionObject*) object;
+	btCollisionShape* cshape = cobj->getCollisionShape();
+
+	LIExtPhysicsTerrainStickShape* shape;
+	if (strcmp (cshape->getName(), "Convex"))
+	{
+		// Some versions of Bullet report collisions are the compound object
+		// and use a separate index number, which tells which subshape was hit.
+		btCompoundShape* compound = (btCompoundShape*) cshape;
+		lisys_assert (compound->getNumChildShapes() >= part);
+		shape = (LIExtPhysicsTerrainStickShape*) compound->getChildShape(part);
+	}
+	else
+	{
+		// Some other versions of bullet report collisions directly for the
+		// child convex shapes, skipping parent compound shape.
+		shape = (LIExtPhysicsTerrainStickShape*) cshape;
+	}
+
+	result[0] = shape->x;
+	result[1] = 0;
+	result[2] = shape->z;
 }
 
 /**
@@ -255,7 +330,12 @@ void liext_physics_terrain_set_friction (
 	LIExtPhysicsTerrain* self,
 	float                value)
 {
-	self->object->setFriction (value);
+	self->friction = value;
+
+	/* Update the chunks. */
+	LIAlgU32dicIter iter;
+	LIALG_U32DIC_FOREACH (iter, self->chunks)
+		((LIExtPhysicsTerrainChunk*) iter.value)->set_friction(value);
 }
 
 /**
@@ -314,11 +394,10 @@ void liext_physics_terrain_set_visible (
 		return;
 	self->realized = value;
 
-	/* Add to or remove from the physics world. */
-	if (value)
-		self->module->physics->dynamics->addCollisionObject (self->object, self->collision_group, self->collision_mask);
-	else
-		self->module->physics->dynamics->removeCollisionObject (self->object);
+	/* Update the chunks. */
+	LIAlgU32dicIter iter;
+	LIALG_U32DIC_FOREACH (iter, self->chunks)
+		((LIExtPhysicsTerrainChunk*) iter.value)->set_visible(value);
 }
 
 /** @} */

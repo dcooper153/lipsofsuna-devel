@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -23,6 +23,7 @@
  */
 
 #include "lipsofsuna/system.h"
+#include "lipsofsuna/extension/physics-terrain/physics-terrain.hpp"
 #include "physics.h"
 #include "physics-collision-configuration.hpp"
 #include "physics-constraint.h"
@@ -458,8 +459,8 @@ static bool private_contact_processed (
 
 	/* Get contact information. */
 	/* If the userdata is NULL, the body was a heightmap. Otherwise, was
-	   either an object or voxels depending on which one is set in the
-	   struct to which the pointer points. */
+	   either an object or terrain depending on which one is set in the
+	   struct of the pointer. */
 	liphy_contact_init (&contact);
 	if (pointer0 != NULL)
 	{
@@ -471,8 +472,12 @@ static bool private_contact_processed (
 		}
 		else
 		{
-			contact.terrain_id = pointer0->id;
-			memcpy (contact.terrain_tile, pointer0->tile, 3 * sizeof (int));
+			lisys_assert (pointer0->type == LIPHY_POINTER_TYPE_TERRAIN);
+			liext_physics_terrain_get_column_by_object (
+				(LIExtPhysicsTerrain*) pointer0->pointer,
+				body0,
+				point.m_index0,
+				contact.terrain_tile);
 		}
 	}
 	if (pointer1 != NULL)
@@ -485,8 +490,13 @@ static bool private_contact_processed (
 		}
 		else
 		{
+			lisys_assert (pointer1->type == LIPHY_POINTER_TYPE_TERRAIN);
 			contact.terrain_id = pointer1->id;
-			memcpy (contact.terrain_tile, pointer1->tile, 3 * sizeof (int));
+			liext_physics_terrain_get_column_by_object (
+				(LIExtPhysicsTerrain*) pointer1->pointer,
+				body1,
+				point.m_index1,
+				contact.terrain_tile);
 		}
 	}
 

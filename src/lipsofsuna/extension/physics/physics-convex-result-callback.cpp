@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,6 +18,7 @@
 #include "physics-private.h"
 #include "physics-object.h"
 #include "physics-convex-result-callback.hpp"
+#include "lipsofsuna/extension/physics-terrain/physics-terrain.h"
 
 LIPhyConvexResultCallback::LIPhyConvexResultCallback (LIPhyObject** ignore_array, int ignore_count) :
 	btCollisionWorld::ClosestConvexResultCallback (btVector3 (0.0, 0.0, 0.0), btVector3 (0.0, 0.0, 0.0))
@@ -37,13 +38,13 @@ btScalar LIPhyConvexResultCallback::addSingleResult (btCollisionWorld::LocalConv
 
 	if (pointer == NULL)
 	{
-		/* Heightmap. */
+		// Heightmap.
 		ret = ClosestConvexResultCallback::addSingleResult (result, world);
 		liphy_contact_init (&this->result);
 	}
 	else if (pointer->type == LIPHY_POINTER_TYPE_OBJECT)
 	{
-		/* Object. */
+		// Object.
 		object = (LIPhyObject*) pointer->pointer;
 		for (i = 0 ; i < ignore_count ; i++)
 		{
@@ -56,16 +57,16 @@ btScalar LIPhyConvexResultCallback::addSingleResult (btCollisionWorld::LocalConv
 	}
 	else
 	{
-		/* Terrain. */
-		/* FIXME: Doesn't work. Does the terrain collision algorithm need to do something more? */
-		if (m_closestHitFraction >= 1.0f)
-			return 1.0f;
+		// Terrain.
+		lisys_assert (pointer->type == LIPHY_POINTER_TYPE_TERRAIN);
 		ret = ClosestConvexResultCallback::addSingleResult (result, world);
 		liphy_contact_init (&this->result);
 		this->result.terrain_id = pointer->id;
-		this->result.terrain_tile[0] = pointer->tile[0];
-		this->result.terrain_tile[1] = pointer->tile[1];
-		this->result.terrain_tile[2] = pointer->tile[2];
+		liext_physics_terrain_get_column_by_object (
+			(LIExtPhysicsTerrain*) pointer->pointer,
+			(void*) result.m_hitCollisionObject,
+			result.m_localShapeInfo->m_triangleIndex,
+			this->result.terrain_tile);
 	}
 	this->result.fraction = m_closestHitFraction;
 	this->result.point = limat_vector_init (m_hitPointWorld[0], m_hitPointWorld[1], m_hitPointWorld[2]);

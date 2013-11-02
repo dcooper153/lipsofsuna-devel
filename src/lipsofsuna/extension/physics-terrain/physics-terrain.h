@@ -58,6 +58,10 @@ LIAPICALL (void, liext_physics_terrain_remove, (
 	LIExtPhysicsTerrain* self,
 	LIExtTerrain*        terrain));
 
+LIAPICALL (void, liext_physics_terrain_update, (
+	LIExtPhysicsTerrain* self,
+	float                secs));
+
 LIAPICALL (void, liext_physics_terrain_set_collision_group, (
 	LIExtPhysicsTerrain* self,
 	int                  value));
@@ -65,6 +69,12 @@ LIAPICALL (void, liext_physics_terrain_set_collision_group, (
 LIAPICALL (void, liext_physics_terrain_set_collision_mask, (
 	LIExtPhysicsTerrain* self,
 	int                  value));
+
+LIAPICALL (void, liext_physics_terrain_get_column_by_object, (
+	const LIExtPhysicsTerrain* self,
+	void*                      object,
+	int                        part,
+	int*                       result));
 
 LIAPICALL (void, liext_physics_terrain_set_friction, (
 	LIExtPhysicsTerrain* self,

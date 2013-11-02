@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,14 +15,23 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIEXT_PHYSICS_TERRAIN__PHYSICS_TERRAIN_COLLISION_ALGORITHM_H__
-#define __LIEXT_PHYSICS_TERRAIN__PHYSICS_TERRAIN_COLLISION_ALGORITHM_H__
+#ifndef __EXT_PHYSICS_TERRAIN_PHYSICS_TERRAIN_STICK_SHAPE_HPP__
+#define __EXT_PHYSICS_TERRAIN_PHYSICS_TERRAIN_STICK_SHAPE_HPP__
 
-LIAPICALL (void*, liext_physics_terrain_collision_algorithm_new, (
-	LIPhyPhysics* physics));
+#include "lipsofsuna/system.h"
+#include "lipsofsuna/extension/physics/physics-private.h"
+#include <btBulletCollisionCommon.h>
 
-LIAPICALL (void, liext_physics_terrain_collision_algorithm_free, (
-	LIPhyPhysics* physics,
-	void*         self));
+class LIExtPhysicsTerrainStickShape : public btConvexHullShape
+{
+public:
+	LIExtPhysicsTerrainStickShape(int x, int z, const btVector3* points, int count) :
+		btConvexHullShape ((const btScalar*) points, count, sizeof (btVector3)), x(x), z(z)
+	{
+	}
+public:
+	int x;
+	int z;
+};
 
 #endif

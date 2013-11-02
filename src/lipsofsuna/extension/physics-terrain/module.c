@@ -23,11 +23,15 @@
  */
 
 #include "module.h"
-#include "physics-terrain-collision-algorithm.h"
+#include "physics-terrain.h"
 
 static void private_terrain_free (
 	LIExtPhysicsTerrainModule* self,
 	LIExtTerrain*              terrain);
+
+static int private_tick (
+	LIExtPhysicsTerrainModule* self,
+	float                      secs);
 
 /*****************************************************************************/
 
@@ -73,7 +77,8 @@ LIExtPhysicsTerrainModule* liext_physics_terrain_module_new (
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, "terrain-free", 0, private_terrain_free, self, self->calls + 0))
+	if (!lical_callbacks_insert (program->callbacks, "terrain-free", 0, private_terrain_free, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, "tick", 1, private_tick, self, self->calls + 1))
 	{
 		liext_physics_terrain_module_free (self);
 		return NULL;
@@ -82,14 +87,6 @@ LIExtPhysicsTerrainModule* liext_physics_terrain_module_new (
 	/* Register classes. */
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_PHYSICS_TERRAIN, self);
 	liext_script_physics_terrain (program->script);
-
-	/* Create the collision algorithm. */
-	self->collision_algorithm = liext_physics_terrain_collision_algorithm_new (self->physics);
-	if (self->collision_algorithm == NULL)
-	{
-		liext_physics_terrain_module_free (self);
-		return NULL;
-	}
 
 	return self;
 }
@@ -100,10 +97,6 @@ void liext_physics_terrain_module_free (
 	/* Remove callbacks. */
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 
-	if (self->collision_algorithm != NULL)
-	{
-		liext_physics_terrain_collision_algorithm_free (self->physics, self->collision_algorithm);
-	}
 	if (self->terrains != NULL)
 	{
 		lisys_assert (self->terrains->size == 0);
@@ -124,6 +117,20 @@ static void private_terrain_free (
 	{
 		liext_physics_terrain_remove (iter.value, terrain);
 	}
+}
+
+static int private_tick (
+	LIExtPhysicsTerrainModule* self,
+	float                      secs)
+{
+	LIAlgPtrdicIter iter;
+
+	LIALG_PTRDIC_FOREACH (iter, self->terrains)
+	{
+		liext_physics_terrain_update (iter.value, secs);
+	}
+
+	return 1;
 }
 
 /** @} */
