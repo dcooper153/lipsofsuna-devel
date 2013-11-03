@@ -37,7 +37,8 @@ ModelManager.find_by_name = function(self, name)
 	if not model then
 		-- Load a new model.
 		local spec = ModelSpec:find_by_name(name)
-		model = Model(name)
+		model = Model()
+		model.name = name
 		model:load(spec and spec.model or name, Client and true or false)
 		self.models_by_name[name] = model
 		-- Edit materials.

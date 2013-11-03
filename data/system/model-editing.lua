@@ -6,6 +6,45 @@ end
 
 ------------------------------------------------------------------------------
 
+--- Adds an axis-aligned bounding box to the model.
+-- @param self Model.
+-- @param material.
+-- @param min Minimum vector.
+-- @param max Maximum vector.
+Model.add_aabb = function(self, material, min, max)
+	self:add_quads(material, {
+		-- Left.
+		{min.x,min.y,min.z,-1,0,0},
+		{min.x,max.y,min.z,-1,0,0},
+		{min.x,max.y,max.z,-1,0,0},
+		{min.x,min.y,max.z,-1,0,0},
+		-- Right.
+		{max.x,min.y,min.z,-1,0,0},
+		{max.x,min.y,max.z,-1,0,0},
+		{max.x,max.y,max.z,-1,0,0},
+		{max.x,max.y,min.z,-1,0,0},
+		-- Bottom.
+		{min.x,min.y,min.z,0,-1,0},
+		{max.x,min.y,max.z,0,-1,0},
+		{max.x,min.y,max.z,0,-1,0},
+		{max.x,min.y,min.z,0,-1,0},
+		-- Top.
+		{min.x,max.y,min.z,0,1,0},
+		{min.x,max.y,max.z,0,1,0},
+		{max.x,max.y,max.z,0,1,0},
+		{max.x,max.y,min.z,0,1,0},
+		-- Front.
+		{min.x,min.y,min.z,0,0,-1},
+		{max.x,min.y,min.z,0,0,-1},
+		{max.x,max.y,min.z,0,0,-1},
+		{min.x,max.y,min.z,0,0,-1},
+		-- Back.
+		{min.x,min.y,max.z,0,0,1},
+		{min.x,max.y,max.z,0,0,1},
+		{max.x,max.y,max.z,0,0,1},
+		{max.x,min.y,max.z,0,0,1}})
+end
+
 --- Adds a material to the model.
 -- @param self Model.
 -- @param ... Arguments.<ul>
@@ -22,6 +61,27 @@ end
 --   <li>vertices: Array of vertices.</li></ul>
 Model.add_triangles = function(self, ...)
 	Los.model_add_triangles(self.handle, ...)
+end
+
+--- Adds quads to the model.
+-- @param self Model.
+-- @param material Material number.
+-- @param vertices Array of vertices.
+Model.add_quads = function(self, material, vertices)
+	local i = 1
+	local j = 1
+	local v = {}
+	while vertices[j+3] do
+		v[i] = vertices[j]
+		v[i+1] = vertices[j+1]
+		v[i+2] = vertices[j+2]
+		v[i+3] = vertices[j]
+		v[i+4] = vertices[j+2]
+		v[i+5] = vertices[j+3]
+		i = i + 6
+		j = j + 4
+	end
+	self:add_triangles{material = material, vertices = v}
 end
 
 --- Calculates LOD data for the model.

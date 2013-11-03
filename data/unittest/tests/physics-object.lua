@@ -1,10 +1,8 @@
-Unittest:add(2, "system", "physics object", function()
+Unittest:add(1, "system", "physics object: creation", function()
 	local Model = require("system/model")
 	local Physics = require("system/physics")
 	local PhysicsObject = require("system/physics-object")
-	local Program = require("system/core")
 	local Vector = require("system/math/vector")
-	-- Creation and basic setters.
 	local o = PhysicsObject()
 	assert(o:get_physics() == "static")
 	o:set_id(1)
@@ -20,6 +18,68 @@ Unittest:add(2, "system", "physics object", function()
 	assert(o:get_position().y == 1100)
 	assert(o:get_position().z == 1200)
 	assert(o:get_visible() == true)
+end)
+
+Unittest:add(1, "system", "physics object: collision", function()
+	local Model = require("system/model-editing")
+	local Physics = require("system/physics")
+	local PhysicsObject = require("system/physics-object")
+	local Program = require("system/core")
+	local Vector = require("system/math/vector")
+	-- Create the collision shape.
+	local model = Model()
+	model:add_material{material = "diff1"}
+	model:add_aabb(1, Vector(-1,-1,-1), Vector(1,1,1))
+	model:changed()
+	-- Create the first object.
+	local o1 = PhysicsObject()
+	o1:set_id(1)
+	o1:set_mass(100)
+	o1:set_model(model)
+	o1:set_physics("rigid")
+	o1:set_position(Vector(1000,1100,1200))
+	o1:set_visible(true)
+	local o2 = PhysicsObject()
+	o2:set_id(1)
+	o2:set_mass(100)
+	o2:set_model(model)
+	o2:set_physics("rigid")
+	o2:set_position(Vector(1000,1100,1200))
+	o2:set_visible(true)
+	-- Simulation.
+	Physics:set_enable_simulation(true)
+	Program:discard_events()
+	local start = Program:get_time()
+	local curr = start
+	local prev = start - 0.01
+	while curr < start + 0.2 do
+		Physics:update(curr - prev)
+		Program:update()
+		local e = Program:pop_event()
+		while e do
+			e = Program:pop_event()
+		end
+		prev = curr
+		curr = Program:get_time()
+	end
+	Physics:set_enable_simulation(false)
+end)
+
+Unittest:add(1, "system", "physics object: motion", function()
+	local Model = require("system/model")
+	local Physics = require("system/physics")
+	local PhysicsObject = require("system/physics-object")
+	local Program = require("system/core")
+	local Vector = require("system/math/vector")
+	-- Create the object.
+	local o = PhysicsObject()
+	assert(o:get_physics() == "static")
+	o:set_id(1)
+	o:set_mass(100)
+	o:set_model(Model())
+	o:set_physics("rigid")
+	o:set_position(Vector(1000,1100,1200))
+	o:set_visible(true)
 	-- Simulation.
 	Physics:set_enable_simulation(true)
 	Program:discard_events()
@@ -47,5 +107,4 @@ Unittest:add(2, "system", "physics object", function()
 	assert(o:get_position().y < 1100)
 	assert(o:get_position().z == 1200)
 	Physics:set_enable_simulation(false)
-	-- TODO: Collisions.
 end)
