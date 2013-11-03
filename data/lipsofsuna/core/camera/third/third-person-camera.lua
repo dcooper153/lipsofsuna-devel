@@ -211,8 +211,7 @@ ThirdPersonCamera.update = function(self, secs)
 	-- Calculate the final transformation.
 	local pos,rot = self:get_eye_transform()
 	local dist = self:calculate_3rd_person_clipped_distance(pos, rot,
-		zoom, nil, self:get_collision_group(), self:get_collision_mask())
-	dist = math.max(dist - 0.2, 0)
+		zoom, 0.2, self:get_collision_group(), self:get_collision_mask())
 	pos,rot = self:calculate_3rd_person_transform(pos, rot, dist)
 	-- Mix in the camera quake.
 	if self.__quake_vector then
