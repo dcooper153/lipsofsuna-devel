@@ -96,6 +96,16 @@ ChunkManager.update = function(self, secs)
 	end
 end
 
+--- Waits until all the active chunks have finished loading.
+-- @param self ChunkManager.
+ChunkManager.wait_until_loaded = function(self)
+	for k,chunk in pairs(self.chunks) do
+		if chunk.loader then
+			chunk.loader:finish()
+		end
+	end
+end
+
 --- Returns true if the chunk has finished loading.
 -- @param self ChunkManager.
 -- @param x X coordinate in grid units.

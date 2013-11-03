@@ -83,6 +83,11 @@ Building.update = function(self, secs)
 		Server.players_by_client = {}
 		Server.players_by_client[-1] = self.player --FIXME
 		self.player:calculate_animation()
+
+		-- Wait for terrain to load.
+		self.player:refresh(10)
+		Main.terrain:wait_until_loaded()
+		Server:send_game_state(self.player)
 	end
 end
 

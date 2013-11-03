@@ -86,7 +86,6 @@ Crafting.update = function(self, secs)
 		Server.players_by_client = {}
 		Server.players_by_client[-1] = self.player --FIXME
 		self.player:calculate_animation()
-		Server:send_game_state(self.player)
 
 		local alchemy = Obstacle(Main.objects)
 		alchemy:set_spec(Obstaclespec:find_by_name("alchemy table"))
@@ -113,6 +112,11 @@ Crafting.update = function(self, secs)
 		chest:set_position(Vector(505,105.1,510))
 		chest:set_visible(true)
 		chest:randomize()
+
+		-- Wait for terrain to load.
+		self.player:refresh(10)
+		Main.terrain:wait_until_loaded()
+		Server:send_game_state(self.player)
 
 		-- Unlock everything.
 		Main.unlocks:unlock_all()
