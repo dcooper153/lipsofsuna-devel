@@ -54,7 +54,11 @@ LIPhyControlRigid::~LIPhyControlRigid ()
 void LIPhyControlRigid::apply_impulse (const btVector3& pos, const btVector3& imp)
 {
 	this->body.activate ();
+#if BT_BULLET_VERSION >= 282
+	this->body.applyImpulse (imp * 1.2, pos);
+#else
 	this->body.applyImpulse (imp, pos);
+#endif
 }
 
 void LIPhyControlRigid::transform (const btTransform& value)
