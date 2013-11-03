@@ -102,6 +102,10 @@ btCollisionObject* LIPhyControl::get_object ()
 	return NULL;
 }
 
+void LIPhyControl::get_transform (btTransform* value)
+{
+}
+
 void LIPhyControl::get_velocity (btVector3* value)
 {
 	*value = btVector3 (0.0, 0.0, 0.0);

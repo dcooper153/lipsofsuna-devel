@@ -887,6 +887,10 @@ void liphy_object_get_transform (
 	/* Get the raw transformation. */
 	self->motion->getWorldTransform (trans);
 
+	/* Allow the controller to modify the result. */
+	if (self->control != NULL)
+		self->control->get_transform (&trans);
+
 	/* Calculate displacement. */
 	/* Due to the center of mass transform of the collision shape, the
 	   object may need to displaced for it to appear in the right place. */

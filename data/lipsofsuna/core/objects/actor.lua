@@ -683,7 +683,8 @@ Actor.update_actions = function(self, secs)
 			local prevy = self.velocity_prev.y
 			local diffy = self:get_velocity().y - prevy
 			if prevy < -limity and diffy > limity then
-				local damage = (diffy - limity) * self.spec.falling_damage_rate * self.attributes.falling_damage
+				local rate = self.spec.falling_damage_rate
+				local damage = (diffy - limity) * rate * self.attributes.falling_damage
 				if damage > 2 then
 					self:damaged{amount = damage, type = "falling"}
 					local effect = self.spec:get_effect("falling damage")

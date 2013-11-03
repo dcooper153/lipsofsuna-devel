@@ -203,6 +203,7 @@ public:
 	virtual bool get_ground ();
 	virtual void set_mass (float value, const btVector3& inertia);
 	virtual btCollisionObject* get_object ();
+	virtual void get_transform (btTransform* value);
 	virtual void get_velocity (btVector3* value);
 	virtual void set_velocity (const btVector3& value);
 public:
@@ -230,6 +231,7 @@ public:
 	virtual void set_gravity (const btVector3& value);
 	virtual void set_mass (float value, const btVector3& inertia);
 	virtual btCollisionObject* get_object ();
+	virtual void get_transform (btTransform* value);
 	virtual void get_velocity (btVector3* value);
 	virtual void set_velocity (const btVector3& value);
 public:

@@ -54,11 +54,7 @@ LIPhyControlRigid::~LIPhyControlRigid ()
 void LIPhyControlRigid::apply_impulse (const btVector3& pos, const btVector3& imp)
 {
 	this->body.activate ();
-#if BT_BULLET_VERSION >= 282
-	this->body.applyImpulse (imp * 1.2, pos);
-#else
 	this->body.applyImpulse (imp, pos);
-#endif
 }
 
 void LIPhyControlRigid::transform (const btTransform& value)
@@ -147,6 +143,11 @@ void LIPhyControlRigid::set_mass (float value, const btVector3& inertia)
 btCollisionObject* LIPhyControlRigid::get_object ()
 {
 	return &this->body;
+}
+
+void LIPhyControlRigid::get_transform (btTransform* value)
+{
+	*value = this->body.getCenterOfMassTransform ();
 }
 
 void LIPhyControlRigid::get_velocity (btVector3* value)
