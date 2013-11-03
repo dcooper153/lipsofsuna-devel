@@ -92,4 +92,7 @@ LIAPICALL (void, liphy_physics_set_userdata, (
 	LIPhyPhysics* self,
 	void*         data));
 
+LIAPICALL (float, liphy_physics_get_version, (
+	LIPhyPhysics* self));
+
 #endif

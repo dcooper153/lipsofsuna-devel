@@ -85,4 +85,11 @@ Physics.set_enable_simulation = function(self, v)
 	Los.physics_set_enable_simulation(v)
 end
 
+--- Gets the version number of the physics engine.
+-- @param self Physics class.
+-- @return Number.
+Physics.get_version = function(self)
+	return Los.physics_get_version()
+end
+
 return Physics

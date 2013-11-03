@@ -186,6 +186,14 @@ static void Physics_set_enable_simulation (LIScrArgs* args)
 		module->simulate = value;
 }
 
+static void Physics_get_version (LIScrArgs* args)
+{
+	LIExtPhysicsModule* module;
+
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS);
+	liscr_args_seti_float (args, liphy_physics_get_version (module->physics));
+}
+
 /*****************************************************************************/
 
 void liext_script_physics (
@@ -196,6 +204,7 @@ void liext_script_physics (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_update", Physics_update);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_get_enable_simulation", Physics_get_enable_simulation);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_set_enable_simulation", Physics_set_enable_simulation);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_get_version", Physics_get_version);
 }
 
 /** @} */

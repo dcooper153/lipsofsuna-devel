@@ -435,6 +435,17 @@ void liphy_physics_set_userdata (
 	self->userdata = data;
 }
 
+/**
+ * \brief Gets the physics engine version.
+ * \param self Physics simulation.
+ * \return Version number.
+ */
+float liphy_physics_get_version (
+	LIPhyPhysics* self)
+{
+	return BT_BULLET_VERSION / 100.0f + 0.005;
+}
+
 /*****************************************************************************/
 
 static bool private_contact_processed (
