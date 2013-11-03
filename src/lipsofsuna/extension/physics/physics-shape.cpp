@@ -70,7 +70,7 @@ LIPhyShape* liphy_shape_new (
 	try
 	{
 		self->physics = physics;
-		self->shape = new btCompoundShape (false);
+		self->shape = new btCompoundShape ();
 		self->shape->setUserPointer (self);
 	}
 	catch (...)
