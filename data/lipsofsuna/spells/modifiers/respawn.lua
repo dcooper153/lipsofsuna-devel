@@ -18,6 +18,8 @@ end
 -- @param secs Seconds since the last update.
 -- @return True to continue effect-over-time updates. False otherwise.
 RespawnModifier.update = function(modifier, secs)
+	-- Zero the velocity until spawned.
+	modifier.object:set_velocity(Vector())
 	-- Wait for the sector to load.
 	local src = modifier.object:get_position()
 	if not Main.terrain:is_point_loaded(src) then
@@ -32,7 +34,6 @@ RespawnModifier.update = function(modifier, secs)
 		dst.y = 50000
 		dst.z = src.z + 10 * math.random()
 		modifier.object:set_position(dst)
-		modifier.object.physics:set_velocity(Vector())
 		return true
 	end
 	-- Snap to the terrain surface.

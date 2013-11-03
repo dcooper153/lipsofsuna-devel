@@ -1063,6 +1063,16 @@ Actor.set_tilt_angle = function(self, tilt, predict)
 	end
 end
 
+--- Sets the velocity of the object.
+-- @param self Actor.
+-- @param value Velocity vector.
+-- @param predict True to use prediction
+Actor.set_velocity = function(self, value, predict)
+	self.fall_timer = nil
+	self.velocity_prev = nil
+	SimulationObject.set_velocity(self, value, predict)
+end
+
 --- Gets the currently wielded weapon.
 -- @param self Actor.
 -- @return Item, or nil.
