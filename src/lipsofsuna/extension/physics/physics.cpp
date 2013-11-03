@@ -457,6 +457,12 @@ static bool private_contact_processed (
 	pointer0 = (LIPhyPointer*)((btCollisionObject*) body0)->getUserPointer ();
 	pointer1 = (LIPhyPointer*)((btCollisionObject*) body1)->getUserPointer ();
 
+	/* Make sure that the contact involved at least one object with a contact
+	   callback. Otherwise, we don't need to do anything abou this contact. */
+	if ((pointer0 == NULL || pointer0->type != LIPHY_POINTER_TYPE_OBJECT || !((LIPhyObject*) pointer0->pointer)->config.contact_events) &&
+	    (pointer1 == NULL || pointer1->type != LIPHY_POINTER_TYPE_OBJECT || !((LIPhyObject*) pointer1->pointer)->config.contact_events))
+		return false;
+
 	/* Get contact information. */
 	/* If the userdata is NULL, the body was a heightmap. Otherwise, was
 	   either an object or terrain depending on which one is set in the
@@ -473,6 +479,7 @@ static bool private_contact_processed (
 		else
 		{
 			lisys_assert (pointer0->type == LIPHY_POINTER_TYPE_TERRAIN);
+			contact.terrain_id = pointer0->id;
 			liext_physics_terrain_get_column_by_object (
 				(LIExtPhysicsTerrain*) pointer0->pointer,
 				body0,
@@ -484,9 +491,18 @@ static bool private_contact_processed (
 	{
 		if (pointer1->type == LIPHY_POINTER_TYPE_OBJECT)
 		{
-			object1 = (LIPhyObject*) pointer1->pointer;
-			contact.object1_id = liphy_object_get_external_id (object1);
-			physics = object1->physics;
+			if (object0 != NULL)
+			{
+				object1 = (LIPhyObject*) pointer1->pointer;
+				contact.object1_id = liphy_object_get_external_id (object1);
+				physics = object1->physics;
+			}
+			else
+			{
+				object0 = (LIPhyObject*) pointer1->pointer;
+				contact.object_id = liphy_object_get_external_id (object0);
+				physics = object0->physics;
+			}
 		}
 		else
 		{
@@ -499,12 +515,6 @@ static bool private_contact_processed (
 				contact.terrain_tile);
 		}
 	}
-
-	/* Make sure that the contact involved at least one object with a contact
-	   callback before inserting the contact to the queue. */
-	if ((object0 == NULL || !object0->config.contact_events) &&
-	    (object1 == NULL || !object1->config.contact_events))
-		return false;
 
 	/* Get collision point. */
 	const btVector3& pt = point.getPositionWorldOnB ();
