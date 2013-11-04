@@ -12,43 +12,79 @@
 	{
 		"type": "Actorspec",
 		"name": "aer",
-		"base": "race",
-		"body_scale_min": 0.8,
-		"body_scale_max": 1.2,
-		"animations":
-		{
-			"default": "default",
-			"feminine": "feminine"
-		},
 		"actions":
 		{
 			"left": "block",
 			"right": "attack"
 		},
+		"aim_ray_center": [0, 1.5, 0],
+		"aim_ray_end": 5,
+		"aim_ray_start": 0.5,
+		"animations":
+		{
+			"default": "default",
+			"feminine": "feminine"
+		},
+		"body_scale_min": 0.8,
+		"body_scale_max": 1.2,
+		"camera_center": [0, 1.5, 0],
 		"effects":
 		{
 			"default": "aer"
 		},
 		"equipment_class": "aer",
+		"equipment_slots":
+		{
+			"arms": "",
+			"feet": "",
+			"hand.L": "#hand.L",
+			"hand.R": "#hand.R",
+			"head": "",
+			"lowerbody": "",
+			"pants": "",
+			"upperbody": ""
+		},
 		"eye_style": "random",
 		"eye_styles":
 		{
 			"Default": "aereye1",
 			"Angled": "aereye2"
 		},
+		"factions":
+		{
+			"good": true
+		},
 		"falling_damage_rate": 3,
+		"footstep_height": 0.3,
+		"footstep_sound": "step1",
 		"hair_style": "random",
 		"head_scale_min": 0.8,
 		"head_scale_max": 1.2,
+		"head_styles":
+		{
+			"Default": ""
+		},
+		"inventory_size": 20,
 		"model": "aer1",
 		"models":
 		{
 			"skeleton": "aer1",
 			"body": "aerbody1"
 		},
+		"skill_quota": 200,
+		"skin_styles":
+		{
+			"Default": ""
+		},
 		"skin_textures": ["skin1"],
+		"speed_walk": 5,
+		"speed_run": 15,
 		"tilt_bone": ["spine", "chest"],
+		"tilt_limit": 1.25,
 		"tilt_mult": -1
+		"timing_build": 0.2,
+		"timing_jump": 0,
+		"timing_pickup": 0.2,
 	},
 	{
 		"type": "Actorspec",

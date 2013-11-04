@@ -98,7 +98,7 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "skin_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of skin styles."},
 	{name = "skin_textures", type = "list", list = {type = "string"}, description = "List of skin textures."},
 	{name = "special_effects", type = "list", list = {type = "string", details = {value = {spec = "Effectspec"}}}, default = {}, description = "List of special effects to render."},
-	{name = "speed_run", type = "number", default = 6, description = "Turning speed in meters per second."},
+	{name = "speed_run", type = "number", default = 6, description = "Running speed in meters per second."},
 	{name = "speed_walk", type = "number", default = 3, description = "Walking speed in meters per second."},
 	{name = "swim_force", type = "number", default = 3.5, description = "Mass-independent upward swim force of the actor."},
 	{name = "tilt_bone", type = "list", list = {type = "string"}, default = {}, description = "Name of the tilt bone of the actor."},
