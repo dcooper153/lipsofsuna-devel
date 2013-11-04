@@ -565,6 +565,14 @@
 	},
 	{
 		"type": "ModifierSpec",
+		"name": "spawn",
+		"modifiers":
+		{
+			"spawn": 1
+		}
+	},
+	{
+		"type": "ModifierSpec",
 		"name": "travel",
 		"actions":
 		{

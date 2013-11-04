@@ -182,6 +182,9 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 		player:teleport{position = home}
 		-- Spawn the player.
 		player:add_modifier("respawn", 1)
+	else
+		-- Spawn the player.
+		player:add_modifier("spawn", 1)
 	end
 	player:set_client(client)
 	player:set_visible(true)
