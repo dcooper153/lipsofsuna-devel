@@ -15,7 +15,7 @@
 		"name": "firewall1",
 		"model": "firewall1",
 		"particle": "firewall1",
-		"effect": "firewall burning 1"
+		"effect": "firewall burning"
 	},
 	{
 		"type": "Spellspec",

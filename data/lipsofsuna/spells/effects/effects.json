@@ -15,6 +15,25 @@
 	},
 	{
 		"type": "Effectspec",
+		"name": "burning spell",
+		"particle": "fire-damage1",
+		"particle_life": 5,
+		"quake": 0.2,
+		"sound": "explosion2",
+		"sound_pitch_min": 2,
+		"sound_pitch_max": 2,
+		"sound_volume": 0.5
+	},
+	{
+		"type": "Effectspec",
+		"name": "burning spell cast",
+		"sound": "fireball1",
+		"sound_pitch_min": 2,
+		"sound_pitch_max": 2,
+		"sound_volume": 0.3
+	},
+	{
+		"type": "Effectspec",
 		"name": "cold damage",
 		"particle": "cold-damage1",
 		"particle_life": 1,
@@ -31,6 +50,11 @@
 	},
 	{
 		"type": "Effectspec",
+		"name": "conjuration spell cast",
+		"sound": "spellberserk1"
+	},
+	{
+		"type": "Effectspec",
 		"name": "dig spell",
 		"sound": "dig-spell1",
 		"sound_rolloff": 0.2
@@ -40,11 +64,6 @@
 		"name": "dig spell cast",
 		"sound": "dig-spell-cast1",
 		"sound_rolloff": 0.5
-	},
-	{
-		"type": "Effectspec",
-		"name": "disease1",
-		"sound": "diseasecontact1"
 	},
 	{
 		"type": "Effectspec",
@@ -66,23 +85,42 @@
 	},
 	{
 		"type": "Effectspec",
-		"name": "fireball1",
+		"name": "fire damage cast",
+		"sound": "fireball1",
+		"sound_pitch_min": 2,
+		"sound_pitch_max": 2,
+		"sound_volume": 0.3
+	},
+	{
+		"type": "Effectspec",
+		"name": "firewall spell",
+		"sound": "fire-000"
+	},
+	{
+		"type": "Effectspec",
+		"name": "firewall spell cast",
 		"sound": "fireball1",
 		"sound_volume": 0.3
 	},
 	{
 		"type": "Effectspec",
-		"name": "firewall start 1",
-		"sound": "fire-000"
-	},
-	{
-		"type": "Effectspec",
-		"name": "firewall burning 1",
+		"name": "firewall burning",
 		"particle": "firewall1",
 		"sound": "firewall-burning1",
 		"sound_loop": true,
 		"sound_pitch_min": 0.8,
 		"sound_pitch_max": 1.2,
+		"sound_volume": 0.3
+	},
+	{
+		"type": "Effectspec",
+		"name": "disease1",
+		"sound": "diseasecontact1"
+	},
+	{
+		"type": "Effectspec",
+		"name": "fireball1",
+		"sound": "fireball1",
 		"sound_volume": 0.3
 	},
 	{

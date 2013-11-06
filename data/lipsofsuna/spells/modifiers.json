@@ -39,7 +39,7 @@
 			"ranged spell": true
 		},
 		"description": "Conjure infectious plagued monsters",
-		"effect": "FIXME",
+		"effect": "conjuration spell cast",
 		"icon": "modifier-black haze",
 		"projectile": "fireball1",
 		"spell_strength": 1,
@@ -114,7 +114,8 @@
 			"touch spell": true
 		},
 		"description": "Inflict damage over time by putting the target on fire",
-		"effect": "berserk1",
+		"effect": "burning spell",
+		"effect_fire": "burning spell cast",
 		"icon": "firewall",
 		"spell_strength": 10,
 		"required_stats":
@@ -243,7 +244,7 @@
 		},
 		"description": "Inflict fire damage",
 		"effect": "fire damage",
-		"effect_fire": "fireball1",
+		"effect_fire": "fire damage cast",
 		"icon": "modifier-fireball",
 		"projectile": "fireball1",
 		"spell_strength": 5,
@@ -265,7 +266,7 @@
 			"self spell": true
 		},
 		"description": "Conjure a fire elemental",
-		"effect": "FIXME",
+		"effect": "conjuration spell cast",
 		"icon": "firewall",
 		"spell_strength": 60,
 		"required_stats":
@@ -288,8 +289,8 @@
 			"ranged spell": true
 		},
 		"description": "Conjure a wall of fire",
-		"effect": "firewall start 1",
-		"effect_fire": "fireball1",
+		"effect": "firewall spell",
+		"effect_fire": "firewall spell cast",
 		"icon": "firewall",
 		"projectile": "fireball1",
 		"spell_strength": 5,
@@ -457,7 +458,7 @@
 			"touch spell": true
 		},
 		"description": "Regenerate health every second",
-		"effect": "berserk1",
+		"effect": "heal1",
 		"icon": "modifier-heal",
 		"spell_strength": 60,
 		"required_stats":
