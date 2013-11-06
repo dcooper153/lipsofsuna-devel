@@ -19,7 +19,6 @@ UiInvItem.apply = function(self)
 	Client.data.inventory.id = self.inventory_id
 	Client.data.inventory.index = self.index
 	Client.data.inventory.count = self.item.count or 1
-	Client.effects:play_global("uitransition1")
 	-- Create the selector widgets.
 	local id = self.inventory_id
 	local index = self.index
