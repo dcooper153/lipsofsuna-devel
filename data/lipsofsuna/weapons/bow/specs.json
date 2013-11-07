@@ -113,7 +113,7 @@
 		{
 			"default": "bow"
 		},
-		"equipment_anchor_rotation": [0.0102222, -0.388443, 0.051111, 0.919997],
+		"equipment_anchor_rotation": [0, -1, 0, 0],
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved": {"hand.L": true},
 		"icon": "bow1",
@@ -141,6 +141,7 @@
 		{
 			"default": "bow"
 		},
+		"equipment_anchor_rotation": [0, -1, 0, 0],
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved": {"hand.L": true},
 		"icon": "bow2",
@@ -168,6 +169,7 @@
 		{
 			"default": "bow"
 		},
+		"equipment_anchor_rotation": [0, -1, 0, 0],
 		"equipment_slot": "hand.R",
 		"equipment_slots_reserved": {"hand.L": true},
 		"icon": "bow2",

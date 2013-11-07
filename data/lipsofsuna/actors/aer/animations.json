@@ -551,18 +551,22 @@
 	{
 		"type": "AnimationSpec",
 		"name": "default attack bow",
-		"animation": "aer1-attack-bow",
+		"animation": "aer1-attack-musket",
 		"channel": 2,
+		"fade_in_mode": "instant",
+		"replace": true,
+		"time_frames": 20,
 		"priority": 10,
 		"node_priorities": {"LOWER": 3}
 	},
 	{
 		"type": "AnimationSpec",
 		"name": "default charge bow",
-		"animation": "aer1-charge-bow",
+		"animation": "aer1-attack-musket",
 		"channel": 2,
 		"permanent": true,
-		"repeat_start": 10,
+		"repeat_end_frames": 20,
+		"repeat_start_frames": 20,
 		"priority": 3,
 		"node_priorities": {"ARMS": 10}
 	},
