@@ -1,15 +1,5 @@
 [
 	{
-		"type": "Effectspec",
-		"name": "aerhurt1",
-		"sound": "thud-000"
-	},
-	{
-		"type": "Effectspec",
-		"name": "jump1",
-		"sound": "hop-000"
-	},
-	{
 		"type": "Actorspec",
 		"name": "aer",
 		"actions":
@@ -81,10 +71,10 @@
 		"speed_run": 15,
 		"tilt_bone": ["spine", "chest"],
 		"tilt_limit": 1.25,
-		"tilt_mult": -1
+		"tilt_mult": -1,
 		"timing_build": 0.2,
 		"timing_jump": 0,
-		"timing_pickup": 0.2,
+		"timing_pickup": 0.2
 	},
 	{
 		"type": "Actorspec",
@@ -102,23 +92,5 @@
 		"name": "Aer skin 1",
 		"actors": {"aer": true},
 		"textures": ["skin1"]
-	},
-	{
-		"type": "EffectProfileSpec",
-		"name": "aer",
-		"effects":
-		{
-			"falling damage": "aerhurt1",
-			"physical damage": "flesh impact 1"
-		}
-	},
-	{
-		"type": "EffectProfileSpec",
-		"name": "default",
-		"effects":
-		{
-			"attack bite": "swing1",
-			"physical damage": "flesh impact 1"
-		}
 	}
 ]

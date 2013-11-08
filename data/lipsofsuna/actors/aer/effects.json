@@ -1,0 +1,30 @@
+[
+	{
+		"type": "Effectspec",
+		"name": "aerhurt1",
+		"sound": "thud-000"
+	},
+	{
+		"type": "Effectspec",
+		"name": "jump1",
+		"sound": "hop-000"
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "aer",
+		"effects":
+		{
+			"falling damage": "aerhurt1",
+			"physical damage": "flesh impact 1"
+		}
+	},
+	{
+		"type": "EffectProfileSpec",
+		"name": "default",
+		"effects":
+		{
+			"attack bite": "swing1",
+			"physical damage": "flesh impact 1"
+		}
+	}
+]
