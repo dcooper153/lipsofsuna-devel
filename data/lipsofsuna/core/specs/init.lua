@@ -1,9 +1,11 @@
+local ActorTextureSpec = require("core/specs/actor-texture")
 local AnimationSpec = require("core/specs/animation")
 local AnimationProfileSpec = require("core/specs/animation-profile")
 local ModifierSpec = require("core/specs/modifier")
 local MusicSpec = require("core/specs/music")
 
 Main.main_start_hooks:register(0, function()
+	ActorTextureSpec:validate_all()
 	Actionspec:validate_all()
 	Actorspec:validate_all()
 	Actorpresetspec:validate_all()

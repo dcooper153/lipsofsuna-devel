@@ -8,6 +8,7 @@
 -- @module character.texture_builder
 -- @alias TextureBuilder
 
+local ActorTextureSpec = require("core/specs/actor-texture")
 local Class = require("system/class")
 local Color = require("system/color")
 local HairStyleSpec = require("core/specs/hair-style")
@@ -132,17 +133,7 @@ TextureBuilder.build_with_merger = function(clss, merger, args, hash)
 		end
 	end
 	-- Blit the eye texture.
-	local eye = args.eye_style
-	if eye then
-		local blit = Main.images:copy_by_name(eye)
-		if blit then
-			if args.eye_color then
-				merger:blit_hsv_add_weightv(blit, args.eye_color[1], -1 + 2 * args.eye_color[2], -1 + 2 * args.eye_color[3])
-			else
-				merger:blit(blit)
-			end
-		end
-	end
+	clss:merge_actor_texture(merger, args.eye_style, args.eye_color)
 	-- Blit the additional textures.
 	local blits = textures[basename]
 	if blits then
@@ -155,6 +146,29 @@ TextureBuilder.build_with_merger = function(clss, merger, args, hash)
 	end
 	merger:finish()
 	return hash1
+end
+
+--- Adds an actor texture to the texture merger.
+-- @param clss TextureBuilder class.
+-- @param merger ImageMerger.
+-- @param name ActorTextureSpec name.
+-- @param color HSV color.
+TextureBuilder.merge_actor_texture = function(clss, merger, name, color)
+	if not name then return end
+	local spec = ActorTextureSpec:find_by_name(name)
+	if not spec then return end
+	if not spec.blit_texture then return end
+	local blit = Main.images:copy_by_name(spec.blit_texture)
+	if not blit then return end
+	if color then
+		if spec.blit_mode == "hsv_add_weightv" then
+			merger:blit_hsv_add_weightv(blit, color[1], -1 + 2 * color[2], -1 + 2 * color[3])
+		else
+			merger:blit_hsv_add(blit, color[1], -1 + 2 * color[2], -1 + 2 * color[3])
+		end
+	else
+		merger:blit(blit)
+	end
 end
 
 return TextureBuilder

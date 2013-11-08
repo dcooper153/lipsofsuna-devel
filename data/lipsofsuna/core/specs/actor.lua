@@ -8,6 +8,7 @@
 -- @module core.specs.actor
 -- @alias Actorspec
 
+local ActorTextureSpec = require("core/specs/actor-texture")
 local AnimationProfileSpec = require("core/specs/animation-profile")
 local Class = require("system/class")
 local Color = require("system/color")
@@ -62,7 +63,6 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "equipment_slots", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of equipment slots."},
 	{name = "eye_color", type = "color", description = "Eye color."},
 	{name = "eye_style", type = "string", description = "Eye style."},
-	{name = "eye_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of eye styles."},
 	{name = "factions", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of factions.", details = {keys = {spec = "Factionspec"}}},
 	{name = "falling_damage_rate", type = "number", default = 10, description = "Number of points of damage per every meters per second exceeding the falling damage speed."},
 	{name = "falling_damage_speed", type = "number", default = 10, description = "Speed in meters per seconds after which the actor starts taking falling damage."},
@@ -296,14 +296,12 @@ Actorspec.get_random_eye_style = function(self)
 	local style = self.eye_style
 	if not style then return end
 	if style == "random" then
-		if not self.eye_styles then return end
-		local lst = {}
-		for k,v in pairs(self.eye_styles) do
-			table.insert(lst, v)
-		end
+		local c = self.equipment_class
+		if not c then return end
+		local lst = ActorTextureSpec:find_by_actor_and_usage(c, "eyes")
 		local l = #lst
 		if l == 0 then return end
-		style = lst[math.random(1, l)]
+		style = lst[math.random(1, l)].name
 	end
 	return style
 end

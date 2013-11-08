@@ -128,9 +128,9 @@ class Specs(object):
 					if len(texture):
 						self.textures[texture] = True
 			# Customization textures.
-			textures = spec.get('eye_styles', {})
-			for texture in textures.values():
-				if len(texture):
+			if spec['type'] == 'ActorTextureSpec':
+				texture = spec.get('blit_texture')
+				if texture:
 					self.textures[texture] = True
 			# Sound effects.
 			if spec['type'] == 'Effectspec':

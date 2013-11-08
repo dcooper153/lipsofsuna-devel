@@ -35,11 +35,6 @@
 			"upperbody": ""
 		},
 		"eye_style": "random",
-		"eye_styles":
-		{
-			"Default": "aereye1",
-			"Angled": "aereye2"
-		},
 		"factions":
 		{
 			"good": true
@@ -92,5 +87,24 @@
 		"name": "Aer skin 1",
 		"actors": {"aer": true},
 		"textures": ["skin1"]
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "default eyes",
+		"actors": {"aer": true},
+		"blit_dst": [0, 0],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aereye1",
+		"label": "Default",
+		"usages": {"eyes": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "angled eyes",
+		"actors": {"aer": true},
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aereye2",
+		"label": "Angled",
+		"usages": {"eyes": true}
 	}
 ]

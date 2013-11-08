@@ -1,3 +1,4 @@
+local ActorTextureSpec = require("core/specs/actor-texture")
 local ChargenSliderSpec = require("core/specs/chargen-slider")
 local Client = require("core/client/client")
 local HairStyleSpec = require("core/specs/hair-style")
@@ -232,19 +233,13 @@ Ui:add_widget{
 		return UiRadioMenu("Eye style", function(self)
 			-- Find and sort the eye styles.
 			local race = Client.chargen:get_race()
-			local spec = Actorspec:find{name = race}
-			if not spec.head_styles then return end
-			local lst = {}
-			for k,v in pairs(spec.eye_styles) do
-				table.insert(lst, {k, v})
-			end
-			table.sort(lst, function(a,b) return a[1] < b[1] end)
+			local lst = ActorTextureSpec:find_by_actor_and_usage(race, "eyes")
 			-- Create the popup widgets.
 			self:clear()
 			for k,v in ipairs(lst) do
-				local active = Client.chargen:get_eye_style() == v[2]
-				self:add_item(v[1], active, function(w)
-					Client.chargen:set_eye_style(v[2])
+				local active = Client.chargen:get_eye_style() == v.name
+				self:add_item(v.label, active, function(w)
+					Client.chargen:set_eye_style(v.name)
 				end)
 			end
 		end)

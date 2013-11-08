@@ -49,6 +49,7 @@ Actorpresetspec.get_chargen = function(self)
 		animation_profile = self.animation_profile,
 		body = self:get_chargen_body(),
 		eye_color = self.eye_color,
+		eye_style = self.eye_style,
 		face = self:get_chargen_face(),
 		hair_color = self.hair_color,
 		hair_style = self.hair_style,
