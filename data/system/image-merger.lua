@@ -77,6 +77,52 @@ ImageMerger.blit_hsv_add_weightv = function(self, image, h, s, v, vw)
 	Los.image_merger_blit_hsv_add_weightv(self.handle, image.handle, h, s, v, vw)
 end
 
+--- Blits an image.
+-- @param self ImageMerger.
+-- @param image Image to blit.
+-- @param dx Destination X.
+-- @param dy Destination Y.
+-- @param sw Destination width.
+-- @param sh Destination height.
+-- @param sx Source X.
+-- @param sy Source Y.
+ImageMerger.blit_rect = function(self, image, dx, dy, dw, dh, sx, sy)
+	Los.image_merger_blit_rect(self.handle, image.handle, dx, dy, dw, dh, sx, sy)
+end
+
+--- Blits an HSV adjusted image.
+-- @param self ImageMerger.
+-- @param image Image to blit.
+-- @param dx Destination X.
+-- @param dy Destination Y.
+-- @param sw Destination width.
+-- @param sh Destination height.
+-- @param sx Source X.
+-- @param sy Source Y.
+-- @param h Hue to add.
+-- @param s Saturation to add.
+-- @param v Value to add.
+ImageMerger.blit_rect_hsv_add = function(self, image, dx, dy, dw, dh, sx, sy, h, s, v)
+	Los.image_merger_blit_rect_hsv_add(self.handle, image.handle, dx, dy, dw, dh, sx, sy, h, s, v)
+end
+
+--- Blits an HSV adjusted image with value weighting.
+-- @param self ImageMerger.
+-- @param image Image to blit.
+-- @param dx Destination X.
+-- @param dy Destination Y.
+-- @param sw Destination width.
+-- @param sh Destination height.
+-- @param sx Source X.
+-- @param sy Source Y.
+-- @param h Hue to add.
+-- @param s Saturation to add.
+-- @param v Value to add.
+-- @param vw Value weighting range.
+ImageMerger.blit_rect_hsv_add_weightv = function(self, image, dx, dy, dw, dh, sx, sy, h, s, v, vw)
+	Los.image_merger_blit_rect_hsv_add_weightv(self.handle, image.handle, dx, dy, dw, dh, sx, sy, h, s, v, vw)
+end
+
 --- Queues finishing the build.
 -- @param self ImageMerger.
 ImageMerger.finish = function(self)

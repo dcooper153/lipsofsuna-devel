@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -31,6 +31,16 @@
 #include "image.h"
 #include "image-compress.h"
 #include "image-png.h"
+
+static void private_init_blit_rects (
+	const LIImgImage*   dstimg,
+	const LIImgImage*   srcimg,
+	const LIMatRectInt* dst,
+	const LIMatRectInt* src,
+	LIMatRectInt*       dst1,
+	LIMatRectInt*       src1);
+
+/*****************************************************************************/
 
 /**
  * \brief Creates a new empty image.
@@ -248,10 +258,14 @@ int liimg_image_alloc (
  * \brief Blits another image over this one.
  * \param self Image.
  * \param image Image.
+ * \param dst_rect Destination rectangle. NULL for default.
+ * \param src_rect Source rectangle. NULL for default.
  */
 void liimg_image_blit (
-	LIImgImage* self,
-	LIImgImage* image)
+	LIImgImage*         self,
+	LIImgImage*         image,
+	const LIMatRectInt* dst_rect,
+	const LIMatRectInt* src_rect)
 {
 	int x;
 	int y;
@@ -259,13 +273,16 @@ void liimg_image_blit (
 	int a2;
 	uint8_t* src;
 	uint8_t* dst;
+	LIMatRectInt src1;
+	LIMatRectInt dst1;
 
-	for (y = 0 ; y < self->height && y < image->height ; y++)
+	private_init_blit_rects (self, image, dst_rect, src_rect, &dst1, &src1);
+	for (y = 0 ; y < src1.height ; y++)
 	{
-		for (x = 0 ; x < self->width && x < image->width ; x++)
+		for (x = 0 ; x < src1.width ; x++)
 		{
-			src = image->pixels + 4 * (x + y * image->width);
-			dst = self->pixels + 4 * (x + y * self->width);
+			src = image->pixels + 4 * ((x + src1.x) + (y + src1.y) * image->width);
+			dst = self->pixels + 4 * ((x + dst1.x) + (y + dst1.y) * self->width);
 			a1 = src[3];
 			a2 = 256 - a1;
 			dst[0] = (src[0] * a1 + dst[0] * a2) >> 8;
@@ -280,16 +297,20 @@ void liimg_image_blit (
  * \brief Blits an HSV altered image over this one.
  * \param self Image.
  * \param image Image.
+ * \param dst_rect Destination rectangle. NULL for default.
+ * \param src_rect Source rectangle. NULL for default.
  * \param hue_add Amount to add to hue. The hue range is [0,1].
  * \param sat_add Amount to add to saturation. The saturation range is [0,1].
  * \param val_add Amount to add to value. The value range is [0,1].
  */
 void liimg_image_blit_hsv_add (
-	LIImgImage* self,
-	LIImgImage* image,
-	float       hue_add,
-	float       sat_add,
-	float       val_add)
+	LIImgImage*         self,
+	LIImgImage*         image,
+	const LIMatRectInt* dst_rect,
+	const LIMatRectInt* src_rect,
+	float               hue_add,
+	float               sat_add,
+	float               val_add)
 {
 	int x;
 	int y;
@@ -299,14 +320,17 @@ void liimg_image_blit_hsv_add (
 	uint8_t* dst;
 	LIImgColor rgb;
 	LIImgColorHSV hsv;
+	LIMatRectInt src1;
+	LIMatRectInt dst1;
 
-	for (y = 0 ; y < self->height && y < image->height ; y++)
+	private_init_blit_rects (self, image, dst_rect, src_rect, &dst1, &src1);
+	for (y = 0 ; y < src1.height ; y++)
 	{
-		for (x = 0 ; x < self->width && x < image->width ; x++)
+		for (x = 0 ; x < src1.width ; x++)
 		{
 			/* Get the pixels. */
-			src = image->pixels + 4 * (x + y * image->width);
-			dst = self->pixels + 4 * (x + y * self->width);
+			src = image->pixels + 4 * ((x + src1.x) + (y + src1.y) * image->width);
+			dst = self->pixels + 4 * ((x + dst1.x) + (y + dst1.y) * self->width);
 
 			/* Perform the HSV modification. */
 			rgb.r = src[0];
@@ -333,18 +357,22 @@ void liimg_image_blit_hsv_add (
  * \brief Blits an HSV altered image over this one, using V channel weighting.
  * \param self Image.
  * \param image Image.
+ * \param dst_rect Destination rectangle. NULL for default.
+ * \param src_rect Source rectangle. NULL for default.
  * \param hue_add Amount to add to hue. The hue range is [0,1].
  * \param sat_add Amount to add to saturation. The saturation range is [0,1].
  * \param val_add Amount to add to value. The value range is [0,1].
  * \param val_range Value ranged affected by weighting.
  */
 void liimg_image_blit_hsv_add_weightv (
-	LIImgImage* self,
-	LIImgImage* image,
-	float       hue_add,
-	float       sat_add,
-	float       val_add,
-	float       val_range)
+	LIImgImage*         self,
+	LIImgImage*         image,
+	const LIMatRectInt* dst_rect,
+	const LIMatRectInt* src_rect,
+	float               hue_add,
+	float               sat_add,
+	float               val_add,
+	float               val_range)
 {
 	int x;
 	int y;
@@ -355,14 +383,17 @@ void liimg_image_blit_hsv_add_weightv (
 	uint8_t* dst;
 	LIImgColor rgb;
 	LIImgColorHSV hsv;
+	LIMatRectInt src1;
+	LIMatRectInt dst1;
 
-	for (y = 0 ; y < self->height && y < image->height ; y++)
+	private_init_blit_rects (self, image, dst_rect, src_rect, &dst1, &src1);
+	for (y = 0 ; y < src1.height ; y++)
 	{
-		for (x = 0 ; x < self->width && x < image->width ; x++)
+		for (x = 0 ; x < src1.width ; x++)
 		{
 			/* Get the pixels. */
-			src = image->pixels + 4 * (x + y * image->width);
-			dst = self->pixels + 4 * (x + y * self->width);
+			src = image->pixels + 4 * ((x + src1.x) + (y + src1.y) * image->width);
+			dst = self->pixels + 4 * ((x + dst1.x) + (y + dst1.y) * self->width);
 
 			/* Calculate the HSV color. */
 			rgb.r = src[0];
@@ -767,6 +798,102 @@ void liimg_image_set_pixel (
 	pixel[1] = color->g;
 	pixel[2] = color->b;
 	pixel[3] = color->a;
+}
+
+/*****************************************************************************/
+
+static void private_init_blit_rects (
+	const LIImgImage*   dstimg,
+	const LIImgImage*   srcimg,
+	const LIMatRectInt* dst,
+	const LIMatRectInt* src,
+	LIMatRectInt*       dst1,
+	LIMatRectInt*       src1)
+{
+	int max_w;
+	int max_h;
+
+	/* Initialize the rectangles. */
+	if (dst == NULL)
+	{
+		dst1->x = 0;
+		dst1->y = 0;
+		dst1->width = dstimg->width;
+		dst1->height = dstimg->height;
+	}
+	else
+		*dst1 = *dst;
+	if (src == NULL)
+	{
+		src1->x = 0;
+		src1->y = 0;
+		src1->width = srcimg->width;
+		src1->height = srcimg->height;
+	}
+	else
+		*src1 = *src;
+
+	/* Clip the top-left destination corner. */
+	if (dst1->x < 0)
+	{
+		src1->x -= dst1->x;
+		src1->width += dst1->x;
+		dst1->x = 0;
+	}
+	if (dst1->y < 0)
+	{
+		src1->y -= dst1->y;
+		src1->height += dst1->y;
+		dst1->y = 0;
+	}
+
+	/* Clip the top-left source corner. */
+	if (src1->x < 0)
+	{
+		dst1->x -= src1->x;
+		dst1->width += src1->x;
+		src1->x = 0;
+	}
+	if (src1->y < 0)
+	{
+		dst1->y -= src1->y;
+		dst1->height += src1->y;
+		src1->y = 0;
+	}
+
+	/* Clip the bottom-right destination corner. */
+	max_w = dstimg->width - dst1->x;
+	max_h = dstimg->height - dst1->y;
+	if (dst1->width > max_w)
+	{
+		src1->width -= (dst1->width - max_w);
+		dst1->width = max_w;
+	}
+	if (dst1->height > max_h)
+	{
+		src1->height -= (dst1->height - max_h);
+		dst1->height = max_h;
+	}
+
+	/* Clip the bottom-right source corner. */
+	max_w = srcimg->width - src1->x;
+	max_h = srcimg->height - src1->y;
+	if (src1->width > max_w)
+	{
+		dst1->width -= (src1->width - max_w);
+		src1->width = max_w;
+	}
+	if (src1->height > max_h)
+	{
+		dst1->height -= (src1->height - max_h);
+		src1->height = max_h;
+	}
+
+	/* Restrict to the smaller rectangle. */
+	src1->width = LIMAT_MIN (src1->width, dst1->width);
+	src1->height = LIMAT_MIN (src1->height, dst1->height);
+	dst1->width = src1->width;
+	dst1->height = src1->height;
 }
 
 /** @} */

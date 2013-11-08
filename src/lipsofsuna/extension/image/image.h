@@ -58,23 +58,29 @@ LIAPICALL (int, liimg_image_alloc, (
 	int         h));
 
 LIAPICALL (void, liimg_image_blit, (
-	LIImgImage* self,
-	LIImgImage* image));
+	LIImgImage*         self,
+	LIImgImage*         image,
+	const LIMatRectInt* dst_rect,
+	const LIMatRectInt* src_rect));
 
 LIAPICALL (void, liimg_image_blit_hsv_add, (
-	LIImgImage* self,
-	LIImgImage* image,
-	float       hue_add,
-	float       sat_add,
-	float       val_add));
+	LIImgImage*         self,
+	LIImgImage*         image,
+	const LIMatRectInt* dst_rect,
+	const LIMatRectInt* src_rect,
+	float               hue_add,
+	float               sat_add,
+	float               val_add));
 
 LIAPICALL (void, liimg_image_blit_hsv_add_weightv, (
-	LIImgImage* self,
-	LIImgImage* image,
-	float       hue_add,
-	float       sat_add,
-	float       val_add,
-	float       val_range));
+	LIImgImage*         self,
+	LIImgImage*         image,
+	const LIMatRectInt* dst_rect,
+	const LIMatRectInt* src_rect,
+	float               hue_add,
+	float               sat_add,
+	float               val_add,
+	float               val_range));
 
 LIAPICALL (void, liimg_image_fill, (
 	LIImgImage*       self,

@@ -34,6 +34,7 @@
 #include "lipsofsuna/math/math-quadratic.h"
 #include "lipsofsuna/math/math-quaternion.h"
 #include "lipsofsuna/math/math-rectangle.h"
+#include "lipsofsuna/math/math-rect-int.h"
 #include "lipsofsuna/math/math-transform.h"
 #include "lipsofsuna/math/math-triangle.h"
 #include "lipsofsuna/math/math-unittest.h"

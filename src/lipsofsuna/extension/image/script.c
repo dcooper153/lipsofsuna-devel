@@ -119,7 +119,7 @@ static void Image_blit (LIScrArgs* args)
 	if (liscr_args_geti_data (args, 0, LIEXT_SCRIPT_IMAGE, &value))
 	{
 		image = liscr_data_get_data (value);
-		liimg_image_blit (self, image);
+		liimg_image_blit (self, image, NULL, NULL);
 	}
 }
 
@@ -143,7 +143,7 @@ static void Image_blit_hsv_add (LIScrArgs* args)
 		val_add = 0.0f;
 
 	image = liscr_data_get_data (value);
-	liimg_image_blit_hsv_add (self, image, hue_add, sat_add, val_add);
+	liimg_image_blit_hsv_add (self, image, NULL, NULL, hue_add, sat_add, val_add);
 }
 
 static void Image_copy (LIScrArgs* args)

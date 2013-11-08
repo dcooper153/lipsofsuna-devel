@@ -152,11 +152,15 @@ int liimg_async_merger_add_hsv_weightv (
  * \brief Queues an image blit task.
  * \param self Merger.
  * \param image Image.
+ * \param dst_rect Destination rectangle. NULL for default.
+ * \param src_rect Source rectangle. NULL for default.
  * \return One if succeeded. False otherwise.
  */
 int liimg_async_merger_blit (
-	LIImgAsyncMerger* self,
-	const LIImgImage* image)
+	LIImgAsyncMerger*   self,
+	const LIImgImage*   image,
+	const LIMatRectInt* dst_rect,
+	const LIMatRectInt* src_rect)
 {
 	LIImgAsyncMergerTask* task;
 
@@ -167,6 +171,14 @@ int liimg_async_merger_blit (
 	task->blit.type = LIIMG_ASYNC_MERGER_BLIT;
 	task->blit.image = self->image;
 	task->blit.blit = liimg_image_new_from_image (image);
+	if (dst_rect != NULL)
+		task->blit.dst_rect = *dst_rect;
+	else
+		limat_rect_int_set (&task->blit.dst_rect, 0, 0, image->width, image->height);
+	if (src_rect != NULL)
+		task->blit.src_rect = *src_rect;
+	else
+		limat_rect_int_set (&task->blit.src_rect, 0, 0, image->width, image->height);
 
 	/* Add the task. */
 	if (!lisys_serial_worker_push_task (self->worker, task))
@@ -182,12 +194,16 @@ int liimg_async_merger_blit (
  * \brief Queues an HSV altered image blit task.
  * \param self Merger.
  * \param image Image.
+ * \param dst_rect Destination rectangle. NULL for default.
+ * \param src_rect Source rectangle. NULL for default.
  * \param hsv HSV color.
  * \return One if succeeded. False otherwise.
  */
 int liimg_async_merger_blit_hsv_add (
 	LIImgAsyncMerger*    self,
 	const LIImgImage*    image,
+	const LIMatRectInt*  dst_rect,
+	const LIMatRectInt*  src_rect,
 	const LIImgColorHSV* hsv)
 {
 	LIImgAsyncMergerTask* task;
@@ -200,6 +216,14 @@ int liimg_async_merger_blit_hsv_add (
 	task->blit_hsv_add.image = self->image;
 	task->blit_hsv_add.blit = liimg_image_new_from_image (image);
 	task->blit_hsv_add.hsv = *hsv;
+	if (dst_rect != NULL)
+		task->blit_hsv_add.dst_rect = *dst_rect;
+	else
+		limat_rect_int_set (&task->blit_hsv_add.dst_rect, 0, 0, image->width, image->height);
+	if (src_rect != NULL)
+		task->blit_hsv_add.src_rect = *src_rect;
+	else
+		limat_rect_int_set (&task->blit_hsv_add.src_rect, 0, 0, image->width, image->height);
 
 	/* Add the task. */
 	if (!lisys_serial_worker_push_task (self->worker, task))
@@ -215,6 +239,8 @@ int liimg_async_merger_blit_hsv_add (
  * \brief Queues an HSV altered image blit task.
  * \param self Merger.
  * \param image Image.
+ * \param dst_rect Destination rectangle. NULL for default.
+ * \param src_rect Source rectangle. NULL for default.
  * \param hsv HSV color.
  * \param val_range Value ranged affected by weighting.
  * \return One if succeeded. False otherwise.
@@ -222,6 +248,8 @@ int liimg_async_merger_blit_hsv_add (
 int liimg_async_merger_blit_hsv_add_weightv (
 	LIImgAsyncMerger*    self,
 	const LIImgImage*    image,
+	const LIMatRectInt*  dst_rect,
+	const LIMatRectInt*  src_rect,
 	const LIImgColorHSV* hsv,
 	float                val_range)
 {
@@ -236,6 +264,14 @@ int liimg_async_merger_blit_hsv_add_weightv (
 	task->blit_hsv_add_weightv.blit = liimg_image_new_from_image (image);
 	task->blit_hsv_add_weightv.hsv = *hsv;
 	task->blit_hsv_add_weightv.val_range = val_range;
+	if (dst_rect != NULL)
+		task->blit_hsv_add_weightv.dst_rect = *dst_rect;
+	else
+		limat_rect_int_set (&task->blit_hsv_add_weightv.dst_rect, 0, 0, image->width, image->height);
+	if (src_rect != NULL)
+		task->blit_hsv_add_weightv.src_rect = *src_rect;
+	else
+		limat_rect_int_set (&task->blit_hsv_add_weightv.src_rect, 0, 0, image->width, image->height);
 
 	/* Add the task. */
 	if (!lisys_serial_worker_push_task (self->worker, task))
@@ -338,16 +374,19 @@ static LIImgImage* private_task_handle (
 				task->add_hsv_weightv.hsv.v, task->add_hsv_weightv.val_range);
 			break;
 		case LIIMG_ASYNC_MERGER_BLIT:
-			liimg_image_blit (task->blit.image, task->blit.blit);
+			liimg_image_blit (task->blit.image, task->blit.blit,
+				&task->blit.dst_rect, &task->blit.src_rect);
 			break;
 		case LIIMG_ASYNC_MERGER_BLIT_HSV_ADD:
 			liimg_image_blit_hsv_add (task->blit_hsv_add.image, task->blit_hsv_add.blit,
+				&task->blit_hsv_add.dst_rect, &task->blit_hsv_add.src_rect,
 				task->blit_hsv_add.hsv.h, task->blit_hsv_add.hsv.s, task->blit_hsv_add.hsv.v);
 			break;
 		case LIIMG_ASYNC_MERGER_BLIT_HSV_ADD_WEIGHTV:
-			liimg_image_blit_hsv_add_weightv (task->blit_hsv_add_weightv.image,
-				task->blit_hsv_add_weightv.blit, task->blit_hsv_add_weightv.hsv.h,
-				task->blit_hsv_add_weightv.hsv.s, task->blit_hsv_add_weightv.hsv.v,
+			liimg_image_blit_hsv_add_weightv (
+				task->blit_hsv_add_weightv.image, task->blit_hsv_add_weightv.blit,
+				&task->blit_hsv_add_weightv.dst_rect, &task->blit_hsv_add_weightv.src_rect,
+				task->blit_hsv_add_weightv.hsv.h, task->blit_hsv_add_weightv.hsv.s, task->blit_hsv_add_weightv.hsv.v,
 				task->blit_hsv_add_weightv.val_range);
 			break;
 		case LIIMG_ASYNC_MERGER_FINISH:
