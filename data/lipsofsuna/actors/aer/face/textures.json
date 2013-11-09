@@ -1,59 +1,161 @@
 [
 	{
 		"type": "ActorTextureSpec",
+		"name": "angry brow",
+		"actors": {"aer": true},
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-brow-angry-1",
+		"label": "Angry",
+		"usages": {"brow": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "annoyed brow",
+		"actors": {"aer": true},
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-brow-annoyed-1",
+		"label": "Annoyed",
+		"usages": {"brow": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "happy brow",
+		"actors": {"aer": true},
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-brow-happy-1",
+		"label": "Happy",
+		"usages": {"brow": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "long brow",
+		"actors": {"aer": true},
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-brow-long-1",
+		"label": "Long",
+		"usages": {"brow": true}
+	},
+
+
+
+	{
+		"type": "ActorTextureSpec",
+		"name": "angled eyes",
+		"actors": {"aer": true},
+		"color": "eye_color",
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-eye-angled-1",
+		"label": "Angled",
+		"usages": {"eye": true}
+	},
+	{
+		"type": "ActorTextureSpec",
 		"name": "annoyed eyes",
 		"actors": {"aer": true},
+		"color": "eye_color",
 		"blit_dst": [395, -35, 1000, 1000],
 		"blit_mode": "hsv_add_weightv",
 		"blit_texture": "aer-eye-annoyed-1",
 		"label": "Annoyed",
-		"usages": {"eyes": true}
+		"usages": {"eye": true}
 	},
 	{
 		"type": "ActorTextureSpec",
 		"name": "closed eyes",
 		"actors": {"aer": true},
+		"color": "eye_color",
 		"blit_dst": [395, -35, 1000, 1000],
 		"blit_mode": "hsv_add_weightv",
 		"blit_texture": "aer-eye-closed-1",
 		"label": "Closed",
-		"usages": {"eyes": true}
+		"usages": {"eye": true}
 	},
 	{
 		"type": "ActorTextureSpec",
 		"name": "default eyes",
 		"actors": {"aer": true},
+		"color": "eye_color",
+		"blit_dst": [395, -35, 1000, 1000],
 		"blit_mode": "hsv_add_weightv",
-		"blit_texture": "aereye1",
+		"blit_texture": "aer-eye-default-1",
 		"label": "Default",
-		"usages": {"eyes": true}
-	},
-	{
-		"type": "ActorTextureSpec",
-		"name": "default face",
-		"actors": {"aer": true},
-		"blit_mode": "hsv_add_weightv",
-		"blit_texture": "aerface1",
-		"label": "Default",
-		"usages": {"face": true}
-	},
-	{
-		"type": "ActorTextureSpec",
-		"name": "angled eyes",
-		"actors": {"aer": true},
-		"blit_mode": "hsv_add_weightv",
-		"blit_texture": "aereye2",
-		"label": "Angled",
-		"usages": {"eyes": true}
+		"usages": {"eye": true}
 	},
 	{
 		"type": "ActorTextureSpec",
 		"name": "round eyes",
 		"actors": {"aer": true},
+		"color": "eye_color",
 		"blit_dst": [395, -35, 1000, 1000],
 		"blit_mode": "hsv_add_weightv",
 		"blit_texture": "aer-eye-round-1",
 		"label": "Round",
-		"usages": {"eyes": true}
+		"usages": {"eye": true}
+	},
+
+
+
+	{
+		"type": "ActorTextureSpec",
+		"name": "alternative face",
+		"actors": {"aer": true},
+		"color": "skin_color",
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-face-2",
+		"label": "Alternative",
+		"usages": {"face": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "default face",
+		"actors": {"aer": true},
+		"color": "skin_color",
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-face-1",
+		"label": "Default",
+		"usages": {"face": true}
+	},
+
+
+
+	{
+		"type": "ActorTextureSpec",
+		"name": "annoyed mouth",
+		"actors": {"aer": true},
+		"color": "skin_color",
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-mouth-annoyed-1",
+		"label": "Annoyed",
+		"usages": {"mouth": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "happy mouth",
+		"actors": {"aer": true},
+		"color": "skin_color",
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-mouth-happy-1",
+		"label": "Happy",
+		"usages": {"mouth": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "smile mouth",
+		"actors": {"aer": true},
+		"color": "skin_color",
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-mouth-smile-1",
+		"label": "Smile",
+		"usages": {"mouth": true}
 	}
 ]

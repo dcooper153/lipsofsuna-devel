@@ -234,9 +234,12 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/actors/aer/face/aereye1.png",
-				"data/lipsofsuna/actors/aer/face/aereye2.png",
-				"data/lipsofsuna/actors/aer/face/aerface1.png",
+				"data/lipsofsuna/actors/aer/face/aer-brow-angry-1.png",
+				"data/lipsofsuna/actors/aer/face/aer-brow-long-1.png",
+				"data/lipsofsuna/actors/aer/face/aer-eye-angled-1.png",
+				"data/lipsofsuna/actors/aer/face/aer-eye-default-1.png",
+				"data/lipsofsuna/actors/aer/face/aer-face-1.png",
+				"data/lipsofsuna/actors/aer/face/aer-mouth-smile-1.png",
 				"data/lipsofsuna/actors/aer/hair/aershorthair1.png",
 				"data/lipsofsuna/actors/aer/hair/aershorthair2.png",
 				"data/lipsofsuna/actors/aer/hair/aerpigtails1.lmdl",
@@ -299,9 +302,12 @@
 			],
 			"files_original":
 			[
-				"data/lipsofsuna/actors/aer/face/aereye1.svg",
-				"data/lipsofsuna/actors/aer/face/aereye2.svg",
-				"data/lipsofsuna/actors/aer/face/aerface1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-brow-angry-1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-brow-long-1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-eye-angled-1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-eye-default-1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-face-1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-mouth-smile-1.svg",
 				"data/lipsofsuna/actors/aer/hair/aerdrillhair1.blend",
 				"data/lipsofsuna/actors/aer/hair/aerhairponytail1.blend",
 				"data/lipsofsuna/actors/aer/hair/aerpigtails1.blend",
@@ -1731,15 +1737,26 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/actors/aer/face/aer-brow-annoyed-1.png",
+				"data/lipsofsuna/actors/aer/face/aer-brow-annoyed-1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-brow-happy-1.png",
 				"data/lipsofsuna/actors/aer/face/aer-eye-annoyed-1.png",
 				"data/lipsofsuna/actors/aer/face/aer-eye-closed-1.png",
-				"data/lipsofsuna/actors/aer/face/aer-eye-round-1.png"
+				"data/lipsofsuna/actors/aer/face/aer-eye-round-1.png",
+				"data/lipsofsuna/actors/aer/face/aer-face-2.png",
+				"data/lipsofsuna/actors/aer/face/aer-mouth-annoyed-1.png",
+				"data/lipsofsuna/actors/aer/face/aer-mouth-happy-1.png"
 			],
 			"files_original":
 			[
+				"data/lipsofsuna/actors/aer/face/aer-brow-annoyed-1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-brow-happy-1.svg",
 				"data/lipsofsuna/actors/aer/face/aer-eye-annoyed-1.svg",
 				"data/lipsofsuna/actors/aer/face/aer-eye-closed-1.svg",
-				"data/lipsofsuna/actors/aer/face/aer-eye-round-1.svg"
+				"data/lipsofsuna/actors/aer/face/aer-eye-round-1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-face-2.svg",
+				"data/lipsofsuna/actors/aer/face/aer-mouth-annoyed-1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-mouth-happy-1.svg"
 			],
 			"authors":
 			[
