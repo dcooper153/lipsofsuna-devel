@@ -84,12 +84,20 @@ end
 --- Removes objects that are not in the world map or inventories.
 -- @param self ObjectDatabase.
 ObjectDatabase.clear_unused_objects = function(self)
-	-- Delete objects that are neither in the map or the inventory.
-	self.db:query([[DELETE FROM object_data WHERE
-		type <> 'static' AND
-		(type <> 'player' OR dead = 1) AND
-		NOT EXISTS (SELECT 1 FROM object_inventory AS a WHERE object_data.id=a.id) AND
-		NOT EXISTS (SELECT 1 FROM object_sectors AS a WHERE object_data.id=a.id);]])
+	-- Delete objects that are neither in the map nor the inventory.
+	if Server.config.permanent_death then
+		self.db:query([[DELETE FROM object_data WHERE
+			type <> 'static' AND
+			(type <> 'player' OR dead = 1) AND
+			NOT EXISTS (SELECT 1 FROM object_inventory AS a WHERE object_data.id=a.id) AND
+			NOT EXISTS (SELECT 1 FROM object_sectors AS a WHERE object_data.id=a.id);]])
+	else
+		self.db:query([[DELETE FROM object_data WHERE
+			type <> 'static' AND
+			type <> 'player' AND
+			NOT EXISTS (SELECT 1 FROM object_inventory AS a WHERE object_data.id=a.id) AND
+			NOT EXISTS (SELECT 1 FROM object_sectors AS a WHERE object_data.id=a.id);]])
+	end
 	-- Delete orphaned inventory data.
 	-- The fields of the object_inventory table are considered orphaned if
 	-- either the object ID or the parent ID are not in object_data
