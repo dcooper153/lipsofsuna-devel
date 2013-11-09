@@ -510,20 +510,22 @@ Actor.handle_inventory_event = function(self, args)
 	if not self:has_client_data() then return end
 	local node = self.spec:get_node_by_equipment_slot(args.slot)
 	-- Update achored equipment or the actor model.
-	if args.type == "inventory-equipped" then
-		self.render:handle_inventory_equip(args.slot, args.object)
-		local effect = args.object.spec:get_effect("equip")
-		if effect then
-			if not Operators.play:is_startup_period() then
-				Client.effects:play_object(effect.name, self, node)
+	if args.inventory.id == self.inventory.id then
+		if args.type == "inventory-equipped" then
+			self.render:handle_inventory_equip(args.slot, args.object)
+			local effect = args.object.spec:get_effect("equip")
+			if effect then
+				if not Operators.play:is_startup_period() then
+					Client.effects:play_object(effect.name, self, node)
+				end
 			end
-		end
-	elseif args.type == "inventory-unequipped" then
-		self.render:handle_inventory_unequip(args.slot, args.object)
-		local effect = args.object.spec:get_effect("unequip")
-		if effect then
-			if not Operators.play:is_startup_period() then
-				Client.effects:play_object(effect.name, self, node)
+		elseif args.type == "inventory-unequipped" then
+			self.render:handle_inventory_unequip(args.slot, args.object)
+			local effect = args.object.spec:get_effect("unequip")
+			if effect then
+				if not Operators.play:is_startup_period() then
+					Client.effects:play_object(effect.name, self, node)
+				end
 			end
 		end
 	end
