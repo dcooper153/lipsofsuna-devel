@@ -7,6 +7,17 @@ Actionspec{
 		["throw"] = true
 	},
 	start = function(action)
+		-- Let the AI attack immediately.
+		if action.object.ai then
+			if action.object.cooldown then return end
+			local chained = Main.combat_utils:get_combat_action_for_actor(action.object, "right")
+			if not chained or chained.name == "attack" then
+				chained = Actionspec:find_by_name("melee")
+				if not chained then return end
+			end
+			action.object:action(chained.name)
+			return
+		end
 		-- Enable effect-over-time updates.
 		return true
 	end,
@@ -49,4 +60,7 @@ Actionspec{
 		action.charge_value = action.charge_value + secs
 		action.object.cooldown = 1
 		return true
+	end,
+	get_score = function(action)
+		return 1
 	end}
