@@ -32,6 +32,7 @@ Actionspec{
 			return
 		end
 		-- Check for charge finish.
+		action.object.cooldown = 1
 		if not action.object.control_right then
 			-- Wait for the release delay.
 			action.timer = action.timer + secs
@@ -54,6 +55,5 @@ Actionspec{
 		end
 		-- Continue charging.
 		action.charge_value = action.charge_value + secs
-		action.object.cooldown = 1
 		return true
 	end}

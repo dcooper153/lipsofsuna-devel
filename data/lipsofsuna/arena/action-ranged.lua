@@ -41,6 +41,7 @@ Actionspec{
 		end
 		if action.released then
 			-- Wait for the launch.
+			action.object.cooldown = 1
 			action.time = action.time + secs
 			if action.time < action.delay then return true end
 			-- Split the ammo.

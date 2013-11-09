@@ -16,6 +16,7 @@ Actionspec{
 	end,
 	update = function(action, secs)
 		-- Wait for the delay to end.
+		action.object.cooldown = 1
 		action.time = action.time + secs
 		if action.time < action.delay then return true end
 		-- Cast a straight attack ray.
