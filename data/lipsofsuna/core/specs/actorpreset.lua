@@ -19,13 +19,16 @@ Actorpresetspec = Spec:register("Actorpresetspec", "actor preset", {
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "animation_profile", type = "string", description = "Default animation profile."},
 	{name = "body", type = "list", list = {type = "number"}, description = "Body morph table."},
+	{name = "brow_style", type = "string", description = "Brow style name."},
 	{name = "eye_color", type = "color", description = "Eye color."},
 	{name = "eye_style", type = "string", description = "Eye style name."},
 	{name = "face", type = "list", list = {type = "number"}, description = "Face morph table."},
+	{name = "face_style", type = "string", description = "Face style name."},
 	{name = "hair_color", type = "color", description = "Hair color."},
 	{name = "hair_style", type = "string", description = "Hair style name."},
 	{name = "head_style", type = "string", description = "Head style name."},
 	{name = "height", type = "number", description = "Height multiplier."},
+	{name = "mouth_style", type = "string", description = "Mouth style name."},
 	{name = "playable", type = "boolean", description = "True to show the preset in the character creation screen."},
 	{name = "skin_color", type = "color", description = "Skin color."},
 	{name = "skin_style", type = "string", description = "Skin style name."}
@@ -48,15 +51,18 @@ Actorpresetspec.get_chargen = function(self)
 	return {
 		animation_profile = self.animation_profile,
 		body = self:get_chargen_body(),
+		brow_style = self.brow_style,
 		eye_color = self.eye_color,
 		eye_style = self.eye_style,
 		face = self:get_chargen_face(),
+		face_style = self.face_style,
 		hair_color = self.hair_color,
 		hair_style = self.hair_style,
 		head_style = self.head_style,
 		height = self.height,
 		skin_color = self.skin_color,
-		skin_style = self.skin_style}
+		skin_style = self.skin_style,
+		mouth_style = self.mouth_style}
 end
 
 --- Gets the body in the list form suitable for character creation.

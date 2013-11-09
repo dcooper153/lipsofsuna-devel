@@ -81,9 +81,9 @@ Benchmark.update = function(self, secs)
 	for k,v in pairs(self.objects) do
 		if not v.model_rebuild_timer then
 			v.model_rebuild_timer = 2
-			v.body_style = {}
+			v.body_sliders = {}
 			for i = 1,9 do
-				v.body_style[i] = math.random()
+				v.body_sliders[i] = math.random()
 			end
 		end
 	end

@@ -51,6 +51,7 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "blocking_delay", type = "number", default = 0.4, description = "Time in seconds how long it takes to enter the blocking stance."},
 	{name = "body_scale_min", type = "number", default = 1, description = "Minimum body scale."},
 	{name = "body_scale_max", type = "number", default = 1, description = "Maximum body scale."},
+	{name = "brow_style", type = "string", description = "Brow style."},
 	{name = "camera_center", type = "vector", description = "Camera center position."},
 	{name = "collision_group", type = "number", default = 0x0001},
 	{name = "damage_from_magma", type = "number", default = 6, description = "Points of damage from magma per second."},
@@ -63,6 +64,7 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "equipment_slots", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of equipment slots."},
 	{name = "eye_color", type = "color", description = "Eye color."},
 	{name = "eye_style", type = "string", description = "Eye style."},
+	{name = "face_style", type = "string", description = "Face style."},
 	{name = "factions", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of factions.", details = {keys = {spec = "Factionspec"}}},
 	{name = "falling_damage_rate", type = "number", default = 10, description = "Number of points of damage per every meters per second exceeding the falling damage speed."},
 	{name = "falling_damage_speed", type = "number", default = 10, description = "Speed in meters per seconds after which the actor starts taking falling damage."},
@@ -83,12 +85,13 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "loot_categories", type = "list", list = {type = "string"}, description = "List of item categories this actor can have as random loot."},
 	{name = "loot_count_min", type = "number", description = "Minimum number of random loot items this actor can have."},
 	{name = "loot_count_max", type = "number", description = "Maximum number of random loot items this actor can have."},
-	{name = "personality", type = "string", description = "Name of the personality type.", details = {spec = "Personalityspec"}},
-	{name = "preset", type = "string", description = "Name of the actor preset to use.", details = {spec = "Actorpresetspec"}},
 	{name = "marker", type = "string", description = "Map marker name."},
 	{name = "mass", type = "number", default = 50, description = "Mass in kilograms."},
 	{name = "model", type = "string", description = "Model name."},
 	{name = "models", type = "dict", dict = {type = "string"}, description = "Dictionary or model names."},
+	{name = "mouth_style", type = "string", description = "Mouth style."},
+	{name = "personality", type = "string", description = "Name of the personality type.", details = {spec = "Personalityspec"}},
+	{name = "preset", type = "string", description = "Name of the actor preset to use.", details = {spec = "Actorpresetspec"}},
 	{name = "reagentless_spells", type = "boolean", description = "True to allow the actor to cast spells without reagents."},
 	{name = "skill_regen", type = "number", default = 0.5, description = "Skill regeneration speed in units per second."},
 	{name = "skill_quota", type = "number", default = 200, description = "Number of skill points the actor can distribute over skills."},
@@ -289,23 +292,6 @@ Actorspec.get_random_eye_color = function(self)
 	return {color[1], color[2], color[3]}
 end
 
---- Gets a random eye style for the actor.
--- @param self Actor spec.
--- @return Style name, or nil.
-Actorspec.get_random_eye_style = function(self)
-	local style = self.eye_style
-	if not style then return end
-	if style == "random" then
-		local c = self.equipment_class
-		if not c then return end
-		local lst = ActorTextureSpec:find_by_actor_and_usage(c, "eyes")
-		local l = #lst
-		if l == 0 then return end
-		style = lst[math.random(1, l)].name
-	end
-	return style
-end
-
 --- Gets a random hair color for the actor.
 -- @param self Actor spec.
 -- @return Color table, or nil.
@@ -358,6 +344,24 @@ Actorspec.get_random_head = function(self)
 		local l = #lst
 		if l == 0 then return end
 		style = lst[math.random(1, l)]
+	end
+	return style
+end
+
+--- Gets a random brow style for the actor.
+-- @param self Actor spec.
+-- @param name Style class name.
+-- @return Style name, or nil.
+Actorspec.get_random_texture_style = function(self, name)
+	local style = self[name .. "_style"]
+	if not style then return end
+	if style == "random" then
+		local c = self.equipment_class
+		if not c then return end
+		local lst = ActorTextureSpec:find_by_actor_and_usage(c, name)
+		local l = #lst
+		if l == 0 then return end
+		style = lst[math.random(1, l)].name
 	end
 	return style
 end

@@ -23,8 +23,8 @@ local RenderUtils = Class("RenderUtils")
 -- @return Animation arguments, or nil.
 RenderUtils.create_breast_animation = function(self, actor)
 	-- Get the breast size.
-	if not actor.body_style then return end
-	local size = actor.body_style[3]
+	if not actor.body_sliders then return end
+	local size = actor.body_sliders[3]
 	if not size then return end
 	size = size / 255
 	-- Determine the damping factor.

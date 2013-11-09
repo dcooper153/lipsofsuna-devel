@@ -56,8 +56,12 @@ Actor.serializer = ObjectSerializer(
 		type = "number"
 	},
 	{
-		name = "body_style",
+		name = "body_sliders",
 		type = "number list"
+	},
+	{
+		name = "brow_style",
+		type = "string"
 	},
 	{
 		name = "dead",
@@ -73,8 +77,12 @@ Actor.serializer = ObjectSerializer(
 		type = "string"
 	},
 	{
-		name = "face_style",
+		name = "face_sliders",
 		type = "number list"
+	},
+	{
+		name = "face_style",
+		type = "string"
 	},
 	{
 		name = "hair_color",
@@ -91,6 +99,10 @@ Actor.serializer = ObjectSerializer(
 	{
 		name = "home_point",
 		type = "vector"
+	},
+	{
+		name = "mouth_style",
+		type = "string"
 	},
 	{
 		name = "position",
@@ -141,10 +153,13 @@ Actor.clone = function(self)
 	o:set_dead(self.dead)
 	o:set_position(self:get_position())
 	o:set_rotation(self:get_rotation())
+	o.brow_style = self.brow_style
 	o.eye_style = self.eye_style
+	o.face_sliders = self.face_sliders
 	o.face_style = self.face_style
 	o.hair_style = self.hair_style
 	o.head_style = self.head_style
+	o.mouth_style = self.mouth_style
 	o.physics:set_angular(self.physics:get_angular())
 	o.physics:set_physics(self.physics:get_physics())
 	return o
@@ -532,11 +547,14 @@ end
 Actor.randomize = function(self)
 	local spec = self:get_spec()
 	-- Set the appearance.
+	self.brow_style = self.brow_style or spec:get_random_texture_style("brow")
 	self.eye_color = self.eye_color or spec:get_random_eye_color()
-	self.eye_style = self.eye_style or spec:get_random_eye_style()
-	self.head_style = self.head_style or spec:get_random_head() 
+	self.eye_style = self.eye_style or spec:get_random_texture_style("eye")
+	self.face_style = self.face_style or spec:get_random_texture_style("face")
+	self.head_style = self.head_style or spec:get_random_head()
 	self.hair_color = self.hair_color or spec:get_random_hair_color() 
 	self.hair_style = self.hair_style or spec:get_random_hair_style() 
+	self.mouth_style = self.mouth_style or spec:get_random_texture_style("mouth")
 	-- Populate the stats.
 	self.stats:set_value("health", self.stats:get_maximum("health"))
 	self.stats:set_value("willpower", self.stats:get_maximum("willpower"))

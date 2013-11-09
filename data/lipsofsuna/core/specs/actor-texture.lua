@@ -20,6 +20,7 @@ local ActorTextureSpec = Spec:register("ActorTextureSpec", "actor skin", {
 	{name = "blit_dst", type = "list", list = {type = "number"}, description = "Blit destination point in pixels"},
 	{name = "blit_mode", type = "string", description = "Blit mode name."},
 	{name = "blit_texture", type = "string", description = "Texture name."},
+	{name = "color", type = "string", description = "Color name."},
 	{name = "label", type = "string", description = "Label to display in the charactor creator."},
 	{name = "usages", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of usage names."}
 })

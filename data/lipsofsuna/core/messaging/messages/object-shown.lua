@@ -114,20 +114,23 @@ Main.messaging:register_message{
 			add(data, "uint8", o.hair_color and o.hair_color[3] or 255)
 		end
 		-- Body style.
-		if o.body_scale or o.body_style then
+		if o.body_scale or o.body_sliders then
 			flags = flags + FlagType.BODY
 			add(data, "uint8", o.body_scale or 128)
-			add(data, "uint16", o.body_style and #o.body_style or 0)
-			for k,v in ipairs(o.body_style or {}) do
-				add(data, "uint8", o.body_style[k])
+			add(data, "uint16", o.body_sliders and #o.body_sliders or 0)
+			for k,v in ipairs(o.body_sliders or {}) do
+				add(data, "uint8", o.body_sliders[k])
 			end
 		end
 		-- Face style.
-		if o.face_style then
+		if o.brow_style or o.face_style or o.mouth_style or o.face_sliders then
 			flags = flags + FlagType.FACE
-			add(data, "uint16", #o.face_style)
-			for k,v in ipairs(o.face_style) do
-				add(data, "uint8", o.face_style[k])
+			add(date, "string", o.brow_style or "")
+			add(date, "string", o.face_style or "")
+			add(date, "string", o.mouth_style or "")
+			add(data, "uint16", #o.face_sliders)
+			for k,v in ipairs(o.face_sliders) do
+				add(data, "uint8", o.face_sliders[k])
 			end
 		end
 		-- Animations.
@@ -293,22 +296,25 @@ Main.messaging:register_message{
 			local ok,scale,count = packet:resume("uint8", "uint16")
 			if not ok then return end
 			args.body_scale = scale
-			args.body_style = {}
+			args.body_sliders = {}
 			for i = 1,count do
 				local ok,val = packet:resume("uint8")
 				if not ok then return end
-				args.body_style[i] = val
+				args.body_sliders[i] = val
 			end
 		end
 		-- Face style.
 		if Bitwise:band(args.flags, FlagType.FACE) ~= 0 then
-			local ok,count = packet:resume("uint16")
+			local ok,brow,face,mouth,count = packet:resume("string", "string", "string", "uint16")
 			if not ok then return end
-			args.face_style = {}
+			args.brow_style = (brow ~= "" and brow or nil)
+			args.face_style = (face ~= "" and face or nil)
+			args.mouth_style = (mouth ~= "" and mouth or nil)
+			args.face_sliders = {}
 			for i = 1,count do
 				local ok,val = packet:resume("uint8")
 				if not ok then return end
-				args.face_style[i] = val
+				args.face_sliders[i] = val
 			end
 		end
 		-- Animations.
@@ -478,13 +484,16 @@ Main.messaging:register_message{
 			o.hair_color = args.hair_color
 		end
 		-- Body style.
-		if args.body_style then
+		if args.body_sliders then
 			o.body_scale = args.body_scale
-			o.body_style = args.body_style
+			o.body_sliders = args.body_sliders
 		end
 		-- Face style.
 		if args.face_style then
+			o.brow_style = args.brow_style
 			o.face_style = args.face_style
+			o.mouth_style = args.mouth_style
+			o.face_sliders = args.face_sliders
 		end
 		-- Show the object.
 		o:set_visible(true)

@@ -230,16 +230,70 @@ Ui:add_state{
 Ui:add_widget{
 	state = "chargen/face",
 	widget = function()
+		return UiRadioMenu("Brow style", function(self)
+			-- Find and sort the brow styles.
+			local race = Client.chargen:get_race()
+			local lst = ActorTextureSpec:find_by_actor_and_usage(race, "brow")
+			-- Create the popup widgets.
+			self:clear()
+			for k,v in ipairs(lst) do
+				local active = Client.chargen:get_brow_style() == v.name
+				self:add_item(v.label, active, function(w)
+					Client.chargen:set_brow_style(v.name)
+				end)
+			end
+		end)
+	end}
+
+Ui:add_widget{
+	state = "chargen/face",
+	widget = function()
 		return UiRadioMenu("Eye style", function(self)
 			-- Find and sort the eye styles.
 			local race = Client.chargen:get_race()
-			local lst = ActorTextureSpec:find_by_actor_and_usage(race, "eyes")
+			local lst = ActorTextureSpec:find_by_actor_and_usage(race, "eye")
 			-- Create the popup widgets.
 			self:clear()
 			for k,v in ipairs(lst) do
 				local active = Client.chargen:get_eye_style() == v.name
 				self:add_item(v.label, active, function(w)
 					Client.chargen:set_eye_style(v.name)
+				end)
+			end
+		end)
+	end}
+
+Ui:add_widget{
+	state = "chargen/face",
+	widget = function()
+		return UiRadioMenu("Face style", function(self)
+			-- Find and sort the face styles.
+			local race = Client.chargen:get_race()
+			local lst = ActorTextureSpec:find_by_actor_and_usage(race, "face")
+			-- Create the popup widgets.
+			self:clear()
+			for k,v in ipairs(lst) do
+				local active = Client.chargen:get_face_style() == v.name
+				self:add_item(v.label, active, function(w)
+					Client.chargen:set_face_style(v.name)
+				end)
+			end
+		end)
+	end}
+
+Ui:add_widget{
+	state = "chargen/face",
+	widget = function()
+		return UiRadioMenu("Mouth style", function(self)
+			-- Find and sort the mouth styles.
+			local race = Client.chargen:get_race()
+			local lst = ActorTextureSpec:find_by_actor_and_usage(race, "mouth")
+			-- Create the popup widgets.
+			self:clear()
+			for k,v in ipairs(lst) do
+				local active = Client.chargen:get_mouth_style() == v.name
+				self:add_item(v.label, active, function(w)
+					Client.chargen:set_mouth_style(v.name)
 				end)
 			end
 		end)

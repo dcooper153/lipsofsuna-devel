@@ -17,6 +17,7 @@
 		},
 		"body_scale_min": 0.8,
 		"body_scale_max": 1.2,
+		"brow_style": "random",
 		"camera_center": [0, 1.5, 0],
 		"effects":
 		{
@@ -35,6 +36,7 @@
 			"upperbody": ""
 		},
 		"eye_style": "random",
+		"face_style": "random",
 		"factions":
 		{
 			"good": true
@@ -56,6 +58,7 @@
 			"skeleton": "aer1",
 			"body": "aerbody1"
 		},
+		"mouth_style": "random",
 		"skill_quota": 200,
 		"skin_styles":
 		{

@@ -44,7 +44,8 @@ TextureBuilder.build_for_actor = function(clss, object)
 	object.texture_build_hash = clss:build_with_merger(merger, {
 		beheaded = object:get_beheaded(),
 		body_scale = object.body_scale,
-		body_style = object.body_style,
+		body_sliders = object.body_sliders,
+		brow_style = object.brow_style,
 		equipment = equipment,
 		eye_color = Color:ubyte_to_float(object.eye_color),
 		eye_style = object.eye_style,
@@ -52,6 +53,7 @@ TextureBuilder.build_for_actor = function(clss, object)
 		hair_color = Color:ubyte_to_float(object.hair_color),
 		hair_style = object.hair_style,
 		head_style = object.head_style,
+		mouth_style = object.mouth_style,
 		nudity = Client.options.nudity_enabled,
 		skin_color = Color:ubyte_to_float(object.skin_color),
 		skin_style = object.skin_style,
@@ -104,11 +106,13 @@ TextureBuilder.build_with_merger = function(clss, merger, args, hash)
 	end
 	-- Build and compare the hash.
 	local hash1 = Serialize:write{
+		args.brow_style,
 		args.skin_style,
 		args.skin_color,
-		args.face_texture,
+		args.face_style,
 		args.eye_style,
 		args.eye_color,
+		args.mouth_style,
 		textures}
 	if hash1 == hash then
 		return hash
@@ -124,10 +128,11 @@ TextureBuilder.build_with_merger = function(clss, merger, args, hash)
 	if args.skin_color then
 		merger:add_hsv_weightv(args.skin_color[1], -1 + 2 * args.skin_color[2], -1 + 2 * args.skin_color[3])
 	end
-	-- Blit the face texture.
-	clss:merge_actor_texture(merger, "default face") --FIXME
-	-- Blit the eye texture.
-	clss:merge_actor_texture(merger, args.eye_style, args.eye_color)
+	-- Blit the face textures.
+	clss:merge_actor_texture(merger, args.face_style, args)
+	clss:merge_actor_texture(merger, args.mouth_style, args)
+	clss:merge_actor_texture(merger, args.brow_style, args)
+	clss:merge_actor_texture(merger, args.eye_style, args)
 	-- Blit the additional textures.
 	local blits = textures[basename]
 	if blits then
@@ -146,8 +151,8 @@ end
 -- @param clss TextureBuilder class.
 -- @param merger ImageMerger.
 -- @param name ActorTextureSpec name.
--- @param color HSV color.
-TextureBuilder.merge_actor_texture = function(clss, merger, name, color)
+-- @param args Image building arguments.
+TextureBuilder.merge_actor_texture = function(clss, merger, name, args)
 	if not name then return end
 	local spec = ActorTextureSpec:find_by_name(name)
 	if not spec then return end
@@ -156,6 +161,10 @@ TextureBuilder.merge_actor_texture = function(clss, merger, name, color)
 	if not blit then return end
 	local dst = spec.blit_dst
 	local src = dst and spec.blit_src or {0, 0, 10000, 10000}
+	local color = nil
+	if spec.color == "eye_color" or spec.color == "skin_color" then
+		color = args[spec.color]
+	end
 	if color then
 		if spec.blit_mode == "hsv_add_weightv" then
 			if dst then

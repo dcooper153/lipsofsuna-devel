@@ -47,7 +47,7 @@ Simulation.create_object_by_spec = function(self, spec, id)
 	o:set_spec(spec)
 	-- Apply presets.
 	if spec.preset then
-		local preset = Actorpresetspec:find{name = spec.preset}
+		local preset = Actorpresetspec:find_by_name(spec.preset)
 		if preset then
 			preset = preset:get_chargen()
 			local copy_table = function(t)
@@ -61,14 +61,17 @@ Simulation.create_object_by_spec = function(self, spec, id)
 				if not u then return end
 				return Color:float_to_ubyte(Color:hsv_to_rgb(u))
 			end
-			o.body_style = copy_table(preset.body)
+			o.body_scale = preset.height
+			o.body_sliders = copy_table(preset.body)
+			o.brow_style = preset.brow_style
 			o.eye_color = copy_color(preset.eye_color)
 			o.eye_style = preset.eye_style
-			o.face_style = copy_table(preset.face)
+			o.face_sliders = copy_table(preset.face)
+			o.face_style = preset.face_style
 			o.hair_color = copy_color(preset.hair_color)
 			o.hair_style = preset.hair_style
 			o.head_style = preset.head_style
-			o.body_scale = preset.height
+			o.mouth_style = preset.mouth_style
 			o.skin_color = copy_color(preset.skin_color)
 			o.skin_style = preset.skin_style
 		end

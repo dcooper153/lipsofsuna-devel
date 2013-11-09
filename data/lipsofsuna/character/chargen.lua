@@ -118,15 +118,18 @@ Chargen.apply = function(self)
 	if self.data.standalone then return end
 	Main.messaging:client_event("create character", {
 		animation_profile = self.char.animation_profile,
-		body_style = scale255(self.char.body),
+		body_scale = self.char.height,
+		body_sliders = scale255(self.char.body),
+		brow_style = self.char.brow_style,
 		eye_color = scale255(self.char.eye_color),
 		eye_style = self.char.eye_style,
-		face_style = scale255(self.char.face),
+		face_sliders = scale255(self.char.face),
+		face_style = self.char.face_style,
 		hair_color = scale255(self.char.hair_color),
 		hair_style = self.char.hair_style,
 		-- TODO: head_scale
 		head_style = self.char.head_style,
-		body_scale = self.char.height,
+		mouth_style = self.char.mouth_style,
 		name = self.char.name,
 		race = self.char.race,
 		skin_color = scale255(self.char.skin_color),
@@ -223,15 +226,17 @@ Chargen.update = function(self, secs)
 		self.data.object:set_spec(spec)
 		self.data.object.physics:set_collision_group(PhysicsConsts.GROUP_PLAYERS)
 		self.data.object.body_scale = self.char.height
-		self.data.object.body_style = scale255(self.char.body)
-		--self.data.object.equipment = {"bloomers", "bloomers top"}
+		self.data.object.body_sliders = scale255(self.char.body)
+		self.data.object.brow_style = self.char.brow_style
 		self.data.object.eye_color = scale255(self.char.eye_color)
 		self.data.object.eye_style = self.char.eye_style
-		self.data.object.face_style = scale255(self.char.face)
+		self.data.object.face_sliders = scale255(self.char.face)
+		self.data.object.face_style = self.char.face_style
 		self.data.object.hair_color = scale255(self.char.hair_color)
 		self.data.object.hair_style = self.char.hair_style
 		self.data.object.head_scale = self.char.head_scale
 		self.data.object.head_style = self.char.head_style
+		self.data.object.mouth_style = self.char.mouth_style
 		self.data.object.skin_color = scale255(self.char.skin_color)
 		self.data.object.skin_style = self.char.skin_style
 		self.data.object.render:request_model_rebuild()
@@ -283,6 +288,21 @@ Chargen.set_body = function(self, slider, value)
 	self.data.update_needed = true
 end
 
+--- Gets the brow style of the character.
+-- @param self Chargen.
+-- @return Style name.
+Chargen.get_brow_style = function(self)
+	return self.char.brow_style
+end
+
+--- Sets the face style of the character.
+-- @param self Chargen.
+-- @param value Style name.
+Chargen.set_brow_style = function(self, value)
+	self.char.brow_style = value
+	self.data.update_needed = true
+end
+
 --- Gets the data form model and texture builders.
 -- @param self Chargen.
 -- @return Table.
@@ -291,15 +311,18 @@ Chargen.get_build_data = function(self)
 	return {
 		beheaded = false,
 		body_scale = self.char.height,
-		body_style = scale255(self.char.body),
+		body_sliders = scale255(self.char.body),
+		brow_style = self.char.brow_style,
 		equipment = {"bloomers", "bloomers top"},
 		eye_color = self.char.eye_color,
 		eye_style = self.char.eye_style,
-		face_style = scale255(self.char.face),
+		face_sliders = scale255(self.char.face),
+		face_style = self.char.face_style,
 		hair_color = self.char.hair_color,
 		head_scale = self.char.head_scale,
 		hair_style = self.char.hair_style,
 		head_style = self.char.head_style,
+		mouth_style = self.char.head_style,
 		nudity = Client.options.nudity_enabled,
 		skin_color = self.char.skin_color,
 		skin_style = self.char.skin_style,
@@ -315,9 +338,6 @@ Chargen.get_camera_focus = function(self)
 end
 
 --- Gets the eye style of the character.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @return Style name.
 Chargen.get_eye_style = function(self)
@@ -325,9 +345,6 @@ Chargen.get_eye_style = function(self)
 end
 
 --- Sets the eye style of the character.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @param value Style name.
 Chargen.set_eye_style = function(self, value)
@@ -336,9 +353,6 @@ Chargen.set_eye_style = function(self, value)
 end
 
 --- Gets one of the HSV channels of the eye color.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @param channel Channel index.
 -- @return Channel value.
@@ -347,9 +361,6 @@ Chargen.get_eye_color = function(self, channel)
 end
 
 --- Sets one of the HSV channels of the eye color.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @param channel Channel index.
 -- @param value Channel value.
@@ -359,9 +370,6 @@ Chargen.set_eye_color = function(self, channel, value)
 end
 
 --- Gets the value of a face slider.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @param slider Slider index.
 -- @return Slider value.
@@ -370,9 +378,6 @@ Chargen.get_face = function(self, slider)
 end
 
 --- Sets the value of a face slider.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @param slider Slider index.
 -- @param value Slider value.
@@ -381,10 +386,22 @@ Chargen.set_face = function(self, slider, value)
 	self.data.update_needed = true
 end
 
+--- Gets the face style of the character.
+-- @param self Chargen.
+-- @return Style name.
+Chargen.get_face_style = function(self)
+	return self.char.face_style
+end
+
+--- Sets the face style of the character.
+-- @param self Chargen.
+-- @param value Style name.
+Chargen.set_face_style = function(self, value)
+	self.char.face_style = value
+	self.data.update_needed = true
+end
+
 --- Gets the hair style of the character.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @return Style name.
 Chargen.get_hair_style = function(self)
@@ -392,9 +409,6 @@ Chargen.get_hair_style = function(self)
 end
 
 --- Sets the hair style of the character.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @param value Style name.
 Chargen.set_hair_style = function(self, value)
@@ -403,9 +417,6 @@ Chargen.set_hair_style = function(self, value)
 end
 
 --- Gets one of the HSV channels of the hair color.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @param channel Channel index.
 -- @return Channel value.
@@ -414,9 +425,6 @@ Chargen.get_hair_color = function(self, channel)
 end
 
 --- Sets one of the HSV channels of the hair color.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @param channel Channel index.
 -- @param value Channel value.
@@ -426,9 +434,6 @@ Chargen.set_hair_color = function(self, channel, value)
 end
 
 --- Gets the head style of the character.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @return Style name.
 Chargen.get_head_style = function(self)
@@ -475,10 +480,22 @@ Chargen.set_height = function(self, value)
 	self.data.object.render:update_scale()
 end
 
+--- Gets the mouth style of the character.
+-- @param self Chargen.
+-- @return Style name.
+Chargen.get_mouth_style = function(self)
+	return self.char.mouth_style
+end
+
+--- Sets the mouth style of the character.
+-- @param self Chargen.
+-- @param value Style name.
+Chargen.set_mouth_style = function(self, value)
+	self.char.mouth_style = value
+	self.data.update_needed = true
+end
+
 --- Gets the name of the character.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @return Name.
 Chargen.get_name = function(self)
@@ -486,9 +503,6 @@ Chargen.get_name = function(self)
 end
 
 --- Sets the name of the character.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @param value Name.
 Chargen.set_name = function(self, value)
@@ -496,9 +510,6 @@ Chargen.set_name = function(self, value)
 end
 
 --- Sets the character from a preset.
---
--- Context: The character creator must have been initialized.
---
 -- @param self Chargen.
 -- @param spec Preset spec.
 Chargen.set_preset = function(self, spec)

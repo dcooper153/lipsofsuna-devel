@@ -43,11 +43,11 @@ ModelBuilder.build_for_actor = function(clss, object)
 	object.model_build_hash = clss:build_with_merger(merger, {
 		beheaded = object:get_beheaded(),
 		body_scale = object.body_scale,
-		body_style = object.body_style,
+		body_sliders = object.body_sliders,
 		equipment = equipment,
 		eye_color = Color:ubyte_to_float(object.eye_color),
 		eye_style = object.eye_style,
-		face_style = object.face_style,
+		face_sliders = object.face_sliders,
 		hair_color = Color:ubyte_to_float(object.hair_color),
 		hair_style = object.hair_style,
 		head_style = object.head_style,
@@ -115,13 +115,13 @@ ModelBuilder.build_with_merger = function(clss, merger, args, hash)
 		meshes["upper_safe"] = nil
 	end
 	-- Remove the top if the character is sufficiently male.
-	if args.body_style then
+	if args.body_sliders then
 		local male = 0
-		if args.body_style[3] and args.body_style[3] < 0.1 then male = male + 5 end -- breast size
-		if args.body_style[4] and args.body_style[4] < 0.3 then male = male + 1 end -- hips wide
-		if args.body_style[4] and args.body_style[4] > 0.6 then male = male - 5 end -- hips wide
-		if args.body_style[6] and args.body_style[6] > 0.3 then male = male + 1 end -- torso wide
-		if args.body_style[8] and args.body_style[8] > 0.5 then male = male + 1 end -- waist wide
+		if args.body_sliders[3] and args.body_sliders[3] < 0.1 then male = male + 5 end -- breast size
+		if args.body_sliders[4] and args.body_sliders[4] < 0.3 then male = male + 1 end -- hips wide
+		if args.body_sliders[4] and args.body_sliders[4] > 0.6 then male = male - 5 end -- hips wide
+		if args.body_sliders[6] and args.body_sliders[6] > 0.3 then male = male + 1 end -- torso wide
+		if args.body_sliders[8] and args.body_sliders[8] > 0.5 then male = male + 1 end -- waist wide
 		if male >= 7 then meshes["upper_safe"] = nil end
 	end
 	-- Remove the head if beheaded.
@@ -132,8 +132,8 @@ ModelBuilder.build_with_merger = function(clss, merger, args, hash)
 	end
 	-- Build and compare the hash.
 	local hash1 = Serialize:write{
-		args.body_style,
-		args.face_style,
+		args.body_sliders,
+		args.face_sliders,
 		args.hair_color,
 		meshes}
 	if hash1 == hash then
@@ -197,7 +197,7 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 		end
 	end
 	-- Face customization.
-	if args.face_style then--and string.match(name, ".*head.*" then
+	if args.face_sliders then--and string.match(name, ".*head.*" then
 		for k,spec in ipairs(ChargenSliderSpec:find_by_category("face")) do
 			local field = args[spec.field_name]
 			if field then
@@ -206,7 +206,7 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 		end
 	end
 	-- Body customization.
-	if args.body_style then
+	if args.body_sliders then
 		for k,spec in ipairs(ChargenSliderSpec:find_by_category("body")) do
 			local field = args[spec.field_name]
 			if field then
