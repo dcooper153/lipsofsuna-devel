@@ -1731,6 +1731,29 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/actors/aer/face/aer-eye-annoyed-1.png",
+				"data/lipsofsuna/actors/aer/face/aer-eye-closed-1.png",
+				"data/lipsofsuna/actors/aer/face/aer-eye-round-1.png"
+			],
+			"files_original":
+			[
+				"data/lipsofsuna/actors/aer/face/aer-eye-annoyed-1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-eye-closed-1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-eye-round-1.svg"
+			],
+			"authors":
+			[
+				"Julius"
+			],
+			"licenses":
+			[
+				"Creative Commons BY-SA 3.0"
+			],
+			"source": "http://opengameart.org/content/vector-art-anime-facial-expressions"
+		},
+		{
+			"files":
+			[
 				"data/lipsofsuna/environment/sky/divine_fr.png",
 				"data/lipsofsuna/environment/sky/divine_bk.png",
 				"data/lipsofsuna/environment/sky/divine_lf.png",

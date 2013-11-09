@@ -125,13 +125,7 @@ TextureBuilder.build_with_merger = function(clss, merger, args, hash)
 		merger:add_hsv_weightv(args.skin_color[1], -1 + 2 * args.skin_color[2], -1 + 2 * args.skin_color[3])
 	end
 	-- Blit the face texture.
-	local face = args.face_texture or "aerface1" --FIXME
-	if face then
-		local blit = Main.images:copy_by_name(face)
-		if blit then
-			merger:blit(blit)
-		end
-	end
+	clss:merge_actor_texture(merger, "default face") --FIXME
 	-- Blit the eye texture.
 	clss:merge_actor_texture(merger, args.eye_style, args.eye_color)
 	-- Blit the additional textures.
@@ -160,14 +154,28 @@ TextureBuilder.merge_actor_texture = function(clss, merger, name, color)
 	if not spec.blit_texture then return end
 	local blit = Main.images:copy_by_name(spec.blit_texture)
 	if not blit then return end
+	local dst = spec.blit_dst
+	local src = dst and spec.blit_src or {0, 0, 10000, 10000}
 	if color then
 		if spec.blit_mode == "hsv_add_weightv" then
-			merger:blit_hsv_add_weightv(blit, color[1], -1 + 2 * color[2], -1 + 2 * color[3])
+			if dst then
+				merger:blit_rect_hsv_add_weightv(blit, dst[1], dst[2], dst[3], dst[4], src[1], src[2], color[1], -1 + 2 * color[2], -1 + 2 * color[3])
+			else
+				merger:blit_hsv_add_weightv(blit, color[1], -1 + 2 * color[2], -1 + 2 * color[3])
+			end
 		else
-			merger:blit_hsv_add(blit, color[1], -1 + 2 * color[2], -1 + 2 * color[3])
+			if dst then
+				merger:blit_rect_hsv_add(blit, dst[1], dst[2], dst[3], dst[4], src[1], src[2], color[1], -1 + 2 * color[2], -1 + 2 * color[3])
+			else
+				merger:blit_hsv_add(blit, color[1], -1 + 2 * color[2], -1 + 2 * color[3])
+			end
 		end
 	else
-		merger:blit(blit)
+		if dst then
+			merger:blit_rect(blit, dst[1], dst[2], dst[3], dst[4], src[1], src[2])
+		else
+			merger:blit(blit)
+		end
 	end
 end
 

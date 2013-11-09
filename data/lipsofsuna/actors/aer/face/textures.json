@@ -1,0 +1,59 @@
+[
+	{
+		"type": "ActorTextureSpec",
+		"name": "annoyed eyes",
+		"actors": {"aer": true},
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-eye-annoyed-1",
+		"label": "Annoyed",
+		"usages": {"eyes": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "closed eyes",
+		"actors": {"aer": true},
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-eye-closed-1",
+		"label": "Closed",
+		"usages": {"eyes": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "default eyes",
+		"actors": {"aer": true},
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aereye1",
+		"label": "Default",
+		"usages": {"eyes": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "default face",
+		"actors": {"aer": true},
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aerface1",
+		"label": "Default",
+		"usages": {"face": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "angled eyes",
+		"actors": {"aer": true},
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aereye2",
+		"label": "Angled",
+		"usages": {"eyes": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "round eyes",
+		"actors": {"aer": true},
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-eye-round-1",
+		"label": "Round",
+		"usages": {"eyes": true}
+	}
+]
