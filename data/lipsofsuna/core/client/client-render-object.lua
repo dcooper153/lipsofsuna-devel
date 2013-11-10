@@ -67,6 +67,8 @@ ClientRenderObject.clear = function(self)
 	-- Mark as uninitialized.
 	if not self.initialized then return end
 	self.initialized = nil
+	self.object.model_build_hash = nil
+	self.object.texture_build_hash = nil
 	self.object = nil
 	-- Reset and hide the render object.
 	self:clear_animations()

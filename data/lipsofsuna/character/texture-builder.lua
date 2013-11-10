@@ -23,7 +23,7 @@ local TextureBuilder = Class("TextureBuilder")
 --- Builds the textures for the given actor.
 -- @param clss TextureBuilder class.
 -- @param object Object whose texture to build.
--- @return Texture override dictionary.
+-- @return True if should reuse the old model.
 TextureBuilder.build_for_actor = function(clss, object)
 	if not object.spec then return end
 	if not object.spec.models then return end
@@ -41,7 +41,7 @@ TextureBuilder.build_for_actor = function(clss, object)
 	end
 	-- Build the character textures.
 	-- The result is handled in the update handler of Chargen.
-	object.texture_build_hash = clss:build_with_merger(merger, {
+	local hash,reuse = clss:build_with_merger(merger, {
 		beheaded = object:get_beheaded(),
 		body_scale = object.body_scale,
 		body_sliders = object.body_sliders,
@@ -58,6 +58,8 @@ TextureBuilder.build_for_actor = function(clss, object)
 		skin_color = Color:ubyte_to_float(object.skin_color),
 		skin_style = object.skin_style,
 		spec = object:get_spec()}, object.texture_build_hash)
+	object.texture_build_hash = hash
+	return reuse
 end
 
 --- Builds the texture for the given object.
@@ -115,7 +117,7 @@ TextureBuilder.build_with_merger = function(clss, merger, args, hash)
 		args.mouth_style,
 		textures}
 	if hash1 == hash then
-		return hash
+		return hash, true
 	end
 	-- Set the base texture.
 	local basename = args.spec:get_base_texture()

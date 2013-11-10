@@ -23,6 +23,7 @@ local ModelBuilder = Class("ModelBuilder")
 --- Builds the mesh for the given actor.
 -- @param clss ModelBuilder class.
 -- @param object Object whose model to build.
+-- @return True if should reuse the old model.
 ModelBuilder.build_for_actor = function(clss, object)
 	if not object.spec then return end
 	if not object.spec.models then return end
@@ -40,7 +41,7 @@ ModelBuilder.build_for_actor = function(clss, object)
 	end
 	-- Build the character model in a separate thread.
 	-- The result is handled in the update handler of Chargen.
-	object.model_build_hash = clss:build_with_merger(merger, {
+	local hash,reuse = clss:build_with_merger(merger, {
 		beheaded = object:get_beheaded(),
 		body_scale = object.body_scale,
 		body_sliders = object.body_sliders,
@@ -55,6 +56,8 @@ ModelBuilder.build_for_actor = function(clss, object)
 		skin_color = Color:ubyte_to_float(object.skin_color),
 		skin_style = object.skin_style,
 		spec = object:get_spec()}, object.model_build_hash)
+	object.model_build_hash = hash
+	return reuse
 end
 
 --- Builds the mesh for the given object.
@@ -137,7 +140,7 @@ ModelBuilder.build_with_merger = function(clss, merger, args, hash)
 		args.hair_color,
 		meshes}
 	if hash1 == hash then
-		return hash
+		return hash, true
 	end
 	-- Morph and merge the submodels.
 	local model = Main.models:find_by_name(meshes["skeleton"])
