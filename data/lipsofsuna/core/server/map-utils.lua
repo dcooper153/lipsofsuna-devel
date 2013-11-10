@@ -53,6 +53,7 @@ MapUtils.place_actor = function(clss, args)
 	obj:set_position(args.point)
 	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
 	obj:set_visible(true)
+	return obj
 end
 
 --- Places an item to the map.
@@ -68,11 +69,14 @@ MapUtils.place_item = function(clss, args)
 	if not spec then return end
 	local clss_ = args.class or Item or Object
 	local obj = clss_(Main.objects)
-	obj.random = true
 	obj:set_spec(spec)
+	if obj.randomize then
+		obj:randomize()
+	end
 	obj:set_position(args.point)
 	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
 	obj:set_visible(true)
+	return obj
 end
 
 --- Places an obstacle to the map.
@@ -91,10 +95,11 @@ MapUtils.place_obstacle = function(clss, args)
 	obj:set_position(args.point)
 	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
 	obj:set_visible(true)
+	return obj
 end
 
 --- Places a static object to the map.
--- @param clss Voxel class.
+-- @param clss MapUtils class.
 -- @param args Arguments.<ul>
 --   <li>class: Forces all objects to use the given class.</li>
 --   <li>name: Static object name.</li>
@@ -109,6 +114,7 @@ MapUtils.place_static = function(clss, args)
 	obj:set_position(args.point)
 	if args.rotation then obj:set_rotation(Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}) end
 	obj:set_visible(true)
+	return obj
 end
 
 --- Places a predefined map pattern to the map.

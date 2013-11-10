@@ -54,7 +54,7 @@ PlaceDefault.generate_objects = function(self, chunk, surface)
 		p:multiply(chunk.manager.grid_size)
 		p:add_xyz(0, civ_y, 0)
 		-- Choose and create the obstacle.
-		MapUtils:place_obstacle{point = p, category = "civilization"}
+		MapUtils:place_obstacle{point = p, category = "civilization", rotation = math.random() * math.pi * 2}
 	end
 end
 

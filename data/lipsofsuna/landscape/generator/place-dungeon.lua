@@ -368,6 +368,19 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 			t:calculate_smooth_normals(x, z)
 		end
 	end
+	-- Generate items in dead ends.
+	local connections = (conn_xm and 1 or 0) + (conn_xp and 1 or 0) + (conn_zm and 1 or 0) + (conn_zp and 1 or 0)
+	if connections == 1 then
+		local p = Vector(chunk.x + 6.5, 0.0, chunk.z + 6.5)
+		p:multiply(chunk.manager.grid_size):add_xyz(0, y, 0)
+		MapUtils:place_item{point = p, name = "treasure chest", rotation = math.random() * math.pi * 2}
+	end
+	-- Generate extra monsters.
+	if connections >= 2 and math.random() < 0.5 then
+		local p = Vector(chunk.x + 6.5, 0.0, chunk.z + 6.5)
+		p:multiply(chunk.manager.grid_size):add_xyz(0, y, 0)
+		MapUtils:place_actor{point = p, category = "enemy", rotation = math.random() * math.pi * 2}
+	end
 end
 
 --- Generates a dungeon room chunk.
@@ -415,7 +428,13 @@ PlaceDungeon.generate_room = function(self, chunk, params)
 		p:multiply(chunk.manager.grid_size)
 		p:add_xyz(0, civ_y, 0)
 		-- Choose and create the obstacle.
-		MapUtils:place_obstacle{point = p, category = "civilization"}
+		MapUtils:place_obstacle{point = p, category = "civilization", rotation = math.random() * math.pi * 2}
+	end
+	-- Generate extra monsters.
+	if math.random() < 0.5 then
+		local p = Vector(chunk.x + math.random(1, w-2), 0.0, chunk.z + math.random(1, w-2))
+		p:multiply(chunk.manager.grid_size):add_xyz(0, y, 0)
+		MapUtils:place_actor{point = p, category = "enemy", rotation = math.random() * math.pi * 2}
 	end
 end
 
