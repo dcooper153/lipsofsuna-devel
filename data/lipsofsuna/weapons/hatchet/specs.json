@@ -21,6 +21,7 @@
 		{
 			"default": "metal item"
 		},
+		"equipment_anchor_rotation": [0, 1, 0, 0],
 		"equipment_slot": "hand.R",
 		"icon": "axe3",
 		"modifiers": {"hatchet": 10, "physical damage": 10},
@@ -46,6 +47,7 @@
 		{
 			"default": "metal item"
 		},
+		"equipment_anchor_rotation": [0, 1, 0, 0],
 		"equipment_slot": "hand.R",
 		"icon": "axe2",
 		"modifiers": {"cold damage": 4, "hatchet": 7, "physical damage": 4},
@@ -72,6 +74,7 @@
 		{
 			"default": "metal item"
 		},
+		"equipment_anchor_rotation": [0, 1, 0, 0],
 		"equipment_slot": "hand.R",
 		"health": 500,
 		"icon": "axe2",
@@ -98,6 +101,7 @@
 		{
 			"default": "metal item"
 		},
+		"equipment_anchor_rotation": [0, 1, 0, 0],
 		"equipment_slot": "hand.R",
 		"health": 220,
 		"icon": "axe2",
@@ -124,6 +128,7 @@
 		{
 			"default": "stone item"
 		},
+		"equipment_anchor_rotation": [0, 1, 0, 0],
 		"equipment_slot": "hand.R",
 		"health": 130,
 		"icon": "axe1",
@@ -151,6 +156,7 @@
 		{
 			"default": "wooden item"
 		},
+		"equipment_anchor_rotation": [0, 1, 0, 0],
 		"equipment_slot": "hand.R",
 		"health": 100,
 		"icon": "axe1",
