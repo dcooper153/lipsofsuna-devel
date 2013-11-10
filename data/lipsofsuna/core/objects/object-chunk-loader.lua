@@ -34,13 +34,28 @@ end
 -- should be used. When running synchronously, a dummy function should be
 -- used.
 --
--- @param clss ObjectChunkLoader class.
+-- @param self ObjectChunkLoader.
 -- @param manager ObjectChunkManager.
 -- @param chunk Chunk ID.
 -- @param yield Function.
-ObjectChunkLoader.execute = function(clss, manager, chunk, yield)
-	-- Load objects.
-	local objects = Server.object_database:load_sector_objects(chunk)
+ObjectChunkLoader.execute = function(self, manager, chunk, yield)
+	-- Load the data.
+	if not manager.database then return end
+	local rows = manager.database:query(
+		[[SELECT b.id,b.type,b.spec,b.dead FROM
+		object_sectors AS a INNER JOIN
+		object_data AS b WHERE
+		a.sector=? AND a.id=b.id]], {chunk})
+	yield()
+	-- Create the objects.
+	local objects = {}
+	for k,v in ipairs(rows) do
+		local obj = Server.object_database:load_object(v[1], v[2], v[3], v[4])
+		if obj then
+			obj:set_visible(true)
+			table.insert(objects, obj)
+		end
+	end
 	yield()
 	-- Trigger global events.
 	Server.events:sector_created(chunk, terrain, objects)

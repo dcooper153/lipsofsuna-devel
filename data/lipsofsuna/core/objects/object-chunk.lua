@@ -45,10 +45,19 @@ end
 --- Saves the chunk.
 -- @param self ObjectChunk.
 ObjectChunk.save = function(self)
+	-- Check if saving is enabled.
 	if self.loader then return end
-	if not self.manager.database then return end
-	if not Server.initialized then return end
-	Server.object_database:save_sector_objects(self.id)
+	local db = self.manager.database
+	if not db then return end
+	-- Delete old objects.
+	db:query([[DELETE FROM object_sectors WHERE sector=?;]], {self.id})
+	-- Write new objects.
+	local objs = self.manager.manager:find_by_sector(self.id)
+	for k,object in pairs(objs) do
+		if object.serializer then
+			object.serializer:write(object, db)
+		end
+	end
 end
 
 --- Updates the chunk.

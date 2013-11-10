@@ -201,27 +201,6 @@ ObjectDatabase.load_player = function(self, account)
 	end
 end
 
---- Reads all objects in a sector.
--- @param self ObjectDatabase.
--- @param sector Sector index.
--- @return List of objects.
-ObjectDatabase.load_sector_objects = function(self, sector)
-	local objects = {}
-	local rows = self.db:query(
-		[[SELECT b.id,b.type,b.spec,b.dead FROM
-		object_sectors AS a INNER JOIN
-		object_data AS b WHERE
-		a.sector=? AND a.id=b.id]], {sector})
-	for k,v in ipairs(rows) do
-		local obj = self:load_object(v[1], v[2], v[3], v[4])
-		if obj then
-			obj:set_visible(true)
-			table.insert(objects, obj)
-		end
-	end
-	return objects
-end
-
 --- Reads all static objects.
 -- @param self ObjectDatabase.
 -- @return List of objects.
@@ -245,17 +224,6 @@ end
 ObjectDatabase.save_object = function(self, object)
 	if object.serializer then
 		object.serializer:write(object, self.db)
-	end
-end
-
---- Writes objects in the given sector to the database.
--- @param self ObjectDatabase.
--- @param sector Sector number.
-ObjectDatabase.save_sector_objects = function(self, sector)
-	self.db:query([[DELETE FROM object_sectors WHERE sector=?;]], {sector})
-	local objs = Main.objects:find_by_sector(sector)
-	for k,v in pairs(objs) do
-		self:save_object(v)
 	end
 end
 
