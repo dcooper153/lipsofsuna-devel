@@ -198,12 +198,23 @@ PlaceDungeon.plan = function(self, x, z, place, params)
 	-- Create the entrance.
 	self.__planner:create_chunk(x, z, {3, params, 10, 0})
 	create_waypoint("entrance", x, z, params, 10)
+	local last = nil
 	local created = 1
 	-- Create the content.
 	while waypoints_num > 0 and created < 64 do
-		local rnd = math.random(1, waypoints_num)
-		if expand_waypoint(rnd, waypoints[rnd]) then
+		-- Choose the next waypoint.
+		if not last or math.random() < 0.1 then
+			last = math.random(1, waypoints_num)
+		end
+		-- Try to expand the waypoint.
+		if expand_waypoint(last, waypoints[last]) then
 			created = created + 1
+			last = waypoints_num
+			if waypoints[last].type ~= "corridor" then
+				last = nil
+			end
+		else
+			last = nil
 		end
 	end
 	return true
