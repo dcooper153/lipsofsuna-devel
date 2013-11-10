@@ -519,10 +519,25 @@ SimulationObject.get_bounding_box = function(self)
 	return Object.get_bounding_box(self)
 end
 
+--- Gets the importance of the object.
+-- @param self Object.
+-- @return True if important. False otherwise.
+SimulationObject.get_important = function(self)
+	if self.__important ~= nil then return self.__important end
+	if self.spec.important then return true end
+end
+
+--- Sets the importance of the object.
+-- @param self Object.
+-- @param value True if important. False otherwise.
+SimulationObject.set_important = function(self, value)
+	self.__important = value and true or nil
+end
+
 --- Gets the model of the object.
 -- @param self Object.
 -- @return Model.
-Object.get_model = function(self)
+SimulationObject.get_model = function(self)
 	return self.__model
 end
 

@@ -101,6 +101,12 @@ Actor.serializer = ObjectSerializer(
 		type = "vector"
 	},
 	{
+		name = "important",
+		type = "boolean",
+		get = function(self) return self:get_important() end,
+		set = function(self, v) self:set_important(v) end
+	},
+	{
 		name = "mouth_style",
 		type = "string"
 	},
@@ -942,6 +948,14 @@ Actor.set_dead_state = function(self, drop)
 	end
 	-- Emit a vision event.
 	Main.vision:object_event(self, "object-dead", {dead = true})
+end
+
+--- Gets the importance of the object.
+-- @param self Object.
+-- @return True if important. False otherwise.
+Actor.get_important = function(self)
+	if self.__important ~= nil and not self.dead then return self.__important end
+	if self.spec.important then return true end
 end
 
 --- Gets a modifier by name.

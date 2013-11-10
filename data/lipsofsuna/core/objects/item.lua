@@ -42,6 +42,12 @@ Item.serializer = ObjectSerializer(
 		type = "number"
 	},
 	{
+		name = "important",
+		type = "boolean",
+		get = function(self) return self:get_important() end,
+		set = function(self, v) self:set_important(v) end
+	},
+	{
 		name = "looted",
 		type = "boolean"
 	},

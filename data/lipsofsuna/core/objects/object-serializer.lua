@@ -86,7 +86,7 @@ local writers = {
 	["sector"] = function(self, object, db, id)
 		local sector = not object.client and object:get_sector()
 		if sector then
-			if object.spec.important then
+			if object:get_important() then
 				db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {id, sector, nil})
 			else
 				db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {id, sector, 0})
