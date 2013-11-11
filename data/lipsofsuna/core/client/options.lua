@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local ConfigFile = require("system/config-file")
-local Render = require("system/render")
 
 --- Client options.
 -- @type Options
@@ -144,6 +143,7 @@ end
 -- @param self Options.
 Options.apply = function(self)
 	-- Set the anisotropic filter.
+	local Render = require("system/render")
 	Render:set_anisotrophy(self.anisotropic_filter)
 	-- Set the shader scheme.
 	-- TODO: Change this now since quality 2 is not used.
