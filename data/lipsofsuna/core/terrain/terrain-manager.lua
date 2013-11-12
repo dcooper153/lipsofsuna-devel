@@ -53,7 +53,7 @@ TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, 
 	self.physics:set_collision_group(PhysicsConsts.GROUP_TERRAIN)
 	self.physics:set_collision_mask(PhysicsConsts.MASK_TERRAIN)
 	self.physics:set_visible(true)
-	self.physics:set_friction(1.2)
+	self.physics:set_friction(0.5)
 	self.physics:set_unloaded_collision(true)
 	-- Initialize the database tables needed by us.
 	if self.database then

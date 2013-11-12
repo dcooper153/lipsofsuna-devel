@@ -140,11 +140,12 @@ void LIPhyCharacterAction::updateAction (
 	damp1 = (1.0f - LIPHY_CHARACTER_GROUND_DAMPING) * delta;
 
 	/* Walking. */
+	bool ground1 = (this->hover < 0.5f);
 	speed = this->object->config.movement * this->object->config.speed;
 	speed *= 1.0f - this->object->config.friction_liquid * this->object->submerged;
 	if (speed != 0.0f && vely[1] > -5.0)
 	{
-		private_calculate_control (ground, -dotz, speed, &pos, &forward, &velz, &accel);
+		private_calculate_control (ground1, -dotz, speed, &pos, &forward, &velz, &accel);
 		velz *= damp0;
 	}
 	else if (ground)
@@ -155,7 +156,7 @@ void LIPhyCharacterAction::updateAction (
 	speed *= 1.0f - this->object->config.friction_liquid * this->object->submerged;
 	if (speed != 0.0f && vely[1] > -5.0)
 	{
-		private_calculate_control (ground, dotx, speed, &pos, &right, &velx, &accel);
+		private_calculate_control (ground1, dotx, speed, &pos, &right, &velx, &accel);
 		velx *= damp0;
 	}
 	else if (ground)
@@ -196,6 +197,7 @@ void LIPhyCharacterControl::apply_impulse (const btVector3& pos, const btVector3
 	   make it the default behavior. */
 	this->action.timer = -0.5f;
 	this->action.ground = false;
+	this->action.hover = 0.0f;
 }
 
 bool LIPhyCharacterControl::get_ground ()
@@ -224,8 +226,8 @@ static void private_calculate_control (
 	   else the character will be able to push heavy objects effortlessly. */
 	if (ground)
 	{
-		speed_factor = limat_smoothstep (current_speed, 0.0f, 7.0f);
-		speed_factor = limat_mix (0.5f, 0.3f, speed_factor);
+		speed_factor = limat_smoothstep (current_speed, 0.0f, target_speed);
+		speed_factor = limat_mix (0.8f, 0.4f, speed_factor);
 		if ((target_speed > 0.0f && current_speed < speed_factor * target_speed) ||
 			(target_speed < 0.0f && current_speed > speed_factor * target_speed))
 			*velocity_result = *direction * target_speed * speed_factor;
@@ -239,7 +241,7 @@ static void private_calculate_control (
 	if ((target_speed < 0.0f || current_speed < target_speed) &&
 	    (target_speed > 0.0f || current_speed > target_speed))
 	{
-		accel_factor = limat_smoothstep (target_speed, 1.0f, 7.0f);
+		accel_factor = limat_smoothstep (target_speed, 1.0f, target_speed);
 		accel_factor = limat_mix (6.0f, 2.0f, accel_factor);
 		*acceleration_result += *direction * target_speed * accel_factor;
 	}
