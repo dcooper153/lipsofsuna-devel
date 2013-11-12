@@ -21,7 +21,7 @@ Actionspec{
 			self.jumping = true
 			Main.vision:object_effect(self, "jump1")
 			self:animate("jump")
-			local v = self:get_velocity()
+			local v = self:get_velocity() * 0.2
 			local f = self.spec.mass * self.spec.jump_force * self.attributes.jump
 			self.physics:jump(Vector(v.x, f, v.z))
 			-- Enable effect-over-time updates.
