@@ -3,7 +3,7 @@ particle_system explosion1
 	material flarefx1
 	particle_width 1.0
 	particle_height 1.0
-	quota 50
+	quota 200
 	cull_each false
 	sorted false
 	local_space false
@@ -15,26 +15,20 @@ particle_system explosion1
 	point_rendering false
 	accurate_facing false
 
-	emitter HollowEllipsoid
+	emitter Ellipsoid
 	{
-		position 0.0 0.5 0.0
-		direction 0.0 -1.0 0.0
-		angle 0
+		position 0.0 0.0 0.0
+		direction 0.0 1.0 0.0
+		angle 180
 		width 0.5
 		height 0.5
 		depth 0.5
-		inner_width 0.1
-		inner_height 0.1
-		inner_depth 0.1
-		emission_rate 20
-		velocity_min 0.2
-		velocity_max 0.0
-		time_to_live_min 5
-		time_to_live_max 5
-		duration_min 2
-		duration_max 2
-		repeat_delay_min 100
-		repeat_delay_max 100
+		emission_rate 100
+		velocity_min 0.1
+		velocity_max 3.0
+		time_to_live 0.5
+		duration 0.5
+		repeat_delay 100
 		colour_range_start 1 1 0.5 1
 		colour_range_end 1 1 0.5 1
 	}
@@ -50,8 +44,8 @@ particle_system explosion1
 	affector ColourFader
 	{
 		red 0.01
-		green -0.17
-		blue -0.15
-		alpha -0.55
+		green -2.0
+		blue -1.0
+		alpha -1.0
 	}
 }
