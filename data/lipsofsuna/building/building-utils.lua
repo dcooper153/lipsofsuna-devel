@@ -44,7 +44,9 @@ BuildingUtils.destroy_terrain_sphere = function(self, attacker, point, radius)
 	-- Play the collapse effect.
 	self:__play_terrain_destruction_effect(point, materials)
 	-- Create items.
-	self:__create_terrain_mining_items(attacker, materials)
+	if attacker then
+		self:__create_terrain_mining_items(attacker, materials)
+	end
 	-- Spawn random monsters.
 	-- TODO: Should use material specs.
 		--[[

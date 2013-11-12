@@ -214,6 +214,9 @@ Utils.explosion = function(clss, point, radius)
 		v1.physics:impulse(impulse)
 		v1:damaged{amount = 40 * (1 - frac), type = "explosion"}
 	end
+	-- Damage terrain.
+	local BuildingUtils = require("building/building-utils")
+	BuildingUtils:destroy_terrain_sphere(nil, point, radius or 1.5)
 end
 
 return Utils
