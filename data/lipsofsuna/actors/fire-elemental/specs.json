@@ -4,7 +4,7 @@
 		"name": "fire elemental",
 		"categories":
 		{
-			"enemy": true
+			"fixme": true
 		},
 		"ai_combat_actions":
 		{
