@@ -71,7 +71,9 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "chargen",
-	widget = function() return Widgets.Uibutton("Create", function()
+	widget = function()
+		if Client.chargen.data.standalone then return end
+		return Widgets.Uibutton("Create", function()
 			Client.chargen:apply()
 		end)
 	end}
