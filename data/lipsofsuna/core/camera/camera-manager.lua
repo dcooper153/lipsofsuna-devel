@@ -100,7 +100,11 @@ CameraManager.update = function(self, secs)
 		if r1 then
 			local p,o = Simulation:pick_scene_by_ray(r1, r2)
 			Client.player_state:set_targeted_object(o)
-			Client.player_state.crosshair = (p or r2) - (r2 - r1):normalize() * 0.1
+			if p then
+				Client.player_state.crosshair = p - (r2 - r1):normalize() * 0.1
+			else
+				Client.player_state.crosshair = r1 + (r2 - r1) * 3
+			end
 		end
 	else
 		Client.player_state:set_targeted_object()
