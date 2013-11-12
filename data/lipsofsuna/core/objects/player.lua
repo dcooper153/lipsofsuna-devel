@@ -129,6 +129,8 @@ Player.respawn = function(self)
 	self:teleport{position = home}
 	-- Resurrect the player.
 	self:action("resurrect")
+	-- Restore health.
+	self.stats:set_value("health", self.stats:get_maximum("health"))
 	-- Spawn the player.
 	self:add_modifier("respawn", 1)
 end
