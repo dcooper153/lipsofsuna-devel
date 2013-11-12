@@ -15,27 +15,6 @@
 -- non generating admin items: "weapons", "logs", "health jar", "magic jar"
 
 ------------------------------------------------------------------------------
--- Ammo.
-
-CraftingRecipeSpec{
-	name = "bullet",
-	effect = "craftmetal1",
-	count = 10,
-	materials = {["iron ingot"] = 1},
-	modes = {["metal"] = true}}
-
-Itemspec{
-	name = "bullet",
-	categories = {["bullet"] = true},
-	gravity_projectile = Vector(0,-4,0),
-	icon = "arrow1",
-	modifiers = {["physical damage"] = 1},
-	mass = 1,
-	mass_inventory = 0.1,
-	model = "arrow-000", -- FIXME
-	stacking = true}
-
-------------------------------------------------------------------------------
 -- Decorations
 
 CraftingRecipeSpec{

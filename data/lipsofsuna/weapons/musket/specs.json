@@ -13,6 +13,26 @@
 		}
 	},
 	{
+		"type": "Itemspec",
+		"name": "bullet",
+        "categories": {"bullet": true},
+		"modifiers": {"physical damage": 1},
+		"gravity_projectile": [0,-0.5,0],
+		"icon": "arrow1",
+		"mass": 1,
+		"mass_inventory": 0.1,
+		"model": "arrow-000",
+		"stacking": true
+	},
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "bullet",
+		"count": 10,
+		"effect": "craftwood1",
+		"materials": {"iron ingot": 1},
+		"modes": {"metal": true}
+	},
+	{
 		"type": "CraftingRecipeSpec",
 		"name": "adamantium musket",
 		"effect": "craftmetal1",
