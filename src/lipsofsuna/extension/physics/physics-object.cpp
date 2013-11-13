@@ -732,6 +732,8 @@ void liphy_object_set_movement (
 	float        value)
 {
 	self->config.movement = value;
+	if (self->control != NULL && value != 0.0f)
+		self->control->set_activated (true);
 #if 0
 	if (self->control_mode == LIPHY_CONTROL_MODE_VEHICLE)
 	{
@@ -868,6 +870,8 @@ void liphy_object_set_strafing (
 	float        value)
 {
 	self->config.strafing = value;
+	if (self->control != NULL && value != 0.0f)
+		self->control->set_activated (true);
 }
 
 /**

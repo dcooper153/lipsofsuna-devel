@@ -177,7 +177,6 @@ LIPhyCharacterControl::LIPhyCharacterControl (LIPhyObject* object, btCollisionSh
 	LIPhyControlRigid (object, shape), action (object)
 {
 	object->physics->dynamics->addAction (&this->action);
-	this->body.setActivationState (DISABLE_DEACTIVATION);
 	this->body.setAngularFactor (0.0f);
 }
 
@@ -198,6 +197,7 @@ void LIPhyCharacterControl::apply_impulse (const btVector3& pos, const btVector3
 	this->action.timer = -0.5f;
 	this->action.ground = false;
 	this->action.hover = 0.0f;
+	this->body.activate();
 }
 
 bool LIPhyCharacterControl::get_ground ()
