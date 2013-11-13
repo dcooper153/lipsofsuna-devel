@@ -87,6 +87,9 @@ DiamondSquare.calculate = function(self, seeds)
 		d = d/2
 		e = e/1.85
 	end
+	-- Normalize the minimum elevation.
+	local miny = a:get_min()
+	a:add(100 - miny)
 end
 
 --- Prints the heights into the terminal.
