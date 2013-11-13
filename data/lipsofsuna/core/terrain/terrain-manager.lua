@@ -41,6 +41,7 @@ TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, 
 	self.unload_time_model = 3
 	self.generate_hooks = Hooks()
 	self.__view_distance = 48
+	self.__load_priorities = {}
 	self.terrain = Terrain(chunk_size, grid_size)
 	-- Initialize the materials.
 	for k,v in pairs(TerrainMaterialSpec.dict_id) do
@@ -69,13 +70,21 @@ end
 -- @param point Point in world space.
 -- @param radius Radius in world units.
 TerrainManager.refresh_chunks_by_point = function(self, point, radius)
+	local xc,zc = self:get_chunk_xz_by_point(point.x, point.z)
 	local x0,z0,x1,z1 = self:get_chunk_xz_range_by_point(point, radius)
 	local t = Program:get_time()
 	for z = z0,z1,self.chunk_size do
 		for x = x0,x1,self.chunk_size do
+			-- Load the chunk.
+			local id = self:get_chunk_id_by_xz(x, z)
 			if not self:load_chunk(x, z) then
-				local id = self:get_chunk_id_by_xz(x, z)
 				self.chunks[id].time = t
+			end
+			-- Set the loading priority.
+			local c = self.chunks[id]
+			if c and c.loader then
+				local p = math.sqrt((x-xc)^2 + math.abs(z-zc)^2)
+				table.insert(self.__load_priorities, {p, id})
 			end
 		end
 	end
@@ -128,7 +137,15 @@ end
 -- @param self TerrainManager.
 -- @param secs Seconds since the last update.
 TerrainManager.update = function(self, secs)
-	-- Load and unload chunks on demand.
+	-- Load chunks on demand.
+	table.sort(self.__load_priorities, function(a, b) return a[1] < b[1] end)
+	for k,v in ipairs(self.__load_priorities) do
+		local c = self.chunks[v[2]]
+		if c then c:load(secs) end
+		if v[1] > 0 and k > 3 then break end
+	end
+	self.__load_priorities = {}
+	-- Unload chunks on demand.
 	ChunkManager.update(self, secs)
 	-- Build chunk models on demand.
 	if self.graphics and self.__view_center then

@@ -87,6 +87,15 @@ TerrainChunk.detach_render_object = function(self)
 	self.time_model = nil
 end
 
+--- Progresses the loading of the chunk.
+-- @param self TerrainChunk.
+TerrainChunk.load = function(self)
+	if not self.loader then return end
+	if not self.loader:update(secs) then
+		self.loader = nil
+	end
+end
+
 --- Saves the chunk.
 -- @param self TerrainChunk.
 TerrainChunk.save = function(self)
@@ -132,13 +141,6 @@ TerrainChunk.update = function(self, secs)
 	-- Unload unused models.
 	if self.time_model and t - self.time_model >= self.manager.unload_time_model then
 		self:detach_render_object()
-		return
-	end
-	-- Progess chunk loading.
-	if self.loader then
-		if not self.loader:update(secs) then
-			self.loader = nil
-		end
 		return
 	end
 end
