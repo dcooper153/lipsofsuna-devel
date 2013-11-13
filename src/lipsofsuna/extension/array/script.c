@@ -59,6 +59,16 @@ static void NumberArray2d_new (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
+static void NumberArray2d_add (LIScrArgs* args)
+{
+	float value;
+
+	if (!liscr_args_geti_float (args, 0, &value))
+		return;
+
+	liext_number_array_2d_add (args->self, value);
+}
+
 static void NumberArray2d_get (LIScrArgs* args)
 {
 	int x;
@@ -190,12 +200,23 @@ static void NumberArray2d_get_gradient_bilinear (LIScrArgs* args)
 	liscr_args_seti_float (args, atan2f (gx, gy));
 }
 
+static void NumberArray2d_get_max (LIScrArgs* args)
+{
+	liscr_args_seti_float (args, liext_number_array_2d_get_max (args->self));
+}
+
+static void NumberArray2d_get_min (LIScrArgs* args)
+{
+	liscr_args_seti_float (args, liext_number_array_2d_get_min (args->self));
+}
+
 /*****************************************************************************/
 
 void liext_script_number_array_2d (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_new", NumberArray2d_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_add", NumberArray2d_add);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get", NumberArray2d_get);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_set", NumberArray2d_set);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get_bilinear", NumberArray2d_get_bilinear);
@@ -203,6 +224,8 @@ void liext_script_number_array_2d (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_set_data", NumberArray2d_set_data);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get_gradient", NumberArray2d_get_gradient);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get_gradient_bilinear", NumberArray2d_get_gradient_bilinear);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get_max", NumberArray2d_get_max);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_NUMBER_ARRAY_2D, "number_array_2d_get_min", NumberArray2d_get_min);
 }
 
 /** @} */

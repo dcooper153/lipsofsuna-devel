@@ -34,6 +34,13 @@ NumberArray2d.new = function(clss, w, h)
 	return self
 end
 
+--- Adds a value to all the elements of the array.
+-- @param self NumberArray2d.
+-- @param value Value.
+NumberArray2d.add = function(self, value)
+	return Los.number_array_2d_add(self.handle, value)
+end
+
 --- Gets a value.
 -- @param self NumberArray2d.
 -- @param x X index.
@@ -100,6 +107,20 @@ end
 -- @return Horizontal, vertical, magnitude and angle.
 NumberArray2d.get_gradient_bilinear = function(self, x, y)
 	return Los.number_array_2d_get_gradient_bilinear(self.handle, x, y)
+end
+
+--- Gets the maximum value of the array.
+-- @param self NumberArray2d.
+-- @return Number.
+NumberArray2d.get_max = function(self)
+	return Los.number_array_2d_get_max(self.handle)
+end
+
+--- Gets the minimum value of the array.
+-- @param self NumberArray2d.
+-- @return Number.
+NumberArray2d.get_min = function(self)
+	return Los.number_array_2d_get_min(self.handle)
 end
 
 return NumberArray2d

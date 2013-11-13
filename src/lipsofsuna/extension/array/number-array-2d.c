@@ -26,6 +26,21 @@
 #include "number-array-2d.h"
 
 /**
+ * \brief Adds the given value to each array element.
+ * \param self Array.
+ * \param value Value
+ */
+void liext_number_array_2d_add (
+	LIExtNumberArray2d* self,
+	float               value)
+{
+	int i;
+
+	for (i = 0 ; i < self->width * self->height ; i++)
+		self->values[i] += value;
+}
+
+/**
  * \brief Gets a bilinearly interpolated value.
  * \param self Array.
  * \param fx Floating point X coordinate.
@@ -225,6 +240,42 @@ void liext_number_array_2d_get_gradient_bilinear (
 		*result_x = (1.0f - b) * gx[0] + b * gx[1];
 		*result_y = (1.0f - b) * gy[0] + b * gy[1];
 	}
+}
+
+/**
+ * \brief Gets the maximum value of the array.
+ * \param self Array.
+ * \return Value
+ */
+float liext_number_array_2d_get_max (
+	const LIExtNumberArray2d* self)
+{
+	int i;
+	float v;
+
+	v = self->values[0];
+	for (i = 0 ; i < self->width * self->height ; i++)
+		v = LIMAT_MAX (v, self->values[i]);
+
+	return v;
+}
+
+/**
+ * \brief Gets the minimum value of the array.
+ * \param self Array.
+ * \return Value
+ */
+float liext_number_array_2d_get_min (
+	const LIExtNumberArray2d* self)
+{
+	int i;
+	float v;
+
+	v = self->values[0];
+	for (i = 0 ; i < self->width * self->height ; i++)
+		v = LIMAT_MIN (v, self->values[i]);
+
+	return v;
 }
 
 /** @} */

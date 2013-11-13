@@ -21,6 +21,21 @@ Unittest:add(1, "system", "array", function()
 	end
 end)
 
+Unittest:add(1, "system", "array: add", function()
+	local NumberArray2d = require("system/array/number-2d")
+	local a = NumberArray2d(10, 10)
+	for x=0,9 do
+		for z=0,9 do
+			a:set(x, z, 1 + x + z)
+		end
+	end
+	assert(a:get_min() == 1)
+	assert(a:get_max() == 19)
+	a:add(100)
+	assert(a:get_min() == 101)
+	assert(a:get_max() == 119)
+end)
+
 Unittest:add(1, "system", "array: bilinear interpolation", function()
 	local NumberArray2d = require("system/array/number-2d")
 	local a = NumberArray2d(3, 3)
