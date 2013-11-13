@@ -38,6 +38,7 @@ private:
 	void create_shape ();
 	void delete_object ();
 	void delete_shape ();
+	void add_stick (int x, int z, const btTransform& transform, const btVector3* verts);
 private:
 	int x;
 	int z;

@@ -104,13 +104,10 @@ void LIExtPhysicsTerrainChunk::create_object ()
 
 	object = new btCollisionObject ();
 	object->setCollisionFlags (btCollisionObject::CF_STATIC_OBJECT);
-	object->setActivationState (DISABLE_DEACTIVATION);
 	object->setCollisionShape (shape);
 	object->setWorldTransform (btTransform (btQuaternion(0.0, 0.0, 0.0, 1.0), btVector3(x * grid_size, 0.0, z * grid_size)));
 	object->setUserPointer (terrain->pointer);
 	object->setFriction (terrain->friction);
-	object->setCollisionFlags (object->getCollisionFlags() |
-		btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 	terrain->module->physics->dynamics->addCollisionObject (object, terrain->collision_group, terrain->collision_mask);
 }
 
@@ -160,10 +157,7 @@ void LIExtPhysicsTerrainChunk::create_shape ()
 
 			// Create the convex hull shape.
 			if (stick->material != 0)
-			{
-				btConvexHullShape* s = new LIExtPhysicsTerrainStickShape (this->x + x, this->z + z, verts, 8);
-				shape->addChildShape(transform, s);
-			}
+				add_stick (this->x + x, this->z + z, transform, verts);
 
 			// Set the bottom surface offset.
 			verts[0] = verts[4];
@@ -195,6 +189,46 @@ void LIExtPhysicsTerrainChunk::delete_shape ()
 	}
 	delete shape;
 	shape = NULL;
+}
+
+void LIExtPhysicsTerrainChunk::add_stick (int x, int z, const btTransform& transform, const btVector3* verts)
+{
+	const float maxh = 2000.0f;
+	btVector3 verts2[8];
+
+	float ymin = LIMAT_MIN (LIMAT_MIN (verts[0][1], verts[1][1]), LIMAT_MIN (verts[2][1], verts[3][1]));
+	float ymax = LIMAT_MAX (LIMAT_MAX (verts[4][1], verts[5][1]), LIMAT_MAX (verts[6][1], verts[7][1]));
+	if (ymax - ymin > maxh)
+	{
+		// Split too long splits since they can cause severe inaccuracies in the
+		// simulation, which may lead to players walking through walls.
+		int parts = (int) ceilf((ymax - ymin) / maxh);
+		verts2[0] = verts[0];
+		verts2[1] = verts[1];
+		verts2[2] = verts[2];
+		verts2[3] = verts[3];
+		for (int i = 1 ; i <= parts ; i++)
+		{
+			float a = (float) i / parts;
+			float b = 1.0f - a;
+			verts2[4] = verts[0] * b + verts[4] * a;
+			verts2[5] = verts[1] * b + verts[5] * a;
+			verts2[6] = verts[2] * b + verts[6] * a;
+			verts2[7] = verts[3] * b + verts[7] * a;
+			btConvexHullShape* s = new LIExtPhysicsTerrainStickShape (x, z, verts2, 8);
+			shape->addChildShape(transform, s);
+			verts2[0] = verts[4];
+			verts2[1] = verts[5];
+			verts2[2] = verts[6];
+			verts2[3] = verts[7];
+		}
+	}
+	else
+	{
+		// Create a convex shape normally.
+		btConvexHullShape* s = new LIExtPhysicsTerrainStickShape (x, z, verts, 8);
+		shape->addChildShape(transform, s);
+	}
 }
 
 /** @} */
