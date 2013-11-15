@@ -29,7 +29,7 @@ ObjectChunk.new = function(clss, manager, x, z)
 	self.time = Program:get_time()
 	-- Create a sector loader.
 	if Server.initialized then
-		self.loader = ObjectChunkLoader(self, self.id)
+		self.loader = ObjectChunkLoader(manager, self.id, x, z)
 	end
 	return self
 end

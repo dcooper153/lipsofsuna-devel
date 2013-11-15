@@ -17,6 +17,9 @@ local TerrainChunkLoader = Class("TerrainChunkLoader")
 --- Creates a new terrain chunk loader.
 -- @param clss TerrainChunkLoader class.
 -- @param manager TerrainManager.
+-- @param id Chunk ID.
+-- @param x Chunk offset.
+-- @param z Chunk offset.
 -- @return TerrainChunkLoader.
 TerrainChunkLoader.new = function(clss, manager, id, x, z)
 	local self = Class.new(clss)

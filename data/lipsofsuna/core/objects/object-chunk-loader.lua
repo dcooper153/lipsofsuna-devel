@@ -17,12 +17,18 @@ local ObjectChunkLoader = Class("ObjectChunkLoader")
 --- Creates a new sector loader.
 -- @param clss ObjectChunkLoader class.
 -- @param manager ObjectChunkManager.
--- @param chunk Chunk ID.
+-- @param id Chunk ID.
+-- @param x Chunk offset.
+-- @param z Chunk offset.
 -- @return ObjectChunkLoader.
-ObjectChunkLoader.new = function(clss, manager, chunk)
+ObjectChunkLoader.new = function(clss, manager, id, x, z)
 	local self = Class.new(clss)
+	self.manager = manager
+	self.id = id
+	self.x = x
+	self.z = z
 	self.routine = coroutine.create(function()
-		self:execute(manager, chunk, coroutine.yield)
+		self:execute(coroutine.yield)
 	end)
 	return self
 end
@@ -35,17 +41,15 @@ end
 -- used.
 --
 -- @param self ObjectChunkLoader.
--- @param manager ObjectChunkManager.
--- @param chunk Chunk ID.
 -- @param yield Function.
-ObjectChunkLoader.execute = function(self, manager, chunk, yield)
+ObjectChunkLoader.execute = function(self, yield)
 	-- Load the data.
-	if not manager.database then return end
-	local rows = manager.database:query(
+	if not self.manager.database then return end
+	local rows = self.manager.database:query(
 		[[SELECT b.id,b.type,b.spec,b.dead FROM
 		object_sectors AS a INNER JOIN
 		object_data AS b WHERE
-		a.sector=? AND a.id=b.id]], {chunk})
+		a.sector=? AND a.id=b.id]], {self.id})
 	yield()
 	-- Create the objects.
 	local objects = {}
@@ -58,7 +62,7 @@ ObjectChunkLoader.execute = function(self, manager, chunk, yield)
 	end
 	yield()
 	-- Trigger global events.
-	Server.events:sector_created(chunk, terrain, objects)
+	Server.events:sector_created(self.id, terrain, objects)
 	yield()
 end
 

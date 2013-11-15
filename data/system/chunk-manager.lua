@@ -56,6 +56,20 @@ ChunkManager.reload_chunk = function(self, x, z)
 	self.chunks_iterator = nil
 end
 
+--- Saves a chunk.
+-- @param self ChunkManager.
+-- @param x X coordinate in grid units.
+-- @param z Z coordinate in grid units.
+-- @return True if saved successfully. False otherwise..
+ChunkManager.save_chunk = function(self, x, z)
+	local id = self:get_chunk_id_by_xz(x, z)
+	local c = self.chunks[id]
+	if not c then return end
+	if not c.save then return end
+	c:save()
+	return true
+end
+
 --- Unloads a chunk.
 -- @param self ChunkManager.
 -- @param x X coordinate in grid units.

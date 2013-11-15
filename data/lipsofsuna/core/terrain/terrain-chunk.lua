@@ -111,6 +111,12 @@ TerrainChunk.save = function(self)
 	else
 		print("ERROR: Could not save terrain")
 	end
+	-- Chain save the object chunk.
+	if Main and Main.objects then
+		local p = self.manager:get_chunk_center_by_xz(self.x, self.z)
+		local x,z = Main.objects.chunks:get_chunk_xz_by_point(p.x, p.z)
+		Main.objects.chunks:save_chunk(x, z)
+	end
 end
 
 --- Updates the chunk.
