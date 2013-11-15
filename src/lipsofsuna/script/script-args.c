@@ -466,6 +466,8 @@ int liscr_args_gets_float (
 		if (lua_isnumber (self->lua, -1))
 		{
 			*result = lua_tonumber (self->lua, -1);
+			if (isnan (*result) || isinf (*result))
+				*result = 0.0f;
 			ret = 1;
 		}
 		lua_pop (self->lua, 1);
