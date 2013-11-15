@@ -84,6 +84,13 @@ Main.messaging:register_message{
 				end
 			end
 		end
+		-- Count physically active objects.
+		local num_physics = 0
+		for k,v in pairs(Main.objects.objects_by_id) do
+			if v.physics and v.physics:get_activated() then
+				num_physics = num_physics + 1
+			end
+		end
 		-- Count sectors.
 		local num_sectors = 0
 		for k,v in pairs(Main.objects.chunks:get_chunks()) do
@@ -104,6 +111,7 @@ Items: %d+%d+%d
 Obstacles: %d+%d
 Others: %d+%d
 Vision: %d+%d
+Physics active: %d
 Sectors: %d]],
 			Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024,
 			Main.terrain.terrain:get_chunk_count(), Main.terrain.terrain:get_memory_used() / 1024,
@@ -114,6 +122,7 @@ Sectors: %d]],
 			num_obstacles_real, num_obstacles_miss,
 			num_objects_real, num_objects_miss,
 			num_vision_real, num_vision_miss,
+			num_physics,
 			num_sectors)
 		Main.messaging:server_event("server stats", client, response)
 	end,
