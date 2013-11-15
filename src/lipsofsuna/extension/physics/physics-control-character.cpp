@@ -28,6 +28,7 @@
 #define LIPHY_CHARACTER_FLIGHT_FACTOR 0.3f
 #define LIPHY_CHARACTER_RISING_LIMIT 5.0f 
 #define LIPHY_CHARACTER_GROUND_DAMPING 1.0f
+#define LIPHY_CHARACTER_GROUND_UPDATE 0.1f
 #define LIPHY_CHARACTER_HOVER_DETECTION_TIME 0.2f
 #define LIPHY_CHARACTER_HOVER_DETECTION_THRESHOLD 0.5f
 #define LIPHY_CHARACTER_HOVER_RESOLUTION_TIME 1.0f
@@ -63,6 +64,13 @@ void LIPhyCharacterAction::updateAction (
 	btTransform transform;
 	btCollisionObject* object = this->object->control->get_object ();
 
+	/* Skip sleeping objects to improve performance. */
+	/* Since the ground check in particular is very expensive, this can
+	   significantly boost the performance when combined with fast actor
+	   deactivation. */
+	if (((btRigidBody*) object)->getActivationState () != ACTIVE_TAG)
+		return;
+
 	/* Get the transformation of the bottom of the character. */
 	liphy_object_get_bounds_internal (this->object, &bounds);
 	transform = object->getWorldTransform ();
@@ -86,7 +94,7 @@ void LIPhyCharacterAction::updateAction (
 
 	/* Check for ground. */
 	this->timer += delta;
-	if (this->timer >= 0.05f)
+	if (this->timer >= LIPHY_CHARACTER_GROUND_UPDATE)
 	{
 		LIMatVector check0 = { pos[0], pos[1] + 0.1f, pos[2] };
 		LIMatVector check1 = { pos[0], pos[1] - 0.6f, pos[2] };

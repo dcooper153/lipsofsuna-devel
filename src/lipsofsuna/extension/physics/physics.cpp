@@ -102,6 +102,9 @@ LIPhyPhysics* liphy_physics_new (
 	extern ContactProcessedCallback gContactProcessedCallback;
 	gContactProcessedCallback = private_contact_processed;
 
+	extern btScalar gDeactivationTime;
+	gDeactivationTime = 1.0;
+
 	return self;
 }
 
