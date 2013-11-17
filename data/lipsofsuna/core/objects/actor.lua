@@ -15,6 +15,7 @@ local Modifier = require("core/server/modifier")
 local ModifierSpec = require("core/specs/modifier")
 local ObjectSerializer = require("core/objects/object-serializer")
 local Physics = require("system/physics")
+local Quaternion = require("system/math/quaternion")
 local SimulationObject = require("core/objects/simulation")
 local Skills = require("core/server/skills")
 local Stats = require("core/server/stats")
@@ -133,6 +134,8 @@ Actor.serializer = ObjectSerializer(
 	}
 })
 
+local __quat1 = Quaternion()
+local __quat2 = Quaternion()
 local __vec1 = Vector()
 local __vec2 = Vector()
 local __vec3 = Vector()
@@ -500,11 +503,11 @@ end
 Actor.face_point = function(self, args)
 	local sdir = __vec1:set_xyz(0, 0, -1):transform(self:get_rotation())
 	local edir = __vec2:set(args.point):subtract(self:get_position()):normalize()
-	local quat = Quaternion{dir = __vec3:set_xyz(edir.x, 0, edir.z), up = __vec4:set_xyz(0, 1, 0)}
+	local quat = __quat1:set_dir(__vec3:set_xyz(edir.x, 0, edir.z), __vec4:set_xyz(0, 1, 0))
 	if args.secs then
 		-- Interpolate rotation towards target point.
 		-- TODO: Should use args.secs here somehow.
-		self:set_rotation(self:get_rotation():copy():nlerp(quat, 0.9))
+		self:set_rotation(__quat2:set(self:get_rotation()):nlerp(quat, 0.9))
 		return sdir:dot(edir)
 	else
 		-- Instantly set the target rotation.

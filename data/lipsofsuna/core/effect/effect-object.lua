@@ -9,12 +9,16 @@
 -- @alias EffectObject
 
 local Class = require("system/class")
+local Quaternion = require("system/math/quaternion")
 local Vector = require("system/math/vector")
 
 --- Base class for anchorable effects.
 -- @type EffectObject
 local EffectObject = Class("EffectObject")
 
+local __quat1 = Quaternion()
+local __quat2 = Quaternion()
+local __quat3 = Quaternion()
 local __vec1 = Vector()
 local __vec2 = Vector()
 local __vec3 = Vector()
@@ -99,11 +103,11 @@ end
 EffectObject.update_transform = function(self, secs)
 	if not self.parent then return end
 	local par_p = __vec1:set(self.parent:get_position())
-	local par_r = self.parent:get_rotation():copy()
+	local par_r = __quat1:set(self.parent:get_rotation())
 	local node_p,node_r = self.parent:find_node{name = self.parent_node}
 	if self.rotation_mode == "node-node" then
 		-- Parent.
-		local r = par_r:copy()
+		local r = __quat2:set(par_r)
 		local p = __vec2:set(par_p)
 		-- Node.
 		if node_p then
@@ -118,7 +122,7 @@ EffectObject.update_transform = function(self, secs)
 				r = r:concat(s)
 			end
 		else
-			r:concat(Quaternion{axis = __vec4:set_xyz(0,1,0), angle = math.pi/2})
+			r:concat(__quat3:set_axis(__vec4:set_xyz(0,1,0), math.pi/2))
 		end
 		-- Extra.
 		if self.rotation_local then
@@ -132,7 +136,7 @@ EffectObject.update_transform = function(self, secs)
 		self:set_rotation(r)
 	elseif self.rotation_mode == "node" then
 		-- Parent.
-		local r = par_r:copy()
+		local r = __quat2:set(par_r)
 		local p = __vec2:set(par_p)
 		-- Node.
 		if node_p then
@@ -198,7 +202,11 @@ end
 -- @param self EffectObject.
 -- @param v Quaternion.
 EffectObject.set_rotation = function(self, v)
-	self.__rotation = v
+	if self.__rotation then
+		self.__rotation:set(v)
+	else
+		self.__rotation = Quaternion():set(v)
+	end
 end
 
 return EffectObject

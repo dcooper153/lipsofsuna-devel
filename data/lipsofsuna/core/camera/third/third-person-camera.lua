@@ -13,11 +13,16 @@ local Class = require("system/class")
 local MathUtils = require("system/math/utils")
 local Physics = require("system/physics")
 local PhysicsConsts = require("core/server/physics-consts")
+local Quaternion = require("system/math/quaternion")
+local Vector = require("system/math/vector")
 
 --- Third person camera.
 -- @type ThirdPersonCamera
 local ThirdPersonCamera = Class("ThirdPersonCamera", Camera)
 
+local __quat1 = Quaternion()
+local __quat2 = Quaternion()
+local __quat3 = Quaternion()
 local __vec1 = Vector()
 local __vec2 = Vector()
 local __vec3 = Vector()
@@ -99,7 +104,7 @@ ThirdPersonCamera.get_position_displacement = function(self, pos, rot, turn)
 		if crosshair then
 			local dir = __vec4:set(crosshair):subtract(center):normalize()
 			local tmp = __vec5:set_xyz(0, 1, 0)
-			local rot1 = Quaternion{dir = dir, up = tmp}
+			local rot1 = __quat1:set_dir(dir, tmp)
 			local dir1 = __vec6:set_xyz(0,0,-1):transform(rot)
 			local dir2 = __vec7:set_xyz(0,0,-1):transform(rot1)
 			if i > 0 and dir1:dot(dir2) < 0.95 then score = -2 end
@@ -116,9 +121,9 @@ end
 
 ThirdPersonCamera.get_rotation_displacement = function(self, pos, rot, ratio)
 	-- Rotate the 3D cursor to the screen center.
-	local cur = Client.player_state:get_crosshair_position() or Vector(0,0,-5):transform(rot, pos)
-	local dir = cur:copy():subtract(pos):normalize()
-	local drot = Quaternion{dir = dir, up = Vector(0,1,0)}
+	local cur = Client.player_state:get_crosshair_position() or __vec1:set_xyz(0,0,-5):transform(rot, pos)
+	local dir = __vec2:set(cur):subtract(pos):normalize()
+	local drot = Quaternion():set_dir(dir, Vector(0,1,0))
 	-- Damp cases when the 3D cursor is too close.
 	drot:nlerp(rot, ratio)
 	-- Convert the rotation to the object space.
@@ -133,8 +138,8 @@ ThirdPersonCamera.get_center_transform = function(self)
 	local ipol = self.__death_ipol
 	local turn = self.turn_state + self.object:get_turn_angle() * (1 - ipol)
 	local tilt = (self.tilt_state + self.object:get_tilt_angle()) * (1 - ipol) - 0.7 * ipol
-	local rot = Quaternion{euler = {turn, 0, tilt}}
-	local turn1 = Quaternion{euler = {turn}}
+	local rot = Quaternion():set_euler(turn, 0, tilt)
+	local turn1 = Quaternion():set_euler(turn, 0, 0)
 	-- Calculate the initial center position.
 	local spec = self.object.spec
 	local rel = spec and spec.camera_center or Vector(0, 2, 0)
@@ -169,7 +174,7 @@ ThirdPersonCamera.get_eye_transform = function(self)
 	self.prev_target_rot = drot:copy()
 	-- Mix in the free rotation mode.
 	local mix = math.max(math.abs(self.turn_state),math.abs(self.tilt_state))
-	drot:nlerp(Quaternion(), 1 - math.min(1, 30 * mix))
+	drot:nlerp(__quat3:set_xyzw(0, 0, 0, 1), 1 - math.min(1, 30 * mix))
 	-- Calculate the eye transformation.
 	local eye_pos = dpos:transform(turn, pos)
 	local eye_rot = drot:concat(rot)

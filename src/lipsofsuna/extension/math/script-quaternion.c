@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -166,6 +166,20 @@ static void Quaternion_normalize (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &tmp);
 }
 
+static void Quaternion_set_axis (LIScrArgs* args)
+{
+	float angle;
+	LIMatQuaternion* self;
+	LIMatVector axis;
+
+	if (liscr_args_geti_vector (args, 0, &axis) &&
+	    liscr_args_geti_float (args, 1, &angle))
+	{
+		self = args->self;
+		*self = limat_quaternion_rotation (angle, axis);
+	}
+}
+
 static void Quaternion_get_conjugate (LIScrArgs* args)
 {
 	LIMatQuaternion* data;
@@ -174,6 +188,21 @@ static void Quaternion_get_conjugate (LIScrArgs* args)
 	data = args->self;
 	tmp = limat_quaternion_conjugate (*data);
 	liscr_args_seti_quaternion (args, &tmp);
+}
+
+static void Quaternion_set_dir (LIScrArgs* args)
+{
+	LIMatQuaternion* self;
+	LIMatVector v1;
+	LIMatVector v2;
+
+	if (liscr_args_geti_vector (args, 0, &v1) &&
+	    liscr_args_geti_vector (args, 1, &v2))
+	{
+		self = args->self;
+		*self = limat_quaternion_look (v1, v2);
+		*self = limat_quaternion_conjugate (*self);
+	}
 }
 
 static void Quaternion_get_euler (LIScrArgs* args)
@@ -187,6 +216,19 @@ static void Quaternion_get_euler (LIScrArgs* args)
 	liscr_args_seti_float (args, limat_number_validate (e[0]));
 	liscr_args_seti_float (args, limat_number_validate (e[1]));
 	liscr_args_seti_float (args, limat_number_validate (e[2]));
+}
+static void Quaternion_set_euler (LIScrArgs* args)
+{
+	float e[3];
+	LIMatQuaternion* self;
+
+	if (liscr_args_geti_float (args, 0, e + 0) &&
+	    liscr_args_geti_float (args, 1, e + 1) &&
+	    liscr_args_geti_float (args, 2, e + 2))
+	{
+		self = args->self;
+		*self = limat_quaternion_euler (e[0], e[1], e[2]);
+	}
 }
 
 static void Quaternion_get_length (LIScrArgs* args)
@@ -245,8 +287,11 @@ void liext_script_quaternion (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_tostring", Quaternion_tostring);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_nlerp", Quaternion_nlerp);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_normalize", Quaternion_normalize);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_set_axis", Quaternion_set_axis);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_get_conjugate", Quaternion_get_conjugate);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_set_dir", Quaternion_set_dir);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_get_euler", Quaternion_get_euler);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_set_euler", Quaternion_set_euler);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_get_length", Quaternion_get_length);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_get_x", Quaternion_get_x);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_set_x", Quaternion_set_x);

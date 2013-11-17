@@ -273,4 +273,62 @@ Quaternion.normalize = function(self)
 	return Quaternion:new_from_handle(handle)
 end
 
+--- Set the components of the quaternion in-place from another quaternion.
+-- @param self Quaternion.
+-- @param q Quaternion.
+-- @return Self.
+Quaternion.set = function(self, q)
+	self.x = q.x
+	self.y = q.y
+	self.z = q.z
+	self.w = q.w
+	return self
+end
+
+--- Set the quaternion from axis and angle.
+-- @param self Quaternion.
+-- @param axis Axis vector.
+-- @param angle Angle in radians.
+-- @return Self.
+Quaternion.set_axis = function(self, axis, angle)
+	Los.quaternion_set_axis(self.handle, axis, angle)
+	return self
+end
+
+--- Set the quaternion from direction and up vectors.
+-- @param self Quaternion.
+-- @param dir Direction vector.
+-- @param up Up vector.
+-- @return Self.
+Quaternion.set_dir = function(self, dir, up)
+	Los.quaternion_set_dir(self.handle, dir.handle, up.handle)
+	return self
+end
+
+--- Set the quaternion from euler angles.
+-- @param self Quaternion.
+-- @param x First angle.
+-- @param y Second angle.
+-- @param z Third angle.
+-- @return Self.
+Quaternion.set_euler = function(self, x, y, z)
+	Los.quaternion_set_euler(self.handle, x, y, z)
+	return self
+end
+
+--- Set the components of the quaternion in-place.
+-- @param self Quaternion.
+-- @param x X component.
+-- @param y Y component.
+-- @param z Z component.
+-- @param w W component.
+-- @return Self.
+Quaternion.set_xyzw = function(self, x, y, z, w)
+	if x then self.x = x end
+	if y then self.y = y end
+	if z then self.z = z end
+	if w then self.w = w end
+	return self
+end
+
 return Quaternion

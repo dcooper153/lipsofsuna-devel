@@ -337,8 +337,10 @@ end
 SimulationObject.set_tilt_angle = function(self, value, predict)
 	if self.prediction and predict then
 		self.prediction:set_target_tilt(value)
+	elseif self.tilt then
+		self.tilt:set_euler(0, 0, value)
 	else
-		self.tilt = Quaternion{euler = {0, 0, value}}
+		self.tilt = Quaternion():set_euler(0, 0, value)
 	end
 end
 
