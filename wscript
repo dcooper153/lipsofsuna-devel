@@ -7,7 +7,7 @@ from waflib import Logs
 from waflib import Options
 
 APPNAME='lipsofsuna'
-VERSION='0.7.0'
+VERSION='0.8.0'
 
 top = '.'
 out = '.build'
@@ -223,7 +223,7 @@ def build(bld):
 
 def dist(ctx):
 	import tarfile
-	dirs = ['src/**/*.*', 'data/**/*.*', 'tool/**/*.*', 'misc/*', 'docs/*', 'AUTHORS', 'ASSETS.xml', 'COPYING', 'NEWS', 'README', 'waf', 'wscript']
+	dirs = ['src/**/*.*', 'data/**/*.*', 'tool/**/*.*', 'misc/*', 'docs/*', 'AUTHORS', 'ASSETS.json', 'COPYING', 'NEWS', 'README', 'waf', 'wscript']
 	excl = ['**/.*', 'docs/html', '**/__pycache__']
 	base = APPNAME + '-' + VERSION
 	name = base + '.tar.gz'
