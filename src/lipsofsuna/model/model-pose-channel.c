@@ -266,11 +266,11 @@ int limdl_pose_channel_play (
 					self->time = repeat_end;
 			}
 		}
-
-		/* Calculate the absolute playback offset. */
-		time = limdl_pose_channel_get_current_time (self);
-		end = limdl_pose_channel_get_total_time (self);
 	}
+
+	/* Calculate the absolute playback offset. */
+	time = limdl_pose_channel_get_current_time (self);
+	end = limdl_pose_channel_get_total_time (self);
 
 	/* Advance fade out. */
 	switch (self->fade_out.mode)

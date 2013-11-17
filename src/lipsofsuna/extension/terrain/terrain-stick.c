@@ -108,7 +108,8 @@ int liext_terrain_stick_cast_sphere (
 	LIMatVector point;
 	LIMatPlane plane;
 
-
+	frac.x = 0;
+	frac.z = 0;
 	best.fraction = LIMAT_INFINITE;
 	v = limat_vector_subtract (*sphere_rel_cast_end, *sphere_rel_cast_start);
 
