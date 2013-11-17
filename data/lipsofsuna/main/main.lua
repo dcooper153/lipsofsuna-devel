@@ -47,6 +47,7 @@ Main.new = function(clss)
 	self.main_start_hooks = Hooks()
 	self.main_end_hooks = Hooks()
 	self.update_hooks = Hooks()
+	self.__gc_timer = 0
 	_G["Mod"] = self.mods --FIXME: global
 	_G["Settings"] = self.settings --FIXME: global
 	return self
@@ -165,31 +166,39 @@ Main.enable_manual_gc = function(self)
 	self.__need_memory = memory1
 	self.__collect_time = 0.001
 	self.__collect_rate = (memory0 - memory1) / (time1 - time0)
-	self.__collect_thresh = memory1 * 1.5
+	self.__collect_thresh = memory1 * 2
 end
 
 --- Collects garbage manually.
 -- @param self Main.
 -- @param secs Seconds since the last collection.
 Main.perform_manual_gc = function(self, secs)
-	-- Estimate the needed collection time.
-	local rate = self.__collect_rate
-	local thresh = self.__collect_thresh
-	local memory = collectgarbage("count")
-	local time = math.max(0, memory - thresh) / (rate * secs)
-	time = math.min(time, self.__collect_time + 0.0001)
-	self.__collect_time = time
-	-- Collect garbage.
-	Program:collect_garbage(time)
-	collectgarbage("stop")
-	-- Estimate the collection rate.
-	local collected = memory - collectgarbage("count")
-	if collected > 0 and time > 0 then
-		self.__collect_rate = collected / time
+	self.__gc_timer = self.__gc_timer + secs
+	if self.__gc_timer < 5 then
+		-- Estimate the needed collection time.
+		local rate = self.__collect_rate
+		local thresh = self.__collect_thresh
+		local memory = collectgarbage("count")
+		local time = math.max(0, memory - thresh) / (rate * secs)
+		time = math.min(time, self.__collect_time + 0.0001)
+		self.__collect_time = time
+		-- Collect garbage.
+		Program:collect_garbage(time)
+		collectgarbage("stop")
+		-- Estimate the collection rate.
+		local collected = memory - collectgarbage("count")
+		if collected > 0 and time > 0 then
+			self.__collect_rate = collected / time
+		end
+	else
+		-- Periodically re-calculate the real memory consumption.
+		local prev_memory = collectgarbage("count")
+		collectgarbage()
+		collectgarbage("stop")
+		self.__need_memory = collectgarbage("count")
+		self.__collect_thresh = self.__need_memory * 1.2
+		self.__gc_timer = 0
 	end
-	-- TODO: Estimate the real memory consumption.
-	-- self.__need_memory = ???
-	-- self.__collect_thresh = self.__need_memory * ???
 end
 
 return Main()
