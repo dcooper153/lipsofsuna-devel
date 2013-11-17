@@ -438,10 +438,14 @@ static void PhysicsObject_set_strafing (LIScrArgs* args)
 
 static void PhysicsObject_get_velocity (LIScrArgs* args)
 {
-	LIMatVector tmp;
+	LIMatVector* v;
+	LIScrData* data;
 
-	liphy_object_get_velocity (args->self, &tmp);
-	liscr_args_seti_vector (args, &tmp);
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &data))
+	{
+		v = liscr_data_get_data (data);
+		liphy_object_get_velocity (args->self, v);
+	}
 }
 static void PhysicsObject_set_velocity (LIScrArgs* args)
 {

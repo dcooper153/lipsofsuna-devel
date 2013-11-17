@@ -1,4 +1,4 @@
---- TODO:doc
+--- Axis-aligned bounding box.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -11,9 +11,12 @@
 local Class = require("system/class")
 local Vector = require("system/math/vector")
 
---- TODO:doc
+--- Axis-aligned bounding box.
 -- @type Aabb
 local Aabb = Class("Aabb")
+
+local __vec1 = Vector()
+local __vec2 = Vector()
 
 --- Creates a new axis-aligned bounding box.
 -- @param clss Aabb class.
@@ -33,7 +36,11 @@ end
 -- @param point Vector.
 -- @return Number.
 Aabb.get_distance_to_point = function(self, point)
-	return (point - self:get_nearest_point(point)).length
+	local nearest = __vec1:set_xyz(
+		math.min(math.max(point.x, self.point.x), self.point.x + self.size.x),
+		math.min(math.max(point.y, self.point.y), self.point.y + self.size.y),
+		math.min(math.max(point.z, self.point.z), self.point.z + self.size.z))
+	return __vec2:set(point):subtract(nearest).length
 end
 
 --- Returns the point inside the box closest to the given point.
@@ -76,5 +83,3 @@ Aabb.intersects_point = function(self, point)
 end
 
 return Aabb
-
-

@@ -158,7 +158,7 @@ UiWidget.get_offset = function(self)
 end
 
 UiWidget.set_offset = function(self, v)
-	self.__offset = v
+	self.__offset:set(v)
 	self.__need_reoffset = true
 end
 

@@ -18,6 +18,14 @@ local PhysicsConsts = require("core/server/physics-consts")
 -- @type ThirdPersonCamera
 local ThirdPersonCamera = Class("ThirdPersonCamera", Camera)
 
+local __vec1 = Vector()
+local __vec2 = Vector()
+local __vec3 = Vector()
+local __vec4 = Vector()
+local __vec5 = Vector()
+local __vec6 = Vector()
+local __vec7 = Vector()
+
 --- Creates a new third person camera.
 -- @param clss Third person camera class.
 -- @param args Arguments.
@@ -68,7 +76,8 @@ ThirdPersonCamera.get_position_displacement = function(self, pos, rot, turn)
 	local stepl = 0.12
 	local stepn = 6
 	local steps = stepn
-	local ctr = Physics:cast_ray(pos, Vector(stepl * stepn):transform(turn, pos), self:get_collision_mask())
+	local target = __vec1:set_xyz(stepl * stepn, 0, 0):transform(turn, pos)
+	local ctr = Physics:cast_ray(pos, target, self:get_collision_mask())
 	if ctr then
 		steps = math.floor((ctr.point - pos).length / stepl)
 		steps = math.max(0, steps - 1)
@@ -79,18 +88,20 @@ ThirdPersonCamera.get_position_displacement = function(self, pos, rot, turn)
 	for i=0,steps do
 		-- Favor positions that have the best displacement to the side and
 		-- the most distance to the target before hitting a wall.
-		local center = Vector(i * stepl):transform(turn, pos)
-		local back = Physics:cast_ray(center, Vector(0,0,5):transform(rot, center), self:get_collision_mask())
+		local center = __vec2:set_xyz(i * stepl, 0, 0):transform(turn, pos)
+		local target = __vec3:set_xyz(0, 0, 5):transform(rot, center)
+		local back = Physics:cast_ray(center, target, self:get_collision_mask())
 		local dist = back and (back.point - center).length or 5
 		local score = 3 * dist + (i + 1)
 		-- Prevent the crosshair corrected rotation from diverging too much
 		-- from the look direction when the target is very close.
 		local crosshair = Client.player_state:get_crosshair_position()
 		if crosshair then
-			local dir = (crosshair - center):normalize()
-			local rot1 = Quaternion{dir = dir, up = Vector(0,1,0)}
-			local dir1 = Vector(0,0,-1):transform(rot)
-			local dir2 = Vector(0,0,-1):transform(rot1)
+			local dir = __vec4:set(crosshair):subtract(center):normalize()
+			local tmp = __vec5:set_xyz(0, 1, 0)
+			local rot1 = Quaternion{dir = dir, up = tmp}
+			local dir1 = __vec6:set_xyz(0,0,-1):transform(rot)
+			local dir2 = __vec7:set_xyz(0,0,-1):transform(rot1)
 			if i > 0 and dir1:dot(dir2) < 0.95 then score = -2 end
 		end
 		-- Choose the best camera center.

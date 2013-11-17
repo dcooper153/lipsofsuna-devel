@@ -9,10 +9,20 @@
 -- @alias EffectObject
 
 local Class = require("system/class")
+local Vector = require("system/math/vector")
 
 --- Base class for anchorable effects.
 -- @type EffectObject
 local EffectObject = Class("EffectObject")
+
+local __vec1 = Vector()
+local __vec2 = Vector()
+local __vec3 = Vector()
+local __vec4 = Vector()
+local __vec5 = Vector()
+local __vec6 = Vector()
+local __vec7 = Vector()
+local __vec8 = Vector()
 
 --- Creates a new effect.
 -- @param clss EffectObject class.
@@ -88,16 +98,16 @@ end
 -- @param secs Seconds since the last update.
 EffectObject.update_transform = function(self, secs)
 	if not self.parent then return end
-	local par_p = self.parent:get_position():copy()
+	local par_p = __vec1:set(self.parent:get_position())
 	local par_r = self.parent:get_rotation():copy()
 	local node_p,node_r = self.parent:find_node{name = self.parent_node}
 	if self.rotation_mode == "node-node" then
 		-- Parent.
 		local r = par_r:copy()
-		local p = par_p:copy()
+		local p = __vec2:set(par_p)
 		-- Node.
 		if node_p then
-			p = node_p:copy():transform(r, p)
+			p = __vec3:set(node_p):transform(r, p)
 			r = r:concat(node_r)
 		end
 		-- Anchor.
@@ -108,14 +118,14 @@ EffectObject.update_transform = function(self, secs)
 				r = r:concat(s)
 			end
 		else
-			r:concat(Quaternion{axis = Vector(0,1,0), angle = math.pi/2})
+			r:concat(Quaternion{axis = __vec4:set_xyz(0,1,0), angle = math.pi/2})
 		end
 		-- Extra.
 		if self.rotation_local then
 			r = r:concat(self.rotation_local)
 		end
 		if self.position_local then
-			p = self.position_local:copy():transform(r, p)
+			p = __vec5:set(self.position_local):transform(r, p)
 		end
 		-- Final.
 		self:set_position(p)
@@ -123,18 +133,18 @@ EffectObject.update_transform = function(self, secs)
 	elseif self.rotation_mode == "node" then
 		-- Parent.
 		local r = par_r:copy()
-		local p = par_p:copy()
+		local p = __vec2:set(par_p)
 		-- Node.
 		if node_p then
 			r = r:concat(node_r)
-			p = node_p:copy():transform(par_r, p)
+			p = __vec3:set(node_p):transform(par_r, p)
 		end
 		-- Extra.
 		if self.rotation_local then
 			r = r:concat(self.rotation_local)
 		end
 		if self.position_local then
-			p = self.position_local:copy():transform(r, p)
+			p = __vec4:set(self.position_local):transform(r, p)
 		end
 		-- Final.
 		self:set_position(p)
@@ -156,7 +166,11 @@ end
 -- @param self EffectObject.
 -- @param v Vector.
 EffectObject.set_position = function(self, v)
-	self.__position = v
+	if self.__position then
+		self.__position:set(v)
+	else
+		self.__position = Vector():set(v)
+	end
 end
 
 --- Gets the visibility of the effect.

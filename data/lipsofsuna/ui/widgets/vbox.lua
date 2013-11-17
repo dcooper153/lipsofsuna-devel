@@ -16,6 +16,9 @@ local Vector = require("system/math/vector")
 -- @type UiVBox
 local UiVBox = Class("UiVBox", UiWidget)
 
+local __vec1 = Vector()
+local __vec2 = Vector()
+
 --- Creates a new vertical widget packer.
 -- @param clss UiVBox class.
 -- @return UiVBox.
@@ -192,10 +195,10 @@ UiVBox.update = function(self, secs)
 		if widget.temporary then
 			local wx = widget.temporary.x
 			local wy = widget.temporary.y + y0
-			widget:set_offset(Vector(wx, wy))
+			widget:set_offset(__vec1:set_xyz(wx, wy))
 			widget:set_visible(true)--wy > -wh and wy < sh)
 		else
-			widget:set_offset(Vector(x, y))
+			widget:set_offset(__vec1:set_xyz(x, y))
 			widget:set_visible(true)--y > -wh and y < sh)
 			y = y + wh + Theme.spacing
 		end

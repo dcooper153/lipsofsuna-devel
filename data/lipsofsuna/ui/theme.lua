@@ -149,11 +149,13 @@ Theme.draw_icon_scaled = function(self, widget, name, x, y, w, h, color)
 	end
 end
 
+local __text_displ = {Vector(-1.5,-1.5), Vector(1.5,-1.5), Vector(-1.5,1.5), Vector(1.5,1.5)}
+
 Theme.draw_scene_text = function(self, widget, text, x, y, w, h, alpha, align)
 	local d = 1.5
 	local a1 = 0.4 * (alpha or 1)
 	local a2 = (alpha or 1)
-	for k,v in pairs{Vector(-d,-d), Vector(d,-d), Vector(-d,d), Vector(d,d)} do
+	for k,v in pairs(__text_displ) do
 		widget:canvas_text{
 			dest_position = {x+v.x,y+v.y},
 			dest_size = {w,h},

@@ -29,6 +29,7 @@ local PhysicsObject = Class("PhysicsObject")
 PhysicsObject.new = function(clss)
 	local self = Class.new(clss)
 	self.handle = Los.physics_object_new()
+	self.__velocity = Vector()
 	return self
 end
 
@@ -410,7 +411,8 @@ end
 -- @param self PhysicsObject.
 -- @return Vector.
 PhysicsObject.get_velocity = function(self)
-	return Vector:new_from_handle(Los.physics_object_get_velocity(self.handle))
+	Los.physics_object_get_velocity(self.handle, self.__velocity.handle)
+	return self.__velocity
 end
 
 --- Sets the linear velocity of the object.

@@ -266,6 +266,17 @@ Vector.round = function(self)
 	return self
 end
 
+--- Set the components of the vector in-place from another vector.
+-- @param self Vector.
+-- @param v Vector.
+-- @return Self.
+Vector.set = function(self, v)
+	self.x = v.x
+	self.y = v.y
+	self.z = v.z
+	return self
+end
+
 --- Set the components of the vector in-place.
 -- @param self Vector.
 -- @param x X component.

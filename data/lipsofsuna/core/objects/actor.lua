@@ -19,6 +19,7 @@ local SimulationObject = require("core/objects/simulation")
 local Skills = require("core/server/skills")
 local Stats = require("core/server/stats")
 local Timer = require("system/timer")
+local Vector = require("system/math/vector")
 
 --- TODO:doc
 -- @type Actor
@@ -131,6 +132,11 @@ Actor.serializer = ObjectSerializer(
 		type = "string"
 	}
 })
+
+local __vec1 = Vector()
+local __vec2 = Vector()
+local __vec3 = Vector()
+local __vec4 = Vector()
 
 --- Creates a new actor.
 -- @param clss Actor class.
@@ -492,9 +498,9 @@ end
 --   <li>secs: Tick length or nil for instant rotation.</li></ul>
 -- @return The dot product of the current direction and the target direction.
 Actor.face_point = function(self, args)
-	local sdir = Vector(0, 0, -1):transform(self:get_rotation())
-	local edir = args.point:copy():subtract(self:get_position()):normalize()
-	local quat = Quaternion{dir = Vector(edir.x, 0, edir.z), up = Vector(0, 1, 0)}
+	local sdir = __vec1:set_xyz(0, 0, -1):transform(self:get_rotation())
+	local edir = __vec2:set(args.point):subtract(self:get_position()):normalize()
+	local quat = Quaternion{dir = __vec3:set_xyz(edir.x, 0, edir.z), up = __vec4:set_xyz(0, 1, 0)}
 	if args.secs then
 		-- Interpolate rotation towards target point.
 		-- TODO: Should use args.secs here somehow.
@@ -685,12 +691,12 @@ Actor.update_actions = function(self, secs)
 		if math.abs(self:get_movement()) > 0.5 then
 			local e = self.tilt.euler[3]
 			if e > 0 then
-				self:set_velocity(Vector(v.x, math.max(v.y, 5*math.sin(e)), v.z))
+				self:set_velocity(__vec1:set_xyz(v.x, math.max(v.y, 5*math.sin(e)), v.z))
 			else
-				self:set_velocity(Vector(v.x, math.min(v.y, 5*math.sin(e)), v.z))
+				self:set_velocity(__vec1:set_xyz(v.x, math.min(v.y, 5*math.sin(e)), v.z))
 			end
 		else
-			self:set_velocity(Vector())
+			self:set_velocity(__vec1:set_xyz(0, 0, 0))
 		end
 	end
 	-- Update feat cooldown.
@@ -706,7 +712,7 @@ Actor.update_actions = function(self, secs)
 	if self.fall_timer > 0.3 then
 		if self.velocity_prev then
 			local limity = self.spec.falling_damage_speed
-			local prevy = self.velocity_prev.y
+			local prevy = self.velocity_prev
 			local diffy = self:get_velocity().y - prevy
 			if prevy < -limity and diffy > limity then
 				local rate = self.spec.falling_damage_rate
@@ -720,7 +726,7 @@ Actor.update_actions = function(self, secs)
 				end
 			end
 		end
-		self.velocity_prev = self:get_velocity()
+		self.velocity_prev = self:get_velocity().y
 	end
 end
 
@@ -986,9 +992,9 @@ end
 -- @param point Position vector in world space.
 -- @return Quaternion.
 Actor.get_rotation_to_point = function(self, point)
-	local dir = point:copy():subtract(self:get_position()):normalize()
+	local dir = __vec1:set(point):subtract(self:get_position()):normalize()
 	dir.y = 0
-	return Quaternion{dir = dir, up = Vector(0, 1, 0)}
+	return Quaternion{dir = dir, up = __vec2:set_xyz(0, 1, 0)}
 end
 
 --- Sets the actor spec of the object.

@@ -1,3 +1,7 @@
+local Vector = require("system/math/vector")
+
+local __vec1 = Vector()
+
 Aistatespec{
 	name = "wander",
 	calculate = function(self)
@@ -21,7 +25,7 @@ Aistatespec{
 			return
 		end
 		-- Move towards the target.
-		local dist = (self.target - self.object:get_position()).length
+		local dist = __vec1:set(self.target):subtract(self.object:get_position()).length
 		if dist < 0.5 then
 			self.object:set_movement(0)
 		else
