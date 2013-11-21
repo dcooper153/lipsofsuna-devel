@@ -291,7 +291,7 @@ end
 -- @param angle Angle in radians.
 -- @return Self.
 Quaternion.set_axis = function(self, axis, angle)
-	Los.quaternion_set_axis(self.handle, axis, angle)
+	Los.quaternion_set_axis(self.handle, axis.handle, angle)
 	return self
 end
 
