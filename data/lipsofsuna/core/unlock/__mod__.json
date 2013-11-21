@@ -1,3 +1,4 @@
 {
-	"scripts": ["main", "chat-commands"]
+	"scripts": ["main", "chat-commands"],
+	"client_scripts": ["client-main"]
 }

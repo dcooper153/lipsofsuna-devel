@@ -1,3 +1,5 @@
+local Skillspec = require("core/specs/skill")
+
 Skillspec{
 	name = "Health lv1",
 	description = "Increase your base health to 40 points.",

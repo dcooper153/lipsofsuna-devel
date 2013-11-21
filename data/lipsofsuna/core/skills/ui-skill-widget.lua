@@ -1,10 +1,25 @@
+--- Skill configuration widget.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.skills.skill_widget
+-- @alias UiSkillWidget
+
 local Class = require("system/class")
-require(Mod.path .. "widget")
+local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uiskill = Class("Uiskill", Widgets.Uiwidget)
+--- Skill configuration widget.
+-- @type UiSkillWidget
+local UiSkillWidget = Class("UiSkillWidget", UiWidget)
 
-Widgets.Uiskill.new = function(clss, skill, active, value)
-	local self = Widgets.Uiwidget.new(clss)
+--- Creates a new skill widget.
+-- @param clss UiSkillWidget class.
+-- @return UiSkillWidget.
+UiSkillWidget.new = function(clss, skill, active, value)
+	local self = UiWidget.new(clss)
 	self.skill = skill
 	self.active = active
 	self.value = value
@@ -13,7 +28,7 @@ Widgets.Uiskill.new = function(clss, skill, active, value)
 	return self
 end
 
-Widgets.Uiskill.apply = function(self)
+UiSkillWidget.apply = function(self)
 	if not self.active then return end
 	-- Toggle the value.
 	self.value = not self.value
@@ -21,20 +36,20 @@ Widgets.Uiskill.apply = function(self)
 	self.need_repaint = true
 	-- Add or remove the skill.
 	if self.value then
-		Client.data.skills:add(self.skill.name)
+		Main.client_skills:add(self.skill.name)
 		Client.effects:play_global("uitoggle1")
 	else
-		Client.data.skills:remove(self.skill.name)
+		Main.client_skills:remove(self.skill.name)
 		Ui:restart_state()
 		Client.effects:play_global("uitoggle2")
 	end
 	-- Send an update.
-	Main.messaging:client_event("update skills", Client.data.skills:get_names())
+	Main.messaging:client_event("update skills", Main.client_skills:get_names())
 end
 
-Widgets.Uiskill.rebuild_size = function(self)
+UiSkillWidget.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiwidget.rebuild_size(self)
+	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the description.
 	if self.skill then
 		local w1,h1 = Program:measure_text(Theme.text_font_2, self.skill.name, size.x-5-Theme.width_icon_1)
@@ -47,11 +62,11 @@ Widgets.Uiskill.rebuild_size = function(self)
 	return size
 end
 
-Widgets.Uiskill.rebuild_canvas = function(self)
+UiSkillWidget.rebuild_canvas = function(self)
 	local w = self.size.x
 	local h = self.size.y
 	-- Add the base.
-	Widgets.Uiwidget.rebuild_canvas(self)
+	UiWidget.rebuild_canvas(self)
 	-- Add the icon.
 	if self.skill then
 		Theme:draw_icon_scaled(self, self.skill.icon or "missing1",
@@ -79,3 +94,5 @@ Widgets.Uiskill.rebuild_canvas = function(self)
 			text_font = Theme.text_font_1}
 	end
 end
+
+return UiSkillWidget

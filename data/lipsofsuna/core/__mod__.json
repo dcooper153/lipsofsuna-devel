@@ -52,6 +52,7 @@
 		["load", "core/server"],
 		["load", "core/shaders"],
 		["load", "core/shortcut"],
+		["load", "core/skills"],
 		["load", "core/specs"],
 		["load", "core/terrain"],
 		["load", "core/unlock"],

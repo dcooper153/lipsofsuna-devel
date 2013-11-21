@@ -1,14 +1,15 @@
---- TODO:doc
+--- Create and synchronize skills.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.server.skills
+-- @module core.skills.skills
 -- @alias Skills
 
 local Class = require("system/class")
+local Skillspec = require("core/specs/skill")
 
 --- Create and synchronize skills.
 -- @type Skills
@@ -246,5 +247,3 @@ Skills.remove_invalid = function(self)
 end
 
 return Skills
-
-

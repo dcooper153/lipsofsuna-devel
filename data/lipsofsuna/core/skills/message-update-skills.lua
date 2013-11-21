@@ -3,6 +3,8 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 
+local Skillspec = require("core/specs/skill")
+
 Main.messaging:register_message{
 	name = "update skills",
 	client_to_server_encode = function(self, enabled)
@@ -62,9 +64,9 @@ Main.messaging:register_message{
 	end,
 	server_to_client_handle = function(self, enabled)
 		-- Enable and disable skills.
-		Client.data.skills:clear()
+		Main.client_skills:clear()
 		for name in pairs(enabled) do
-			Client.data.skills:add(name)
+			Main.client_skills:add(name)
 		end
 		-- Update the user interface.
 		if Ui:get_state() == "skills" then

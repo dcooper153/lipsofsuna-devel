@@ -1,4 +1,4 @@
---- TODO:doc
+--- Specifies a skill.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -11,9 +11,9 @@
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
---- TODO:doc
+--- Specifies a skill.
 -- @type Skillspec
-Skillspec = Spec:register("Skillspec", "skill", {
+local Skillspec = Spec:register("Skillspec", "skill", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "assign", type = "ignore"},

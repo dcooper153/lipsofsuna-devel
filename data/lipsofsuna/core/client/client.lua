@@ -19,7 +19,8 @@ local Physics = require("system/physics")
 local PlayerState = require("core/client/player-state")
 local Reload = require("system/reload")
 local Simulation = require("core/client/simulation")
-local Skills = require("core/server/skills")
+local Skills = require("core/skills/skills")
+local Skillspec = require("core/specs/skill")
 local TerrainSync = require("core/client/terrain-sync")
 local UnlockManager = require("core/unlock/unlock-manager")
 
@@ -95,13 +96,13 @@ Client.create_world = function(self)
 end
 
 Client.reset_data = function(self)
+	self.data = {}
 	-- Call the reset hooks.
 	self.reset_hooks:call(secs)
 
 	Operators.inventory:reset()
 	Operators.quests:reset()
 	--self.editor:reset()
-	self.data = {}
 	self.data.admin = {}
 	self.data.book = {}
 	self.data.connection = {}
@@ -110,14 +111,7 @@ Client.reset_data = function(self)
 	self.data.load = {}
 	self.data.map = {scale = 1}
 	self.data.modifiers = {}
-	self.data.skills = Skills()
 	self.data.trading = {buy = {}, sell = {}, shop = {}}
-	self.data.unlocks = UnlockManager()
-	for k,v in pairs(Skillspec.dict_name) do
-		local found = false
-		for k1,v1 in pairs(v.requires) do found = true end
-		self.data.skills[k] = {active = not found, value = false}
-	end
 end
 
 --- Registers an initialization hook.
