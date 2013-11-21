@@ -18,7 +18,7 @@ local Introspect = Class("Introspect")
 
 -- Got to load the types this way to avoid problems with unittests.
 Introspect.types_dict = {}
-for k,v in pairs{"boolean", "color", "dialog-tree", "dict", "generic", "ignore",
+for k,v in pairs{"boolean", "color", "dialog-tree", "dict", "function", "generic", "ignore",
 	"list", "map-object-list", "map-object", "map-tile-list", "map-tile",
 	"number", "quaternion", "spawn", "string", "struct", "table", "todo", "vector"} do
 	local res = require("core/introspect/types/" .. v)
