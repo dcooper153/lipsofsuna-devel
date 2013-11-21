@@ -1,0 +1,24 @@
+[
+	{
+		"type": "Skillspec",
+		"name": "Nerf combat lv1",
+		"assign": "function(skills) skills.ranged,skills.melee = skills.ranged/2, skills.melee/2 end"
+	},
+	{
+		"type": "Skillspec",
+		"name": "Nerf combat lv2",
+		"requires": ["Nerf combat lv1"],
+		"assign": "function(skills) skills.ranged,skills.melee = skills.ranged/2, skills.melee/2 end"
+	},
+	{
+		"type": "Skillspec",
+		"name": "Nerf health lv1",
+		"assign": "function(skills) skills.max_health = skills.max_health / 2 end"
+	},
+	{
+		"type": "Skillspec",
+		"name": "Nerf health lv2",
+		"requires": ["Nerf health lv1"],
+		"assign": "function(skills) skills.max_health = skills.max_health / 2 end"
+	}
+]
