@@ -17,6 +17,7 @@ local Skillspec = Spec:register("Skillspec", "skill", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "assign", type = "function"},
+	{name = "action", type = "string", description = "Action for combat arts.", details = {spec = "Actionspec"}},
 	{name = "combat", type = "boolean", default = false, description = "Set to true for combat arts."},
 	{name = "description", type = "string", description = "Description string."},
 	{name = "icon", type = "string", description = "Icon name."},

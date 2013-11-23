@@ -52,6 +52,16 @@ Actionspec{
 		end
 		-- Check for charge finish.
 		if not action.object.control_right then
+			-- Directional combat arts.
+			if action.charge_value < 0.5 then
+				local a = action.object.skills:get_combat_art(action.charge_move)
+				if a then
+					action.object.cooldown = nil
+					action.object:action(a.name)
+					return
+				end
+			end
+			-- Normal melee attacks.
 			action.object.cooldown = nil
 			action.object:action(action.finish_action.name, action.charge_move, action.charge_value)
 			return

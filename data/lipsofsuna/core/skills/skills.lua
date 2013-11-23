@@ -71,7 +71,7 @@ Skills.calculate_attributes = function(self)
 		view_distance = 32}
 	for k,v in pairs(self.skills) do
 		local skill = Skillspec:find{name = k}
-		if skill then skill.assign(attr) end
+		if skill and skill.assign then skill.assign(attr) end
 	end
 	return attr
 end
@@ -136,6 +136,21 @@ end
 -- @param self Skills.
 Skills.clear = function(self)
 	self.skills = {}
+end
+
+--- Gets the combat art for the given directional key.
+-- @param self Skills.
+-- @return Actionspec if found. Nil otherwise.
+Skills.get_combat_art = function(self, dir)
+	for k,v in pairs(self.skills) do
+		if true or v == dir then-- TODO: direction
+			local s = Skillspec:find_by_name(k)
+			if s and s.action then
+				local a = Actionspec:find_by_name(s.action)
+				if a then return a end
+			end
+		end
+	end
 end
 
 --- Returns the dictionary of enabled skills.
