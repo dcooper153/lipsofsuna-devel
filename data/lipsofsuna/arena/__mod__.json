@@ -18,12 +18,14 @@
 		"action-attack",
 		"action-bite",
 		"action-block",
+		"action-circle-cut",
 		"action-left-claw",
 		"action-melee",
 		"action-ranged",
 		"action-ranged-spell",
 		"action-right-claw",
 		"action-self-spell",
+		"action-stun-smash",
 		"action-throw",
 		"action-touch-spell"
 	],
@@ -35,6 +37,7 @@
 	[
 		"dialogs",
 		"effects",
+		"skills",
 		"specs"
 	]
 }

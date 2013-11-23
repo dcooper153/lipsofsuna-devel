@@ -234,6 +234,8 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/actors/aer/aer1-circle-cut.lani",
+				"data/lipsofsuna/actors/aer/aer1-stun-smash.lani",
 				"data/lipsofsuna/actors/aer/face/aer-brow-angry-1.png",
 				"data/lipsofsuna/actors/aer/face/aer-brow-long-1.png",
 				"data/lipsofsuna/actors/aer/face/aer-eye-angled-1.png",
@@ -302,6 +304,7 @@
 			],
 			"files_original":
 			[
+				"data/lipsofsuna/actors/aer/anims-combat-art1.blend",
 				"data/lipsofsuna/actors/aer/face/aer-brow-angry-1.svg",
 				"data/lipsofsuna/actors/aer/face/aer-brow-long-1.svg",
 				"data/lipsofsuna/actors/aer/face/aer-eye-angled-1.svg",

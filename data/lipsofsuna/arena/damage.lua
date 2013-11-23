@@ -268,4 +268,13 @@ Damage.get_total_health_modifier = function(self)
 	return health
 end
 
+--- Multiplies all the influences by a constant.
+-- @param self Damage.
+-- @param multiplier Multiplier.
+Damage.multiply = function(self, multiplier)
+	for name,value in pairs(self.modifiers) do
+		self.modifiers[name] = value * multiplier
+	end
+end
+
 return Damage

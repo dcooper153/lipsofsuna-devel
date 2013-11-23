@@ -12,6 +12,13 @@
 	},
 	{
 		"type": "AnimationSpec",
+		"name": "default attack circle cut",
+		"animation": "aer1-circle-cut",
+		"channel": 2,
+		"priority": 10
+	},
+	{
+		"type": "AnimationSpec",
 		"name": "default attack front",
 		"animation": "aer1-attack-front",
 		"channel": 2,
@@ -42,6 +49,13 @@
 		"time_frames": 20,
 		"priority": 10,
 		"node_priorities": {"LOWER": 3}
+	},
+	{
+		"type": "AnimationSpec",
+		"name": "default attack stun smash",
+		"animation": "aer1-stun-smash",
+		"channel": 2,
+		"priority": 10
 	},
 	{
 		"type": "AnimationSpec",
@@ -463,10 +477,12 @@
 		"animations":
 		{
 			"attack back": "default attack back",
+			"attack circle cut": "default attack circle cut",
 			"attack front": "default attack front",
 			"attack left": "default attack left",
 			"attack right": "default attack right",
 			"attack stand": "default attack stand",
+			"attack stun smash": "default attack stun smash",
 			"attack punch": "default attack punch",
 			"block start": "default block start",
 			"block stop": "default block stop",

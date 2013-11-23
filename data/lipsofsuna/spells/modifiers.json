@@ -574,6 +574,31 @@
 	},
 	{
 		"type": "ModifierSpec",
+		"name": "stun",
+		"categories":
+		{
+			"harmful": true,
+			"spell": true
+		},
+		"actions":
+		{
+			"missile spell": true,
+			"ranged spell": true,
+			"self spell": true,
+			"touch spell": true
+		},
+		"description": "Makes the target unable to attack for a while",
+		"effect": "FIXME",
+		"icon": "missing1",
+		"projectile": "fireball1",
+		"spell_strength": 5,
+		"required_stats":
+		{
+			"willpower": 10
+		}
+	},
+	{
+		"type": "ModifierSpec",
 		"name": "travel",
 		"actions":
 		{

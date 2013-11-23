@@ -1,0 +1,16 @@
+[
+	{
+		"type": "Skillspec",
+		"name": "Circle cut",
+		"combat": true,
+		"action": "circle cut",
+		"description": "Jump attack."
+	},
+	{
+		"type": "Skillspec",
+		"name": "Stun smash",
+		"combat": true,
+		"action": "stun smash",
+		"description": "Melee attack that occasionally stuns the target."
+	}
+]
