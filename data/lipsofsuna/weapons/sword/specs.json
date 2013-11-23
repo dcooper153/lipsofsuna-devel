@@ -97,7 +97,7 @@
 		{
 			"default": "metal item"
 		},
-		"equipment_anchor_rotation": [0, 0.707, 0, 0.707],
+		"equipment_anchor_rotation": [0, -1, 0, 0],
 		"equipment_slot": "hand.R",
 		"health": 220,
 		"icon": "sword2",
