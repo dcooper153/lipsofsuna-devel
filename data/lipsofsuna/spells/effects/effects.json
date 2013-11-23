@@ -55,6 +55,12 @@
 	},
 	{
 		"type": "Effectspec",
+		"name": "debug1",
+		"particle": "debug1",
+		"particle_life": 5
+	},
+	{
+		"type": "Effectspec",
 		"name": "dig spell",
 		"sound": "dig-spell1",
 		"sound_rolloff": 0.2
