@@ -134,7 +134,7 @@ static void Physics_cast_sphere (LIScrArgs* args)
 	liscr_args_geti_int (args, 3, &mask);
 	ignore = private_build_ignore_list (module, args, 4, ignores, sizeof (ignores) / sizeof (*ignores));
 
-	if (liphy_physics_cast_ray (module->physics, &start, &end, group, mask, ignores, ignore, &result))
+	if (liphy_physics_cast_sphere (module->physics, &start, &end, radius, group, mask, ignores, ignore, &result))
 	{
 		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
 		liscr_args_sets_vector (args, "point", &result.point);
