@@ -1,10 +1,10 @@
 local Class = require("system/class")
-require(Mod.path .. "widget")
+local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uibutton = Class("Uibutton", Widgets.Uiwidget)
+Widgets.Uibutton = Class("Uibutton", UiWidget)
 
 Widgets.Uibutton.new = function(clss, label, apply)
-	local self = Widgets.Uiwidget.new(clss)
+	local self = UiWidget.new(clss)
 	self.apply = apply
 	self.hint = "$A: Activate\n$$B\n$$U\n$$D"
 	self.text = label
@@ -16,7 +16,7 @@ end
 
 Widgets.Uibutton.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiwidget.rebuild_size(self)
+	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the label.
 	local w,h = Theme:measure_button(self.text, Theme.width_widget_1-10)
 	size.x = math.max(size.x, w + 10)

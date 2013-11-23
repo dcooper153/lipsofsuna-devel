@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local InputHandler = require("ui/input-handler")
+local UiButton = require("ui/widgets/button")
 local UiVBox = require("ui/widgets/vbox")
 local UiWidget = require("ui/widgets/widget")
 
@@ -44,6 +45,18 @@ UiMenu.new = function(clss, widgets)
 	self.__input.handle_menu = self.__input.handle_back
 	self.__input:set_enabled(false)
 	return self
+end
+
+--- Adds a button to the menu.
+-- @param self UiMenu.
+-- @param label Label of the button.
+-- @param func Callback function.
+UiMenu.add_button = function(self, label, func)
+	local widget = UiButton(label, function(w)
+		if func then func(w) end
+		self:set_menu_opened(false)
+	end)
+	self:add_widget(widget)
 end
 
 --- Adds a widget to the menu.

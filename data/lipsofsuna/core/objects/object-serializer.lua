@@ -41,9 +41,9 @@ local readers = {
 	end,
 	["skills"] = function(self, object, db, create)
 		local rows = db:query(
-			[[SELECT name FROM object_skills WHERE id=?]], {object:get_id()})
+			[[SELECT name,dir FROM object_skills WHERE id=?]], {object:get_id()})
 		for k,v in ipairs(rows) do
-			object.skills:add_without_requirements(v[1])
+			object.skills:add_without_requirements(v[1], v[2])
 		end
 		object.skills:remove_invalid()
 	end,
@@ -98,7 +98,7 @@ local writers = {
 	["skills"] = function(self, object, db, id)
 		db:query([[DELETE FROM object_skills WHERE id=?;]], {id})
 		for name,value in pairs(object.skills.skills) do
-			db:query([[REPLACE INTO object_skills (id,name) VALUES (?,?);]], {id, name})
+			db:query([[REPLACE INTO object_skills (id,name,dir) VALUES (?,?,?);]], {id, name, value})
 		end
 	end,
 	["stats"] = function(self, object, db, id)

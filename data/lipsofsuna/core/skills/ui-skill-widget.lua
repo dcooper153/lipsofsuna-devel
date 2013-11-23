@@ -9,17 +9,22 @@
 -- @alias UiSkillWidget
 
 local Class = require("system/class")
+local Skillspec = require("core/specs/skill")
+local UiMenu = require("ui/widgets/menu")
 local UiWidget = require("ui/widgets/widget")
 
 --- Skill configuration widget.
 -- @type UiSkillWidget
-local UiSkillWidget = Class("UiSkillWidget", UiWidget)
+local UiSkillWidget = Class("UiSkillWidget", UiMenu)
 
 --- Creates a new skill widget.
 -- @param clss UiSkillWidget class.
+-- @param skill Skillspec.
+-- @param active True if the requirements are met. False otherwise.
+-- @param value True if enabled by the user. False otherwise.
 -- @return UiSkillWidget.
 UiSkillWidget.new = function(clss, skill, active, value)
-	local self = UiWidget.new(clss)
+	local self = UiMenu.new(clss)
 	self.skill = skill
 	self.active = active
 	self.value = value
@@ -30,19 +35,45 @@ end
 
 UiSkillWidget.apply = function(self)
 	if not self.active then return end
-	-- Toggle the value.
-	self.value = not self.value
-	self.hint = self.value and "$A: Disable\n$$B\n$$U\n$$D" or "$A: Enable\n$$B\n$$U\n$$D"
-	self.need_repaint = true
-	-- Add or remove the skill.
-	if self.value then
-		Main.client_skills:add(self.skill.name)
-		Client.effects:play_global("uitoggle1")
-	else
-		Main.client_skills:remove(self.skill.name)
-		Ui:restart_state()
-		Client.effects:play_global("uitoggle2")
+	-- Direction popup for combat arts.
+	if not self.value and self.skill.combat then
+		self:clear()
+		self:add_button("Stand", function(w) self:enable_skill("stand") end)
+		self:add_button("Front", function(w) self:enable_skill("front") end)
+		self:add_button("Back", function(w) self:enable_skill("back") end)
+		self:add_button("Left", function(w) self:enable_skill("left") end)
+		self:add_button("Right", function(w) self:enable_skill("right") end)
+		return UiMenu.apply(self)
 	end
+	-- Toggle the value.
+	if self.value then
+		self:disable_skill()
+	else
+		self:enable_skill("")
+	end
+end
+
+UiSkillWidget.disable_skill = function(self)
+	-- Toggle the value.
+	self.value = false
+	self.hint = "$A: Enable\n$$B\n$$U\n$$D"
+	self.need_repaint = true
+	-- Remove the skill.
+	Main.client_skills:remove(self.skill.name)
+	Ui:restart_state()
+	Client.effects:play_global("uitoggle2")
+	-- Send an update.
+	Main.messaging:client_event("update skills", Main.client_skills:get_names())
+end
+
+UiSkillWidget.enable_skill = function(self, dir)
+	-- Toggle the value.
+	self.value = true
+	self.hint = "$A: Disable\n$$B\n$$U\n$$D"
+	self.need_repaint = true
+	-- Add the skill.
+	Main.client_skills:add(self.skill.name, dir)
+	Client.effects:play_global("uitoggle1")
 	-- Send an update.
 	Main.messaging:client_event("update skills", Main.client_skills:get_names())
 end

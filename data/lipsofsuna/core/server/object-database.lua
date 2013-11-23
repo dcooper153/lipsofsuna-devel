@@ -63,6 +63,7 @@ ObjectDatabase.reset = function(self)
 	self.db:query([[CREATE TABLE object_skills (
 		id INTEGER,
 		name TEXT,
+		dir TEXT,
 		PRIMARY KEY(id,name));]])
 	self.db:query([[CREATE TABLE object_stats (
 		id INTEGER,

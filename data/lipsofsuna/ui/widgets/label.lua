@@ -5,7 +5,6 @@ Widgets.Uilabel = Class("Uilabel", Widgets.Uiwidget)
 
 Widgets.Uilabel.new = function(clss, label)
 	local self = Widgets.Uiwidget.new(clss)
-	self.apply = apply
 	self.hint = "$$B\n$$U\n$$D"
 	self.text = label
 	return self

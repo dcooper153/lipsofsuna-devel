@@ -9,18 +9,20 @@ Main.messaging:register_message{
 	name = "update skills",
 	client_to_server_encode = function(self, enabled)
 		local data = {}
-		for k in pairs(enabled) do
+		for k,v in pairs(enabled) do
 			table.insert(data, "string")
 			table.insert(data, k)
+			table.insert(data, "string")
+			table.insert(data, tostring(v))
 		end
 		return data
 	end,
 	client_to_server_decode = function(self, packet)
 		local enabled = {}
 		while true do
-			local ok,s = packet:resume("string")
+			local ok,s,v = packet:resume("string", "string")
 			if not ok then break end
-			enabled[s] = true
+			enabled[s] = v
 		end
 		return {enabled}
 	end,
@@ -38,8 +40,8 @@ Main.messaging:register_message{
 		end
 		-- Enable and disable skills.
 		player.skills:clear()
-		for k in pairs(enabled) do
-			player.skills:add_without_requirements(k)
+		for k,v in pairs(enabled) do
+			player.skills:add_without_requirements(k, v)
 		end
 		player.skills:remove_invalid()
 		-- Recalculate player attributes.
@@ -65,8 +67,8 @@ Main.messaging:register_message{
 	server_to_client_handle = function(self, enabled)
 		-- Enable and disable skills.
 		Main.client_skills:clear()
-		for name in pairs(enabled) do
-			Main.client_skills:add(name)
+		for name,dir in pairs(enabled) do
+			Main.client_skills:add(name, dir)
 		end
 		-- Update the user interface.
 		if Ui:get_state() == "skills" then

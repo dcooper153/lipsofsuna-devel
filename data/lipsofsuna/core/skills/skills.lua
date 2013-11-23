@@ -29,28 +29,30 @@ end
 --- Adds a skill and all its requirements.
 -- @param self Skills.
 -- @param name Skill name.
-Skills.add = function(self, name)
+-- @param dir Activation direction. Nil for non-combat skills.
+Skills.add = function(self, name, dir)
 	-- Find the skill.
-	local skill = Skillspec:find{name = name}
+	local skill = Skillspec:find_by_name(name)
 	if not skill then return end
 	-- Add the skill.
-	self.skills[name] = true
+	self.skills[name] = dir or ""
 	-- Add the requirements.
 	local reqs = skill:find_indirect_requirements()
 	for name in pairs(reqs) do
-		self.skills[name] = true
+		self.skills[name] = ""
 	end
 end
 
 --- Adds a skill without requirements.
 -- @param self Skills.
 -- @param name Skill name.
-Skills.add_without_requirements = function(self, name)
+-- @param dir Activation direction. Nil for non-combat skills.
+Skills.add_without_requirements = function(self, name, dir)
 	-- Find the skill.
-	local skill = Skillspec:find{name = name}
+	local skill = Skillspec:find_by_name(name)
 	if not skill then return end
 	-- Add the skill.
-	self.skills[name] = true
+	self.skills[name] = dir or ""
 end
 
 --- Calculates actor attributes based on the skills.
@@ -70,7 +72,7 @@ Skills.calculate_attributes = function(self)
 		spell_damage = 1,
 		view_distance = 32}
 	for k,v in pairs(self.skills) do
-		local skill = Skillspec:find{name = k}
+		local skill = Skillspec:find_by_name(k)
 		if skill and skill.assign then skill.assign(attr) end
 	end
 	return attr
@@ -143,9 +145,9 @@ end
 -- @return Actionspec if found. Nil otherwise.
 Skills.get_combat_art = function(self, dir)
 	for k,v in pairs(self.skills) do
-		if true or v == dir then-- TODO: direction
+		if v == dir then
 			local s = Skillspec:find_by_name(k)
-			if s and s.action then
+			if s and s.combat and s.action then
 				local a = Actionspec:find_by_name(s.action)
 				if a then return a end
 			end
@@ -200,7 +202,7 @@ end
 -- @param name Skill name.
 -- @return True if the requirements are met.
 Skills.is_activable = function(self, name)
-	local skill = Skillspec:find{name = name}
+	local skill = Skillspec:find_by_name(name)
 	if not skill then return end
 	for index,name in pairs(skill.requires) do
 		if not self.skills[name] then return end
@@ -222,7 +224,7 @@ end
 -- @param name Skill name.
 Skills.remove = function(self, name)
 	-- Find the skill.
-	local skill = Skillspec:find{name = name}
+	local skill = Skillspec:find_by_name(name)
 	if not skill then return end
 	-- Remove the skill.
 	self.skills[name] = nil
@@ -241,7 +243,7 @@ Skills.remove_invalid = function(self)
 	while more do
 		more = false
 		for name in pairs(self.skills) do
-			local skill = Skillspec:find{name = name}
+			local skill = Skillspec:find_by_name(name)
 			if skill then
 				-- Remove if the requirements are not met.
 				local deps = skill:find_direct_requirements()
