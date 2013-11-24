@@ -21,9 +21,9 @@
 		"camera_center": [0, 1.5, 0],
 		"censorship_nodes":
 		{
-			"breast.L": true,
-			"breast.R": true,
-			"genitals": true
+			"#breast.L": true,
+			"#breast.R": true,
+			"#genitals": true
 		},
 		"effects":
 		{

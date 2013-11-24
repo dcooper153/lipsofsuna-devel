@@ -20,8 +20,8 @@
 		},
 		"censorship_nodes":
 		{
-			"breast.L": false,
-			"breast.R": false
+			"#breast.L": false,
+			"#breast.R": false
 		},
 		"equipment_models":
 		{

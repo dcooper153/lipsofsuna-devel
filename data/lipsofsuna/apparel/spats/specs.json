@@ -14,7 +14,7 @@
 		"categories": {"armor": true},
 		"censorship_nodes":
 		{
-			"genitals": false
+			"#genitals": false
 		},
 		"equipment_textures":
 		{
