@@ -8,9 +8,11 @@
 -- @module core.effect.model_effect
 -- @alias CensorshipEffect
 
+local Billboard = require("system/billboard")
 local Class = require("system/class")
 local EffectObject = require("core/effect/effect-object")
 local RenderObject = require("system/render-object")
+local Vector = require("system/math/vector")
 
 --- Anchorable censorship effect.
 -- @type CensorshipEffect
@@ -23,10 +25,13 @@ local CensorshipEffect = Class("CensorshipEffect", EffectObject)
 -- @return CensorshipEffect.
 CensorshipEffect.new = function(clss, parent, parent_node)
 	local self = EffectObject.new(clss, {parent = parent, parent_node = parent_node})
-	self.model = Main.models:find_by_name("book-000"):get_render()
-	self.render = RenderObject()
-	self.render:set_visible(true)
-	self.render:add_model(self.model)
+	self.billboard = Billboard()
+	self.billboard:set_render_queue("main")
+	self.billboard:set_render_queue("8")
+	self.billboard:set_size(0.15, 0.15)
+	self.billboard:set_material("censorship1")
+	self.billboard:add(Vector())
+	self.billboard:set_visible(true)
 	return self
 end
 
@@ -34,7 +39,7 @@ end
 -- @param self EffectObject.
 CensorshipEffect.detach = function(self)
 	-- Detach the render object.
-	self.render:set_visible(false)
+	self.billboard:set_visible(false)
 	-- Call the base class.
 	EffectObject.detach(self)
 end
@@ -55,6 +60,7 @@ CensorshipEffect.update = function(self, secs)
 			return self:detach()
 		end
 	end
+	self:__recalculate_transform()
 	EffectObject.update(self, secs)
 end
 
@@ -62,16 +68,22 @@ end
 -- @param self EffectObject.
 -- @param v Vector.
 CensorshipEffect.set_position = function(self, v)
-	self.render:set_position(v)
 	EffectObject.set_position(self, v)
+	self:__recalculate_transform()
 end
 
 --- Sets the rotation of the effect.
 -- @param self EffectObject.
 -- @param v Quaternion.
 CensorshipEffect.set_rotation = function(self, v)
-	self.render:set_rotation(v)
 	EffectObject.set_rotation(self, v)
+end
+
+CensorshipEffect.__recalculate_transform = function(self)
+	local r1,r2 = Client.camera_manager.camera:get_picking_ray()
+	local d = r2:subtract(r1):normalize():multiply(0.1)
+	self.billboard:set_position(self:get_position() - d)
+	self.billboard:set_rotation(self:get_rotation())
 end
 
 return CensorshipEffect

@@ -8,12 +8,12 @@ compositor outline1
 		target srt_depth
 		{
 			input none
-			material_scheme srt_depth
 			pass clear
 			{
 			}
 			pass render_scene
 			{
+				material_scheme srt_depth
 				first_render_queue 1
 				last_render_queue 79
 			}
@@ -21,9 +21,9 @@ compositor outline1
 		target srt_color
 		{
 			input none
-			material_scheme srt_color
 			pass render_scene
 			{
+				material_scheme srt_color
 				first_render_queue 1
 				last_render_queue 79
 			}
@@ -41,6 +41,12 @@ compositor outline1
 		target_output
 		{
 			input none
+			pass render_scene
+			{
+				material_scheme srt_depth
+				first_render_queue 1
+				last_render_queue 79
+			}
 			pass render_quad
 			{
 				material erode1
@@ -49,6 +55,7 @@ compositor outline1
 			}
 			pass render_scene
 			{
+				material_scheme above
 				first_render_queue 80
 			}
 		}

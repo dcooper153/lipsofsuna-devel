@@ -62,7 +62,7 @@ ThirdPersonCamera.quake = function(self, amount)
 end
 
 ThirdPersonCamera.get_picking_ray = function(self)
-	local pos,rot = self:get_transform()
+	local pos,rot = self:get_position(),self:get_rotation()
 	return pos,pos + rot * Vector(0,0,-50)
 end
 
