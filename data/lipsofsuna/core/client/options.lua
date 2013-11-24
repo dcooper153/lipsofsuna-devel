@@ -201,6 +201,7 @@ Options.apply_object = function(self, object)
 	else
 		object.render:set_shadow_casting(self.shadow_casting_items)
 	end
+	object.render:update_censorship()
 end
 
 --- Saves the options.
