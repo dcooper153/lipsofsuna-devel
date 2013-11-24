@@ -1,4 +1,4 @@
---- TODO:doc
+--- Renderable object.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -9,17 +9,18 @@
 -- @alias ClientRenderObject
 
 local Animation = require("system/animation")
+local CensorshipEffect = require("core/effect/censorship-effect")
 local Class = require("system/class")
 local Model = require("system/model")
-local ModelBuilder = require("character/model-builder") --FIXME
-local ModelEffect = require("core/effect/model-effect") --FIXME
-local ParticleEffect = require("core/effect/particle-effect") --FIXME
+local ModelBuilder = require("character/model-builder")
+local ModelEffect = require("core/effect/model-effect")
+local ParticleEffect = require("core/effect/particle-effect")
 local RenderObject = require("system/render-object")
 local RenderUtils = require("core/client/render-utils")
-local SpeedlineEffect = require("core/effect/speedline-effect") --FIXME
-local TextureBuilder = require("character/texture-builder") --FIXME
+local SpeedlineEffect = require("core/effect/speedline-effect")
+local TextureBuilder = require("character/texture-builder")
 
---- TODO:doc
+--- Renderable object.
 -- @type ClientRenderObject
 local ClientRenderObject = Class("ClientRenderObject", RenderObject)
 
@@ -231,22 +232,28 @@ end
 
 ClientRenderObject.handle_inventory_equip = function(self, slot, object)
 	if not self.initialized then return end
+	-- Update models and anchors.
 	local node = self.object.spec:get_node_by_equipment_slot(slot)
 	if node then
 		self:add_equipment_anchor(object, slot, node)
 	else
 		self:request_model_rebuild()
 	end
+	-- Update censorship nodes.
+	self:update_censorship()
 end
 
 ClientRenderObject.handle_inventory_unequip = function(self, slot, object)
 	if not self.initialized then return end
+	-- Update models and anchors.
 	local node = self.object.spec:get_node_by_equipment_slot(slot)
 	if node then
 		self:remove_equipment_anchor(object, slot, node)
 	else
 		self:request_model_rebuild()
 	end
+	-- Update censorship nodes.
+	self:update_censorship()
 end
 
 --- Removes a wielded weapon from the model.
@@ -326,6 +333,58 @@ ClientRenderObject.update = function(self, secs)
 			if base then
 				self:add_texture_alias(base, image)
 			end
+		end
+	end
+end
+
+--- Updates the censorship nodes of the object.
+-- @param self ClientRenderObject.
+ClientRenderObject.update_censorship = function(self)
+	if not self.initialized then return end
+	-- Create the censorship node list.
+	local nodes = {}
+	if not Client.options.nudity_enabled then
+		-- Add the default censorship nodes.
+		local spec = self.object:get_spec()
+		if spec and spec.censorship_nodes then
+			for k,v in pairs(spec.censorship_nodes) do
+				if v then
+					nodes[k] = v
+				end
+			end
+		end
+		-- Let items override the nodes.
+		for slot,index in pairs(self.object.inventory.equipped) do
+			local item = self.object.inventory:get_object_by_index(index)
+			for k,v in pairs(item:get_spec().censorship_nodes) do
+				if v then
+					nodes[k] = true
+				else
+					nodes[k] = nil
+				end
+			end
+		end
+	end
+	-- Clear the old anchors.
+	local i = 1
+	if self.special_effects then
+		while self.special_effects[i] do
+			local effect = self.special_effects[i]
+			if effect.class == CensorshipEffect then
+				effect:detach_delayed()
+				table.remove(self.special_effects, i)
+			else
+				i = i + 1
+			end
+		end
+	end
+	-- Create the new anchors.
+	for node in pairs(nodes) do
+		local effect = CensorshipEffect(self, node)
+		if self.special_effects then
+			table.insert(self.special_effects, effect)
+		else
+			self.special_effects = {effect}
 		end
 	end
 end

@@ -18,6 +18,11 @@
 		{
 			"armor": true
 		},
+		"censorship_nodes":
+		{
+			"breast.L": false,
+			"breast.R": false
+		},
 		"equipment_models":
 		{
 			"aer":

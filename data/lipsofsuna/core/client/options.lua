@@ -175,6 +175,9 @@ Options.apply = function(self)
 	-- Update the render properties of objects.
 	for k,v in pairs(Main.objects.objects_by_id) do
 		self:apply_object(v)
+		if v.render then
+			v.render:update_censorship()
+		end
 	end
 end
 

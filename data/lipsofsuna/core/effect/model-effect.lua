@@ -1,4 +1,4 @@
---- TODO:doc
+--- Anchorable model.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -13,7 +13,7 @@ local EffectObject = require("core/effect/effect-object")
 local RenderObject = require("system/render-object")
 local SpeedlineEffect = require("core/effect/speedline-effect")
 
---- TODO:doc
+--- Anchorable model.
 -- @type ModelEffect
 local ModelEffect = Class("ModelEffect", EffectObject)
 
@@ -55,6 +55,8 @@ ModelEffect.add_speedline = function(self, args)
 	self.speedline = SpeedlineEffect(args)
 end
 
+--- Removes the effect from the scene.
+-- @param self EffectObject.
 ModelEffect.detach = function(self)
 	-- Detach the render object.
 	self.render:set_visible(false)
@@ -71,16 +73,20 @@ ModelEffect.find_node = function(self, ...)
 	return self.render:find_node(...)
 end
 
+--- Sets the position of the effect.
+-- @param self EffectObject.
+-- @param v Vector.
 ModelEffect.set_position = function(self, v)
 	self.render:set_position(v)
 	EffectObject.set_position(self, v)
 end
 
+--- Sets the rotation of the effect.
+-- @param self EffectObject.
+-- @param v Quaternion.
 ModelEffect.set_rotation = function(self, v)
 	self.render:set_rotation(v)
 	EffectObject.set_rotation(self, v)
 end
 
 return ModelEffect
-
-

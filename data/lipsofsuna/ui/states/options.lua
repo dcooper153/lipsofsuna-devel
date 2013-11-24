@@ -145,4 +145,8 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "options",
-	widget = function() return Widgets.Uiconfigoption("nudity_enabled") end}
+	widget = function()
+		return Widgets.Uiconfigoption("nudity_enabled", function()
+			Client.options:apply()
+		end)
+	end}

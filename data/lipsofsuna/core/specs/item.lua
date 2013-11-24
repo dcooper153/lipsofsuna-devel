@@ -24,6 +24,7 @@ Itemspec = Spec:register("Itemspec", "item", {
 	{name = "animations_equipped", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation profiles used by the actor when equipping the item.", details = {values = {spec = "AnimationProfileSpec"}}},
 	{name = "armor_class", type = "number", default = 0, description = "How much protection the item offers when equipped."},
 	{name = "book_text", type = "string", description = "Content of player readable items."},
+	{name = "censorship_nodes", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of nodes that require censorship."},
 	{name = "collision_group", type = "number", default = 0x0002, description = "Collision group."},
 	{name = "construct_tile", type = "string", description = "Tile type to construct when used.", details = {spec = "TerrainMaterialSpec"}},
 	{name = "construct_tile_count", type = "number", description = "Material count required by tile construction.", details = {integer = true, min = 1}},

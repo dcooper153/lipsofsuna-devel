@@ -18,6 +18,11 @@
 		"icon": "cloth1",
 		"armor_class": 0.02,
 		"categories": {"armor": true},
+		"censorship_nodes":
+		{
+			"breast.L": false,
+			"breast.R": false
+		},
 		"equipment_models":
 		{
 			"aer": {"lower": "aerlowerdress1", "upper": "aerupperclothed1"}
@@ -36,6 +41,11 @@
 		"icon": "cloth1",
 		"armor_class": 0.015,
 		"categories": {"armor": true},
+		"censorship_nodes":
+		{
+			"breast.L": false,
+			"breast.R": false
+		},
 		"equipment_models":
 		{
 			"aer": {"lower": "aerlowerdress1", "upper": "aerupperbra1"}

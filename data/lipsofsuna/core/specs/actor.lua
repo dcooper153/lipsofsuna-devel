@@ -53,6 +53,7 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "body_scale_max", type = "number", default = 1, description = "Maximum body scale."},
 	{name = "brow_style", type = "string", description = "Brow style."},
 	{name = "camera_center", type = "vector", description = "Camera center position."},
+	{name = "censorship_nodes", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of nodes that require censorship."},
 	{name = "collision_group", type = "number", default = 0x0001},
 	{name = "damage_from_magma", type = "number", default = 6, description = "Points of damage from magma per second."},
 	{name = "damage_from_water", type = "number", default = 0, description = "Points of damage from water per second."},

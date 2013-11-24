@@ -16,6 +16,11 @@
 			"armor": true
 		},
 		"armor_class": 0.05,
+		"censorship_nodes":
+		{
+			"breast.L": false,
+			"breast.R": false
+		},
 		"equipment_models":
 		{
 			"aer":
