@@ -44,7 +44,7 @@ Actionspec{
 			if not finish then return end
 			-- Start the charge animation.
 			local move = Main.combat_utils:get_melee_move_of_actor(action.object)
-			action.object:animate("charge " .. move, true)
+			action.object:animate("charge stand", true)
 			-- Initialize the charge timer.
 			action.finish_action = finish
 			action.charge_move = move
@@ -63,7 +63,7 @@ Actionspec{
 			end
 			-- Normal melee attacks.
 			action.object.cooldown = nil
-			action.object:action(action.finish_action.name, action.charge_move, action.charge_value)
+			action.object:action(action.finish_action.name, "stand", action.charge_value)
 			return
 		end
 		-- Continue charging.
