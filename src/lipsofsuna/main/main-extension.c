@@ -27,6 +27,7 @@
 
 extern LIMaiExtensionInfo liext_animation_info;
 extern LIMaiExtensionInfo liext_array_info;
+extern LIMaiExtensionInfo liext_billboard_info;
 extern LIMaiExtensionInfo liext_camera_info;
 extern LIMaiExtensionInfo liext_config_file_info;
 extern LIMaiExtensionInfo liext_database_info;
@@ -115,6 +116,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "vision", &liext_vision_info },
 		{ "watchdog", &liext_watchdog_info },
 #ifndef LI_DISABLE_GRAPHICS
+		{ "billboard", &liext_billboard_info },
 		{ "camera", &liext_camera_info },
 		{ "graphics", &liext_graphics_info },
 		{ "heightmap-render", &liext_heightmap_render_info },
