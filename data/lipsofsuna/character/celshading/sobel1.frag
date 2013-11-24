@@ -1,7 +1,6 @@
 #version 120
 
 uniform sampler2D LOS_diffuse_texture_0;
-uniform sampler2D LOS_diffuse_texture_1;
 uniform vec4 LOS_pixel_size;
 uniform float LOS_near_distance;
 uniform float LOS_far_distance;
@@ -25,15 +24,15 @@ void main()
 	 * e = sqrt(x^2 + y^2)
 	 */
 	vec2 p = LOS_pixel_size.xy;
-	float d00 = mapz(texture2D(LOS_diffuse_texture_1, F_uv + vec2(-1.0, -1.0) * p));
-	float d10 = mapz(texture2D(LOS_diffuse_texture_1, F_uv + vec2(0.0, -1.0) * p));
-	float d20 = mapz(texture2D(LOS_diffuse_texture_1, F_uv + vec2(1.0, -1.0) * p));
-	float d01 = mapz(texture2D(LOS_diffuse_texture_1, F_uv + vec2(-1.0, 0.0) * p));
-	float d11 = mapz(texture2D(LOS_diffuse_texture_1, F_uv));
-	float d21 = mapz(texture2D(LOS_diffuse_texture_1, F_uv + vec2(1.0, 0.0) * p));
-	float d02 = mapz(texture2D(LOS_diffuse_texture_1, F_uv + vec2(-1.0, 1.0) * p));
-	float d12 = mapz(texture2D(LOS_diffuse_texture_1, F_uv + vec2(0.0, 1.0) * p));
-	float d22 = mapz(texture2D(LOS_diffuse_texture_1, F_uv + vec2(1.0, 1.0) * p));
+	float d00 = mapz(texture2D(LOS_diffuse_texture_0, F_uv + vec2(-1.0, -1.0) * p));
+	float d10 = mapz(texture2D(LOS_diffuse_texture_0, F_uv + vec2(0.0, -1.0) * p));
+	float d20 = mapz(texture2D(LOS_diffuse_texture_0, F_uv + vec2(1.0, -1.0) * p));
+	float d01 = mapz(texture2D(LOS_diffuse_texture_0, F_uv + vec2(-1.0, 0.0) * p));
+	float d11 = mapz(texture2D(LOS_diffuse_texture_0, F_uv));
+	float d21 = mapz(texture2D(LOS_diffuse_texture_0, F_uv + vec2(1.0, 0.0) * p));
+	float d02 = mapz(texture2D(LOS_diffuse_texture_0, F_uv + vec2(-1.0, 1.0) * p));
+	float d12 = mapz(texture2D(LOS_diffuse_texture_0, F_uv + vec2(0.0, 1.0) * p));
+	float d22 = mapz(texture2D(LOS_diffuse_texture_0, F_uv + vec2(1.0, 1.0) * p));
 	float x = 3.0*(-d00 -d02 +d20 + d22) + 10.0*(-d01 +d21);
 	float y = 3.0*(-d00 -d20 +d02 + d22) + 10.0*(-d10 +d12);
 	float e = sqrt(x * x + y * y);

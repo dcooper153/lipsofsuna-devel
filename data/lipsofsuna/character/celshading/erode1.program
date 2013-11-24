@@ -4,7 +4,6 @@ fragment_program erode1/frag glsl
 	default_params
 	{
 		param_named LOS_diffuse_texture_0 int 0
-		param_named LOS_diffuse_texture_1 int 1
 		param_named_auto LOS_pixel_size inverse_texture_size 0
 	}
 }

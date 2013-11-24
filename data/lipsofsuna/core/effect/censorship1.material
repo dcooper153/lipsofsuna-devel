@@ -3,6 +3,25 @@ material censorship1
 	receive_shadows off
 	technique
 	{
+		scheme mrt
+	}
+	technique
+	{
+		scheme srt_color
+		pass
+		{
+			lighting off
+			scene_blend add
+			depth_write off
+		}
+	}
+	technique
+	{
+		scheme srt_depth
+	}
+	technique
+	{
+		scheme fixed
 		pass
 		{
 			lighting off

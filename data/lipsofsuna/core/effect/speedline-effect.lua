@@ -37,6 +37,7 @@ SpeedlineEffect.new = function(clss, args)
 	self.model = Model()
 	self.model:add_material{material = "speedline1"}
 	self.render = RenderObject()
+	self.render:set_render_queue("8")
 	Client.effects.scene_nodes_by_ref[self] = true
 	return self
 end

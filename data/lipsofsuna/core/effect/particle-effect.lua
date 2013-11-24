@@ -20,6 +20,7 @@ ParticleEffect.new = function(clss, args)
 	local self = EffectObject.new(clss, args)
 	self.render = RenderObject()
 	self.render:particle_animation{loop = false}
+	self.render:set_render_queue("8")
 	self.render:set_particle(args.particle)
 	self.render:set_visible(true)
 	return self
