@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -36,13 +36,16 @@ LIRenAttachmentParticle::LIRenAttachmentParticle (LIRenObject* object, const Ogr
 	particles = NULL;
 	try
 	{
-		/* Attach a new particle system to the scene node. */
+		// Attach a new particle system to the scene node.
 		Ogre::String e_name = render->id.next ();
 		particles = render->scene_manager->createParticleSystem (e_name, particle);
 		object->node->attachObject (particles);
 
-		/* Set particle effect visibility. */
+		// Set particle effect visibility.
 		particles->setVisible (object->get_visible ());
+
+		// Apply settings.
+		update_settings ();
 	}
 	catch (...)
 	{
@@ -57,6 +60,15 @@ LIRenAttachmentParticle::~LIRenAttachmentParticle ()
 
 void LIRenAttachmentParticle::update (float secs)
 {
+}
+
+void LIRenAttachmentParticle::update_settings ()
+{
+	if (particles == NULL)
+		return;
+
+	particles->setCastShadows (object->get_shadow_casting ());
+	particles->setRenderQueueGroup (object->get_render_queue ());
 }
 
 void LIRenAttachmentParticle::set_emitting (bool value)

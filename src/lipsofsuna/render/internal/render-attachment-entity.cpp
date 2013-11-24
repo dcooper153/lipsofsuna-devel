@@ -239,6 +239,9 @@ void LIRenAttachmentEntity::update (float secs)
 	// hidden or Ogre will render our invisible objects. */
 	entity->setVisible (object->get_visible ());
 
+	// Apply queued settings.
+	update_settings ();
+
 	// Clear the now useless dependency list.
 	resources.clear ();
 	loading_mesh = false;
