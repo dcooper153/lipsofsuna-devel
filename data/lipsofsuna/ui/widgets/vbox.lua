@@ -193,8 +193,8 @@ UiVBox.update = function(self, secs)
 	for _,widget in ipairs(self.__widgets) do
 		local wh = widget.size.y
 		if widget.temporary then
-			local wx = widget.temporary.x
-			local wy = widget.temporary.y + y0
+			local wx = widget.temporary.x + x
+			local wy = widget.temporary.y - y0
 			widget:set_offset(__vec1:set_xyz(wx, wy))
 			widget:set_visible(true)--wy > -wh and wy < sh)
 		else
