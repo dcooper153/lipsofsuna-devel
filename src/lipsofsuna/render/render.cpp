@@ -198,7 +198,14 @@ void liren_render_project (
 void liren_render_render (
 	LIRenRender* self)
 {
-	self->render ();
+	try
+	{
+		self->render ();
+	}
+	catch (Ogre::Exception e)
+	{
+		printf ("ERROR: %s\n", e.getFullDescription().c_str());
+	}
 }
 
 int liren_render_screenshot (
