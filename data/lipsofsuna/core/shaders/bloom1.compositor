@@ -47,5 +47,12 @@ compositor bloom1
 			}
 		}
 	}
+	technique
+	{
+		target_output
+		{
+			input previous
+		}
+	}
 }
 

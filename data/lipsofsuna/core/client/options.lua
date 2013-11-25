@@ -147,23 +147,19 @@ Options.apply = function(self)
 	Render:set_anisotrophy(self.anisotropic_filter)
 	-- Set the shader scheme.
 	-- TODO: Change this now since quality 2 is not used.
-	Render:remove_compositor("outline1")
-	Render:remove_compositor("outline2")
+	Render:remove_compositor("compositor/default")
+	Render:remove_compositor("compositor/outlines")
+	Render:remove_compositor("compositor/particles")
 	Render:remove_compositor("bloom1")
 	if self.shader_quality > 1 then
+		Render:set_material_scheme("none")
+		Render:add_compositor("compositor/default")
 		if self.outlines_enabled then
-			if self.mrt_enabled then --FIXME: Never true.
-				Render:set_material_scheme("none")
-				Render:add_compositor("outline2")
-			else
-				Render:set_material_scheme("none")
-				Render:add_compositor("outline1")
-			end
-			if self.bloom_enabled then
-			   Render:add_compositor("bloom1")
-			end
-		else
-			Render:set_material_scheme("srt_color")
+			Render:add_compositor("compositor/outlines")
+		end
+		Render:add_compositor("compositor/particles")
+		if self.bloom_enabled then
+		   Render:add_compositor("bloom1")
 		end
 	else
 		Render:set_material_scheme("fixed")

@@ -1,0 +1,19 @@
+vertex_program censorship1/vert glsl
+{
+	source censorship1.vert
+	default_params
+	{
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+	}
+}
+
+fragment_program censorship1/frag glsl
+{
+	source censorship1.frag
+	default_params
+	{
+		param_named LOS_diffuse_texture_0 int 0
+		param_named_auto LOS_camera_position camera_position_object_space
+		param_named_auto LOS_viewport_size viewport_size
+	}
+}

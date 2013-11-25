@@ -11,8 +11,17 @@ material censorship1
 		pass
 		{
 			lighting off
-			scene_blend add
 			depth_write off
+			texture_unit
+			{
+				content_type compositor compositor/particles color
+			}
+			vertex_program_ref censorship1/vert
+			{
+			}
+			fragment_program_ref censorship1/frag
+			{
+			}
 		}
 	}
 	technique
