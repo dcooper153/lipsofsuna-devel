@@ -80,9 +80,21 @@ CensorshipEffect.set_rotation = function(self, v)
 end
 
 CensorshipEffect.__recalculate_transform = function(self)
+	-- Breast scaling.
+	local scale = Vector()
+	if self.parent_node == "#breast.L" or self.parent_node == "#breast.R" then
+		if self.parent.object and self.parent.object.body_sliders then
+			local breast = self.parent.object.body_sliders[3]
+			if breast then
+				scale:set_xyz(0, 0, 0.1*(1-breast/255)):transform(self.parent.object:get_rotation())
+			end
+		end
+	end
+	-- Node safety padding.
 	local r1,r2 = Client.camera_manager.camera:get_picking_ray()
 	local d = r2:subtract(r1):normalize():multiply(0.1)
-	self.billboard:set_position(self:get_position() - d)
+	-- Update the billboard transformation.
+	self.billboard:set_position(self:get_position() - d + scale)
 	self.billboard:set_rotation(self:get_rotation())
 end
 
