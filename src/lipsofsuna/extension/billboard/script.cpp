@@ -74,9 +74,7 @@ static void Billboard_set_material (LIScrArgs* args)
 
 	if (!liscr_args_geti_string (args, 0, &name))
 		return;
-	Ogre::MaterialPtr ptr = self->render->material_manager->getByName (name);
-	if (!ptr.isNull ())
-		self->billboards->setMaterial (ptr);
+	self->billboards->setMaterialName (name);
 }
 
 static void Billboard_set_position (LIScrArgs* args)
