@@ -20,9 +20,9 @@ Main.messaging:register_message{
 		if not player.account then return end
 		-- Validate the parameters.
 		if index < 1 or index > 10 then return end
-		if #action > 32 then return end
+		if action and #action > 32 then return end
 		-- Save into the account.
-		local del = (item == 0 or action == "")
+		local del = (item == 0 or action == "" or action == nil)
 		local s = player.account.shortcuts
 		if s then
 			if del then
