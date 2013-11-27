@@ -218,7 +218,7 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 		end
 	end
 	-- Morph and merge.
-	merger:add_model_morph(ref, morph)
+	merger:add_model_morph_weld(ref, morph)
 end
 
 return ModelBuilder

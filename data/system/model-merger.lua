@@ -45,6 +45,14 @@ ModelMerger.add_model_morph = function(self, model, targets)
 	Los.model_merger_add_model_morph(self.handle, model.handle, unpack(targets))
 end
 
+--- Adds a morphed model with normal welding.
+-- @param self ModelMerger.
+-- @param model Model to add.
+-- @param targets List of alternating morph target names and influence.
+ModelMerger.add_model_morph_weld = function(self, model, targets)
+	Los.model_merger_add_model_morph_weld(self.handle, model.handle, unpack(targets))
+end
+
 --- Queues finishing the build.
 -- @param self ModelMerger.
 ModelMerger.finish = function(self)

@@ -90,6 +90,35 @@ static void ModelMerger_add_model_morph (LIScrArgs* args)
 	limdl_async_merger_add_model_morph (self, model, morphs, i);
 }
 
+static void ModelMerger_add_model_morph_weld (LIScrArgs* args)
+{
+	int i = 0;
+	float value;
+	const char* shape;
+	LIMdlAsyncMerger* self;
+	LIMdlAsyncMergerMorph morphs[128];
+	LIMdlModel* model;
+	LIScrData* data;
+
+	/* Get arguments. */
+	self = args->self;
+	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &data))
+		return;
+	model = liscr_data_get_data (data);
+	for (i = 0 ; i < 128 ; i++)
+	{
+		if (!liscr_args_geti_string (args, 2 * i + 1, &shape) ||
+		    !liscr_args_geti_float (args, 2 * i + 2, &value))
+			break;
+		strncpy (morphs[i].shape, shape, LIMDL_ASYNC_MERGER_SHAPE_LENGTH_MAX);
+		morphs[i].shape[LIMDL_ASYNC_MERGER_SHAPE_LENGTH_MAX - 1] = '\0';
+		morphs[i].value = value;
+	}
+
+	/* Add the task. */
+	limdl_async_merger_add_model_morph_weld (self, model, morphs, i);
+}
+
 static void ModelMerger_finish (LIScrArgs* args)
 {
 	LIMdlAsyncMerger* self;
@@ -194,6 +223,7 @@ void liext_script_model_merger (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_new", ModelMerger_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_add_model", ModelMerger_add_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_add_model_morph", ModelMerger_add_model_morph);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_add_model_morph_weld", ModelMerger_add_model_morph_weld);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_finish", ModelMerger_finish);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_pop_model", ModelMerger_pop_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MODEL_MERGER, "model_merger_replace_material", ModelMerger_replace_material);

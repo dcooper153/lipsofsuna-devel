@@ -27,6 +27,7 @@ enum
 {
 	LIMDL_ASYNC_MERGER_ADD_MODEL,
 	LIMDL_ASYNC_MERGER_ADD_MODEL_MORPH,
+	LIMDL_ASYNC_MERGER_ADD_MODEL_MORPH_WELD,
 	LIMDL_ASYNC_MERGER_FINISH,
 	LIMDL_ASYNC_MERGER_REPLACE_MATERIAL
 };
@@ -98,6 +99,12 @@ LIAPICALL (int, limdl_async_merger_add_model, (
 	const LIMdlModel* model));
 
 LIAPICALL (int, limdl_async_merger_add_model_morph, (
+	LIMdlAsyncMerger*            self,
+	const LIMdlModel*            model,
+	const LIMdlAsyncMergerMorph* morph_array,
+	int                          morph_count));
+
+LIAPICALL (int, limdl_async_merger_add_model_morph_weld, (
 	LIMdlAsyncMerger*            self,
 	const LIMdlModel*            model,
 	const LIMdlAsyncMergerMorph* morph_array,

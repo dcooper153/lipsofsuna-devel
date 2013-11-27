@@ -130,6 +130,11 @@ LIAPICALL (int, limdl_builder_merge_model, (
 	const LIMdlModel*     model,
 	const LIMatTransform* transform));
 
+LIAPICALL (int, limdl_builder_merge_model_welded, (
+	LIMdlBuilder*         self,
+	const LIMdlModel*     model,
+	const LIMatTransform* transform));
+
 LIAPICALL (void, limdl_builder_transform_vertices, (
 	LIMdlBuilder*         self,
 	int                   start,

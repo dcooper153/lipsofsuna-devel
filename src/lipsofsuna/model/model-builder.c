@@ -24,6 +24,10 @@
 
 #include "model-builder.h"
 
+static void private_weld_normals (
+	LIMdlBuilder* self,
+	int           vertex_offset);
+
 static int private_faces_init (
 	LIMdlBuilderFaces* self,
 	LIMdlFaces*        src,
@@ -696,6 +700,122 @@ int limdl_builder_merge_model (
 	return 1;
 }
 
+/**
+ * \brief Merges a model to the builder.
+ * \param self Model builder.
+ * \param model Model.
+ * \param transform Vertex transformation, or NULL for none.
+ * \return Nonzero on success.
+ */
+int limdl_builder_merge_model_welded (
+	LIMdlBuilder*         self,
+	const LIMdlModel*     model,
+	const LIMatTransform* transform)
+{
+	int i;
+	int j;
+	int group;
+	int material;
+	int vertex_offset;
+	int* wgroups = NULL;
+	LIMdlFaces* srcfaces;
+	LIMdlLod* lod;
+
+	/* Map weight groups. */
+	if (model->weight_groups.count)
+	{
+		wgroups = lisys_calloc (model->weight_groups.count, sizeof (int));
+		if (wgroups == NULL)
+			return 0;
+		for (i = 0 ; i < model->weight_groups.count ; i++)
+		{
+			group = limdl_model_find_weightgroup (self->model,
+				model->weight_groups.array[i].name,
+				model->weight_groups.array[i].bone);
+			if (group == -1)
+			{
+				group = self->model->weight_groups.count;
+				if (!limdl_builder_insert_weightgroup (self, 
+				    model->weight_groups.array[i].name,
+				    model->weight_groups.array[i].bone))
+				{
+					lisys_free (wgroups);
+					return 0;
+				}
+			}
+			lisys_assert (group < self->model->weight_groups.count);
+			wgroups[i] = group;
+		}
+	}
+
+	/* Merge vertices. */
+	vertex_offset = self->model->vertices.count;
+	if (model->vertices.count)
+	{
+		if (!limdl_builder_insert_vertices (self, model->vertices.array, model->vertices.count, wgroups))
+		{
+			lisys_free (wgroups);
+			return 0;
+		}
+		if (transform != NULL)
+			limdl_builder_transform_vertices (self, self->model->vertices.count - model->vertices.count, model->vertices.count, transform);
+	}
+
+	/* Weld the inserted vertices. */
+	private_weld_normals (self, vertex_offset);
+
+	/* Create levels of detail. */
+	if (self->lod.count < model->lod.count)
+	{
+		if (!limdl_builder_add_detail_levels (self, model->lod.count - self->lod.count))
+		{
+			lisys_free (wgroups);
+			return 0;
+		}
+	}
+
+	/* Merge each level of detail. */
+	/* If the added model doesn't have enough detail levels, the lowest
+	   quality level provided by it is used for the missing levels. */
+	for (j = 0 ; j < self->lod.count ; j++)
+	{
+		if (j < model->lod.count)
+			lod = model->lod.array + j;
+		else
+			lod = model->lod.array + model->lod.count - 1;
+
+		/* Merge each face group. */
+		for (i = 0 ; i < lod->face_groups.count ; i++)
+		{
+			srcfaces = lod->face_groups.array + i;
+
+			/* Find or create the material. */
+			material = limdl_model_find_material (self->model, model->materials.array + i);
+			if (material == -1)
+			{
+				material = self->model->materials.count;
+				if (!limdl_builder_insert_material (self, model->materials.array + i))
+				{
+					lisys_free (wgroups);
+					return 0;
+				}
+			}
+
+			/* Insert indices. */
+			if (!limdl_builder_insert_indices (self, j, material, lod->indices.array + srcfaces->start, srcfaces->count, vertex_offset))
+			{
+				lisys_free (wgroups);
+				return 0;
+			}
+		}
+	}
+
+	/* Merge node hierarchies. */
+	limdl_nodes_merge (&self->model->nodes, &model->nodes);
+	lisys_free (wgroups);
+
+	return 1;
+}
 
 /**
  * \brief Transforms vertices in the builder.
@@ -722,6 +842,70 @@ void limdl_builder_transform_vertices (
 }
 
 /*****************************************************************************/
+
+static void private_weld_normals (
+	LIMdlBuilder* self,
+	int           vertex_offset)
+{
+	int i;
+	LIAlgMemdic* lookup;
+	LIAlgMemdicIter iter;
+	LIMatVector key;
+	LIMatVector* value;
+
+	lookup = lialg_memdic_new ();
+	if (lookup == NULL)
+		return;
+
+	/* Add the new vertices to the lookup. */
+	for (i = vertex_offset ; i < self->model->vertices.count ; i++)
+	{
+		key = self->model->vertices.array[i].coord;
+		value = lialg_memdic_find (lookup, &key, sizeof (LIMatVector));
+		if (value == NULL)
+		{
+			value = lisys_calloc (1, sizeof (LIMatVector));
+			if (value != NULL)
+			{
+				*value = self->model->vertices.array[i].normal;
+				if (!lialg_memdic_insert (lookup, &key, sizeof (LIMatVector), value))
+					lisys_free (value);
+			}
+		}
+		else
+			*value = limat_vector_add (*value, self->model->vertices.array[i].normal);
+	}
+
+	/* Add the old vertices that can be welded with the new vertices. */
+	for (i = 0 ; i < vertex_offset ; i++)
+	{
+		key = self->model->vertices.array[i].coord;
+		value = lialg_memdic_find (lookup, &key, sizeof (LIMatVector));
+		if (value != NULL)
+			*value = limat_vector_add (*value, self->model->vertices.array[i].normal);
+	}
+
+	/* Normalize the summed normals. */
+	LIALG_MEMDIC_FOREACH (iter, lookup)
+	{
+		value = iter.value;
+		*value = limat_vector_normalize (*value);
+	}
+
+	/* Update the normals of the welded vertices. */
+	for (i = 0 ; i < self->model->vertices.count ; i++)
+	{
+		key = self->model->vertices.array[i].coord;
+		value = lialg_memdic_find (lookup, &key, sizeof (LIMatVector));
+		if (value != NULL)
+			self->model->vertices.array[i].normal = *value;
+	}
+
+	/* Free the lookup. */
+	LIALG_MEMDIC_FOREACH (iter, lookup)
+		lisys_free (iter.value);
+	lialg_memdic_free (lookup);
+}
 
 static int private_faces_init (
 	LIMdlBuilderFaces* self,
