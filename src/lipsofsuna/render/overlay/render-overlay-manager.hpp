@@ -19,7 +19,8 @@
 #define __RENDER_OVERLAY_OVERLAY_MANAGER_HPP__
 
 #include "lipsofsuna/algorithm.h"
-#include <OgreOverlayManager.h>
+#include "lipsofsuna/render.h"
+#include "render-overlay.hpp"
 
 class LIRenContainerFactory;
 class LIRenImageOverlayFactory;
@@ -29,7 +30,7 @@ class LIRenTextOverlayFactory;
 class LIRenOverlayManager
 {
 public:
-	LIRenOverlayManager ();
+	LIRenOverlayManager (LIRenRender* render);
 	~LIRenOverlayManager ();
 
 // FIXME
@@ -40,6 +41,9 @@ public:
 	LIRenImageOverlayFactory* image_factory;
 	LIRenScaledOverlayFactory* scaled_factory;
 	LIRenTextOverlayFactory* text_factory;
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 9
+	Ogre::OverlaySystem* overlay_system;
+#endif
 };
 
 #endif

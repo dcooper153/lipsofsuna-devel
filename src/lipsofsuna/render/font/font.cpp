@@ -27,12 +27,17 @@
 #include "lipsofsuna/system.h"
 #include "../internal/render.hpp"
 #include "font.h"
-#include <OgreFont.h>
-#include <OgreFontManager.h>
 #include <OgrePass.h>
 #include <OgreStringConverter.h>
 #include <OgreTechnique.h>
 #include <OgreTextureUnitState.h>
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 9
+#include <Overlay/OgreFont.h>
+#include <Overlay/OgreFontManager.h>
+#else
+#include <OgreFont.h>
+#include <OgreFontManager.h>
+#endif
 
 struct _LIFntFont
 {

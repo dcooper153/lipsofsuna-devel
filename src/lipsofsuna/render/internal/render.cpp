@@ -36,7 +36,6 @@
 #include "../overlay/render-overlay-manager.hpp"
 #include <OgreCompositorManager.h>
 #include <OgreEntity.h>
-#include <OgreFontManager.h>
 #include <OgreMeshManager.h>
 #include <OgrePlugin.h>
 #include <OgreShadowCameraSetupLiSPSM.h>
@@ -114,7 +113,7 @@ int LIRenRender::init (
 	camera->setAspectRatio (w / h);
 
 	/* Initialize the user interface. */
-	overlay_mgr = new LIRenOverlayManager ();
+	overlay_mgr = new LIRenOverlayManager (this);
 
 	/* Create the group for temporary resources. */
 	/* This group is used for temporary resources such as meshes or

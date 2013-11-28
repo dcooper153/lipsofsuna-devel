@@ -31,12 +31,17 @@
 #include "render-scaled-overlay-factory.hpp"
 #include "render-text-overlay-factory.hpp"
 
-LIRenOverlayManager::LIRenOverlayManager ()
+LIRenOverlayManager::LIRenOverlayManager (LIRenRender* render)
 {
 	/* Allocate the overlay dictionary. */
 	overlays = lialg_u32dic_new ();
 	if (overlays == NULL)
 		throw;
+
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 9
+	overlay_system = new Ogre::OverlaySystem ();
+	render->scene_manager->addRenderQueueListener (overlay_system);
+#endif
 
 	/* Add the overlay factories. */
 	overlay_manager = &(Ogre::OverlayManager::getSingleton ());

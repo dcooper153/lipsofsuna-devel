@@ -92,6 +92,7 @@ def configure(conf):
 		conf.check_ogre()
 		conf.check_ogre_plugindir()
 		conf.check_ogre_terrain()
+		conf.check_ogre_overlay()
 		conf.check_ois()
 		conf.check_xlib()
 	if Options.options.sound:
@@ -526,6 +527,30 @@ def check_ogre_terrain(conf):
 	conf.env.revert()
 	conf.end_msg(False)
 	conf.fatal('Could not find OGRE-Terrain')
+
+@conf
+def check_ogre_overlay(conf):
+	conf.start_msg('Checking for package OGRE-Overlay')
+	conf.env.stash()
+	if conf.check_cfg(package='OGRE-Overlay', atleast_version='1.9.0', args='--cflags --libs', mandatory=False, uselib_store='OGRE'):
+		conf.end_msg('pkg-config OGRE-Overlay')
+		return
+	conf.env.revert()
+	conf.env.stash()
+	if conf.check_cxx(lib='OgreOverlay', mandatory=False, uselib='TEST', uselib_store='OGRE') and\
+	   conf.check_cxx(header_name='Overlay/OgreOverlay.h', mandatory=False, uselib='TEST', uselib_store='OGRE', fragment='''
+			#include <stdio.h>
+			int main() { printf(""); return 0; }'''):
+		conf.end_msg('library OgreOverlay')
+		return
+	conf.env.revert()
+	conf.env.stash()
+	if conf.check_cfg(package='OGRE', atleast_version='1.9.0', args='--cflags --libs', mandatory=False, uselib_store='OGRE'):
+		conf.env.revert()
+		conf.end_msg(False)
+		conf.fatal('Could not find OGRE-Overlay')
+		return
+	conf.end_msg('OGRE built-in')
 
 @conf
 def check_ois(conf):

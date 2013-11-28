@@ -19,6 +19,7 @@
 #define __RENDER_INTERNAL_SCALED_OVERLAY_HPP__
 
 #include "lipsofsuna/system.h"
+#include "render-overlay.hpp"
 #include "render-image-overlay.hpp"
 
 class LIRenScaledOverlay : public LIRenImageOverlay

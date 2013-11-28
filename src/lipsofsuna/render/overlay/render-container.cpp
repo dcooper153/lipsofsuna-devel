@@ -26,7 +26,6 @@
 
 #include "render-container.hpp"
 #include <OgreHardwareBufferManager.h>
-#include <OgreOverlayManager.h>
 
 #define MAX_VERTEX_COUNT 1024
 

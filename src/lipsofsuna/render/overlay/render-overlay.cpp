@@ -537,7 +537,12 @@ static bool private_create_material (
 	}
 
 	/* Create a new material. */
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 9
+	self->render->material_manager->load (matname, group);
+	material = self->render->material_manager->getByName (matname);
+#else
 	material = self->render->material_manager->load (matname, group);
+#endif
 	lisys_assert (!material.isNull ());
 	material->setSceneBlending (Ogre::SBT_TRANSPARENT_ALPHA);
 

@@ -19,8 +19,8 @@
 #define __RENDER_INTERNAL_TEXT_OVERLAY_FACTORY_HPP__
 
 #include "lipsofsuna/system.h"
+#include "render-overlay.hpp"
 #include "render-text-overlay.hpp"
-#include <OgreOverlayElementFactory.h>
 
 class LIRenTextOverlayFactory : public Ogre::OverlayElementFactory
 {

@@ -19,8 +19,8 @@
 #define __RENDER_INTERNAL_CONTAINER_FACTORY_HPP__
 
 #include "lipsofsuna/system.h"
+#include "render-overlay.hpp"
 #include "render-container.hpp"
-#include <OgreOverlayElementFactory.h>
 
 class LIRenContainerFactory : public Ogre::OverlayElementFactory
 {

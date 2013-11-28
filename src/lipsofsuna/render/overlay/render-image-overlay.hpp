@@ -20,7 +20,11 @@
 
 #include "lipsofsuna/system.h"
 #include "render-base-overlay.hpp"
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 9
+#include <Overlay/OgreOverlayElement.h>
+#else
 #include <OgreOverlayElement.h>
+#endif
 
 class LIRenImageOverlay : public LIRenBaseOverlay, public Ogre::OverlayElement
 {

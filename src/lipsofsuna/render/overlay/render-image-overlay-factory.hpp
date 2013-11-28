@@ -19,8 +19,8 @@
 #define __RENDER_INTERNAL_IMAGE_OVERLAY_FACTORY_HPP__
 
 #include "lipsofsuna/system.h"
+#include "render-overlay.hpp"
 #include "render-image-overlay.hpp"
-#include <OgreOverlayElementFactory.h>
 
 class LIRenImageOverlayFactory : public Ogre::OverlayElementFactory
 {

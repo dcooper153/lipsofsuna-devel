@@ -376,7 +376,7 @@ bool LIRenMeshBuilder::create_skeleton (Ogre::Mesh* mesh)
 	/* Create the skeleton. */
 	Ogre::String name (render->id.next ());
 	Ogre::ResourcePtr resource = Ogre::SkeletonManager::getSingleton ().create (name, LIREN_RESOURCES_TEMPORARY, true);
-	Ogre::SkeletonPtr skeleton (resource);
+	Ogre::Skeleton* skeleton = (Ogre::Skeleton*) resource.getPointer ();
 
 	/* Create the dummy bone. */
 	bone = skeleton->createBone (0);

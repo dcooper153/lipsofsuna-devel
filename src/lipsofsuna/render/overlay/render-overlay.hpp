@@ -19,7 +19,17 @@
 #define __RENDER_OVERLAY_OVERLAY_HPP__
 
 #include "lipsofsuna/math.h"
-#include <OgreOverlay.h>
+#include "lipsofsuna/render/internal/render.hpp"
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 9
+#include <Overlay/OgreOverlaySystem.h>
+#include <Overlay/OgreOverlayManager.h>
+#include <Overlay/OgreOverlayElementFactory.h>
+#include <Overlay/OgrePanelOverlayElement.h>
+#else
+#include <OgreOverlayManager.h>
+#include <OgreOverlayElementFactory.h>
+#include <OgrePanelOverlayElement.h>
+#endif
 
 class LIRenContainer;
 class LIRenOverlayManager;
