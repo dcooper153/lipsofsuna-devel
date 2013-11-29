@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -30,6 +30,7 @@
 #include "model-material.h"
 #include "model-nodes.h"
 #include "model-particle.h"
+#include "model-partition.h"
 #include "model-node.h"
 #include "model-shape.h"
 #include "model-shape-key.h"
@@ -52,6 +53,7 @@ struct _LIMdlModel
 	struct { int count; LIMdlLod* array; } lod;
 	struct { int count; LIMdlMaterial* array; } materials;
 	struct { int count; LIMdlParticleSystem* array; } particle_systems;
+	struct { int count; LIMdlPartition* array; } partitions;
 	struct { int count; LIMdlShape* array; } shapes;
 	struct { int count; LIMdlShapeKey* array; } shape_keys;
 	struct { int count; LIMdlVertex* array; } vertices;

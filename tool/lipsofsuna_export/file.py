@@ -177,6 +177,10 @@ class LIFile:
 			data.clear("wei")
 			if self.mesh.write_weights(data):
 				self.write_block("wei", data)
+			# Partitions.
+			data.clear("ptt")
+			if self.mesh.write_partitions(data):
+				self.write_block("ptt", data)
 			# Shape keys.
 			data.clear("shk")
 			if self.mesh.write_shape_keys(data):

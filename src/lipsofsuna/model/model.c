@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -70,6 +70,10 @@ static int private_read_particles (
 	LIMdlModel*  self,
 	LIArcReader* reader);
 
+static int private_read_partitions (
+	LIMdlModel*  self,
+	LIArcReader* reader);
+
 static int private_read_shapes (
 	LIMdlModel*  self,
 	LIArcReader* reader);
@@ -126,6 +130,10 @@ static int private_write_nodes (
 	LIArcWriter*      writer);
 
 static int private_write_particles (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
+
+static int private_write_partitions (
 	const LIMdlModel* self,
 	LIArcWriter*      writer);
 
@@ -223,6 +231,13 @@ LIMdlModel* limdl_model_new_copy (
 			limdl_particle_systems_init_copy (self->particle_systems.array + i, model->particle_systems.array + i);
 	}
 #endif
+	if (model->partitions.count)
+	{
+		self->partitions.array = lisys_calloc (model->partitions.count, sizeof (LIMdlPartition));
+		self->partitions.count = model->partitions.count;
+		for (i = 0 ; i < model->partitions.count ; i++)
+			limdl_partition_init_copy (self->partitions.array + i, model->partitions.array + i);
+	}
 	if (model->shapes.count)
 	{
 		self->shapes.array = lisys_calloc (model->shapes.count, sizeof (LIMdlShape));
@@ -967,6 +982,14 @@ static void private_clear (
 		lisys_free (self->hairs.array);
 	}
 
+	/* Free partitions. */
+	if (self->partitions.array != NULL)
+	{
+		for (i = 0 ; i < self->partitions.count ; i++)
+			limdl_partition_clear (self->partitions.array + i);
+		lisys_free (self->partitions.array);
+	}
+
 	/* Free shapes. */
 	if (self->shapes.array != NULL)
 	{
@@ -997,6 +1020,7 @@ static int private_read (
 	uint32_t size;
 	uint32_t version;
 	LIMdlLod* lod;
+	LIMdlPartition* partition;
 
 	/* Read magic. */
 	if (!liarc_reader_check_text (reader, "lips/mdl", ""))
@@ -1065,6 +1089,8 @@ static int private_read (
 			ret = private_read_hairs (self, reader);
 		else if (mesh && !strcmp (id, "par"))
 			ret = private_read_particles (self, reader);
+		else if (mesh && !strcmp (id, "ptt"))
+			ret = private_read_partitions (self, reader);
 		else if (!strcmp (id, "sha"))
 			ret = private_read_shapes (self, reader);
 		else
@@ -1122,6 +1148,18 @@ static int private_read (
 			if (self->vertices.array[i].bones[j] > self->weight_groups.count)
 			{
 				lisys_error_set (EINVAL, "weight group index out of bounds");
+				return 0;
+			}
+		}
+	}
+	for (i = 0 ; i < self->partitions.count ; i++)
+	{
+		partition = self->partitions.array + i;
+		for (j = 0 ; j < partition->vertices.count ; j++)
+		{
+			if (partition->vertices.array[i].index > self->vertices.count)
+			{
+				lisys_error_set (EINVAL, "partition vertex index out of bounds");
 				return 0;
 			}
 		}
@@ -1308,6 +1346,34 @@ static int private_read_particles (
 	{
 		if (!limdl_particle_system_read (self->particle_systems.array + i, reader))
 			return 0;
+	}
+
+	return 1;
+}
+
+static int private_read_partitions (
+	LIMdlModel*  self,
+	LIArcReader* reader)
+{
+	int i;
+	uint32_t tmp;
+
+	/* Read header. */
+	if (!liarc_reader_get_uint32 (reader, &tmp))
+		return 0;
+	self->partitions.count = tmp;
+
+	/* Read shapes. */
+	if (self->partitions.count)
+	{
+		self->partitions.array = lisys_calloc (self->partitions.count, sizeof (LIMdlPartition));
+		if (self->partitions.array == NULL)
+			return 0;
+		for (i = 0 ; i < self->partitions.count ; i++)
+		{
+			if (!limdl_partition_read (self->partitions.array + i, reader))
+				return 0;
+		}
 	}
 
 	return 1;
@@ -1543,6 +1609,7 @@ static int private_write (
 	    !private_write_block (self, "nod", private_write_nodes, writer) ||
 	    !private_write_block (self, "hai", private_write_hairs, writer) ||
 	    !private_write_block (self, "par", private_write_particles, writer) ||
+	    !private_write_block (self, "ptt", private_write_partitions, writer) ||
 	    !private_write_block (self, "sha", private_write_shapes, writer))
 		return 0;
 	return 1;
@@ -1723,6 +1790,30 @@ static int private_write_particles (
 	for (i = 0 ; i < self->particle_systems.count ; i++)
 	{
 		if (!limdl_particle_system_write (self->particle_systems.array + i, writer))
+			return 0;
+	}
+
+	return 1;
+}
+
+static int private_write_partitions (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
+{
+	int i;
+	LIMdlPartition* partition;
+
+	/* Check if writing is needed. */
+	if (!self->partitions.count)
+		return 1;
+
+	/* Write the partitions. */
+	if (!liarc_writer_append_uint32 (writer, self->partitions.count))
+		return 0;
+	for (i = 0 ; i < self->partitions.count ; i++)
+	{
+		partition = self->partitions.array + i;
+		if (!limdl_partition_write (partition, writer))
 			return 0;
 	}
 

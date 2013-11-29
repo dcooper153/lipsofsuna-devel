@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 #ifndef __MODEL_TYPES_H__
 #define __MODEL_TYPES_H__
 
-#include <lipsofsuna/math.h>
+#include "lipsofsuna/math.h"
 
 enum
 {
@@ -45,6 +45,8 @@ typedef void (*LIMdlNodeTransformFunc)(void*, LIMdlNode*, LIMatTransform*);
 typedef struct _LIMdlParticle LIMdlParticle;
 typedef struct _LIMdlParticleFrame LIMdlParticleFrame;
 typedef struct _LIMdlParticleSystem LIMdlParticleSystem;
+typedef struct _LIMdlPartition LIMdlPartition;
+typedef struct _LIMdlPartitionVertex LIMdlPartitionVertex;
 typedef struct _LIMdlPose LIMdlPose;
 typedef struct _LIMdlPoseChannel LIMdlPoseChannel;
 typedef int LIMdlPoseChannelState;

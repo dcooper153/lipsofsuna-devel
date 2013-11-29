@@ -18,6 +18,7 @@ class LIMesh:
 		self.vertmapping = [] # los_index -> bl_index
 		self.weightgroupdict = {}
 		self.weightgrouplist = []
+		self.partitions = {}
 		# Calculate the bounding box.
 		# This may be needed by generated texture coordinates.
 		if len(mesh.vertices):
@@ -133,13 +134,24 @@ class LIMesh:
 				weights = []
 				for weight in bvert.groups:
 					group = obj.vertex_groups[weight.group]
-					if group.name not in self.weightgroupdict:
-						grpidx = len(self.weightgrouplist)
-						self.weightgroupdict[group.name] = grpidx
-						self.weightgrouplist.append(group.name)
-					else:
-						grpidx = self.weightgroupdict[group.name]
-					weights.append((grpidx, weight.weight))
+					if not group.name.startswith('#'):
+						# Bone weight.
+						if group.name not in self.weightgroupdict:
+							grpidx = len(self.weightgrouplist)
+							self.weightgroupdict[group.name] = grpidx
+							self.weightgrouplist.append(group.name)
+						else:
+							grpidx = self.weightgroupdict[group.name]
+						weights.append((grpidx, weight.weight))
+					elif group.name.startswith('#P:'):
+						# Partition.
+						name = group.name[3:]
+						part = self.partitions.get(name)
+						index = len(self.vertlist)
+						if part:
+							part.append((index, weight.weight))
+						else:
+							self.partitions[name] = [(index, weight.weight)]
 				# Add vertex.
 				vert = LIVertex(len(self.vertlist), bvert.co, no, uv, weights)
 				self.vertmapping.append(indices[i])
@@ -196,6 +208,21 @@ class LIMesh:
 		writer.write_marker()
 		for mat in self.matlist:
 			mat.write_info(writer)
+		return True
+
+	def write_partitions(self, writer):
+		if not self.partitions:
+			return False
+		names = sorted([k for k in self.partitions])
+		writer.write_int(len(names))
+		for name in names:
+			writer.write_marker()
+			weights = self.partitions[name]
+			writer.write_string(name)
+			writer.write_int(len(weights))
+			for w in weights:
+				writer.write_int(w[0])
+				writer.write_float(w[1])
 		return True
 
 	def write_shape_keys(self, writer):
