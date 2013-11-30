@@ -89,6 +89,7 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "marker", type = "string", description = "Map marker name."},
 	{name = "mass", type = "number", default = 50, description = "Mass in kilograms."},
 	{name = "model", type = "string", description = "Model name."},
+	{name = "model_partitions", type = "dict", dict = {type = "string"}, description = "Dictionary of model partitions."},
 	{name = "models", type = "dict", dict = {type = "string"}, description = "Dictionary or model names."},
 	{name = "mouth_style", type = "string", description = "Mouth style."},
 	{name = "personality", type = "string", description = "Name of the personality type.", details = {spec = "Personalityspec"}},

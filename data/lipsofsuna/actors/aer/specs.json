@@ -59,6 +59,14 @@
 		},
 		"inventory_size": 20,
 		"model": "aer1",
+		"model_partitions":
+		{
+			"arm.L": "body",
+			"arm.R": "body",
+			"body": "body",
+			"head": "head",
+			"head_meat": "head_meat"
+		},
 		"models":
 		{
 			"skeleton": "aer1",

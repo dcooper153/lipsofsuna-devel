@@ -217,8 +217,24 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 			end
 		end
 	end
+	-- Partitioning.
+	local partitions = nil
+	if args.spec.model_partitions then
+		partitions = {}
+		for k,v in pairs(args.spec.model_partitions) do
+			if (v == "body") or
+			   (v == "head" and not args.beheaded) or
+			   (v == "head_meat" and args.beheaded) then
+				table.insert(partitions, k)
+			end
+		end
+	end
 	-- Morph and merge.
-	merger:add_model_morph_weld(ref, morph)
+	if partitions then
+		merger:add_model_morph_partition_weld(ref, morph, partitions)
+	else
+		merger:add_model_morph_weld(ref, morph)
+	end
 end
 
 return ModelBuilder
