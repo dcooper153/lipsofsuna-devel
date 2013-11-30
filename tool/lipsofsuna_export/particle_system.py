@@ -1,3 +1,4 @@
+import os
 from .format import *
 from .particle import *
 
@@ -19,7 +20,7 @@ class LIParticleSystem:
 			# Set material shader.
 			mat = self.object.material_slots[mat]
 			try:
-				self.shader = mat.material["shader"]
+				self.shader = mat.material["material"]
 			except:
 				pass
 			# Set material texture.
