@@ -53,6 +53,32 @@ ModelMerger.add_model_morph_weld = function(self, model, targets)
 	Los.model_merger_add_model_morph_weld(self.handle, model.handle, unpack(targets))
 end
 
+--- Adds a morphed model.
+-- @param self ModelMerger.
+-- @param model Model to add.
+-- @param targets List of alternating morph target names and influence.
+-- @param partitions List of partition names.
+ModelMerger.add_model_morph_partition = function(self, model, targets, partitions)
+	local tmp = {}
+	for k,v in ipairs(targets) do table.insert(tmp, v) end
+	table.insert(tmp, true)
+	for k,v in ipairs(partitions) do table.insert(tmp, v) end
+	Los.model_merger_add_model_morph_partition(self.handle, model.handle, unpack(tmp))
+end
+
+--- Adds a morphed model with normal welding.
+-- @param self ModelMerger.
+-- @param model Model to add.
+-- @param targets List of alternating morph target names and influence.
+-- @param partitions List of partition names.
+ModelMerger.add_model_morph_partition_weld = function(self, model, targets, partitions)
+	local tmp = {}
+	for k,v in ipairs(targets) do table.insert(tmp, v) end
+	table.insert(tmp, true)
+	for k,v in ipairs(partitions) do table.insert(tmp, v) end
+	Los.model_merger_add_model_morph_partition_weld(self.handle, model.handle, unpack(tmp))
+end
+
 --- Queues finishing the build.
 -- @param self ModelMerger.
 ModelMerger.finish = function(self)

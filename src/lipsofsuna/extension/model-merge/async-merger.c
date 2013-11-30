@@ -87,14 +87,24 @@ void limdl_async_merger_free (
 }
 
 /**
- * \brief Queues a model merge task.
+ * \brief Queues a morphed model merge task.
  * \param self Merger.
  * \param model Model.
+ * \param morph_array Array of morphs.
+ * \param morph_count Number of morphs. Zero to disable morphing.
+ * \param partition_array Array of partitions.
+ * \param partition_count Number of partitions. Zero to disable partitioning.
+ * \param enable_welding One to enable welding. Zero otherwise.
  * \return One if succeeded. False otherwise.
  */
 int limdl_async_merger_add_model (
-	LIMdlAsyncMerger* self,
-	const LIMdlModel* model)
+	LIMdlAsyncMerger*            self,
+	const LIMdlModel*            model,
+	const LIMdlAsyncMergerMorph* morph_array,
+	int                          morph_count,
+	const LIMdlAsyncMergerMorph* partition_array,
+	int                          partition_count,
+	int                          enable_welding)
 {
 	LIMdlAsyncMergerTask* task;
 
@@ -105,88 +115,20 @@ int limdl_async_merger_add_model (
 	task->add_model.type = LIMDL_ASYNC_MERGER_ADD_MODEL;
 	task->add_model.model = self->model;
 	task->add_model.model_add = limdl_model_new_copy (model, 0);
-
-	/* Add the task. */
-	if (!lisys_serial_worker_push_task (self->worker, task))
-	{
-		private_task_free (task);
-		return 0;
-	}
-
-	return 1;
-}
-
-/**
- * \brief Queues a morphed model merge task.
- * \param self Merger.
- * \param model Model.
- * \param morph_array Array of morphs.
- * \param morph_count Number of morphs.
- * \return One if succeeded. False otherwise.
- */
-int limdl_async_merger_add_model_morph (
-	LIMdlAsyncMerger*            self,
-	const LIMdlModel*            model,
-	const LIMdlAsyncMergerMorph* morph_array,
-	int                          morph_count)
-{
-	LIMdlAsyncMergerTask* task;
-
-	/* Create the task. */
-	task = lisys_calloc (1, sizeof (LIMdlAsyncMergerTask));
-	if (task == NULL)
-		return 0;
-	task->add_model_morph.type = LIMDL_ASYNC_MERGER_ADD_MODEL_MORPH;
-	task->add_model_morph.model = self->model;
-	task->add_model_morph.model_add = limdl_model_new_copy (model, 0);
-	task->add_model_morph.model_ref = limdl_model_new_copy (model, 1);
 	if (morph_count)
 	{
-		task->add_model_morph.morphs.count = morph_count;
-		task->add_model_morph.morphs.array = lisys_calloc (morph_count, sizeof (LIMdlAsyncMergerMorph));
-		memcpy (task->add_model_morph.morphs.array, morph_array, morph_count * sizeof (LIMdlAsyncMergerMorph));
+		task->add_model.model_ref = limdl_model_new_copy (model, 1);
+		task->add_model.morphs.count = morph_count;
+		task->add_model.morphs.array = lisys_calloc (morph_count, sizeof (LIMdlAsyncMergerMorph));
+		memcpy (task->add_model.morphs.array, morph_array, morph_count * sizeof (LIMdlAsyncMergerMorph));
 	}
-
-	/* Add the task. */
-	if (!lisys_serial_worker_push_task (self->worker, task))
+	if (partition_count)
 	{
-		private_task_free (task);
-		return 0;
+		task->add_model.partitions.count = partition_count;
+		task->add_model.partitions.array = lisys_calloc (partition_count, sizeof (LIMdlAsyncMergerMorph));
+		memcpy (task->add_model.partitions.array, partition_array, partition_count * sizeof (LIMdlAsyncMergerMorph));
 	}
-
-	return 1;
-}
-
-/**
- * \brief Queues a morphed and welded model merge task.
- * \param self Merger.
- * \param model Model.
- * \param morph_array Array of morphs.
- * \param morph_count Number of morphs.
- * \return One if succeeded. False otherwise.
- */
-int limdl_async_merger_add_model_morph_weld (
-	LIMdlAsyncMerger*            self,
-	const LIMdlModel*            model,
-	const LIMdlAsyncMergerMorph* morph_array,
-	int                          morph_count)
-{
-	LIMdlAsyncMergerTask* task;
-
-	/* Create the task. */
-	task = lisys_calloc (1, sizeof (LIMdlAsyncMergerTask));
-	if (task == NULL)
-		return 0;
-	task->add_model_morph.type = LIMDL_ASYNC_MERGER_ADD_MODEL_MORPH_WELD;
-	task->add_model_morph.model = self->model;
-	task->add_model_morph.model_add = limdl_model_new_copy (model, 0);
-	task->add_model_morph.model_ref = limdl_model_new_copy (model, 1);
-	if (morph_count)
-	{
-		task->add_model_morph.morphs.count = morph_count;
-		task->add_model_morph.morphs.array = lisys_calloc (morph_count, sizeof (LIMdlAsyncMergerMorph));
-		memcpy (task->add_model_morph.morphs.array, morph_array, morph_count * sizeof (LIMdlAsyncMergerMorph));
-	}
+	task->add_model.enable_welding = enable_welding;
 
 	/* Add the task. */
 	if (!lisys_serial_worker_push_task (self->worker, task))
@@ -309,36 +251,47 @@ static LIMdlModel* private_task_handle (
 {
 	int i;
 	LIMdlBuilder* builder;
+	const char** tmp;
 	LIMdlModel* res = NULL;
 
 	switch (task->type)
 	{
 		case LIMDL_ASYNC_MERGER_ADD_MODEL:
-			limdl_model_merge (task->add_model.model, task->add_model.model_add);
-			break;
-		case LIMDL_ASYNC_MERGER_ADD_MODEL_MORPH:
-			for (i = 0 ; i < task->add_model_morph.morphs.count ; i++)
+			if (task->add_model.partitions.count && task->add_model.model_add->partitions.count)
 			{
-				limdl_model_morph (
-					task->add_model_morph.model_add,
-					task->add_model_morph.model_ref,
-					task->add_model_morph.model_ref,
-					task->add_model_morph.morphs.array[i].shape,
-					task->add_model_morph.morphs.array[i].value);
+				tmp = lisys_calloc (task->add_model.partitions.count, sizeof (char*));
+				if (tmp == NULL)
+					break;
+				for (i = 0 ; i < task->add_model.partitions.count ; i++)
+					tmp[i] = task->add_model.partitions.array[i].shape;
+				limdl_model_apply_partitions (task->add_model.model_add,
+					tmp, task->add_model.partitions.count);
 			}
-			limdl_model_merge (task->add_model_morph.model, task->add_model_morph.model_add);
-			break;
-		case LIMDL_ASYNC_MERGER_ADD_MODEL_MORPH_WELD:
-			builder = limdl_builder_new (task->add_model_morph.model);
+			if (task->add_model.morphs.count)
+			{
+				for (i = 0 ; i < task->add_model.morphs.count ; i++)
+				{
+					limdl_model_morph (
+						task->add_model.model_add,
+						task->add_model.model_ref,
+						task->add_model.model_ref,
+						task->add_model.morphs.array[i].shape,
+						task->add_model.morphs.array[i].value);
+				}
+			}
+			builder = limdl_builder_new (task->add_model.model);
 			if (builder != NULL)
 			{
-				if (!limdl_builder_merge_model_welded (builder, task->add_model_morph.model_add, NULL))
+				if (task->add_model.enable_welding)
 				{
-					limdl_builder_free (builder);
-					return 0;
+					if (limdl_builder_merge_model_welded (builder, task->add_model.model_add, NULL))
+						limdl_builder_finish (builder, 0);
 				}
-				/* FIXME: Recalculates the bounding box from scratch even though could just calculate the union. */
-				limdl_builder_finish (builder, 0);
+				else
+				{
+					if (limdl_builder_merge_model (builder, task->add_model.model_add, NULL))
+						limdl_builder_finish (builder, 0);
+				}
 				limdl_builder_free (builder);
 			}
 			break;
@@ -372,12 +325,10 @@ static void private_task_free (
 	{
 		case LIMDL_ASYNC_MERGER_ADD_MODEL:
 			limdl_model_free (task->add_model.model_add);
-			break;
-		case LIMDL_ASYNC_MERGER_ADD_MODEL_MORPH:
-		case LIMDL_ASYNC_MERGER_ADD_MODEL_MORPH_WELD:
-			limdl_model_free (task->add_model_morph.model_add);
-			limdl_model_free (task->add_model_morph.model_ref);
-			lisys_free (task->add_model_morph.morphs.array);
+			if (task->add_model.model_ref != NULL)
+				limdl_model_free (task->add_model.model_ref);
+			lisys_free (task->add_model.partitions.array);
+			lisys_free (task->add_model.morphs.array);
 			break;
 		case LIMDL_ASYNC_MERGER_FINISH:
 			if (task->finish.model != NULL)

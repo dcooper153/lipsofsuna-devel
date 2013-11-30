@@ -77,6 +77,11 @@ LIAPICALL (LIMdlModel*, limdl_model_new_from_file, (
 LIAPICALL (void, limdl_model_free, (
 	LIMdlModel* self));
 
+LIAPICALL (int, limdl_model_apply_partitions, (
+	LIMdlModel*  self,
+	const char** partition_array,
+	int          partition_count));
+
 LIAPICALL (void, limdl_model_calculate_bounds, (
 	LIMdlModel* self));
 

@@ -27,7 +27,6 @@ enum
 {
 	LIMDL_ASYNC_MERGER_ADD_MODEL,
 	LIMDL_ASYNC_MERGER_ADD_MODEL_MORPH,
-	LIMDL_ASYNC_MERGER_ADD_MODEL_MORPH_WELD,
 	LIMDL_ASYNC_MERGER_FINISH,
 	LIMDL_ASYNC_MERGER_REPLACE_MATERIAL
 };
@@ -48,19 +47,19 @@ union _LIMdlAsyncMergerTask
 		int type;
 		LIMdlModel* model;
 		LIMdlModel* model_add;
-	} add_model;
-	struct
-	{
-		int type;
-		LIMdlModel* model;
-		LIMdlModel* model_add;
 		LIMdlModel* model_ref;
 		struct
 		{
 			int count;
 			LIMdlAsyncMergerMorph* array;
+		} partitions;
+		struct
+		{
+			int count;
+			LIMdlAsyncMergerMorph* array;
 		} morphs;
-	} add_model_morph;
+		int enable_welding;
+	} add_model;
 	struct
 	{
 		int type;
@@ -95,20 +94,13 @@ LIAPICALL (void, limdl_async_merger_free, (
 	LIMdlAsyncMerger* self));
 
 LIAPICALL (int, limdl_async_merger_add_model, (
-	LIMdlAsyncMerger* self,
-	const LIMdlModel* model));
-
-LIAPICALL (int, limdl_async_merger_add_model_morph, (
 	LIMdlAsyncMerger*            self,
 	const LIMdlModel*            model,
 	const LIMdlAsyncMergerMorph* morph_array,
-	int                          morph_count));
-
-LIAPICALL (int, limdl_async_merger_add_model_morph_weld, (
-	LIMdlAsyncMerger*            self,
-	const LIMdlModel*            model,
-	const LIMdlAsyncMergerMorph* morph_array,
-	int                          morph_count));
+	int                          morph_count,
+	const LIMdlAsyncMergerMorph* partition_array,
+	int                          partition_count,
+	int                          enable_welding));
 
 LIAPICALL (int, limdl_async_merger_finish, (
 	LIMdlAsyncMerger* self));

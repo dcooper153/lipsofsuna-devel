@@ -361,6 +361,80 @@ void limdl_model_free (
 }
 
 /**
+ * \brief Removes faces that don't belong to the given partitions.
+ * \param self Model.
+ * \param partition_array Array of partition names.
+ * \param partition_count Number of partitions.
+ * \return One on success. Zero otherwise.
+ */
+int limdl_model_apply_partitions (
+	LIMdlModel*  self,
+	const char** partition_array,
+	int          partition_count)
+{
+	int i;
+	int j;
+	int k;
+	int src;
+	int dst;
+	int* mask;
+	LIMdlFaces* faces;
+	LIMdlLod* lod;
+	LIMdlPartition* partition;
+
+	/* Allocate the vertex mask. */
+	mask = lisys_calloc (self->vertices.count, sizeof (int));
+	if (mask == NULL)
+		return 0;
+
+	/* Find the vertices belonging to the partitions. */
+	for (i = 0 ; i < partition_count ; i++)
+	{
+		for (j = 0 ; j < self->partitions.count ; j++)
+		{
+			partition = self->partitions.array + j;
+			if (!strcmp (partition_array[i], partition->name))
+			{
+				for (k = 0 ; k < partition->vertices.count ; k++)
+					mask[partition->vertices.array[k].index] = 1;
+			}
+		}
+	}
+
+	/* Remove faces with vertices that are not in the partitions. */
+	for (i = 0 ; i < self->lod.count ; i++)
+	{
+		lod = self->lod.array + i;
+		for (j = lod->face_groups.count - 1 ; j >= 0 ; j--)
+		{
+			faces = lod->face_groups.array + j;
+			for (src = dst = faces->start ; src < faces->start + faces->count ; src += 3)
+			{
+				if (mask[lod->indices.array[src]] && mask[lod->indices.array[src + 1]] && mask[lod->indices.array[src + 2]])
+				{
+					lod->indices.array[dst] = lod->indices.array[src];
+					lod->indices.array[dst + 1] = lod->indices.array[src + 1];
+					lod->indices.array[dst + 2] = lod->indices.array[src + 2];
+					dst += 3;
+				}
+			}
+			if (src != dst)
+			{
+				memmove (lod->indices.array + dst, lod->indices.array + src, lod->indices.count - src);
+				faces->count = dst;
+				lod->indices.count -= src - dst;
+			}
+		}
+	}
+
+	/* FIXME: Partitions now contain invalid indices. */
+
+	lisys_free (mask);
+
+	return 1;
+}
+
+/**
  * \brief Recalculates the bounding box of the model.
  *
  * Loops through all vertices of the model and calculates the minimum and
