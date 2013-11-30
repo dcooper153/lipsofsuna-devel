@@ -50,6 +50,7 @@ extern LIMaiExtensionInfo liext_noise_info;
 extern LIMaiExtensionInfo liext_object_info;
 extern LIMaiExtensionInfo liext_object_physics_info;
 extern LIMaiExtensionInfo liext_object_render_info;
+extern LIMaiExtensionInfo liext_particle_info;
 extern LIMaiExtensionInfo liext_password_info;
 extern LIMaiExtensionInfo liext_physics_info;
 extern LIMaiExtensionInfo liext_physics_terrain_info;
@@ -121,6 +122,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "graphics", &liext_graphics_info },
 		{ "heightmap-render", &liext_heightmap_render_info },
 		{ "input", &liext_input_info },
+		{ "particle", &liext_particle_info },
 		{ "render-object", &liext_object_render_info },
 		{ "render", &liext_render_info },
 		{ "render-model", &liext_render_model_info },

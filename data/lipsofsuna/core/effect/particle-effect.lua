@@ -1,4 +1,4 @@
---- TODO:doc
+--- Particle effect.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -10,29 +10,29 @@
 
 local Class = require("system/class")
 local EffectObject = require("core/effect/effect-object")
-local RenderObject = require("system/render-object")
+local Particle = require("system/particle")
 
---- TODO:doc
+--- Particle effect.
 -- @type ParticleEffect
 local ParticleEffect = Class("ParticleEffect", EffectObject)
 
 ParticleEffect.new = function(clss, args)
 	local self = EffectObject.new(clss, args)
-	self.render = RenderObject()
-	self.render:particle_animation{loop = false}
-	self.render:set_render_queue("8")
-	self.render:set_particle(args.particle)
-	self.render:set_visible(true)
+	self.particle = Particle()
+	self.particle:add_script(args.particle)
+--	self.particle:set_looping(false)
+	self.particle:set_render_queue("8")
+	self.particle:set_visible(true)
 	return self
 end
 
 ParticleEffect.detach = function(self)
-	self.render:set_visible(false)
+	self.particle:set_visible(false)
 	EffectObject.detach(self)
 end
 
 ParticleEffect.unparent = function(self)
-	self.render:set_particle_emitting(false)
+	self.particle:set_emitting(false)
 	self.unparent_timer = 5
 	self.parent = nil
 end
@@ -48,15 +48,13 @@ ParticleEffect.update = function(self, secs)
 end
 
 ParticleEffect.set_position = function(self, v)
-	self.render:set_position(v)
+	self.particle:set_position(v)
 	EffectObject.set_position(self, v)
 end
 
 ParticleEffect.set_rotation = function(self, v)
-	self.render:set_rotation(v)
+	self.particle:set_rotation(v)
 	EffectObject.set_rotation(self, v)
 end
 
 return ParticleEffect
-
-
