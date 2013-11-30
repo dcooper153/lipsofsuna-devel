@@ -222,15 +222,13 @@ LIMdlModel* limdl_model_new_copy (
 		for (i = 0 ; i < model->nodes.count ; i++)
 			self->nodes.array[i] = limdl_node_copy (model->nodes.array[i], 1);
 	}
-#if 0
 	if (model->particle_systems.count)
 	{
 		self->particle_systems.array = lisys_calloc (model->particle_systems.count, sizeof (LIMdlParticleSystem));
 		self->particle_systems.count = model->particle_systems.count;
 		for (i = 0 ; i < model->particle_systems.count ; i++)
-			limdl_particle_systems_init_copy (self->particle_systems.array + i, model->particle_systems.array + i);
+			limdl_particle_system_init_copy (self->particle_systems.array + i, model->particle_systems.array + i);
 	}
-#endif
 	if (model->partitions.count)
 	{
 		self->partitions.array = lisys_calloc (model->partitions.count, sizeof (LIMdlPartition));

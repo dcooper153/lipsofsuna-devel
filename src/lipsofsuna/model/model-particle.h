@@ -55,6 +55,12 @@ struct _LIMdlParticleSystem
 	} particles;
 };
 
+/*****************************************************************************/
+
+LIAPICALL (int, limdl_particle_init_copy, (
+	LIMdlParticle* self,
+	LIMdlParticle* particle));
+
 LIAPICALL (void, limdl_particle_clear, (
 	LIMdlParticle* self));
 
@@ -73,6 +79,8 @@ LIAPICALL (int, limdl_particle_get_state, (
 	LIMatVector*   position,
 	float*         fade));
 
+/*****************************************************************************/
+
 LIAPICALL (int, limdl_particle_frame_read, (
 	LIMdlParticleFrame* self,
 	LIArcReader*        reader));
@@ -80,6 +88,12 @@ LIAPICALL (int, limdl_particle_frame_read, (
 LIAPICALL (int, limdl_particle_frame_write, (
 	const LIMdlParticleFrame* self,
 	LIArcWriter*              writer));
+
+/*****************************************************************************/
+
+LIAPICALL (int, limdl_particle_system_init_copy, (
+	LIMdlParticleSystem* self,
+	LIMdlParticleSystem* system));
 
 LIAPICALL (void, limdl_particle_system_clear, (
 	LIMdlParticleSystem* self));

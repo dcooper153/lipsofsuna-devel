@@ -37,6 +37,48 @@ static int private_read_v2 (
 
 /*****************************************************************************/
 
+int limdl_particle_system_init_copy (
+	LIMdlParticleSystem* self,
+	LIMdlParticleSystem* system)
+{
+	int i;
+
+	memset (self, 0, sizeof (LIMdlParticleSystem));
+	self->flags = system->flags;
+	self->frame_start = system->frame_start;
+	self->frame_end_emit = system->frame_end_emit;
+	self->frame_end = system->frame_end;
+	self->particle_size = system->particle_size;
+
+	/* Copy the material name. */
+	self->shader = lisys_string_dup (system->shader);
+	if (self->shader == NULL)
+		return 0;
+
+	/* Copy the texture name. */
+	self->texture = lisys_string_dup (system->texture);
+	if (self->texture == NULL)
+		return 0;
+
+	/* Allocate the particles. */
+	if (system->particles.count > 0)
+	{
+		self->particles.array = lisys_calloc (system->particles.count, sizeof (LIMdlParticle));
+		if (self->particles.array == NULL)
+			return 0;
+		self->particles.count = system->particles.count;
+	}
+
+	/* Copy the particles. */
+	for (i = 0 ; i < self->particles.count ; i++)
+	{
+		if (!limdl_particle_init_copy (self->particles.array + i, system->particles.array + i))
+			return 0;
+	}
+
+	return 1;
+}
+
 void limdl_particle_system_clear (
 	LIMdlParticleSystem* self)
 {

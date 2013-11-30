@@ -27,6 +27,32 @@
 
 #define TIMESCALE 0.02f
 
+int limdl_particle_init_copy (
+	LIMdlParticle* self,
+	LIMdlParticle* particle)
+{
+	int i;
+
+	memset (self, 0, sizeof (LIMdlParticle));
+	self->frame_start = particle->frame_start;
+	self->frame_end = particle->frame_end;
+
+	/* Allocate the frames. */
+	if (particle->frames.count > 0)
+	{
+		self->frames.array = lisys_calloc (particle->frames.count, sizeof (LIMdlParticleFrame));
+		if (self->frames.array == NULL)
+			return 0;
+		self->frames.count = particle->frames.count;
+	}
+
+	/* Copy the frames. */
+	for (i = 0 ; i < self->frames.count ; i++)
+		self->frames.array[i] = particle->frames.array[i];
+
+	return 1;
+}
+
 void limdl_particle_clear (
 	LIMdlParticle* self)
 {
