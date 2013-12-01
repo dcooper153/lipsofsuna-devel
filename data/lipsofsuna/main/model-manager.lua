@@ -39,7 +39,7 @@ ModelManager.find_by_name = function(self, name)
 		local spec = ModelSpec:find_by_name(name)
 		model = Model()
 		model.name = name
-		model:load(spec and spec.model or name, Client and true or false)
+		model.loaded = model:load(spec and spec.model or name, Client and true or false)
 		self.models_by_name[name] = model
 		-- Edit materials.
 		if Client and spec then

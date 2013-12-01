@@ -19,7 +19,12 @@ local ParticleEffect = Class("ParticleEffect", EffectObject)
 ParticleEffect.new = function(clss, args)
 	local self = EffectObject.new(clss, args)
 	self.particle = Particle()
-	self.particle:add_script(args.particle)
+	local model = Main.models:find_by_name(args.particle)
+	if model and model.loaded then
+		self.particle:add_model(model)
+	else
+		self.particle:add_script(args.particle)
+	end
 	self.particle:set_looping(false)
 	self.particle:set_render_queue("8")
 	self.particle:set_visible(true)
