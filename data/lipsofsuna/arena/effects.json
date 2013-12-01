@@ -26,7 +26,7 @@
 	{
 		"type": "Effectspec",
 		"name": "flesh impact 1",
-		"particle": "impact1",
+		"particle": "blood1",
 		"particle_life": 5,
 		"sound": "impact-flesh1",
 		"sound_pitch_min": 0.9,
