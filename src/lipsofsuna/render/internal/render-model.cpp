@@ -158,23 +158,6 @@ int LIRenModel::get_loaded () const
 }
 
 /**
- * \brief Gets the current LIMdlModel.
- * \return Model or NULL.
- */
-LIMdlModel* LIRenModel::get_model () const
-{
-	if (mesh.isNull ())
-		return NULL;
-
-	LIRenMeshBuilder* builder = (LIRenMeshBuilder*) lialg_strdic_find (
-		render->mesh_builders, mesh->getName ().c_str ());
-	if (builder == NULL)
-		return NULL;
-
-	return builder->get_model ();
-}
-
-/**
  * \brief Sets the current LIMdlModel.
  * \param model Model.
  */

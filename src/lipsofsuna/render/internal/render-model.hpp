@@ -44,8 +44,6 @@ public:
 
 	int get_loaded () const;
 
-	LIMdlModel* get_model () const;
-
 	int set_model (
 		LIMdlModel* model);
 
@@ -56,7 +54,6 @@ private:
 
 private:
 	int id;
-	LIMdlModel* model;
 	LIRenRender* render;
 
 // FIXME
