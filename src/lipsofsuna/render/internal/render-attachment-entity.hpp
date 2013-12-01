@@ -37,10 +37,9 @@ class LIRenAttachmentEntity : public LIRenAttachment
 public:
 	LIRenAttachmentEntity (LIRenObject* object, LIRenModel* model);
 	virtual ~LIRenAttachmentEntity ();
-	virtual LIMdlModel* get_model () const;
+	virtual LIRenModelData* get_model () const;
 	virtual bool has_model (LIRenModel* model);
 	virtual bool is_loaded () const;
-	virtual LIMdlNode* find_node (const char* name);
 	virtual void remove_model (LIRenModel* model);
 	virtual void replace_texture (const char* name, Ogre::TexturePtr& texture);
 	virtual void update (float secs);

@@ -26,6 +26,7 @@
 typedef struct _LIMdlPoseBufferBone LIMdlPoseBufferBone;
 struct _LIMdlPoseBufferBone
 {
+	char* name;
 	LIMatTransform transform;
 	LIMatVector scale;
 };
@@ -33,18 +34,21 @@ struct _LIMdlPoseBufferBone
 typedef struct _LIMdlPoseBuffer LIMdlPoseBuffer;
 struct _LIMdlPoseBuffer
 {
-	LIMdlModel* model;
 	struct { int count; LIMdlPoseBufferBone* array; } bones;
 };
 
 LIAPICALL (LIMdlPoseBuffer*, limdl_pose_buffer_new, (
-	LIMdlModel* model));
+	const LIMdlModel* model));
+
+LIAPICALL (LIMdlPoseBuffer*, limdl_pose_buffer_new_copy, (
+	const LIMdlPoseBuffer* buffer));
 
 LIAPICALL (void, limdl_pose_buffer_free, (
 	LIMdlPoseBuffer* self));
 
-LIAPICALL (void, limdl_pose_buffer_reset, (
-	LIMdlPoseBuffer* self));
+LIAPICALL (void, limdl_pose_buffer_copy_pose, (
+	LIMdlPoseBuffer*       self,
+	const LIMdlPoseBuffer* src));
 
 LIAPICALL (void, limdl_pose_buffer_update, (
 	LIMdlPoseBuffer*   self,

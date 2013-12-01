@@ -50,10 +50,10 @@ LIAPICALL (void, limdl_pose_free, (
 	LIMdlPose* self));
 
 LIAPICALL (void, limdl_pose_calculate_node_tranformation, (
-	LIMdlPose*      self,
-	const char*     node,
-	LIMatTransform* result_transform,
-	float*          result_scale));
+	const LIMdlPose* self,
+	const char*      node,
+	LIMatTransform*  result_transform,
+	float*           result_scale));
 
 LIAPICALL (void, limdl_pose_clear_channel_node_priorities, (
 	LIMdlPose*  self,

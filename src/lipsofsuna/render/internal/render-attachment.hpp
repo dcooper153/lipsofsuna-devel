@@ -20,6 +20,7 @@
 
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/model.h"
+#include "render-model-data.hpp"
 #include <OgreTexture.h>
 
 class LIRenModel;
@@ -31,8 +32,7 @@ class LIRenAttachment
 public:
 	LIRenAttachment (LIRenObject* object);
 	virtual ~LIRenAttachment ();
-	virtual LIMdlNode* find_node (const char* name);
-	virtual LIMdlModel* get_model () const;
+	virtual LIRenModelData* get_model () const;
 	virtual bool has_model (LIRenModel* model);
 	virtual bool is_loaded () const;
 	virtual void remove_model (LIRenModel* model);

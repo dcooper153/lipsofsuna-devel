@@ -30,8 +30,8 @@ struct _LIMdlPoseSkeleton
 };
 
 LIAPICALL (LIMdlPoseSkeleton*, limdl_pose_skeleton_new, (
-	LIMdlModel** models,
-	int          count));
+	const LIMdlModel** models,
+	int                count));
 
 LIAPICALL (void, limdl_pose_skeleton_free, (
 	LIMdlPoseSkeleton* self));
@@ -40,10 +40,15 @@ LIAPICALL (LIMdlNode*, limdl_pose_skeleton_find_node, (
 	const LIMdlPoseSkeleton* self,
 	const char*              name));
 
-LIAPICALL (void, limdl_pose_skeleton_rebuild, (
+LIAPICALL (void, limdl_pose_skeleton_rebuild_from_models, (
 	LIMdlPoseSkeleton* self,
-	LIMdlModel**       models,
+	const LIMdlModel** models,
 	int                count));
+
+LIAPICALL (void, limdl_pose_skeleton_rebuild_from_skeletons, (
+	LIMdlPoseSkeleton*        self,
+	const LIMdlPoseSkeleton** skeletons,
+	int                       count));
 
 LIAPICALL (void, limdl_pose_skeleton_update, (
 	LIMdlPoseSkeleton* self,

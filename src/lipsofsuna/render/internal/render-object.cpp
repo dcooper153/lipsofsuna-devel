@@ -221,19 +221,8 @@ int LIRenObject::find_node (
 	/* Search from the skeleton. */
 	if (pose_skeleton != NULL)
 		node = limdl_pose_skeleton_find_node (pose_skeleton, name);
-
-	/* Search from attachments. */
 	if (node == NULL)
-	{
-		for (size_t i = 0 ; i < attachments.size () ; i++)
-		{
-			node = attachments[i]->find_node (name);
-			if (node != NULL)
-				break;
-		}
-		if (node == NULL)
-			return 0;
-	}
+		return 0;
 
 	/* Get the transformation. */
 	limdl_node_get_world_transform (node, &scale, &transform);
@@ -678,7 +667,7 @@ Ogre::TexturePtr LIRenObject::create_texture (int width, int height, const void*
 void LIRenObject::rebuild_skeleton ()
 {
 	int count;
-	LIMdlModel** models;
+	const LIMdlPoseSkeleton** skeletons;
 
 	/* Check if a skeleton exists. */
 	skeleton_rebuild_needed = 0;
@@ -688,14 +677,14 @@ void LIRenObject::rebuild_skeleton ()
 	/* Check for attachments. */
 	if (!attachments.size ())
 	{
-		limdl_pose_skeleton_rebuild (pose_skeleton, NULL, 0);
+		limdl_pose_skeleton_rebuild_from_skeletons (pose_skeleton, NULL, 0);
 		return;
 	}
 
 	/* Allocate space for models. */
 	count = 0;
-	models = (LIMdlModel**) lisys_calloc (attachments.size (), sizeof (LIMdlModel*));
-	if (models == NULL)
+	skeletons = (const LIMdlPoseSkeleton**) lisys_calloc (attachments.size (), sizeof (LIMdlPoseSkeleton*));
+	if (skeletons == NULL)
 		return;
 
 	/* Add each model to the list. */
@@ -703,18 +692,18 @@ void LIRenObject::rebuild_skeleton ()
 	{
 		if (attachments[i]->get_replacer () == NULL)
 		{
-			LIMdlModel* m = attachments[i]->get_model ();
-			if (m != NULL && m->nodes.count)
+			LIRenModelData* m = attachments[i]->get_model ();
+			if (m != NULL && m->rest_pose_skeleton->nodes.count)
 			{
-				models[count] = m;
+				skeletons[count] = m->rest_pose_skeleton;
 				count++;
 			}
 		}
 	}
 
 	/* Rebuild the skeleton. */
-	limdl_pose_skeleton_rebuild (pose_skeleton, models, count);
-	lisys_free (models);
+	limdl_pose_skeleton_rebuild_from_skeletons (pose_skeleton, skeletons, count);
+	lisys_free (skeletons);
 }
 
 void LIRenObject::remove_entity (

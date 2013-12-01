@@ -39,12 +39,7 @@ LIRenAttachment::~LIRenAttachment ()
 {
 }
 
-LIMdlNode* LIRenAttachment::find_node (const char* name)
-{
-	return NULL;
-}
-
-LIMdlModel* LIRenAttachment::get_model () const
+LIRenModelData* LIRenAttachment::get_model () const
 {
 	return NULL;
 }

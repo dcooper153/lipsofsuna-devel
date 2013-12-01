@@ -65,23 +65,7 @@ LIRenAttachmentEntity::~LIRenAttachmentEntity ()
 	}
 }
 
-LIMdlNode* LIRenAttachmentEntity::find_node (const char* name)
-{
-	LIMdlNode* node;
-
-	if (entity == NULL)
-		return NULL;
-
-	LIMdlModel* model = get_model ();
-	if (model != NULL)
-		node = limdl_model_find_node (model, name);
-	else
-		node = NULL;
-
-	return node;
-}
-
-LIMdlModel* LIRenAttachmentEntity::get_model () const
+LIRenModelData* LIRenAttachmentEntity::get_model () const
 {
 	if (mesh.isNull ())
 		return NULL;
@@ -208,11 +192,11 @@ void LIRenAttachmentEntity::update (float secs)
 	// Create the skeleton and its pose buffer.
 	if (create_skeleton ())
 	{
-		LIMdlModel* model = get_model ();
+		LIRenModelData* model = get_model ();
 		lisys_assert (pose_buffer == NULL);
 		if (model != NULL)
 		{
-			pose_buffer = limdl_pose_buffer_new (model);
+			pose_buffer = limdl_pose_buffer_new_copy (model->rest_pose_buffer);
 			lisys_assert (pose_buffer != NULL);
 			lisys_assert (pose_buffer->bones.count == entity->getSkeleton ()->getNumBones ());
 		}
@@ -317,20 +301,21 @@ bool LIRenAttachmentEntity::create_skeleton ()
 	/* The mesh may not have set these correctly if it depended on bones
 	   in external skeletons. Because of external bones, we need to set
 	   the transformations using the pose skeleton of the object. */
-	LIMdlModel* model = get_model ();
+	LIRenModelData* model = get_model ();
 	if (object->pose_skeleton != NULL && model != NULL)
 	{
-		for (int i = 0 ; i < model->weight_groups.count ; i++)
+		for (int i = 0 ; i < model->rest_pose_buffer->bones.count ; i++)
 		{
-			Ogre::Bone* bone = skeleton->getBone (i + 1);
-			LIMdlWeightGroup* group = model->weight_groups.array + i;
-			LIMdlNode* node = limdl_pose_skeleton_find_node (object->pose_skeleton, group->bone);
-			if (node != NULL)
-			{
-				LIMatTransform t = node->rest_transform.global;
-				bone->setPosition (t.position.x, t.position.y, t.position.z);
-				bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
-			}
+			const LIMdlPoseBufferBone* group = model->rest_pose_buffer->bones.array + i;
+			if (!group->name)
+				continue;
+			LIMdlNode* node = limdl_pose_skeleton_find_node (object->pose_skeleton, group->name);
+			if (!node)
+				continue;
+			LIMatTransform t = node->rest_transform.global;
+			Ogre::Bone* bone = skeleton->getBone (i);
+			bone->setPosition (t.position.x, t.position.y, t.position.z);
+			bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
 		}
 	}
 

@@ -29,7 +29,7 @@
 
 static void private_copy_nodes (
 	LIMdlPoseSkeleton* self,
-	LIMdlModel**       models,
+	const LIMdlModel** models,
 	int                models_num);
 
 static void private_transform_node (
@@ -40,8 +40,8 @@ static void private_transform_node (
 /*****************************************************************************/
 
 LIMdlPoseSkeleton* limdl_pose_skeleton_new (
-	LIMdlModel** models,
-	int          count)
+	const LIMdlModel** models,
+	int                count)
 {
 	LIMdlPoseSkeleton* self;
 
@@ -91,12 +91,34 @@ LIMdlNode* limdl_pose_skeleton_find_node (
  * \param models Array of models.
  * \param count Number of models in the array.
  */
-void limdl_pose_skeleton_rebuild (
+void limdl_pose_skeleton_rebuild_from_models (
 	LIMdlPoseSkeleton* self,
-	LIMdlModel**       models,
+	const LIMdlModel** models,
 	int                count)
 {
 	private_copy_nodes (self, models, count);
+}
+
+/**
+ * \brief Rebuilds the skeleton from multiple skeletons.
+ * \param self Pose skeleton.
+ * \param skeletons Array of pose skeletons.
+ * \param count Number of skeletons in the array.
+ */
+void limdl_pose_skeleton_rebuild_from_skeletons (
+	LIMdlPoseSkeleton*        self,
+	const LIMdlPoseSkeleton** skeletons,
+	int                       count)
+{
+	int i;
+	int j;
+
+	limdl_nodes_clear (&self->nodes);
+	for (j = 0 ; j < count ; j++)
+	{
+		for (i = 0 ; i < skeletons[j]->nodes.count ; i++)
+			limdl_nodes_merge (&self->nodes, &skeletons[j]->nodes);
+	}
 }
 
 void limdl_pose_skeleton_update (
@@ -114,7 +136,7 @@ void limdl_pose_skeleton_update (
 
 static void private_copy_nodes (
 	LIMdlPoseSkeleton* self,
-	LIMdlModel**       models,
+	const LIMdlModel** models,
 	int                models_num)
 {
 	int i;

@@ -129,10 +129,10 @@ void limdl_pose_free (
  * \param result_scale Return location for the scale.
  */
 void limdl_pose_calculate_node_tranformation (
-	LIMdlPose*      self,
-	const char*     node,
-	LIMatTransform* result_transform,
-	float*          result_scale)
+	const LIMdlPose* self,
+	const char*      node,
+	LIMatTransform*  result_transform,
+	float*           result_scale)
 {
 	int i;
 	int tmp1;
