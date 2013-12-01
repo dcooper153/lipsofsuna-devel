@@ -78,23 +78,6 @@ LIRenModelData::LIRenModelData (const LIMdlModel* model)
 		}
 	}
 
-	/* Copy the skeleton data. */
-	if (vertex_count)
-	{
-		for (int i = 0 ; i < model->weight_groups.count ; i++)
-		{
-			bones.push_back (LIRenModelDataBone ());
-			LIRenModelDataBone& data = bones[i];
-			const LIMdlWeightGroup* group = model->weight_groups.array + i;
-			const LIMdlNode* node = limdl_model_find_node (model, group->bone);
-			if (node != NULL)
-				data.transform = node->rest_transform.global;
-			else
-				data.transform = limat_transform_identity ();
-			data.bone = group->bone;
-		}
-	}
-
 	/* Initialize the rest pose. */
 	rest_pose_buffer = limdl_pose_buffer_new (model);
 	rest_pose_skeleton = limdl_pose_skeleton_new (&model, 1);

@@ -44,13 +44,6 @@ public:
 	LIMdlMaterial material;
 };
 
-class LIRenModelDataBone
-{
-public:
-	LIMatTransform transform;
-	Ogre::String bone;
-};
-
 class LIRenModelData
 {
 public:
@@ -65,10 +58,9 @@ public:
 	float* buffer_data_2;
 	uint16_t* index_data;
 	LIMatAabb bounds;
-	std::vector<LIRenModelDataMaterial> materials;
-	std::vector<LIRenModelDataBone> bones;
 	LIMdlPoseBuffer* rest_pose_buffer;
 	LIMdlPoseSkeleton* rest_pose_skeleton;
+	std::vector<LIRenModelDataMaterial> materials;
 };
 
 #endif

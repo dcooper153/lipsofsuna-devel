@@ -138,8 +138,8 @@ void LIRenMeshBuilder::step_1_bg (Ogre::Mesh* mesh)
 
 	/* Create the bone index to blend index mapping. */
 	/* The indices are always the same but Ogre needs the map regardless. */
-	mesh->sharedBlendIndexToBoneIndexMap.resize (data.bones.size () + 1);
-	for (size_t i = 0 ; i < data.bones.size () + 1 ; i++)
+	mesh->sharedBlendIndexToBoneIndexMap.resize (data.rest_pose_buffer->bones.count);
+	for (int i = 0 ; i < data.rest_pose_buffer->bones.count ; i++)
 		mesh->sharedBlendIndexToBoneIndexMap[i] = i;
 
 	/* Create submeshes. */
@@ -252,7 +252,7 @@ void LIRenMeshBuilder::step_3_fg (Ogre::Mesh* mesh)
 void LIRenMeshBuilder::step_4_fg (Ogre::Mesh* mesh)
 {
 	/* Create a skeleton if needed. */
-	if (!data.vertex_count || !data.bones.size ())
+	if (!data.vertex_count || data.rest_pose_buffer->bones.count <= 1)
 		return;
 	bool ok = create_skeleton (mesh);
 
@@ -273,9 +273,9 @@ bool LIRenMeshBuilder::create_skeleton (Ogre::Mesh* mesh)
 	/* Ogre seems to occasionally fail an assertion when it tries to
 	   upload bone matrices to shaders. This check seems to have eliminated
 	   the issue so it probably can't handle too many matrices. */
-	if (data.bones.size () > 32)
+	if (data.rest_pose_buffer->bones.count > 32)
 	{
-		printf ("WARNING: too many weighted bones: %d/%d!\n", (int) data.bones.size (), 32);
+		printf ("WARNING: too many weighted bones: %d/%d!\n", data.rest_pose_buffer->bones.count, 32);
 		return false;
 	}
 
