@@ -49,9 +49,9 @@ LIRenMeshBuilder::LIRenMeshBuilder (LIRenRender* render, LIMdlModel* model)
 
 LIRenMeshBuilder::~LIRenMeshBuilder ()
 {
-	delete[] buffer_data_0;
-	delete[] buffer_data_1;
-	delete[] buffer_data_2;
+	lisys_free (buffer_data_0);
+	lisys_free (buffer_data_1);
+	lisys_free (buffer_data_2);
 
 	/* Free the model. */
 	if (model != NULL)
@@ -92,9 +92,9 @@ void LIRenMeshBuilder::loadResource (Ogre::Resource* resource)
 		step = 4;
 	}
 	step = 0;
-	delete[] buffer_data_0;
-	delete[] buffer_data_1;
-	delete[] buffer_data_2;
+	lisys_free (buffer_data_0);
+	lisys_free (buffer_data_1);
+	lisys_free (buffer_data_2);
 	buffer_data_0 = NULL;
 	buffer_data_1 = NULL;
 	buffer_data_2 = NULL;
@@ -174,53 +174,21 @@ void LIRenMeshBuilder::step_1_bg (Ogre::Mesh* mesh)
 
 	/* Prepare the first vertex buffer. */
 	/* Contains positions and normals only. */
-	int j = 0;
-	buffer_data_0 = new float[6 * model->vertices.count];
-	for (int i = 0 ; i < model->vertices.count ; i++)
-	{
-		LIMdlVertex* v = model->vertices.array + i;
-		buffer_data_0[j++] = v->coord.x;
-		buffer_data_0[j++] = v->coord.y;
-		buffer_data_0[j++] = v->coord.z;
-		buffer_data_0[j++] = v->normal.x;
-		buffer_data_0[j++] = v->normal.y;
-		buffer_data_0[j++] = v->normal.z;
-	}
-	lisys_assert (j == 6 * model->vertices.count);
+	int buffer_data_size_0;
+	buffer_data_0 = limdl_model_get_buffer_vtx_nml (model, &buffer_data_size_0);
+	lisys_assert ((size_t) buffer_data_size_0 == buffer_size_0 * model->vertices.count);
 
 	/* Create the second vertex buffer. */
 	/* Contains the rest apart from blending information. */
-	j = 0;
-	buffer_data_1 = new float[6 * model->vertices.count];
-	for (int i = 0 ; i < model->vertices.count ; i++)
-	{
-		LIMdlVertex* v = model->vertices.array + i;
-		buffer_data_1[j++] = v->tangent.x;
-		buffer_data_1[j++] = v->tangent.y;
-		buffer_data_1[j++] = v->tangent.z;
-		buffer_data_1[j++] = v->texcoord[0];
-		buffer_data_1[j++] = v->texcoord[1];
-		uint8_t* color = (uint8_t*)(buffer_data_1 + j++);
-		color[0] = v->color[0];
-		color[1] = v->color[1];
-		color[2] = v->color[2];
-		color[3] = v->color[3];
-	}
-	lisys_assert (j == 6 * model->vertices.count);
+	int buffer_data_size_1;
+	buffer_data_1 = limdl_model_get_buffer_tan_tex_col (model, &buffer_data_size_1);
+	lisys_assert ((size_t) buffer_data_size_1 == buffer_size_1 * model->vertices.count);
 
 	/* Create the third vertex buffer. */
 	/* Contains blending indices and weights. */
-	j = 0;
-	buffer_data_2 = new float[5 * model->vertices.count];
-	for (int i = 0 ; i < model->vertices.count ; i++)
-	{
-		LIMdlVertex* v = model->vertices.array + i;
-		memcpy (buffer_data_2 + j, v->bones, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (uint8_t));
-		j++;
-		memcpy (buffer_data_2 + j, v->weights, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (float));
-		j += LIMDL_VERTEX_WEIGHTS_MAX;
-	}
-	lisys_assert (j == 5 * model->vertices.count);
+	int buffer_data_size_2;
+	buffer_data_2 = limdl_model_get_buffer_bon_wgt (model, &buffer_data_size_2);
+	lisys_assert ((size_t) buffer_data_size_2 == buffer_size_2 * model->vertices.count);
 
 	/* Create submeshes. */
 	/* The index buffer cannot be prepared yet since it doesn't exist. */

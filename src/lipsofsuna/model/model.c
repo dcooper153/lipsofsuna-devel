@@ -859,6 +859,12 @@ void limdl_model_replace_material_by_string (
 	}
 }
 
+/**
+ * \brief Writes the model into a steam.
+ * \param self Model.
+ * \param writer Stream writer.
+ * \return One on success. Zero otherwise.
+ */
 int limdl_model_write (
 	const LIMdlModel* self,
 	LIArcWriter*      writer)
@@ -866,6 +872,12 @@ int limdl_model_write (
 	return private_write (self, writer);
 }
 
+/**
+ * \brief Writes the model into a file.
+ * \param self Model.
+ * \param path Path to the file.
+ * \return One on success. Zero otherwise.
+ */
 int limdl_model_write_file (
 	const LIMdlModel* self,
 	const char*       path)
@@ -887,6 +899,110 @@ int limdl_model_write_file (
 	liarc_writer_free (writer);
 
 	return 1;
+}
+
+/**
+ * \brief Gets the vertex buffer data for tangents, textures and and colors.
+ * \param self Model.
+ * \param count Return location for the number of bytes. NULL to not return.
+ * \return Vertex buffer data on success. NULL otherwise.
+ */
+float* limdl_model_get_buffer_bon_wgt (
+	const LIMdlModel* self,
+	int*              count)
+{
+	int i;
+	int j;
+	float* data;
+	LIMdlVertex* v;
+
+	data = lisys_calloc (5 * self->vertices.count, sizeof (float));
+	if (data == NULL)
+		return NULL;
+	for (i = j = 0 ; i < self->vertices.count ; i++)
+	{
+		v = self->vertices.array + i;
+		memcpy (data + j, v->bones, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (uint8_t));
+		j++;
+		memcpy (data + j, v->weights, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (float));
+		j += LIMDL_VERTEX_WEIGHTS_MAX;
+	}
+	if (count != NULL)
+		*count = 20 * self->vertices.count;
+
+	return data;
+}
+
+/**
+ * \brief Gets the vertex buffer data for tangents, textures and and colors.
+ * \param self Model.
+ * \param count Return location for the number of bytes. NULL to not return.
+ * \return Vertex buffer data on success. NULL otherwise.
+ */
+float* limdl_model_get_buffer_tan_tex_col (
+	const LIMdlModel* self,
+	int*              count)
+{
+	int i;
+	int j;
+	float* data;
+	LIMdlVertex* v;
+
+	data = lisys_calloc (6 * self->vertices.count, sizeof (float));
+	if (data == NULL)
+		return NULL;
+	for (i = j = 0 ; i < self->vertices.count ; i++)
+	{
+		v = self->vertices.array + i;
+		data[j++] = v->tangent.x;
+		data[j++] = v->tangent.y;
+		data[j++] = v->tangent.z;
+		data[j++] = v->texcoord[0];
+		data[j++] = v->texcoord[1];
+		uint8_t* color = (uint8_t*)(data + j++);
+		color[0] = v->color[0];
+		color[1] = v->color[1];
+		color[2] = v->color[2];
+		color[3] = v->color[3];
+	}
+	if (count != NULL)
+		*count = 24 * self->vertices.count;
+
+	return data;
+}
+
+/**
+ * \brief Gets the vertex buffer data for coordinates and normals.
+ * \param self Model.
+ * \param count Return location for the number of floats. NULL to not return.
+ * \return Vertex buffer data on success. NULL otherwise.
+ */
+float* limdl_model_get_buffer_vtx_nml (
+	const LIMdlModel* self,
+	int*              count)
+{
+	int i;
+	int j;
+	float* data;
+	LIMdlVertex* v;
+
+	data = lisys_calloc (6 * self->vertices.count, sizeof (float));
+	if (data == NULL)
+		return NULL;
+	for (i = j = 0 ; i < self->vertices.count ; i++)
+	{
+		v = self->vertices.array + i;
+		data[j++] = v->coord.x;
+		data[j++] = v->coord.y;
+		data[j++] = v->coord.z;
+		data[j++] = v->normal.x;
+		data[j++] = v->normal.y;
+		data[j++] = v->normal.z;
+	}
+	if (count != NULL)
+		*count = 24 * self->vertices.count;
+
+	return data;
 }
 
 /**

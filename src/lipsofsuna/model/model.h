@@ -152,6 +152,18 @@ LIAPICALL (int, limdl_model_write_file, (
 	const LIMdlModel* self,
 	const char*       path));
 
+LIAPICALL (float*, limdl_model_get_buffer_bon_wgt, (
+	const LIMdlModel* self,
+	int*              count));
+
+LIAPICALL (float*, limdl_model_get_buffer_tan_tex_col, (
+	const LIMdlModel* self,
+	int*              count));
+
+LIAPICALL (float*, limdl_model_get_buffer_vtx_nml, (
+	const LIMdlModel* self,
+	int*              count));
+
 LIAPICALL (int, limdl_model_get_memory, (
 	const LIMdlModel* self));
 
