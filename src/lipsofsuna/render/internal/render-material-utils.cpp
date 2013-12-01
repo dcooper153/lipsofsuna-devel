@@ -116,6 +116,71 @@ Ogre::MaterialPtr LIRenMaterialUtils::create_material (
 }
 
 /**
+ * \brief Creates a material with a replaced texture.
+ * \param name Base material name.
+ * \param texture Texture name.
+ * \return Ogre material on success. Null material pointer on error.
+ */
+Ogre::MaterialPtr LIRenMaterialUtils::create_instanced_material (const char* name, const char* texture)
+{
+	// Find the base material.
+	Ogre::MaterialPtr base = render->material_manager->getByName (name);
+	if (base.isNull())
+		return base;
+
+	// Duplicate the material if overridable.
+	if (!has_overridable_texture (base))
+		return base;
+	Ogre::MaterialPtr material = base->clone (render->id.next (), true, LIREN_RESOURCES_TEMPORARY);
+
+	// Override the texture units.
+	for (int tech_idx = 0 ; tech_idx < material->getNumTechniques() ; ++tech_idx)
+	{
+		Ogre::Technique* tech = material->getTechnique(tech_idx);
+		for (int pass_idx = 0 ; pass_idx < tech->getNumPasses() ; ++pass_idx)
+		{
+			Ogre::Pass* pass = tech->getPass(pass_idx);
+			for (int unit_idx = 0 ; unit_idx < pass->getNumTextureUnitStates() ; ++unit_idx)
+			{
+				// Try to override the texture.
+				Ogre::TextureUnitState* state = pass->getTextureUnitState(unit_idx);
+				if (check_name_override (state->getName ()))
+					state->setTextureName (texture_name_to_filename(texture));
+			}
+		}
+	}
+
+	return material;
+}
+
+/**
+ * \brief Checks if the material has any overridable textures.
+ * \param material Material.
+ * \return True if found. False otherwise.
+ */
+bool LIRenMaterialUtils::has_overridable_texture (const Ogre::MaterialPtr& material)
+{
+	for (int tech_idx = 0 ; tech_idx < material->getNumTechniques() ; ++tech_idx)
+	{
+		Ogre::Technique* tech = const_cast<Ogre::Technique*>(material->getTechnique(tech_idx));
+		for (int pass_idx = 0 ; pass_idx < tech->getNumPasses() ; ++pass_idx)
+		{
+			const Ogre::Pass* pass = tech->getPass(pass_idx);
+			for (int unit_idx = 0 ; unit_idx < pass->getNumTextureUnitStates() ; ++unit_idx)
+			{
+				// Check if the unit is overridable.
+				const Ogre::TextureUnitState* state = pass->getTextureUnitState(unit_idx);
+				if (!check_name_override (state->getName ()))
+					continue;
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+/**
  * \brief Checks if the material has the given overridable texture.
  * \param material Material.
  * \param name Texture name without extension.

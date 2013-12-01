@@ -31,6 +31,8 @@ public:
 	LIRenMaterialUtils (LIRenRender* render);
 public:
 	Ogre::MaterialPtr create_material (LIMdlMaterial* mat);
+	Ogre::MaterialPtr create_instanced_material (const char* name, const char* texture);
+	bool has_overridable_texture (const Ogre::MaterialPtr& material);
 	bool has_overridable_texture (const Ogre::MaterialPtr& material, const Ogre::String& name);
 	void replace_texture (Ogre::MaterialPtr& material, const Ogre::String& name, const Ogre::String& new_name);
 public:
