@@ -135,6 +135,7 @@ ModelBuilder.build_with_merger = function(clss, merger, args, hash)
 	end
 	-- Build and compare the hash.
 	local hash1 = Serialize:write{
+		args.beheaded and 1 or 0,
 		args.body_sliders,
 		args.face_sliders,
 		args.hair_color,

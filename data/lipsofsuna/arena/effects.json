@@ -2,7 +2,7 @@
 	{
 		"type": "Effectspec",
 		"name": "behead1",
-		"particle": "blood2",
+		"particle": "decapitate1",
 		"particle_life": 5,
 		"rotation": false,
 		"sound": "squish-000"

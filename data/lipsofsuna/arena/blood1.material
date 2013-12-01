@@ -1,0 +1,36 @@
+pass blood1/alpha
+{
+	lighting off
+	scene_blend alpha_blend
+	depth_write off
+	texture_unit LOS1
+	{
+		texture blood1.png
+	}
+}
+
+material blood1
+{
+	technique
+	{
+		scheme mrt
+	}
+	technique
+	{
+		scheme srt_color
+		pass LOS1 : blood1/alpha
+		{
+		}
+	}
+	technique
+	{
+		scheme srt_depth
+	}
+	technique
+	{
+		scheme fixed
+		pass LOS1 : blood1/alpha
+		{
+		}
+	}
+}

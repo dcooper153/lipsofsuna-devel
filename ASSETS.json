@@ -292,6 +292,8 @@
 				"data/lipsofsuna/apparel/longcoat/longcoat1.png",
 				"data/lipsofsuna/apparel/underwear/aerpanties1.png",
 				"data/lipsofsuna/apparel/underwear/aerbra1.png",
+				"data/lipsofsuna/arena/blood1.png",
+				"data/lipsofsuna/arena/decapitate1.lmdl",
 				"data/lipsofsuna/items/ore/ore1.lmdl",
 				"data/lipsofsuna/items/ore/ore1.png",
 				"data/lipsofsuna/items/potion/potion1.png",
@@ -339,6 +341,7 @@
 				"data/lipsofsuna/apparel/longcoat/aerlongcoat1.svg",
 				"data/lipsofsuna/apparel/longcoat/longcoat1.blend",
 				"data/lipsofsuna/apparel/longcoat/longcoat1.svg",
+				"data/lipsofsuna/arena/decapitate1.blend",
 				"data/lipsofsuna/spells/effects/heal1.blend",
 				"data/lipsofsuna/spells/effects/summon1.blend",
 				"data/lipsofsuna/items/ore/ore1.blend",
@@ -954,7 +957,6 @@
 				"data/lipsofsuna/core/terrain/stickterrainfixed1.png",
 				"data/lipsofsuna/spells/effects/explosion1.dds",
 				"data/lipsofsuna/spells/effects/flare1.png",
-				"data/lipsofsuna/particle/blood1.dds",
 				"data/lipsofsuna/particle/star1.png"
 			],
 			"authors":

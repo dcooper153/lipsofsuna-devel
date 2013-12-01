@@ -21,6 +21,6 @@ Main.messaging:register_message{
 		object.render:set_beheaded(beheaded)
 		-- Play the effect.
 		if beheaded then
-			Client.effects:play_object("behead1", object, "#neck")
+			Client.effects:play_object("behead1", object, "neck")
 		end
 	end}
