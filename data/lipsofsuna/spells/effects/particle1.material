@@ -1,0 +1,36 @@
+pass particle1/alpha
+{
+	lighting off
+	scene_blend src_alpha one
+	depth_write off
+	texture_unit LOS1
+	{
+		texture star1.png
+	}
+}
+
+material particle1
+{
+	technique
+	{
+		scheme mrt
+	}
+	technique
+	{
+		scheme srt_color
+		pass LOS1 : particle1/alpha
+		{
+		}
+	}
+	technique
+	{
+		scheme srt_depth
+	}
+	technique
+	{
+		scheme fixed
+		pass LOS1 : particle1/alpha
+		{
+		}
+	}
+}
