@@ -71,11 +71,17 @@ void LIExtParticle::add_model (
 void LIExtParticle::add_ogre (
 	const char* name)
 {
-	LIExtParticleDriverOgre* driver = new LIExtParticleDriverOgre(this, name);
-	driver->set_emitting(emitting);
-	driver->set_looping(looping);
-	driver->set_render_queue(render_queue);
-	drivers.push_back(driver);
+	try
+	{
+		LIExtParticleDriverOgre* driver = new LIExtParticleDriverOgre(this, name);
+		driver->set_emitting(emitting);
+		driver->set_looping(looping);
+		driver->set_render_queue(render_queue);
+		drivers.push_back(driver);
+	}
+	catch(...)
+	{
+	}
 }
 
 /**
