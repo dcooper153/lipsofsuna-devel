@@ -38,7 +38,7 @@ LIRenMaterialUtils::LIRenMaterialUtils (LIRenRender* render) : render(render)
  * \return Ogre material.
  */
 Ogre::MaterialPtr LIRenMaterialUtils::create_material (
-	LIMdlMaterial* mat)
+	const LIMdlMaterial* mat)
 {
 	bool existing = false;
 	bool override = true;
@@ -298,9 +298,9 @@ bool LIRenMaterialUtils::check_name_override (
 }
 
 void LIRenMaterialUtils::override_technique (
-	LIMdlMaterial*   mat,
-	Ogre::Technique* technique,
-	bool             existing)
+	const LIMdlMaterial* mat,
+	Ogre::Technique*     technique,
+	bool                 existing)
 {
 	if (existing)
 	{
@@ -318,8 +318,8 @@ void LIRenMaterialUtils::override_technique (
 }
 
 void LIRenMaterialUtils::initialize_pass (
-	LIMdlMaterial* mat,
-	Ogre::Pass*    pass)
+	const LIMdlMaterial* mat,
+	Ogre::Pass*          pass)
 {
 	/* Initialize pass properties. */
 	pass->setSelfIllumination (mat->emission, mat->emission, mat->emission);
@@ -337,8 +337,8 @@ void LIRenMaterialUtils::initialize_pass (
 }
 
 void LIRenMaterialUtils::override_pass (
-	LIMdlMaterial* mat,
-	Ogre::Pass*    pass)
+	const LIMdlMaterial* mat,
+	Ogre::Pass*          pass)
 {
 	/* Set pass properties. */
 	/* If this is a newly created material or the name of the first pass

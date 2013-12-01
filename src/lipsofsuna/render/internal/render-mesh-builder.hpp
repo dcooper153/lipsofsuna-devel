@@ -45,6 +45,9 @@ private:
 	/* Static data. */
 	LIRenRender* render;
 	LIMdlModel* model;
+	size_t vertex_count;
+	size_t index_count;
+	LIMatAabb bounds;
 	/* Prepared data. */
 	int step;
 	size_t buffer_size_0;
@@ -53,6 +56,7 @@ private:
 	float* buffer_data_0;
 	float* buffer_data_1;
 	float* buffer_data_2;
+	uint16_t* index_data;
 	Ogre::VertexData* vertex_data;
 	Ogre::VertexDeclaration vertex_declaration;
 	/* Loaded data */
@@ -66,6 +70,33 @@ private:
 	   period of the mesh being initialized but not used, we need to
 	   keep references to the materials. */
 	std::vector<Ogre::MaterialPtr> materials;
+private:
+	class MaterialData
+	{
+	public:
+		MaterialData () : start(0), count(0)
+		{
+			limdl_material_init (&material);
+		}
+		MaterialData (const MaterialData& m) : start(m.start), count(m.count)
+		{
+			limdl_material_init_copy (&material, &m.material);
+		}
+		~MaterialData ()
+		{
+			limdl_material_free (&material);
+		}
+	public:
+		int start;
+		int count;
+		LIMdlMaterial material;
+	};
+	std::vector<MaterialData> material_data;
+	struct BoneData
+	{
+		LIMatTransform transform;
+	};
+	std::vector<BoneData> bone_data;
 };
 
 #endif

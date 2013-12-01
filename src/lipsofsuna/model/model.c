@@ -908,8 +908,7 @@ int limdl_model_write_file (
  * \return Vertex buffer data on success. NULL otherwise.
  */
 float* limdl_model_get_buffer_bon_wgt (
-	const LIMdlModel* self,
-	int*              count)
+	const LIMdlModel* self)
 {
 	int i;
 	int j;
@@ -927,8 +926,41 @@ float* limdl_model_get_buffer_bon_wgt (
 		memcpy (data + j, v->weights, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (float));
 		j += LIMDL_VERTEX_WEIGHTS_MAX;
 	}
-	if (count != NULL)
-		*count = 20 * self->vertices.count;
+
+	return data;
+}
+
+/**
+ * \brief Gets the index buffer data for the given LOD level.
+ * \param self Model.
+ * \return Vertex buffer data on success. NULL otherwise.
+ */
+uint16_t* limdl_model_get_buffer_idx (
+	const LIMdlModel* self,
+	int               level)
+{
+#ifndef _NDEBUG
+	int i;
+#endif
+	uint16_t* data;
+	const LIMdlLod* lod;
+
+	/* Get the LOD. */
+	lisys_assert (level < self->lod.count);
+	lod = self->lod.array + level;
+
+	/* Validate the indices. */
+#ifndef _NDEBUG
+	lisys_assert (lod->indices.count % 3 == 0);
+	for (i = 0 ; i < lod->indices.count ; i++)
+		lisys_assert (lod->indices.array[i] < self->vertices.count);
+#endif
+
+	/* Clone the indices. */
+	data = lisys_calloc (lod->indices.count, sizeof (uint16_t));
+	if (data == NULL)
+		return NULL;
+	memcpy (data, lod->indices.array, lod->indices.count * sizeof (uint16_t));
 
 	return data;
 }
@@ -936,12 +968,10 @@ float* limdl_model_get_buffer_bon_wgt (
 /**
  * \brief Gets the vertex buffer data for tangents, textures and and colors.
  * \param self Model.
- * \param count Return location for the number of bytes. NULL to not return.
  * \return Vertex buffer data on success. NULL otherwise.
  */
 float* limdl_model_get_buffer_tan_tex_col (
-	const LIMdlModel* self,
-	int*              count)
+	const LIMdlModel* self)
 {
 	int i;
 	int j;
@@ -965,8 +995,6 @@ float* limdl_model_get_buffer_tan_tex_col (
 		color[2] = v->color[2];
 		color[3] = v->color[3];
 	}
-	if (count != NULL)
-		*count = 24 * self->vertices.count;
 
 	return data;
 }
@@ -974,12 +1002,10 @@ float* limdl_model_get_buffer_tan_tex_col (
 /**
  * \brief Gets the vertex buffer data for coordinates and normals.
  * \param self Model.
- * \param count Return location for the number of floats. NULL to not return.
  * \return Vertex buffer data on success. NULL otherwise.
  */
 float* limdl_model_get_buffer_vtx_nml (
-	const LIMdlModel* self,
-	int*              count)
+	const LIMdlModel* self)
 {
 	int i;
 	int j;
@@ -999,8 +1025,6 @@ float* limdl_model_get_buffer_vtx_nml (
 		data[j++] = v->normal.y;
 		data[j++] = v->normal.z;
 	}
-	if (count != NULL)
-		*count = 24 * self->vertices.count;
 
 	return data;
 }

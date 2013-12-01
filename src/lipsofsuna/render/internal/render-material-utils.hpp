@@ -30,7 +30,7 @@ class LIRenMaterialUtils
 public:
 	LIRenMaterialUtils (LIRenRender* render);
 public:
-	Ogre::MaterialPtr create_material (LIMdlMaterial* mat);
+	Ogre::MaterialPtr create_material (const LIMdlMaterial* mat);
 	Ogre::MaterialPtr create_instanced_material (const char* name, const char* texture);
 	bool has_overridable_texture (const Ogre::MaterialPtr& material);
 	bool has_overridable_texture (const Ogre::MaterialPtr& material, const Ogre::String& name);
@@ -38,9 +38,9 @@ public:
 public:
 	bool check_material_override (const Ogre::MaterialPtr& material);
 	bool check_name_override (const Ogre::String& name);
-	void override_technique (LIMdlMaterial* mat, Ogre::Technique* technique, bool existing);
-	void initialize_pass (LIMdlMaterial* mat, Ogre::Pass* pass);
-	void override_pass (LIMdlMaterial* mat, Ogre::Pass* pass);
+	void override_technique (const LIMdlMaterial* mat, Ogre::Technique* technique, bool existing);
+	void initialize_pass (const LIMdlMaterial* mat, Ogre::Pass* pass);
+	void override_pass (const LIMdlMaterial* mat, Ogre::Pass* pass);
 	Ogre::String texture_name_to_filename(const Ogre::String& name);
 	Ogre::String texture_filename_to_name(const Ogre::String& filename);
 private:
