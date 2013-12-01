@@ -32,13 +32,14 @@ BlackHazeModifier.start = function(modifier, value)
 	-- Spawn the monster.
 	local p = modifier.point + Vector(
 		-1 + 2 * math.random(),
-		-1 + 2 * math.random(),
+		0,
 		-1 + 2 * math.random())
 	local o = Actor(modifier.owner.manager)
 	o:set_spec(s)
 	o:set_position(p)
 	o:randomize()
 	o:set_visible(true)
+	Main.vision:world_effect(p, "conjuration spell")
 	-- Add the plague modifier to the monster.
 	o:add_modifier(modifier.spec.name)
 end

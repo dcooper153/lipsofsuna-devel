@@ -50,6 +50,12 @@
 	},
 	{
 		"type": "Effectspec",
+		"name": "conjuration spell",
+		"particle": "summon1",
+		"particle_life": 5
+	},
+	{
+		"type": "Effectspec",
 		"name": "conjuration spell cast",
 		"sound": "spellberserk1"
 	},
