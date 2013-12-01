@@ -18,14 +18,24 @@
 #ifndef __EXT_PARTICLE_PARTICLE_DRIVER_MODEL_HPP__
 #define __EXT_PARTICLE_PARTICLE_DRIVER_MODEL_HPP__
 
+#include <vector>
 #include "lipsofsuna/model.h"
+#include "model-particles.h"
 #include "particle-driver.hpp"
+#include "particle-model-system.hpp"
 
 class LIExtParticleDriverModel : public LIExtParticleDriver
 {
 public:
 	LIExtParticleDriverModel(LIExtParticle* parent, const LIMdlModel* model);
 	virtual ~LIExtParticleDriverModel();
+	virtual void update(float secs);
+	virtual void set_emitting(bool value);
+	virtual void set_looping(bool value);
+	virtual void set_render_queue(int render_queue);
+protected:
+	LIExtModelParticles data;
+	std::vector<LIExtParticleModelSystem*> systems;
 };
 
 #endif

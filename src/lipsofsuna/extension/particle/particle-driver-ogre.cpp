@@ -35,5 +35,32 @@ LIExtParticleDriverOgre::LIExtParticleDriverOgre(LIExtParticle* parent, const ch
 	parent->node->attachObject (particles);
 }
 
+/**
+ * \brief Frees the driver.
+ */
+LIExtParticleDriverOgre::~LIExtParticleDriverOgre()
+{
+	parent->node->detachObject (particles);
+	parent->render->scene_manager->destroyParticleSystem (particles);
+}
+
+/**
+ * \brief Enables or disables particle emission.
+ * \param value True to enable. False otherwise.
+ */
+void LIExtParticleDriverOgre::set_emitting (bool value)
+{
+	particles->setEmitting (value);
+}
+
+/**
+ * \brief Sets the render queue of the particle effect.
+ * \param render_queue Queue number.
+ */
+void LIExtParticleDriverOgre::set_render_queue(int render_queue)
+{
+	particles->setRenderQueueGroup (render_queue);
+}
+
 /** @} */
 /** @} */

@@ -15,36 +15,34 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_PARTICLE_PARTICLE_HPP__
-#define __EXT_PARTICLE_PARTICLE_HPP__
+#ifndef __EXT_PARTICLE_PARTICLE_MODEL_SYSTEM_HPP__
+#define __EXT_PARTICLE_PARTICLE_MODEL_SYSTEM_HPP__
 
-#include "lipsofsuna/extension.h"
-#include "lipsofsuna/render/internal/render.hpp"
+#include <vector>
+#include "model-particles.h"
+#include "particle.hpp"
+#include "particle-driver.hpp"
+#include <OgreParticle.h>
 
-class LIExtParticleDriver;
-
-class LIExtParticle
+class LIExtParticleModelSystem
 {
 public:
-	LIExtParticle (LIRenRender* render);
-	~LIExtParticle ();
-	void add_model (const LIMdlModel* model);
-	void add_ogre (const char* name);
-	void clear ();
-	void update (float secs);
-	void set_emitting (bool value);
-	void set_looping (bool value);
-	void set_render_queue (const char* value);
-public:
-	LIRenRender* render;
-	int render_queue;
+	LIExtParticleModelSystem (LIExtParticle* parent, LIExtModelParticles* data, int index);
+	~LIExtParticleModelSystem ();
+	void update(float secs);
+	void set_emitting(bool value);
+	void set_looping(bool value);
+	void set_render_queue(int render_queue);
+protected:
+	int index;
 	bool emitting;
 	bool looping;
-	Ogre::SceneNode* node;
-	std::vector<LIExtParticleDriver*> drivers;
+	float time;
+	LIExtParticle* parent;
+	LIExtModelParticles* data;
+	LIExtModelParticleSystem* system;
+	Ogre::ParticleSystem* particles;
+	std::vector<Ogre::Particle*> created;
 };
-
-LIAPICALL (void, liext_particle_free, (
-	LIExtParticle* self));
 
 #endif

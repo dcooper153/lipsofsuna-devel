@@ -28,11 +28,12 @@ class LIExtParticleDriver
 public:
 	LIExtParticleDriver(LIExtParticle* parent);
 	virtual ~LIExtParticleDriver();
+	virtual void update(float secs);
 	virtual void set_emitting(bool value);
+	virtual void set_looping(bool value);
 	virtual void set_render_queue(int render_queue);
 protected:
 	LIExtParticle* parent;
-	Ogre::ParticleSystem* particles;
 };
 
 #endif

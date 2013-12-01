@@ -31,7 +31,8 @@
  * \brief Initializes the particle effect.
  * \param render Renderer.
  */
-LIExtParticle::LIExtParticle (LIRenRender* render) : render(render), emitting(true)
+LIExtParticle::LIExtParticle (LIRenRender* render) :
+	render(render), emitting(true), looping(true)
 {
 	render_queue = Ogre::RENDER_QUEUE_MAIN;
 
@@ -58,6 +59,7 @@ void LIExtParticle::add_model (
 {
 	LIExtParticleDriverModel* driver = new LIExtParticleDriverModel(this, model);
 	driver->set_emitting(emitting);
+	driver->set_looping(looping);
 	driver->set_render_queue(render_queue);
 	drivers.push_back(driver);
 }
@@ -71,6 +73,7 @@ void LIExtParticle::add_ogre (
 {
 	LIExtParticleDriverOgre* driver = new LIExtParticleDriverOgre(this, name);
 	driver->set_emitting(emitting);
+	driver->set_looping(looping);
 	driver->set_render_queue(render_queue);
 	drivers.push_back(driver);
 }
@@ -86,6 +89,17 @@ void LIExtParticle::clear ()
 }
 
 /**
+ * \brief Updates the particle effect.
+ * \param secs Seconds since the last update.
+ */
+void LIExtParticle::update (
+	float secs)
+{
+	for (size_t i = 0 ; i < drivers.size() ; i++)
+		drivers[i]->update (secs);
+}
+
+/**
  * \brief Enables or disables particle emission.
  * \param value True to enable. False otherwise.
  */
@@ -95,6 +109,18 @@ void LIExtParticle::set_emitting (
 	emitting = value;
 	for (size_t i = 0 ; i < drivers.size() ; i++)
 		drivers[i]->set_emitting (value);
+}
+
+/**
+ * \brief Enables or disables looping.
+ * \param value True to enable. False otherwise.
+ */
+void LIExtParticle::set_looping (
+	bool value)
+{
+	looping = value;
+	for (size_t i = 0 ; i < drivers.size() ; i++)
+		drivers[i]->set_looping (value);
 }
 
 /**

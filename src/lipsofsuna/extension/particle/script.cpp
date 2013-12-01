@@ -74,6 +74,16 @@ static void Particle_clear (LIScrArgs* args)
 	self->clear ();
 }
 
+static void Particle_update (LIScrArgs* args)
+{
+	float v;
+	LIExtParticle* self = (LIExtParticle*) args->self;
+
+	if (!liscr_args_geti_float (args, 0, &v))
+		return;
+	self->update (v);
+}
+
 static void Particle_set_emitting (LIScrArgs* args)
 {
 	int v;
@@ -82,6 +92,16 @@ static void Particle_set_emitting (LIScrArgs* args)
 	if (!liscr_args_geti_bool (args, 0, &v))
 		return;
 	self->set_emitting (v);
+}
+
+static void Particle_set_looping (LIScrArgs* args)
+{
+	int v;
+	LIExtParticle* self = (LIExtParticle*) args->self;
+
+	if (!liscr_args_geti_bool (args, 0, &v))
+		return;
+	self->set_looping (v);
 }
 
 static void Particle_set_position (LIScrArgs* args)
@@ -143,7 +163,9 @@ void liext_script_particle (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PARTICLE, "particle_add_model", Particle_add_model);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PARTICLE, "particle_add_ogre", Particle_add_ogre);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PARTICLE, "particle_clear", Particle_clear);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PARTICLE, "particle_update", Particle_update);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PARTICLE, "particle_set_emitting", Particle_set_emitting);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PARTICLE, "particle_set_looping", Particle_set_looping);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PARTICLE, "particle_set_position", Particle_set_position);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PARTICLE, "particle_set_render_queue", Particle_set_render_queue);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_PARTICLE, "particle_set_rotation", Particle_set_rotation);

@@ -24,6 +24,11 @@ class LIExtParticleDriverOgre : public LIExtParticleDriver
 {
 public:
 	LIExtParticleDriverOgre(LIExtParticle* parent, const char* name);
+	virtual ~LIExtParticleDriverOgre();
+	virtual void set_emitting(bool value);
+	virtual void set_render_queue(int render_queue);
+protected:
+	Ogre::ParticleSystem* particles;
 };
 
 #endif

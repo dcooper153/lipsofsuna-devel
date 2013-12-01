@@ -31,7 +31,9 @@
  */
 LIExtParticleDriverModel::LIExtParticleDriverModel(LIExtParticle* parent, const LIMdlModel* model) : LIExtParticleDriver(parent)
 {
-	// TODO
+	liext_model_particles_init (&data, model);
+	for (int i = 0 ; i < data.systems.count ; i++)
+		systems.push_back(new LIExtParticleModelSystem (parent, &data, i));
 }
 
 /**
@@ -39,7 +41,49 @@ LIExtParticleDriverModel::LIExtParticleDriverModel(LIExtParticle* parent, const 
  */
 LIExtParticleDriverModel::~LIExtParticleDriverModel()
 {
-	// TODO
+	for (size_t i = 0 ; i < systems.size() ; i++)
+		delete systems[i];
+	liext_model_particles_clear (&data);
+}
+
+/**
+ * \brief Updates the driver.
+ * \param secs Seconds since the last update.
+ */
+void LIExtParticleDriverModel::update (float secs)
+{
+	for (size_t i = 0 ; i < systems.size() ; i++)
+		systems[i]->update (secs);
+}
+
+/**
+ * \brief Enables or disables particle emission.
+ * \param value True to enable. False otherwise.
+ */
+void LIExtParticleDriverModel::set_emitting (bool value)
+{
+	for (size_t i = 0 ; i < systems.size() ; i++)
+		systems[i]->set_emitting (value);
+}
+
+/**
+ * \brief Enables or disables looping.
+ * \param value True to enable. False otherwise.
+ */
+void LIExtParticleDriverModel::set_looping (bool value)
+{
+	for (size_t i = 0 ; i < systems.size() ; i++)
+		systems[i]->set_looping (value);
+}
+
+/**
+ * \brief Sets the render queue of the particle effect.
+ * \param render_queue Queue number.
+ */
+void LIExtParticleDriverModel::set_render_queue(int render_queue)
+{
+	for (size_t i = 0 ; i < systems.size() ; i++)
+		systems[i]->set_render_queue (render_queue);
 }
 
 /** @} */

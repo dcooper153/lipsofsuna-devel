@@ -28,7 +28,7 @@
  * \brief Initializes the driver.
  * \param parent Particle effect.
  */
-LIExtParticleDriver::LIExtParticleDriver(LIExtParticle* parent) : parent(parent), particles(NULL)
+LIExtParticleDriver::LIExtParticleDriver(LIExtParticle* parent) : parent(parent)
 {
 }
 
@@ -37,11 +37,14 @@ LIExtParticleDriver::LIExtParticleDriver(LIExtParticle* parent) : parent(parent)
  */
 LIExtParticleDriver::~LIExtParticleDriver()
 {
-	if (particles)
-	{
-		parent->node->detachObject (particles);
-		parent->render->scene_manager->destroyParticleSystem (particles);
-	}
+}
+
+/**
+ * \brief Updates the driver.
+ * \param secs Seconds since the last update.
+ */
+void LIExtParticleDriver::update (float secs)
+{
 }
 
 /**
@@ -50,8 +53,14 @@ LIExtParticleDriver::~LIExtParticleDriver()
  */
 void LIExtParticleDriver::set_emitting (bool value)
 {
-	if (particles)
-		particles->setEmitting (value);
+}
+
+/**
+ * \brief Enables or disables looping.
+ * \param value True to enable. False otherwise.
+ */
+void LIExtParticleDriver::set_looping (bool value)
+{
 }
 
 /**
@@ -60,8 +69,6 @@ void LIExtParticleDriver::set_emitting (bool value)
  */
 void LIExtParticleDriver::set_render_queue(int render_queue)
 {
-	if (particles)
-		particles->setRenderQueueGroup (render_queue);
 }
 
 /** @} */

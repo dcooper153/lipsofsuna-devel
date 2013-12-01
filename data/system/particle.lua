@@ -49,11 +49,25 @@ Particle.clear = function(self)
 	Los.particle_clear(self.handle)
 end
 
+--- Updates the particles.
+-- @param self Particle.
+-- @param secs Seconds since the last update.
+Particle.update = function(self, secs)
+	Los.particle_update(self.handle, secs)
+end
+
 --- Enables or disables particle emitting.
 -- @param self Particle.
 -- @param v True to enable. False otherwise.
 Particle.set_emitting = function(self, v)
 	Los.particle_set_emitting(self.handle, v)
+end
+
+--- Enables or disables looping.
+-- @param self Particle.
+-- @param v True to enable. False otherwise.
+Particle.set_looping = function(self, v)
+	Los.particle_set_looping(self.handle, v)
 end
 
 --- Sets the position of the particle set.

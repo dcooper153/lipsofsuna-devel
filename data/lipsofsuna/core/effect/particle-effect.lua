@@ -20,7 +20,7 @@ ParticleEffect.new = function(clss, args)
 	local self = EffectObject.new(clss, args)
 	self.particle = Particle()
 	self.particle:add_script(args.particle)
---	self.particle:set_looping(false)
+	self.particle:set_looping(false)
 	self.particle:set_render_queue("8")
 	self.particle:set_visible(true)
 	return self
@@ -38,6 +38,7 @@ ParticleEffect.unparent = function(self)
 end
 
 ParticleEffect.update = function(self, secs)
+	self.particle:update(secs)
 	if self.unparent_timer then
 		self.unparent_timer = self.unparent_timer - secs
 		if self.unparent_timer <= 0 then
