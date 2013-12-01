@@ -32,6 +32,7 @@
 LIExtParticleDriverOgre::LIExtParticleDriverOgre(LIExtParticle* parent, const char* name) : LIExtParticleDriver(parent)
 {
 	particles = parent->render->scene_manager->createParticleSystem (parent->render->id.next (), name);
+	particles->setCastShadows (false);
 	parent->node->attachObject (particles);
 }
 

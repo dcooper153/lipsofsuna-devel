@@ -40,6 +40,7 @@ LIExtParticleModelSystem::LIExtParticleModelSystem (LIExtParticle* parent, LIExt
 	particles = parent->render->scene_manager->createParticleSystem (parent->render->id.next (), count);
 	particles->setDefaultDimensions (size, size);
 	particles->setKeepParticlesInLocalSpace (true);
+	particles->setCastShadows (false);
 
 	// Instantiate the material.
 	Ogre::MaterialPtr instanced = parent->render->material_utils->create_instanced_material (system->material, system->texture);
