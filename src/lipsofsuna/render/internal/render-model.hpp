@@ -28,9 +28,9 @@ class LIRenModel
 {
 public:
 	LIRenModel (
-		LIRenRender* render,
-		LIMdlModel*  model,
-		int          id);
+		LIRenRender*      render,
+		const LIMdlModel* model,
+		int               id);
 
 	~LIRenModel ();
 
@@ -45,12 +45,12 @@ public:
 	int get_loaded () const;
 
 	int set_model (
-		LIMdlModel* model);
+		const LIMdlModel* model);
 
 private:
 
 	void create_mesh (
-		LIMdlModel* model);
+		const LIMdlModel* model);
 
 private:
 	int id;

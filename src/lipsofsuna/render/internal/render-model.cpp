@@ -43,9 +43,9 @@
  * \param id Unique model ID.
  */
 LIRenModel::LIRenModel (
-	LIRenRender* render,
-	LIMdlModel*  model,
-	int          id)
+	LIRenRender*      render,
+	const LIMdlModel* model,
+	int               id)
 {
 	this->id = id;
 	this->render = render;
@@ -162,7 +162,7 @@ int LIRenModel::get_loaded () const
  * \param model Model.
  */
 int LIRenModel::set_model (
-	LIMdlModel* model)
+	const LIMdlModel* model)
 {
 	create_mesh (model);
 
@@ -172,7 +172,7 @@ int LIRenModel::set_model (
 /*****************************************************************************/
 
 void LIRenModel::create_mesh (
-	LIMdlModel* model)
+	const LIMdlModel* model)
 {
 	/* Create the resource loader. */
 	/* Ogre doesn't free the manual resource loader, nor does it allow us to

@@ -126,6 +126,27 @@ public:
 	void set_particle_emitting (
 		int value);
 
+	void set_position (
+		float x,
+		float y,
+		float z)
+	{
+		LIMatTransform t = transform;
+		t.position = limat_vector_init (x, y, z);
+		set_transform (&t);
+	}
+
+	void set_rotation (
+		float x,
+		float y,
+		float z,
+		float w)
+	{
+		LIMatTransform t = transform;
+		t.rotation = limat_quaternion_init (x, y, z, w);
+		set_transform (&t);
+	}
+
 	int get_visible () const { return visible; }
 
 	int set_visible (
