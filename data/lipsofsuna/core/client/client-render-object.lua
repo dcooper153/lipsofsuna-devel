@@ -14,6 +14,7 @@ local Class = require("system/class")
 local Model = require("system/model")
 local ModelBuilder = require("character/model-builder")
 local ModelEffect = require("core/effect/model-effect")
+local ObjectVisual = require("core/client/object-visual")
 local ParticleEffect = require("core/effect/particle-effect")
 local RenderObject = require("system/render-object")
 local RenderUtils = require("core/client/render-utils")
@@ -32,6 +33,7 @@ ClientRenderObject.init = function(self, object)
 	if self.initialized then self:clear() end
 	if not object.spec then return end
 	self.initialized = true
+	self.visuals = ObjectVisual(object, self)
 	-- Store the object.
 	self.object = object
 	Client.options:apply_object(object)
@@ -45,7 +47,7 @@ ClientRenderObject.init = function(self, object)
 	end
 	self:set_visible(true)
 	-- Create special effects.
-	self.special_effects = RenderUtils:create_special_effects(self, object.spec)
+	self.visuals:add_special_effects("special", object.spec)
 	-- Create equipment anchors.
 	for slot,index in pairs(self.object.inventory.equipped) do
 		local item = self.object.inventory:get_object_by_index(index)
@@ -55,10 +57,7 @@ ClientRenderObject.init = function(self, object)
 	end
 	-- Create spell particles.
 	if object.spec and object.spec.particle then
-		self:add_effect(ParticleEffect{
-			parent = self,
-			particle = object.spec.particle,
-			position_mode = "node"})
+		self.visuals:add_particle_effect("particle", object.spec.particle)
 	end
 end
 
@@ -71,6 +70,9 @@ ClientRenderObject.clear = function(self)
 	self.object.model_build_hash = nil
 	self.object.texture_build_hash = nil
 	self.object = nil
+	-- Detach special effects.
+	self.visuals:unparent_all()
+	self.visuals = nil
 	-- Reset and hide the render object.
 	self:clear_animations()
 	self:set_visible(false)
@@ -78,11 +80,6 @@ ClientRenderObject.clear = function(self)
 	if self.model then
 		self:remove_model(self.model)
 		self.model = nil
-	end
-	-- Detach special effects.
-	if self.special_effects then
-		for k,v in pairs(self.special_effects) do v:unparent() end
-		self.special_effects = nil
 	end
 	-- Stop the speed line
 	if self.speedline then
@@ -146,29 +143,8 @@ end
 -- @param node Node where to attach the object.
 ClientRenderObject.add_equipment_anchor = function(self, object, slot, node)
 	if not self.initialized then return end
-	-- Get the anchored model.
-	local model_name = object:get_model_name()
-	if not model_name then return end
-	local model = Main.models:find_by_name(model_name)
-	if not model then return end
 	-- Add the anchor effect.
-	local effect = ModelEffect{
-		model = model,
-		model_node = object.spec.equipment_anchor,
-		parent = self,
-		parent_node = node,
-		position_local = object.spec.equipment_anchor_position,
-		position_mode = "node-node",
-		rotation_local = object.spec.equipment_anchor_rotation,
-		rotation_mode = "node-node"}
-	effect.anchor_object = object
-	if self.special_effects then
-		table.insert(self.special_effects, effect)
-	else
-		self.special_effects = {effect}
-	end
-	-- Add special effects for the anchor.
-	effect:add_special_effects(RenderUtils:create_special_effects(effect, object.spec))
+	self.visuals:add_anchor_object(slot .. "_anchor", object, node)
 	-- Add the equipment holding animation.
 	local anim = self:add_animation("hold", 0, 0, object)
 	if anim then
@@ -216,11 +192,7 @@ end
 -- @return Effect object, or nil.
 ClientRenderObject.get_equipment_anchor = function(self, object)
 	if not self.initialized then return end
-	for k,v in pairs(self.special_effects) do
-		if v.anchor_object == object then
-			return v
-		end
-	end
+	return self.visuals:find_by_object(object)
 end
 
 --- Gets the render model of the object.
@@ -264,13 +236,7 @@ end
 ClientRenderObject.remove_equipment_anchor = function(self, object, slot, node)
 	if not self.initialized then return end
 	-- Remove the anchor effect.
-	for k,v in pairs(self.special_effects) do
-		if v.anchor_object == object then
-			table.remove(self.special_effects, k)
-			v:detach()
-			break
-		end
-	end
+	self.visuals:unparent_by_slot(slot .. "_anchor")
 	-- Disable the equipment holding animation.
 	if not self.equipment_animations then return end
 	if not self.equipment_animations[slot] then return end
@@ -366,26 +332,10 @@ ClientRenderObject.update_censorship = function(self)
 		end
 	end
 	-- Clear the old anchors.
-	local i = 1
-	if self.special_effects then
-		while self.special_effects[i] do
-			local effect = self.special_effects[i]
-			if effect.class == CensorshipEffect then
-				effect:detach_delayed()
-				table.remove(self.special_effects, i)
-			else
-				i = i + 1
-			end
-		end
-	end
+	self.visuals:unparent_by_class(CensorshipEffect)
 	-- Create the new anchors.
 	for node in pairs(nodes) do
-		local effect = CensorshipEffect(self, node)
-		if self.special_effects then
-			table.insert(self.special_effects, effect)
-		else
-			self.special_effects = {effect}
-		end
+		self.visuals:add_censorship(node .. "_censor", node)
 	end
 end
 

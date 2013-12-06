@@ -1,0 +1,177 @@
+--- Visuals of a specific object.
+--
+-- Lips of Suna is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU Lesser General Public License as
+-- published by the Free Software Foundation, either version 3 of the
+-- License, or (at your option) any later version.
+--
+-- @module core.client.object_visual
+-- @alias ObjectVisual
+
+local Animation = require("system/animation")
+local CensorshipEffect = require("core/effect/censorship-effect")
+local Class = require("system/class")
+local Model = require("system/model")
+local ModelBuilder = require("character/model-builder")
+local ModelEffect = require("core/effect/model-effect")
+local ParticleEffect = require("core/effect/particle-effect")
+local RenderObject = require("system/render-object")
+local RenderUtils = require("core/client/render-utils")
+local SpeedlineEffect = require("core/effect/speedline-effect")
+local TextureBuilder = require("character/texture-builder")
+
+--- Visuals of a specific object.
+-- @type ObjectVisual
+local ObjectVisual = Class("ObjectVisual")
+
+--- Creates new object visuals.
+-- @param clss ObjectVisual class.
+-- @return ObjectVisual.
+ObjectVisual.new = function(clss, object, render)
+	local self = Class.new(clss)
+	self.object = object
+	self.render = render
+	self.slots = {}
+	return self
+end
+
+--- Adds an anchor object.
+-- @param self ObjectVisual.
+-- @param slot Slot name.
+-- @param object Object.
+-- @param node Node name.
+ObjectVisual.add_anchor_object = function(self, slot, object, node)
+	-- Get the anchored model.
+	local model_name = object:get_model_name()
+	if not model_name then return end
+	local model = Main.models:find_by_name(model_name)
+	if not model then return end
+	-- Create the model effect.
+	local effect = ModelEffect{
+		model = model,
+		model_node = object.spec.equipment_anchor,
+		parent = self.render,
+		parent_node = node,
+		position_local = object.spec.equipment_anchor_position,
+		position_mode = "node-node",
+		rotation_local = object.spec.equipment_anchor_rotation,
+		rotation_mode = "node-node"}
+	effect.anchor_object = object
+	self:__set_slot(slot, effect)
+	-- Add special effects for the anchor.
+	effect:add_special_effects(RenderUtils:create_special_effects(effect, object.spec))
+end
+
+--- Adds a censorship effect.
+-- @param self ObjectVisual.
+-- @param slot Slot name.
+-- @param node Node name.
+ObjectVisual.add_censorship = function(self, slot, node)
+	self:__set_slot(slot, CensorshipEffect(self.render, node))
+end
+
+--- Adds a particle item.
+-- @param self ObjectVisual.
+-- @param slot Slot name.
+-- @param name Particle effect name.
+ObjectVisual.add_particle_effect = function(self, slot, name)
+	self:__set_slot(slot, ParticleEffect{
+		parent = self.render,
+		particle = name,
+		position_mode = "node"})
+end
+
+--- Adds an anchor item.
+-- @param self ObjectVisual.
+-- @param slot Slot name.
+-- @param spec HairStyleSpec.
+ObjectVisual.add_softbody_hair = function(self, slot, spec)
+end
+
+--- Adds special effects.
+-- @param self ObjectVisual.
+-- @param slot Slot name.
+-- @param spec ObjectSpec.
+ObjectVisual.add_special_effects = function(self, slot, spec)
+	local effects = RenderUtils:create_special_effects(self.render, spec)
+	for k,v in pairs(effects) do
+		self.slots[slot .. "_effect_" .. tostring(k)] = v
+	end
+end
+
+--- Finds an effect by its parent object.
+-- @param object Object.
+-- @return Effect if found. Nil otherwise.
+ObjectVisual.find_by_object = function(self, object)
+	for k,v in pairs(self.slots) do
+		if v.anchor_object == object then
+			return v
+		end
+	end
+end
+
+--- Finds an effect by slot name.
+-- @param slot Slot name.
+-- @return Effect if found. Nil otherwise.
+ObjectVisual.find_by_slot = function(self, slot)
+	return self.slots[slot]
+end
+
+--- Unparents all effects.
+-- @param self ObjectVisual.
+ObjectVisual.unparent_all = function(self)
+	for k,v in pairs(self.slots) do
+		self:__unparent(v)
+	end
+	self.slots = {}
+end
+
+--- Unparents all effects of the given type.
+-- @param self ObjectVisual.
+-- @param class Class.
+ObjectVisual.unparent_by_class = function(self, class)
+	for k,effect in pairs(self.slots) do
+		if effect.class == class then
+			if effect.class == class then
+				effect:detach_delayed() --FIXME
+				self.slots[k] = nil
+			end
+		end
+	end
+end
+
+--- Unparents an individual slot.
+-- @param self ObjectVisual.
+-- @param slot Slot name.
+ObjectVisual.unparent_by_slot = function(self, slot)
+	local effect = self.slots[slot]
+	if effect then
+		self.slots[slot] = nil
+		self:__unparent(effect)
+	end
+end
+
+--- Unparents the given effect.
+-- @param self ObjectVisual.
+-- @param effect Effect.
+ObjectVisual.__unparent = function(self, effect)
+	if effect.unparent then
+		effect:unparent()
+	else
+		effect:detach()
+	end
+end
+
+--- Sets the effect of the given slot.
+-- @param self ObjectVisual.
+-- @param slot Slot name.
+-- @param effect Effect.
+ObjectVisual.__set_slot = function(self, slot, effect)
+	local old = self.slots[slot]
+	if old then
+		self:__unparent(old)
+	end
+	self.slots[slot] = effect
+end
+
+return ObjectVisual
