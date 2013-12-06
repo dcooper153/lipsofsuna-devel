@@ -51,6 +51,7 @@ public:
 	~LIRenModelData ();
 	void clear_buffer_data ();
 public:
+	bool clear_buffers;
 	size_t vertex_count;
 	size_t index_count;
 	float* buffer_data_0;

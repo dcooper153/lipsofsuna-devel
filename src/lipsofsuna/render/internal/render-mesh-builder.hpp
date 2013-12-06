@@ -27,7 +27,7 @@
 class LIRenMeshBuilder : public Ogre::ManualResourceLoader
 {
 public:
-	LIRenMeshBuilder (LIRenRender* render, const LIMdlModel* model);
+	LIRenMeshBuilder (LIRenRender* render, const LIMdlModel* model, bool editable);
 	virtual ~LIRenMeshBuilder ();
 	LIRenModelData* get_model () { return &data; }
 private:
@@ -44,6 +44,7 @@ private:
 	void update_entities ();
 private:
 	/* Static data. */
+	bool editable;
 	LIRenRender* render;
 	LIRenModelData data;
 	/* Prepared data. */

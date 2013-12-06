@@ -22,6 +22,7 @@
 #include "lipsofsuna/system.h"
 #include <OgreMesh.h>
 
+class LIRenModelData;
 class LIRenRender;
 
 class LIRenModel
@@ -30,15 +31,21 @@ public:
 	LIRenModel (
 		LIRenRender*      render,
 		const LIMdlModel* model,
-		int               id);
+		int               id,
+		bool              editable = false);
 
 	~LIRenModel ();
+
+	void replace_buffer_vtx_nml (
+		const void* data);
 
 	void replace_texture (
 		const char* name,
 		int         width,
 		int         height,
 		const void* pixels);
+
+	LIRenModelData* get_editable () const;
 
 	int get_id () const;
 
@@ -54,6 +61,7 @@ private:
 
 private:
 	int id;
+	bool editable;
 	LIRenRender* render;
 
 // FIXME

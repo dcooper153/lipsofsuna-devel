@@ -41,11 +41,13 @@
  * \param render Renderer.
  * \param model Model description.
  * \param id Unique model ID.
+ * \param editable True to keep buffer data. False otherwise.
  */
 LIRenModel::LIRenModel (
 	LIRenRender*      render,
 	const LIMdlModel* model,
-	int               id)
+	int               id,
+	bool              editable) : editable(editable)
 {
 	this->id = id;
 	this->render = render;
@@ -84,6 +86,24 @@ LIRenModel::~LIRenModel ()
 
 	/* Remove from the model dictionary. */
 	lialg_u32dic_remove (render->models, id);
+}
+
+void LIRenModel::replace_buffer_vtx_nml (
+	const void* data)
+{
+	if (mesh.isNull ())
+		return;
+	if (!get_loaded ())
+		return;
+
+	Ogre::VertexBufferBinding* binding = mesh->sharedVertexData->vertexBufferBinding;
+	if (binding == NULL)
+		return;
+	const Ogre::HardwareVertexBufferSharedPtr& buffer = binding->getBuffer (0);
+	if (buffer.isNull())
+		return;
+
+	buffer->writeData (0, buffer->getSizeInBytes (), data, true);
 }
 
 /**
@@ -138,6 +158,22 @@ void LIRenModel::replace_texture (
 }
 
 /**
+ * \brief Gets the editable data of the model.
+ * \return Editable data. NULL if not editable.
+ */
+LIRenModelData* LIRenModel::get_editable () const
+{
+	LIRenMeshBuilder* builder;
+
+	if (!editable)
+		return NULL;
+	builder = (LIRenMeshBuilder*) lialg_strdic_find (render->mesh_builders, mesh->getName ().c_str ());
+	if (!builder)
+		return NULL;
+	return builder->get_model ();
+}
+
+/**
  * \brief Gets the ID of the model.
  * \return ID.
  */
@@ -179,7 +215,7 @@ void LIRenModel::create_mesh (
 	   store custom data to meshes. Because of those reasons, we store the
 	   loader to a dictionary that is searched by mesh name. The render class
 	   will also use the dictionary to garbage collect unused loaders. */
-	LIRenMeshBuilder* builder = new LIRenMeshBuilder (render, model);
+	LIRenMeshBuilder* builder = new LIRenMeshBuilder (render, model, editable);
 	Ogre::String name = render->id.next ();
 	lialg_strdic_insert (render->mesh_builders, name.c_str (), builder);
 

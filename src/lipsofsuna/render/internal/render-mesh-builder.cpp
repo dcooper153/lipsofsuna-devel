@@ -32,7 +32,8 @@
 #include <OgreSubMesh.h>
 #include <OgreSkeletonManager.h>
 
-LIRenMeshBuilder::LIRenMeshBuilder (LIRenRender* render, const LIMdlModel* model) : render(render), data (model)
+LIRenMeshBuilder::LIRenMeshBuilder (LIRenRender* render, const LIMdlModel* model, bool editable) :
+	editable(editable), render(render), data(model)
 {
 	step = 0;
 	buffer_size_0 = 0;
@@ -80,7 +81,8 @@ void LIRenMeshBuilder::loadResource (Ogre::Resource* resource)
 		step = 4;
 	}
 	step = 0;
-	data.clear_buffer_data ();
+	if (!editable)
+		data.clear_buffer_data ();
 	vertex_data = NULL;
 	vertex_buffer_binding = NULL;
 }
