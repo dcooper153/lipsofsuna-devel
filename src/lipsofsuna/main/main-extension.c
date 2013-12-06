@@ -61,6 +61,7 @@ extern LIMaiExtensionInfo liext_sectors_info;
 extern LIMaiExtensionInfo liext_skeleton_info;
 extern LIMaiExtensionInfo liext_sound_info;
 extern LIMaiExtensionInfo liext_string_info;
+extern LIMaiExtensionInfo liext_softbody_info;
 extern LIMaiExtensionInfo liext_terrain_info;
 extern LIMaiExtensionInfo liext_thread_info;
 extern LIMaiExtensionInfo liext_time_info;
@@ -123,9 +124,10 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "heightmap-render", &liext_heightmap_render_info },
 		{ "input", &liext_input_info },
 		{ "particle", &liext_particle_info },
-		{ "render-object", &liext_object_render_info },
 		{ "render", &liext_render_info },
+		{ "render-object", &liext_object_render_info },
 		{ "render-model", &liext_render_model_info },
+		{ "softbody", &liext_softbody_info },
 		{ "widgets", &liext_widgets_info },
 		{ "wireframe", &liext_wireframe_info },
 #endif
