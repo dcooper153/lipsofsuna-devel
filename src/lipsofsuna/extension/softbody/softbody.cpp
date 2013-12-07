@@ -168,15 +168,20 @@ LIExtSoftbody::LIExtSoftbody (LIPhyPhysics* physics, LIRenRender* render, const 
 	mat->m_kAST = 0.5;
 	mat->m_flags &= ~btSoftBody::fMaterial::DebugDraw;
 	softbody->m_cfg.aeromodel = btSoftBody::eAeroModel::V_TwoSided;
-	softbody->m_cfg.kDP = 0.001;
-	softbody->m_cfg.kDF = 0.9;
-	softbody->m_cfg.kMT = 0.001;
+	softbody->m_cfg.kDP = 0.005;
+	softbody->m_cfg.kDF = 1.0;
+	softbody->m_cfg.kMT = 0.005;
 	softbody->m_cfg.collisions = btSoftBody::fCollision::CL_SS | btSoftBody::fCollision::CL_RS;
-	softbody->randomizeConstraints();
+	softbody->m_cfg.piterations = 5;
+	softbody->m_cfg.diterations = 5;
+	softbody->m_cfg.viterations = 5;
 	softbody->generateBendingConstraints(2, mat);
-	softbody->setTotalMass(2.0f);
-	softbody->generateClusters(100);
+	softbody->randomizeConstraints();
+	softbody->setTotalMass(1.0f);
+	softbody->generateClusters(10);
 	softbody->setPose(false, true);
+
+	transform.setIdentity();
 }
 
 LIExtSoftbody::~LIExtSoftbody ()
@@ -194,6 +199,7 @@ void LIExtSoftbody::update (float secs)
 	if (data == NULL || data->buffer_data_0 == NULL)
 		return;
 
+	btTransform it = transform.inverse();
 	btSoftBody::tNodeArray& nodes (softbody->m_nodes);
 	for (size_t i = 0 ; i < index_list.size() ; i++)
 	{
@@ -201,9 +207,10 @@ void LIExtSoftbody::update (float secs)
 		for (size_t j = 0 ; j < indices.size() ; j++)
 		{
 			float* coord = data->buffer_data_0 + 6 * indices[j];
-			coord[0] = nodes[i].m_x[0];
-			coord[1] = nodes[i].m_x[1];
-			coord[2] = nodes[i].m_x[2];
+			btVector3 v = it * nodes[i].m_x;
+			coord[0] = v[0];
+			coord[1] = v[1];
+			coord[2] = v[2];
 		}
 	}
 
@@ -215,18 +222,29 @@ void LIExtSoftbody::set_position (float x, float y, float z)
 	// Move the render object.
 	object->set_position (x, y, z);
 
-	// Move the softbody.
-	btTransform t = softbody->getWorldTransform();
-	btVector3 diff = btVector3(x, y, z) - t.getOrigin();
-	t.setOrigin(btVector3(x, y, z));
-	softbody->setWorldTransform (t);
+	// Move the virtual origin.
+	btVector3 diff = btVector3(x, y, z) - transform.getOrigin();
+	transform.setOrigin(btVector3(x, y, z));
 
-	// Apply fake forces to the softbody.
-	if (visible && diff.length() < 1.0f)
+	// Move pinned vertices.
+	btSoftBody::tNodeArray& nodes (softbody->m_nodes);
+	if (diff.length() < 1.0f)
 	{
-		t.setOrigin(btVector3(0,0,0));
-		diff = t.inverse() * -diff;
-		softbody->addForce(movement_deformation * diff);
+		for (size_t i = 0 ; i < coord_list.size() ; i++)
+		{
+			const btVector3& coord0 = nodes[i].m_x;
+			const btVector3 coord1 = transform * coord_list[i];
+			float w = weight_list[i];
+			nodes[i].m_x = w * coord0 + (1.0f - w) * coord1;
+		}
+	}
+	else
+	{
+		for (size_t i = 0 ; i < coord_list.size() ; i++)
+		{
+			const btVector3 coord1 = transform * coord_list[i];
+			nodes[i].m_x = coord1;
+		}
 	}
 }
 
@@ -235,23 +253,17 @@ void LIExtSoftbody::set_rotation (float x, float y, float z, float w)
 	// Move the render object.
 	object->set_rotation (x, y, z, w);
 
-	// Move the softbody.
-	btTransform t0 = softbody->getWorldTransform ();
-	btTransform t1 = t0;
-	t1.setRotation(btQuaternion(x, y, z, w));
-	softbody->setWorldTransform (t1);
+	// Move the virtual origin.
+	transform.setRotation(btQuaternion(x, y, z, w));
 
-	// Apply fake forces to the softbody.
-	if (visible)
+	// Move pinned vertices.
+	btSoftBody::tNodeArray& nodes (softbody->m_nodes);
+	for (size_t i = 0 ; i < coord_list.size() ; i++)
 	{
-		btSoftBody::tNodeArray& nodes (softbody->m_nodes);
-		btTransform t = t1.inverse() * t0;
-		for (size_t i = 0 ; i < coord_list.size() ; i++)
-		{
-			const btVector3& coord = nodes[i].m_x;
-			btVector3 diff = -((t * coord) - coord);
-			softbody->addForce(movement_deformation * diff, i);
-		}
+		const btVector3& coord0 = nodes[i].m_x;
+		const btVector3 coord1 = transform * coord_list[i];
+		float w = weight_list[i];
+		nodes[i].m_x = w * coord0 + (1.0f - w) * coord1;
 	}
 }
 
@@ -269,7 +281,7 @@ void LIExtSoftbody::set_visible (int value)
 
 	object->set_visible (visible);
 	if (visible)
-		physics->dynamics->addSoftBody(softbody, 0x0001, 0xFFFF);
+		physics->dynamics->addSoftBody(softbody, 0x0001, 0xFF00);
 	else
 		physics->dynamics->removeSoftBody(softbody);
 }

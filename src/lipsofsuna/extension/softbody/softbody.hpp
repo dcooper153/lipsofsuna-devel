@@ -52,6 +52,7 @@ private:
 	WeldList index_list;
 	WeightList weight_list;
 	btSoftBody* softbody;
+	btTransform transform;
 };
 
 LIAPICALL (void, liext_softbody_free, (
