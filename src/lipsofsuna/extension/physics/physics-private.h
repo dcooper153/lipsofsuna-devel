@@ -56,6 +56,7 @@ struct _LIPhyPhysics
 #endif
 	btCollisionDispatcher* dispatcher;
 	btConstraintSolver* solver;
+	btSoftBodySolver* softbody_solver;
 	btGhostPairCallback* ghostcallback;
 	LIAlgList* constraints;
 	LIAlgList* controllers;

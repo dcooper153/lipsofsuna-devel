@@ -22,12 +22,14 @@
 #define assert(a)
 #endif
 #include <btBulletDynamicsCommon.h>
+#include <BulletSoftBody/btDefaultSoftBodySolver.h>
+#include <BulletSoftBody/btSoftRigidDynamicsWorld.h>
 #include "physics-raycast-hook.hpp"
 
-class LIPhyDynamicsWorld : public btDiscreteDynamicsWorld
+class LIPhyDynamicsWorld : public btSoftRigidDynamicsWorld
 {
 public:
-	LIPhyDynamicsWorld (btDispatcher* dispatcher, btBroadphaseInterface* pairCache, btConstraintSolver* constraintSolver, btCollisionConfiguration* collisionConfiguration);
+	LIPhyDynamicsWorld (btDispatcher* dispatcher, btBroadphaseInterface* pairCache, btConstraintSolver* constraintSolver, btCollisionConfiguration* collisionConfiguration, btSoftBodySolver* softBodySolver);
 	virtual ~LIPhyDynamicsWorld ();
 	virtual void addCollisionObject (btCollisionObject* collisionObject, short int collisionFilterGroup = btBroadphaseProxy::DefaultFilter, short int collisionFilterMask = btBroadphaseProxy::AllFilter);
 	virtual void rayTest (const btVector3& rayFromWorld, const btVector3& rayToWorld, RayResultCallback& resultCallback) const;

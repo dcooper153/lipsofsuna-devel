@@ -17,7 +17,7 @@
 
 #include "physics-collision-configuration.hpp"
 
-LIPhyCollisionConfiguration::LIPhyCollisionConfiguration () : btDefaultCollisionConfiguration ()
+LIPhyCollisionConfiguration::LIPhyCollisionConfiguration () : btSoftBodyRigidBodyCollisionConfiguration ()
 {
 	algorithms = NULL;
 	void* mem = btAlignedAlloc (sizeof (LIPhyCollisionAlgorithmCreateFunc), 16);
@@ -37,7 +37,7 @@ btCollisionAlgorithmCreateFunc* LIPhyCollisionConfiguration::getCollisionAlgorit
 		return create_func;
 	if ((proxyType0 == CUSTOM_CONVEX_SHAPE_TYPE) && (proxyType1 == CONVEX_HULL_SHAPE_PROXYTYPE))
 		return create_func;
-	return btDefaultCollisionConfiguration::getCollisionAlgorithmCreateFunc (proxyType0, proxyType1);
+	return btSoftBodyRigidBodyCollisionConfiguration::getCollisionAlgorithmCreateFunc (proxyType0, proxyType1);
 }
 
 void LIPhyCollisionConfiguration::add_algorithm (LIPhyCollisionAlgorithmCreator* algorithm)

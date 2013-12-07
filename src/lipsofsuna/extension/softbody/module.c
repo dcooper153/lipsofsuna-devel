@@ -42,6 +42,14 @@ LIExtSoftbodyModule* liext_softbody_module_new (
 		return NULL;
 	self->program = program;
 
+	/* Find the physics component. */
+	self->physics = limai_program_find_component (program, "physics");
+	if (self->physics == NULL)
+	{
+		liext_softbody_module_free (self);
+		return NULL;
+	}
+
 	/* Find the render component. */
 	self->render = limai_program_find_component (program, "render");
 	if (self->render == NULL)

@@ -90,7 +90,8 @@ LIPhyPhysics* liphy_physics_new (
 		self->configuration = new LIPhyCollisionConfiguration ();
 		self->dispatcher = new btCollisionDispatcher (self->configuration);
 		self->solver = new btSequentialImpulseConstraintSolver ();
-		self->dynamics = new LIPhyDynamicsWorld (self->dispatcher, self->broadphase, self->solver, self->configuration);
+		self->softbody_solver = new btDefaultSoftBodySolver ();
+		self->dynamics = new LIPhyDynamicsWorld (self->dispatcher, self->broadphase, self->solver, self->configuration, self->softbody_solver);
 		self->dynamics->setInternalTickCallback (private_internal_tick, self);
 	}
 	catch (...)
@@ -133,6 +134,7 @@ void liphy_physics_free (
 
 	delete self->dynamics;
 	delete self->solver;
+	delete self->softbody_solver;
 	delete self->configuration;
 	delete self->dispatcher;
 	delete self->broadphase;

@@ -21,6 +21,7 @@
 #include "physics-private.h"
 #include <btBulletCollisionCommon.h>
 #include <BulletCollision/CollisionDispatch/btConvexConvexAlgorithm.h>
+#include <BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
 
 class LIPhyCollisionAlgorithmCreator
 {
@@ -48,7 +49,7 @@ public:
 
 class LIPhyCollisionAlgorithmCreateFunc;
 
-class LIPhyCollisionConfiguration : public btDefaultCollisionConfiguration
+class LIPhyCollisionConfiguration : public btSoftBodyRigidBodyCollisionConfiguration
 {
 public:
 	LIPhyCollisionConfiguration ();

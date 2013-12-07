@@ -36,7 +36,7 @@ static void Softbody_new (LIScrArgs* args)
 		return;
 
 	/* Allocate self. */
-	self = new LIExtSoftbody (module->render, (const LIMdlModel*) liscr_data_get_data (data));
+	self = new LIExtSoftbody (module->physics, module->render, (const LIMdlModel*) liscr_data_get_data (data));
 	if (self == NULL)
 		return;
 
@@ -107,7 +107,7 @@ static void Softbody_set_visible (LIScrArgs* args)
 
 	if (!liscr_args_geti_bool (args, 0, &v))
 		return;
-	self->object->set_visible (v);
+	self->set_visible (v);
 }
 
 /*****************************************************************************/

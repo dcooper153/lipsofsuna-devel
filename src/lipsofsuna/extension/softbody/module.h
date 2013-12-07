@@ -20,6 +20,7 @@
 
 #include "lipsofsuna/extension.h"
 #include "lipsofsuna/render.h"
+#include "lipsofsuna/extension/physics/physics.h"
 
 #define LIEXT_SCRIPT_SOFTBODY "Softbody"
 
@@ -27,6 +28,7 @@ typedef struct _LIExtSoftbodyModule LIExtSoftbodyModule;
 struct _LIExtSoftbodyModule
 {
 	LIMaiProgram* program;
+	LIPhyPhysics* physics;
 	LIRenRender* render;
 };
 

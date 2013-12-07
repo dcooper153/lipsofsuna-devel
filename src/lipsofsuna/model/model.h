@@ -107,6 +107,10 @@ LIAPICALL (LIMdlNode*, limdl_model_find_node, (
 	const LIMdlModel* self,
 	const char*       name));
 
+LIAPICALL (LIMdlPartition*, limdl_model_find_partition, (
+	const LIMdlModel* self,
+	const char*       name));
+
 LIAPICALL (LIMdlShapeKey*, limdl_model_find_shape_key, (
 	LIMdlModel* self,
 	const char* name));

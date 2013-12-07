@@ -18,8 +18,8 @@
 #include "physics-dynamics-world.hpp"
 #include "physics-private.h"
 
-LIPhyDynamicsWorld::LIPhyDynamicsWorld (btDispatcher* dispatcher, btBroadphaseInterface* pairCache, btConstraintSolver* constraintSolver, btCollisionConfiguration* collisionConfiguration) :
-	btDiscreteDynamicsWorld (dispatcher, pairCache, constraintSolver, collisionConfiguration)
+LIPhyDynamicsWorld::LIPhyDynamicsWorld (btDispatcher* dispatcher, btBroadphaseInterface* pairCache, btConstraintSolver* constraintSolver, btCollisionConfiguration* collisionConfiguration, btSoftBodySolver* softBodySolver) :
+	btSoftRigidDynamicsWorld (dispatcher, pairCache, constraintSolver, collisionConfiguration, softBodySolver)
 {
 	this->raycast_hooks = NULL;
 	this->setGravity (btVector3 (0.0f, -10.0f, 0.0f));

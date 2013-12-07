@@ -18,15 +18,19 @@
 #ifndef __EXT_SOFTBODY_SOFTBODY_HPP__
 #define __EXT_SOFTBODY_SOFTBODY_HPP__
 
+#include <map>
+#include <vector>
 #include "lipsofsuna/extension.h"
+#include "lipsofsuna/extension/physics/physics.h"
 #include "lipsofsuna/render/internal/render.hpp"
 #include "lipsofsuna/render/internal/render-object.hpp"
 #include "lipsofsuna/render/internal/render-model.hpp"
+#include <BulletSoftBody/btSoftBody.h>
 
 class LIExtSoftbody
 {
 public:
-	LIExtSoftbody (LIRenRender* render, const LIMdlModel* model);
+	LIExtSoftbody (LIPhyPhysics* physics, LIRenRender* render, const LIMdlModel* model);
 	~LIExtSoftbody ();
 	void update (float secs);
 	void set_position (float x, float y, float z);
@@ -34,9 +38,20 @@ public:
 	void set_render_queue (const char* value);
 	void set_visible (int value);
 public:
+	LIPhyPhysics* physics;
 	LIRenRender* render;
 	LIRenModel* model;
 	LIRenObject* object;
+private:
+	typedef std::vector<btScalar> WeightList;
+	typedef std::vector<btVector3> CoordList;
+	typedef std::vector<std::vector<int> > WeldList;
+	bool visible;
+	float movement_deformation;
+	CoordList coord_list;
+	WeldList index_list;
+	WeightList weight_list;
+	btSoftBody* softbody;
 };
 
 LIAPICALL (void, liext_softbody_free, (

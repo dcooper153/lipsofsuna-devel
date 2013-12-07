@@ -605,6 +605,27 @@ LIMdlNode* limdl_model_find_node (
 }
 
 /**
+ * \brief Finds a partition by name.
+ * \param self Model.
+ * \param name Name of the partition to find.
+ * \return Partition or NULL.
+ */
+LIMdlPartition* limdl_model_find_partition (
+	const LIMdlModel* self,
+	const char*       name)
+{
+	int i;
+
+	for (i = 0 ; i < self->partitions.count ; i++)
+	{
+		if (!strcmp (self->partitions.array[i].name, name))
+			return self->partitions.array + i;
+	}
+
+	return NULL;
+}
+
+/**
  * \brief Finds a shape key by name.
  * \param self Model.
  * \param name Shape key name.

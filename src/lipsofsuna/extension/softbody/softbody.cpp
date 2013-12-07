@@ -22,44 +22,237 @@
  * @{
  */
 
+#include "lipsofsuna/extension/physics/physics-private.h"
 #include "lipsofsuna/render/internal/render-model-data.hpp"
 #include "softbody.hpp"
 
-LIExtSoftbody::LIExtSoftbody (LIRenRender* render, const LIMdlModel* model) : render(render)
+struct Vertex
 {
+	float x, y, z;
+	bool operator<(const Vertex& f) const
+	{
+		if (x < f.x) return true;
+		if (x > f.x) return false;
+		if (y < f.y) return true;
+		if (y > f.y) return false;
+		if (z < f.z) return true;
+		return false;
+	}
+};
+
+struct Edge
+{
+	int i1, i2;
+	bool operator<(const Edge& f) const
+	{
+		if (i1 < f.i1) return true;
+		if (i1 > f.i1) return false;
+		if (i2 < f.i2) return true;
+		return false;
+	}
+	Edge reversed() const
+	{
+		Edge res = {i2, i1};
+		return res;
+	}
+};
+
+struct Face
+{
+	int i1, i2, i3;
+	bool operator<(const Face& f) const
+	{
+		if (i1 < f.i1) return true;
+		if (i1 > f.i1) return false;
+		if (i2 < f.i2) return true;
+		if (i2 > f.i2) return false;
+		if (i3 < f.i3) return true;
+		return false;
+	}
+};
+
+/*****************************************************************************/
+
+LIExtSoftbody::LIExtSoftbody (LIPhyPhysics* physics, LIRenRender* render, const LIMdlModel* model) :
+	physics(physics), render(render), visible(false), movement_deformation(1.0f)
+{
+	// Create the render model.
 	this->model = new LIRenModel (render, model, 0, true);
+
+	// Create the render object.
 	object = new LIRenObject (render, 0);
 	object->add_model (this->model);
+
+	// Join vertices whose coordinates match each other.
+	std::map<Vertex, int> weld_map;
+	std::vector<int> index_list_rev;
+	for (int i = 0 ; i < model->vertices.count ; i++)
+	{
+		LIMatVector v = model->vertices.array[i].coord;
+		Vertex key = { v.x, v.y, v.z };
+		std::map<Vertex, int>::iterator iter = weld_map.find(key);
+		if (iter == weld_map.end())
+		{
+			size_t index = index_list.size();
+			index_list.push_back(std::vector<int>());
+			index_list[index].push_back(i);
+			coord_list.push_back(btVector3(v.x, v.y, v.z));
+			weight_list.push_back(0.0f);
+			weld_map[key] = index;
+			lisys_assert(weld_map.find(key) != weld_map.end());
+			index_list_rev.push_back(index);
+		}
+		else
+		{
+			index_list[iter->second].push_back(i);
+			index_list_rev.push_back(iter->second);
+		}
+	}
+
+	// Read the weights from the model partition.
+	LIMdlPartition* partition = limdl_model_find_partition (model, "softbody");
+	if (partition)
+	{
+		for (int i = 0 ; i < partition->vertices.count ; i++)
+		{
+			int mdl_index = partition->vertices.array[i].index;
+			int sb_index = index_list_rev[mdl_index];
+			float weight = partition->vertices.array[i].weight;
+			weight_list[sb_index] = weight;
+		}
+	}
+
+	// Create the softbody.
+	btSoftBodyWorldInfo& info = physics->dynamics->getWorldInfo();
+	info.m_gravity.setValue(0, -10, 0);
+	softbody = new btSoftBody (&info, coord_list.size(),
+		(btVector3*) &(coord_list[0]), (btScalar*) &(weight_list[0]));
+
+	// Create the softbody links.
+	std::map<Edge, bool> created;
+	std::map<Face, bool> created_faces;
+	if (model->lod.count)
+	{
+		const LIMdlLod* lod = model->lod.array;
+		for (int i = 0 ; i < lod->indices.count ; i += 3)
+		{
+			int i1 = index_list_rev[lod->indices.array[i]];
+			int i2 = index_list_rev[lod->indices.array[i + 1]];
+			int i3 = index_list_rev[lod->indices.array[i + 2]];
+			if (i1 == i2 || i2 == i3 || i3 == i1)
+				continue;
+			Edge edges[3] = {{i1,i2}, {i2,i3}, {i3,i1}};
+			for (int j = 0 ; j < 3 ; j++)
+			{
+				if (created.find(edges[j]) == created.end())
+				{
+					created[edges[j]] = true;
+					created[edges[j].reversed()] = true;
+					lisys_assert(created.find(edges[j]) != created.end());
+					lisys_assert(created.find(edges[j].reversed()) != created.end());
+					softbody->appendLink(edges[j].i1, edges[j].i2);
+				}
+			}
+			Face f = { i1,i2,i3 };
+			if (created_faces.find(f) == created_faces.end())
+			{
+				softbody->appendFace(i1,i2,i3);
+				created_faces[f] = true;
+			}
+		}
+	}
+
+	// Set the simulation parameters.
+	btSoftBody::Material* mat = softbody->appendMaterial();
+	mat->m_kLST = 0.5;
+	mat->m_kAST = 0.5;
+	mat->m_flags &= ~btSoftBody::fMaterial::DebugDraw;
+	softbody->m_cfg.aeromodel = btSoftBody::eAeroModel::V_TwoSided;
+	softbody->m_cfg.kDP = 0.001;
+	softbody->m_cfg.kDF = 0.9;
+	softbody->m_cfg.kMT = 0.001;
+	softbody->m_cfg.collisions = btSoftBody::fCollision::CL_SS | btSoftBody::fCollision::CL_RS;
+	softbody->randomizeConstraints();
+	softbody->generateBendingConstraints(2, mat);
+	softbody->setTotalMass(2.0f);
+	softbody->generateClusters(100);
+	softbody->setPose(false, true);
 }
 
 LIExtSoftbody::~LIExtSoftbody ()
 {
+	if (visible)
+		physics->dynamics->removeSoftBody(softbody);
+	delete softbody;
 	delete object;
 	delete model;
 }
 
 void LIExtSoftbody::update (float secs)
 {
-	// TODO
 	LIRenModelData* data = model->get_editable ();
 	if (data == NULL || data->buffer_data_0 == NULL)
 		return;
-	for (size_t i = 0 ; i < data->vertex_count ; i++)
+
+	btSoftBody::tNodeArray& nodes (softbody->m_nodes);
+	for (size_t i = 0 ; i < index_list.size() ; i++)
 	{
-		float* coord = data->buffer_data_0 + 6 * i;
-		coord[0] += 0.1f * secs;
+		const std::vector<int>& indices = index_list[i];
+		for (size_t j = 0 ; j < indices.size() ; j++)
+		{
+			float* coord = data->buffer_data_0 + 6 * indices[j];
+			coord[0] = nodes[i].m_x[0];
+			coord[1] = nodes[i].m_x[1];
+			coord[2] = nodes[i].m_x[2];
+		}
 	}
+
 	model->replace_buffer_vtx_nml (data->buffer_data_0);
 }
 
 void LIExtSoftbody::set_position (float x, float y, float z)
 {
+	// Move the render object.
 	object->set_position (x, y, z);
+
+	// Move the softbody.
+	btTransform t = softbody->getWorldTransform();
+	btVector3 diff = btVector3(x, y, z) - t.getOrigin();
+	t.setOrigin(btVector3(x, y, z));
+	softbody->setWorldTransform (t);
+
+	// Apply fake forces to the softbody.
+	if (visible && diff.length() < 1.0f)
+	{
+		t.setOrigin(btVector3(0,0,0));
+		diff = t.inverse() * -diff;
+		softbody->addForce(movement_deformation * diff);
+	}
 }
 
 void LIExtSoftbody::set_rotation (float x, float y, float z, float w)
 {
+	// Move the render object.
 	object->set_rotation (x, y, z, w);
+
+	// Move the softbody.
+	btTransform t0 = softbody->getWorldTransform ();
+	btTransform t1 = t0;
+	t1.setRotation(btQuaternion(x, y, z, w));
+	softbody->setWorldTransform (t1);
+
+	// Apply fake forces to the softbody.
+	if (visible)
+	{
+		btSoftBody::tNodeArray& nodes (softbody->m_nodes);
+		btTransform t = t1.inverse() * t0;
+		for (size_t i = 0 ; i < coord_list.size() ; i++)
+		{
+			const btVector3& coord = nodes[i].m_x;
+			btVector3 diff = -((t * coord) - coord);
+			softbody->addForce(movement_deformation * diff, i);
+		}
+	}
 }
 
 void LIExtSoftbody::set_render_queue (const char* value)
@@ -69,7 +262,16 @@ void LIExtSoftbody::set_render_queue (const char* value)
 
 void LIExtSoftbody::set_visible (int value)
 {
-	object->set_visible (value);
+	bool v = (value != 0);
+	if (v == visible)
+		return;
+	visible = v;
+
+	object->set_visible (visible);
+	if (visible)
+		physics->dynamics->addSoftBody(softbody, 0x0001, 0xFFFF);
+	else
+		physics->dynamics->removeSoftBody(softbody);
 }
 
 void liext_softbody_free (
