@@ -27,10 +27,24 @@
 #include "lipsofsuna/render/internal/render-model.hpp"
 #include <BulletSoftBody/btSoftBody.h>
 
+class LIExtSoftbodyParams
+{
+public:
+	LIExtSoftbodyParams();
+public:
+	float movement_response;
+	float pose;
+	float damp;
+	float drag;
+	float stiffness_angular;
+	float stiffness_linear;
+	int iterations;
+};
+
 class LIExtSoftbody
 {
 public:
-	LIExtSoftbody (LIPhyPhysics* physics, LIRenRender* render, const LIMdlModel* model);
+	LIExtSoftbody (LIPhyPhysics* physics, LIRenRender* render, const LIMdlModel* model, const LIExtSoftbodyParams& params);
 	~LIExtSoftbody ();
 	void update (float secs);
 	void set_collision_group (int value);
@@ -51,6 +65,7 @@ private:
 	bool visible;
 	int collision_group;
 	int collision_mask;
+	float movement_response;
 	CoordList coord_list;
 	WeldList index_list;
 	WeightList weight_list;

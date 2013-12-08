@@ -73,9 +73,23 @@ struct Face
 
 /*****************************************************************************/
 
-LIExtSoftbody::LIExtSoftbody (LIPhyPhysics* physics, LIRenRender* render, const LIMdlModel* model) :
+LIExtSoftbodyParams::LIExtSoftbodyParams ()
+{
+	movement_response = 0.5f;
+	pose = 1.0f;
+	damp = 1.0f;
+	drag = 1.0f;
+	stiffness_angular = 0.5f;
+	stiffness_linear = 0.5f;
+	iterations = 15;
+}
+
+/*****************************************************************************/
+
+LIExtSoftbody::LIExtSoftbody (LIPhyPhysics* physics, LIRenRender* render, const LIMdlModel* model, const LIExtSoftbodyParams& params) :
 	physics(physics), render(render), visible(false),
-	collision_group(1), collision_mask(0xFFFF)
+	collision_group(1), collision_mask(0xFFFF),
+	movement_response(params.movement_response)
 {
 	// Create the render model.
 	this->model = new LIRenModel (render, model, 0, true);
@@ -165,18 +179,18 @@ LIExtSoftbody::LIExtSoftbody (LIPhyPhysics* physics, LIRenRender* render, const 
 
 	// Set the simulation parameters.
 	btSoftBody::Material* mat = softbody->appendMaterial();
-	mat->m_kLST = 0.5;
-	mat->m_kAST = 0.5;
+	mat->m_kLST = params.stiffness_linear;
+	mat->m_kAST = params.stiffness_angular;
 	mat->m_flags &= ~btSoftBody::fMaterial::DebugDraw;
 	softbody->m_cfg.aeromodel = btSoftBody::eAeroModel::V_TwoSided;
-	softbody->m_cfg.kDP = 0.005;
-	softbody->m_cfg.kDF = 1.0;
-	softbody->m_cfg.kMT = 0.005;
+	softbody->m_cfg.kDP = params.damp;
+	softbody->m_cfg.kDF = params.drag;
+	softbody->m_cfg.kMT = params.pose;
 	softbody->m_cfg.collisions = btSoftBody::fCollision::CL_SS | btSoftBody::fCollision::CL_RS;
-	softbody->m_cfg.piterations = 5;
-	softbody->m_cfg.diterations = 5;
-	softbody->m_cfg.viterations = 5;
-	softbody->generateBendingConstraints(2, mat);
+	softbody->m_cfg.piterations = params.iterations;
+	softbody->m_cfg.diterations = params.iterations;
+	softbody->m_cfg.viterations = params.iterations;
+	softbody->generateBendingConstraints(3, mat);
 	softbody->randomizeConstraints();
 	softbody->setTotalMass(1.0f);
 	softbody->generateClusters(10);
@@ -244,6 +258,7 @@ void LIExtSoftbody::set_position (float x, float y, float z)
 	object->set_position (x, y, z);
 
 	// Move the virtual origin.
+	btTransform t = transform;
 	btVector3 diff = btVector3(x, y, z) - transform.getOrigin();
 	transform.setOrigin(btVector3(x, y, z));
 
@@ -251,12 +266,16 @@ void LIExtSoftbody::set_position (float x, float y, float z)
 	btSoftBody::tNodeArray& nodes (softbody->m_nodes);
 	if (diff.length() < 1.0f)
 	{
+		t = transform * t.inverse();
 		for (size_t i = 0 ; i < coord_list.size() ; i++)
 		{
-			const btVector3& coord0 = nodes[i].m_x;
-			const btVector3 coord1 = transform * coord_list[i];
-			float w = weight_list[i];
-			nodes[i].m_x = w * coord0 + (1.0f - w) * coord1;
+			float w1 = weight_list[i];
+			float w2 = movement_response;
+			btVector3 coord0 = nodes[i].m_x;
+			btVector3 coord1 = transform * coord_list[i];
+			btVector3 coord2 = t * nodes[i].m_x;
+			btVector3 tmp = w1 * coord0 + (1.0f - w1) * coord1;
+			nodes[i].m_x = w2 * tmp + (1.0f - w2) * coord2;
 		}
 	}
 	else
@@ -275,16 +294,21 @@ void LIExtSoftbody::set_rotation (float x, float y, float z, float w)
 	object->set_rotation (x, y, z, w);
 
 	// Move the virtual origin.
+	btTransform t = transform;
 	transform.setRotation(btQuaternion(x, y, z, w));
+	t = transform * t.inverse();
 
 	// Move pinned vertices.
 	btSoftBody::tNodeArray& nodes (softbody->m_nodes);
 	for (size_t i = 0 ; i < coord_list.size() ; i++)
 	{
-		const btVector3& coord0 = nodes[i].m_x;
-		const btVector3 coord1 = transform * coord_list[i];
-		float w = weight_list[i];
-		nodes[i].m_x = w * coord0 + (1.0f - w) * coord1;
+		float w1 = weight_list[i];
+		float w2 = movement_response;
+		btVector3 coord0 = nodes[i].m_x;
+		btVector3 coord1 = transform * coord_list[i];
+		btVector3 coord2 = t * nodes[i].m_x;
+		btVector3 tmp = w1 * coord0 + (1.0f - w1) * coord1;
+		nodes[i].m_x = w2 * tmp + (1.0f - w2) * coord2;
 	}
 }
 

@@ -28,15 +28,24 @@
 static void Softbody_new (LIScrArgs* args)
 {
 	LIExtSoftbody* self;
+	LIExtSoftbodyParams params;
 	LIExtSoftbodyModule* module;
 	LIScrData* data;
 
+	/* Read the parameters. */
 	module = (LIExtSoftbodyModule*) liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SOFTBODY);
 	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &data))
 		return;
+	if (liscr_args_geti_float (args, 1, &params.movement_response)) params.movement_response = LIMAT_CLAMP (params.movement_response, 0.0f, 1.0f);
+	if (liscr_args_geti_float (args, 2, &params.pose)) params.pose = LIMAT_CLAMP (params.pose, 0.0f, 1.0f);
+	if (liscr_args_geti_float (args, 3, &params.damp)) params.damp = LIMAT_CLAMP (params.damp, 0.0f, 1.0f);
+	if (liscr_args_geti_float (args, 4, &params.drag)) params.drag = LIMAT_CLAMP (params.drag, 0.0f, 1.0f);
+	if (liscr_args_geti_float (args, 5, &params.stiffness_angular)) params.stiffness_angular = LIMAT_CLAMP (params.stiffness_angular, 0.0f, 1.0f);
+	if (liscr_args_geti_float (args, 6, &params.stiffness_linear)) params.stiffness_linear = LIMAT_CLAMP (params.stiffness_linear, 0.0f, 1.0f);
+	if (liscr_args_geti_int (args, 7, &params.iterations)) params.iterations = LIMAT_CLAMP (params.iterations, 1, 100);
 
 	/* Allocate self. */
-	self = new LIExtSoftbody (module->physics, module->render, (const LIMdlModel*) liscr_data_get_data (data));
+	self = new LIExtSoftbody (module->physics, module->render, (const LIMdlModel*) liscr_data_get_data (data), params);
 	if (self == NULL)
 		return;
 

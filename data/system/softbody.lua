@@ -23,10 +23,11 @@ local Softbody = Class("Softbody")
 --- Creates a new softbody set.
 -- @param clss Softbody class.
 -- @param model Model.
+-- @param params Array of numbers.
 -- @return Softbody.
-Softbody.new = function(clss, model)
+Softbody.new = function(clss, model, params)
 	local self = Class.new(clss)
-	self.handle = Los.softbody_new(model.handle)
+	self.handle = Los.softbody_new(model.handle, params[1], params[2], params[3], params[4], params[5], params[6], params[7], params[8])
 	self.__collision_mask = 1
 	self.__collision_group = 0xFFFF
 	return self
