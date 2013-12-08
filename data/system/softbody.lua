@@ -27,6 +27,8 @@ local Softbody = Class("Softbody")
 Softbody.new = function(clss, model)
 	local self = Class.new(clss)
 	self.handle = Los.softbody_new(model.handle)
+	self.__collision_mask = 1
+	self.__collision_group = 0xFFFF
 	return self
 end
 
@@ -35,6 +37,34 @@ end
 -- @param secs Seconds since the last update.
 Softbody.update = function(self, secs)
 	Los.softbody_update(self.handle, secs)
+end
+
+--- Gets the collision group number of the softbody.
+-- @param self Softbody.
+-- @return Number.
+Softbody.get_collision_group = function(self)
+	return self.__collision_group
+end
+
+--- Sets the collision group number of the softbody.
+-- @param self Softbody.
+-- @param v Number.
+Softbody.set_collision_group = function(self, v)
+	Los.softbody_set_collision_group(self.handle, v)
+end
+
+--- Gets the collision bitmask of the softbody.
+-- @param self Softbody.
+-- @return Number.
+Softbody.get_collision_mask = function(self)
+	return self.__collision_mask
+end
+
+--- Sets the collision bitmask of the softbody.
+-- @param self Softbody.
+-- @param v Number.
+Softbody.set_collision_mask = function(self, v)
+	Los.softbody_set_collision_mask(self.handle, v)
 end
 
 --- Sets the position of the softbody.

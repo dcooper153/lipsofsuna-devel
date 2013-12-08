@@ -33,6 +33,8 @@ public:
 	LIExtSoftbody (LIPhyPhysics* physics, LIRenRender* render, const LIMdlModel* model);
 	~LIExtSoftbody ();
 	void update (float secs);
+	void set_collision_group (int value);
+	void set_collision_mask (int value);
 	void set_position (float x, float y, float z);
 	void set_rotation (float x, float y, float z, float w);
 	void set_render_queue (const char* value);
@@ -47,7 +49,8 @@ private:
 	typedef std::vector<btVector3> CoordList;
 	typedef std::vector<std::vector<int> > WeldList;
 	bool visible;
-	float movement_deformation;
+	int collision_group;
+	int collision_mask;
 	CoordList coord_list;
 	WeldList index_list;
 	WeightList weight_list;

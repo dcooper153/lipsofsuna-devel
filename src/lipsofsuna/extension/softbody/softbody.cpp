@@ -74,7 +74,8 @@ struct Face
 /*****************************************************************************/
 
 LIExtSoftbody::LIExtSoftbody (LIPhyPhysics* physics, LIRenRender* render, const LIMdlModel* model) :
-	physics(physics), render(render), visible(false), movement_deformation(1.0f)
+	physics(physics), render(render), visible(false),
+	collision_group(1), collision_mask(0xFFFF)
 {
 	// Create the render model.
 	this->model = new LIRenModel (render, model, 0, true);
@@ -217,6 +218,26 @@ void LIExtSoftbody::update (float secs)
 	model->replace_buffer_vtx_nml (data->buffer_data_0);
 }
 
+void LIExtSoftbody::set_collision_group (int value)
+{
+	collision_group = value;
+	if (visible)
+	{
+		physics->dynamics->removeSoftBody(softbody);
+		physics->dynamics->addSoftBody(softbody, collision_group, collision_mask);
+	}
+}
+
+void LIExtSoftbody::set_collision_mask (int value)
+{
+	collision_mask = value;
+	if (visible)
+	{
+		physics->dynamics->removeSoftBody(softbody);
+		physics->dynamics->addSoftBody(softbody, collision_group, collision_mask);
+	}
+}
+
 void LIExtSoftbody::set_position (float x, float y, float z)
 {
 	// Move the render object.
@@ -281,7 +302,7 @@ void LIExtSoftbody::set_visible (int value)
 
 	object->set_visible (visible);
 	if (visible)
-		physics->dynamics->addSoftBody(softbody, 0x0001, 0xFF00);
+		physics->dynamics->addSoftBody(softbody, collision_group, collision_mask);
 	else
 		physics->dynamics->removeSoftBody(softbody);
 }

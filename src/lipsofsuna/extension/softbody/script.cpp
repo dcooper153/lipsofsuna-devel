@@ -60,6 +60,26 @@ static void Softbody_update (LIScrArgs* args)
 	self->update (v);
 }
 
+static void Softbody_set_collision_group (LIScrArgs* args)
+{
+	int v;
+	LIExtSoftbody* self = (LIExtSoftbody*) args->self;
+
+	if (!liscr_args_geti_int (args, 0, &v))
+		return;
+	self->set_collision_group (v);
+}
+
+static void Softbody_set_collision_mask (LIScrArgs* args)
+{
+	int v;
+	LIExtSoftbody* self = (LIExtSoftbody*) args->self;
+
+	if (!liscr_args_geti_int (args, 0, &v))
+		return;
+	self->set_collision_mask (v);
+}
+
 static void Softbody_set_position (LIScrArgs* args)
 {
 	float x;
@@ -117,6 +137,8 @@ void liext_script_softbody (
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SOFTBODY, "softbody_new", Softbody_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOFTBODY, "softbody_update", Softbody_update);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOFTBODY, "softbody_set_collision_group", Softbody_set_collision_group);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOFTBODY, "softbody_set_collision_mask", Softbody_set_collision_mask);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOFTBODY, "softbody_set_position", Softbody_set_position);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOFTBODY, "softbody_set_render_queue", Softbody_set_render_queue);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SOFTBODY, "softbody_set_rotation", Softbody_set_rotation);
