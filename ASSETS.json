@@ -1688,8 +1688,8 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/core/shortcut/bind-item-shortcut1.flac",
-				"data/lipsofsuna/core/shortcut/clear-item-shortcut1.flac"
+				"data/lipsofsuna/core/shortcut/shortcut-equip1.flac",
+				"data/lipsofsuna/core/shortcut/shortcut-unequip1.flac"
 			],
 			"authors":
 			[
@@ -1700,6 +1700,23 @@
 				"Creative Commons BY 3.0"
 			],
 			"source": "http://opengameart.org/content/item-handling"
+		},
+		{
+			"files":
+			[
+				"data/lipsofsuna/core/shortcut/shortcut-bind1.flac",
+				"data/lipsofsuna/core/shortcut/shortcut-clear1.flac",
+				"data/lipsofsuna/core/shortcut/shortcut-error1.flac"
+			],
+			"authors":
+			[
+				"qubodup"
+			],
+			"licenses":
+			[
+				"CC0"
+			],
+			"source": "http://opengameart.org/content/item-shortcut-sound-pack"
 		},
 		{
 			"files":

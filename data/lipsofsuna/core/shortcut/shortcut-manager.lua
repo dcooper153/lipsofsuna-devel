@@ -88,12 +88,14 @@ ShortcutManager.invoke_shortcut = function(self, index)
 	local s = self.__shortcuts[index]
 	if not s then
 		Client:append_log(string.format("Shortcut #%d is not bound to any inventory item.", index))
+		Client.effects:play_global("shortcut error")
 		return
 	end
 	-- Get the item.
 	local item = player.inventory:get_object_by_index(s[1])
 	if not item then
 		Client:append_log(string.format("Shortcut #%d is bound to an empty inventory index #%d.", index, s[1]))
+		Client.effects:play_global("shortcut error")
 		return
 	end
 	-- Perform equip/unequip actions.
@@ -102,8 +104,10 @@ ShortcutManager.invoke_shortcut = function(self, index)
 		if slot then
 			if player.inventory:get_slot_by_index(s[1]) then
 				Main.messaging:client_event("unequip", s[1])
+				Client.effects:play_global("shortcut unequip")
 			else
 				Main.messaging:client_event("equip from inventory", s[1], slot)
+				Client.effects:play_global("shortcut equip")
 			end
 			return
 		end
@@ -119,6 +123,7 @@ ShortcutManager.invoke_shortcut = function(self, index)
 	end
 	-- Warn about unapplicable actions.
 	Client:append_log(string.format("Shortcut #%d cannot be applied to the item in inventory index #%d.", index, s[1]))
+	Client.effects:play_global("shortcut error")
 end
 
 --- Records a shortcut.
