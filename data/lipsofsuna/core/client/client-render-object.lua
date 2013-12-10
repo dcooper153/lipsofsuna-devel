@@ -252,7 +252,6 @@ ClientRenderObject.request_model_rebuild = function(self)
 	if self.object.spec.models then
 		self.model_rebuild_timer = 0.1
 	end
-	self.visuals:add_hair_style(self.object.hair_style)
 end
 
 --- Updates the state of the render object.
@@ -304,6 +303,8 @@ ClientRenderObject.update = function(self, secs)
 			end
 		end
 	end
+	-- Update the anchors.
+	self.visuals:update(secs)
 end
 
 --- Updates the censorship nodes of the object.
@@ -354,8 +355,6 @@ ClientRenderObject.update_scale = function(self)
 	if args then
 		self:animate(args)
 	end
-	-- Scale the haircut.
-	self.visuals:add_hair_style(self.object.hair_style)
 end
 
 --- Sets the beheading state of the object.

@@ -35,6 +35,8 @@ ObjectVisual.new = function(clss, object, render)
 	self.object = object
 	self.render = render
 	self.slots = {}
+	self.__softbody_enabled = Client.options.softbody_enabled
+	self.__hair_color = {255, 255, 255}
 	return self
 end
 
@@ -78,8 +80,6 @@ end
 -- @param slot Slot name.
 -- @param style Hair style name.
 ObjectVisual.add_hair_style = function(self, style)
-	-- Remove the old hair anchors.
-	self:unparent_by_slot_prefix("hair_")
 	-- Get the hair style spec.
 	if not style then return end
 	local spec = HairStyleSpec:find_by_name(style)
@@ -244,6 +244,30 @@ ObjectVisual.unparent_by_slot_prefix = function(self, prefix)
 			self.slots[slot] = nil
 			self:__unparent(effect)
 		end
+	end
+end
+
+--- Updates the anchors.
+-- @param self ObjectVisual.
+-- @param secs Seconds since the last update.
+ObjectVisual.update = function(self, secs)
+	-- Rebuild hair.
+	local a = self.__hair_color
+	local b1 = self.object.hair_color and self.object.hair_color[1] or 255
+	local b2 = self.object.hair_color and self.object.hair_color[2] or 255
+	local b3 = self.object.hair_color and self.object.hair_color[3] or 255
+	if self.__beheaded ~= self.render.beheaded or
+	   self.__hair_style ~= self.object.hair_style or
+	   a[1] ~= b1 or a[2] ~= b2 or a[3] ~= b3 or
+	   self.__head_scale ~= self.object.head_scale or
+	   self.__softbody_enabled ~= Client.options.softbody_enabled then
+		self.__beheaded = self.render.beheaded
+		self.__hair_color = {b1, b2, b3}
+		self.__hair_style = self.object.hair_style
+		self.__head_scale = self.object.head_scale
+		self.__softbody_enabled = Client.options.softbody_enabled
+		self:unparent_by_slot_prefix("hair_")
+		self:add_hair_style(self.object.hair_style)
 	end
 end
 

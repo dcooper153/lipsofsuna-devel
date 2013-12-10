@@ -413,7 +413,7 @@ end
 -- @param value Style name.
 Chargen.set_hair_style = function(self, value)
 	self.char.hair_style = value
-	self.data.update_needed = true
+	self.data.object.hair_style = value
 end
 
 --- Gets one of the HSV channels of the hair color.
@@ -430,9 +430,7 @@ end
 -- @param value Channel value.
 Chargen.set_hair_color = function(self, channel, value)
 	self.char.hair_color[channel] = value
-	self.data.update_needed = true
-	-- Update the haircut.
-	self.data.object.render.visuals:add_hair_style(self.data.object.hair_style)
+	self.data.object.hair_color = scale255(self.char.hair_color)
 end
 
 --- Gets the head style of the character.
