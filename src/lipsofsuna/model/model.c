@@ -881,6 +881,41 @@ void limdl_model_replace_material_by_string (
 }
 
 /**
+ * \brief Scales the model.
+ * \param self Model.
+ * \param factor Scale factor.
+ */
+void limdl_model_scale (
+	LIMdlModel* self,
+	float       factor)
+{
+	int i;
+	int j;
+	LIMdlVertex* v;
+	LIMdlShapeKey* s;
+	LIMdlShapeKeyVertex* vs;
+
+	for (i = 0 ; i < self->vertices.count ; i++)
+	{
+		v = self->vertices.array + i;
+		v->coord.x *= factor;
+		v->coord.y *= factor;
+		v->coord.z *= factor;
+	}
+	for (j = 0 ; j < self->shape_keys.count ; j++)
+	{
+		s = self->shape_keys.array + j;
+		for (i = 0 ; i < self->vertices.count ; i++)
+		{
+			vs = s->vertices.array + i;
+			vs->coord.x *= factor;
+			vs->coord.y *= factor;
+			vs->coord.z *= factor;
+		}
+	}
+}
+
+/**
  * \brief Writes the model into a steam.
  * \param self Model.
  * \param writer Stream writer.

@@ -408,6 +408,17 @@ static void Model_remove_vertices (LIScrArgs* args)
 	limdl_model_clear_vertices (model);
 }
 
+static void Model_scale (LIScrArgs* args)
+{
+	float value;
+	LIMdlModel* model;
+
+	model = args->self;
+	if (!liscr_args_geti_float (args, 0, &value))
+		return;
+	limdl_model_scale (model, value);
+}
+
 /*****************************************************************************/
 
 void liext_script_model_editing (
@@ -422,6 +433,7 @@ void liext_script_model_editing (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_morph", Model_morph);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_morph_copy", Model_morph_copy);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_remove_vertices", Model_remove_vertices);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_scale", Model_scale);
 }
 
 /** @} */

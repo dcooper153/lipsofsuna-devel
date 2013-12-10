@@ -150,4 +150,11 @@ Model.remove_vertices = function(self)
 	Los.model_remove_vertices(self.handle)
 end
 
+--- Scales the model.
+-- @param self Model.
+-- @param factor Scale factor.
+Model.scale = function(self, factor)
+	Los.model_scale(self.handle, factor)
+end
+
 return Model

@@ -148,6 +148,10 @@ LIAPICALL (void, limdl_model_replace_material_by_string, (
 	const char** set_textures,
 	int          set_textures_count));
 
+LIAPICALL (void, limdl_model_scale, (
+	LIMdlModel* self,
+	float       factor));
+
 LIAPICALL (int, limdl_model_write, (
 	const LIMdlModel* self,
 	LIArcWriter*      writer));
