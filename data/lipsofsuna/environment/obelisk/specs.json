@@ -14,5 +14,17 @@
 		{
 			"examine": true
 		}
+	},
+	{
+		"type": "Effectspec",
+		"name": "obelisk visit 1",
+		"sound": "obelisk-visit1",
+		"sound_volume": 0.8
+	},
+	{
+		"type": "Effectspec",
+		"name": "obelisk visit 2",
+		"sound": "obelisk-visit2",
+		"sound_volume": 1
 	}
 ]

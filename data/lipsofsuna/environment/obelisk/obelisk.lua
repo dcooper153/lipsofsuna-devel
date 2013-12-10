@@ -1,8 +1,10 @@
 Dialogspec{name = "obelisk", commands = {
 	{"branch", check = {{"var", "examined"}},
+		{"effect", "obelisk visit 2"},
 		{"info", "As you examine the already familiar obelisk, you are reminded of your past discoveries."},
 		{"exit"}
 	},
+	{"effect", "obelisk visit 1"},
 	{"random",
 		{"info", "Upon examining the unfamiliar obelisk, its strange runes coalesce into a grand vision in your mind."},
 		{"info", "Upon examining the unfamiliar obelisk, its strange runes paint in your mind an image of yourself standing on the shoulder of the giant."},
