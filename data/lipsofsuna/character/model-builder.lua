@@ -90,13 +90,6 @@ ModelBuilder.build_with_merger = function(clss, merger, args, hash)
 			end
 		end
 	end
-	-- Find the haircut spec.
-	if args.hair_style and args.hair_style ~= "" then
-		local spec = HairStyleSpec:find_by_name(args.hair_style)
-		if spec then
-			table.insert(equipment, spec)
-		end
-	end
 	-- Prioritize the equipment models.
 	table.sort(equipment, function(a,b) return a.equipment_priority < b.equipment_priority end)
 	-- Add the equipment models.

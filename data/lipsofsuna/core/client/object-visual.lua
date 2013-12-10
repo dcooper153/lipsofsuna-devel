@@ -11,12 +11,15 @@
 local Animation = require("system/animation")
 local CensorshipEffect = require("core/effect/censorship-effect")
 local Class = require("system/class")
+local Color = require("system/color")
+local HairStyleSpec = require("core/specs/hair-style")
 local Model = require("system/model")
 local ModelBuilder = require("character/model-builder")
 local ModelEffect = require("core/effect/model-effect")
 local ParticleEffect = require("core/effect/particle-effect")
 local RenderObject = require("system/render-object")
 local RenderUtils = require("core/client/render-utils")
+local SoftbodyEffect = require("core/effect/softbody-effect")
 local SpeedlineEffect = require("core/effect/speedline-effect")
 local TextureBuilder = require("character/texture-builder")
 
@@ -68,6 +71,75 @@ end
 -- @param node Node name.
 ObjectVisual.add_censorship = function(self, slot, node)
 	self:__set_slot(slot, CensorshipEffect(self.render, node))
+end
+
+--- Adds a hair style.
+-- @param self ObjectVisual.
+-- @param slot Slot name.
+-- @param style Hair style name.
+ObjectVisual.add_hair_style = function(self, style)
+	-- Remove the old hair anchors.
+	self:unparent_by_slot_prefix("hair_")
+	-- Get the hair style spec.
+	if not style then return end
+	local spec = HairStyleSpec:find_by_name(style)
+	if not spec then return end
+	-- Get the list of anchors.
+	local class = self.object.spec.equipment_class or self.object.spec.name
+	local list = spec:get_equipment_anchors(class)
+	if not list then return end
+	-- Create the new hair anchors.
+	for k,v in pairs(list) do
+		if v.partition == "head" and self.render.beheaded then
+			-- Skip dismembered effects.
+		elseif v.type == "model" or v.type == "softbody" then
+			-- Models and softbodies.
+			local copied = false
+			local model = Main.models:find_by_name(v.model)
+			if v.model_color == "hair" then
+				if self.object.hair_color then
+					local rgb = Color:hsv_to_rgb(Color:ubyte_to_float(self.object.hair_color))
+					copied = true
+					model = model:copy()
+					model:edit_material{match_material = "animhair1", diffuse = rgb}
+				end
+			end
+			if v.model_scale == "head" then
+				local ospec = self.object.spec
+				local scale = self.object.head_scale or 0.5
+				if ospec.head_scale_min and ospec.head_scale_max then
+					scale = ospec.head_scale_min + scale * (ospec.head_scale_max - ospec.head_scale_min)
+					if scale ~= 1 then
+						if not copied then
+							model = model:copy()
+							copied = true
+						end
+						model:scale(scale)
+						model:calculate_bounds()
+					end
+				end
+			end
+			local effect
+			if v.type == "softbody" and Client.options.softbody_enabled then
+				local params = v.softbody_params or {}
+				effect = SoftbodyEffect(self.render, v.parent_node, model, params)
+			else
+				effect = ModelEffect{
+					model = model,
+					model_node = v.model_node,
+					parent = self.render,
+					parent_node = v.parent_node,
+					position_local = v.equipment_anchor_position,
+					position_mode = "node-node",
+					rotation_local = v.equipment_anchor_rotation,
+					rotation_mode = "node-node"}
+			end
+			effect.anchor_object = self.object
+			effect.partition = v.partition
+			effect.weird_rotation = nil
+			self:__set_slot("hair_" .. v.slot, effect)
+		end
+	end
 end
 
 --- Adds a particle item.
@@ -140,6 +212,18 @@ ObjectVisual.unparent_by_class = function(self, class)
 	end
 end
 
+--- Unparents all effects in the given partition.
+-- @param self ObjectVisual.
+-- @param partition Partition name.
+ObjectVisual.unparent_by_partition = function(self, partition)
+	for k,effect in pairs(self.slots) do
+		if effect.partition == partition then
+			effect:unparent()
+			self.slots[k] = nil
+		end
+	end
+end
+
 --- Unparents an individual slot.
 -- @param self ObjectVisual.
 -- @param slot Slot name.
@@ -148,6 +232,18 @@ ObjectVisual.unparent_by_slot = function(self, slot)
 	if effect then
 		self.slots[slot] = nil
 		self:__unparent(effect)
+	end
+end
+
+--- Unparents all slots that start with the given prefix.
+-- @param self ObjectVisual.
+-- @param prefix Slot prefix.
+ObjectVisual.unparent_by_slot_prefix = function(self, prefix)
+	for slot,effect in pairs(self.slots) do
+		if string.sub(slot, 1, #prefix) == prefix then
+			self.slots[slot] = nil
+			self:__unparent(effect)
+		end
 	end
 end
 

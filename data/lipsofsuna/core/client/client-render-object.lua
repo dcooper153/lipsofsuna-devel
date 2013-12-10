@@ -48,6 +48,7 @@ ClientRenderObject.init = function(self, object)
 	self:set_visible(true)
 	-- Create special effects.
 	self.visuals:add_special_effects("special", object.spec)
+	self.visuals:add_hair_style(object.hair_style)
 	-- Create equipment anchors.
 	for slot,index in pairs(self.object.inventory.equipped) do
 		local item = self.object.inventory:get_object_by_index(index)
@@ -248,8 +249,10 @@ end
 -- @param self Render object.
 ClientRenderObject.request_model_rebuild = function(self)
 	if not self.initialized then return end
-	if not self.object.spec.models then return end
-	self.model_rebuild_timer = 0.1
+	if self.object.spec.models then
+		self.model_rebuild_timer = 0.1
+	end
+	self.visuals:add_hair_style(self.object.hair_style)
 end
 
 --- Updates the state of the render object.
@@ -351,6 +354,8 @@ ClientRenderObject.update_scale = function(self)
 	if args then
 		self:animate(args)
 	end
+	-- Scale the haircut.
+	self.visuals:add_hair_style(self.object.hair_style)
 end
 
 --- Sets the beheading state of the object.

@@ -49,6 +49,7 @@ EffectObject.new = function(clss, args)
 	self.position_mode = args.position_mode or "node"
 	self.rotation_local = args.rotation_local
 	self.rotation_mode = args.rotation_mode or "node"
+	self.weird_rotation = true --TODO: Get rid of this.
 	self.__visible = true
 	self.__initial_position = args.position
 	Client.effects.scene_nodes_by_ref[self] = true
@@ -121,7 +122,7 @@ EffectObject.update_transform = function(self, secs)
 				p:subtract(h:transform(s.conjugate):transform(r))
 				r = r:concat(s)
 			end
-		else
+		elseif self.weird_rotation then
 			r:concat(__quat3:set_axis(__vec4:set_xyz(0,1,0), math.pi/2))
 		end
 		-- Extra.

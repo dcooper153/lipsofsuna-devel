@@ -127,6 +127,14 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "options/graphics",
 	widget = function()
+		return Widgets.Uiconfigoption("softbody_enabled", function()
+			Client.options:apply()
+		end)
+	end}
+
+Ui:add_widget{
+	state = "options/graphics",
+	widget = function()
 		return Widgets.Uiconfigoption("nudity_enabled", function()
 			Client.options:apply()
 		end)

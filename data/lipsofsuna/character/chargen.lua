@@ -431,6 +431,8 @@ end
 Chargen.set_hair_color = function(self, channel, value)
 	self.char.hair_color[channel] = value
 	self.data.update_needed = true
+	-- Update the haircut.
+	self.data.object.render.visuals:add_hair_style(self.data.object.hair_style)
 end
 
 --- Gets the head style of the character.

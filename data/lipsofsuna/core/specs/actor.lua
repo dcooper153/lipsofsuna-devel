@@ -320,7 +320,7 @@ Actorspec.get_random_hair_style = function(self)
 		if not c then return end
 		local lst = {}
 		for k,v in pairs(HairStyleSpec.dict_name) do
-			if v:get_equipment_models(c) then
+			if v:get_equipment_anchors(c) then
 				table.insert(lst, k)
 			end
 		end

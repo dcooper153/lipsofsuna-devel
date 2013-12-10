@@ -6,75 +6,218 @@
 	{
 		"type": "HairStyleSpec",
 		"name": "Pigtails 1",
-		"equipment_models":
+		"equipment_anchors":
 		{
 			"aer":
-			{
-				"hair": "aerpigtails1"
-			}
+			[
+				{
+					"slot": "hair",
+					"type": "softbody",
+					"model": "aerpigtails1",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head",
+					"softbody_params": [0.5, 1, 0.05, 1, 0.5, 0.5, 10]
+				},
+				{
+					"slot": "hair_ribbon",
+					"type": "softbody",
+					"model": "ribbon1",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head",
+					"softbody_params": [0.3, 1, 0.05, 1, 0.7, 0.7, 5]
+				},
+				{
+					"slot": "hair_back",
+					"type": "model",
+					"model": "aerhairbacksmooth1",
+					"model_color": "hair",
+					"model_scale": "head",
+					"partition": "head",
+					"parent_node": "#head"
+				},
+				{
+					"slot": "hair_front",
+					"type": "model",
+					"model": "aerhairfrontshort2",
+					"model_color": "hair",
+					"model_scale": "head",
+					"partition": "head",
+					"parent_node": "#head"
+				}
+			]
 		}
 	},
 	{
 		"type": "HairStyleSpec",
 		"name": "Pigtails 2",
-		"equipment_models":
+		"equipment_anchors":
 		{
 			"aer":
-			{
-				"hair": "aerhairpigtails2",
-				"hair_back": "aerhairbacksmooth1",
-				"hair_front": "aerhairfrontshort2"
-			}
+			[
+				{
+					"slot": "hair",
+					"type": "softbody",
+					"model": "aerhairpigtails2",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head",
+					"softbody_params": [0.7, 1, 0.03, 1, 0.5, 0.5, 5]
+				},
+				{
+					"slot": "hair_back",
+					"type": "model",
+					"model": "aerhairbacksmooth1",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head"
+				},
+				{
+					"slot": "hair_front",
+					"type": "model",
+					"model": "aerhairfrontshort2",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head"
+				}
+			]
 		}
 	},
 	{
 		"type": "HairStyleSpec",
 		"name": "Drill 1",
-		"equipment_models":
+		"equipment_anchors":
 		{
 			"aer":
-			{
-				"hair": "aerhairtwindrill1",
-				"hair_back": "aerhairbacksmooth1",
-				"hair_front": "aerhairfrontshort2"
-			}
+			[
+				{
+					"slot": "hair",
+					"type": "softbody",
+					"model": "aerhairtwindrill1",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head",
+					"softbody_params": [0.4, 1, 0.1, 1, 0.7, 0.7, 10]
+				},
+				{
+					"slot": "hair_back",
+					"type": "model",
+					"model": "aerhairbacksmooth1",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head"
+				},
+				{
+					"slot": "hair_front",
+					"type": "model",
+					"model": "aerhairfrontshort2",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head"
+				}
+			]
 		}
 	},
 	{
 		"type": "HairStyleSpec",
 		"name": "Short 1",
-		"equipment_models":
+		"equipment_anchors":
 		{
 			"aer":
-			{
-				"hair_back": "aerhairbackshort2",
-				"hair_front": "aerhairfrontshort1"
-			}
+			[
+				{
+					"slot": "hair_back",
+					"type": "model",
+					"model": "aerhairbackshort2",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head"
+				},
+				{
+					"slot": "hair_front",
+					"type": "model",
+					"model": "aerhairfrontshort1",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head"
+				}
+			]
 		}
 	},
 	{
 		"type": "HairStyleSpec",
 		"name": "Short 2",
-		"equipment_models":
+		"equipment_anchors":
 		{
 			"aer":
-			{
-				"hair_back": "aerhairbackshort1",
-				"hair_front": "aerhairfrontshort2"
-			}
+			[
+				{
+					"slot": "hair_back",
+					"type": "model",
+					"model": "aerhairbackshort1",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head"
+				},
+				{
+					"slot": "hair_front",
+					"type": "model",
+					"model": "aerhairfrontshort2",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head"
+				}
+			]
 		}
 	},
 	{
 		"type": "HairStyleSpec",
 		"name": "Ponytail 1",
-		"equipment_models":
+		"equipment_anchors":
 		{
 			"aer":
-			{
-				"hair_back": "aerhairbacksmooth1",
-				"hair_front": "aerhairfrontshort1",
-				"hair_ponytail": "aerhairponytail1"
-			}
+			[
+				{
+					"slot": "hair",
+					"type": "softbody",
+					"model": "aerhairponytail1",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head",
+					"softbody_params": [0.5, 1, 0.1, 0.3, 0.1, 0.1, 10]
+				},
+				{
+					"slot": "hair_back",
+					"type": "model",
+					"model": "aerhairbacksmooth1",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head"
+				},
+				{
+					"slot": "hair_front",
+					"type": "model",
+					"model": "aerhairfrontshort1",
+					"model_color": "hair",
+					"model_scale": "head",
+					"parent_node": "#head",
+					"partition": "head"
+				}
+			]
 		}
 	}
 ]
