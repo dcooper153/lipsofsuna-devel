@@ -44,7 +44,7 @@
 			"url": "http://pfunked.deviantart.com/"
 		},
 		{
-			"name": "Dim"
+			"name": "Dimproject"
 		},
 		{
 			"name": "Dm3d",
@@ -482,6 +482,28 @@
 				"CC0"
 			],
 			"comment": "Too plain; the head and fletchings don't look quite good. See http://en.wikipedia.org/wiki/Arrow for possible ideas."
+		},
+		{
+			"files":
+			[
+				"data/lipsofsuna/actors/aer/face/aer-eye-long-upper-1.png",
+				"data/lipsofsuna/actors/aer/face/aer-face-3.png",
+				"data/lipsofsuna/actors/aer/face/aer-mouth-open-1.png"
+			],
+			"files_original":
+			[
+				"data/lipsofsuna/actors/aer/face/aer-eye-long-upper-1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-face-3.svg",
+				"data/lipsofsuna/actors/aer/face/aer-mouth-open-1.svg"
+			],
+			"authors":
+			[
+				"Dimproject"
+			],
+			"licenses":
+			[
+				"Creative Commons BY-SA 3.0"
+			]
 		},
 		{
 			"files":

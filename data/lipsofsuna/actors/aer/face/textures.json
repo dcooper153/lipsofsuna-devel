@@ -88,6 +88,17 @@
 	},
 	{
 		"type": "ActorTextureSpec",
+		"name": "long upper eyes",
+		"actors": {"aer": true},
+		"color": "eye_color",
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-eye-long-upper-1",
+		"label": "Long lid",
+		"usages": {"eye": true}
+	},
+	{
+		"type": "ActorTextureSpec",
 		"name": "round eyes",
 		"actors": {"aer": true},
 		"color": "eye_color",
@@ -122,6 +133,17 @@
 		"label": "Default",
 		"usages": {"face": true}
 	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "sharp nose face",
+		"actors": {"aer": true},
+		"color": "skin_color",
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-face-3",
+		"label": "Sharp nose",
+		"usages": {"face": true}
+	},
 
 
 
@@ -145,6 +167,17 @@
 		"blit_mode": "hsv_add_weightv",
 		"blit_texture": "aer-mouth-happy-1",
 		"label": "Happy",
+		"usages": {"mouth": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "open mouth",
+		"actors": {"aer": true},
+		"color": "skin_color",
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-mouth-open-1",
+		"label": "Open",
 		"usages": {"mouth": true}
 	},
 	{
