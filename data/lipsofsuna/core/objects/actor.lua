@@ -8,6 +8,7 @@
 -- @module core.objects.actor
 -- @alias Actor
 
+local ActorPresetSpec = require("core/specs/actorpreset")
 local Class = require("system/class")
 local Coroutine = require("system/coroutine")
 local Item = require("core/objects/item")
@@ -564,6 +565,14 @@ end
 Actor.randomize = function(self)
 	local spec = self:get_spec()
 	-- Set the appearance.
+	if spec.preset then
+		local preset = ActorPresetSpec:find_by_name(spec.preset)
+		if preset then
+			for k,v in pairs(preset:get_actor()) do
+				self[k] = v
+			end
+		end
+	end
 	self.brow_style = self.brow_style or spec:get_random_texture_style("brow")
 	self.eye_color = self.eye_color or spec:get_random_eye_color()
 	self.eye_style = self.eye_style or spec:get_random_texture_style("eye")

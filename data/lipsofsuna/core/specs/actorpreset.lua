@@ -44,6 +44,43 @@ Actorpresetspec.new = function(clss, args)
 	return self
 end
 
+--- Gets the spec data in the form suitable for actor creation.
+-- @param self Actorpresetspec.
+-- @return Table.
+Actorpresetspec.get_actor = function(self)
+	local res = {
+		animation_profile = self.animation_profile,
+		body_sliders = self:get_chargen_body(),
+		brow_style = self.brow_style,
+		eye_color = self.eye_color,
+		eye_style = self.eye_style,
+		face_sliders = self:get_chargen_face(),
+		face_style = self.face_style,
+		hair_color = self.hair_color,
+		hair_style = self.hair_style,
+		head_style = self.head_style,
+		height = self.height,
+		skin_color = self.skin_color,
+		skin_style = self.skin_style,
+		mouth_style = self.mouth_style}
+	for k,v in pairs(res.body_sliders) do
+		res.body_sliders[k] = 255 * v
+	end
+	for k,v in pairs(res.eye_color) do
+		res.eye_color[k] = 255 * v
+	end
+	for k,v in pairs(res.face_sliders) do
+		res.face_sliders[k] = 255 * v
+	end
+	for k,v in pairs(res.hair_color) do
+		res.hair_color[k] = 255 * v
+	end
+	for k,v in pairs(res.skin_color) do
+		res.skin_color[k] = 255 * v
+	end
+	return res
+end
+
 --- Gets the spec data in the form suitable for character creation.
 -- @param self Actorpresetspec.
 -- @return Table.
