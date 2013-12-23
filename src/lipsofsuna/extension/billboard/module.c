@@ -28,7 +28,8 @@ LIMaiExtensionInfo liext_billboard_info =
 {
 	LIMAI_EXTENSION_VERSION, "Billboard",
 	liext_billboard_module_new,
-	liext_billboard_module_free
+	liext_billboard_module_free,
+	liext_billboard_module_get_memstat
 };
 
 LIExtBillboardModule* liext_billboard_module_new (
@@ -61,6 +62,18 @@ void liext_billboard_module_free (
 	LIExtBillboardModule* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_billboard_module_get_memstat (
+	LIExtBillboardModule* self,
+	LIMaiMemstat*         stat)
+{
+/* TODO: memstat */
 }
 
 /** @} */

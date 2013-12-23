@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,17 +22,21 @@
 
 #define LIEXT_SCRIPT_LOBBY "Lobby"
 
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+typedef struct _LIExtLobbyModule LIExtLobbyModule;
+struct _LIExtLobbyModule
 {
 	LIMaiProgram* program;
 };
 
-LIExtModule* liext_lobby_new (
+LIExtLobbyModule* liext_lobby_new (
 	LIMaiProgram* program);
 
 void liext_lobby_free (
-	LIExtModule* self);
+	LIExtLobbyModule* self);
+
+void liext_lobby_get_memstat (
+	LIExtLobbyModule* self,
+	LIMaiMemstat*     stat);
 
 /*****************************************************************************/
 

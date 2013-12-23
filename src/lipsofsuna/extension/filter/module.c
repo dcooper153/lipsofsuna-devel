@@ -28,7 +28,8 @@ LIMaiExtensionInfo liext_filter_info =
 {
 	LIMAI_EXTENSION_VERSION, "Filter",
 	liext_filter_module_new,
-	liext_filter_module_free
+	liext_filter_module_free,
+	liext_filter_module_get_memstat
 };
 
 LIExtFilterModule* liext_filter_module_new (
@@ -53,6 +54,18 @@ void liext_filter_module_free (
 	LIExtFilterModule* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_filter_module_get_memstat (
+	LIExtFilterModule* self,
+	LIMaiMemstat*      stat)
+{
+/* TODO: memstat */
 }
 
 /** @} */

@@ -61,7 +61,7 @@ static void private_update_projection (
  * \return New camera or NULL.
  */
 LIExtCamera* liext_camera_new (
-	LIExtModule* module)
+	LIExtCameraModule* module)
 {
 	LIExtCamera* self;
 

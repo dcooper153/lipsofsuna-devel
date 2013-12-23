@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -43,6 +43,10 @@ int liext_watchdog_start (
 
 void liext_watchdog_stop (
 	LIExtModule* self);
+
+void liext_watchdog_get_memstat (
+	LIExtModule*  self,
+	LIMaiMemstat* stat);
 
 /*****************************************************************************/
 

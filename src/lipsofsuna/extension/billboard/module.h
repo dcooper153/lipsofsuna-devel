@@ -36,6 +36,10 @@ LIAPICALL (LIExtBillboardModule*, liext_billboard_module_new, (
 LIAPICALL (void, liext_billboard_module_free, (
 	LIExtBillboardModule* self));
 
+LIAPICALL (void, liext_billboard_module_get_memstat, (
+	LIExtBillboardModule* self,
+	LIMaiMemstat*         stat));
+
 /*****************************************************************************/
 
 LIAPICALL (void, liext_script_billboard, (

@@ -34,6 +34,10 @@ LIExtImageMerge* liext_image_merge_new (
 void liext_image_merge_free (
 	LIExtImageMerge* self);
 
+void liext_image_merge_get_memstat (
+	LIExtImageMerge* self,
+	LIMaiMemstat*    stat);
+
 /*****************************************************************************/
 
 void liext_script_image_merger (

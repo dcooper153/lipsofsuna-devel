@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -28,16 +28,17 @@ LIMaiExtensionInfo liext_lobby_info =
 {
 	LIMAI_EXTENSION_VERSION, "Lobby",
 	liext_lobby_new,
-	liext_lobby_free
+	liext_lobby_free,
+	liext_lobby_get_memstat
 };
 
-LIExtModule* liext_lobby_new (
+LIExtLobbyModule* liext_lobby_new (
 	LIMaiProgram* program)
 {
-	LIExtModule* self;
+	LIExtLobbyModule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIExtModule));
+	self = lisys_calloc (1, sizeof (LIExtLobbyModule));
 	if (self == NULL)
 		return NULL;
 	self->program = program;
@@ -50,9 +51,21 @@ LIExtModule* liext_lobby_new (
 }
 
 void liext_lobby_free (
-	LIExtModule* self)
+	LIExtLobbyModule* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_lobby_get_memstat (
+	LIExtLobbyModule* self,
+	LIMaiMemstat*     stat)
+{
+/* TODO: memstat */
 }
 
 /** @} */

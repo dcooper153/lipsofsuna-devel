@@ -29,7 +29,7 @@
 static void Camera_new (LIScrArgs* args)
 {
 	LIExtCamera* self;
-	LIExtModule* module;
+	LIExtCameraModule* module;
 	LIScrData* data;
 	LIRenRender* render;
 	LIRenVideomode mode;

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -41,6 +41,9 @@ LIExtRenderModel* liext_render_model_new (
 void liext_render_model_free (
 	LIExtRenderModel* self);
 
+int liext_render_model_get_memory (
+	const LIExtRenderModel* self);
+
 /*****************************************************************************/
 
 struct _LIExtRenderModelModule
@@ -55,6 +58,10 @@ LIExtRenderModelModule* liext_render_model_module_new (
 
 void liext_render_model_module_free (
 	LIExtRenderModelModule* self);
+
+void liext_render_model_module_get_memstat (
+	LIExtRenderModelModule* self,
+	LIMaiMemstat*           stat);
 
 /*****************************************************************************/
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -57,7 +57,8 @@ LIMaiExtensionInfo liext_network_info =
 {
 	LIMAI_EXTENSION_VERSION, "Network",
 	liext_network_new,
-	liext_network_free
+	liext_network_free,
+	liext_network_get_memstat
 };
 
 LIExtModule* liext_network_new (
@@ -383,6 +384,18 @@ int liext_network_get_connected (
 	LIExtModule* self)
 {
 	return self->connected;
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_network_get_memstat (
+	LIExtModule*  self,
+	LIMaiMemstat* stat)
+{
+/* TODO: memstat */
 }
 
 /*****************************************************************************/

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -43,7 +43,8 @@ extern "C"
 	{
 		LIMAI_EXTENSION_VERSION, "HeightmapRender",
 		(void*) liext_heightmap_render_new,
-		(void*) liext_heightmap_render_free
+		(void*) liext_heightmap_render_free,
+		(void*) liext_heightmap_render_get_memstat
 	};
 }
 
@@ -127,6 +128,18 @@ void liext_heightmap_render_free (
 
 	delete self->globals;
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_heightmap_render_get_memstat (
+	LIExtHeightmapRender* self,
+	LIMaiMemstat*         stat)
+{
+/* TODO: memstat */
 }
 
 /*****************************************************************************/

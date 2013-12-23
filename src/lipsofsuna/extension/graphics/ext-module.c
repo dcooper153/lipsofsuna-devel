@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -38,7 +38,8 @@ LIMaiExtensionInfo liext_graphics_info =
 {
 	LIMAI_EXTENSION_VERSION, "Graphics",
 	liext_graphics_new,
-	liext_graphics_free
+	liext_graphics_free,
+	liext_graphics_get_memstat
 };
 
 LIExtGraphics* liext_graphics_new (
@@ -115,6 +116,18 @@ void liext_graphics_update (
 		self->program->quit = 1;
 	else
 		liren_render_get_videomode (self->render, &self->mode);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_graphics_get_memstat (
+	LIExtGraphics* self,
+	LIMaiMemstat*  stat)
+{
+/* TODO: memstat */
 }
 
 int liext_graphics_set_videomode (

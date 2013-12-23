@@ -32,6 +32,10 @@ LIAPICALL (LIExtTerrainModule*, liext_terrain_module_new, (
 LIAPICALL (void, liext_terrain_module_free, (
 	LIExtTerrainModule* self));
 
+LIAPICALL (void, liext_terrain_module_get_memstat, (
+	LIExtTerrainModule* self,
+	LIMaiMemstat*       stat));
+
 /*****************************************************************************/
 
 LIAPICALL (void, liext_script_terrain, (

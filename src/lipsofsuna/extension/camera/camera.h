@@ -35,7 +35,7 @@ enum
 
 struct _LIExtCamera
 {
-	LIExtModule* module;
+	LIExtCameraModule* module;
 	struct
 	{
 		int collision_mask;
@@ -70,7 +70,7 @@ struct _LIExtCamera
 };
 
 LIAPICALL (LIExtCamera*, liext_camera_new, (
-	LIExtModule* module));
+	LIExtCameraModule* module));
 
 LIAPICALL (void, liext_camera_free, (
 	LIExtCamera* self));

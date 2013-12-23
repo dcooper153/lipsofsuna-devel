@@ -42,7 +42,8 @@ extern "C"
 	{
 		LIMAI_EXTENSION_VERSION, "HeightmapPhysics",
 		(void*) liext_heightmap_physics_module_new,
-		(void*) liext_heightmap_physics_module_free
+		(void*) liext_heightmap_physics_module_free,
+		(void*) liext_heightmap_physics_module_get_memstat
 	};
 }
 
@@ -105,6 +106,18 @@ void liext_heightmap_physics_module_free (
 	}
 
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_heightmap_physics_module_get_memstat (
+	LIExtHeightmapPhysicsModule* self,
+	LIMaiMemstat*                stat)
+{
+/* TODO: memstat */
 }
 
 /*****************************************************************************/

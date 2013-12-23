@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -31,13 +31,17 @@ LIAPICALL (LIInpInput*, liinp_input_new, (
 LIAPICALL (void, liinp_input_free, (
 	LIInpInput* self));
 
+LIAPICALL (void, liinp_input_get_memstat, (
+	LIInpInput*   self,
+	LIMaiMemstat* stat));
+
+LIAPICALL (int, liinp_input_get_mouse_button_state, (
+	LIInpInput* self));
+
 LIAPICALL (void, liinp_input_get_pointer, (
 	LIInpInput* self,
 	int*        x,
 	int*        y));
-
-LIAPICALL (int, liinp_input_get_mouse_button_state, (
-	LIInpInput* self));
 
 LIAPICALL (int, liinp_input_get_pointer_grab, (
 	LIInpInput* self));

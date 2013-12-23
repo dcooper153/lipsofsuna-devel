@@ -38,7 +38,8 @@ LIMaiExtensionInfo liext_sectors_info =
 {
 	LIMAI_EXTENSION_VERSION, "Sectors",
 	liext_sectors_new,
-	liext_sectors_free
+	liext_sectors_free,
+	liext_sectors_get_memstat
 };
 
 LIExtSectorsModule* liext_sectors_new (
@@ -91,6 +92,18 @@ void liext_sectors_update (
 	float               secs)
 {
 	lialg_sectors_update (self->sectors, secs);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_sectors_get_memstat (
+	LIExtSectorsModule* self,
+	LIMaiMemstat*       stat)
+{
+/* TODO: memstat */
 }
 
 /*****************************************************************************/

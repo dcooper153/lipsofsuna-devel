@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -39,7 +39,8 @@ LIMaiExtensionInfo liext_object_physics_info =
 {
 	LIMAI_EXTENSION_VERSION, "ObjectPhysics",
 	liext_object_physics_new,
-	liext_object_physics_free
+	liext_object_physics_free,
+	liext_object_physics_get_memstat
 };
 
 LIExtPhysicsObjectModule* liext_object_physics_new (
@@ -90,6 +91,18 @@ void liext_object_physics_free (
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_object_physics_get_memstat (
+	LIExtPhysicsObjectModule* self,
+	LIMaiMemstat*             stat)
+{
+/* TODO: memstat */
 }
 
 /*****************************************************************************/

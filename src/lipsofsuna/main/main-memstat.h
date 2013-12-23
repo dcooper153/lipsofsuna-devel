@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,28 +15,36 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __MAIN_MEMSTAT_H__
+#define __MAIN_MEMSTAT_H__
 
-#include "lipsofsuna/extension.h"
+#include "lipsofsuna/system.h"
 
-#define LIEXT_SCRIPT_WIREFRAME "Wireframe"
-
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+typedef struct _LIMaiMemstatObject LIMaiMemstatObject;
+struct _LIMaiMemstatObject
 {
-	LIMaiProgram* program;
+	LIMaiMemstatObject* next;
+	char ext[128];
+	char cls[128];
+	int bytes;
 };
 
-LIExtModule* liext_wireframe_new (
-	LIMaiProgram* program);
+typedef struct _LIMaiMemstat LIMaiMemstat;
+struct _LIMaiMemstat
+{
+	LIMaiMemstatObject* first;
+	LIMaiMemstatObject* last;
+};
 
-void liext_wireframe_free (
-	LIExtModule* self);
+LIAPICALL (LIMaiMemstat*, limai_memstat_new, ());
 
-/*****************************************************************************/
+LIAPICALL (void, limai_memstat_free, (
+	LIMaiMemstat* self));
 
-void liext_script_wireframe (
-	LIScrScript* self);
+LIAPICALL (int, limai_memstat_add_object, (
+	LIMaiMemstat* self,
+	const char*   ext,
+	const char*   cls,
+	int           bytes));
 
 #endif

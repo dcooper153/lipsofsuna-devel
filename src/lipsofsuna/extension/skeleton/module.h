@@ -34,6 +34,10 @@ LIAPICALL (LIExtSkeletonModule*, liext_skeleton_module_new, (
 LIAPICALL (void, liext_skeleton_module_free, (
 	LIExtSkeletonModule* self));
 
+LIAPICALL (void, liext_skeleton_module_get_memstat, (
+	LIExtSkeletonModule* self,
+	LIMaiMemstat*        stat));
+
 /*****************************************************************************/
 
 LIAPICALL (void, liext_script_skeleton, (

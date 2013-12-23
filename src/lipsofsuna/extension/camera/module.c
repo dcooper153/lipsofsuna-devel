@@ -29,16 +29,17 @@ LIMaiExtensionInfo liext_camera_info =
 {
 	LIMAI_EXTENSION_VERSION, "Camera",
 	liext_camera_module_new,
-	liext_camera_module_free
+	liext_camera_module_free,
+	liext_camera_module_get_memstat
 };
 
-LIExtModule* liext_camera_module_new (
+LIExtCameraModule* liext_camera_module_new (
 	LIMaiProgram* program)
 {
-	LIExtModule* self;
+	LIExtCameraModule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIExtModule));
+	self = lisys_calloc (1, sizeof (LIExtCameraModule));
 	if (self == NULL)
 		return NULL;
 	self->program = program;
@@ -51,9 +52,21 @@ LIExtModule* liext_camera_module_new (
 }
 
 void liext_camera_module_free (
-	LIExtModule* self)
+	LIExtCameraModule* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_camera_module_get_memstat (
+	LIExtCameraModule* self,
+	LIMaiMemstat*      stat)
+{
+/* TODO: memstat */
 }
 
 /** @} */

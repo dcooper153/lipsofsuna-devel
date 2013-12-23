@@ -28,7 +28,8 @@ LIMaiExtensionInfo liext_image_merge_info =
 {
 	LIMAI_EXTENSION_VERSION, "ImageMerge",
 	liext_image_merge_new,
-	liext_image_merge_free
+	liext_image_merge_free,
+	liext_image_merge_get_memstat
 };
 
 LIExtImageMerge* liext_image_merge_new (
@@ -52,6 +53,18 @@ void liext_image_merge_free (
 	LIExtImageMerge* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_image_merge_get_memstat (
+	LIExtImageMerge* self,
+	LIMaiMemstat*    stat)
+{
+/* TODO: memstat */
 }
 
 /** @} */

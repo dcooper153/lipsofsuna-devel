@@ -34,6 +34,10 @@ LIAPICALL (LIExtFilterModule*, liext_filter_module_new, (
 LIAPICALL (void, liext_filter_module_free, (
 	LIExtFilterModule* self));
 
+LIAPICALL (void, liext_filter_module_get_memstat, (
+	LIExtFilterModule* self,
+	LIMaiMemstat*      stat));
+
 /*****************************************************************************/
 
 LIAPICALL (void, liext_script_fir_filter, (

@@ -26,9 +26,10 @@
 
 LIMaiExtensionInfo liext_config_file_info =
 {
-	LIMAI_EXTENSION_VERSION, "Database",
+	LIMAI_EXTENSION_VERSION, "ConfigFile",
 	liext_config_file_new,
-	liext_config_file_free
+	liext_config_file_free,
+	liext_config_file_get_memstat
 };
 
 LIExtModule* liext_config_file_new (
@@ -53,6 +54,18 @@ void liext_config_file_free (
 	LIExtModule* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_config_file_get_memstat (
+	LIExtModule*  self,
+	LIMaiMemstat* stat)
+{
+/* TODO: memstat */
 }
 
 /** @} */

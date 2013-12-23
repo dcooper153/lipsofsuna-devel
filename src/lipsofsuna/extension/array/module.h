@@ -34,6 +34,10 @@ LIAPICALL (LIExtArrayModule*, liext_array_module_new, (
 LIAPICALL (void, liext_array_module_free, (
 	LIExtArrayModule* self));
 
+LIAPICALL (void, liext_array_module_get_memstat, (
+	LIExtArrayModule* self,
+	LIMaiMemstat*     stat));
+
 /*****************************************************************************/
 
 LIAPICALL (void, liext_script_number_array_2d, (

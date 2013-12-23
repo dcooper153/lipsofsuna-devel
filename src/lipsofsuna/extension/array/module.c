@@ -28,7 +28,8 @@ LIMaiExtensionInfo liext_array_info =
 {
 	LIMAI_EXTENSION_VERSION, "Array",
 	liext_array_module_new,
-	liext_array_module_free
+	liext_array_module_free,
+	liext_array_module_get_memstat
 };
 
 LIExtArrayModule* liext_array_module_new (
@@ -53,6 +54,18 @@ void liext_array_module_free (
 	LIExtArrayModule* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_array_module_get_memstat (
+	LIExtArrayModule* self,
+	LIMaiMemstat*     stat)
+{
+/* TODO: memstat */
 }
 
 /** @} */

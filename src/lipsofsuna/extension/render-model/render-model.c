@@ -62,5 +62,12 @@ void liext_render_model_free (
 	lisys_free (self);
 }
 
+int liext_render_model_get_memory (
+	const LIExtRenderModel* self)
+{
+	/* TODO: memstat */
+	return sizeof (LIExtRenderModel);
+}
+
 /** @} */
 /** @} */

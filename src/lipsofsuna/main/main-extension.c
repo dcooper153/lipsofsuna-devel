@@ -68,7 +68,6 @@ extern LIMaiExtensionInfo liext_time_info;
 extern LIMaiExtensionInfo liext_vision_info;
 extern LIMaiExtensionInfo liext_watchdog_info;
 extern LIMaiExtensionInfo liext_widgets_info;
-extern LIMaiExtensionInfo liext_wireframe_info;
 
 /**
  * \brief Gets a built-in extension by name.
@@ -129,7 +128,6 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "render-model", &liext_render_model_info },
 		{ "softbody", &liext_softbody_info },
 		{ "widgets", &liext_widgets_info },
-		{ "wireframe", &liext_wireframe_info },
 #endif
 	};
 

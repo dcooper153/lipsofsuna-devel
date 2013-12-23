@@ -47,6 +47,10 @@ LIAPICALL (LIExtHeightmapRender*, liext_heightmap_render_new, (
 LIAPICALL (void, liext_heightmap_render_free, (
 	LIExtHeightmapRender* self));
 
+LIAPICALL (void, liext_heightmap_render_get_memstat, (
+	LIExtHeightmapRender* self,
+	LIMaiMemstat*         stat));
+
 LIAPICALL (void, liext_script_heightmap_render, (
 	LIScrScript* self));
 

@@ -20,6 +20,7 @@
 
 #include "lipsofsuna/main/main-event.h"
 #include "lipsofsuna/main/main-extension.h"
+#include "lipsofsuna/main/main-memstat.h"
 #include "lipsofsuna/main/main-program.h"
 
 #endif

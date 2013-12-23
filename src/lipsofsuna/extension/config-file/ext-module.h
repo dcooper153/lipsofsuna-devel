@@ -34,6 +34,10 @@ LIExtModule* liext_config_file_new (
 void liext_config_file_free (
 	LIExtModule* self);
 
+void liext_config_file_get_memstat (
+	LIExtModule*  self,
+	LIMaiMemstat* stat);
+
 /*****************************************************************************/
 
 void liext_script_config_file (

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -28,7 +28,8 @@ LIMaiExtensionInfo liext_terrain_info =
 {
 	LIMAI_EXTENSION_VERSION, "Terrain",
 	liext_terrain_module_new,
-	liext_terrain_module_free
+	liext_terrain_module_free,
+	liext_terrain_module_get_memstat
 };
 
 LIExtTerrainModule* liext_terrain_module_new (
@@ -53,6 +54,18 @@ void liext_terrain_module_free (
 	LIExtTerrainModule* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_terrain_module_get_memstat (
+	LIExtTerrainModule* self,
+	LIMaiMemstat*       stat)
+{
+/* TODO: memstat */
 }
 
 /** @} */

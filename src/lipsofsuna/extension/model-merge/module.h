@@ -34,6 +34,10 @@ LIExtModelMerge* liext_model_merge_new (
 void liext_model_merge_free (
 	LIExtModelMerge* self);
 
+void liext_model_merge_get_memstat (
+	LIExtModelMerge* self,
+	LIMaiMemstat*    stat);
+
 /*****************************************************************************/
 
 void liext_script_model_merger (

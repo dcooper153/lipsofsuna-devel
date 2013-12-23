@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -42,7 +42,8 @@ LIMaiExtensionInfo liext_reload_info =
 {
 	LIMAI_EXTENSION_VERSION, "Reload",
 	liext_reload_new,
-	liext_reload_free
+	liext_reload_free,
+	liext_reload_get_memstat
 };
 
 LIExtReload* liext_reload_new (
@@ -163,6 +164,18 @@ int liext_reload_set_enabled (
 	}
 
 	return 1;
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_reload_get_memstat (
+	LIExtReload*  self,
+	LIMaiMemstat* stat)
+{
+/* TODO: memstat */
 }
 
 /*****************************************************************************/

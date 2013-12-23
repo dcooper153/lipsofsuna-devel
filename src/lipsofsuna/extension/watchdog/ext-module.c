@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -34,7 +34,8 @@ LIMaiExtensionInfo liext_watchdog_info =
 {
 	LIMAI_EXTENSION_VERSION, "Watchdog",
 	liext_watchdog_new,
-	liext_watchdog_free
+	liext_watchdog_free,
+	liext_watchdog_get_memstat
 };
 
 LIExtModule* liext_watchdog_new (
@@ -106,6 +107,18 @@ void liext_watchdog_stop (
 		lisys_async_call_free (self->worker);
 		self->worker = NULL;
 	}
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_watchdog_get_memstat (
+	LIExtModule*  self,
+	LIMaiMemstat* stat)
+{
+/* TODO: memstat */
 }
 
 /*****************************************************************************/

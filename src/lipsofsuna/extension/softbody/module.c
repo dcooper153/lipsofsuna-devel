@@ -28,7 +28,8 @@ LIMaiExtensionInfo liext_softbody_info =
 {
 	LIMAI_EXTENSION_VERSION, "Softbody",
 	liext_softbody_module_new,
-	liext_softbody_module_free
+	liext_softbody_module_free,
+	liext_softbody_module_get_memstat
 };
 
 LIExtSoftbodyModule* liext_softbody_module_new (
@@ -69,6 +70,18 @@ void liext_softbody_module_free (
 	LIExtSoftbodyModule* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_softbody_module_get_memstat (
+	LIExtSoftbodyModule* self,
+	LIMaiMemstat*        stat)
+{
+/* TODO: memstat */
 }
 
 /** @} */

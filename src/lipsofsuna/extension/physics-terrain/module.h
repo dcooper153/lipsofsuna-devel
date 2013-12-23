@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -38,6 +38,10 @@ LIAPICALL (LIExtPhysicsTerrainModule*, liext_physics_terrain_module_new, (
 
 LIAPICALL (void, liext_physics_terrain_module_free, (
 	LIExtPhysicsTerrainModule* self));
+
+LIAPICALL (void, liext_physics_terrain_module_get_memstat, (
+	LIExtPhysicsTerrainModule* self,
+	LIMaiMemstat*              stat));
 
 /*****************************************************************************/
 

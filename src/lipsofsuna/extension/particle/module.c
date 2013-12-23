@@ -28,7 +28,8 @@ LIMaiExtensionInfo liext_particle_info =
 {
 	LIMAI_EXTENSION_VERSION, "Particle",
 	liext_particle_module_new,
-	liext_particle_module_free
+	liext_particle_module_free,
+	liext_particle_module_get_memstat
 };
 
 LIExtParticleModule* liext_particle_module_new (
@@ -61,6 +62,18 @@ void liext_particle_module_free (
 	LIExtParticleModule* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_particle_module_get_memstat (
+	LIExtParticleModule* self,
+	LIMaiMemstat*        stat)
+{
+/* TODO: memstat */
 }
 
 /** @} */

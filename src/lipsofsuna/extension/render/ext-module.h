@@ -37,6 +37,10 @@ LIExtModule* liext_render_new (
 void liext_render_free (
 	LIExtModule* self);
 
+void liext_render_get_memstat (
+	LIExtModule*  self,
+	LIMaiMemstat* stat);
+
 /*****************************************************************************/
 
 typedef struct _LIExtLight LIExtLight;

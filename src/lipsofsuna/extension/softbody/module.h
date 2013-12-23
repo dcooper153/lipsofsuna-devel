@@ -38,6 +38,10 @@ LIAPICALL (LIExtSoftbodyModule*, liext_softbody_module_new, (
 LIAPICALL (void, liext_softbody_module_free, (
 	LIExtSoftbodyModule* self));
 
+LIAPICALL (void, liext_softbody_module_get_memstat, (
+	LIExtSoftbodyModule* self,
+	LIMaiMemstat*        stat));
+
 /*****************************************************************************/
 
 LIAPICALL (void, liext_script_softbody, (

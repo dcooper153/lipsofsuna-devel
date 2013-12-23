@@ -28,9 +28,15 @@ LIMaiExtensionInfo liext_skeleton_info =
 {
 	LIMAI_EXTENSION_VERSION, "Skeleton",
 	liext_skeleton_module_new,
-	liext_skeleton_module_free
+	liext_skeleton_module_free,
+	liext_skeleton_module_get_memstat
 };
 
+/**
+ * \brief Initializes the module.
+ * \param program Program.
+ * \return Module on success. NULL otherwise.
+ */
 LIExtSkeletonModule* liext_skeleton_module_new (
 	LIMaiProgram* program)
 {
@@ -49,10 +55,26 @@ LIExtSkeletonModule* liext_skeleton_module_new (
 	return self;
 }
 
+/**
+ * \brief Frees the module.
+ * \param self Module.
+ */
 void liext_skeleton_module_free (
 	LIExtSkeletonModule* self)
 {
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liext_skeleton_module_get_memstat (
+	LIExtSkeletonModule* self,
+	LIMaiMemstat*        stat)
+{
+/* TODO: memstat */
 }
 
 /** @} */

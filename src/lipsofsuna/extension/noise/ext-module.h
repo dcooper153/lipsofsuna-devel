@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -43,6 +43,10 @@ LIAPICALL (float, liext_noise_perlin_noise, (
 	int          octaves,
 	float        frequency,
 	float        persistence));
+
+LIAPICALL (void, liext_noise_get_memstat, (
+	LIExtModule*  self,
+	LIMaiMemstat* stat));
 
 /*****************************************************************************/
 

@@ -34,6 +34,10 @@ LIExtModelModule* liext_model_new (
 void liext_model_free (
 	LIExtModelModule* self);
 
+void liext_model_get_memstat (
+	LIExtModelModule* self,
+	LIMaiMemstat*     stat);
+
 /*****************************************************************************/
 
 void liext_script_model (

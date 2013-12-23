@@ -22,17 +22,21 @@
 
 #define LIEXT_SCRIPT_CAMERA "Camera"
 
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+typedef struct _LIExtCameraModule LIExtCameraModule;
+struct _LIExtCameraModule
 {
 	LIMaiProgram* program;
 };
 
-LIExtModule* liext_camera_module_new (
+LIExtCameraModule* liext_camera_module_new (
 	LIMaiProgram* program);
 
 void liext_camera_module_free (
-	LIExtModule* self);
+	LIExtCameraModule* self);
+
+void liext_camera_module_get_memstat (
+	LIExtCameraModule* self,
+	LIMaiMemstat*      stat);
 
 /*****************************************************************************/
 

@@ -30,7 +30,8 @@ LIMaiExtensionInfo liext_object_info =
 {
 	LIMAI_EXTENSION_VERSION, "Object",
 	liobj_manager_new,
-	liobj_manager_free
+	liobj_manager_free,
+	liobj_manager_get_memstat
 };
 
 LIObjManager* liobj_manager_new (
@@ -105,6 +106,18 @@ LIObjObject* liobj_manager_find_object (
 	uint32_t      id)
 {
 	return lialg_u32dic_find (self->objects, id);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liobj_manager_get_memstat (
+	LIObjManager* self,
+	LIMaiMemstat* stat)
+{
+/* TODO: memstat */
 }
 
 /** @} */

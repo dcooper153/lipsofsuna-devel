@@ -42,6 +42,10 @@ LIAPICALL (LIObjObject*, liobj_manager_find_object, (
 	LIObjManager* self,
 	uint32_t      id));
 
+LIAPICALL (void, liobj_manager_get_memstat, (
+	LIObjManager* self,
+	LIMaiMemstat* stat));
+
 /*****************************************************************************/
 
 void liext_script_object (

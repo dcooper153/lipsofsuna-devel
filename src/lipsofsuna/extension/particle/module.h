@@ -36,6 +36,10 @@ LIAPICALL (LIExtParticleModule*, liext_particle_module_new, (
 LIAPICALL (void, liext_particle_module_free, (
 	LIExtParticleModule* self));
 
+void liext_particle_module_get_memstat (
+	LIExtParticleModule* self,
+	LIMaiMemstat*        stat);
+
 /*****************************************************************************/
 
 LIAPICALL (void, liext_script_particle, (

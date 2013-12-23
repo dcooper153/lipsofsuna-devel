@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2013 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -39,7 +39,8 @@ LIMaiExtensionInfo liext_input_info =
 {
 	LIMAI_EXTENSION_VERSION, "Input",
 	(void*) liinp_input_new,
-	(void*) liinp_input_free
+	(void*) liinp_input_free,
+	(void*) liinp_input_get_memstat
 };
 
 /**
@@ -111,6 +112,18 @@ void liinp_input_free (
 		delete self->system;
 
 	lisys_free (self);
+}
+
+/**
+ * \brief Gets the memory statistics of the module.
+ * \param self Module.
+ * \param stat Return location for the stats.
+ */
+void liinp_input_get_memstat (
+	LIInpInput*   self,
+	LIMaiMemstat* stat)
+{
+/* TODO: memstat */
 }
 
 /**
