@@ -108,6 +108,28 @@
 		"label": "Round",
 		"usages": {"eye": true}
 	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "freaked eyes",
+		"actors": {"aer": true},
+		"color": "eye_color",
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-eye-c1",
+		"label": "Freaked",
+		"usages": {"eye": true}
+	},
+	{
+		"type": "ActorTextureSpec",
+		"name": "freaked slanted eyes",
+		"actors": {"aer": true},
+		"color": "eye_color",
+		"blit_dst": [395, -35, 1000, 1000],
+		"blit_mode": "hsv_add_weightv",
+		"blit_texture": "aer-eye-c2",
+		"label": "Freaked, slanted",
+		"usages": {"eye": true}
+	},
 
 
 

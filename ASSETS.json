@@ -486,12 +486,16 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/actors/aer/face/aer-eye-c1.png",
+				"data/lipsofsuna/actors/aer/face/aer-eye-c2.png",
 				"data/lipsofsuna/actors/aer/face/aer-eye-long-upper-1.png",
 				"data/lipsofsuna/actors/aer/face/aer-face-3.png",
 				"data/lipsofsuna/actors/aer/face/aer-mouth-open-1.png"
 			],
 			"files_original":
 			[
+				"data/lipsofsuna/actors/aer/face/aer-eye-c1.svg",
+				"data/lipsofsuna/actors/aer/face/aer-eye-c2.svg",
 				"data/lipsofsuna/actors/aer/face/aer-eye-long-upper-1.svg",
 				"data/lipsofsuna/actors/aer/face/aer-face-3.svg",
 				"data/lipsofsuna/actors/aer/face/aer-mouth-open-1.svg"
