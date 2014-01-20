@@ -8,9 +8,6 @@
 	"authors":
 	[
 		{
-			"name": "Harald"
-		},
-		{
 			"name": "Andrew Kator &amp; Jennifer Legaz",
 			"url": "http://www.katorlegaz.com/3d_models/"
 		},
@@ -60,6 +57,9 @@
 		{
 			"name": "Independent.nu",
 			"url": "http://www.johannespinter.com/inu/ljudbank.htm"
+		},
+		{
+			"name": "JCW"
 		},
 		{
 			"name": "Julius",
@@ -466,12 +466,7 @@
 		{
 			"files":
 			[
-				"data/lipsofsuna/weapons/bow/arrow-000.lmdl",
 				"data/lipsofsuna/weapons/bow/arrow-000.png"
-			],
-			"files_original":
-			[
-				"data/lipsofsuna/weapons/bow/arrow-000.blend"
 			],
 			"authors":
 			[
@@ -480,8 +475,7 @@
 			"licenses":
 			[
 				"CC0"
-			],
-			"comment": "Too plain; the head and fletchings don't look quite good. See http://en.wikipedia.org/wiki/Arrow for possible ideas."
+			]
 		},
 		{
 			"files":
@@ -1309,16 +1303,34 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/weapons/bow/bow1.lmdl",
+				"data/lipsofsuna/weapons/bow/arrow-000.lmdl"
+			],
+			"files_original":
+			[
+				"data/lipsofsuna/weapons/bow/bow1.blend",
+				"data/lipsofsuna/weapons/bow/arrow-000.blend"
+			],
+			"authors":
+			[
+				"JCW"
+			],
+			"licenses":
+			[
+				"Creative Commons BY-SA 3.0"
+			]
+		},
+		{
+			"files":
+			[
 				"data/lipsofsuna/items/gem/gem-000.lmdl",
 				"data/lipsofsuna/items/gem/gem-000.png",
 				"data/lipsofsuna/misc/fence1.lmdl",
-				"data/lipsofsuna/weapons/hatchet/axe1.lmdl",
-				"data/lipsofsuna/weapons/bow/bow1.lmdl"
+				"data/lipsofsuna/weapons/hatchet/axe1.lmdl"
 			],
 			"files_original":
 			[
 				"data/lipsofsuna/weapons/hatchet/axe1.blend",
-				"data/lipsofsuna/weapons/bow/bow1.blend",
 				"data/lipsofsuna/items/gem/gem-000.blend"
 			],
 			"authors":
