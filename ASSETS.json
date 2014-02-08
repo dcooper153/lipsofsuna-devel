@@ -1304,12 +1304,15 @@
 			"files":
 			[
 				"data/lipsofsuna/weapons/bow/bow1.lmdl",
-				"data/lipsofsuna/weapons/bow/arrow-000.lmdl"
+				"data/lipsofsuna/weapons/bow/arrow-000.lmdl",
+				"data/lipsofsuna/crafting/workbench/workbench2.lmdl",
+				"data/lipsofsuna/crafting/workbench/workbench1.png"
 			],
 			"files_original":
 			[
 				"data/lipsofsuna/weapons/bow/bow1.blend",
-				"data/lipsofsuna/weapons/bow/arrow-000.blend"
+				"data/lipsofsuna/weapons/bow/arrow-000.blend",
+				"data/lipsofsuna/crafting/workbench/workbench1.blend"
 			],
 			"authors":
 			[
@@ -1942,8 +1945,6 @@
 				"data/lipsofsuna/crafting/anvil/anvil1.png",
 				"data/lipsofsuna/crafting/spelltable/spelltable1.lmdl",
 				"data/lipsofsuna/crafting/spelltable/spelltable1.png",
-				"data/lipsofsuna/crafting/workbench/workbench2.png",
-				"data/lipsofsuna/crafting/workbench/workbench2.lmdl",
 				"data/lipsofsuna/environment/furniture/shelf1.lmdl",
 				"data/lipsofsuna/environment/furniture/shelf1.png",
 				"data/lipsofsuna/environment/obelisk/obelisk1.lmdl",
@@ -1984,7 +1985,6 @@
 				"data/lipsofsuna/actors/turret/turret1.blend",
 				"data/lipsofsuna/crafting/anvil/anvil1.blend",
 				"data/lipsofsuna/crafting/spelltable/spelltable1.blend",
-				"data/lipsofsuna/crafting/workbench/workbench2.blend",
 				"data/lipsofsuna/environment/furniture/shelf1.blend",
 				"data/lipsofsuna/environment/obelisk/obelisk1.blend",
 				"data/lipsofsuna/items/food/apple1.blend",
