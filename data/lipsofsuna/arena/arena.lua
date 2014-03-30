@@ -8,6 +8,7 @@
 -- @module arena.arena
 -- @alias Arena
 
+local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Game = require("core/server/game")
 local Hooks = require("system/hooks")
@@ -100,6 +101,12 @@ Arena.update = function(self, secs)
 		spelltable:set_spec(Obstaclespec:find_by_name("spell table"))
 		spelltable:set_position(Vector(500,100.1,495))
 		spelltable:set_visible(true)
+
+		local scholar = Actor(Main.objects)
+		scholar:set_spec(Actorspec:find_by_name("scholar"))
+		scholar:set_position(Vector(495,100.1,500))
+		scholar:randomize()
+		scholar:set_visible(true)
 
 		-- Wait for terrain to load.
 		self.player:refresh(10)

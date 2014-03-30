@@ -12,6 +12,7 @@
 	["load", "actors/imp"],
 	["load", "actors/lizardman"],
 	["load", "actors/rat"],
+	["load", "actors/scholar"],
 	["load", "actors/slime"],
 	["load", "actors/turret"],
 

@@ -1,0 +1,11 @@
+[
+	{
+		"type": "Dialogspec",
+		"name": "scholar",
+		"commands":
+		[
+			["say", "Scholar", "Stop for a while and think about everything you have learned."],
+			["func", "Main.messaging:server_event(\"show skills\", q.user.client, true)"]
+		]
+	}
+]

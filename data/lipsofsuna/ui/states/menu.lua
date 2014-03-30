@@ -18,10 +18,6 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "menu",
-	widget = function() return Widgets.Uitransition("Skills", "skills") end}
-
-Ui:add_widget{
-	state = "menu",
 	widget = function() return Widgets.Uitransition("Map", "map") end}
 
 Ui:add_widget{

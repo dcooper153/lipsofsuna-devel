@@ -1,0 +1,38 @@
+[
+	{
+		"type": "Actorspec",
+		"name": "scholar",
+		"base": "aer",
+		"ai_type": "anchored",
+		"categories":
+		{
+			"castle": true,
+			"friendly": true
+		},
+		"dialog": "scholar",
+		"factions":
+		{
+			"neutral": true
+		},
+		"eye_style": "random",
+		"hair_style": "random",
+		"inventory_items":
+		{
+			"shirt": 1,
+			"leather pants": 1,
+			"leather leggings": 1
+		},
+		"loot_categories":
+		[
+			"armor",
+			"material",
+			"potion",
+			"shield",
+			"weapon"
+		],
+		"loot_count_min": 2,
+		"loot_count_max": 4,
+		"personality": "noble",
+		"preset": "Female 1"
+	}
+]
