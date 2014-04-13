@@ -26,6 +26,8 @@ FirstPersonCamera.new = function(clss, args)
 	local self = Camera.new(clss, args)
 	self:set_collision_mask(PhysicsConsts.MASK_CAMERA)
 	self:set_mode("first-person")
+	self.camera_node_name = "#camera"
+	self.camera_node_offset = nil
 	self.tilt_speed = 0
 	self.tilt_state = 0
 	self.turn_speed = 0
@@ -54,16 +56,13 @@ FirstPersonCamera.get_transform = function(self)
 	local spec = self.object.spec
 	local rel = spec.camera_center or Vector(0, 2, 0)
 	local pos = self.object:transform_local_to_global(rel)
-	local npos,nrot = self.object:find_node{name = "#camera"}
+	local npos,nrot = self.object:find_node{name = self.camera_node_name}
+	if npos and self.camera_node_offset then
+		npos:add(self.camera_node_offset)
+	end
 	if npos then
-		-- The position of the camera node is always used but the rotation is
-		-- ignored most of the time since the rotation component of the node
-		-- is highly annoying in many animations. However, the rotation is used
-		-- when the player dies to avoid the camera facing inside the corpse.
 		pos = self.object:transform_local_to_global(npos)
-		if self.object.dead then
-			rot = rot * nrot
-		end
+		rot = nrot * rot
 	end
 	return pos,rot
 end
