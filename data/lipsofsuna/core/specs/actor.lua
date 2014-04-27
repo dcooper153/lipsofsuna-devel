@@ -396,4 +396,4 @@ Actorspec.set_factions = function(self, args)
 	end
 end
 
-
+return Actorspec

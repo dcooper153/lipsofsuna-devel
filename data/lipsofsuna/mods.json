@@ -7,6 +7,7 @@
 	["load", "actors/bitingbark"],
 	["load", "actors/bloodworm"],
 	["load", "actors/brigand"],
+	["load", "actors/companion"],
 	["load", "actors/dragon"],
 	["load", "actors/fire-elemental"],
 	["load", "actors/imp"],

@@ -1,0 +1,36 @@
+[
+	{
+		"type": "Actorspec",
+		"name": "companion",
+		"base": "aer",
+		"ai_type": "companion",
+		"categories":
+		{
+			"companion": true
+		},
+		"factions":
+		{
+			"good": true
+		},
+		"eye_style": "random",
+		"hair_style": "random",
+		"inventory_items":
+		{
+			"shirt": 1,
+			"leather pants": 1,
+			"leather leggings": 1
+		},
+		"loot_categories":
+		[
+			"armor",
+			"material",
+			"potion",
+			"shield",
+			"weapon"
+		],
+		"loot_count_min": 2,
+		"loot_count_max": 4,
+		"personality": "noble",
+		"preset": "Female 1"
+	}
+]

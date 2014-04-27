@@ -9,7 +9,9 @@
 -- @alias Player
 
 local Actor = require("core/objects/actor")
+local ActorSpec = require("core/specs/actor")
 local Class = require("system/class")
+local Companion = require("core/objects/companion")
 local Modifier = require("core/server/modifier")
 local ModifierSpec = require("core/specs/modifier")
 local Packet = require("system/packet")
@@ -27,8 +29,7 @@ local Player = Class("Player", Actor)
 Player.new = function(clss, manager, id)
 	local self = Actor.new(clss, manager, id)
 	self.inventory_subscriptions = {}
-	self.running = true
-	self:calculate_speed()
+	self:set_running(true)
 	return self
 end
 
@@ -158,6 +159,20 @@ Player.update = function(self, secs)
 			if not self:can_reach_object(self.crafting_device) then
 				self:set_crafting_device()
 			end
+		end
+		-- Update the state of the companion.
+		if not self.companion then
+			-- FIXME: Appearance should be customizable.
+			local spec = ActorSpec:find_by_name("companion")
+			if spec then
+				self.companion = Companion(self.manager)
+				self.companion:set_owner(self)
+				self.companion:set_spec(spec)
+				self.companion:randomize()
+			end
+		end
+		if self.companion and not self.companion:get_visible() then
+			self.companion:respawn()
 		end
 	end
 	-- Update the base class.

@@ -90,12 +90,14 @@ ObjectDatabase.clear_unused_objects = function(self)
 		self.db:query([[DELETE FROM object_data WHERE
 			type <> 'static' AND
 			(type <> 'player' OR dead = 1) AND
+			type <> 'companion' AND
 			NOT EXISTS (SELECT 1 FROM object_inventory AS a WHERE object_data.id=a.id) AND
 			NOT EXISTS (SELECT 1 FROM object_sectors AS a WHERE object_data.id=a.id);]])
 	else
 		self.db:query([[DELETE FROM object_data WHERE
 			type <> 'static' AND
 			type <> 'player' AND
+			type <> 'companion' AND
 			NOT EXISTS (SELECT 1 FROM object_inventory AS a WHERE object_data.id=a.id) AND
 			NOT EXISTS (SELECT 1 FROM object_sectors AS a WHERE object_data.id=a.id);]])
 	end
@@ -157,6 +159,7 @@ ObjectDatabase.load_object = function(self, id, type_, spec, dead)
 	-- Get the spec.
 	local objspec
 	if type_ == "actor" then objspec = Actorspec:find_by_name(spec)
+	elseif type_ == "companion" then objspec = Actorspec:find_by_name(spec)
 	elseif type_ == "item" then objspec = Itemspec:find_by_name(spec)
 	elseif type_ == "obstacle" then objspec = Obstaclespec:find_by_name(spec)
 	elseif type_ == "player" then objspec = Actorspec:find_by_name(spec)
@@ -171,6 +174,7 @@ ObjectDatabase.load_object = function(self, id, type_, spec, dead)
 	-- Create the object.
 	local object
 	if type_ == "actor" then object = Actor(Main.objects, id)
+	elseif type_ == "companion" then object = Companion(Main.objects, id)
 	elseif type_ == "item" then object = Item(Main.objects, id)
 	elseif type_ == "obstacle" then object = Obstacle(Main.objects, id)
 	elseif type_ == "player" then object = Player(Main.objects, id)

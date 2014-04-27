@@ -14,6 +14,21 @@ local Serializer = require("system/serializer")
 local readers = {
 	["base"] = function(self, object, db, create)
 	end,
+	["companion"] = function(self, object, db, create)
+		local id = object.companion
+		object.companion = nil
+		if type(id) ~= "number" then return end
+		local rows = db:query(
+			[[SELECT type,spec,dead FROM
+			object_data WHERE
+			id=?]], {id})
+		for k,v in ipairs(rows) do
+			local child = create(id, v[2], v[3], v[4])
+			if child then
+				object.companion = child
+			end
+		end
+	end,
 	["fields"] = function(self, object, db, create)
 		local rows = db:query(
 			[[SELECT name,value FROM object_fields WHERE id=?]], {object:get_id()})
@@ -60,6 +75,8 @@ local writers = {
 		db:query([[REPLACE INTO object_data (id,type,spec,dead) VALUES (?,?,?,?);]],
 			{id, object:get_storage_type(), object.spec.name, object.dead and 1 or 0})
 	end,
+	["companion"] = function(self, object, db, id)
+	end,
 	["fields"] = function(self, object, db, id)
 		db:query([[DELETE FROM object_fields WHERE id=?;]], {id})
 		self.serializer:write(object, function(name, value)
@@ -84,7 +101,7 @@ local writers = {
 		end
 	end,
 	["sector"] = function(self, object, db, id)
-		local sector = not object.client and object:get_sector()
+		local sector = not object.client and object:get_storage_type() ~= "companion" and object:get_sector()
 		if sector then
 			if object:get_important() then
 				db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {id, sector, nil})

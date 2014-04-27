@@ -33,7 +33,8 @@ Actor.serializer = ObjectSerializer(
 	"inventory",
 	"sector",
 	"skills",
-	"stats"
+	"stats",
+	"companion"
 },
 {
 	{
@@ -65,6 +66,12 @@ Actor.serializer = ObjectSerializer(
 	{
 		name = "brow_style",
 		type = "string"
+	},
+	{
+		name = "companion",
+		type = "number",
+		get = function(self) return self.companion and self.companion:get_id() end,
+		set = function(self, v) self.companion = v end
 	},
 	{
 		name = "dead",
@@ -1007,6 +1014,22 @@ Actor.get_rotation_to_point = function(self, point)
 	local dir = __vec1:set(point):subtract(self:get_position()):normalize()
 	dir.y = 0
 	return Quaternion{dir = dir, up = __vec2:set_xyz(0, 1, 0)}
+end
+
+--- Gets the running state of the actor.
+-- @param self Actor.
+-- @return True if running is enabled. False otherwise.
+Actor.get_running = function(self)
+	return self.running
+end
+
+--- Sets the running state of the actor.
+-- @param self Actor.
+-- @param v True to enable running. False otherwise.
+Actor.set_running = function(self, v)
+	if self.running == v then return end
+	self.running = v
+	self:calculate_speed()
 end
 
 --- Sets the actor spec of the object.
