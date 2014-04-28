@@ -48,19 +48,24 @@ end
 -- @param self Actorpresetspec.
 -- @return Table.
 Actorpresetspec.get_actor = function(self)
+	local copy = function(t)
+		local res = {}
+		for k,v in pairs(t) do res[k] = v end
+		return res
+	end
 	local res = {
 		animation_profile = self.animation_profile,
 		body_sliders = self:get_chargen_body(),
 		brow_style = self.brow_style,
-		eye_color = self.eye_color,
+		eye_color = copy(self.eye_color),
 		eye_style = self.eye_style,
 		face_sliders = self:get_chargen_face(),
 		face_style = self.face_style,
-		hair_color = self.hair_color,
+		hair_color = copy(self.hair_color),
 		hair_style = self.hair_style,
 		head_style = self.head_style,
 		height = self.height,
-		skin_color = self.skin_color,
+		skin_color = copy(self.skin_color),
 		skin_style = self.skin_style,
 		mouth_style = self.mouth_style}
 	for k,v in pairs(res.body_sliders) do
