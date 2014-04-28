@@ -197,6 +197,7 @@ end
 Actor.add_enemy = function(self, object)
 	if not self.ai then return end
 	if object.god then return end
+	if object == self.owner then return end
 	self.ai:add_enemy(object)
 end
 
@@ -313,9 +314,10 @@ Actor.check_enemy = function(self, object)
 	if object == self then return end
 	if object.dead then return end
 	if object.god then return end
-	-- Enemy check for summons.
-	if self.summon_owner then
-		return self.summon_owner:check_enemy(object)
+	-- Enemy check for companions.
+	if self.owner then
+		if object == self.owner then return end
+		if self.owner:check_enemy(object) then return true end
 	end
 	-- Default enemy check.
 	return self.spec:check_enemy(object)
