@@ -8,7 +8,7 @@ material erode1
 			cull_software none
 			depth_check off
 			depth_write off
-			scene_blend alpha_blend
+			scene_blend modulate
 			vertex_program_ref compositor1_vert
 			{
 			}

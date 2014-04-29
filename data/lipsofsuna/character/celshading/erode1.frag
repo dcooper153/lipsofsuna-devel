@@ -20,5 +20,5 @@ void main()
 	float d12 = texture2D(LOS_diffuse_texture_0, F_uv + vec2(0.0, 1.0) * p).x;
 	float d22 = texture2D(LOS_diffuse_texture_0, F_uv + vec2(1.0, 1.0) * p).x;
 	float pass = min(1.0, d11 + 0.15 * (d00 + d10 + d20 + d01 + d21 + d02 + d12 + d22));
-	gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0 - pass);
+	gl_FragColor = vec4(min(1.0, 0.35 + pass));
 }
