@@ -93,6 +93,7 @@
 		"name": "aer-player",
 		"base": "aer",
 		"ai_enabled": false,
+		"enable_decapitation": false,
 		"inventory_items":
 		{
 			"leather pants": 1,

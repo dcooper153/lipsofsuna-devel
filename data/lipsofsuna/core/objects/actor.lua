@@ -872,6 +872,8 @@ end
 Actor.set_beheaded = function(self, value)
 	if self.beheaded == value then return end
 	if value then
+		-- Check is allowed.
+		if not self.spec.enable_decapitation then return end
 		-- Behead.
 		self.__beheaded = true
 		Main.vision:object_event(self, "object-beheaded")

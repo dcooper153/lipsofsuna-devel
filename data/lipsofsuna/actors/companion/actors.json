@@ -12,6 +12,7 @@
 		{
 			"good": true
 		},
+		"enable_decapitation": false,
 		"eye_style": "random",
 		"hair_style": "random",
 		"inventory_items":

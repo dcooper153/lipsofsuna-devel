@@ -61,6 +61,7 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "dialog", type = "string", description = "Dialog name.", details = {spec = "Dialogspec"}},
 	{name = "difficulty", type = "number", default = 0, description = "The approximate difficulty of the actor in the range of [0,1]."},
 	{name = "effects", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of effect profiles.", details = {values = {spec = "EffectProfileSpec"}}},
+	{name = "enable_decapitation", type = "boolean", default = true, description = "False to not allow the actor to be decapitated."},
 	{name = "equipment_class", type = "string", description = "Name of the equipment class to use for equipment models."},
 	{name = "equipment_slots", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of equipment slots."},
 	{name = "eye_color", type = "color", description = "Eye color."},
