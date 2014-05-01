@@ -98,6 +98,9 @@ public:
 	void update (
 		float secs);
 
+	void update_animations (
+		float secs);
+
 	int set_effect (
 		const char*  shader,
 		const float* params);
@@ -201,6 +204,7 @@ private:
 	int render_queue;
 	int shadow_casting;
 	int skeleton_rebuild_needed;
+	int animations_updated;
 	float render_distance;
 	LIMatTransform transform;
 	LIMdlPose* pose;

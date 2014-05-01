@@ -54,6 +54,13 @@ Program.update_scene = function(clss, secs)
 	return Los.program_render_update(secs)
 end
 
+--- Updates the animations of the scene.
+-- @param clss Program class.
+-- @param secs Seconds since the last update.
+Program.update_scene_animations = function(clss, secs)
+	return Los.program_render_update_animations(secs)
+end
+
 --- Gets the far plane distance of the camera.
 -- @param self Program class.
 -- @return Far plane distance.

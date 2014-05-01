@@ -48,6 +48,7 @@ LIRenObject::LIRenObject (
 	render_queue = Ogre::RENDER_QUEUE_MAIN;
 	shadow_casting = 0;
 	skeleton_rebuild_needed = 0;
+	animations_updated = 0;
 	render_distance = -1.0f;
 	transform = limat_transform_identity ();
 	pose = NULL;
@@ -345,6 +346,10 @@ void LIRenObject::replace_texture (
 	replace_texture (name, texture);
 }
 
+/**
+ * \brief Updates the object.
+ * \param secs Seconds since the last update.
+ */
 void LIRenObject::update (
 	float secs)
 {
@@ -397,12 +402,30 @@ void LIRenObject::update (
 	/* Update attachment poses. */
 	if (pose_skeleton != NULL)
 	{
+		update_animations (secs);
+		for (size_t i = 0 ; i < attachments.size () ; i++)
+			attachments[i]->update_pose (pose_skeleton);
+	}
+	animations_updated = false;
+}
+
+/**
+ * \brief Updates the animations of the object.
+ * \param secs Seconds since the last update.
+ */
+void LIRenObject::update_animations (
+	float secs)
+{
+	if (animations_updated)
+		return;
+	animations_updated = true;
+
+	if (pose_skeleton != NULL)
+	{
 		limdl_pose_update (pose, secs);
 		if (skeleton_rebuild_needed)
 			rebuild_skeleton ();
 		limdl_pose_skeleton_update (pose_skeleton, pose);
-		for (size_t i = 0 ; i < attachments.size () ; i++)
-			attachments[i]->update_pose (pose_skeleton);
 	}
 }
 

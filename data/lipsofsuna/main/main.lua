@@ -99,6 +99,8 @@ Main.main = function(self)
 		Program:update()
 		-- Update the scene.
 		if self.client then
+			self.timing:start_action("animations")
+			Program:update_scene_animations(tick)
 			self.timing:start_action("scene")
 			Program:update_scene(tick)
 		end

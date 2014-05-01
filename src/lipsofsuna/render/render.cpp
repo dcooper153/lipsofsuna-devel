@@ -228,6 +228,18 @@ int liren_render_update (
 	return self->update (secs);
 }
 
+/**
+ * \brief Updates the animations of the scene.
+ * \param self Renderer.
+ * \param secs Number of seconds since the last update.
+ */
+void liren_render_update_animations (
+	LIRenRender* self,
+	float        secs)
+{
+	return self->update_animations (secs);
+}
+
 int liren_render_layout_text (
 	LIRenRender* self,
 	const char*  font,

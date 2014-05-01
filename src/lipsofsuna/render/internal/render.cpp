@@ -411,6 +411,24 @@ int LIRenRender::update (
 	return 1;
 }
 
+/**
+ * \brief Updates the animations of the scene.
+ * \param secs Number of seconds since the last update.
+ */
+void LIRenRender::update_animations (
+	float secs)
+{
+	LIAlgU32dicIter iter1;
+	LIRenObject* object;
+
+	/* Update objects. */
+	LIALG_U32DIC_FOREACH (iter1, objects)
+	{
+		object = (LIRenObject*) iter1.value;
+		object->update_animations (secs);
+	}
+}
+
 int LIRenRender::get_anisotropy () const
 {
 	return anisotropy;

@@ -93,6 +93,9 @@ public:
 	int update (
 		float secs);
 
+	void update_animations (
+		float secs);
+
 	int get_anisotropy () const;
 
 	void set_anisotropy (

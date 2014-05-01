@@ -70,6 +70,10 @@ LIAPICALL (int, liren_render_update, (
 	LIRenRender* self,
 	float        secs));
 
+LIAPICALL (void, liren_render_update_animations, (
+	LIRenRender* self,
+	float        secs));
+
 LIAPICALL (int, liren_render_layout_text, (
 	LIRenRender* self,
 	const char*  font,
