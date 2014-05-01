@@ -476,7 +476,23 @@ def check_ogre(conf):
 	conf.start_msg('Checking for package OGRE')
 	conf.env.stash()
 	if conf.check_cfg(package='OGRE', atleast_version='1.7.0', args='--cflags --libs', mandatory=False):
-		conf.end_msg('pkg-config OGRE')
+		# Check if this is a sane system that provides a functional pkg-config file.
+		if conf.check_cxx(mandatory=False, uselib='TEST OGRE', fragment='''
+				#include <OgreRoot.h>
+				int main() { Ogre::Root root("", "", ""); printf(" "); return 0; }'''):
+			conf.end_msg('pkg-config OGRE')
+			return
+		# Check if the pkg-config file is missing -lboost_system from linker flags.
+		if conf.check_cxx(lib='boost_system', mandatory=False, uselib='TEST OGRE', uselib_store='OGRE') and\
+		   conf.check_cxx(mandatory=False, uselib='TEST OGRE', fragment='''
+				#include <OgreRoot.h>
+				int main() { Ogre::Root root("", "", ""); printf(" "); return 0; }'''):
+			conf.end_msg('pkg-config OGRE (-lboost_system missing from linker flags)')
+			return
+		conf.env.revert()
+		conf.end_msg(False)
+		# Broken in some other way that we're not aware of.
+		conf.fatal('You system ships with a broken OGRE pkg-config file')
 		return
 	conf.env.revert()
 	conf.env.stash()
@@ -485,7 +501,7 @@ def check_ogre(conf):
 	if conf.check_cxx(lib='OgreMain', mandatory=False, uselib='TEST', uselib_store='OGRE') and\
 	   conf.check_cxx(header_name='Ogre.h', mandatory=False, uselib='TEST', uselib_store='OGRE', fragment='''
 			#include <stdio.h>
-			int main() { printf(""); return 0; }'''):
+			int main() { printf(" "); return 0; }'''):
 		conf.end_msg('library OgreMain')
 		return
 	conf.env.revert()
