@@ -85,26 +85,27 @@ end
 CameraManager.update = function(self, secs)
 	-- Update target objects.
 	if Client.player_object then
-		for k,v in pairs(self.cameras) do
-			v.object = Client.player_object -- FIXME: should be a function
-		end
+		self.camera.object = Client.player_object -- FIXME: Should use a setter
 	end
 	-- Update the camera.
-	for k,v in pairs(self.cameras) do
-		v:update(secs)
-	end
 	Client.lighting:update(secs)
+	self.camera:update(secs)
 	-- Update targeting.
 	if Client.player_object then
-		local r1,r2 = self.cameras["first-person"]:get_picking_ray() --FIXME
-		if r1 then
-			local p,o = Simulation:pick_scene_by_ray(r1, r2)
-			Client.player_state:set_targeted_object(o)
-			if p then
-				Client.player_state.crosshair = p - (r2 - r1):normalize() * 0.1
-			else
-				Client.player_state.crosshair = r1 + (r2 - r1) * 3
-			end
+		-- Calculate the picking ray start.
+		local o = Client.player_object
+		local r1 = o:transform_local_to_global(o.spec.aim_ray_center)
+		-- Calculate the picking ray end.
+		local euler = o:get_rotation().euler
+		local rot = Quaternion:new_from_euler(euler[1], euler[2], o:get_tilt_angle())
+		local r2 = Vector(0,0,-5):transform(rot, r1)
+		-- Pick the scene.
+		local p,o = Simulation:pick_scene_by_ray(r1, r2)
+		Client.player_state:set_targeted_object(o)
+		if p then
+			Client.player_state.crosshair = p - (r2 - r1):normalize() * 0.1
+		else
+			Client.player_state.crosshair = r1 + (r2 - r1) * 3
 		end
 	else
 		Client.player_state:set_targeted_object()
@@ -118,13 +119,9 @@ CameraManager.update = function(self, secs)
 	Program:set_camera_rotation(self.camera:get_rotation())
 	local mode = Program:get_video_mode()
 	local viewport = {0, 0, mode[1], mode[2]}
-	for k,v in pairs(self.cameras) do
-		v:set_viewport(viewport)
-	end
+	self.camera:set_viewport(viewport)
 	Client.lighting:set_dungeon_mode(false)
-	for k,v in pairs(self.cameras) do
-		v:set_far(Client.options.view_distance)
-	end
+	self.camera:set_far(Client.options.view_distance)
 end
 
 --- Zooms the camera.
