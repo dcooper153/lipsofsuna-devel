@@ -18,6 +18,7 @@ local Log = require("main/log")
 local Messaging = require("main/messaging")
 local ModelManager = require("main/model-manager")
 local Mod = require("main/mod")
+local Parallel = require("system/parallel")
 local Physics = require("system/physics")
 local Settings = require("main/settings")
 local Timing = require("main/timing")
@@ -96,9 +97,6 @@ Main.main = function(self)
 			Watchdog:start(30)
 		end
 		Program:update()
-		-- Update physics.
-		self.timing:start_action("physics")
-		Physics:update(tick)
 		-- Update the scene.
 		if self.client then
 			self.timing:start_action("scene")
@@ -117,11 +115,9 @@ Main.main = function(self)
 		self.timing:start_action("resources")
 		self.images:update(tick)
 		self.models:update(tick)
-		-- Render the scene.
-		if self.client then
-			self.timing:start_action("render")
-			Program:render_scene()
-		end
+		-- Update physics and render.
+		self.timing:start_action("parallel")
+		Parallel:update_physics_and_render(tick)
 		-- Collect garbage.
 		self.timing:start_action("garbage")
 		self:perform_manual_gc(tick)

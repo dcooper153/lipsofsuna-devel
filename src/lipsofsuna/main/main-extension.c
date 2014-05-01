@@ -50,6 +50,7 @@ extern LIMaiExtensionInfo liext_noise_info;
 extern LIMaiExtensionInfo liext_object_info;
 extern LIMaiExtensionInfo liext_object_physics_info;
 extern LIMaiExtensionInfo liext_object_render_info;
+extern LIMaiExtensionInfo liext_parallel_info;
 extern LIMaiExtensionInfo liext_particle_info;
 extern LIMaiExtensionInfo liext_password_info;
 extern LIMaiExtensionInfo liext_physics_info;
@@ -102,10 +103,11 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "network", &liext_network_info },
 		{ "noise", &liext_noise_info },
 		{ "object", &liext_object_info },
-		{ "physics-object", &liext_object_physics_info },
-		{ "physics-terrain", &liext_physics_terrain_info },
+		{ "parallel", &liext_parallel_info },
 		{ "password", &liext_password_info },
 		{ "physics", &liext_physics_info },
+		{ "physics-object", &liext_object_physics_info },
+		{ "physics-terrain", &liext_physics_terrain_info },
 		{ "reload", &liext_reload_info },
 		{ "sectors", &liext_sectors_info },
 		{ "skeleton", &liext_skeleton_info },
