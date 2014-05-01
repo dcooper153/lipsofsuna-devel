@@ -7,6 +7,7 @@ Client:register_init_hook(0, function(secs)
 end)
 
 Client:register_update_hook(5, function(secs)
+	Main.timing:start_action("ui")
 	-- Emit key repeat events.
 	local t = Program:get_time()
 	for k,v in pairs(Client.input.pressed) do

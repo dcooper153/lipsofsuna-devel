@@ -99,7 +99,7 @@ end
 Timing.get_profiling_string = function(self)
 	local res = {}
 	for k,v in ipairs(self:get_profiling_data()) do
-		table.insert(res, string.format("%9s: %6d %6d %6d %6d ms",
+		table.insert(res, string.format("%9s: %6.1f %6.1f %6.1f %6.1f ms",
 			v[1], v[2] * 1000, v[3] * 1000, v[4] * 1000, v[5] * 1000))
 	end
 	return string.format("%9s  %6s %6s %6s %6s\n", "Action", "Last", "Best", "Worst", "Average") ..

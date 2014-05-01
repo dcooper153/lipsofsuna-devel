@@ -17,5 +17,6 @@ Client:register_reset_hook(25, function()
 end)
 
 Client:register_update_hook(25, function(secs)
+	Main.timing:start_action("camera")
 	Client.camera_manager:update(secs)
 end)

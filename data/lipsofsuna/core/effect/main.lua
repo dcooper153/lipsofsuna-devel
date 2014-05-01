@@ -15,6 +15,7 @@ end)
 Client:register_update_hook(40, function(secs)
 	-- Update effects.
 	-- Must be done after objects to ensure correct anchoring.
+	Main.timing:start_action("effect")
 	Client.effects:update(secs)
 	Client.music:update(secs)
 end)

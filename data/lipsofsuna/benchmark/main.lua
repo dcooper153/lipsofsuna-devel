@@ -30,6 +30,7 @@ end)
 
 Client:register_update_hook(11, function()
 	if Main.benchmark then
+		Main.timing:start_action("benchmark")
 		Main.benchmark:update(secs)
 	end
 end)

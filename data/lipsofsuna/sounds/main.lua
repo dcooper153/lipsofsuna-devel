@@ -49,6 +49,7 @@ Main.main_start_hooks:register(10, function(secs)
 end)
 
 Client:register_update_hook(15, function(secs)
+	Main.timing:start_action("sound")
 	-- Listener position.
 	if Client.player_object then
 		local p,r = Client.player_object:find_node{name = "#neck", space = "world"}
