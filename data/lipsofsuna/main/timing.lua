@@ -62,6 +62,13 @@ Timing.start_frame = function(self)
 	self.__frame_start = time
 end
 
+--- Gets the FPS of the last frame.
+-- @param self Timing.
+-- @return FPS.
+Timing.get_fps = function(self)
+	return self.frame_time > 0 and 1.0 / self.frame_time or 0
+end
+
 --- Gets the last frame duration.
 -- @param self Timing.
 -- @return Time in seconds.
