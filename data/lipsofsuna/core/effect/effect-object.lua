@@ -105,7 +105,7 @@ EffectObject.update_transform = function(self, secs)
 	if not self.parent then return end
 	local par_p = __vec1:set(self.parent:get_position())
 	local par_r = __quat1:set(self.parent:get_rotation())
-	local node_p,node_r = self.parent:find_node{name = self.parent_node}
+	local node_p,node_r = self.parent:find_node_by_name(self.parent_node)
 	if self.rotation_mode == "node-node" then
 		-- Parent.
 		local r = __quat2:set(par_r)
@@ -117,7 +117,7 @@ EffectObject.update_transform = function(self, secs)
 		end
 		-- Anchor.
 		if self.model_anchor and self.render then
-			local h,s = self.render:find_node{name = self.model_anchor}
+			local h,s = self.render:find_node_by_name(self.model_anchor)
 			if h then
 				p:subtract(h:transform(s.conjugate):transform(r))
 				r = r:concat(s)

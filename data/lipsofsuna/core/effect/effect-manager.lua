@@ -118,7 +118,7 @@ EffectManager.play_object = function(self, name, object, node)
 	-- Find the node.
 	local p
 	local n = node or effect.node
-	if n then p = object:find_node{name = n} end
+	if n then p = object:find_node_by_name(n) end
 	-- Create the effect object.
 	if effect.particle then
 		ParticleEffect{

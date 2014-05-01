@@ -104,12 +104,20 @@ end
 
 --- Finds a bone or an anchor by name.
 -- @param self Object.
--- @param args Arguments.<ul>
---   <li>name: Node name.</li>
---   <li>space: Coordinate space. ("local"/"world")</li></ul>
+-- @param name Node name.
 -- @return Position and rotation, or nil if not found.
-RenderObject.find_node = function(self, args)
-	local p,r = Los.render_object_find_node(self.handle, args)
+RenderObject.find_node_by_name = function(self, name)
+	local p,r = Los.render_object_find_node(self.handle, name)
+	if not p then return end
+	return Vector:new_from_handle(p), Quaternion:new_from_handle(r)
+end
+
+--- Finds a bone or an anchor by name.
+-- @param self Object.
+-- @param name Node name.
+-- @return Position and rotation, or nil if not found.
+RenderObject.find_node_by_name_world_space = function(self, name)
+	local p,r = Los.render_object_find_node_world_space(self.handle, name)
 	if not p then return end
 	return Vector:new_from_handle(p), Quaternion:new_from_handle(r)
 end

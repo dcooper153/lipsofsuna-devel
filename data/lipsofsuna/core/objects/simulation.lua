@@ -497,10 +497,22 @@ end
 -- has been loaded. If these are not the case, nil is returned.
 --
 -- @param self Object.
--- @param ... Arguments.
-SimulationObject.find_node = function(self, ...)
+-- @param name String.
+SimulationObject.find_node_by_name = function(self, name)
 	if not self.render then return end
-	return self.render:find_node(...)
+	return self.render:find_node_by_name(name)
+end
+
+--- Finds a node from the graphical skeleton of the object.<br/>
+--
+-- This only works when running in the graphical mode and the skeleton
+-- has been loaded. If these are not the case, nil is returned.
+--
+-- @param self Object.
+-- @param name String.
+SimulationObject.find_node_by_name_world_space = function(self, name)
+	if not self.render then return end
+	return self.render:find_node_by_name_world_space(name)
 end
 
 --- Gets the stack count of the object.

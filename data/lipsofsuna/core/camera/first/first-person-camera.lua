@@ -56,7 +56,7 @@ FirstPersonCamera.get_transform = function(self)
 	local spec = self.object.spec
 	local rel = spec.camera_center or Vector(0, 2, 0)
 	local pos = self.object:transform_local_to_global(rel)
-	local npos,nrot = self.object:find_node{name = self.camera_node_name}
+	local npos,nrot = self.object:find_node_by_name(self.camera_node_name)
 	if npos and self.camera_node_offset then
 		npos:add(self.camera_node_offset)
 	end

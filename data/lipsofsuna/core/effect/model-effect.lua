@@ -69,8 +69,12 @@ ModelEffect.detach = function(self)
 	EffectObject.detach(self)
 end
 
-ModelEffect.find_node = function(self, ...)
-	return self.render:find_node(...)
+ModelEffect.find_node_by_name = function(self, name)
+	return self.render:find_node_by_name(name)
+end
+
+ModelEffect.find_node_by_name_world_space = function(self, name)
+	return self.render:find_node_by_name_world_space(name)
 end
 
 --- Sets the position of the effect.

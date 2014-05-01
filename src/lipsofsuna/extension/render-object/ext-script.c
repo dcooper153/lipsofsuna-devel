@@ -247,17 +247,34 @@ static void RenderObject_clear_animations (LIScrArgs* args)
 static void RenderObject_find_node (LIScrArgs* args)
 {
 	const char* name;
-	const char* space = "local";
 	LIMatTransform transform;
 	LIExtRenderObject* object;
 
 	object = args->self;
-	if (!liscr_args_gets_string (args, "name", &name))
+	if (!liscr_args_geti_string (args, 0, &name))
 		return;
-	liscr_args_gets_string (args, "space", &space);
 
 	/* Get the transformation. */
-	if (!liren_render_object_find_node (object->render, object->id, name, !strcmp (space, "world"), &transform))
+	if (!liren_render_object_find_node (object->render, object->id, name, 0, &transform))
+		return;
+
+	/* Return the transformation. */
+	liscr_args_seti_vector (args, &transform.position);
+	liscr_args_seti_quaternion (args, &transform.rotation);
+}
+
+static void RenderObject_find_node_world_space (LIScrArgs* args)
+{
+	const char* name;
+	LIMatTransform transform;
+	LIExtRenderObject* object;
+
+	object = args->self;
+	if (!liscr_args_geti_string (args, 0, &name))
+		return;
+
+	/* Get the transformation. */
+	if (!liren_render_object_find_node (object->render, object->id, name, 1, &transform))
 		return;
 
 	/* Return the transformation. */
@@ -522,6 +539,7 @@ void liext_script_render_object (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_animate_fade", RenderObject_animate_fade);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_clear_animations", RenderObject_clear_animations);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_find_node", RenderObject_find_node);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_find_node_world_space", RenderObject_find_node_world_space);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_get_animation", RenderObject_get_animation);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_particle_animation", RenderObject_particle_animation);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_RENDER_OBJECT, "render_object_remove_model", RenderObject_remove_model);

@@ -17,9 +17,9 @@ Main.main_start_hooks:register(10, function(secs)
 		-- Find the foot anchors.
 		-- These are needed for foot position tracking so that we know when and
 		-- where to play the positional sound.
-		local lnode = object:find_node{name = "#foot.L", space = "world"}
+		local lnode = object:find_node_by_name_world_space("#foot.L")
 		if not lnode then return end
-		local rnode = object:find_node{name = "#foot.R", space = "world"}
+		local rnode = object:find_node_by_name_world_space("#foot.R")
 		if not rnode then return end
 		-- Ground check.
 		-- We don't want to play footsteps if the character is flying.
@@ -34,14 +34,14 @@ Main.main_start_hooks:register(10, function(secs)
 		-- to the negative. Using the Y distance to the ground is too error prone
 		-- so this approximation is the best approach I have found so far.
 		object.lfoot_prev = object.lfoot_curr
-		object.lfoot_curr = object:find_node{name = "#foot.L"}
+		object.lfoot_curr = object:find_node_by_name("#foot.L")
 		if object.lfoot_prev and object.lfoot_curr.z < 0 and object.lfoot_prev.z >= 0 then
 			Client.effects:play_world(spec.footstep_sound, lnode)
 		end
 		-- Right foot.
 		-- Works the same way with the left foot.
 		object.rfoot_prev = object.rfoot_curr
-		object.rfoot_curr = object:find_node{name = "#foot.R"}
+		object.rfoot_curr = object:find_node_by_name("#foot.R")
 		if object.rfoot_prev and object.rfoot_curr.z < 0 and object.rfoot_prev.z >= 0 then
 			Client.effects:play_world(spec.footstep_sound, rnode)
 		end
@@ -52,7 +52,7 @@ Client:register_update_hook(15, function(secs)
 	Main.timing:start_action("sound")
 	-- Listener position.
 	if Client.player_object then
-		local p,r = Client.player_object:find_node{name = "#neck", space = "world"}
+		local p,r = Client.player_object:find_node_by_name_world_space("#neck")
 		if p then
 			Sound:set_listener_position(p)
 			Sound:set_listener_rotation(r)

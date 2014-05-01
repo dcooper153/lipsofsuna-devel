@@ -75,7 +75,7 @@ SpeechBubbleEffect.transform = function(self)
 	if not self.object then return end
 	local p
 	if self.node and self.object.render then
-		p = self.object.render:find_node{name = self.node}
+		p = self.object.render:find_node_by_name(self.node)
 	end
 	if p then
 		self.position = self.offset + self.object:get_position() + self.object:get_rotation() * p

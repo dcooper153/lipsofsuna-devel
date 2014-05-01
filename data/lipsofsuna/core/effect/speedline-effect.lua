@@ -55,8 +55,8 @@ SpeedlineEffect.add_slice = function(self)
 	local h = 0.07
 	local n = #self.path
 	-- Get the current line vertices.
-	local p1 = self.object:find_node{name = "#blade1"}
-	local p2 = self.object:find_node{name = "#blade2"}
+	local p1 = self.object:find_node_by_name("#blade1")
+	local p2 = self.object:find_node_by_name("#blade2")
 	if not p1 or not p2 then
 		p1 = self.object:get_position():copy():subtract_xyz(0,h,0)
 		p2 = self.object:get_position():copy():add_xyz(0,h,0)
