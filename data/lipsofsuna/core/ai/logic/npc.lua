@@ -5,11 +5,11 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.ai.npc
+-- @module core.ai.logic.npc
 -- @alias NpcAi
 
+local Ai = require("core/ai/logic/ai")
 local Class = require("system/class")
-local Ai = require(Mod.path .. "ai")
 
 --- TODO:doc
 -- @type NpcAi
@@ -22,10 +22,11 @@ NpcAi.type = "npc"
 -- of computing time since player motion often triggers loading of sectors whose
 -- actors are never seen.
 -- @param clss AI class.
+-- @param manager AI manager.
 -- @param object Controlled actor.
 -- @return AI.
-NpcAi.new = function(clss, object)
-	local self = Ai.new(clss, object)
+NpcAi.new = function(clss, manager, object)
+	local self = Ai.new(clss, manager, object)
 	self.update_timer = 0
 	self:set_state{state = "none"}
 	-- Initialize states.

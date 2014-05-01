@@ -5,7 +5,7 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.ai.ai
+-- @module core.ai.logic.ai
 -- @alias Ai
 
 local Class = require("system/class")
@@ -25,10 +25,13 @@ Ai.dict_name = {}
 -- actors are never seen.
 --
 -- @param clss AI class.
+-- @param manager AI manager.
 -- @param object Controlled actor.
 -- @return AI.
-Ai.new = function(clss, object)
+Ai.new = function(clss, manager, object)
 	local self = Class.new(clss)
+	self.manager = manager
+	self.manager:add(self)
 	self.object = object
 	self.enemies = setmetatable({}, {__mode = "kv"})
 	self:calculate_combat_ratings()

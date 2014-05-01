@@ -110,6 +110,10 @@ Main.main = function(self)
 		if self.objects then
 			self.objects:update(tick)
 		end
+		self.timing:start_action("ai")
+		if self.ai then
+			self.ai:update(tick)
+		end
 		self.timing:start_action("hooks")
 		self.update_hooks:call(tick)
 		self.timing:start_action("resources")

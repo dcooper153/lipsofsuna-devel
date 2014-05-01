@@ -1,8 +1,9 @@
 {
-	"scripts": ["init"],
+	"scripts": ["main"],
 	"mods":
 	[
 		["load", "core/ai/combat"],
+		["load", "core/ai/logic"],
 		["load", "core/ai/personality"],
 		["load", "core/ai/state"]
 	]

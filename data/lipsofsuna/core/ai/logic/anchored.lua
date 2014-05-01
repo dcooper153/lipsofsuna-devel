@@ -5,11 +5,11 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.ai.anchored
+-- @module core.ai.logic.anchored
 -- @alias AnchoredAi
 
 local Class = require("system/class")
-local CamperAi = require(Mod.path .. "camper")
+local CamperAi = require("core/ai/logic/camper")
 
 --- TODO:doc
 -- @type AnchoredAi
@@ -18,10 +18,11 @@ AnchoredAi.type = "anchored"
 
 --- Creates a new anchored AI.
 -- @param clss CamperAi class.
+-- @param manager AI manager.
 -- @param object Controlled actor.
 -- @return AI.
-AnchoredAi.new = function(clss, object)
-	local self = CamperAi.new(clss, object)
+AnchoredAi.new = function(clss, manager, object)
+	local self = CamperAi.new(clss, manager, object)
 	return self
 end
 

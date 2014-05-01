@@ -5,11 +5,11 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.ai.camper
+-- @module core.ai.logic.camper
 -- @alias CamperAi
 
 local Class = require("system/class")
-local NpcAi = require(Mod.path .. "npc")
+local NpcAi = require("core/ai/logic/npc")
 
 --- TODO:doc
 -- @type CamperAi
@@ -18,10 +18,11 @@ CamperAi.type = "camper"
 
 --- Creates a new camper AI.
 -- @param clss CamperAi class.
+-- @param manager AI manager.
 -- @param object Controlled actor.
 -- @return AI.
-CamperAi.new = function(clss, object)
-	local self = NpcAi.new(clss, object)
+CamperAi.new = function(clss, manager, object)
+	local self = NpcAi.new(clss, manager, object)
 	return self
 end
 

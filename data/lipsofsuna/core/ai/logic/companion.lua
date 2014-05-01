@@ -5,11 +5,11 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.ai.companion
+-- @module core.ai.logic.companion
 -- @alias CompanionAi
 
 local Class = require("system/class")
-local NpcAi = require("core/ai/npc")
+local NpcAi = require("core/ai/logic/npc")
 
 --- Companion AI.
 -- @type CompanionAi
@@ -18,10 +18,11 @@ CompanionAi.type = "companion"
 
 --- Creates a new companion AI.
 -- @param clss AI class.
+-- @param manager AI manager.
 -- @param object Controlled actor.
 -- @return AI.
-CompanionAi.new = function(clss, object)
-	local self = NpcAi.new(clss, object)
+CompanionAi.new = function(clss, manager, object)
+	local self = NpcAi.new(clss, manager, object)
 	return self
 end
 

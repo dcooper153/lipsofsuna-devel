@@ -681,8 +681,8 @@ end
 -- @param secs Seconds since the last update.
 Actor.update = function(self, secs)
 	if not self:get_visible() then return end
+	-- Update the state.
 	if self:has_server_data() then
-		-- Update the state.
 		self.update_timer = self.update_timer + secs
 		if self.update_timer > 0.3 then
 			local tick = self.update_timer
@@ -693,11 +693,8 @@ Actor.update = function(self, secs)
 			self:update_summon(tick)
 			self.update_timer = 0
 		end
-		-- Update the AI.
-		if self.ai then
-			self.ai:update(secs)
-		end
 	end
+	-- Update the graphics.
 	if self:has_client_data() then
 		self.render:update(secs)
 	end
@@ -1077,7 +1074,7 @@ Actor.set_spec = function(self, v)
 		-- Create the AI.
 		if not spec.dead and spec.ai_enabled then
 			ai_class = Ai.dict_name[spec.ai_type or "npc"]
-			self.ai = ai_class and ai_class(self)
+			self.ai = ai_class and ai_class(Main.ai, self)
 		end
 	end
 	-- Set the model.
