@@ -123,6 +123,10 @@ public:
 	int set_model (
 		LIRenModel* model);
 
+	bool get_node_transform (
+		const char*     name,
+		LIMatTransform& result);
+
 	int set_particle (
 		const char* name);
 
@@ -208,13 +212,13 @@ private:
 	float render_distance;
 	LIMatTransform transform;
 	LIMdlPose* pose;
+	LIMdlPoseSkeleton* pose_skeleton;
 	std::vector<LIRenAttachment*> attachments;
 	std::map<int, Ogre::Vector4> custom_params;
 	std::map<Ogre::String, Ogre::TexturePtr> texture_aliases;
 
 // FIXME
 public:
-	LIMdlPoseSkeleton* pose_skeleton;
 	LIRenRender* render;
 	Ogre::SceneNode* node;
 };

@@ -519,6 +519,25 @@ int LIRenObject::set_model (
 }
 
 /**
+ * \brief Gets the transformation of a pose skeleton node.
+ * \param name Node name.
+ * \param result Return location for the transformation.
+ * \return True if the node was found. False otherwise.
+ */
+bool LIRenObject::get_node_transform (
+	const char*     name,
+	LIMatTransform& result)
+{
+	if (!pose_skeleton)
+		return false;
+	LIMdlNode* node = limdl_pose_skeleton_find_node (pose_skeleton, name);
+	if (!node)
+		return false;
+	result = node->rest_transform.global;
+	return true;
+}
+
+/**
  * \brief Sets the particle effect of the object.
  * \param name Particle effect name.
  * \return Nonzero on success.

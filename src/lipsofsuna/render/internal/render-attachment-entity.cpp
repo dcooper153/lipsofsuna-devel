@@ -302,17 +302,16 @@ bool LIRenAttachmentEntity::create_skeleton ()
 	   in external skeletons. Because of external bones, we need to set
 	   the transformations using the pose skeleton of the object. */
 	LIRenModelData* model = get_model ();
-	if (object->pose_skeleton != NULL && model != NULL)
+	if (model != NULL && model->rest_pose_buffer != NULL)
 	{
 		for (int i = 0 ; i < model->rest_pose_buffer->bones.count ; i++)
 		{
 			const LIMdlPoseBufferBone* group = model->rest_pose_buffer->bones.array + i;
 			if (!group->name)
 				continue;
-			LIMdlNode* node = limdl_pose_skeleton_find_node (object->pose_skeleton, group->name);
-			if (!node)
+			LIMatTransform t;
+			if (!object->get_node_transform (group->name, t))
 				continue;
-			LIMatTransform t = node->rest_transform.global;
 			Ogre::Bone* bone = skeleton->getBone (i);
 			bone->setPosition (t.position.x, t.position.y, t.position.z);
 			bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
