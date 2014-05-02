@@ -208,11 +208,11 @@ private:
 	int render_queue;
 	int shadow_casting;
 	int skeleton_rebuild_needed;
-	int animations_updated;
 	float render_distance;
 	LIMatTransform transform;
 	LIMdlPose* pose;
 	LIMdlPoseSkeleton* pose_skeleton;
+	LISysMutex* mutex_pose_attachment;
 	std::vector<LIRenAttachment*> attachments;
 	std::map<int, Ogre::Vector4> custom_params;
 	std::map<Ogre::String, Ogre::TexturePtr> texture_aliases;

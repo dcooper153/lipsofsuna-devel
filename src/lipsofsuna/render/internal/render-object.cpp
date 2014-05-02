@@ -48,7 +48,6 @@ LIRenObject::LIRenObject (
 	render_queue = Ogre::RENDER_QUEUE_MAIN;
 	shadow_casting = 0;
 	skeleton_rebuild_needed = 0;
-	animations_updated = 0;
 	render_distance = -1.0f;
 	transform = limat_transform_identity ();
 	pose = NULL;
@@ -68,8 +67,11 @@ LIRenObject::LIRenObject (
 	node = render->scene_root->createChildSceneNode ();
 	node->setVisible (false);
 
+	/* Create the mutex. */
+	mutex_pose_attachment = lisys_mutex_new ();
+
 	/* Add self to the object dictionary. */
-	lialg_u32dic_insert (render->objects, this->id, this);
+	render->add_object (this);
 }
 
 /**
@@ -78,7 +80,7 @@ LIRenObject::LIRenObject (
 LIRenObject::~LIRenObject ()
 {
 	/* Remove from the object dictionary. */
-	lialg_u32dic_remove (render->objects, id);
+	render->remove_object (this);
 
 	/* Free models and particles. */
 	clear_models ();
@@ -92,6 +94,10 @@ LIRenObject::~LIRenObject ()
 		limdl_pose_skeleton_free (pose_skeleton);
 	if (pose != NULL)
 		limdl_pose_free (pose);
+
+	/* Free the mutex. */
+	if (mutex_pose_attachment != NULL)
+		lisys_mutex_free (mutex_pose_attachment);
 }
 
 /**
@@ -101,6 +107,8 @@ LIRenObject::~LIRenObject ()
 void LIRenObject::add_model (
 	LIRenModel*  model)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	/* Create the new entity. */
 	LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (this, model);
 	attachments.push_back (attachment);
@@ -123,6 +131,8 @@ void LIRenObject::add_texture_alias (
 	int         height,
 	const void* pixels)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	Ogre::TexturePtr texture = create_texture (width, height, pixels);
 	replace_texture (name, texture);
 	texture_aliases[name] = texture;
@@ -140,6 +150,7 @@ int LIRenObject::channel_animate (
 	int                     keep,
 	const LIMdlPoseChannel* info)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
 	LIMdlPose* pose1;
 
 	/* Update the reference pose. */
@@ -161,12 +172,15 @@ void LIRenObject::channel_fade (
 	int   channel,
 	float time)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	channel_fade (pose, channel, time);
 }
 
 LIMdlPoseChannel* LIRenObject::channel_get_state (
 	int channel) const
 {
+	LISysScopedLock lock (mutex_pose_attachment);
 	LIMdlPoseChannel* chan;
 
 	if (pose == NULL)
@@ -184,6 +198,8 @@ LIMdlPoseChannel* LIRenObject::channel_get_state (
  */
 void LIRenObject::clear_animations ()
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	if (pose == NULL)
 		return;
 	limdl_pose_destroy_all (pose);
@@ -194,6 +210,8 @@ void LIRenObject::clear_animations ()
  */
 void LIRenObject::clear_models ()
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	/* Detach everything from the scene node. */
 	node->detachAllObjects ();
 
@@ -218,6 +236,7 @@ int LIRenObject::find_node (
 	float scale;
 	LIMatTransform transform;
 	LIMdlNode* node = NULL;
+	LISysScopedLock lock (mutex_pose_attachment);
 
 	/* Search from the skeleton. */
 	if (pose_skeleton != NULL)
@@ -261,6 +280,8 @@ void LIRenObject::particle_animation (
 void LIRenObject::model_changed (
 	LIRenModel* model)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	for (size_t i = 0 ; i < attachments.size () ; i++)
 	{
 		if (attachments[i]->has_model (model))
@@ -284,6 +305,8 @@ void LIRenObject::model_changed (
 void LIRenObject::remove_model (
 	LIRenModel* model)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	for (size_t i = 0 ; i < attachments.size () ; i++)
 	{
 		if (attachments[i]->has_model (model))
@@ -308,6 +331,8 @@ void LIRenObject::replace_model (
 	LIRenModel* model_old,
 	LIRenModel* model_new)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	/* Try to replace. */
 	for (size_t i = 0 ; i < attachments.size () ; i++)
 	{
@@ -342,6 +367,8 @@ void LIRenObject::replace_texture (
 	int         height,
 	const void* pixels)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	Ogre::TexturePtr texture = create_texture (width, height, pixels);
 	replace_texture (name, texture);
 }
@@ -353,6 +380,8 @@ void LIRenObject::replace_texture (
 void LIRenObject::update (
 	float secs)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	/* Update attachments. */
 	/* This needs to be done before replacing attachments since an
 	   attachment may finish loading here. If replacing were done first,
@@ -398,15 +427,6 @@ void LIRenObject::update (
 	}
 	else
 		node->setVisible (visible);
-
-	/* Update attachment poses. */
-	if (pose_skeleton != NULL)
-	{
-		update_animations (secs);
-		for (size_t i = 0 ; i < attachments.size () ; i++)
-			attachments[i]->update_pose (pose_skeleton);
-	}
-	animations_updated = false;
 }
 
 /**
@@ -416,9 +436,7 @@ void LIRenObject::update (
 void LIRenObject::update_animations (
 	float secs)
 {
-	if (animations_updated)
-		return;
-	animations_updated = true;
+	LISysScopedLock lock (mutex_pose_attachment);
 
 	if (pose_skeleton != NULL)
 	{
@@ -426,6 +444,8 @@ void LIRenObject::update_animations (
 		if (skeleton_rebuild_needed)
 			rebuild_skeleton ();
 		limdl_pose_skeleton_update (pose_skeleton, pose);
+		for (size_t i = 0 ; i < attachments.size () ; i++)
+			attachments[i]->update_pose (pose_skeleton);
 	}
 }
 
@@ -444,6 +464,8 @@ void LIRenObject::set_custom_param (
 	float b,
 	float a)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	custom_params[index] = Ogre::Vector4 (r, g, b, a);
 	update_entity_settings ();
 }
@@ -478,6 +500,8 @@ int LIRenObject::get_id () const
  */
 int LIRenObject::get_loaded () const
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	for (size_t i = 0 ; i < attachments.size () ; i++)
 	{
 		if (!attachments[i]->is_loaded ())
@@ -496,6 +520,8 @@ int LIRenObject::get_loaded () const
 int LIRenObject::set_model (
 	LIRenModel* model)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	/* Simply clear everything if setting to NULL. */
 	if (model == NULL)
 	{
@@ -545,6 +571,8 @@ bool LIRenObject::get_node_transform (
 int LIRenObject::set_particle (
 	const char* name)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	/* Remove the existing model or particle system. */
 	clear_models ();
 
@@ -561,6 +589,8 @@ int LIRenObject::set_particle (
 void LIRenObject::set_particle_emitting (
 	int value)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	for (size_t i = 0 ; i < attachments.size () ; i++)
 		attachments[i]->set_emitting (value);
 }
@@ -585,6 +615,8 @@ int LIRenObject::set_visible (
 void LIRenObject::set_render_distance (
 	float value)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	render_distance = value;
 	update_entity_settings ();
 }
@@ -596,6 +628,8 @@ void LIRenObject::set_render_distance (
 void LIRenObject::set_render_queue (
 	const char* value)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	if (!strcmp (value, "background"))
 		render_queue = Ogre::RENDER_QUEUE_BACKGROUND;
 	else if (!strcmp (value, "skies_early"))
@@ -632,6 +666,8 @@ void LIRenObject::set_render_queue (
 void LIRenObject::set_shadow_casting (
 	int value)
 {
+	LISysScopedLock lock (mutex_pose_attachment);
+
 	shadow_casting = value;
 	update_entity_settings ();
 }

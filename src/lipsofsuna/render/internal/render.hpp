@@ -35,8 +35,10 @@
 #define LIREN_RESOURCES_PERMANENT "permanent"
 #define LIREN_RESOURCES_TEMPORARY "temporary"
 
+class LIRenAnimationUpdater;
 class LIRenMaterialUtils;
 class LIRenModel;
+class LIRenObject;
 class LIRenOverlayManager;
 class LIRenResourceLoadingListener;
 
@@ -53,6 +55,12 @@ public:
 
 	void remove_compositor (
 		const char* name);
+
+	void add_object (
+		LIRenObject* object);
+
+	void remove_object (
+		LIRenObject* object);
 
 	LIRenModel* find_model (
 		int         id);
@@ -187,6 +195,7 @@ public:
 	LIRenResourceLoadingListener* resource_loading_listener;
 	LIRenUniqueId id;
 	LIAlgStrdic* mesh_builders;
+	LIRenAnimationUpdater* animation_updater;
 };
 
 #endif

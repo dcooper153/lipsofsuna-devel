@@ -25,6 +25,7 @@
  */
 
 #include "render.hpp"
+#include "render-animation-updater.hpp"
 #include "render-material-utils.hpp"
 #include "render-mesh-builder.hpp"
 #include "render-model.hpp"
@@ -137,6 +138,10 @@ int LIRenRender::init (
 
 void LIRenRender::deinit ()
 {
+	/* Free the animation updater. */
+	delete animation_updater;
+	animation_updater = NULL;
+
 	/* Free the mesh builders. */
 	/* Some meshes may be being loaded in other threads so the Ogre root
 	   needs to be shut down first to guarantee clean shutdown. */
@@ -171,6 +176,30 @@ void LIRenRender::remove_compositor (
 	const char* name)
 {
 	Ogre::CompositorManager::getSingleton ().removeCompositor (viewport, name);
+}
+
+/**
+ * \brief Registers an object.
+ * \param object Object.
+ */
+void LIRenRender::add_object (
+	LIRenObject* object)
+{
+	lialg_u32dic_insert (objects, object->get_id (), object);
+	if (animation_updater)
+		animation_updater->object_added (object);
+}
+
+/**
+ * \brief Unregisters an object.
+ * \param object Object.
+ */
+void LIRenRender::remove_object (
+	LIRenObject* object)
+{
+	if (animation_updater)
+		animation_updater->object_removed (object);
+	lialg_u32dic_remove (objects, object->get_id ());
 }
 
 /**
@@ -408,6 +437,14 @@ int LIRenRender::update (
 		garbage_collect_builders ();
 	}
 
+	/* Apply updated animations. */
+	if (animation_updater != NULL)
+	{
+		animation_updater->join();
+		delete animation_updater;
+		animation_updater = NULL;
+	}
+
 	return 1;
 }
 
@@ -418,15 +455,8 @@ int LIRenRender::update (
 void LIRenRender::update_animations (
 	float secs)
 {
-	LIAlgU32dicIter iter1;
-	LIRenObject* object;
-
-	/* Update objects. */
-	LIALG_U32DIC_FOREACH (iter1, objects)
-	{
-		object = (LIRenObject*) iter1.value;
-		object->update_animations (secs);
-	}
+	if (animation_updater == NULL)
+		animation_updater = new LIRenAnimationUpdater (this, secs);
 }
 
 int LIRenRender::get_anisotropy () const

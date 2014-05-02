@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2014 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,39 +15,31 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SYSTEM_MUTEX_H__
-#define __SYSTEM_MUTEX_H__
+#ifndef __RENDER_ANIMATION_UPDATER_HPP__
+#define __RENDER_ANIMATION_UPDATER_HPP__
 
-#include "system-memory.h"
+#include "lipsofsuna/system.h"
+#include <vector>
 
-typedef struct _LISysMutex LISysMutex;
+class LIRenObject;
+class LIRenRender;
 
-LIAPICALL (LISysMutex*, lisys_mutex_new, ());
-
-LIAPICALL (void, lisys_mutex_free, (
-	LISysMutex* self));
-
-LIAPICALL (void, lisys_mutex_lock, (
-	LISysMutex* self));
-
-LIAPICALL (void, lisys_mutex_unlock, (
-	LISysMutex* self));
-
-#ifdef __cplusplus
-class LISysScopedLock
+class LIRenAnimationUpdater
 {
 public:
-	LISysScopedLock (LISysMutex* mutex) : mutex(mutex)
-	{
-		lisys_mutex_lock (mutex);
-	}
-	~LISysScopedLock()
-	{
-		lisys_mutex_unlock (mutex);
-	}
+	LIRenAnimationUpdater (LIRenRender* render, float secs);
+	virtual ~LIRenAnimationUpdater ();
+	void join ();
+	void main ();
+	void object_added (LIRenObject* object);
+	void object_removed (LIRenObject* object);
 private:
+	int pos;
+	float secs;
+	LIRenRender* render;
+	LISysThread* thread;
 	LISysMutex* mutex;
+	std::vector<LIRenObject*> objects;
 };
-#endif
 
 #endif

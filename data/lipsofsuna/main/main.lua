@@ -89,21 +89,19 @@ Main.main = function(self)
 	-- Enter the main loop.
 	self:enable_manual_gc()
 	while not Program:get_quit() do
-		-- Update the program state.
 		local tick = self.timing:get_frame_duration()
 		self.timing:start_frame()
+		-- Update animations.
+		if self.client then
+			self.timing:start_action("animations")
+			Program:update_scene_animations(tick)
+		end
+		-- Update the program state.
 		self.timing:start_action("program")
 		if self.settings.watchdog then
 			Watchdog:start(30)
 		end
 		Program:update()
-		-- Update the scene.
-		if self.client then
-			self.timing:start_action("animations")
-			Program:update_scene_animations(tick)
-			self.timing:start_action("scene")
-			Program:update_scene(tick)
-		end
 		-- Process events.
 		self.timing:start_action("event")
 		Eventhandler:update()
@@ -121,12 +119,17 @@ Main.main = function(self)
 		self.timing:start_action("resources")
 		self.images:update(tick)
 		self.models:update(tick)
-		-- Update physics and render.
-		self.timing:start_action("parallel")
-		Parallel:update_physics_and_render(tick)
 		-- Collect garbage.
 		self.timing:start_action("garbage")
 		self:perform_manual_gc(tick)
+		-- Update the scene.
+		if self.client then
+			self.timing:start_action("scene")
+			Program:update_scene(tick)
+		end
+		-- Update physics and render.
+		self.timing:start_action("parallel")
+		Parallel:update_physics_and_render(tick)
 	end
 	self.main_end_hooks:call()
 end
