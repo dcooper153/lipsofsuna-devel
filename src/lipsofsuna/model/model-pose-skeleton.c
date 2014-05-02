@@ -32,6 +32,13 @@ static void private_copy_nodes (
 	const LIMdlModel** models,
 	int                models_num);
 
+static void private_rebuild_lookup (
+	LIMdlPoseSkeleton* self);
+
+static void private_rebuild_lookup_node (
+	LIMdlPoseSkeleton* self,
+	LIMdlNode*         node);
+
 static void private_transform_node (
 	LIMdlPoseSkeleton* self,
 	LIMdlPose*         pose,
@@ -54,7 +61,10 @@ LIMdlPoseSkeleton* limdl_pose_skeleton_new (
 
 	/* Copy nodes. */
 	if (count)
+	{
 		private_copy_nodes (self, models, count);
+		private_rebuild_lookup (self);
+	}
 
 	return self;
 }
@@ -62,6 +72,8 @@ LIMdlPoseSkeleton* limdl_pose_skeleton_new (
 void limdl_pose_skeleton_free (
 	LIMdlPoseSkeleton* self)
 {
+	if (self->lookup != NULL)
+		lialg_strdic_free (self->lookup);
 	limdl_nodes_deinit (&self->nodes);
 	lisys_free (self);
 }
@@ -76,7 +88,9 @@ LIMdlNode* limdl_pose_skeleton_find_node (
 	const LIMdlPoseSkeleton* self,
 	const char*              name)
 {
-	return limdl_nodes_find_node (&self->nodes, name);
+	if (self->lookup == NULL)
+		return NULL;
+	return lialg_strdic_find (self->lookup, name);
 }
 
 /**
@@ -97,6 +111,7 @@ void limdl_pose_skeleton_rebuild_from_models (
 	int                count)
 {
 	private_copy_nodes (self, models, count);
+	private_rebuild_lookup (self);
 }
 
 /**
@@ -119,6 +134,7 @@ void limdl_pose_skeleton_rebuild_from_skeletons (
 		for (i = 0 ; i < skeletons[j]->nodes.count ; i++)
 			limdl_nodes_merge (&self->nodes, &skeletons[j]->nodes);
 	}
+	private_rebuild_lookup (self);
 }
 
 void limdl_pose_skeleton_update (
@@ -154,6 +170,44 @@ static void private_copy_nodes (
 		for (i = 0 ; i < models[j]->nodes.count ; i++)
 			limdl_nodes_merge (&self->nodes, &models[j]->nodes);
 	}
+}
+
+static void private_rebuild_lookup (
+	LIMdlPoseSkeleton* self)
+{
+	int i;
+
+	/* Clear the lookup. */
+	if (self->lookup == NULL)
+	{
+		self->lookup = lialg_strdic_new ();
+		if (self->lookup == NULL)
+			return;
+	}
+	else
+		lialg_strdic_clear (self->lookup);
+
+	/* Add the nodes recursively. */
+	for (i = 0 ; i < self->nodes.count ; i++)
+		private_rebuild_lookup_node (self, self->nodes.array[i]);
+}
+
+static void private_rebuild_lookup_node (
+	LIMdlPoseSkeleton* self,
+	LIMdlNode*         node)
+{
+	int i;
+
+	/* Add the node. */
+	if (node->name != NULL)
+	{
+		if (lialg_strdic_find (self->lookup, node->name) == NULL)
+			lialg_strdic_insert (self->lookup, node->name, node);
+	}
+
+	/* Add the child nodes recursively. */
+	for (i = 0 ; i < node->nodes.count ; i++)
+		private_rebuild_lookup_node (self, node->nodes.array[i]);
 }
 
 static void private_transform_node (

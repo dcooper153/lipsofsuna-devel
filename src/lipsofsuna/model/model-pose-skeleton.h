@@ -19,6 +19,7 @@
 #define __MODEL_POSE_SKELETON_H__
 
 #include "lipsofsuna/system.h"
+#include "lipsofsuna/algorithm.h"
 #include "lipsofsuna/math.h"
 #include "model-nodes.h"
 #include "model-types.h"
@@ -27,6 +28,7 @@ typedef struct _LIMdlPoseSkeleton LIMdlPoseSkeleton;
 struct _LIMdlPoseSkeleton
 {
 	LIMdlNodes nodes;
+	LIAlgStrdic* lookup;
 };
 
 LIAPICALL (LIMdlPoseSkeleton*, limdl_pose_skeleton_new, (
