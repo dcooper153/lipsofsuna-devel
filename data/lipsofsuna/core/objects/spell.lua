@@ -74,15 +74,12 @@ end
 --- Updates the spell.
 -- @param self Spell.
 -- @param secs Seconds since the last update.
-Spell.update = function(self, secs)
+Spell.update_server = function(self, secs)
 	if not self:get_visible() then return end
-	if self:has_server_data() then
-		-- Prevent impacts from altering movement.
-		self:set_rotation(self.orig_rotation)
-		self:set_velocity(self.orig_velocity)
-	end
-	-- Update the base class.
-	SimulationObject.update(self, secs)
+	if not self:has_server_data() then return end
+	-- Prevent impacts from altering movement.
+	self:set_rotation(self.orig_rotation)
+	self:set_velocity(self.orig_velocity)
 end
 
 --- Sets the modifiers of the spell.

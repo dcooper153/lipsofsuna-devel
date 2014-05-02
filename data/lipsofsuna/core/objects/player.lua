@@ -139,44 +139,43 @@ end
 --- Updates the state of the player.
 -- @param self Object.
 -- @param secs Seconds since the last update.
-Player.update = function(self, secs)
+Player.update_server = function(self, secs)
 	if not self:get_visible() then return end
-	if self:has_server_data() then
-		if self.client then
-			-- Check for bugged characters just in case.
-			if not self:get_visible() or not self.vision then return self:detach() end
-			-- Prevent sectors from unloading if a player is present.
-			self:refresh(self.vision:get_radius())
-		end
-		-- Update vision.
-		if self.vision then
-			self.vision:update(secs)
-		end
-		-- Update inventory subscriptions.
-		self:update_inventory_subscriptions()
-		-- Verify crafting device distance.
-		if self.crafting_device then
-			if not self:can_reach_object(self.crafting_device) then
-				self:set_crafting_device()
-			end
-		end
-		-- Update the state of the companion.
-		if not self.companion then
-			-- FIXME: Appearance should be customizable.
-			local spec = ActorSpec:find_by_name("companion")
-			if spec then
-				self.companion = Companion(self.manager)
-				self.companion:set_owner(self)
-				self.companion:set_spec(spec)
-				self.companion:randomize()
-			end
-		end
-		if self.companion and not self.companion:get_visible() then
-			self.companion:respawn()
+	if not self:has_server_data() then return end
+	if self.client then
+		-- Check for bugged characters just in case.
+		if not self:get_visible() or not self.vision then return self:detach() end
+		-- Prevent sectors from unloading if a player is present.
+		self:refresh(self.vision:get_radius())
+	end
+	-- Update vision.
+	if self.vision then
+		self.vision:update(secs)
+	end
+	-- Update inventory subscriptions.
+	self:update_inventory_subscriptions()
+	-- Verify crafting device distance.
+	if self.crafting_device then
+		if not self:can_reach_object(self.crafting_device) then
+			self:set_crafting_device()
 		end
 	end
+	-- Update the state of the companion.
+	if not self.companion then
+		-- FIXME: Appearance should be customizable.
+		local spec = ActorSpec:find_by_name("companion")
+		if spec then
+			self.companion = Companion(self.manager)
+			self.companion:set_owner(self)
+			self.companion:set_spec(spec)
+			self.companion:randomize()
+		end
+	end
+	if self.companion and not self.companion:get_visible() then
+		self.companion:respawn()
+	end
 	-- Update the base class.
-	Actor.update(self, secs)
+	Actor.update_server(self, secs)
 end
 
 --- Closes unreachable inventories.

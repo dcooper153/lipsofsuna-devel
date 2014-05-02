@@ -679,27 +679,24 @@ end
 --- Updates the state of the actor.
 -- @param self Actor.
 -- @param secs Seconds since the last update.
-Actor.update = function(self, secs)
-	if not self:get_visible() then return end
-	-- Update the state.
-	if self:has_server_data() then
-		self.update_timer = self.update_timer + secs
-		if self.update_timer > 0.3 then
-			local tick = self.update_timer
-			self:update_modifiers(tick)
-			self.stats:update(tick)
-			self:update_actions(tick)
-			self:update_burdening(tick)
-			self:update_summon(tick)
-			self.update_timer = 0
-		end
+Actor.update_client = function(self, secs)
+	self.render:update(secs)
+end
+
+--- Updates the state of the actor.
+-- @param self Actor.
+-- @param secs Seconds since the last update.
+Actor.update_server = function(self, secs)
+	self.update_timer = self.update_timer + secs
+	if self.update_timer > 0.3 then
+		local tick = self.update_timer
+		self:update_modifiers(tick)
+		self.stats:update(tick)
+		self:update_actions(tick)
+		self:update_burdening(tick)
+		self:update_summon(tick)
+		self.update_timer = 0
 	end
-	-- Update the graphics.
-	if self:has_client_data() then
-		self.render:update(secs)
-	end
-	-- Update the base class.
-	SimulationObject.update(self, secs)
 end
 
 Actor.update_actions = function(self, secs)

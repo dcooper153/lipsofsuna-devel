@@ -29,20 +29,21 @@ MissileSpell.new = function(clss, manager, args)
 	return self
 end
 
-MissileSpell.update = function(self, secs)
-	if self:has_server_data() then
-		-- Adjust rotation.
-		-- Controlling is done by copying the rotation from the caster.
-		self:set_rotation(self.owner:get_rotation() * self.owner.tilt)
-		self.orig_rotation = self:get_rotation()
-		-- Adjust velocity.
-		-- Velocity is smoothed but approaches the target value quickly.
-		local vel = self:get_velocity()
-		self:set_velocity(Vector(0,0,-self.speed):transform(self:get_rotation(), vel):multiply(0.5))
-		self.orig_velocity = vel
-	end
+--- Updates the object.
+-- @param self Object.
+-- @param secs Seconds since the last update.
+MissileSpell.update_server = function(self, secs)
+	-- Adjust rotation.
+	-- Controlling is done by copying the rotation from the caster.
+	self:set_rotation(self.owner:get_rotation() * self.owner.tilt)
+	self.orig_rotation = self:get_rotation()
+	-- Adjust velocity.
+	-- Velocity is smoothed but approaches the target value quickly.
+	local vel = self:get_velocity()
+	self:set_velocity(Vector(0,0,-self.speed):transform(self:get_rotation(), vel):multiply(0.5))
+	self.orig_velocity = vel
 	-- Update the base class.
-	Spell.update(self, secs)
+	Spell.update_server(self, secs)
 end
 
 return MissileSpell

@@ -155,6 +155,12 @@ end
 ObjectManager.update = function(self, secs)
 	self.chunks:update(secs)
 	for k,v in pairs(self.visible_by_id) do
+		if v:has_server_data() then v:update_server(secs) end
+	end
+	for k,v in pairs(self.visible_by_id) do
+		if v:has_client_data() then v:update_client(secs) end
+	end
+	for k,v in pairs(self.visible_by_id) do
 		v:update(secs)
 	end
 end

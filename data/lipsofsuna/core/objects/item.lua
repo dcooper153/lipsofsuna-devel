@@ -207,11 +207,10 @@ end
 --- Updates the state of the item.
 -- @param self Item.
 -- @param secs Seconds since the last update.
-Item.update = function(self, secs)
+Item.update_server = function(self, secs)
 	if self.controller then
 		self.controller:update(secs)
 	end
-	SimulationObject.update(self, secs)
 end
 
 --- Gets the stack count of the item.

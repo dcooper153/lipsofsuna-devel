@@ -458,7 +458,6 @@ end
 -- @param self Object.
 -- @param secs Seconds since the last update.
 SimulationObject.update = function(self, secs)
-	if not self:get_visible() then return end
 	-- Update actions.
 	if self.actions then
 		for k in pairs(self.actions) do
@@ -469,6 +468,18 @@ SimulationObject.update = function(self, secs)
 	end
 	-- Update hooks.
 	Main.objects.object_update_hooks:call(self, secs)
+end
+
+--- Updates the object.
+-- @param self Object.
+-- @param secs Seconds since the last update.
+SimulationObject.update_client = function(self, secs)
+end
+
+--- Updates the object.
+-- @param self Object.
+-- @param secs Seconds since the last update.
+SimulationObject.update_server = function(self, secs)
 end
 
 --- Sets the dialog state of the object.

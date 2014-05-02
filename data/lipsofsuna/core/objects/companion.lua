@@ -44,28 +44,26 @@ end
 --- Updates the state of the companion.
 -- @param self Object.
 -- @param secs Seconds since the last update.
-Companion.update = function(self, secs)
-	if self:has_server_data() then
-		-- Hide ownerless companions.
-		if not self.owner or not self.owner:get_visible() then
-			self:detach()
-			return
-		end
-		-- Calculate the distance to the owner.
-		local pos
-		local pos_owner = self.owner:get_position()
-		if self:get_visible() then
-			pos = self:get_position()
-		else
-			pos = pos_owner:copy():add(100000, 0, 0)
-		end
-		-- Respawn near the owner if too far away.
-		if (pos - pos_owner).length > 10 then
-			self:respawn()
-		end
+Companion.update_server = function(self, secs)
+	-- Hide ownerless companions.
+	if not self.owner or not self.owner:get_visible() then
+		self:detach()
+		return
+	end
+	-- Calculate the distance to the owner.
+	local pos
+	local pos_owner = self.owner:get_position()
+	if self:get_visible() then
+		pos = self:get_position()
+	else
+		pos = pos_owner:copy():add(100000, 0, 0)
+	end
+	-- Respawn near the owner if too far away.
+	if (pos - pos_owner).length > 10 then
+		self:respawn()
 	end
 	-- Update the base class.
-	Actor.update(self, secs)
+	Actor.update_server(self, secs)
 end
 
 --- Sets the owner of the companion.

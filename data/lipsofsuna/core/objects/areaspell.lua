@@ -31,37 +31,33 @@ end
 AreaSpell.contact_cb = function(self, args)
 end
 
-AreaSpell.update = function(self, secs)
-	if not self:get_visible() then return end
-	if self:has_server_data() then
-		-- Update periodically.
-		self.timer = self.timer + secs
-		if self.timer < 0.5 then return end
-		self.timer = self.timer - 0.5
-		-- Apply the feat to each nearby object.
-		local objs = Main.objects:find_by_point(self:get_position():copy():add_xyz(0,1,0), self.radius)
-		for k,v in pairs(objs) do
-			if v:get_visible() and v.class_name ~= "AreaSpell" then
-				local damage = Damage()
-				damage:add_spell_modifiers(self.modifiers)
-				damage:apply_defender_vulnerabilities(v)
-				Main.combat_utils:apply_damage_to_actor(self.owner, v, damage, v:get_position())
-			end
-		end
-		-- Detach after timeout.
-		self.duration = self.duration - 0.5
-		if self.duration <= 0 then
-			self:detach()
+AreaSpell.update_client = function(self, secs)
+	-- Play the starting effect.
+	if self.started then return end
+	self.started = true
+	if not self.spec.effect then return end
+	Client.effects:play_object(self.spec.effect, self)
+end
+
+AreaSpell.update_server = function(self, secs)
+	-- Update periodically.
+	self.timer = self.timer + secs
+	if self.timer < 0.5 then return end
+	self.timer = self.timer - 0.5
+	-- Apply the feat to each nearby object.
+	local objs = Main.objects:find_by_point(self:get_position():copy():add_xyz(0,1,0), self.radius)
+	for k,v in pairs(objs) do
+		if v:get_visible() and v.class_name ~= "AreaSpell" then
+			local damage = Damage()
+			damage:add_spell_modifiers(self.modifiers)
+			damage:apply_defender_vulnerabilities(v)
+			Main.combat_utils:apply_damage_to_actor(self.owner, v, damage, v:get_position())
 		end
 	end
-	-- Play the starting effect.
-	if self:has_client_data() then
-		if not self.started then
-			self.started = true
-			if self.spec.effect then
-				Client.effects:play_object(self.spec.effect, self)
-			end
-		end
+	-- Detach after timeout.
+	self.duration = self.duration - 0.5
+	if self.duration <= 0 then
+		self:detach()
 	end
 end
 
