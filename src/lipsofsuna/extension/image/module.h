@@ -22,6 +22,7 @@
 #include "image.h"
 
 #define LIEXT_SCRIPT_IMAGE "Image"
+#define LIEXT_SCRIPT_IMAGE_LOADER "ImageLoader"
 
 typedef struct _LIExtImageModule LIExtImageModule;
 struct _LIExtImageModule
@@ -42,6 +43,9 @@ void liext_image_module_get_memstat (
 /*****************************************************************************/
 
 void liext_script_image (
+	LIScrScript* self);
+
+void liext_script_image_loader (
 	LIScrScript* self);
 
 #endif

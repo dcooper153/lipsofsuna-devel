@@ -45,7 +45,9 @@ LIExtImageModule* liext_image_module_new (
 
 	/* Register classes. */
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_IMAGE, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_IMAGE_LOADER, self);
 	liext_script_image (program->script);
+	liext_script_image_loader (program->script);
 
 	return self;
 }

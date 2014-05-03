@@ -18,6 +18,7 @@
 #ifndef __EXT_IMAGE_IMAGE_H__
 #define __EXT_IMAGE_IMAGE_H__
 
+#include "lipsofsuna/math.h"
 #include "color.h"
 
 typedef struct _LIImgImage LIImgImage;
