@@ -159,6 +159,25 @@ ChatCommand{
 	end}
 
 ChatCommand{
+	name = "prof",
+	description = "Shows profiling data.",
+	pattern = "^/prof$",
+	handler = "client",
+	func = function(player, matches)
+		Ui:set_state("admin/profiling")
+	end}
+
+ChatCommand{
+	name = "prof_reset",
+	description = "Resets profiling data.",
+	pattern = "^/prof_reset$",
+	handler = "client",
+	func = function(player, matches)
+		Main.timing:reset_profiling()
+		Client:append_log("Profiling reset")
+	end}
+
+ChatCommand{
 	name = "revoke_admin",
 	description = "Revoke admin privileges from the given account.",
 	pattern = "^/revoke_admin ([a-zA-Z0-9]*)$",
@@ -310,16 +329,6 @@ ChatCommand{
 	handler = "server",
 	func = function(player, matches)
 		Server.events:stop_event(matches[1])
-	end}
-
-ChatCommand{
-	name = "reset_profiling",
-	description = "Resets profiling data.",
-	pattern = "^/reset_profiling$",
-	handler = "client",
-	func = function(player, matches)
-		Main.timing:reset_profiling()
-		Client:append_log("Profiling reset")
 	end}
 
 ChatCommand{

@@ -25,9 +25,6 @@ Terrain chunks: %d
 Terrain memory: %d kB
 Model count: %d
 Model memory: %d kB
-
-%s
-
 Rendered batches: %d
 Rendered faces: %d
 Allocated attachments: %d
@@ -38,7 +35,7 @@ Allocated textures: %d/%d : %dkB
 Allocated materials: %d/%d
 ]], Main.timing:get_fps(), Program:get_fps(), Database:get_memory_used() / 1024, collectgarbage("count") / 1024,
 Main.terrain.terrain:get_chunk_count(), Main.terrain.terrain:get_memory_used() / 1024,
-models, model_mem / 1024, Main.timing:get_profiling_string(),
+models, model_mem / 1024,
 stats.batch_count, stats.face_count, stats.attachment_count, stats.entity_count, stats.mesh_count,
 stats.mesh_memory / 1000, stats.skeleton_count, stats.texture_count_loaded, stats.texture_count,
 stats.texture_memory / 1000, stats.material_count_loaded, stats.material_count)
