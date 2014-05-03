@@ -273,7 +273,7 @@ ClientRenderObject.update = function(self, secs)
 				-- The result is handled in the tick handler below.
 				ModelBuilder:build_for_actor(self.object)
 				-- Build the character texture in a separate thread.
-				TextureBuilder:build_for_actor(self.object)
+				self.object.texture_builder = TextureBuilder(self.object)
 			end
 		end
 	end
@@ -293,13 +293,17 @@ ClientRenderObject.update = function(self, secs)
 	--
 	-- Textures are built asynchronously similar to models. The build result
 	-- is handled here.
-	if self.object.image_merger then
-		local image = self.object.image_merger:pop_image()
-		if image then
-			local spec = self.object:get_spec()
-			local base = spec:get_base_texture()
-			if base then
-				self:add_texture_alias(base, image)
+	if self.object.texture_builder then
+		local builder = self.object.texture_builder
+		if builder:update(secs) then
+			self.object.texture_builder = nil
+			local image = builder:pop_image()
+			if image then
+				local spec = self.object:get_spec()
+				local base = spec:get_base_texture()
+				if base then
+					self:add_texture_alias(base, image)
+				end
 			end
 		end
 	end

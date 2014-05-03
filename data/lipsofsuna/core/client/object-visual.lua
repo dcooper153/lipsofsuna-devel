@@ -21,7 +21,6 @@ local RenderObject = require("system/render-object")
 local RenderUtils = require("core/client/render-utils")
 local SoftbodyEffect = require("core/effect/softbody-effect")
 local SpeedlineEffect = require("core/effect/speedline-effect")
-local TextureBuilder = require("character/texture-builder")
 
 --- Visuals of a specific object.
 -- @type ObjectVisual

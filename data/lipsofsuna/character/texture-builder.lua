@@ -20,82 +20,101 @@ local Serialize = require("system/serialize")
 -- @type TextureBuilder
 local TextureBuilder = Class("TextureBuilder")
 
---- Builds the textures for the given actor.
+--- Creates a new texture builder.
 -- @param clss TextureBuilder class.
 -- @param object Object whose texture to build.
--- @return True if should reuse the old model.
-TextureBuilder.build_for_actor = function(clss, object)
-	if not object.spec then return end
-	if not object.spec.models then return end
-	-- Create the equipment list.
-	local equipment = {}
-	for k,v in pairs(object.inventory.equipped) do
-		local item = object.inventory:get_object_by_index(v)
-		equipment[k] = item.spec.name
+-- @return TextureBuilder.
+TextureBuilder.new = function(clss, object)
+	local self = Class.new(clss)
+	local spec = object:get_spec()
+	if spec and spec.models then
+		self.object = object
+		self.merger = ImageMerger()
+		self.coroutine = coroutine.create(self.__main)
+		local ret,err = coroutine.resume(self.coroutine, self, spec)
+		if not ret then print(debug.traceback(self.coroutine, "ERROR: " .. err)) end
+		if coroutine.status(self.coroutine) == "dead" then self.coroutine = nil end
 	end
-	-- Create or reuse the image merger.
-	local merger = object.image_merger
-	if not merger then
-		merger = ImageMerger()
-		object.image_merger = merger
-	end
-	-- Build the character textures.
-	-- The result is handled in the update handler of Chargen.
-	local hash,reuse = clss:build_with_merger(merger, {
-		beheaded = object:get_beheaded(),
-		body_scale = object.body_scale,
-		body_sliders = object.body_sliders,
-		brow_style = object.brow_style,
-		equipment = equipment,
-		eye_color = Color:ubyte_to_float(object.eye_color),
-		eye_style = object.eye_style,
-		face_style = object.face_style,
-		hair_color = Color:ubyte_to_float(object.hair_color),
-		hair_style = object.hair_style,
-		head_style = object.head_style,
-		mouth_style = object.mouth_style,
-		nudity = Client.options.nudity_enabled,
-		skin_color = Color:ubyte_to_float(object.skin_color),
-		skin_style = object.skin_style,
-		spec = object:get_spec()}, object.texture_build_hash)
-	object.texture_build_hash = hash
-	return reuse
+	return self
 end
 
---- Builds the texture for the given object.
---
--- If the hash argument is given, the texture building is skipped if the new
--- texture has the given has.
---
--- @param clss TextureBuilder class.
--- @param merger Image merger to use.
--- @param args Image building arguments.
--- @param hash Hash of the old texture, or nil.
--- @return hash Hash of the new texture.
-TextureBuilder.build_with_merger = function(clss, merger, args, hash)
+--- Updates the texture builder.
+-- @param self TextureBuilder.
+-- @param secs Seconds since the last update.
+-- @return True if done. False otherwise.
+TextureBuilder.update = function(self, secs)
+	-- Update the image loader.
+	if self.coroutine then
+		local ret,err = coroutine.resume(self.coroutine, secs)
+		if not ret then print(debug.traceback(self.coroutine, "ERROR: " .. err)) end
+		if coroutine.status(self.coroutine) ~= "dead" then return end
+		self.coroutine = nil
+	end
+	-- Update the image merger.
+	if self.merger then
+		local image = self.merger:pop_image()
+		if not image then return end
+		self.merger = nil
+		self.result = image
+	end
+	return true
+end
+
+--- Pops the finished image.
+-- @param self TextureBuilder.
+-- @return Image on success. Nil otherwise.
+TextureBuilder.pop_image = function(self)
+	local r = self.result
+	self.result = nil
+	return r
+end
+
+--- The main function of the image loader coroutine.
+-- @param self TextureBuilder.
+-- @param spec ActorSpec.
+TextureBuilder.__main = function(self, spec)
+	local merger = self.merger
+	local object = self.object
+	local hash = object.texture_build_hash
+	-- Get the appearance variables.
+	local beheaded = object:get_beheaded()
+	local body_scale = object.body_scale
+	local body_sliders = object.body_sliders
+	local brow_style = object.brow_style
+	local eye_color = Color:ubyte_to_float(object.eye_color)
+	local eye_style = object.eye_style
+	local face_style = object.face_style
+	local hair_color = Color:ubyte_to_float(object.hair_color)
+	local hair_style = object.hair_style
+	local head_style = object.head_style
+	local mouth_style = object.mouth_style
+	local nudity = Client.options.nudity_enabled
+	local skin_color = Color:ubyte_to_float(object.skin_color)
+	local skin_style = object.skin_style
 	-- Find the equipment specs.
-	local equipment = {}
-	if args.equipment then
-		for slot,name in pairs(args.equipment) do
-			local spec = Itemspec:find_by_name(name)
-			if spec then
-				table.insert(equipment, spec)
+	local specs = {}
+	for slot,index in pairs(object.inventory.equipped) do
+		local item = object.inventory:get_object_by_index(index)
+		if item then
+			local spec1 = item:get_spec()
+			if spec1 then
+				table.insert(specs, spec1)
 			end
 		end
 	end
 	-- Find the haircut spec.
-	if args.hair_style and args.hair_style ~= "" then
-		local spec = HairStyleSpec:find_by_name(args.hair_style)
-		if spec then
-			table.insert(equipment, spec)
+	if hair_style and hair_style ~= "" then
+		local spec1 = HairStyleSpec:find_by_name(hair_style)
+		if spec1 then
+			table.insert(specs, spec1)
 		end
 	end
 	-- Sort the specs by priority.
-	table.sort(equipment, function(a,b) return a.equipment_priority < b.equipment_priority end)
-	-- Add the equipment textures.
+	table.sort(specs, function(a,b) return a.equipment_priority < b.equipment_priority end)
+	-- Find the equipment textures.
 	local textures = {}
-	for i,spec in ipairs(equipment) do
-		local tex = spec:get_equipment_textures(args.spec.equipment_class or args.spec.name, lod)
+	for i,spec1 in ipairs(specs) do
+		local tex = spec1:get_equipment_textures(spec.equipment_class or spec.name, lod)
 		if tex then
 			for k,v in pairs(tex) do
 				if textures[k] then
@@ -107,34 +126,25 @@ TextureBuilder.build_with_merger = function(clss, merger, args, hash)
 		end
 	end
 	-- Build and compare the hash.
-	local hash1 = Serialize:write{
-		args.brow_style,
-		args.skin_style,
-		args.skin_color,
-		args.face_style,
-		args.eye_style,
-		args.eye_color,
-		args.mouth_style,
-		textures}
-	if hash1 == hash then
-		return hash, true
-	end
+	local hash1 = Serialize:write{brow_style, skin_style, skin_color, face_style, eye_style, eye_color, mouth_style, textures}
+	if hash1 == hash then return end
 	-- Set the base texture.
-	local basename = args.spec:get_base_texture()
+	local basename = spec:get_base_texture()
 	if not basename then return end
-	local skinspec = args.skin_style and Actorskinspec:find_by_name(args.skin_style)
+	local skinspec = skin_style and Actorskinspec:find_by_name(skin_style)
 	local skinname = skinspec and skinspec.textures[1] or basename
 	local base = Main.images:copy_by_name(skinname)
 	if not base then return end
 	merger:replace(base)
-	if args.skin_color then
-		merger:add_hsv_weightv(args.skin_color[1], -1 + 2 * args.skin_color[2], -1 + 2 * args.skin_color[3])
+	if skin_color then
+		merger:add_hsv_weightv(skin_color[1], -1 + 2 * skin_color[2], -1 + 2 * skin_color[3])
 	end
 	-- Blit the face textures.
-	clss:merge_actor_texture(merger, args.face_style, args)
-	clss:merge_actor_texture(merger, args.mouth_style, args)
-	clss:merge_actor_texture(merger, args.brow_style, args)
-	clss:merge_actor_texture(merger, args.eye_style, args)
+	local colors = {eye_color = eye_color, hair_color = hair_color, skin_color = skin_color}
+	self:__merge_colored(face_style, colors)
+	self:__merge_colored(mouth_style, colors)
+	self:__merge_colored(brow_style, colors)
+	self:__merge_colored(eye_style, colors)
 	-- Blit the additional textures.
 	local blits = textures[basename]
 	if blits then
@@ -146,15 +156,14 @@ TextureBuilder.build_with_merger = function(clss, merger, args, hash)
 		end
 	end
 	merger:finish()
-	return hash1
+	object.texture_build_hash = hash1
 end
 
 --- Adds an actor texture to the texture merger.
--- @param clss TextureBuilder class.
--- @param merger ImageMerger.
+-- @param self TextureBuilder.
 -- @param name ActorTextureSpec name.
--- @param args Image building arguments.
-TextureBuilder.merge_actor_texture = function(clss, merger, name, args)
+-- @param colors Color dictionary.
+TextureBuilder.__merge_colored = function(self, name, colors)
 	if not name then return end
 	local spec = ActorTextureSpec:find_by_name(name)
 	if not spec then return end
@@ -165,8 +174,9 @@ TextureBuilder.merge_actor_texture = function(clss, merger, name, args)
 	local src = dst and spec.blit_src or {0, 0, 10000, 10000}
 	local color = nil
 	if spec.color == "eye_color" or spec.color == "skin_color" then
-		color = args[spec.color]
+		color = colors[spec.color]
 	end
+	local merger = self.merger
 	if color then
 		if spec.blit_mode == "hsv_add_weightv" then
 			if dst then
