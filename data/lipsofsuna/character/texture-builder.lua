@@ -16,6 +16,8 @@ local Image = require("system/image")
 local ImageMerger = require("system/image-merger")
 local Serialize = require("system/serialize")
 
+local yield = coroutine.yield
+
 --- Builds character textures.
 -- @type TextureBuilder
 local TextureBuilder = Class("TextureBuilder")
@@ -73,7 +75,6 @@ end
 -- @param self TextureBuilder.
 -- @param spec ActorSpec.
 TextureBuilder.__main = function(self, spec)
-	local merger = self.merger
 	local object = self.object
 	local hash = object.texture_build_hash
 	-- Get the appearance variables.
@@ -102,6 +103,7 @@ TextureBuilder.__main = function(self, spec)
 			end
 		end
 	end
+	yield()
 	-- Find the haircut spec.
 	if hair_style and hair_style ~= "" then
 		local spec1 = HairStyleSpec:find_by_name(hair_style)
@@ -109,8 +111,10 @@ TextureBuilder.__main = function(self, spec)
 			table.insert(specs, spec1)
 		end
 	end
+	yield()
 	-- Sort the specs by priority.
 	table.sort(specs, function(a,b) return a.equipment_priority < b.equipment_priority end)
+	yield()
 	-- Find the equipment textures.
 	local textures = {}
 	for i,spec1 in ipairs(specs) do
@@ -124,20 +128,25 @@ TextureBuilder.__main = function(self, spec)
 				end
 			end
 		end
+		yield()
 	end
 	-- Build and compare the hash.
 	local hash1 = Serialize:write{brow_style, skin_style, skin_color, face_style, eye_style, eye_color, mouth_style, textures}
 	if hash1 == hash then return end
+	yield()
 	-- Set the base texture.
 	local basename = spec:get_base_texture()
 	if not basename then return end
 	local skinspec = skin_style and Actorskinspec:find_by_name(skin_style)
 	local skinname = skinspec and skinspec.textures[1] or basename
-	local base = Main.images:copy_by_name(skinname)
+	local base = Main.images:find_by_name_async(skinname, yield)
 	if not base then return end
+	local merger = self.merger
 	merger:replace(base)
+	yield()
 	if skin_color then
 		merger:add_hsv_weightv(skin_color[1], -1 + 2 * skin_color[2], -1 + 2 * skin_color[3])
+		yield()
 	end
 	-- Blit the face textures.
 	local colors = {eye_color = eye_color, hair_color = hair_color, skin_color = skin_color}
@@ -149,14 +158,16 @@ TextureBuilder.__main = function(self, spec)
 	local blits = textures[basename]
 	if blits then
 		for k,blitname in ipairs(blits) do
-			local blit = Main.images:copy_by_name(blitname)
+			local blit = Main.images:find_by_name_async(blitname, yield)
 			if blit then
 				merger:blit(blit)
 			end
+			yield()
 		end
 	end
 	merger:finish()
 	object.texture_build_hash = hash1
+	yield()
 end
 
 --- Adds an actor texture to the texture merger.
@@ -168,7 +179,7 @@ TextureBuilder.__merge_colored = function(self, name, colors)
 	local spec = ActorTextureSpec:find_by_name(name)
 	if not spec then return end
 	if not spec.blit_texture then return end
-	local blit = Main.images:copy_by_name(spec.blit_texture)
+	local blit = Main.images:find_by_name_async(spec.blit_texture, yield)
 	if not blit then return end
 	local dst = spec.blit_dst
 	local src = dst and spec.blit_src or {0, 0, 10000, 10000}
@@ -177,6 +188,7 @@ TextureBuilder.__merge_colored = function(self, name, colors)
 		color = colors[spec.color]
 	end
 	local merger = self.merger
+	yield()
 	if color then
 		if spec.blit_mode == "hsv_add_weightv" then
 			if dst then
@@ -198,6 +210,7 @@ TextureBuilder.__merge_colored = function(self, name, colors)
 			merger:blit(blit)
 		end
 	end
+	yield()
 end
 
 return TextureBuilder
