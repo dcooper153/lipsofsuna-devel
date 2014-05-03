@@ -28,6 +28,7 @@ end
 -- @param self Timing.
 Timing.reset_profiling = function(self)
 	self.action_times = {}
+	self.worst_time = nil
 end
 
 --- Starts an action.
@@ -39,12 +40,12 @@ Timing.start_action = function(self, name)
 	if self.__action_start then
 		local name = self.__action_name
 		local delta = time - self.__action_start
-		local action = self.action_times[name] or {delta, delta, delta, 0, 0}
+		local action = self.action_times[name] or {delta, delta, delta, 0, 0, 0}
 		action[1] = delta
 		action[2] = math.min(action[2], delta)
 		action[3] = math.max(action[3], delta)
-		action[4] = action[4] + delta
-		action[5] = action[5] + 1
+		action[5] = action[5] + delta
+		action[6] = action[6] + 1
 		self.action_times[name] = action
 	end
 	-- Start the next action.
@@ -55,11 +56,19 @@ end
 --- Starts a frame.
 -- @param self Timing.
 Timing.start_frame = function(self)
+	-- Calculate the previous frame duration.
 	local time = Program:get_time()
 	if self.__frame_start then
 		self.frame_time = time - self.__frame_start
 	end
 	self.__frame_start = time
+	-- Update the worst frame timings.
+	if not self.worst_time or self.worst_time < self.frame_time then
+		self.worst_time = self.frame_time
+		for k,v in pairs(self.action_times) do
+			v[4] = v[1]
+		end
+	end
 end
 
 --- Gets the FPS of the last frame.
@@ -80,14 +89,15 @@ end
 --
 -- This function returns the last, best, worst and average action timings
 -- that have occurred during the execution of the game. The return value
--- is a list consisting of {name, last, best, worst, average} tables.
+-- is a list consisting of {name, last, best, worst, average, worst_frame}
+-- tables.
 --
 -- @param self Timing.
 -- @return List of tables.
 Timing.get_profiling_data = function(self)
 	local res = {}
 	for k,v in pairs(self.action_times) do
-		table.insert(res, {k, v[1], v[2], v[3], v[4] / v[5]})
+		table.insert(res, {k, v[1], v[2], v[3], v[4], v[5] / v[6]})
 	end
 	table.sort(res, function(a,b) return a[1] < b[1] end)
 	return res
@@ -99,10 +109,10 @@ end
 Timing.get_profiling_string = function(self)
 	local res = {}
 	for k,v in ipairs(self:get_profiling_data()) do
-		table.insert(res, string.format("%9s: %6.1f %6.1f %6.1f %6.1f ms",
-			v[1], v[2] * 1000, v[3] * 1000, v[4] * 1000, v[5] * 1000))
+		table.insert(res, string.format("%9s: %6.1f %6.1f %6.1f %6.1f %6.1f",
+			v[1], v[2] * 1000, v[3] * 1000, v[4] * 1000, v[5] * 1000, v[6] * 1000))
 	end
-	return string.format("%9s  %6s %6s %6s %6s\n", "Action", "Last", "Best", "Worst", "Average") ..
+	return string.format("%9s  %6s %6s %6s %6s %6s\n", "Action", "Last", "Best", "Worst", "WorstF", "Avg.") ..
 	       table.concat(res, "\n")
 end
 
