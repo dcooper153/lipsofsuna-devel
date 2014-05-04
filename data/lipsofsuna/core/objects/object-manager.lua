@@ -154,12 +154,15 @@ end
 -- @param secs Seconds since the last update.
 ObjectManager.update = function(self, secs)
 	self.chunks:update(secs)
+	Main.timing:start_action("objectS")
 	for k,v in pairs(self.visible_by_id) do
 		if v:has_server_data() then v:update_server(secs) end
 	end
+	Main.timing:start_action("objectC")
 	for k,v in pairs(self.visible_by_id) do
 		if v:has_client_data() then v:update_client(secs) end
 	end
+	Main.timing:start_action("objectG")
 	for k,v in pairs(self.visible_by_id) do
 		v:update(secs)
 	end

@@ -126,6 +126,7 @@ end
 -- @param secs Seconds since the last update.
 TerrainManager.update = function(self, secs)
 	-- Load chunks on demand.
+	Main.timing:start_action("terrainL")
 	table.sort(self.__load_priorities, function(a, b) return a[1] < b[1] end)
 	for k,v in ipairs(self.__load_priorities) do
 		local c = self.chunks[v[2]]
@@ -134,9 +135,11 @@ TerrainManager.update = function(self, secs)
 	end
 	self.__load_priorities = {}
 	-- Unload chunks on demand.
+	Main.timing:start_action("terrainC")
 	ChunkManager.update(self, secs)
 	-- Build chunk models on demand.
 	if self.graphics and self.__view_center then
+		Main.timing:start_action("terrainG")
 		-- Find the closest chunk that needs a model built.
 		self:refresh_models_by_point(self.__view_center, self.__view_distance)
 		local fx,fz = self:get_chunk_xz_by_point(self.__view_center.x, self.__view_center.z)
