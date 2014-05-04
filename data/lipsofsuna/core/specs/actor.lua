@@ -13,6 +13,7 @@ local AnimationProfileSpec = require("core/specs/animation-profile")
 local Class = require("system/class")
 local Color = require("system/color")
 local EffectProfileSpec = require("core/specs/effect-profile")
+local FactionSpec = require("core/specs/faction")
 local HairStyleSpec = require("core/specs/hair-style")
 local Spec = require("core/specs/spec")
 
@@ -67,7 +68,7 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "eye_color", type = "color", description = "Eye color."},
 	{name = "eye_style", type = "string", description = "Eye style."},
 	{name = "face_style", type = "string", description = "Face style."},
-	{name = "factions", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of factions.", details = {keys = {spec = "Factionspec"}}},
+	{name = "factions", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of factions.", details = {keys = {spec = "FactionSpec"}}},
 	{name = "falling_damage_rate", type = "number", default = 10, description = "Number of points of damage per every meters per second exceeding the falling damage speed."},
 	{name = "falling_damage_speed", type = "number", default = 10, description = "Speed in meters per seconds after which the actor starts taking falling damage."},
 	{name = "footstep_height", type = "number", description = "Footstep height."},
@@ -166,7 +167,7 @@ end
 Actorspec.check_enemy = function(self, object)
 	if object.spec.type ~= "actor" then return end
 	for name1 in pairs(self.factions) do
-		local spec1 = Factionspec:find{name = name1}
+		local spec1 = FactionSpec:find_by_name(name1)
 		if spec1 then
 			for name2 in pairs(object.spec.factions) do
 				if spec1.enemies[name2] then
@@ -392,7 +393,7 @@ Actorspec.set_factions = function(self, args)
 	if args then
 		self.factions = {}
 		for k,v in pairs(args) do
-			self.factions[v] = Factionspec:find{name = v}
+			self.factions[v] = FactionSpec:find_by_name(v)
 		end
 	end
 end

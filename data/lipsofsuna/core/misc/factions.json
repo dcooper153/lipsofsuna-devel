@@ -1,0 +1,22 @@
+[
+	{
+		"type": "FactionSpec",
+		"name": "good",
+		"enemies":
+		{
+			"evil": true
+		}
+	},
+	{
+		"type": "FactionSpec",
+		"name": "neutral"
+	},
+	{
+		"type": "FactionSpec",
+		"name": "evil",
+		"enemies":
+		{
+			"good": true
+		}
+	}
+]

@@ -1,4 +1,4 @@
---- TODO:doc
+--- Faction specification.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -6,35 +6,35 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.faction
--- @alias Factionspec
+-- @alias FactionSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
---- TODO:doc
--- @type Factionspec
-Factionspec = Spec:register("Factionspec", "faction", {
+--- Faction specification.
+-- @type FactionSpec
+local FactionSpec = Spec:register("FactionSpec", "faction", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-	{name = "enemies", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of enemy faction names.", details = {keys = {spec = "Factionspec"}}}
+	{name = "enemies", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of enemy faction names.", details = {keys = {spec = "FactionSpec"}}}
 })
 
 --- Creates a new faction.
--- @param clss Factionspec class.
+-- @param clss FactionSpec class.
 -- @param args Arguments.
--- @return Faction spec.
-Factionspec.new = function(clss, args)
+-- @return FactionSpec.
+FactionSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
 
 --- Adds an enemy faction.
--- @param self Faction spec.
+-- @param self FactionSpec.
 -- @param args Arguments.<ul>
 --   <li>name: Faction name.</li></ul>
-Factionspec.add_enemy = function(self, args)
+FactionSpec.add_enemy = function(self, args)
 	self.enemies[args.name] = true
 end
 
-
+return FactionSpec
