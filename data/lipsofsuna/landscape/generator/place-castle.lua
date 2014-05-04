@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local PlaceGenerator = require("landscape/generator/place-generator")
+local TerrainChunk = require("system/terrain-chunk")
 local TerrainMaterialSpec = require("core/specs/terrain-material")
 
 --- Castle generator.
@@ -106,44 +107,42 @@ PlaceCastle.generate = function(self, chunk, params)
 	local t = chunk.manager.terrain
 	local ms = TerrainMaterialSpec:find_by_name("brick")
 	local m = ms and ms.id
+	local chk = TerrainChunk(w)
 	-- Create the floor.
-	for z = 0,w-1 do
-		for x = 0,w-1 do
-			t:add_stick(chunk.x + x, chunk.z + z, 0, params[2], 3)
-			t:add_stick(chunk.x + x, chunk.z + z, params[2], 1, m)
-		end
-	end
+	chk:add_box(0, 0, w-1, w-1, 0, params[2], 3)
+	chk:add_box(0, 0, w-1, w-1, params[2], 1, m)
 	-- Create the west wall.
 	local t1,p1 = self.__planner:get_chunk_type(chunk.x / w - 1, chunk.z / w)
 	if t1 ~= "castle" then
 		for z = 0,w-1 do
-			t:add_stick(chunk.x, chunk.z + z, params[2], params[3] + (z % 2), m)
+			chk:add_stick(0, z, params[2], params[3] + (z % 2), m)
 		end
 	end
 	-- Create the east wall.
 	local t2,p2 = self.__planner:get_chunk_type(chunk.x / w + 1, chunk.z / w)
 	if t2 ~= "castle"  then
 		for z = 0,w-1 do
-			t:add_stick(chunk.x + w - 1, chunk.z + z, params[2], params[3] + (z % 2), m)
+			chk:add_stick(w-1, z, params[2], params[3] + (z % 2), m)
 		end
 	end
 	-- Create the south wall.
 	local t3,p3 = self.__planner:get_chunk_type(chunk.x / w, chunk.z / w - 1)
 	if t3 ~= "castle"  then
 		for x = 0,w-1 do
-			t:add_stick(chunk.x + x, chunk.z, params[2], params[3] + (x % 2), m)
+			chk:add_stick(x, 0, params[2], params[3] + (x % 2), m)
 		end
 	end
 	-- Create the north wall.
 	local t4,p4 = self.__planner:get_chunk_type(chunk.x / w, chunk.z / w + 1)
 	if t4 ~= "castle"  then
 		for x = 0,w-1 do
-			t:add_stick(chunk.x + x, chunk.z + w - 1, params[2], params[3] + (x % 2), m)
+			chk:add_stick(x, w-1, params[2], params[3] + (x % 2), m)
 		end
-		local door = chunk.x + math.floor(w/2)
-		t:add_stick(door, chunk.z + w - 1, params[2] + 1, params[3]/2, 0)
-		t:add_stick(door+1, chunk.z + w - 1, params[2] + 1, params[3]/2, 0)
+		local door = math.floor(w/2)
+		chk:add_box(door, w-1, door+1, w-1, params[2] + 1, params[3]/2, 0)
 	end
+	-- Write the chunk.
+	t:set_chunk(chunk.x, chunk.z, chk)
 	-- Create NPCs.
 	-- TODO: Plan what NPCs to place in which sector.
 	local p = Vector(chunk.x + math.random(1, w-2), 0.0, chunk.z + math.random(1, w-2))

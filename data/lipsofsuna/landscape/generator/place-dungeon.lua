@@ -12,6 +12,7 @@ local Bitwise = require("system/bitwise")
 local Class = require("system/class")
 local PlaceDefault = require("landscape/generator/place-default")
 local Noise = require("system/noise")
+local TerrainChunk = require("system/terrain-chunk")
 local TerrainMaterialSpec = require("core/specs/terrain-material")
 
 --- Dungeon generator.
@@ -245,25 +246,20 @@ PlaceDungeon.generate_entrance = function(self, chunk, params)
 	local m = ms and ms.id
 	local y = params[2]
 	local h = params[3]
+	local chk = TerrainChunk(w)
 	-- Generate the surface normally.
 	local surface = self.__planner:get_chunk_surface(chunk)
-	self:generate_terrain(chunk, surface)
+	self:generate_terrain(chunk, surface, chk)
 	-- Create the floor and ceiling.
-	t:add_box(
-		chunk.x, chunk.z,
-		chunk.x + w - 1, chunk.z + w - 1,
-		y - 1, h + 2, m)
-	-- Create the empty space.
-	t:add_box(
-		chunk.x, chunk.z,
-		chunk.x + w - 1, chunk.z + w - 1,
-		y, h, 0)
+	chk:add_box(0, 0, w-1, w-1, y-1, h+2, m)
+	chk:add_box(0, 0, w-1, w-1, y, h, 0)
 	-- Create the corner pillars.
-	t:add_stick(chunk.x        , chunk.z        , y, h, m)
-	t:add_stick(chunk.x + w - 1, chunk.z        , y, h, m)
-	t:add_stick(chunk.x        , chunk.z + w - 1, y, h, m)
-	t:add_stick(chunk.x + w - 1, chunk.z + w - 1, y, h, m)
+	chk:add_stick(0  , 0  , y, h, m)
+	chk:add_stick(w-1, 0  , y, h, m)
+	chk:add_stick(0  , w-1, y, h, m)
+	chk:add_stick(w-1, w-1, y, h, m)
 	-- Smoothen the surface.
+	t:set_chunk(chunk.x, chunk.z, chk)
 	for x = chunk.x-1,chunk.x+w do
 		for z = chunk.z-1,chunk.z+w do
 			t:calculate_smooth_normals(x, z)
@@ -277,12 +273,12 @@ end
 -- @param params Place parameters as set by plan().
 PlaceDungeon.generate_corridor = function(self, chunk, params)
 	-- Generate the surface normally.
-	local surface = self.__planner:get_chunk_surface(chunk)
-	self:generate_terrain(chunk, surface)
-	self:generate_plants(chunk, surface)
-	-- Create the dungeon space.
-	local w = chunk.manager.chunk_size
 	local t = chunk.manager.terrain
+	local w = chunk.manager.chunk_size
+	local chk = TerrainChunk(w)
+	local surface = self.__planner:get_chunk_surface(chunk)
+	self:generate_terrain(chunk, surface, chk)
+	-- Create the dungeon space.
 	local y = params[2]
 	local h = params[3]
 	local mask = params[4]
@@ -294,8 +290,8 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 	local brick = TerrainMaterialSpec:find_by_name("brick")
 	brick = brick and brick.id
 	local corridor = function(x1, z1, x2, z2, b00, b10, b01, b11, t00, t10, t01, t11)
-		t:add_box_corners(x1, z1, x2, z2, b00-1, b10-1, b01-1, b11-1, t00+1, t10+1, t01+1, t11+1, brick)
-		t:add_box_corners(x1, z1, x2, z2, b00, b10, b01, b11, t00, t10, t01, t11, 0)
+		chk:add_box_corners(x1, z1, x2, z2, b00-1, b10-1, b01-1, b11-1, t00+1, t10+1, t01+1, t11+1, brick)
+		chk:add_box_corners(x1, z1, x2, z2, b00, b10, b01, b11, t00, t10, t01, t11, 0)
 	end
 	if conn_xm and conn_xp and not conn_zm and not conn_zp then
 		-- Straight corridor along the X axis.
@@ -307,8 +303,7 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 		local h1 = (n1 == "dungeon" and p1[3] or h)
 		local bot0,bot1 = (y0 + y) / 2, (y + y1) / 2
 		local top0,top1 = bot0 + (h0 + h) / 2, bot1 + (h + h1) / 2
-		corridor(chunk.x, chunk.z + 4, chunk.x + 11, chunk.z + 8,
-			bot0, bot1, bot0, bot1, top0, top1, top0, top1, 0)
+		corridor(0, 4, 11, 8, bot0, bot1, bot0, bot1, top0, top1, top0, top1, 0)
 	elseif not conn_xm and not conn_xp and conn_zm and conn_zp then
 		-- Straight corridor along the Z axis.
 		local n0,p0 = self.__planner:get_chunk_type(wp.x, wp.z - 1, false)
@@ -319,20 +314,17 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 		local h1 = (n1 == "dungeon" and p1[3] or h)
 		local bot0,bot1 = (y0 + y) / 2, (y + y1) / 2
 		local top0,top1 = bot0 + (h0 + h) / 2, bot1 + (h + h1) / 2
-		corridor(chunk.x + 4, chunk.z, chunk.x + 8, chunk.z + 11,
-			bot0, bot0, bot1, bot1, top0, top0, top1, top1, 0)
+		corridor(4, 0, 8, 11, bot0, bot0, bot1, bot1, top0, top0, top1, top1, 0)
 	else
 		-- Curve or dead end.
-		corridor(chunk.x + 4, chunk.z + 4, chunk.x + 8, chunk.z + 8,
-			y, y, y, y, y + h, y + h, y + h, y + h)
+		corridor(4, 4, 8, 8, y, y, y, y, y + h, y + h, y + h, y + h)
 		if conn_xm then
 			local n,p = self.__planner:get_chunk_type(wp.x - 1, wp.z, false)
 			local y0 = (n == "dungeon" and p[2] or y)
 			local h0 = (n == "dungeon" and p[3] or h)
 			local bot0,bot1 = (y0 + y) / 2, y
 			local top0,top1 = bot0 + (h0 + h) / 2, bot1 + h
-			corridor(chunk.x, chunk.z + 4, chunk.x + 3, chunk.z + 8,
-				bot0, bot1, bot0, bot1, top0, top1, top0, top1, 0)
+			corridor(0, 4, 3, 8, bot0, bot1, bot0, bot1, top0, top1, top0, top1, 0)
 		end
 		if conn_xp then
 			local n,p = self.__planner:get_chunk_type(wp.x + 1, wp.z, false)
@@ -340,8 +332,7 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 			local h1 = (n == "dungeon" and p[3] or h)
 			local bot0,bot1 = y, (y + y1) / 2
 			local top0,top1 = bot0 + h, bot1 + (h + h1) / 2
-			corridor(chunk.x + 9, chunk.z + 4, chunk.x + 11, chunk.z + 8,
-				bot0, bot1, bot0, bot1, top0, top1, top0, top1, 0)
+			corridor(9, 4, 11, 8, bot0, bot1, bot0, bot1, top0, top1, top0, top1, 0)
 		end
 		if conn_zm then
 			local n,p = self.__planner:get_chunk_type(wp.x, wp.z - 1, false)
@@ -349,8 +340,7 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 			local h0 = (n == "dungeon" and p[3] or h)
 			local bot0,bot1 = (y0 + y) / 2, y
 			local top0,top1 = bot0 + (h0 + h) / 2, bot1 + h
-			corridor(chunk.x + 4, chunk.z, chunk.x + 8, chunk.z + 3,
-				bot0, bot0, bot1, bot1, top0, top0, top1, top1, 0)
+			corridor(4, 0, 8, 3, bot0, bot0, bot1, bot1, top0, top0, top1, top1, 0)
 		end
 		if conn_zp then
 			local n,p = self.__planner:get_chunk_type(wp.x, wp.z + 1, false)
@@ -358,16 +348,18 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 			local h1 = (n == "dungeon" and p[3] or h)
 			local bot0,bot1 = y, (y + y1) / 2
 			local top0,top1 = bot0 + h, bot1 + (h + h1) / 2
-			corridor(chunk.x + 4, chunk.z + 9, chunk.x + 8, chunk.z + 11,
-				bot0, bot0, bot1, bot1, top0, top0, top1, top1, 0)
+			corridor(4, 9, 8, 11, bot0, bot0, bot1, bot1, top0, top0, top1, top1, 0)
 		end
 	end
 	-- Smoothen the surface.
+	t:set_chunk(chunk.x, chunk.z, chk)
 	for x = chunk.x-1,chunk.x+w do
 		for z = chunk.z-1,chunk.z+w do
 			t:calculate_smooth_normals(x, z)
 		end
 	end
+	-- Generate surface objects.
+	self:generate_plants(chunk, surface)
 	-- Generate items in dead ends.
 	local connections = (conn_xm and 1 or 0) + (conn_xp and 1 or 0) + (conn_zm and 1 or 0) + (conn_zp and 1 or 0)
 	if connections == 1 then
@@ -397,24 +389,26 @@ PlaceDungeon.generate_room = function(self, chunk, params)
 	local y = params[2]
 	local h = params[3]
 	local mask = params[4]
-	local cx = chunk.x
-	local cz = chunk.z
 	-- Generate the surface normally.
 	local surface = self.__planner:get_chunk_surface(chunk)
-	self:generate_terrain(chunk, surface)
+	local chk = TerrainChunk(w)
+	self:generate_terrain(chunk, surface, chk)
 	-- Create the floor and ceiling.
-	t:add_box(cx, cz, cx+w-1, cz+w-1, y-1, h+2, m)
-	t:add_box(cx, cz, cx+w-1, cz+w-1, y, h, 0)
+	chk:add_box(0, 0, w-1, w-1, y-1, h+2, m)
+	chk:add_box(0, 0, w-1, w-1, y, h, 0)
 	-- Create the walls.
 	local conn_xm = Bitwise:bchk(mask, 0x01)
 	local conn_xp = Bitwise:bchk(mask, 0x02)
 	local conn_zm = Bitwise:bchk(mask, 0x04)
 	local conn_zp = Bitwise:bchk(mask, 0x08)
-	if not conn_xm then t:add_box(cx    , cz    , cx    , cz+w-1, y, h, m) end
-	if not conn_xp then t:add_box(cx+w-1, cz    , cx+w-1, cz+w-1, y, h, m) end
-	if not conn_zm then t:add_box(cx    , cz    , cx+w-1, cz    , y, h, m) end
-	if not conn_zp then t:add_box(cx    , cz+w-1, cx+w-1, cz+w-1, y, h, m) end
+	if not conn_xm then chk:add_box(0  , 0  , 0  , w-1, y, h, m) end
+	if not conn_xp then chk:add_box(w-1, 0  , w-1, w-1, y, h, m) end
+	if not conn_zm then chk:add_box(0  , 0  , w-1, 0  , y, h, m) end
+	if not conn_zp then chk:add_box(0  , w-1, w-1, w-1, y, h, m) end
 	-- Smoothen the surface.
+	local cx = chunk.x
+	local cz = chunk.z
+	t:set_chunk(cx, cz, chk)
 	for x = cx-1,cx+w do
 		for z = cz-1,cz+w do
 			t:calculate_smooth_normals(x, z)

@@ -11,6 +11,7 @@
 local Class = require("system/class")
 local Noise = require("system/noise")
 local PlaceGenerator = require("landscape/generator/place-generator")
+local TerrainChunk = require("system/terrain-chunk")
 local TerrainMaterialSpec = require("core/specs/terrain-material")
 
 --- Default terrain chunk generator.
@@ -32,8 +33,20 @@ end
 -- @param chunk TerrainChunk.
 -- @param params Place parameters as set by plan().
 PlaceDefault.generate = function(self, chunk, params)
+	-- Generate the surface.
+	local t = chunk.manager.terrain
+	local w = chunk.manager.chunk_size
 	local surface = self.__planner:get_chunk_surface(chunk)
-	self:generate_terrain(chunk, surface)
+	local chk = TerrainChunk(w)
+	self:generate_terrain(chunk, surface, chk)
+	-- Smoothen the surface.
+	t:set_chunk(chunk.x, chunk.z, chk)
+	for x = chunk.x-1,chunk.x+w do
+		for z = chunk.z-1,chunk.z+w do
+			t:calculate_smooth_normals(x, z)
+		end
+	end
+	-- Generate object.
 	self:generate_plants(chunk, surface)
 	self:generate_objects(chunk, surface)
 end
@@ -94,14 +107,11 @@ end
 -- @param self PlaceDefault.
 -- @param chunk TerrainChunk.
 -- @param surface Surface data.
-PlaceDefault.generate_terrain = function(self, chunk, surface)
+-- @param chk TerrainChunk data.
+PlaceDefault.generate_terrain = function(self, chunk, surface, chk)
 	local w = chunk.manager.chunk_size
-	local t = chunk.manager.terrain
-	-- Generate the surface.
 	for z = 0,w-1 do
-		local cz = chunk.z + z
 		for x = 0,w-1 do
-			local cx = chunk.x + x
 			-- Calculate the corner heights.
 			local a00,b00,c00 = surface:get(x, z)
 			local a10,b10,c10 = surface:get(x + 1, z)
@@ -110,14 +120,14 @@ PlaceDefault.generate_terrain = function(self, chunk, surface)
 			-- Generate the grass layer.
 			if c00 > 0 or c10 > 0 or c01 > 0 or c11 > 0 then
 				local y0,y1,y2,y3 = a00 + b00 + c00, a10 + b10 + c10, a01 + b01 + c01, a11 + b11 + c11
-				t:add_stick_corners(cx, cz, 0, 0, 0, 0, y0, y1, y2, y3, 2)
+				chk:add_stick_corners(x, z, 0, 0, 0, 0, y0, y1, y2, y3, 2)
 			end
 			-- Generate the soil layer.
 			if b00 > 0 or b10 > 0 or b01 > 0 or b11 > 0 then
-				t:add_stick_corners(cx, cz, 0, 0, 0, 0, a00 + b00, a10 + b10, a01 + b01, a11 + b11, 1)
+				chk:add_stick_corners(x, z, 0, 0, 0, 0, a00 + b00, a10 + b10, a01 + b01, a11 + b11, 1)
 			end
 			-- Generate the rock layer.
-			t:add_stick_corners(cx, cz, 0, 0, 0, 0, a00, a10, a01, a11, 3)
+			chk:add_stick_corners(x, z, 0, 0, 0, 0, a00, a10, a01, a11, 3)
 			-- Generate ore veins.
 			local ore = math.random() * 300
 			if ore < 3 and ore > 0.1 then
@@ -128,14 +138,8 @@ PlaceDefault.generate_terrain = function(self, chunk, surface)
 				else
 					mat = TerrainMaterialSpec:random{category = "rare ore"}
 				end
-				t:add_stick_corners(cx, cz, y0 - ore, y1 - ore, y2 - ore, y3 - ore, y0, y1, y2, y3, mat.id)
+				chk:add_stick_corners(x, z, y0 - ore, y1 - ore, y2 - ore, y3 - ore, y0, y1, y2, y3, mat.id)
 			end
-		end
-	end
-	-- Smoothen the surface.
-	for x = chunk.x-1,chunk.x+w do
-		for z = chunk.z-1,chunk.z+w do
-			t:calculate_smooth_normals(x, z)
 		end
 	end
 end

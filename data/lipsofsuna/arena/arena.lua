@@ -43,11 +43,7 @@ Arena.new = function(clss)
 	Main.terrain.generate_hooks:register(0, function(self)
 		local w = self.manager.chunk_size
 		local t = self.manager.terrain
-		for z = 0,w-1 do
-			for x = 0,w-1 do
-				t:add_stick(self.x + x, self.z + z, 0, 100, 3)
-			end
-		end
+		t:add_box(self.x, self.z, self.x+w-1, self.z+w-1, 0, 100, 3)
 		for x = self.x-1,self.x+w do
 			for z = self.z-1,self.z+w do
 				t:calculate_smooth_normals(x, z)

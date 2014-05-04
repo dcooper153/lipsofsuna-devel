@@ -366,6 +366,19 @@ Terrain.get_chunk_count = function(self)
 	return Los.terrain_get_chunk_count(self.handle)
 end
 
+--- Reads the contents of the chunk from a TerrainChunk.
+-- @param self Terrain.
+-- @param x Grid X coordinate.
+-- @param z Grid Z coordinate.
+-- @param chunk TerrainChunk.
+-- @return True on success, false if the chunk is not loaded.
+Terrain.set_chunk = function(self, x, z, chunk)
+	local writer = Packet(1)
+	chunk:get_chunk_data(writer)
+	local reader = writer:copy_readable()
+	return Los.terrain_set_chunk_data(self.handle, x, z, reader.handle)
+end
+
 --- Writes the contents of the chunk to a packet.
 -- @param self Terrain.
 -- @param x Grid X coordinate.
