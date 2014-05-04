@@ -48,18 +48,28 @@ GlobalEventManager.find_actor_spawn_point = function(self)
 	if not player.vision then return end
 	-- Check that there are not too many actors nearby.
 	local radius = math.max(player.vision:get_radius() * 2, 30)
-	local objects = Main.objects:find_by_point(player:get_position(), radius)
+	local ppos = player:get_position()
+	local objects = Main.objects:find_by_point(ppos, radius)
 	local monsters = 0
 	for id,object in pairs(objects) do
 		if object.class == Actor then
-			monsters = monsters + 1
-			if monsters > 3 then return end
+			if math.abs(object:get_position().y - ppos.y) < 10 then
+				monsters = monsters + 1
+				if monsters > 4 then return end
+			end
 		end
 	end
 	-- Select a random point just outside of the vision radius.
-	local a = 2 * math.pi * math.random()
 	local r = player.vision:get_radius() * 1.2
-	local point = player:get_position():copy():add_xyz(r * math.cos(a), 0, r * math.sin(a))
+	local pa = Vector(1,0,0):transform(player:get_rotation())
+	local a = math.atan2(-pa.x, pa.z)
+	local rr = math.random()
+	if rr < 0.5 then
+		a = a - 0.1 * math.pi * (1 - math.sqrt(2*rr))
+	else
+		a = a + 0.1 * math.pi * (1 - math.sqrt(2*rr-1))
+	end
+	local point = ppos:copy():add_xyz(r * math.cos(a), 10, r * math.sin(a))
 	-- Check that no player sees the spawn point.
 	for k,v in pairs(players) do
 		if (point - v:get_position()).length < v.vision:get_radius() then
