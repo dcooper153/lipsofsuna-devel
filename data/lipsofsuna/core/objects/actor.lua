@@ -921,10 +921,21 @@ Actor.get_burdened = function(self)
 	return false
 end
 
+--- Checks whether the actor is participating in combat.
+-- @param self Actor.
+-- @return True if in combat. False otherwise.
+Actor.get_combat_active = function(self)
+	if not self.ai then return end
+	for k,v in pairs(self.ai.enemies) do
+		return true
+	end
+end
+
 --- Gets the hint on whether the actor is hostile at someone.
 -- @param self Actor.
 -- @return True if set. False otherwise.
 Actor.get_combat_hint = function(self)
+	if self.dead then return false end
 	return self.__combat_hint or false
 end
 
@@ -937,23 +948,56 @@ Actor.set_combat_hint = function(self, value)
 	Main.vision:object_event(self, "object-combat")
 end
 
+Actor.get_dead = function(self)
+	return self.dead
+end
+
+Actor.set_dead = function(self, v)
+	if v then
+		if self.dead then return end
+		-- Disable controls.
+		self:set_movement(0)
+		self:set_strafing(0)
+		self.auto_attack = nil
+		self.jumping = nil
+		self.climbing = nil
+		self.physics:set_shape("dead")
+		self.physics:set_physics("rigid")
+		-- Playback animation.
+		-- NOTE: Animations are discarded after setting the 'dead' member.
+		self:animate("death")
+		self.dead = true
+		-- Disable stats.
+		self.stats.enabled = false
+		self.stats:set_value("health", 0)
+		-- Inform the AI.
+		if self.ai then
+			self.ai:set_dead(true)
+		end
+		-- Emit a vision event.
+		Main.vision:object_event(self, "object-dead", {dead = true})
+	else
+		if not self.dead then return end
+		-- Restore the idle animation.
+		self.dead = nil
+		self:animate("idle")
+		-- Enable controls.
+		self:set_beheaded(false)
+		self.physics:set_shape("default")
+		self.physics:set_physics("kinematic")
+		-- Enable stats.
+		self.stats.enabled = true
+		self.stats:set_value("health", 1)
+		-- Inform the AI.
+		if self.ai then
+			self.ai:set_dead(false)
+		end
+		-- Emit a vision event.
+		Main.vision:object_event(self, "object-dead", {dead = false})
+	end
+end
+
 Actor.set_dead_state = function(self, drop)
-	-- Playback animation.
-	-- This needs to be done first because setting the 'dead' member will
-	-- prevent any future animation changes.
-	self:animate("death")
-	-- Disable controls.
-	self.dead = true
-	self:set_movement(0)
-	self:set_strafing(0)
-	self.auto_attack = nil
-	self.jumping = nil
-	self.climbing = nil
-	self.physics:set_shape("dead")
-	self.physics:set_physics("rigid")
-	-- Disable stats.
-	self.stats.enabled = false
-	self.stats:set_value("health", 0)
 	-- Drop held items.
 	if drop then
 		local o = self.inventory:get_object_by_slot("hand.L")
@@ -969,8 +1013,8 @@ Actor.set_dead_state = function(self, drop)
 			o:set_visible(true)
 		end
 	end
-	-- Emit a vision event.
-	Main.vision:object_event(self, "object-dead", {dead = true})
+	-- Set the death mode.
+	self:set_dead(true)
 end
 
 --- Gets the importance of the object.

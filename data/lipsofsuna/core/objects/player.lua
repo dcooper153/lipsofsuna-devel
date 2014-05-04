@@ -229,6 +229,18 @@ Player.set_client = function(self, client)
 	self.vision = PlayerVision(self)
 end
 
+--- Checks whether the actor is participating in combat.
+-- @param self Actor.
+-- @return True if in combat. False otherwise.
+Player.get_combat_active = function(self)
+	if not self.vision then return end
+	for o in pairs(self.vision.objects) do
+		if o.get_combat_hint and o:get_combat_hint() then
+			return true
+		end
+	end
+end
+
 --- Sets the crafting device used by the player.
 -- @param self Player.
 -- @param object Crafting device, or nil.

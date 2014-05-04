@@ -32,7 +32,7 @@ end
 --- Removes an AI from the update list.
 -- @param self AiManager.
 -- @param ai AI.
-AiManager.removes = function(self, ai)
+AiManager.remove = function(self, ai)
 	self.logics[ai] = nil
 end
 

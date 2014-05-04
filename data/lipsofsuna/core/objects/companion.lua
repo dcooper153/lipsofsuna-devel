@@ -25,14 +25,6 @@ Companion.new = function(clss, manager, id)
 	return self
 end
 
---- Causes the companion to faint.
--- @param self Companion.
-Companion.die = function(self)
-	-- TODO
-	self:action("resurrect")
-	self.stats:set_value("health", self.stats:get_maximum("health"))
-end
-
 --- Respawns the companion.
 -- @param self Object.
 Companion.respawn = function(self)
@@ -60,7 +52,13 @@ Companion.update_server = function(self, secs)
 	end
 	-- Respawn near the owner if too far away.
 	if (pos - pos_owner).length > 10 then
-		self:respawn()
+		if not self:get_combat_active() and not self.owner:get_combat_active() then
+			self:respawn()
+		end
+	end
+	-- Resurrect when combat ends.
+	if self:get_dead() and not self.owner:get_combat_active() then
+		self:set_dead(false)
 	end
 	-- Update the base class.
 	Actor.update_server(self, secs)

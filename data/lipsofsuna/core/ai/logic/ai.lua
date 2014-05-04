@@ -302,4 +302,15 @@ end
 Ai.update = function(self, secs)
 end
 
+--- Informs the AI about the contolled object being killed or resurrected.
+-- @param dead True if killed. False if resurrected.
+Ai.set_dead = function(self, dead)
+	if dead then
+		self.enemies = {}
+		self.manager:remove(self)
+	else
+		self.manager:add(self)
+	end
+end
+
 return Ai
