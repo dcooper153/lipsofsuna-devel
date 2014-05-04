@@ -41,6 +41,9 @@ LIAPICALL (void, liext_terrain_module_get_memstat, (
 LIAPICALL (void, liext_script_terrain, (
 	LIScrScript* self));
 
+LIAPICALL (void, liext_script_terrain_chunk, (
+	LIScrScript* self));
+
 /*****************************************************************************/
 
 LIAPICALL (void, liext_terrain_unittest, ());

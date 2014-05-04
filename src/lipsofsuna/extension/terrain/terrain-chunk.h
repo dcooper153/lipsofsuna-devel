@@ -40,6 +40,36 @@ LIAPICALL (LIExtTerrainChunk*, liext_terrain_chunk_new, (
 LIAPICALL (void, liext_terrain_chunk_free, (
 	LIExtTerrainChunk* self));
 
+LIAPICALL (int, liext_terrain_chunk_add_box, (
+	LIExtTerrainChunk*      self,
+	int                     grid_x1,
+	int                     grid_z1,
+	int                     grid_x2,
+	int                     grid_z2,
+	float                   world_y,
+	float                   world_h,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data));
+
+LIAPICALL (int, liext_terrain_chunk_add_box_corners, (
+	LIExtTerrainChunk*      self,
+	int                     grid_x1,
+	int                     grid_z1,
+	int                     grid_x2,
+	int                     grid_z2,
+	float                   bot00,
+	float                   bot10,
+	float                   bot01,
+	float                   bot11,
+	float                   top00,
+	float                   top10,
+	float                   top01,
+	float                   top11,
+	int                     material,
+	LIExtTerrainStickFilter filter_func,
+	void*                   filter_data));
+
 LIAPICALL (int, liext_terrain_chunk_add_stick, (
 	LIExtTerrainChunk*      self,
 	int                     column_x,
@@ -95,6 +125,18 @@ LIAPICALL (LIExtTerrainColumn*, liext_terrain_chunk_get_column, (
 	LIExtTerrainChunk* self,
 	int                x,
 	int                y));
+
+LIAPICALL (int, liext_terrain_chunk_get_column_data, (
+	LIExtTerrainChunk* self,
+	int                column_x,
+	int                column_z,
+	LIArcWriter*       writer));
+
+LIAPICALL (int, liext_terrain_chunk_set_column_data, (
+	LIExtTerrainChunk* self,
+	int                column_x,
+	int                column_z,
+	LIArcReader*       reader));
 
 LIAPICALL (int, liext_terrain_chunk_get_data, (
 	LIExtTerrainChunk* self,

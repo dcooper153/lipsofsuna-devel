@@ -956,7 +956,6 @@ int liext_terrain_set_column_data (
 	int column_z;
 	LIExtTerrainChunkID id;
 	LIExtTerrainChunk* chunk;
-	LIExtTerrainColumn* column;
 
 	/* Get the chunk. */
 	id = private_get_chunk_id_and_column (self, grid_x, grid_z, &column_x, &column_z);
@@ -965,10 +964,8 @@ int liext_terrain_set_column_data (
 		return 0;
 
 	/* Set the column data. */
-	column = liext_terrain_chunk_get_column (chunk, column_x, column_z);
-	if (!liext_terrain_column_set_data (column, reader))
+	if (!liext_terrain_chunk_set_column_data (chunk, column_x, column_z, reader))
 		return 0;
-	chunk->stamp++;
 
 	/* Mark neighbor chunks dirty on border updates. */
 	if (column_x == 0)

@@ -45,7 +45,9 @@ LIExtTerrainModule* liext_terrain_module_new (
 
 	/* Register classes. */
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_TERRAIN, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_TERRAIN_CHUNK, self);
 	liext_script_terrain (program->script);
+	liext_script_terrain_chunk (program->script);
 
 	return self;
 }
