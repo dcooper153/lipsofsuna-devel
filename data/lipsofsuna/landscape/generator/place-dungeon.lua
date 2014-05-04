@@ -15,6 +15,8 @@ local Noise = require("system/noise")
 local TerrainChunk = require("system/terrain-chunk")
 local TerrainMaterialSpec = require("core/specs/terrain-material")
 
+local yield = coroutine.yield
+
 --- Dungeon generator.
 -- @alias PlaceDungeon
 local PlaceDungeon = Class("PlaceDungeon", PlaceDefault)
@@ -250,14 +252,17 @@ PlaceDungeon.generate_entrance = function(self, chunk, params)
 	-- Generate the surface normally.
 	local surface = self.__planner:get_chunk_surface(chunk)
 	self:generate_terrain(chunk, surface, chk)
+	yield()
 	-- Create the floor and ceiling.
 	chk:add_box(0, 0, w-1, w-1, y-1, h+2, m)
 	chk:add_box(0, 0, w-1, w-1, y, h, 0)
+	yield()
 	-- Create the corner pillars.
 	chk:add_stick(0  , 0  , y, h, m)
 	chk:add_stick(w-1, 0  , y, h, m)
 	chk:add_stick(0  , w-1, y, h, m)
 	chk:add_stick(w-1, w-1, y, h, m)
+	yield()
 	-- Smoothen the surface.
 	t:set_chunk(chunk.x, chunk.z, chk)
 	for x = chunk.x-1,chunk.x+w do
@@ -278,6 +283,7 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 	local chk = TerrainChunk(w)
 	local surface = self.__planner:get_chunk_surface(chunk)
 	self:generate_terrain(chunk, surface, chk)
+	yield()
 	-- Create the dungeon space.
 	local y = params[2]
 	local h = params[3]
@@ -289,9 +295,11 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 	local wp = {x = math.floor(chunk.x / w), z = math.floor(chunk.z / w)}
 	local brick = TerrainMaterialSpec:find_by_name("brick")
 	brick = brick and brick.id
+	yield()
 	local corridor = function(x1, z1, x2, z2, b00, b10, b01, b11, t00, t10, t01, t11)
 		chk:add_box_corners(x1, z1, x2, z2, b00-1, b10-1, b01-1, b11-1, t00+1, t10+1, t01+1, t11+1, brick)
 		chk:add_box_corners(x1, z1, x2, z2, b00, b10, b01, b11, t00, t10, t01, t11, 0)
+		yield()
 	end
 	if conn_xm and conn_xp and not conn_zm and not conn_zp then
 		-- Straight corridor along the X axis.
@@ -358,6 +366,7 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 			t:calculate_smooth_normals(x, z)
 		end
 	end
+	yield()
 	-- Generate surface objects.
 	self:generate_plants(chunk, surface)
 	-- Generate items in dead ends.
@@ -367,6 +376,7 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 		p:multiply(chunk.manager.grid_size):add_xyz(0, y, 0)
 		local obj = MapUtils:place_item{point = p, name = "treasure chest", rotation = math.random() * math.pi * 2}
 		obj:set_important(true)
+		yield()
 	end
 	-- Generate extra monsters.
 	if connections >= 2 and math.random() < 0.5 then
@@ -374,6 +384,7 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 		p:multiply(chunk.manager.grid_size):add_xyz(0, y, 0)
 		local obj = MapUtils:place_actor{point = p, category = "enemy", rotation = math.random() * math.pi * 2}
 		obj:set_important(true)
+		yield()
 	end
 end
 
@@ -393,9 +404,11 @@ PlaceDungeon.generate_room = function(self, chunk, params)
 	local surface = self.__planner:get_chunk_surface(chunk)
 	local chk = TerrainChunk(w)
 	self:generate_terrain(chunk, surface, chk)
+	yield()
 	-- Create the floor and ceiling.
 	chk:add_box(0, 0, w-1, w-1, y-1, h+2, m)
 	chk:add_box(0, 0, w-1, w-1, y, h, 0)
+	yield()
 	-- Create the walls.
 	local conn_xm = Bitwise:bchk(mask, 0x01)
 	local conn_xp = Bitwise:bchk(mask, 0x02)
@@ -414,6 +427,7 @@ PlaceDungeon.generate_room = function(self, chunk, params)
 			t:calculate_smooth_normals(x, z)
 		end
 	end
+	yield()
 	-- Generate a civilization obstacle.
 	if math.random() < 0.5 then
 		-- Calculate the position.
@@ -425,6 +439,7 @@ PlaceDungeon.generate_room = function(self, chunk, params)
 		p:add_xyz(0, civ_y, 0)
 		-- Choose and create the obstacle.
 		MapUtils:place_obstacle{point = p, category = "civilization", rotation = math.random() * math.pi * 2}
+		yield()
 	end
 	-- Generate extra monsters.
 	if math.random() < 0.5 then
@@ -432,6 +447,7 @@ PlaceDungeon.generate_room = function(self, chunk, params)
 		p:multiply(chunk.manager.grid_size):add_xyz(0, y, 0)
 		local obj = MapUtils:place_actor{point = p, category = "enemy", rotation = math.random() * math.pi * 2}
 		obj:set_important(true)
+		yield()
 	end
 end
 

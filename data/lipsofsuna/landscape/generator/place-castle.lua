@@ -13,6 +13,8 @@ local PlaceGenerator = require("landscape/generator/place-generator")
 local TerrainChunk = require("system/terrain-chunk")
 local TerrainMaterialSpec = require("core/specs/terrain-material")
 
+local yield = coroutine.yield
+
 --- Castle generator.
 -- @type PlaceCastle
 local PlaceCastle = Class("PlaceCastle", PlaceGenerator)
@@ -111,6 +113,7 @@ PlaceCastle.generate = function(self, chunk, params)
 	-- Create the floor.
 	chk:add_box(0, 0, w-1, w-1, 0, params[2], 3)
 	chk:add_box(0, 0, w-1, w-1, params[2], 1, m)
+	yield()
 	-- Create the west wall.
 	local t1,p1 = self.__planner:get_chunk_type(chunk.x / w - 1, chunk.z / w)
 	if t1 ~= "castle" then
@@ -118,6 +121,7 @@ PlaceCastle.generate = function(self, chunk, params)
 			chk:add_stick(0, z, params[2], params[3] + (z % 2), m)
 		end
 	end
+	yield()
 	-- Create the east wall.
 	local t2,p2 = self.__planner:get_chunk_type(chunk.x / w + 1, chunk.z / w)
 	if t2 ~= "castle"  then
@@ -132,6 +136,7 @@ PlaceCastle.generate = function(self, chunk, params)
 			chk:add_stick(x, 0, params[2], params[3] + (x % 2), m)
 		end
 	end
+	yield()
 	-- Create the north wall.
 	local t4,p4 = self.__planner:get_chunk_type(chunk.x / w, chunk.z / w + 1)
 	if t4 ~= "castle"  then
@@ -141,8 +146,10 @@ PlaceCastle.generate = function(self, chunk, params)
 		local door = math.floor(w/2)
 		chk:add_box(door, w-1, door+1, w-1, params[2] + 1, params[3]/2, 0)
 	end
+	yield()
 	-- Write the chunk.
 	t:set_chunk(chunk.x, chunk.z, chk)
+	yield()
 	-- Create NPCs.
 	-- TODO: Plan what NPCs to place in which sector.
 	local p = Vector(chunk.x + math.random(1, w-2), 0.0, chunk.z + math.random(1, w-2))
@@ -151,6 +158,7 @@ PlaceCastle.generate = function(self, chunk, params)
 	if obj then
 		obj:set_important(true)
 	end
+	yield()
 end
 
 return PlaceCastle

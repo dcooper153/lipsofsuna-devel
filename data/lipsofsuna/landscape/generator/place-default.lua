@@ -14,6 +14,8 @@ local PlaceGenerator = require("landscape/generator/place-generator")
 local TerrainChunk = require("system/terrain-chunk")
 local TerrainMaterialSpec = require("core/specs/terrain-material")
 
+local yield = coroutine.yield
+
 --- Default terrain chunk generator.
 -- @type PlaceDefault
 local PlaceDefault = Class("PlaceDefault", PlaceGenerator)
@@ -68,6 +70,7 @@ PlaceDefault.generate_objects = function(self, chunk, surface)
 		p:add_xyz(0, civ_y, 0)
 		-- Choose and create the obstacle.
 		MapUtils:place_obstacle{point = p, category = "civilization", rotation = math.random() * math.pi * 2}
+		yield()
 	end
 end
 
@@ -100,6 +103,7 @@ PlaceDefault.generate_plants = function(self, chunk, surface)
 				end
 			end
 		end
+		yield()
 	end
 end
 
@@ -141,6 +145,7 @@ PlaceDefault.generate_terrain = function(self, chunk, surface, chk)
 				chk:add_stick_corners(x, z, y0 - ore, y1 - ore, y2 - ore, y3 - ore, y0, y1, y2, y3, mat.id)
 			end
 		end
+		yield()
 	end
 end
 
