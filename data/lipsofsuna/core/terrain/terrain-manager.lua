@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local ChunkManager = require("system/chunk-manager")
-local Hooks = require("system/hooks")
 local PhysicsTerrain = require("system/physics-terrain")
 local PhysicsConsts = require("core/server/physics-consts")
 local Program = require("system/core")
@@ -28,18 +27,15 @@ local TerrainManager = Class("TerrainManager", ChunkManager)
 -- @param grid_size Grid size.
 -- @param database Database, or nil.
 -- @param unloading True to unable unloading.
--- @param generate True to enable generation of random terrain.
 -- @param graphics True to enable graphics.
 -- @return TerrainManager.
-TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, generate, graphics)
+TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, graphics)
 	local create = function(m, x, z) return TerrainChunk(m, x, z) end
 	local self = ChunkManager.new(clss, chunk_size, grid_size, create)
 	self.database = database
-	self.generate = generate
 	self.graphics = graphics
 	self.unload_time = unloading and 10
 	self.unload_time_model = 3
-	self.generate_hooks = Hooks()
 	self.__view_distance = 48
 	self.__load_priorities = {}
 	self.terrain = Terrain(chunk_size, grid_size)
@@ -108,14 +104,6 @@ TerrainManager.refresh_models_by_point = function(self, point, radius)
 	end
 end
 
---- Registers a terrain chunk generator hook.
--- @param self TerrainManager.
--- @param priority Priority.
--- @param hook Hook.
-TerrainManager.register_generate_hook = function(self, priority, hook)
-	self.generate_hooks:register(priority, hook)
-end
-
 --- Saves all active chunks to the database.
 -- @param self TerrainManager.
 -- @param erase True to completely erase the old map.
@@ -165,11 +153,18 @@ TerrainManager.update = function(self, secs)
 	end
 end
 
---- Enables or disables terrain generation.
+--- Gets the terrain chunk generator function.
 -- @param self TerrainManager.
--- @param value True to enable. False otherwise.
-TerrainManager.set_enable_generation = function(self, value)
-	self.generate = true
+-- @return Function or nil.
+TerrainManager.get_chunk_generator = function(self)
+	return self.generate
+end
+
+--- Sets the terrain chunk generator function.
+-- @param self TerrainManager.
+-- @param func Function or nil.
+TerrainManager.set_chunk_generator = function(self, func)
+	self.generate = func
 end
 
 --- Enables or disables terrain graphics.

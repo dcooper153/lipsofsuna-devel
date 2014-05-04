@@ -28,7 +28,6 @@ Landscape.new = function(clss)
 	Main.game = Game("benchmark")
 	Main.game:start()
 	Main.objects:set_unloading()
-	Main.terrain:set_enable_generation(true)
 	return self
 end
 

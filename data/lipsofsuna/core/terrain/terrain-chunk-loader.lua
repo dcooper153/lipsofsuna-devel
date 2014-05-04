@@ -64,14 +64,10 @@ TerrainChunkLoader.execute = function(self, yield)
 	end
 	-- Create new chunk contents.
 	if not loaded then
+		self.manager.terrain:load_chunk(self.x, self.z)
 		if self.manager.generate then
-			-- Generate a random chunk.
-			self.manager.terrain:load_chunk(self.x, self.z)
-			self.manager.generate_hooks:call(self)
+			self.manager.generate(self)
 			yield()
-		else
-			-- Create an empty chunk.
-			self.manager.terrain:load_chunk(self.x, self.z)
 		end
 	end
 	-- Chain load the object chunk.

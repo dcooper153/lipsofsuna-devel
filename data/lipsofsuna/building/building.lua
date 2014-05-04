@@ -36,8 +36,7 @@ Building.new = function(clss)
 	ServerUtils:set_player_spawn_point(Vector(500,101,500))
 	-- Initialize the terrain.
 	Main.terrain:set_view_center(Vector(500, 0, 500))
-	Main.terrain:set_enable_generation(true)
-	Main.terrain.generate_hooks:register(0, function(self)
+	Main.terrain:set_chunk_generator(function(self)
 		local w = self.manager.chunk_size
 		local t = self.manager.terrain
 		for z = 0,w-1 do
@@ -50,7 +49,6 @@ Building.new = function(clss)
 				t:calculate_smooth_normals(x, z)
 			end
 		end
-		return Hooks.STOP
 	end)
 	-- Enable the simulation.
 	Physics:set_enable_simulation(true)

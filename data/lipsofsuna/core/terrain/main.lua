@@ -5,7 +5,7 @@ Main.game_start_hooks:register(0, function()
 	if not Main.game then return end
 	Main.terrain = TerrainManager(12, 1,
 		Main.game.database, Main.game.enable_unloading,
-		Main.game.enable_generation, Main.game.enable_graphics)
+		Main.game.enable_graphics)
 end)
 
 Main.game_end_hooks:register(100, function()

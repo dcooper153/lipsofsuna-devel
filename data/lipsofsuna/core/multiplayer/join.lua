@@ -57,9 +57,8 @@ Join.join_game = function(self, addr, port)
 	Main.game_start_hooks:call()
 	-- Initialize terrain synchronization.
 	Main.terrain.unload_time = nil --FIXME
-	Main.terrain.generate_hooks:register(0, function(self)
-		Client.terrain_sync:load_chunk(self.x, self.z)
-		return Hooks.STOP
+	Main.terrain:set_chunk_generator(function(chunk)
+		Client.terrain_sync:load_chunk(chunk.x, chunk.z)
 	end)
 	-- Enter the connection state.
 	Ui:set_state("join/connect")

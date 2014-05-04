@@ -12,7 +12,7 @@ Unittest:add(1, "lipsofsuna", "terrain manager: loading and unloading", function
 	local TerrainManager = require("core/terrain/terrain-manager")
 	local Vector = require("system/math/vector")
 	-- Loading.
-	local mgr = TerrainManager(16, 2, nil, false, true, true)
+	local mgr = TerrainManager(16, 2, nil, false, true)
 	mgr:load_chunk(0, 0)
 	assert(type(mgr.chunks[0]) == "table")
 	-- Unloading.
