@@ -22,6 +22,6 @@ end)
 Main.update_hooks:register(0, function(secs)
 	Main.timing:start_action("terrain")
 	if Main.terrain then
-		Main.terrain:update(tick)
+		Main.terrain:update(secs)
 	end
 end)

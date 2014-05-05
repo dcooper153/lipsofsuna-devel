@@ -10,6 +10,7 @@
 
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
+local Triggers = require("core/dialog/triggers")
 
 --- Companion object.
 -- @type Companion
@@ -22,6 +23,7 @@ local Companion = Class("Companion", Actor)
 -- @return Companion.
 Companion.new = function(clss, manager, id)
 	local self = Actor.new(clss, manager, id)
+	self.triggers = Triggers(Main.triggers)
 	return self
 end
 

@@ -47,16 +47,23 @@ end
 -- @param special String for special dialog. Nil for default.
 -- @return True if executed. False otherwise.
 DialogManager.execute = function(self, object, user, special)
-	-- Only allow one dialog at a time.
-	if self.dialogs_by_object[object] then return true end
-	-- Construct the dialog spec name.
 	local name = object.spec.dialog
 	if not name then return end
-	if special then
-		name = name .. " " .. special
-	end
+	if special then name = name .. " " .. special end
+	self:execute_custom(object, user, name)
+end
+
+--- Executes the dialog of the given object.
+-- @param self DialogManager.
+-- @param object Object whose dialog to execute.
+-- @param user Player who triggered the dialog.
+-- @param name Dialog name.
+-- @return True if executed. False otherwise.
+DialogManager.execute_custom = function(self, object, user, name)
+	-- Only allow one dialog at a time.
+	if self.dialogs_by_object[object] then return true end
 	-- Find the dialog spec.
-	local spec = Dialogspec:find{name = object.spec.dialog}
+	local spec = Dialogspec:find_by_name(name)
 	if not spec then return end
 	-- Create the dialog.
 	local dialog = Dialog(object, user or object, spec)
