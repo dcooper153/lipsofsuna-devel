@@ -30,7 +30,7 @@ Main.messaging:register_message{
 		if not obj then return end
 		-- Update the dialog.
 		obj:set_dialog("choice", choices)
-		if init and (Ui:get_state() == "play" or Ui:get_state() == "world/object") then
+		if mine and (Ui:get_state() == "play" or Ui:get_state() == "world/object") then
 			Client.active_dialog_object = obj
 			Ui:set_state("dialog")
 		end

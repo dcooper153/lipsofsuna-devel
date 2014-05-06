@@ -189,8 +189,8 @@ Main.messaging:register_message{
 			end
 		end
 		-- Dialog.
-		if o.dialog and o.dialog.event then
-			local e = o.dialog.event
+		local e = Main.dialogs:get_dialog_event(o)
+		if e then
 			if e.choices then
 				add(data, "uint8", 0)
 				add(data, "uint8", #e.choices)
@@ -414,6 +414,17 @@ Main.messaging:register_message{
 			-- Combat hint.
 			if o.get_combat_hint and o:get_combat_hint() then
 				Client.music:set_combat_hint(o, true)
+			end
+			-- Dialog.
+			local e = Main.dialogs:get_dialog_event(o)
+			if e then
+				if e.type == "choice" then
+					o:set_dialog("choice", e.choices)
+				elseif e.type == "message" then
+					o:set_dialog("message", e)
+				else
+					o:set_dialog("none")
+				end
 			end
 			return
 		end

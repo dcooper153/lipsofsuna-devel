@@ -48,6 +48,7 @@ Dialog.answer = function(self, user, answer)
 		if not sel then return end
 		self.user = user
 		self.choices = nil
+		self.event = nil
 		table.insert(self.vm, 1, {exe = sel, off = 2, pos = 1, len = #sel - 2})
 		self:execute()
 		if Server.events then
@@ -58,6 +59,7 @@ Dialog.answer = function(self, user, answer)
 		self.vm[1].pos = self.vm[1].pos + 1
 		self.user = user
 		self.choices = nil
+		self.event = nil
 		self:execute()
 		if Server.events then
 			Server.events:notify_action("dialog", user)
@@ -244,6 +246,13 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 	end
 end
 
+--- Gets the pending event of dialog.
+-- @param self Dialog.
+-- @return Event if one exists. Nil otherwise.
+Dialog.get_event = function(self)
+	return self.event
+end
+
 --- Emits a dialog change event.<br>
 --
 -- The event is stored to the dialog and emitted as a vision event so that
@@ -359,7 +368,7 @@ Dialog.execute = function(self)
 				table.remove(vm, 1)
 			end
 		end,
-		choice = function(vm, c)
+		["choice"] = function(vm, c)
 			-- Construct the list of choices.
 			local cmd = c
 			local cmds = {}
@@ -374,6 +383,7 @@ Dialog.execute = function(self)
 			until not cmd or cmd[1] ~= "choice"
 			-- Break until answered.
 			self.choices = cmds
+			self.event = {type = "choice", choices = choices}
 			self:emit_event(self.object, {choices = choices})
 			self.user = nil
 			return true
@@ -426,10 +436,12 @@ Dialog.execute = function(self)
 				self.user:send_message("Received " .. c[2] .. " but couldn't carry it")
 			end
 		end,
-		info = function(vm, c)
+		["info"] = function(vm, c)
 			-- Break until answered.
+			local msg = string.format("(%s)", c[2])
 			self.choices = "info"
-			self:emit_event(self.object, {message = string.format("(%s)", c[2])})
+			self.event = {type = "message", message = msg}
+			self:emit_event(self.object, {msg})
 			self.user = nil
 			return true
 		end,
@@ -481,9 +493,10 @@ Dialog.execute = function(self)
 				table.insert(vm, 1, {exe = c, off = 3, pos = 1, len = 1})
 			end
 		end,
-		say = function(vm, c)
+		["say"] = function(vm, c)
 			-- Publish the line.
 			self.choices = "line"
+			self.event = {type = "message", character = c[2], message = c[3]}
 			self:emit_event(self.object, {character = c[2], message = c[3]})
 			self.object:animate("talk")
 			self.user = nil

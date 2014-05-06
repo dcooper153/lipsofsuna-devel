@@ -86,4 +86,14 @@ DialogManager.find_by_object = function(self, object)
 	return self.dialogs_by_object[object]
 end
 
+--- Gets the dialog event of the given object.
+-- @param self DialogManager.
+-- @param object Object.
+-- @return Event if found. Nil otherwise.
+DialogManager.get_dialog_event = function(self, object)
+	local dlg = self.dialogs_by_object[object]
+	if not dlg then return end
+	return dlg:get_event()
+end
+
 return DialogManager
