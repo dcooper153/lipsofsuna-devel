@@ -9,6 +9,7 @@
 -- @alias Triggers
 
 local Class = require("system/class")
+local Trigger = require("core/dialog/trigger")
 
 --- Dialog triggers of one actor.
 -- @type Trigger
@@ -23,6 +24,10 @@ Triggers.new = function(clss, manager, object)
 	self.object = object
 	self.triggers_active = {}
 	self.triggers_inactive = {}
+	for k,v in pairs(manager.classes) do
+		local t = Trigger(self, k, v)
+		self.triggers_active[k] = t
+	end
 	self.manager = manager
 	self.manager:add_triggers(self)
 	return self
@@ -64,6 +69,7 @@ end
 -- @param self Triggers.
 -- @param secs Seconds since the last update.
 Triggers.update = function(self, secs)
+	if Main.dialogs:find_by_object(self.object) then return end
 	for k,v in pairs(self.triggers_active) do
 		local dlg = v:update(secs)
 		if dlg then

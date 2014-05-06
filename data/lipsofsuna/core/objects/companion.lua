@@ -23,7 +23,7 @@ local Companion = Class("Companion", Actor)
 -- @return Companion.
 Companion.new = function(clss, manager, id)
 	local self = Actor.new(clss, manager, id)
-	self.triggers = Triggers(Main.triggers)
+	self.triggers = Triggers(Main.triggers, self)
 	return self
 end
 

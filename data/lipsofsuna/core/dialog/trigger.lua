@@ -18,11 +18,13 @@ local Trigger = Class("Trigger")
 -- @param clss Trigger class.
 -- @param manager Triggers.
 -- @param name Name.
+-- @param update Update function.
 -- @return Trigger.
-Trigger.new = function(clss, manager, name)
+Trigger.new = function(clss, manager, name, update)
 	local self = Class.new(clss)
 	self.manager = manager
 	self.name = name
+	self.update = update
 	return self
 end
 

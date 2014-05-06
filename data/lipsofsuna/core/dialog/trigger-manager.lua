@@ -14,6 +14,8 @@ local Class = require("system/class")
 -- @type Trigger
 local TriggerManager = Class("TriggerManager")
 
+TriggerManager.classes = {}
+
 --- Creates a new dialog trigger manager.
 -- @param clss TriggerManager class.
 -- @return TriggerManager.
@@ -44,6 +46,14 @@ TriggerManager.update = function(self, secs)
 	for k in pairs(self.triggers) do
 		k:update(secs)
 	end
+end
+
+--- Registers a trigger class.
+-- @param clss TriggerManager class.
+-- @param name Trigger name.
+-- @param update Update function.
+TriggerManager.register = function(clss, name, update)
+	clss.classes[name] = update
 end
 
 return TriggerManager
