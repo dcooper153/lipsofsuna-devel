@@ -495,9 +495,10 @@ Dialog.execute = function(self)
 		end,
 		["say"] = function(vm, c)
 			-- Publish the line.
+			local char = #c[2] > 0 and c[2] or self.object.name or self.object.spec.name
 			self.choices = "line"
-			self.event = {type = "message", character = c[2], message = c[3]}
-			self:emit_event(self.object, {character = c[2], message = c[3]})
+			self.event = {type = "message", character = char, message = c[3]}
+			self:emit_event(self.object, {character = char, message = c[3]})
 			self.object:animate("talk")
 			self.user = nil
 			return true
