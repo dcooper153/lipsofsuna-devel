@@ -5,6 +5,7 @@
 	],
 	"specs":
 	[
-		"actors"
+		"actors",
+		"dialog"
 	]
 }

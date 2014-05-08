@@ -1,0 +1,35 @@
+[
+	{
+		"type": "Dialogspec",
+		"name": "first meeting",
+		"commands":
+		[
+			["say", "", "Gosh, you're finally awake!"],
+			["say", "", "I know this comes out weird, but do you know who I am? I don't remember..."],
+			["choice", "Do you remember this girl?",
+				["choice", "I don't remember either.",
+					["say", "", "Sigh, I guess we're in the same boat, then."],
+					["say", "", "This looks pretty bad so we had better do something."],
+					["say", "", "I hope you don't mind us staying together."]
+				],
+				["choice", "Yay! We're the same!",
+					["say", "", "Yay! Lucky!"],
+					["say", "", "I mean, don't be silly in this situation!"],
+					["say", "", "We need to do something or this will get really bad."]
+				],
+				["choice", "Sob sob...",
+					["say", "", "Err... Now, now, don't cry. It's going to be alright. I promise!"],
+					["say", "", "We'll get over this together."],
+					["say", "", "There, there. Good girl. I'm with you so no need to worry."]
+				],
+				["choice", "I might remember if you give a kiss...",
+					["say", "", "..."],
+					["say", "", "You know, your brain is in even more pitiful shape than mine."],
+					["say", "", "Yet, I have to stay with you since I don't think I'd get out of here alone."],
+					["say", "", "I don't know if I even want to remember how I ended up here with you..."]
+				]
+			],
+			["var", "player_met"]
+		]
+	}
+]

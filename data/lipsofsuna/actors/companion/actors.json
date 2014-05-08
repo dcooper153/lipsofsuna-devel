@@ -12,6 +12,7 @@
 		{
 			"good": true
 		},
+		"dialog": "companion",
 		"enable_decapitation": false,
 		"eye_style": "random",
 		"hair_style": "random",

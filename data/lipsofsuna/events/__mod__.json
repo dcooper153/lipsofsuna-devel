@@ -1,3 +1,12 @@
 {
-	"scripts": ["brigand-camp", "lizardman-attack", "random-monsters"]
+	"scripts":
+	[
+		"brigand-camp",
+		"lizardman-attack",
+		"random-monsters"
+	],
+	"mods":
+	[
+		["load", "events/companion"]
+	]
 }
