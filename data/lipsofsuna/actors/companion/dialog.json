@@ -1,0 +1,10 @@
+[
+	{
+		"type": "Dialogspec",
+		"name": "companion",
+		"commands":
+		[
+			["say", "", "..."]
+		]
+	}
+]

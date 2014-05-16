@@ -2,6 +2,7 @@ if not Settings then return end
 if Settings.server then return end
 
 local Hudcompass = require("ui/hud/compass")
+local HudCompanion = require("ui/hud/companion")
 local Hudfps = require("ui/hud/fps")
 local Hudlog = require("ui/hud/log")
 local Hudmodifiers = require("ui/hud/modifiers")
@@ -28,6 +29,11 @@ Ui:add_hud{
 	id = "compass",
 	active = function() return Ui.root == "play" end,
 	init = function() return Hudcompass() end}
+
+Ui:add_hud{
+	id = "companion",
+	active = function() return Ui.root == "play" end,
+	init = function() return HudCompanion() end}
 
 Ui:add_hud{
 	id = "crosshair",

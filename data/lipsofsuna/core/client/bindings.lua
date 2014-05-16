@@ -27,6 +27,12 @@ Client:register_init_hook(500, function()
 		Main.messaging:client_event("climb")
 	end}
 
+	Client.input:register_binding{name = "companion", mode = "press", key1 = Keysym.TAB, func = function()
+		if not Client.player_object then return end
+		local hud = Ui:get_hud("companion")
+		if hud then hud.widget:apply() end
+	end}
+
 	Client.input:register_binding{name = "inventory", mode = "press", key1 = Keysym.i, func = function()
 		if not Client.player_object then return end
 		if Ui:get_state() ~= "inventory" then
