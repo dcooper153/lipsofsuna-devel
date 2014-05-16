@@ -40,7 +40,7 @@ def configure(conf):
 	if Options.options.bindir or Options.options.libdir or Options.options.datadir:
 		if Options.options.relpath:
 			conf.fatal("The directory overrides are not used by a relative path build.\n" +\
-			           "To enable a traditional build, configure with --relpath=false\n")
+			           "To enable a traditional build, configure with --disable-relpath\n")
 
 	# Flags.
 	conf.load('compiler_c compiler_cxx')
@@ -492,7 +492,7 @@ def check_ogre(conf):
 		conf.env.revert()
 		conf.end_msg(False)
 		# Broken in some other way that we're not aware of.
-		conf.fatal('You system ships with a broken OGRE pkg-config file')
+		conf.fatal('Your system ships with a broken OGRE pkg-config file')
 		return
 	conf.env.revert()
 	conf.env.stash()
