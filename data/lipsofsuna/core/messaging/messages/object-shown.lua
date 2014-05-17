@@ -193,6 +193,7 @@ Main.messaging:register_message{
 		if e then
 			if e.choices then
 				add(data, "uint8", 0)
+				add(data, "string", e.character or "")
 				add(data, "uint8", #e.choices)
 				for k,v in ipairs(e.choices) do
 					add(data, "string", v)
@@ -357,8 +358,9 @@ Main.messaging:register_message{
 			if type == 0 then
 				args.dialog_type = "choice"
 				args.dialog_choices = {}
-				local ok,num = packet:resume("uint8")
+				local ok,character,num = packet:resume("string", "uint8")
 				if not ok then return end
+				args.dialog_character = #character and character or nil
 				for i = 1,num do
 					local ok,choice = packet:resume("string")
 					if not ok then return end
@@ -366,8 +368,9 @@ Main.messaging:register_message{
 				end
 			elseif type == 1 then
 				args.dialog_type = "message"
-				ok,args.dialog_message = packet:resume("string")
+				ok,character,args.dialog_message = packet:resume("string", "string")
 				if not ok then return end
+				args.dialog_character = #character and character or nil
 			else
 				args.dialog_type = "none"
 			end
@@ -419,11 +422,11 @@ Main.messaging:register_message{
 			local e = Main.dialogs:get_dialog_event(o)
 			if e then
 				if e.type == "choice" then
-					o:set_dialog("choice", e.choices)
+					o:set_client_dialog("choice", e.character, e.message, e.choices)
 				elseif e.type == "message" then
-					o:set_dialog("message", e)
+					o:set_client_dialog("message", e.character, e.message)
 				else
-					o:set_dialog("none")
+					o:set_client_dialog("none")
 				end
 			end
 			return
@@ -536,11 +539,11 @@ Main.messaging:register_message{
 		end
 		-- Dialog.
 		if args.dialog_type == "choice" then
-			o:set_dialog("choice", args.dialog_choices)
+			o:set_client_dialog("choice", args.dialog_character, args.dialog_message, args.dialog_choices)
 		elseif args.dialog_type == "message" then
-			o:set_dialog("message", args.dialog_message)
+			o:set_client_dialog("message", args.dialog_character, args.dialog_message)
 		elseif args.dialog_type == "none" then
-			o:set_dialog("none")
+			o:set_client_dialog("none")
 		end
 		-- Speed lines.
 		if args.speedline then

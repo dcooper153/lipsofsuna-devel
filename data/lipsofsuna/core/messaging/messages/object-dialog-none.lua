@@ -18,7 +18,7 @@ Main.messaging:register_message{
 		local obj = Main.objects:find_by_id(id)
 		if not obj then return end
 		-- Update the dialog.
-		obj:set_dialog("none")
+		obj:set_client_dialog("none")
 		if obj == Client.active_dialog_object and Ui:get_state() == "dialog" then
 			Ui:pop_state()
 		end

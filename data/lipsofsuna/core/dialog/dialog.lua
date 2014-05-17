@@ -59,6 +59,8 @@ Dialog.answer = function(self, user, answer)
 		self.vm[1].pos = self.vm[1].pos + 1
 		self.user = user
 		self.choices = nil
+		self.character_prev = self.event and self.event.character or nil
+		self.message_prev = self.event and self.event.message or nil
 		self.event = nil
 		self:execute()
 		if Server.events then
@@ -383,8 +385,8 @@ Dialog.execute = function(self)
 			until not cmd or cmd[1] ~= "choice"
 			-- Break until answered.
 			self.choices = cmds
-			self.event = {type = "choice", choices = choices}
-			self:emit_event(self.object, {choices = choices})
+			self.event = {type = "choice", choices = choices, character = self.character_prev, message = self.message_prev}
+			self:emit_event(self.object, {choices = choices, character = self.character_prev, message = self.message_prev})
 			self.user = nil
 			return true
 		end,

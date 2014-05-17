@@ -482,17 +482,19 @@ end
 SimulationObject.update_server = function(self, secs)
 end
 
---- Sets the dialog state of the object.
+--- Sets the client side dialog state of the object.
 -- @param self Object.
 -- @param type Dialog type. ("choice"/"message"/nil)
--- @param args List of choices, the message arguments, or nil.
-SimulationObject.set_dialog = function(self, type, args)
+-- @param character Character name.
+-- @param message Message.
+-- @param args List of choices. Nil if not relevant.
+SimulationObject.set_client_dialog = function(self, type, character, message, choices)
 	assert(self:has_client_data())
 	-- Update the dialog state.
 	if type == "choice" then
-		self.dialog = {type = type, choices = args}
+		self.dialog = {type = type, character = character, message = message, choices = args}
 	elseif type == "message" then
-		self.dialog = {type = type, character = args.character, message = args.message}
+		self.dialog = {type = type, character = character, message = message}
 	else
 		self.dialog = nil
 	end

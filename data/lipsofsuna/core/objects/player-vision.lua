@@ -133,7 +133,7 @@ PlayerVision.__callback = function(self, args)
 			local o = args.object
 			local mine = (o.dialog and o.dialog.user == player or false)
 			if args.choices then
-				Main.messaging:server_event("object dialog choice", client, o:get_id(), mine, args.choices)
+				Main.messaging:server_event("object dialog choice", client, o:get_id(), mine, args.character, args.message, args.choices)
 			elseif args.message then
 				Main.messaging:server_event("object dialog say", client, o:get_id(), mine, args.character or "", args.message)
 			else
