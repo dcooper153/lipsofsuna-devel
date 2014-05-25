@@ -492,7 +492,7 @@ SimulationObject.set_client_dialog = function(self, type, character, message, ch
 	assert(self:has_client_data())
 	-- Update the dialog state.
 	if type == "choice" then
-		self.dialog = {type = type, character = character, message = message, choices = args}
+		self.dialog = {type = type, character = character, message = message, choices = choices}
 	elseif type == "message" then
 		self.dialog = {type = type, character = character, message = message}
 	else
