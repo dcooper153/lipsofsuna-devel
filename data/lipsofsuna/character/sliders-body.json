@@ -21,7 +21,8 @@
 		"categories": {"body": true},
 		"field_name": "body_sliders",
 		"field_index": 3,
-		"shape_keys": ["breast small", "breast big"]
+		"invert": true,
+		"shape_keys": ["breast small"]
 	},
 	{
 		"type": "ChargenSliderSpec",

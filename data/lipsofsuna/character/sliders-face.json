@@ -5,8 +5,7 @@
 		"categories": {"face": true},
 		"field_name": "face_sliders",
 		"field_index": 1,
-		"invert": true,
-		"shape_keys": ["cheekbone small"]
+		"shape_keys": ["cheekbone big"]
 	},
 	{
 		"type": "ChargenSliderSpec",
@@ -47,5 +46,13 @@
 		"field_name": "face_sliders",
 		"field_index": 6,
 		"shape_keys": ["jaw wide"]
+	},
+	{
+		"type": "ChargenSliderSpec",
+		"name": "Nose size",
+		"categories": {"face": true},
+		"field_name": "face_sliders",
+		"field_index": 7,
+		"shape_keys": ["nose big"]
 	}
 ]
