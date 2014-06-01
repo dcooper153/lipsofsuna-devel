@@ -9,6 +9,8 @@
 -- @alias WindowManager
 
 local Class = require("system/class")
+local Client = require("core/client/client")
+local Program = require("system/core")
 
 --- Manages the windows of the user interface.
 -- @type WindowManager
@@ -19,15 +21,28 @@ local WindowManager = Class("WindowManager")
 -- @return WindowManager.
 WindowManager.new = function(clss)
 	local self = Class.new(clss)
+	self.__windows = {}
 	return self
+end
+
+--- Adds a window.
+-- @param self WindowManager.
+-- @param window Window.
+WindowManager.add_window = function(self, window)
+	self.__windows[window] = true
 end
 
 --- Handles an input event.
 -- @param self WindowManager.
 -- @param args Event arguments.
--- @return True if the caller should handle the event.
+-- @return True if the caller should handle the event. False otherwise.
 WindowManager.handle_event = function(self, args)
-	return Ui:handle_event(args)
+	for k,v in pairs(self.__windows) do
+		if not k:handle_event(args) then
+			return false
+		end
+	end
+	return true
 end
 
 --- Updates the user interface.
@@ -40,7 +55,9 @@ WindowManager.update = function(self, secs)
 	if resized then
 		self.__width = mode[1]
 		self.__height = mode[2]
-		Ui:screen_resized(mode[1], mode[2])
+		for k,v in pairs(self.__windows) do
+			k:screen_resized(mode[1], mode[2])
+		end
 	end
 	-- Emit key repeat events.
 	local t = Program:get_time()
@@ -53,7 +70,9 @@ WindowManager.update = function(self, secs)
 		end
 	end
 	-- Update the user interface state.
-	Ui:update(secs)
+	for k,v in pairs(self.__windows) do
+		k:update(secs)
+	end
 	-- Update video mode options.
 	if resized then
 		local v = Program:get_video_mode()

@@ -1,12 +1,14 @@
 local Client = require("core/client/client")
-local Graphics = require("system/graphics")
-local Program = require("system/core")
-local Time = require("system/time")
 local Ui = require("ui/ui")
 local WindowManager = require("ui/window-manager")
 
-Main.update_hooks:register(0, function(secs)
+Main.main_start_hooks:register(0, function(secs)
 	Main.windows = WindowManager()
+	Main.windows:add_window(Ui) -- FIXME: Hack
+end)
+
+Main.update_hooks:register(0, function(secs)
+	-- TODO: Update here instead
 end)
 
 Main.main_start_hooks:register(110, function()
