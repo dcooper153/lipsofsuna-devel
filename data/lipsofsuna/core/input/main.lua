@@ -14,7 +14,7 @@ end)
 
 local handle_input = function(self, args)
 	Client.input:event(args)
-	if Ui:handle_event(args) then
+	if not Main.windows or Main.windows:handle_event(args) then
 		Client.input.bindings:event(args)
 	end
 end
