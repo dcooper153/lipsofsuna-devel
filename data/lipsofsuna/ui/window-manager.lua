@@ -34,6 +34,14 @@ end
 -- @param self WindowManager.
 -- @param secs Seconds since the last update.
 WindowManager.update = function(self, secs)
+	-- Update the window size.
+	local mode = Program:get_video_mode()
+	local resized = (mode[1] ~= self.__width or mode[2] ~= self.__height)
+	if resized then
+		self.__width = mode[1]
+		self.__height = mode[2]
+		Ui:screen_resized(mode[1], mode[2])
+	end
 	-- Emit key repeat events.
 	local t = Program:get_time()
 	for k,v in pairs(Client.input.pressed) do
@@ -46,8 +54,8 @@ WindowManager.update = function(self, secs)
 	end
 	-- Update the user interface state.
 	Ui:update(secs)
-	-- Update the window size.
-	if Ui.was_resized then
+	-- Update video mode options.
+	if resized then
 		local v = Program:get_video_mode()
 		Client.options.window_width = v[1]
 		Client.options.window_height = v[2]

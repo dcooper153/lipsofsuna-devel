@@ -649,29 +649,21 @@ Ui.show_state_detach = function(self)
 	self.label:detach()
 end
 
+Ui.screen_resized = function(self, width, height)
+	self.size.x = width
+	self.size.y = height
+	self.window:set_request(width, height)
+	if self.background then
+		self.background:set_request(width, height)
+	end
+	self:update_help()
+	self.need_relayout = true
+end
+
 --- Updates the user interface system.
 -- @param self Ui class.
 -- @param secs Seconds since the last update.
 Ui.update = function(self, secs)
-	-- Update the window size.
-	local mode = Graphics:get_video_mode()
-	self.was_resized = (mode[1] ~= self.size.x or mode[2] ~= self.size.y)
-	if self.was_resized then
-		self.size.x = mode[1]
-		self.size.y = mode[2]
-		self.window:set_request(mode[1], mode[2])
-		if self.window.reshaped then
-			self.window:reshaped()
-		end
-		if self.background then
-			self.background:set_request(mode[1], mode[2])
-			if self.background.reshaped then
-				self.background:reshaped()
-			end
-		end
-		self:update_help()
-		self.need_relayout = true
-	end
 	-- Update the cursor.
 	if not self:get_pointer_grab() then
 		self.cursor:update()
