@@ -1,5 +1,4 @@
 local BoomerangController = require("arena/boomerang-controller")
-local Combat = require("core/server/combat")
 local ProjectileController = require("arena/projectile-controller")
 
 Actionspec{
@@ -39,7 +38,7 @@ Actionspec{
 			if action.timer < action.delay then return true end
 			-- Get the projectile.
 			local projectile = action.item:split()
-			local damage = Combat:calculate_ranged_damage(action.object, projectile)
+			local damage = Main.combat_utils:calculate_ranged_damage(action.object, projectile)
 			-- Play the attack effect.
 			Main.vision:object_effect(action.object, "swing1")
 			Main.vision:object_event(action.object, "object attack", {move = "stand", variant = math.random(0, 255)})

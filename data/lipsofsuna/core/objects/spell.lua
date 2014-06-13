@@ -9,7 +9,6 @@
 -- @alias Spell
 
 local Class = require("system/class")
-local Combat = require("core/server/combat")
 local Damage = require("arena/damage") --FIXME
 local SimulationObject = require("core/objects/simulation")
 
@@ -42,14 +41,9 @@ Spell.contact_cb = function(self, result)
 		damage:apply_defender_vulnerabilities(result.object)
 		Main.combat_utils:apply_damage_to_actor(self.owner, result.object, damage, result.point)
 	else
-		-- TODO: Move to CombatUtils.
-		for k,v in pairs(self.modifiers) do
-			if not Combat:apply_ranged_spell_impact(self.owner, self, k.name, result.point, nil, result.tile) then
-				self.modifiers[k] = nil
-			else
-				more = true
-			end
-		end
+		local damage = Damage()
+		damage:add_spell_modifiers(self.modifiers)
+		Main.combat_utils:apply_damage_to_terrain(self.owner, result.tile, damage, result.point)
 	end
 	-- Remove from the world.
 	self:detach()

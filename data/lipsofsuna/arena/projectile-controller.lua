@@ -9,7 +9,6 @@
 -- @alias ProjectileController
 
 local Class = require("system/class")
-local Combat = require("core/server/combat")
 
 --- Provides projectile movement to objects.
 -- @type ProjectileController

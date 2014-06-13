@@ -86,6 +86,21 @@ CombatUtils.apply_damage_to_terrain = function(self, caster, tile, damage, point
 	end
 end
 
+--- Calculates the damage of a ranged attack.
+-- @param self CombatUtils.
+-- @param attacker Attacking actor.
+-- @param weapon Item used for the attack, or nil.
+-- @param projectile Item used as the projectile.
+-- @return Damage information.
+CombatUtils.calculate_ranged_damage = function(self, attacker, weapon, projectile)
+	local damage = Damage()
+	damage:add_item_modifiers(weapon, attacker.skills)
+	damage:add_item_modifiers(projectile, attacker.skills)
+	damage:add_knockback()
+	damage:apply_attacker_charge(attacker:get_attack_charge())
+	return damage
+end
+
 --- Checks if the actor is wielding a ranged weapon.
 -- @param self CombatUtils.
 -- @param actor Actor.

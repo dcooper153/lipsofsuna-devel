@@ -1,4 +1,3 @@
-local Combat = require("core/server/combat")
 local ProjectileController = require("arena/projectile-controller")
 
 Actionspec{
@@ -14,7 +13,7 @@ Actionspec{
 		Main.vision:object_event(attacker, "object attack", {move = "stand", variant = math.random(0, 255)})
 		-- Fire the projectile.
 		local projectile = ammo:split()
-		local damage = Combat:calculate_ranged_damage(attacker, projectile)
+		local damage = Main.combat_utils:calculate_ranged_damage(attacker, projectile)
 		local controller = ProjectileController(attacker, projectile, damage, 20, true)
 		controller:attach()
 	end,

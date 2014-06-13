@@ -1,4 +1,3 @@
-local Combat = require("core/server/combat")
 local Damage = require("arena/damage")
 local Physics = require("system/physics")
 

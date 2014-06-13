@@ -9,7 +9,6 @@
 -- @alias BoomerangController
 
 local Class = require("system/class")
-local Combat = require("core/server/combat")
 
 --- Provides boomerange movement to objects.
 -- @type BoomerangController

@@ -1,4 +1,3 @@
-local Combat = require("core/server/combat")
 local Physics = require("system/physics")
 
 Actionspec{
@@ -23,10 +22,12 @@ Actionspec{
 		local src,dst = Main.combat_utils:get_attack_ray_for_actor(action.object, 0)
 		local r = Physics:cast_ray(src, dst, nil, {action.object.physics})
 		if r then
-			local weapon = action.object:get_weapon()
-			if not r.object then
+			local attacker = action.object
+			local defender = r.object and Main.objects:find_by_id(r.object)
+			local weapon = attacker:get_weapon()
+			if not defender then
 				-- Dig the terrain.
-				Main.building_utils:destroy_terrain_stick(action.object, r.point, r.tile, 1)
+				Main.building_utils:destroy_terrain_stick(attacker, r.point, r.tile, 1)
 				-- Damage the weapon.
 				if weapon and weapon.spec.damage_mining then
 					if not weapon:damaged{amount = 2 * weapon.spec.damage_mining * math.random(), type = "mining"} then
@@ -34,8 +35,15 @@ Actionspec{
 					end
 				end
 			else
-				local target = r.object and Main.objects:find_by_id(r.object)
-				Combat:apply_melee_impact(action.object, weapon, r.point, target, r.tile)
+				local damage = Damage()
+				damage:add_item_or_unarmed_modifiers(weapon, attacker.skills)
+				damage:add_knockback()
+				damage:apply_attacker_physical_modifiers(attacker)
+				damage:apply_attacker_charge(attacker:get_attack_charge())
+				damage:apply_defender_armor(defender)
+				damage:apply_defender_blocking(defender)
+				damage:apply_defender_vulnerabilities(defender)
+				Main.combat_utils:apply_damage_to_actor(attacker, defender, damage, r.point)
 			end
 		end
 	end}
