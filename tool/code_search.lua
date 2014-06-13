@@ -88,6 +88,7 @@ Options:
   -rp --replace-pattern STR STR   Replace a pattern.
   -rw --replace-whole STR STR     Replace a pattern in the whole document.
   -s  --search STR                Search for a string.
+  -sg --search-global STR         Search for a global Lua variable.
   -sp --search-pattern STR        Search for a pattern.
 ]])
 end
@@ -149,6 +150,37 @@ Match.line = function(self, line)
 end
 
 Match.match = function(self, line)
+end
+
+------------------------------------------------------------------------------
+
+local MatchGlobal = Class("MatchGlobal", Match)
+
+MatchGlobal.new = function(clss, path, name, expr)
+	local self = Match.new(clss, path, name)
+	self.expression = expr
+	self.expression_local = "local " .. expr .. " = "
+	self.required = (Utils:get_file_type(name) ~= "Lua")
+	return self
+end
+
+MatchGlobal.match = function(self, line)
+	if self.required then
+		return false
+	end
+	if string.find(line, self.expression_local, 1, true) then
+		self.required = true
+		return false
+	end
+	local s1,e1 = string.find(line, self.expression, 1, true)
+	if not s1 then
+		return false
+	end
+	local s2,e2 = string.find(line, "--", 1, true)
+	if s2 and s2 < s1 then
+		return false
+	end
+	return true
 end
 
 ------------------------------------------------------------------------------
@@ -367,6 +399,11 @@ elseif arg[1] == "-s" or arg[1] == "--search" then
 	if #arg ~= 2 and #arg ~= 3 and #arg ~= 3 then return Utils:usage() end
 	for path,name in Utils:find_files(arg[3] or ".") do
 		MatchString(path, name, arg[2]):parse()
+	end
+elseif arg[1] == "-sg" or arg[1] == "--search-global" then
+	if #arg ~= 2 and #arg ~= 3 then return Utils:usage() end
+	for path,name in Utils:find_files(arg[3] or ".") do
+		MatchGlobal(path, name, arg[2]):parse()
 	end
 elseif arg[1] == "-sp" or arg[1] == "--search-pattern" then
 	if #arg ~= 2 and #arg ~= 3 then return Utils:usage() end
