@@ -18,7 +18,7 @@ local Class = require("system/class")
 
 --- Provides access to the sector manager of the engine.
 -- @type Sectors
-Sectors = Class("Sectors")
+local Sectors = Class("Sectors")
 
 --- Increases the timestamp of the sectors inside the given sphere.<br/>
 --
