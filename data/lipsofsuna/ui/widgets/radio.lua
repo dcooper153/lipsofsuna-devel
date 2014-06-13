@@ -1,10 +1,10 @@
 local Class = require("system/class")
-require(Mod.path .. "toggle")
+local UiToggle = require("ui/widgets/toggle")
 
-Widgets.Uiradio = Class("Uiradio", Widgets.Uitoggle)
+Widgets.Uiradio = Class("Uiradio", UiToggle)
 
 Widgets.Uiradio.new = function(clss, label, group, changed)
-	local self = Widgets.Uitoggle.new(clss, label, changed)
+	local self = UiToggle.new(clss, label, changed)
 	self.radio_group = group
 	self.hint = "$A: Select\n$$B\n$$U\n$$D"
 	return self

@@ -4,6 +4,7 @@ local UiButton = require("ui/widgets/button")
 local UiConfigOption = require("ui/widgets/config-option")
 local UiEntry = require("ui/widgets/entry")
 local UiLabel = require("ui/widgets/label")
+local UiToggle = require("ui/widgets/toggle")
 
 Ui:add_state{
 	state = "host/load",
@@ -29,7 +30,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "host/load",
-	widget = function() return Widgets.Uitoggle("Restart", function(w)
+	widget = function() return UiToggle("Restart", function(w)
 			Client.options.host_restart = w.value
 		end)
 	end}

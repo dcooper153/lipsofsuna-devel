@@ -1,9 +1,9 @@
 local Class = require("system/class")
 require("ui/widgets/widget")
 
-Widgets.Uitoggle = Class("Uitoggle", Widgets.Uiwidget)
+local UiToggle = Class("UiToggle", Widgets.Uiwidget)
 
-Widgets.Uitoggle.new = function(clss, label, changed)
+UiToggle.new = function(clss, label, changed)
 	local self = Widgets.Uiwidget.new(clss, label)
 	self.value = false
 	self.changed = changed
@@ -11,17 +11,17 @@ Widgets.Uitoggle.new = function(clss, label, changed)
 	return self
 end
 
-Widgets.Uitoggle.apply = function(self)
+UiToggle.apply = function(self)
 	self.value = not self.value
 	self.need_repaint = true
 	self:changed()
 	Client.effects:play_global(self.value and "uitoggle1" or "uitoggle2")
 end
 
-Widgets.Uitoggle.changed = function(self)
+UiToggle.changed = function(self)
 end
 
-Widgets.Uitoggle.rebuild_size = function(self)
+UiToggle.rebuild_size = function(self)
 	-- Get the base size.
 	local size = Widgets.Uiwidget.rebuild_size(self)
 	-- Resize to fit the label.
@@ -31,7 +31,7 @@ Widgets.Uitoggle.rebuild_size = function(self)
 	return size
 end
 
-Widgets.Uitoggle.rebuild_canvas = function(self)
+UiToggle.rebuild_canvas = function(self)
 	-- Add the base.
 	Widgets.Uiwidget.rebuild_canvas(self)
 	-- Add the button.
@@ -40,3 +40,5 @@ Widgets.Uitoggle.rebuild_canvas = function(self)
 		Theme.width_label_1, 3, self.size.x-Theme.width_label_1-5, self.size.y-6,
 		self.focused, self.value)
 end
+
+return UiToggle

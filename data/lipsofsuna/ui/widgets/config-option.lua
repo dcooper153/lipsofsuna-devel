@@ -2,20 +2,20 @@ local Class = require("system/class")
 local UiEntry = require("ui/widgets/entry")
 require("ui/widgets/scrollfloat")
 require("ui/widgets/scrollinteger")
-require("ui/widgets/toggle")
+local UiToggle = require("ui/widgets/toggle")
 require("ui/widgets/widget")
 local UiScrollFloat = require("ui/widgets/scrollfloat")
 local UiScrollInteger = require("ui/widgets/scrollinteger")
 
 ------------------------------------------------------------------------------
 
-local UiConfigOptionBool = Class("UiConfigOptionBool", Widgets.Uitoggle)
+local UiConfigOptionBool = Class("UiConfigOptionBool", UiToggle)
 
 UiConfigOptionBool.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
 	local value = Client.options[option]
 	-- Create the widget.
-	local self = Widgets.Uitoggle.new(clss, opt[1])
+	local self = UiToggle.new(clss, opt[1])
 	self.key = option
 	self.value = value
 	-- Report the initial value.
