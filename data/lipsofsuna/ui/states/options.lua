@@ -1,5 +1,6 @@
 local Render = require("system/render")
 local Sound = require("system/sound")
+local UiBackground = require("ui/widgets/background")
 local UiRadioMenu = require("ui/widgets/radio-menu")
 local UiStateMenu = require("ui/widgets/state-menu")
 
@@ -8,7 +9,7 @@ Ui:add_state{
 	label = "Options",
 	background = function()
 		if Client.player_object then return end
-		return Widgets.Uibackground("mainmenu1")
+		return UiBackground("mainmenu1")
 	end}
 
 Ui:add_widget{

@@ -1,3 +1,4 @@
+local UiBackground = require("ui/widgets/background")
 local UiBinding = require("ui/widgets/binding")
 
 Ui:add_state{
@@ -5,7 +6,7 @@ Ui:add_state{
 	label = "Controls",
 	background = function()
 		if Client.player_object then return end
-		return Widgets.Uibackground("mainmenu1")
+		return UiBackground("mainmenu1")
 	end,
 	init = function()
 		-- Get the control actions.

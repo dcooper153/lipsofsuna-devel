@@ -1,3 +1,4 @@
+local UiBackground = require("ui/widgets/background")
 local UiButton = require("ui/widgets/button")
 local UiEntry = require("ui/widgets/entry")
 local UiSelector = require("ui/widgets/selector")
@@ -9,7 +10,7 @@ Ui:add_state{
 	root = "mainmenu",
 	label = "New game",
 	background = function()
-		return Widgets.Uibackground("mainmenu1")
+		return UiBackground("mainmenu1")
 	end}
 
 Ui:add_widget{

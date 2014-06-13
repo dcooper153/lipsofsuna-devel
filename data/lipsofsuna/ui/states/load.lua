@@ -1,10 +1,12 @@
+local UiBackground = require("ui/widgets/background")
+
 Ui:add_state{
 	state = "load",
 	root = "load",
 	label = "Loading",
 	hint = "Loading the map, please wait.",
 	background = function()
-		return Widgets.Uibackground("mainmenu1")
+		return UiBackground("mainmenu1")
 	end,
 	init = function()
 		Client.data.load.timer = 0

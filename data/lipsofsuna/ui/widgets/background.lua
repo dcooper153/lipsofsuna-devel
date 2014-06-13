@@ -1,16 +1,16 @@
 local Class = require("system/class")
 local Widget = require("system/widget")
 
-Widgets.Uibackground = Class("Uibackground", Widget)
+local UiBackground = Class("UiBackground", Widget)
 
-Widgets.Uibackground.new = function(clss, image)
+UiBackground.new = function(clss, image)
 	local self = Widget.new(clss)
 	self:set_fullscreen(true)
 	self.image = image
 	return self
 end
 
-Widgets.Uibackground.reshaped = function(self)
+UiBackground.reshaped = function(self)
 	self:set_request(0, 0, true)
 	local w,h = self:get_width(),self:get_height()
 	self:canvas_clear()
@@ -35,3 +35,5 @@ Widgets.Uibackground.reshaped = function(self)
 		end
 	end
 end
+
+return UiBackground

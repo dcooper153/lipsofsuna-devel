@@ -1,3 +1,4 @@
+local UiBackground = require("ui/widgets/background")
 local UiTransition = require("ui/widgets/transition")
 
 Ui:add_state{
@@ -5,7 +6,7 @@ Ui:add_state{
 	root = "mainmenu",
 	label = "Multiplayer",
 	background = function()
-		return Widgets.Uibackground("mainmenu1")
+		return UiBackground("mainmenu1")
 	end}
 
 Ui:add_widget{

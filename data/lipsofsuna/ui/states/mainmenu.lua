@@ -1,3 +1,4 @@
+local UiBackground = require("ui/widgets/background")
 local UiButton = require("ui/widgets/button")
 local UiTransition = require("ui/widgets/transition")
 
@@ -6,7 +7,7 @@ Ui:add_state{
 	root = "mainmenu",
 	label = "Main menu",
 	background = function()
-		return Widgets.Uibackground("mainmenu1")
+		return UiBackground("mainmenu1")
 	end,
 	init = function()
 		Client.music:clear_combat_hints()
