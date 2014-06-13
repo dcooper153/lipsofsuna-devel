@@ -18,7 +18,7 @@ end
 
 --- TODO:doc
 -- @type Widgets
-Widgets = Class("Widgets")
+local Widgets = Class("Widgets")
 
 --- Adds a font style.
 -- @param clss Widgets class.
@@ -61,5 +61,3 @@ Widgets.get_widget_under_cursor = function(self)
 end
 
 return Widgets
-
-

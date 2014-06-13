@@ -11,6 +11,7 @@
 local Class = require("system/class")
 local Input = require("system/input")
 local Widget = require("system/widget")
+local Widgets = require("system/widgets")
 
 --- TODO:doc
 -- @type Cursor

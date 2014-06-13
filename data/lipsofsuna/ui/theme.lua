@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local IconSpec = require("core/specs/icon")
+local Widgets = require("system/widgets")
 
 --- TODO:doc
 -- @type Theme
