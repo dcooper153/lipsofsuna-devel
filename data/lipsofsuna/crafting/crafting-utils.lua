@@ -10,7 +10,7 @@
 
 local Class = require("system/class")
 local CraftingRecipeSpec = require("core/specs/crafting-recipe")
-local Item = require("lipsofsuna/core/objects/item")
+local Item = require("core/objects/item")
 
 --- Crafting utils.
 -- @type CraftingUtils
