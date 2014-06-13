@@ -1,3 +1,5 @@
+local UiButton = require("ui/widgets/button")
+
 Ui:add_state{
 	state = "world/object",
 	label = "Interact",
@@ -21,13 +23,13 @@ Ui:add_state{
 			local action = v[3]
 			if action then
 				-- Add a standard action.
-				table.insert(widgets, Widgets.Uibutton(v[2], function()
+				table.insert(widgets, UiButton(v[2], function()
 					Operators.world:use_object(object, action)
 				end))
 			else
 				-- Add a special action.
 				if v[1] == "dialog" then
-					table.insert(widgets, Widgets.Uibutton(v[2], function()
+					table.insert(widgets, UiButton(v[2], function()
 						if not object.dialog then
 							Main.messaging:client_event("dialog start", object:get_id())
 						else
@@ -36,7 +38,7 @@ Ui:add_state{
 						end
 					end))
 				elseif v[1] == "loot" then
-					table.insert(widgets, Widgets.Uibutton(v[2], function()
+					table.insert(widgets, UiButton(v[2], function()
 						if not Operators.inventory:get_inventory_by_id(object:get_id()) then
 							Main.messaging:client_event("loot in world", object:get_id())
 						end
@@ -44,7 +46,7 @@ Ui:add_state{
 						Ui:set_state("loot")
 					end))
 				elseif v[1] == "pickpocket" then
-					table.insert(widgets, Widgets.Uibutton(v[2], function()
+					table.insert(widgets, UiButton(v[2], function()
 						-- FIXME: Should use a different system.
 						if not Operators.inventory:get_inventory_by_id(object:get_id()) then
 							Main.messaging:client_event("pickpocket", object:get_id())
@@ -53,7 +55,7 @@ Ui:add_state{
 						Ui:set_state("loot")
 					end))
 				elseif v[1] == "pick up" then
-					table.insert(widgets, Widgets.Uibutton(v[2], function()
+					table.insert(widgets, UiButton(v[2], function()
 						Main.messaging:client_event("take from world", object:get_id())
 						Ui:pop_state()
 					end))

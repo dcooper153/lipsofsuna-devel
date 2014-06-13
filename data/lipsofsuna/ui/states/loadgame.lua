@@ -1,4 +1,5 @@
 local File = require("system/file")
+local UiButton = require("ui/widgets/button")
 
 Ui:add_state{
 	state = "loadgame",
@@ -16,7 +17,7 @@ Ui:add_widget{
 			local file = string.match(v, "save([a-z0-9_]*).sqlite")
 			if file then
 				local name = Operators.single_player:decode_save_filename(file)
-				table.insert(widgets, Widgets.Uibutton(name, function()
+				table.insert(widgets, UiButton(name, function()
 					Settings.file = file
 					Settings.generate = false
 					Main:start_game("Normal")

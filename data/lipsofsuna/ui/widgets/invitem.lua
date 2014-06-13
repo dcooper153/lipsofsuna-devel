@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local UiButton = require("ui/widgets/button")
 local UiMenu = require("ui/widgets/menu")
 local UiInvItem = Class("UiInvItem", UiMenu)
 local UiTransition = require("ui/widgets/transition")
@@ -40,7 +41,7 @@ UiInvItem.apply = function(self)
 			-- Don't show the widget if the item is already equipped.
 			if object.inventory:get_slot_by_index(index) then return end
 			-- Create the widget.
-			return Widgets.Uibutton("Equip in " .. slot, function()
+			return UiButton("Equip in " .. slot, function()
 				Main.messaging:client_event("equip from inventory", index, slot)
 				parent:set_menu_opened(false)
 			end)
@@ -52,7 +53,7 @@ UiInvItem.apply = function(self)
 			-- Don't show the widget if the item isn't equipped.
 			if not object.inventory:get_slot_by_index(index) then return end
 			-- Create the widget.
-			return Widgets.Uibutton("Unequip", function()
+			return UiButton("Unequip", function()
 				Main.messaging:client_event("unequip", index)
 				parent:set_menu_opened(false)
 			end)
@@ -70,7 +71,7 @@ UiInvItem.apply = function(self)
 			for k,v in pairs(item.spec:get_use_actions()) do
 				local name = v.label or v.name
 				local action = v.name
-				table.insert(widgets, Widgets.Uibutton(name, function()
+				table.insert(widgets, UiButton(name, function()
 					Main.messaging:client_event("use in inventory", id, index, action)
 					parent:set_menu_opened(false)
 				end))
@@ -78,7 +79,7 @@ UiInvItem.apply = function(self)
 			return widgets
 		end,
 		function()
-			return Widgets.Uibutton("Drop", function()
+			return UiButton("Drop", function()
 				Main.messaging:client_event("drop from inventory", index, count)
 				parent:set_menu_opened(false)
 			end)

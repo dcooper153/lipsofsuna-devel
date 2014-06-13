@@ -1,10 +1,10 @@
 local Class = require("system/class")
-require("ui/widgets/button")
+local UiButton = require("ui/widgets/button")
 
-local UiTransition = Class("UiTransition", Widgets.Uibutton)
+local UiTransition = Class("UiTransition", UiButton)
 
 UiTransition.new = function(clss, label, state, changed)
-	local self = Widgets.Uibutton.new(clss, label)
+	local self = UiButton.new(clss, label)
 	self.hint = "$A: Enter\n$$B\n$$U\n$$D"
 	self.target_state = state
 	self.changed = changed

@@ -1,4 +1,5 @@
 local Network = require("system/network")
+local UiButton = require("ui/widgets/button")
 
 Ui:add_state{
 	state = "host/wait",
@@ -12,7 +13,7 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "host/wait",
-	widget = function() return Widgets.Uibutton("Retry", function()
+	widget = function() return UiButton("Retry", function()
 			Client:terminate_game()
 			Main.host:host_game()
 			--Client:start_single_player()
@@ -21,7 +22,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "host/wait",
-	widget = function() return Widgets.Uibutton("Cancel", function()
+	widget = function() return UiButton("Cancel", function()
 			Client:terminate_game()
 			Ui:set_state("mainmenu")
 		end)

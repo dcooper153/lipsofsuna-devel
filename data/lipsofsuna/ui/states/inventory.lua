@@ -1,3 +1,4 @@
+local UiButton = require("ui/widgets/button")
 local UiInvItem = require("ui/widgets/invitem")
 local UiScrollInteger = require("ui/widgets/scrollinteger")
 
@@ -38,7 +39,7 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "inventory/drop",
 	widget = function()
-		return Widgets.Uibutton("Drop", function()
+		return UiButton("Drop", function()
 			Main.messaging:client_event("drop from inventory", Client.data.inventory.index, Client.data.inventory.count)
 			Ui:pop_state()
 		end)
@@ -64,7 +65,7 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "inventory/split",
 	widget = function()
-		return Widgets.Uibutton("Split", function()
+		return UiButton("Split", function()
 			Main.messaging:client_event("split in inventory", Client.data.inventory.id, Client.data.inventory.index, Client.data.inventory.count)
 			Ui:pop_state()
 		end)

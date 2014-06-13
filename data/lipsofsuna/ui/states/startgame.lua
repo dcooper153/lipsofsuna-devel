@@ -1,4 +1,5 @@
 local Network = require("system/network")
+local UiButton = require("ui/widgets/button")
 
 Ui:add_state{
 	state = "start-game",
@@ -20,7 +21,7 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "start-game",
-	widget = function() return Widgets.Uibutton("Retry", function()
+	widget = function() return UiButton("Retry", function()
 			Client:terminate_game()
 			Client:start_single_player()
 		end)
@@ -28,7 +29,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "start-game",
-	widget = function() return Widgets.Uibutton("Cancel", function()
+	widget = function() return UiButton("Cancel", function()
 			Client:terminate_game()
 			Ui:set_state("mainmenu")
 		end)

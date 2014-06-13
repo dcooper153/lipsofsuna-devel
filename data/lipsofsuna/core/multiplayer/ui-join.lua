@@ -1,4 +1,5 @@
 local Lobby = require("system/lobby")
+local UiButton = require("ui/widgets/button")
 local UiTransition = require("ui/widgets/transition")
 
 Ui:add_state{
@@ -35,7 +36,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "join",
-	widget = function() return Widgets.Uibutton("Connect", function()
+	widget = function() return UiButton("Connect", function()
 			Settings.account = Client.options.join_account
 			Settings.password = Client.options.join_password
 			Main.join:join_game(Client.options.join_address, Client.options.join_port)

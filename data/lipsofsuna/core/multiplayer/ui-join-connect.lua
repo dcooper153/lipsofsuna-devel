@@ -1,6 +1,7 @@
 local Client = require("core/client/client")
 local Network = require("system/network")
 local Ui = require("ui/ui")
+local UiButton = require("ui/widgets/button")
 
 Ui:add_state{
 	state = "join/connect",
@@ -14,7 +15,7 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "join/connect",
-	widget = function() return Widgets.Uibutton("Retry", function()
+	widget = function() return UiButton("Retry", function()
 			Client:terminate_game()
 			Main.join:join_game()
 		end)
@@ -22,7 +23,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "join/connect",
-	widget = function() return Widgets.Uibutton("Cancel", function()
+	widget = function() return UiButton("Cancel", function()
 			Client:terminate_game()
 			Ui:set_state("mainmenu")
 		end)

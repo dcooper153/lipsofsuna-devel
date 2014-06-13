@@ -1,3 +1,5 @@
+local UiButton = require("ui/widgets/button")
+
 Ui:add_state{
 	state = "host/new",
 	root = "mainmenu",
@@ -39,7 +41,7 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "host/new",
 	widget = function()
-		return Widgets.Uibutton("Start game", function()
+		return UiButton("Start game", function()
 			-- Prevent overwriting.
 			local name = Operators.single_player:get_save_name()
 			if #name == 0 then return end

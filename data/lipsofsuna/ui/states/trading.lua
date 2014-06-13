@@ -1,3 +1,5 @@
+local UiButton = require("ui/widgets/button")
+
 Ui:add_state{
 	state = "trading",
 	label = "Trading"}
@@ -36,7 +38,7 @@ Ui:add_widget{
 	state = "trading",
 	widget = function()
 		if Operators.trading:is_acceptable() then
-			return Widgets.Uibutton("Accept", function() Operators.trading:accept() end)
+			return UiButton("Accept", function() Operators.trading:accept() end)
 		else
 			return Widgets.Uilabel("You need to pay more.")
 		end

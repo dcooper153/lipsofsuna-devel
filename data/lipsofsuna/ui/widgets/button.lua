@@ -1,9 +1,9 @@
 local Class = require("system/class")
 local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uibutton = Class("Uibutton", UiWidget)
+local UiButton = Class("UiButton", UiWidget)
 
-Widgets.Uibutton.new = function(clss, label, apply)
+UiButton.new = function(clss, label, apply)
 	local self = UiWidget.new(clss)
 	self.apply = apply
 	self.hint = "$A: Activate\n$$B\n$$U\n$$D"
@@ -11,10 +11,10 @@ Widgets.Uibutton.new = function(clss, label, apply)
 	return self
 end
 
-Widgets.Uibutton.apply = function(self)
+UiButton.apply = function(self)
 end
 
-Widgets.Uibutton.rebuild_size = function(self)
+UiButton.rebuild_size = function(self)
 	-- Get the base size.
 	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the label.
@@ -24,10 +24,10 @@ Widgets.Uibutton.rebuild_size = function(self)
 	return size
 end
 
-Widgets.Uibutton.rebuild_canvas = function(self)
+UiButton.rebuild_canvas = function(self)
 	Theme:draw_button(self, self.text,
 		0, 0, self.size.x, self.size.y,
 		self.focused, false)
 end
 
-return Widgets.Uibutton
+return UiButton

@@ -1,3 +1,5 @@
+local UiButton = require("ui/widgets/button")
+
 Ui:add_state{
 	state = "store",
 	history = "inventory",
@@ -24,7 +26,7 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "store",
 	widget = function()
-		local w = Widgets.Uibutton("Loot", function() Ui:pop_state() end)
+		local w = UiButton("Loot", function() Ui:pop_state() end)
 		w.hint = "$A: Enter\n$$B\n$$U\n$$D"
 		return w
 	end}

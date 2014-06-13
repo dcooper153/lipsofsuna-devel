@@ -1,3 +1,4 @@
+local UiButton = require("ui/widgets/button")
 local UiTransition = require("ui/widgets/transition")
 
 Ui:add_state{
@@ -41,7 +42,7 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "editor/menu",
 	widget = function()
-		return Widgets.Uibutton("Delete", function()
+		return UiButton("Delete", function()
 			Client.editor:delete()
 		end)
 	end}
@@ -49,7 +50,7 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "editor/menu",
 	widget = function()
-		return Widgets.Uibutton("Save", function()
+		return UiButton("Save", function()
 			-- TODO: Path selection
 			Client.editor:save()
 		end)
@@ -80,7 +81,7 @@ Ui:add_state{
 			table.sort(widgets)
 			-- Create widgets for the maps.
 			for k,v in pairs(widgets) do
-				widgets[k] = Widgets.Uibutton(v, function()
+				widgets[k] = UiButton(v, function()
 					Client.editor:load(v)
 				end)
 			end
@@ -151,7 +152,7 @@ Ui:add_state{
 		table.sort(widgets)
 		-- Create widgets for the obstacles.
 		for k,v in pairs(widgets) do
-			widgets[k] = Widgets.Uibutton(v, function()
+			widgets[k] = UiButton(v, function()
 				Client.editor:create_obstacle(v)
 			end)
 		end
@@ -174,7 +175,7 @@ Ui:add_state{
 		table.sort(widgets)
 		-- Create widgets for the static objects.
 		for k,v in pairs(widgets) do
-			widgets[k] = Widgets.Uibutton(v, function()
+			widgets[k] = UiButton(v, function()
 				Client.editor:create_static(v)
 			end)
 		end
@@ -197,7 +198,7 @@ Ui:add_state{
 		table.sort(widgets)
 		-- Create widgets for the actors.
 		for k,v in pairs(widgets) do
-			widgets[k] = Widgets.Uibutton(v, function()
+			widgets[k] = UiButton(v, function()
 				Client.editor:create_actor(v)
 			end)
 		end
@@ -220,7 +221,7 @@ Ui:add_state{
 		table.sort(widgets)
 		-- Create widgets for the tiles.
 		for k,v in pairs(widgets) do
-			widgets[k] = Widgets.Uibutton(v, function()
+			widgets[k] = UiButton(v, function()
 				Client.editor:create_tile(v)
 			end)
 		end

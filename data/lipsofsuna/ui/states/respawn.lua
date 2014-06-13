@@ -1,3 +1,5 @@
+local UiButton = require("ui/widgets/button")
+
 Ui:add_state{
 	state = "respawn",
 	label = "Respawn",
@@ -10,7 +12,7 @@ Ui:add_state{
 Ui:add_widget{
 	state = "respawn",
 	widget = function()
-		return Widgets.Uibutton("Respawn", function()
+		return UiButton("Respawn", function()
 			Main.messaging:client_event("respawn")
 		end)
 	end}

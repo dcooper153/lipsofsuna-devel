@@ -1,3 +1,4 @@
+local UiButton = require("ui/widgets/button")
 local UiSelector = require("ui/widgets/selector")
 
 local game_mode = "Normal"
@@ -53,7 +54,7 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "newgame",
 	widget = function()
-		return Widgets.Uibutton("Start", function()
+		return UiButton("Start", function()
 			-- Prevent overwriting.
 			local name = Operators.single_player:get_save_name()
 			if #name == 0 then return end

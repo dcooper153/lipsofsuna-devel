@@ -1,3 +1,4 @@
+local UiButton = require("ui/widgets/button")
 local UiTransition = require("ui/widgets/transition")
 
 Ui:add_state{
@@ -34,4 +35,4 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "mainmenu",
-	widget = function() return Widgets.Uibutton("Quit", function() Program:set_quit(true) end) end}
+	widget = function() return UiButton("Quit", function() Program:set_quit(true) end) end}
