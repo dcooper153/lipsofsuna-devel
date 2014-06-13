@@ -3,6 +3,7 @@ local UiBackground = require("ui/widgets/background")
 local UiButton = require("ui/widgets/button")
 local UiConfigOption = require("ui/widgets/config-option")
 local UiEntry = require("ui/widgets/entry")
+local UiLabel = require("ui/widgets/label")
 
 Ui:add_state{
 	state = "host/load",
@@ -35,7 +36,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "host/load",
-	widget = function() return Widgets.Uilabel("Files:") end}
+	widget = function() return UiLabel("Files:") end}
 
 Ui:add_widget{
 	state = "host/load",

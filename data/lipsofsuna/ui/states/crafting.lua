@@ -1,3 +1,5 @@
+local UiLabel = require("ui/widgets/label")
+
 Ui:add_state{
 	state = "crafting",
 	label = "Crafting",
@@ -13,7 +15,7 @@ Ui:add_state{
 		end
 		-- Create the fallback widget if nothing to craft.
 		if #widgets == 0 then
-			table.insert(widgets, Widgets.Uilabel("You don't have enough materials in your inventory to craft anything."))
+			table.insert(widgets, UiLabel("You don't have enough materials in your inventory to craft anything."))
 		end
 		return widgets
 	end}

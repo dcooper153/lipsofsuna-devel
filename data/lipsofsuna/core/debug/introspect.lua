@@ -2,6 +2,7 @@ local ChatCommand = require("core/chat/chat-command")
 local Introspect = require("core/introspect/introspect")
 local IntrospectOperator = require("core/debug/introspect-operator")
 local Spec = require("core/specs/spec")
+local UiLabel = require("ui/widgets/label")
 local UiTransition = require("ui/widgets/transition")
 
 ChatCommand{
@@ -95,9 +96,9 @@ Ui:add_state{
 		local field = IntrospectOperator:get_field()
 		local value = spec[field.name]
 		local widgets = {}
-		table.insert(widgets, Widgets.Uilabel("Name: " .. field.name))
-		table.insert(widgets, Widgets.Uilabel("Type: " .. field.type))
-		table.insert(widgets, Widgets.Uilabel("Value: " .. tostring(value)))
-		table.insert(widgets, Widgets.Uilabel("Default: " .. tostring(field.default)))
+		table.insert(widgets, UiLabel("Name: " .. field.name))
+		table.insert(widgets, UiLabel("Type: " .. field.type))
+		table.insert(widgets, UiLabel("Value: " .. tostring(value)))
+		table.insert(widgets, UiLabel("Default: " .. tostring(field.default)))
 		return widgets
 	end}

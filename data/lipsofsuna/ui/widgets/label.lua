@@ -1,19 +1,19 @@
 local Class = require("system/class")
 require("ui/widgets/widget")
 
-Widgets.Uilabel = Class("Uilabel", Widgets.Uiwidget)
+local UiLabel = Class("UiLabel", Widgets.Uiwidget)
 
-Widgets.Uilabel.new = function(clss, label)
+UiLabel.new = function(clss, label)
 	local self = Widgets.Uiwidget.new(clss)
 	self.hint = "$$B\n$$U\n$$D"
 	self.text = label
 	return self
 end
 
-Widgets.Uilabel.apply = function(self)
+UiLabel.apply = function(self)
 end
 
-Widgets.Uilabel.rebuild_size = function(self)
+UiLabel.rebuild_size = function(self)
 	-- Get the base size.
 	local size = Widgets.Uiwidget.rebuild_size(self)
 	-- Resize to fit the label.
@@ -24,7 +24,7 @@ Widgets.Uilabel.rebuild_size = function(self)
 	return size
 end
 
-Widgets.Uilabel.rebuild_canvas = function(self)
+UiLabel.rebuild_canvas = function(self)
 	-- Add the base.
 	Widgets.Uiwidget.rebuild_canvas(self)
 	-- Add the text.
@@ -37,4 +37,4 @@ Widgets.Uilabel.rebuild_canvas = function(self)
 		text_font = Theme.text_font_1}
 end
 
-return Widgets.Uilabel
+return UiLabel

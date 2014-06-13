@@ -1,4 +1,5 @@
 local Ui = require("ui/ui")
+local UiLabel = require("ui/widgets/label")
 
 Ui:add_state{
 	state = "benchmark",
@@ -30,5 +31,5 @@ Ui:add_widget{
 	id = "stats",
 	widget = function()
 		Operators.stats:update_client_stats()
-		return Widgets.Uilabel(Operators.stats:get_client_stats_text())
+		return UiLabel(Operators.stats:get_client_stats_text())
 	end}

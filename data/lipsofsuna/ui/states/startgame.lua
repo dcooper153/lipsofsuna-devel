@@ -1,5 +1,6 @@
 local Network = require("system/network")
 local UiButton = require("ui/widgets/button")
+local UiLabel = require("ui/widgets/label")
 
 Ui:add_state{
 	state = "start-game",
@@ -37,4 +38,4 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "start-game",
-	widget = function() return Widgets.Uilabel(Client.data.connection.text) end}
+	widget = function() return UiLabel(Client.data.connection.text) end}

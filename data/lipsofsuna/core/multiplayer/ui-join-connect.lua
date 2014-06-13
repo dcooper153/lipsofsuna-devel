@@ -2,6 +2,7 @@ local Client = require("core/client/client")
 local Network = require("system/network")
 local Ui = require("ui/ui")
 local UiButton = require("ui/widgets/button")
+local UiLabel = require("ui/widgets/label")
 
 Ui:add_state{
 	state = "join/connect",
@@ -31,4 +32,4 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "join/connect",
-	widget = function() return Widgets.Uilabel(Main.join:get_status()) end}
+	widget = function() return UiLabel(Main.join:get_status()) end}

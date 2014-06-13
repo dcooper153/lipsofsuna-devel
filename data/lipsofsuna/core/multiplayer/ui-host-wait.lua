@@ -1,5 +1,6 @@
 local Network = require("system/network")
 local UiButton = require("ui/widgets/button")
+local UiLabel = require("ui/widgets/label")
 
 Ui:add_state{
 	state = "host/wait",
@@ -30,4 +31,4 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "host/wait",
-	widget = function() return Widgets.Uilabel(Main.host:get_status()) end}
+	widget = function() return UiLabel(Main.host:get_status()) end}

@@ -1,4 +1,5 @@
 local UiButton = require("ui/widgets/button")
+local UiLabel = require("ui/widgets/label")
 
 Ui:add_state{
 	state = "trading",
@@ -6,7 +7,7 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "trading",
-	widget = function() return Widgets.Uilabel("Goods") end}
+	widget = function() return UiLabel("Goods") end}
 
 Ui:add_widget{
 	state = "trading",
@@ -21,7 +22,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "trading",
-	widget = function() return Widgets.Uilabel("Payment") end}
+	widget = function() return UiLabel("Payment") end}
 
 Ui:add_widget{
 	state = "trading",
@@ -40,7 +41,7 @@ Ui:add_widget{
 		if Operators.trading:is_acceptable() then
 			return UiButton("Accept", function() Operators.trading:accept() end)
 		else
-			return Widgets.Uilabel("You need to pay more.")
+			return UiLabel("You need to pay more.")
 		end
 	end}
 

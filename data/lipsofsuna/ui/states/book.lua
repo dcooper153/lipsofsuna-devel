@@ -1,3 +1,5 @@
+local UiLabel = require("ui/widgets/label")
+
 Ui:add_state{
 	state = "book",
 	label = "Book",
@@ -21,11 +23,11 @@ Ui:add_state{
 			return t
 		end
 		-- Create the title widget.
-		local widgets = {Widgets.Uilabel(Client.data.book.title)}
+		local widgets = {UiLabel(Client.data.book.title)}
 		-- Create the page widgets.
 		local pages = split(Client.data.book.text, "\n\n\n")
 		for k,v in ipairs(pages) do
-			table.insert(widgets, Widgets.Uilabel(v))
+			table.insert(widgets, UiLabel(v))
 		end
 		return widgets
 	end}
