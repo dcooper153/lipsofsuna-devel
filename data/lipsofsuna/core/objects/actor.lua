@@ -541,7 +541,7 @@ Actor.handle_inventory_event = function(self, args)
 			local effect = args.object.spec:get_effect("equip")
 			if effect then
 				if not Operators.play:is_startup_period() then
-					Client.effects:play_object(effect.name, self, node)
+					Main.effect_manager:play_object(effect.name, self, node)
 				end
 			end
 		elseif args.type == "inventory-unequipped" then
@@ -549,7 +549,7 @@ Actor.handle_inventory_event = function(self, args)
 			local effect = args.object.spec:get_effect("unequip")
 			if effect then
 				if not Operators.play:is_startup_period() then
-					Client.effects:play_object(effect.name, self, node)
+					Main.effect_manager:play_object(effect.name, self, node)
 				end
 			end
 		end
@@ -1136,11 +1136,11 @@ Actor.set_stat = function(self, s, v, m, diff)
 	-- Show health notifications.
 	if diff and s == "health" then
 		-- Show a health change text.
-		Client.effects:create_damage_text(self, nil, diff)
+		Main.effect_manager:create_damage_text(self, nil, diff)
 		-- Quake the camera if the player was hurt.
-		if self == Client.player_object and diff < -2 then
+		if self == Main.client.player_object and diff < -2 then
 			local amount = math.min(1, 0.01 * (2 - diff))
-			Client.effects:apply_quake(self:get_position(), amount)
+			Main.effect_manager:apply_quake(self:get_position(), amount)
 		end
 		-- Set the correct collision shape.
 		-- Dead actors have a different collision shape. We switch between

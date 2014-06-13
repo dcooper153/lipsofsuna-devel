@@ -12,7 +12,7 @@ Main.main_start_hooks:register(500, function()
 			else
 				Ui:set_state("menu")
 			end
-			Client.effects:play_global("uitransition1")
+			Main.effect_manager:play_global("uitransition1")
 		elseif Ui.root == "editor" then
 			-- Editor controls.
 			if Ui:get_state() ~= "editor" then

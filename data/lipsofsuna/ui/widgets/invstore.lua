@@ -11,7 +11,7 @@ end
 
 UiInvStore.apply = function(self)
 	Main.messaging:client_event("store to container", self.inventory_id, self.index)
-	Client.effects:play_global("uitransition1")
+	Main.effect_manager:play_global("uitransition1")
 end
 
 return UiInvStore

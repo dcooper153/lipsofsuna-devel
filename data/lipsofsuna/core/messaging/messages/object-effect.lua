@@ -16,5 +16,5 @@ Main.messaging:register_message{
 	server_to_client_handle = function(self, id, name)
 		local object = Main.objects:find_by_id(id)
 		if not object then return end
-		Client.effects:play_object(name, object)
+		Main.effect_manager:play_object(name, object)
 	end}

@@ -11,5 +11,5 @@ Ui:add_state{
 		return true
 	end,
 	init = function()
-		Client.music:switch_track("game")
+		Main.music_manager:switch_track("game")
 	end}

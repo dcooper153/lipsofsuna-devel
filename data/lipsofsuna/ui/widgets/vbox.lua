@@ -59,7 +59,7 @@ UiVBox.focus_down = function(self)
 		self.focused_item = self.focused_item + 1
 		local new = self.__widgets[self.focused_item]
 		if new then new:set_focused(true) end
-		Client.effects:play_global("uimove1")
+		Main.effect_manager:play_global("uimove1")
 		return true
 	elseif #self.__widgets > 1 then
 		local old = self.__widgets[self.focused_item]
@@ -67,7 +67,7 @@ UiVBox.focus_down = function(self)
 		self.focused_item = 1
 		local new = self.__widgets[self.focused_item]
 		if new then new:set_focused(true) end
-		Client.effects:play_global("uimove1")
+		Main.effect_manager:play_global("uimove1")
 		return true
 	end
 end
@@ -100,7 +100,7 @@ UiVBox.focus_up = function(self)
 		self.focused_item = self.focused_item - 1
 		local new = self.__widgets[self.focused_item]
 		if new then new:set_focused(true) end
-		Client.effects:play_global("uimove1")
+		Main.effect_manager:play_global("uimove1")
 		return true
 	elseif #self.__widgets > 1 then
 		local old = self.__widgets[self.focused_item]
@@ -108,7 +108,7 @@ UiVBox.focus_up = function(self)
 		self.focused_item = #self.__widgets
 		local new = self.__widgets[self.focused_item]
 		if new then new:set_focused(true) end
-		Client.effects:play_global("uimove1")
+		Main.effect_manager:play_global("uimove1")
 		return true
 	end
 end

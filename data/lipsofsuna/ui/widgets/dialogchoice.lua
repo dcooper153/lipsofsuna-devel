@@ -25,7 +25,7 @@ end
 
 UiDialogChoice.apply = function(self)
 	Main.messaging:client_event("choose dialog answer", self.dialog_id, self.text)
-	Client.effects:play_global("transition1")
+	Main.effect_manager:play_global("transition1")
 end
 
 UiDialogChoice.rebuild_canvas = function(self)

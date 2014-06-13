@@ -46,7 +46,7 @@ UiHelpLink.apply = function(self)
 		end
 	end
 	-- Popup the widgets.
-	Client.effects:play_global("uitransition1")
+	Main.effect_manager:play_global("uitransition1")
 	self:set_menu_widgets(widgets)
 	UiMenu.apply(self)
 end

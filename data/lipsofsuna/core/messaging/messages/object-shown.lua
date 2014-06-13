@@ -388,7 +388,7 @@ Main.messaging:register_message{
 	server_to_client_handle = function(self, mine, args)
 		local update_player_object = function(o)
 			o.physics:set_collision_group(PhysicsConsts.GROUP_PLAYERS)
-			Client:set_player_object(o)
+			Main.client:set_player_object(o)
 			Ui:set_state("play")
 		end
 		-- Only set the render model in single player.
@@ -416,7 +416,7 @@ Main.messaging:register_message{
 			end
 			-- Combat hint.
 			if o.get_combat_hint and o:get_combat_hint() then
-				Client.music:set_combat_hint(o, true)
+				Main.music_manager:set_combat_hint(o, true)
 			end
 			-- Dialog.
 			local e = Main.dialogs:get_dialog_event(o)
@@ -455,7 +455,7 @@ Main.messaging:register_message{
 			o:set_tilt_angle(args.tilt)
 			o.dead = args.dead
 			if args.self then
-				Client:set_player_dead(args.dead)
+				Main.client:set_player_dead(args.dead)
 			end
 		end
 		-- Animation profile.
@@ -551,6 +551,6 @@ Main.messaging:register_message{
 		end
 		-- Combat hint.
 		if args.combat_hint then
-			Client.music:set_combat_hint(o, true)
+			Main.music_manager:set_combat_hint(o, true)
 		end
 	end}

@@ -25,7 +25,7 @@ UiSpellSlot.apply = function(self)
 		Operators.spells:set_effect_index(self.index)
 		Ui:push_state("spells/effects")
 	end
-	Client.effects:play_global("uitransition1")
+	Main.effect_manager:play_global("uitransition1")
 end
 
 return UiSpellSlot

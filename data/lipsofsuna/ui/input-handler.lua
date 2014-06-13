@@ -150,7 +150,7 @@ InputHandler.handle_down = function(self, press)
 		self.__repeat_down = 0
 		if self.__box and self.__box:focus_down() then
 			self:focus_changed()
-			Client.effects:play_global("uimove1")
+			Main.effect_manager:play_global("uimove1")
 		end
 	else
 		self.__repeat_down = nil
@@ -201,7 +201,7 @@ InputHandler.handle_up = function(self, press)
 		self.__repeat_up = 0
 		if self.__box and self.__box:focus_up() then
 			self:focus_changed()
-			Client.effects:play_global("uimove1")
+			Main.effect_manager:play_global("uimove1")
 		end
 	else
 		self.__repeat_up = nil

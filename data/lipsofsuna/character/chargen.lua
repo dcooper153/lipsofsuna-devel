@@ -58,7 +58,7 @@ Chargen.init = function(self, standalone)
 	self:set_race("aer")
 	self.data.update_needed = true
 	-- Change the music track.
-	Client.music:switch_track("char", true)
+	Main.music_manager:switch_track("char", true)
 end
 
 --- Resets the character creator.

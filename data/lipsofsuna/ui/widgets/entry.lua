@@ -25,7 +25,7 @@ UiEntry.apply = function(self)
 	self.input_mode = true
 	self.hint = "[RETURN]: End editing"
 	self.need_repaint = true
-	Client.effects:play_global("uitoggle1")
+	Main.effect_manager:play_global("uitoggle1")
 end
 
 UiEntry.changed = function(self)

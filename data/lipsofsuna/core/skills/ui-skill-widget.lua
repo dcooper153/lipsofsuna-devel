@@ -61,7 +61,7 @@ UiSkillWidget.disable_skill = function(self)
 	-- Remove the skill.
 	Main.client_skills:remove(self.skill.name)
 	Ui:restart_state()
-	Client.effects:play_global("uitoggle2")
+	Main.effect_manager:play_global("uitoggle2")
 	-- Send an update.
 	Main.messaging:client_event("update skills", Main.client_skills:get_names())
 end
@@ -73,7 +73,7 @@ UiSkillWidget.enable_skill = function(self, dir)
 	self.need_repaint = true
 	-- Add the skill.
 	Main.client_skills:add(self.skill.name, dir)
-	Client.effects:play_global("uitoggle1")
+	Main.effect_manager:play_global("uitoggle1")
 	-- Send an update.
 	Main.messaging:client_event("update skills", Main.client_skills:get_names())
 end

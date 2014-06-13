@@ -23,7 +23,7 @@ UiTradeItem.apply = function(self)
 		Operators.trading:add_sell()
 	end
 	Ui:pop_state()
-	Client.effects:play_global("uitransition1")
+	Main.effect_manager:play_global("uitransition1")
 end
 
 return UiTradeItem

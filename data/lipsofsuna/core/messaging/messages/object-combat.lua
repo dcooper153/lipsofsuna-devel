@@ -18,5 +18,5 @@ Main.messaging:register_message{
 		local o = Main.objects:find_by_id(id)
 		if not o then return end
 		-- Set the combat hint.
-		Client.music:set_combat_hint(o, value)
+		Main.music_manager:set_combat_hint(o, value)
 	end}

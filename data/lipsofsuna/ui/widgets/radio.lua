@@ -26,7 +26,7 @@ UiRadio.apply = function(self)
 	self.value = true
 	self.need_repaint = true
 	self:changed()
-	Client.effects:play_global("uitoggle1")
+	Main.effect_manager:play_global("uitoggle1")
 end
 
 UiRadio.changed = function(self)

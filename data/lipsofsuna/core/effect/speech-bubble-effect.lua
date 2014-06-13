@@ -61,9 +61,9 @@ end
 SpeechBubbleEffect.disable = function(self)
 	-- Remove from the effect manager.
 	if self.object then
-		Client.effects.speech_bubble_dict_id[self.object:get_id()] = nil
+		Main.effect_manager.speech_bubble_dict_id[self.object:get_id()] = nil
 	end
-	Client.effects.speech_bubble_dict[self] = nil
+	Main.effect_manager.speech_bubble_dict[self] = nil
 	-- Remove from the UI.
 	for k,v in pairs(self.widgets) do
 		Ui:remove_speech_bubble(v)

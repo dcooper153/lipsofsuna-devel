@@ -34,7 +34,7 @@ end
 Hudmodifiers.add = function(self, name, time)
 	-- Special handling for light and plague.
 	if name == "light" then Client.lighting:set_light_spell(true) end
-	if name == "black haze" and not self.dict_name[name] then Client.effects:play("disease1") end
+	if name == "black haze" and not self.dict_name[name] then Main.effect_manager:play("disease1") end
 	-- Add the icon.
 	local icon = self.dict_name[name]
 	if icon then

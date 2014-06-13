@@ -34,7 +34,7 @@ UiTradeSlot.apply = function(self)
 		Operators.trading:set_sell_index(self.index)
 		Ui:push_state("trading/sell")
 	end
-	Client.effects:play_global("uitransition1")
+	Main.effect_manager:play_global("uitransition1")
 end
 
 return UiTradeSlot

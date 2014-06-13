@@ -29,7 +29,7 @@ end
 -- @param index Shortcut index.
 ShortcutManager.activate = function(self, index)
 	-- Get the player object.
-	local player = Client.player_object
+	local player = Main.client.player_object
 	if not player then return end
 	local id = player:get_id()
 	-- Record if an inventory item was active.
@@ -38,10 +38,10 @@ ShortcutManager.activate = function(self, index)
 		if w.inventory_id == id and w.index then
 			local old = self.__shortcuts[index]
 			if old and old[1] == w.index and old[2] == "auto" then
-				Client:append_log(string.format("Shortcut #%d cleared.", index, w.index))
+				Main.client:append_log(string.format("Shortcut #%d cleared.", index, w.index))
 				self:clear_shortcut(index)
 			else
-				Client:append_log(string.format("Shortcut #%d set to use item #%d.", index, w.index))
+				Main.client:append_log(string.format("Shortcut #%d set to use item #%d.", index, w.index))
 				self:record_shortcut(index, w.index, "auto")
 			end
 			return
@@ -63,7 +63,7 @@ end
 ShortcutManager.clear_shortcut = function(self, index)
 	self.__shortcuts[index] = nil
 	Main.messaging:client_event("shortcut", index)
-	Client.effects:play_global("clear item shortcut")
+	Main.effect_manager:play_global("clear item shortcut")
 end
 
 --- Loads the shortcuts from data obtained from the server.
@@ -81,21 +81,21 @@ end
 -- @param index Shortcut index.
 ShortcutManager.invoke_shortcut = function(self, index)
 	-- Get the player object.
-	local player = Client.player_object
+	local player = Main.client.player_object
 	if not player then return end
 	local id = player:get_id()
 	-- Get the shortcut.
 	local s = self.__shortcuts[index]
 	if not s then
-		Client:append_log(string.format("Shortcut #%d is not bound to any inventory item.", index))
-		Client.effects:play_global("shortcut error")
+		Main.client:append_log(string.format("Shortcut #%d is not bound to any inventory item.", index))
+		Main.effect_manager:play_global("shortcut error")
 		return
 	end
 	-- Get the item.
 	local item = player.inventory:get_object_by_index(s[1])
 	if not item then
-		Client:append_log(string.format("Shortcut #%d is bound to an empty inventory index #%d.", index, s[1]))
-		Client.effects:play_global("shortcut error")
+		Main.client:append_log(string.format("Shortcut #%d is bound to an empty inventory index #%d.", index, s[1]))
+		Main.effect_manager:play_global("shortcut error")
 		return
 	end
 	-- Perform equip/unequip actions.
@@ -104,10 +104,10 @@ ShortcutManager.invoke_shortcut = function(self, index)
 		if slot then
 			if player.inventory:get_slot_by_index(s[1]) then
 				Main.messaging:client_event("unequip", s[1])
-				Client.effects:play_global("shortcut unequip")
+				Main.effect_manager:play_global("shortcut unequip")
 			else
 				Main.messaging:client_event("equip from inventory", s[1], slot)
-				Client.effects:play_global("shortcut equip")
+				Main.effect_manager:play_global("shortcut equip")
 			end
 			return
 		end
@@ -122,8 +122,8 @@ ShortcutManager.invoke_shortcut = function(self, index)
 		end
 	end
 	-- Warn about unapplicable actions.
-	Client:append_log(string.format("Shortcut #%d cannot be applied to the item in inventory index #%d.", index, s[1]))
-	Client.effects:play_global("shortcut error")
+	Main.client:append_log(string.format("Shortcut #%d cannot be applied to the item in inventory index #%d.", index, s[1]))
+	Main.effect_manager:play_global("shortcut error")
 end
 
 --- Records a shortcut.
@@ -134,7 +134,7 @@ end
 ShortcutManager.record_shortcut = function(self, index, item, action)
 	self.__shortcuts[index] = {item, action}
 	Main.messaging:client_event("shortcut", index, item, action)
-	Client.effects:play_global("bind item shortcut")
+	Main.effect_manager:play_global("bind item shortcut")
 end
 
 --- Updates the shortcuts after an inventory item move.

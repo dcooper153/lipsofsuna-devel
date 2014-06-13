@@ -15,7 +15,7 @@ UiToggle.apply = function(self)
 	self.value = not self.value
 	self.need_repaint = true
 	self:changed()
-	Client.effects:play_global(self.value and "uitoggle1" or "uitoggle2")
+	Main.effect_manager:play_global(self.value and "uitoggle1" or "uitoggle2")
 end
 
 UiToggle.changed = function(self)

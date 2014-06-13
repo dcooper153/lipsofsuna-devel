@@ -15,7 +15,7 @@ end
 UiSpellPreview.apply = function(self)
 	Operators.spells:set_spell_index(self.index)
 	Ui:push_state("spells/spell")
-	Client.effects:play_global("uitransition1")
+	Main.effect_manager:play_global("uitransition1")
 end
 
 UiSpellPreview.rebuild_size = function(self)

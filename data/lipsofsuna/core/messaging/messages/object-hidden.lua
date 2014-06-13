@@ -26,5 +26,5 @@ Main.messaging:register_message{
 			obj:detach()
 		end
 		-- Disable the combat hint.
-		Client.music:set_combat_hint(obj, false)
+		Main.music_manager:set_combat_hint(obj, false)
 	end}

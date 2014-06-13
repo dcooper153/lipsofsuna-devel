@@ -13,7 +13,7 @@ UiBinding.new = function(clss, action)
 end
 
 UiBinding.apply = function(self)
-	Client.effects:play_global("uitoggle1")
+	Main.effect_manager:play_global("uitoggle1")
 	self.input_mode = true
 	self.input_key = "key1"
 	if self.action.mode == "analog" then
@@ -66,7 +66,7 @@ UiBinding.handle_event = function(self, args)
 	end
 	-- Finish the input grab.
 	if accept then
-		Client.effects:play_global("uitoggle1")
+		Main.effect_manager:play_global("uitoggle1")
 		if k == "key1" and a.mode == "analog" then
 			self.input_key = "key2"
 			self.hint = "Input the second control"

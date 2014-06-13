@@ -40,7 +40,7 @@ end
 UiIntrospectField.apply = function(self)
 	IntrospectOperator:set_field_name(self.field.name)
 	Ui:push_state("introspect/field")
-	Client.effects:play_global("uitransition1")
+	Main.effect_manager:play_global("uitransition1")
 end
 
 UiIntrospectField.rebuild_size = function(self)

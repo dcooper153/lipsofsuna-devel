@@ -41,7 +41,7 @@ DamageLabelEffect.new = function(clss, object, point, damage)
 	self.widget:set_request(250, nil)
 	self.widget:set_halign(0.5)
 	-- Determine the text color.
-	local player = Client.player_object
+	local player = Main.client.player_object
 	local colors = object == player and player_colors or enemy_colors
 	self.widget:set_color(colors[damage > 0])
 	-- Add the widget to the screen.
@@ -52,7 +52,7 @@ end
 
 DamageLabelEffect.disable = function(self)
 	-- Remove from the effect manager.
-	Client.effects.speech_bubble_dict[self] = nil
+	Main.effect_manager.speech_bubble_dict[self] = nil
 	-- Remove from the UI.
 	Ui:remove_speech_bubble(self.widget)
 	self.widget = nil

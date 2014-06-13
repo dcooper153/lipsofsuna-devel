@@ -36,14 +36,14 @@ Main.main_start_hooks:register(10, function(secs)
 		object.lfoot_prev = object.lfoot_curr
 		object.lfoot_curr = object:find_node_by_name("#foot.L")
 		if object.lfoot_prev and object.lfoot_curr.z < 0 and object.lfoot_prev.z >= 0 then
-			Client.effects:play_world(spec.footstep_sound, lnode)
+			Main.effect_manager:play_world(spec.footstep_sound, lnode)
 		end
 		-- Right foot.
 		-- Works the same way with the left foot.
 		object.rfoot_prev = object.rfoot_curr
 		object.rfoot_curr = object:find_node_by_name("#foot.R")
 		if object.rfoot_prev and object.rfoot_curr.z < 0 and object.rfoot_prev.z >= 0 then
-			Client.effects:play_world(spec.footstep_sound, rnode)
+			Main.effect_manager:play_world(spec.footstep_sound, rnode)
 		end
 	end)
 end)

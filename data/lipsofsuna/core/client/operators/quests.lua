@@ -160,7 +160,7 @@ Operators.quests.set_quest_status = function(self, quest, status, text)
 	-- Play a sound effect unless not played too recently.
 	if not silent then
 		Client.data.sound_timer = t
-		Client.effects:play("quest1")
+		Main.effect_manager:play("quest1")
 	end
 	-- Set as active if nothing else is active.
 	if not self.data.shown and status ~= "completed" then

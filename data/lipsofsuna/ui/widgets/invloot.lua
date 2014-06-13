@@ -11,7 +11,7 @@ end
 
 UiInvLoot.apply = function(self)
 	Main.messaging:client_event("take from inventory", self.inventory_id, self.index)
-	Client.effects:play_global("uitransition1")
+	Main.effect_manager:play_global("uitransition1")
 end
 
 return UiInvLoot

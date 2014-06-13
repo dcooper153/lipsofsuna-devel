@@ -14,5 +14,5 @@ Main.messaging:register_message{
 		return {Vector(x,y,z), t}
 	end,
 	server_to_client_handle = function(self, point, name)
-		Client.effects:play_world(name, point)
+		Main.effect_manager:play_world(name, point)
 	end}

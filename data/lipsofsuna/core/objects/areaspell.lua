@@ -36,7 +36,7 @@ AreaSpell.update_client = function(self, secs)
 	if self.started then return end
 	self.started = true
 	if not self.spec.effect then return end
-	Client.effects:play_object(self.spec.effect, self)
+	Main.effect_manager:play_object(self.spec.effect, self)
 end
 
 AreaSpell.update_server = function(self, secs)

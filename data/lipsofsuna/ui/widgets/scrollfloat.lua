@@ -33,7 +33,7 @@ UiScrollFloat.left = function(self)
 	self.need_repaint = true
 	self:update_text()
 	self:changed()
-	Client.effects:play_global("uislider1")
+	Main.effect_manager:play_global("uislider1")
 end
 
 UiScrollFloat.right = function(self)
@@ -42,7 +42,7 @@ UiScrollFloat.right = function(self)
 	self.need_repaint = true
 	self:update_text()
 	self:changed()
-	Client.effects:play_global("uislider1")
+	Main.effect_manager:play_global("uislider1")
 end
 
 UiScrollFloat.changed = function(self)

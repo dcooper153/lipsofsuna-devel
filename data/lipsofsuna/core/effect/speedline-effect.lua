@@ -38,7 +38,7 @@ SpeedlineEffect.new = function(clss, args)
 	self.model:add_material{material = "speedline1"}
 	self.render = RenderObject()
 	self.render:set_render_queue("8")
-	Client.effects.scene_nodes_by_ref[self] = true
+	Main.effect_manager.scene_nodes_by_ref[self] = true
 	return self
 end
 
@@ -47,7 +47,7 @@ SpeedlineEffect.detach = function(self)
 	if self.object then
 		self.object.speedline = nil
 	end
-	Client.effects.scene_nodes_by_ref[self] = nil
+	Main.effect_manager.scene_nodes_by_ref[self] = nil
 end
 
 SpeedlineEffect.add_slice = function(self)

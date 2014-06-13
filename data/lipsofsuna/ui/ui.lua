@@ -277,7 +277,7 @@ Ui.command = function(self, cmd, press)
 	if cmd == "back" then
 		if self.input:handle_back() and press then
 			self:pop_state()
-			Client.effects:play_global("uitransition1")
+			Main.effect_manager:play_global("uitransition1")
 		end
 	elseif cmd == "apply" then
 		self.input:handle_apply(press)

@@ -52,14 +52,14 @@ EffectObject.new = function(clss, args)
 	self.weird_rotation = true --TODO: Get rid of this.
 	self.__visible = true
 	self.__initial_position = args.position
-	Client.effects.scene_nodes_by_ref[self] = true
+	Main.effect_manager.scene_nodes_by_ref[self] = true
 	return self
 end
 
 --- Removes the effect from the scene.
 -- @param self EffectObject.
 EffectObject.detach = function(self)
-	Client.effects.scene_nodes_by_ref[self] = nil
+	Main.effect_manager.scene_nodes_by_ref[self] = nil
 end
 
 --- Transforms a position vector from the local coordinate space to global.

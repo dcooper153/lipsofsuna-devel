@@ -9,7 +9,7 @@ Ui:add_state{
 		Ui:set_state("mainmenu")
 	end,
 	init = function()
-		Client.music:switch_track("game")
+		Main.music_manager:switch_track("game")
 	end,
 	update = function(secs)
 		local w = Ui:get_widget("stats")

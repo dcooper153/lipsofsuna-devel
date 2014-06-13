@@ -27,10 +27,10 @@ HudCompanion.apply = function(self)
 	if dialog.type == "choice" then
 		-- TODO
 		--Main.messaging:client_event("choose dialog answer", companion.id, text)
-		--Client.effects:play_global("transition1")
+		--Main.effect_manager:play_global("transition1")
 	else
 		Main.messaging:client_event("choose dialog answer", companion:get_id(), "")
-		Client.effects:play_global("uitransition1")
+		Main.effect_manager:play_global("uitransition1")
 	end
 end
 

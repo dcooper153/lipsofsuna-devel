@@ -123,7 +123,7 @@ UiMenu.set_menu_opened = function(self, value)
 		self.__input:set_enabled(true)
 		Ui.input:set_enabled(false)
 		-- Play the effect.
-		Client.effects:play_global("uitransition1")
+		Main.effect_manager:play_global("uitransition1")
 	else
 		-- Remove the box from the UI.
 		Ui:remove_temporary(self.__box)
@@ -132,7 +132,7 @@ UiMenu.set_menu_opened = function(self, value)
 		self.__input:set_enabled(false)
 		Ui.input:set_enabled(true)
 		-- Play the effect.
-		Client.effects:play_global("uitransition1")
+		Main.effect_manager:play_global("uitransition1")
 	end
 end
 
