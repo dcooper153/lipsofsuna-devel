@@ -1,6 +1,7 @@
 local Lobby = require("system/lobby")
 local UiBackground = require("ui/widgets/background")
 local UiButton = require("ui/widgets/button")
+local UiConfigOption = require("ui/widgets/config-option")
 local UiEntry = require("ui/widgets/entry")
 local UiTransition = require("ui/widgets/transition")
 
@@ -18,15 +19,15 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "join",
-	widget = function() return Widgets.Uiconfigoption("join_address") end}
+	widget = function() return UiConfigOption("join_address") end}
 
 Ui:add_widget{
 	state = "join",
-	widget = function() return Widgets.Uiconfigoption("join_port") end}
+	widget = function() return UiConfigOption("join_port") end}
 
 Ui:add_widget{
 	state = "join",
-	widget = function() return Widgets.Uiconfigoption("join_account") end}
+	widget = function() return UiConfigOption("join_account") end}
 
 Ui:add_widget{
 	state = "join",

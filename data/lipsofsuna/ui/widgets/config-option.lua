@@ -1,35 +1,17 @@
 local Class = require("system/class")
 local UiEntry = require("ui/widgets/entry")
-require(Mod.path .. "scrollfloat")
-require(Mod.path .. "scrollinteger")
-require(Mod.path .. "toggle")
-require(Mod.path .. "widget")
+require("ui/widgets/scrollfloat")
+require("ui/widgets/scrollinteger")
+require("ui/widgets/toggle")
+require("ui/widgets/widget")
 local UiScrollFloat = require("ui/widgets/scrollfloat")
 local UiScrollInteger = require("ui/widgets/scrollinteger")
 
-Widgets.Uiconfigoption = Class("Uiconfigoption", Widgets.Uiwidget)
-
-Widgets.Uiconfigoption.new = function(clss, option, changed)
-	local opt = Client.options.config_keys[option]
-	if not opt then return end
-	if opt[2] == "bool" then
-		return Widgets.Uiconfigoptionbool(option, changed)
-	elseif opt[2] == "float" then
-		return Widgets.Uiconfigoptionfloat(option, changed)
-	elseif opt[2] == "int" then
-		return Widgets.Uiconfigoptionint(option, changed)
-	elseif opt[2] == "pow" then
-		return Widgets.Uiconfigoptionpow(option, changed)
-	elseif opt[2] == "string" then
-		return Widgets.Uiconfigoptionstring(option, changed)
-	end
-end
-
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionbool = Class("Uiconfigoptionbool", Widgets.Uitoggle)
+local UiConfigOptionBool = Class("UiConfigOptionBool", Widgets.Uitoggle)
 
-Widgets.Uiconfigoptionbool.new = function(clss, option, changed)
+UiConfigOptionBool.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
 	local value = Client.options[option]
 	-- Create the widget.
@@ -42,7 +24,7 @@ Widgets.Uiconfigoptionbool.new = function(clss, option, changed)
 	return self
 end
 
-Widgets.Uiconfigoptionbool.changed = function(self)
+UiConfigOptionBool.changed = function(self)
 	Client.options[self.key] = self.value
 	Client.options:save()
 	if self.changed_cb then self.changed_cb(self.key, self.value) end
@@ -50,9 +32,9 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionfloat = Class("Uiconfigoptionfloat", UiScrollFloat)
+local UiConfigOptionFloat = Class("UiconfigOptionFloat", UiScrollFloat)
 
-Widgets.Uiconfigoptionfloat.new = function(clss, option, changed)
+UiConfigOptionFloat.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
 	local value = Client.options[option]
 	-- Create the widget.
@@ -64,7 +46,7 @@ Widgets.Uiconfigoptionfloat.new = function(clss, option, changed)
 	return self
 end
 
-Widgets.Uiconfigoptionfloat.changed = function(self)
+UiConfigOptionFloat.changed = function(self)
 	Client.options[self.key] = self.value
 	Client.options:save()
 	if self.changed_cb then self.changed_cb(self.key, self.value) end
@@ -72,9 +54,9 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionint = Class("Uiconfigoptionint", UiScrollInteger)
+local UiConfigOptionInt = Class("UiConfigOptionInt", UiScrollInteger)
 
-Widgets.Uiconfigoptionint.new = function(clss, option, changed)
+UiConfigOptionInt.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
 	local value = Client.options[option]
 	-- Create the widget.
@@ -86,7 +68,7 @@ Widgets.Uiconfigoptionint.new = function(clss, option, changed)
 	return self
 end
 
-Widgets.Uiconfigoptionint.changed = function(self)
+UiConfigOptionInt.changed = function(self)
 	Client.options[self.key] = self.value
 	Client.options:save()
 	if self.changed_cb then self.changed_cb(self.key, self.value) end
@@ -94,9 +76,9 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionpow = Class("Uiconfigoptionpow", UiScrollInteger)
+local UiConfigOptionPow = Class("UiConfigOptionPow", UiScrollInteger)
 
-Widgets.Uiconfigoptionpow.new = function(clss, option, changed)
+UiConfigOptionPow.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
 	local value_exp = Client.options[option]
 	local value_lin = math.floor(math.log(value_exp)/math.log(2) + 0.5)
@@ -109,7 +91,7 @@ Widgets.Uiconfigoptionpow.new = function(clss, option, changed)
 	return self
 end
 
-Widgets.Uiconfigoptionpow.changed = function(self)
+UiConfigOptionPow.changed = function(self)
 	-- Calculate the real value.
 	self.value_pow = 2 ^ self.value
 	self.text = tostring(self.value_pow) .. "x"
@@ -121,9 +103,9 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionstring = Class("Uiconfigoptionstring", UiEntry)
+local UiConfigOptionString = Class("UiConfigOptionString", UiEntry)
 
-Widgets.Uiconfigoptionstring.new = function(clss, option, changed)
+UiConfigOptionString.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
 	local value = Client.options[option]
 	-- Create the widget.
@@ -136,8 +118,30 @@ Widgets.Uiconfigoptionstring.new = function(clss, option, changed)
 	return self
 end
 
-Widgets.Uiconfigoptionstring.changed = function(self)
+UiConfigOptionString.changed = function(self)
 	Client.options[self.key] = self.value
 	Client.options:save()
 	if self.changed_cb then self.changed_cb(self.key, self.value) end
 end
+
+------------------------------------------------------------------------------
+
+local UiConfigOption = Class("UiConfigOption", Widgets.Uiwidget)
+
+UiConfigOption.new = function(clss, option, changed)
+	local opt = Client.options.config_keys[option]
+	if not opt then return end
+	if opt[2] == "bool" then
+		return UiConfigOptionBool(option, changed)
+	elseif opt[2] == "float" then
+		return UiConfigOptionFloat(option, changed)
+	elseif opt[2] == "int" then
+		return UiConfigOptionInt(option, changed)
+	elseif opt[2] == "pow" then
+		return UiConfigOptionPow(option, changed)
+	elseif opt[2] == "string" then
+		return UiConfigOptionString(option, changed)
+	end
+end
+
+return UiConfigOption

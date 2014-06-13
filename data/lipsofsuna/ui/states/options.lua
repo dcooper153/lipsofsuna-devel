@@ -1,6 +1,7 @@
 local Render = require("system/render")
 local Sound = require("system/sound")
 local UiBackground = require("ui/widgets/background")
+local UiConfigOption = require("ui/widgets/config-option")
 local UiRadioMenu = require("ui/widgets/radio-menu")
 local UiStateMenu = require("ui/widgets/state-menu")
 
@@ -67,68 +68,68 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "options/graphics",
 	widget = function()
-		return Widgets.Uiconfigoption("shader_quality",
+		return UiConfigOption("shader_quality",
 			function() Client.options:apply() end)
 		end}
 
 Ui:add_widget{
 	state = "options/graphics",
-	widget = function() return Widgets.Uiconfigoption("multisamples") end}
+	widget = function() return UiConfigOption("multisamples") end}
 
 Ui:add_widget{
 	state = "options/graphics",
-	widget = function() return Widgets.Uiconfigoption("anisotropic_filter", function(k,v) Render:set_anisotrophy(v) end) end}
+	widget = function() return UiConfigOption("anisotropic_filter", function(k,v) Render:set_anisotrophy(v) end) end}
 
 Ui:add_widget{
 	state = "options/graphics",
 	widget = function()
-		return Widgets.Uiconfigoption("landmark_view_distance",
+		return UiConfigOption("landmark_view_distance",
 			function() Client.options:apply() end)
 		end}
 
 Ui:add_widget{
 	state = "options/graphics",
-	widget = function() return Widgets.Uiconfigoption("vsync") end}
+	widget = function() return UiConfigOption("vsync") end}
 
 Ui:add_widget{
 	state = "options/graphics",
 	widget = function()
-		return Widgets.Uiconfigoption("outlines_enabled",
+		return UiConfigOption("outlines_enabled",
 			function() Client.options:apply() end)
 		end}
 
 Ui:add_widget{
 	state = "options/graphics",
 	widget = function()
-		return Widgets.Uiconfigoption("bloom_enabled",
+		return UiConfigOption("bloom_enabled",
 			function() Client.options:apply() end)
 	end}
 
 Ui:add_widget{
 	state = "options/graphics",
 	widget = function()
-		return Widgets.Uiconfigoption("shadow_casting_actors",
+		return UiConfigOption("shadow_casting_actors",
 			function() Client.options:apply() end)
 	end}
 
 Ui:add_widget{
 	state = "options/graphics",
 	widget = function()
-		return Widgets.Uiconfigoption("shadow_casting_items",
+		return UiConfigOption("shadow_casting_items",
 			function() Client.options:apply() end)
 	end}
 
 Ui:add_widget{
 	state = "options/graphics",
 	widget = function()
-		return Widgets.Uiconfigoption("shadow_casting_obstacles",
+		return UiConfigOption("shadow_casting_obstacles",
 			function() Client.options:apply() end)
 	end}
 
 Ui:add_widget{
 	state = "options/graphics",
 	widget = function()
-		return Widgets.Uiconfigoption("softbody_enabled", function()
+		return UiConfigOption("softbody_enabled", function()
 			Client.options:apply()
 		end)
 	end}
@@ -136,7 +137,7 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "options/graphics",
 	widget = function()
-		return Widgets.Uiconfigoption("nudity_enabled", function()
+		return UiConfigOption("nudity_enabled", function()
 			Client.options:apply()
 		end)
 	end}
@@ -145,33 +146,33 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "options/mouse",
-	widget = function() return Widgets.Uiconfigoption("mouse_sensitivity") end}
+	widget = function() return UiConfigOption("mouse_sensitivity") end}
 
 Ui:add_widget{
 	state = "options/mouse",
-	widget = function() return Widgets.Uiconfigoption("invert_mouse") end}
+	widget = function() return UiConfigOption("invert_mouse") end}
 
 Ui:add_widget{
 	state = "options/mouse",
 	widget = function()
 		if not Client.camera_manager then return end
-		return Widgets.Uiconfigoption("mouse_smoothing", function(k,v) Client.camera_manager:set_mouse_smoothing(v) end)
+		return UiConfigOption("mouse_smoothing", function(k,v) Client.camera_manager:set_mouse_smoothing(v) end)
 	end}
 
 ------------------------------------------------------------------------------
 
 Ui:add_widget{
 	state = "options/ui",
-	widget = function() return Widgets.Uiconfigoption("ui_animations") end}
+	widget = function() return UiConfigOption("ui_animations") end}
 
 Ui:add_widget{
 	state = "options/ui",
-	widget = function() return Widgets.Uiconfigoption("help_messages") end}
+	widget = function() return UiConfigOption("help_messages") end}
 
 Ui:add_widget{
 	state = "options/ui",
 	widget = function()
-		return Widgets.Uiconfigoption("ui_size",
+		return UiConfigOption("ui_size",
 			function() Client.options:apply() end)
 	end}
 
@@ -179,8 +180,8 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "options/sound",
-	widget = function() return Widgets.Uiconfigoption("music_volume", function(k,v) Sound:set_music_volume(v) end) end}
+	widget = function() return UiConfigOption("music_volume", function(k,v) Sound:set_music_volume(v) end) end}
 
 Ui:add_widget{
 	state = "options/sound",
-	widget = function() return Widgets.Uiconfigoption("sound_volume") end}
+	widget = function() return UiConfigOption("sound_volume") end}

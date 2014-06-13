@@ -1,5 +1,5 @@
 local Class = require("system/class")
-require(Mod.path .. "widget")
+require("ui/widgets/widget")
 
 Widgets.Uitoggle = Class("Uitoggle", Widgets.Uiwidget)
 

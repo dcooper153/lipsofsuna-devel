@@ -1,6 +1,7 @@
 local File = require("system/file")
 local UiBackground = require("ui/widgets/background")
 local UiButton = require("ui/widgets/button")
+local UiConfigOption = require("ui/widgets/config-option")
 local UiEntry = require("ui/widgets/entry")
 
 Ui:add_state{
@@ -13,7 +14,7 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "host/load",
-	widget = function() return Widgets.Uiconfigoption("host_account") end}
+	widget = function() return UiConfigOption("host_account") end}
 
 Ui:add_widget{
 	state = "host/load",
@@ -23,7 +24,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "host/load",
-	widget = function() return Widgets.Uiconfigoption("host_admin") end}
+	widget = function() return UiConfigOption("host_admin") end}
 
 Ui:add_widget{
 	state = "host/load",
