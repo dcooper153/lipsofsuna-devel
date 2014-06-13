@@ -407,8 +407,102 @@ end
 
 ------------------------------------------------------------------------------
 
+local GraphDeps = Class("GraphDeps")
+
+GraphDeps.new = function(clss)
+	local self = Class.new(clss)
+	self.files = {}
+	self.modules = {}
+
+	self.nodes = {}
+	self.edges = {}
+	return self
+end
+
+GraphDeps.parse = function(self, path, name)
+	local lang = Utils:get_file_type(name)
+	if string.match(name, "__mod__.json") then
+		local clean = self:clean_path(path)
+		self.modules[clean] = true
+	elseif lang == "Lua" then
+		local clean = self:clean_path(path)
+		local file = io.open(path .. name, "r")
+		local deps = {}
+		for l in file:lines() do
+			local req = string.match(l, "require[(]\"(.*)\"[)]")
+			if req then
+				deps[req] = true
+			end
+		end
+		self.files[clean .. name] = {clean, name, deps}
+	end
+end
+
+GraphDeps.clean_path = function(self, path)
+	local m = string.match(path, "[.]/data/lipsofsuna/(.*)$")
+	if m then return m end
+	local m = string.match(path, "[.]/data/system/(.*)$")
+	if m then return "system/" .. m end
+	local m = string.match(path, "[.]/data/(.*)$")
+	if m then return m end
+	return path
+end
+
+GraphDeps.solve_module = function(self, path, name)
+	local c = self:clean_path(path)
+	local p = c
+	while p do
+		if self.modules[p] then return p end
+		if self.modules[p .. "/"] then return p .. "/" end
+		p = string.match(p, "(.*)/[^/]*$")
+	end
+	return "system/"
+end
+
+GraphDeps.print = function(self)
+	local mods = {}
+	local modd = {}
+	for full,args in pairs(self.files) do
+		local m = self:solve_module(args[1], args[2])
+		local deps = modd[m]
+		if not deps then
+			deps = {}
+			modd[m] = deps
+		end
+		for dep in pairs(args[3]) do
+			local m1 = self:solve_module(dep)
+			if m ~= m1 and m1 ~= "system/" then
+				mods[m] = true
+				mods[m1] = true
+				deps[m1] = true
+			end
+		end
+	end
+	print("digraph deps {")
+	print("  rankdir=LR;")
+	print("  size=50;")
+	for m in pairs(mods) do
+		print("  node [shape = circle] \"" .. m .. "\";")
+	end
+	for src,deps in pairs(modd) do
+		for dst in pairs(deps) do
+			print("  \"" .. src .. "\" -> \"" .. dst .. "\";")
+		end
+	end
+	print("}")
+end
+
+------------------------------------------------------------------------------
+
 if #arg == 0 or arg[1] == "-h" or arg[1] == "--help" then
 	return Utils:usage()
+elseif arg[1] == "-d" or arg[1] == "--deps" then
+	if #arg ~= 1 and #arg ~= 2 then return Utils:usage() end
+	local deps = GraphDeps()
+	for path,name in Utils:find_files(arg[2] or ".") do
+		deps:parse(path, name)
+	end
+	deps:print()
 elseif arg[1] == "-l" or arg[1] == "--lines" then
 	if #arg ~= 1 and #arg ~= 2 then return Utils:usage() end
 	local count = CountLines()
