@@ -1,11 +1,11 @@
 local Class = require("system/class")
 local Keysym = require("system/keysym")
 local String = require("system/string")
-require(Mod.path .. "widget")
+require("ui/widgets/widget")
 
-Widgets.Uientry = Class("Uientry", Widgets.Uiwidget)
+local UiEntry = Class("UiEntry", Widgets.Uiwidget)
 
-Widgets.Uientry.new = function(clss, label, changed)
+UiEntry.new = function(clss, label, changed)
 	local self = Widgets.Uiwidget.new(clss, label)
 	self.value = ""
 	self.cursor_pos = 1
@@ -15,23 +15,23 @@ Widgets.Uientry.new = function(clss, label, changed)
 	return self
 end
 
-Widgets.Uientry.accepted = function(self)
+UiEntry.accepted = function(self)
 end
 
-Widgets.Uientry.canceled = function(self)
+UiEntry.canceled = function(self)
 end
 
-Widgets.Uientry.apply = function(self)
+UiEntry.apply = function(self)
 	self.input_mode = true
 	self.hint = "[RETURN]: End editing"
 	self.need_repaint = true
 	Client.effects:play_global("uitoggle1")
 end
 
-Widgets.Uientry.changed = function(self)
+UiEntry.changed = function(self)
 end
 
-Widgets.Uientry.handle_event = function(self, args)
+UiEntry.handle_event = function(self, args)
 	if not self.input_mode or (args.type ~= "keypress" and args.type ~= "keyrepeat") then
 		return Widgets.Uiwidget.handle_event(self, args)
 	end
@@ -109,7 +109,7 @@ end
 
 --- Moves the cursor down one line.
 -- @param self Entry widget.
-Widgets.Uientry.move_cursor_down = function(self)
+UiEntry.move_cursor_down = function(self)
 	-- Layout the text.
 	local text = self:get_displayed_text()
 	local layout = Program:layout_text(Theme.text_font_1, text, self:get_text_area_width())
@@ -132,7 +132,7 @@ end
 
 --- Moves the cursor down one line.
 -- @param self Entry widget.
-Widgets.Uientry.move_cursor_up = function(self)
+UiEntry.move_cursor_up = function(self)
 	-- Layout the text.
 	local text = self:get_displayed_text()
 	local layout = Program:layout_text(Theme.text_font_1, text, self:get_text_area_width())
@@ -153,7 +153,7 @@ Widgets.Uientry.move_cursor_up = function(self)
 	end
 end
 
-Widgets.Uientry.rebuild_size = function(self)
+UiEntry.rebuild_size = function(self)
 	-- Get the base size.
 	local size = Widgets.Uiwidget.rebuild_size(self)
 	-- Resize to fit the label.
@@ -165,7 +165,7 @@ Widgets.Uientry.rebuild_size = function(self)
 	return size
 end
 
-Widgets.Uientry.rebuild_canvas = function(self)
+UiEntry.rebuild_canvas = function(self)
 	-- Format the text.
 	local text = self:get_displayed_text()
 	-- Add the base.
@@ -202,7 +202,7 @@ end
 --- Gets the visual position of the cursor relative to the text area origin.
 -- @param self Entry widget.
 -- @return X,Y.
-Widgets.Uientry.get_cursor_position = function(self)
+UiEntry.get_cursor_position = function(self)
 	local text = self:get_displayed_text()
 	local layout = Program:layout_text(Theme.text_font_1, text, self:get_text_area_width())
 	if not layout then return 0,0 end
@@ -222,7 +222,7 @@ end
 --- Gets the characters visible to the user.
 -- @param self Entry widget.
 -- @return String.
-Widgets.Uientry.get_displayed_text = function(self)
+UiEntry.get_displayed_text = function(self)
 	-- In password mode, all characters are replaced with '*'.
 	if self.password and self.value then
 		local ws = String.utf8_to_wchar(self.value)
@@ -236,7 +236,10 @@ end
 --- Gets the width of the text area.
 -- @param self Entry widget.
 -- @return Width in pixels.
-Widgets.Uientry.get_text_area_width = function(self, size)
+UiEntry.get_text_area_width = function(self, size)
 	local s = size or self.size
 	return s.x - Theme.width_label_1 - 15
 end
+
+return UiEntry
+

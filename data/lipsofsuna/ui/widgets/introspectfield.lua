@@ -1,9 +1,9 @@
 local Class = require("system/class")
-require(Mod.path .. "entry")
 local Introspect = require("core/introspect/introspect")
 local IntrospectOperator = require("core/debug/introspect-operator")
+local UiEntry = require("ui/widgets/entry")
 
-Widgets.Uiintrospectfield = Class("Uiintrospectfield", Widgets.Uientry)
+Widgets.Uiintrospectfield = Class("Uiintrospectfield", UiEntry)
 Widgets.Uiintrospectfield.brief_fields = {["boolean"] = true, ["color"] = true, ["number"] = true, ["quaternion"] = true, ["string"] = true, ["vector"] = true}
 
 Widgets.Uiintrospectfield.new = function(clss, spec, field)

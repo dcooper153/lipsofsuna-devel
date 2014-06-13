@@ -1,4 +1,5 @@
 local UiButton = require("ui/widgets/button")
+local UiEntry = require("ui/widgets/entry")
 
 Ui:add_state{
 	state = "host/new",
@@ -11,7 +12,7 @@ Ui:add_state{
 Ui:add_widget{
 	state = "host/new",
 	widget = function()
-		local widget = Widgets.Uientry("Save name", function(w)
+		local widget = UiEntry("Save name", function(w)
 			Operators.single_player:set_save_name(w.value) end)
 		widget.value = Operators.single_player:generate_new_save_name()
 		return widget
@@ -23,7 +24,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "host/new",
-	widget = function() return Widgets.Uientry("Password", Client.options.host_password,
+	widget = function() return UiEntry("Password", Client.options.host_password,
 		function(w) Client.options.host_password = w.value end)
 	end}
 

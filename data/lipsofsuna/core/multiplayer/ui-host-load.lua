@@ -1,5 +1,6 @@
 local File = require("system/file")
 local UiButton = require("ui/widgets/button")
+local UiEntry = require("ui/widgets/entry")
 
 Ui:add_state{
 	state = "host/load",
@@ -15,7 +16,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "host/load",
-	widget = function() return Widgets.Uientry("Password", Client.options.host_password,
+	widget = function() return UiEntry("Password", Client.options.host_password,
 		function(w) Client.options.host_password = w.value end)
 	end}
 

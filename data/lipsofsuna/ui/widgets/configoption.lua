@@ -1,5 +1,5 @@
 local Class = require("system/class")
-require(Mod.path .. "entry")
+local UiEntry = require("ui/widgets/entry")
 require(Mod.path .. "scrollfloat")
 require(Mod.path .. "scrollinteger")
 require(Mod.path .. "toggle")
@@ -121,13 +121,13 @@ end
 
 ------------------------------------------------------------------------------
 
-Widgets.Uiconfigoptionstring = Class("Uiconfigoptionstring", Widgets.Uientry)
+Widgets.Uiconfigoptionstring = Class("Uiconfigoptionstring", UiEntry)
 
 Widgets.Uiconfigoptionstring.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]
 	local value = Client.options[option]
 	-- Create the widget.
-	local self = Widgets.Uientry.new(clss, opt[1])
+	local self = UiEntry.new(clss, opt[1])
 	self.key = option
 	self.value = value
 	-- Report the initial value.

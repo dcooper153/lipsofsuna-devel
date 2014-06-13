@@ -4,6 +4,7 @@ local ChargenSliderSpec = require("core/specs/chargen-slider")
 local Client = require("core/client/client")
 local HairStyleSpec = require("core/specs/hair-style")
 local UiButton = require("ui/widgets/button")
+local UiEntry = require("ui/widgets/entry")
 local UiRadioMenu = require("ui/widgets/radio-menu")
 local UiScrollFloat = require("ui/widgets/scrollfloat")
 local UiTransition = require("ui/widgets/transition")
@@ -30,7 +31,7 @@ Ui:add_state{
 Ui:add_widget{
 	state = "chargen",
 	widget = function()
-		local widget = Widgets.Uientry("Name", function(w)
+		local widget = UiEntry("Name", function(w)
 			Client.chargen:set_name(w.value)
 		end)
 		widget.value = Client.chargen:get_name()

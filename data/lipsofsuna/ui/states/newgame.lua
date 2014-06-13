@@ -1,4 +1,5 @@
 local UiButton = require("ui/widgets/button")
+local UiEntry = require("ui/widgets/entry")
 local UiSelector = require("ui/widgets/selector")
 
 local game_mode = "Normal"
@@ -14,7 +15,7 @@ Ui:add_state{
 Ui:add_widget{
 	state = "newgame",
 	widget = function()
-		local widget = Widgets.Uientry("Save name", function(w)
+		local widget = UiEntry("Save name", function(w)
 			Operators.single_player:set_save_name(w.value) end)
 		widget.value = Operators.single_player:generate_new_save_name()
 		return widget

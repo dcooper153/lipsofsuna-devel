@@ -1,3 +1,5 @@
+local UiEntry = require("ui/widgets/entry")
+
 Ui:add_state{
 	state = "chat",
 	label = "Chat"}
@@ -5,7 +7,7 @@ Ui:add_state{
 Ui:add_widget{
 	state = "chat",
 	widget = function()
-		local widget = Widgets.Uientry("Chat")
+		local widget = UiEntry("Chat")
 		widget.input_mode = true
 		widget.hint = "[RETURN]: Send\n[ESCAPE]: Cancel"
 		widget.accepted = function(w)

@@ -1,5 +1,6 @@
 local Lobby = require("system/lobby")
 local UiButton = require("ui/widgets/button")
+local UiEntry = require("ui/widgets/entry")
 local UiTransition = require("ui/widgets/transition")
 
 Ui:add_state{
@@ -29,7 +30,7 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "join",
 	widget = function()
-		return Widgets.Uientry("Password", Client.options.join_password, function(w)
+		return UiEntry("Password", Client.options.join_password, function(w)
 			Client.options.join_password = w.value
 		end)
 	end}
