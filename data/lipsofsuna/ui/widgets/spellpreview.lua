@@ -1,11 +1,11 @@
 local Class = require("system/class")
 local ModifierSpec = require("core/specs/modifier")
-require(Mod.path .. "widget")
+local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uispellpreview = Class("Uispellpreview", Widgets.Uiwidget)
+Widgets.Uispellpreview = Class("Uispellpreview", UiWidget)
 
 Widgets.Uispellpreview.new = function(clss, index, spell)
-	local self = Widgets.Uiwidget.new(clss)
+	local self = UiWidget.new(clss)
 	self.index = index
 	self.spell = spell
 	self.hint = "$A: Edit\n$$B\n$$U\n$$D" or "$$B\n$$U\n$$D"
@@ -29,7 +29,7 @@ Widgets.Uispellpreview.rebuild_canvas = function(self)
 	local w = self.size.x
 	local h = self.size.y
 	-- Add the base.
-	Widgets.Uiwidget.rebuild_canvas(self)
+	UiWidget.rebuild_canvas(self)
 	-- Add the index label.
 	self:canvas_text{
 		dest_position = {5,5},

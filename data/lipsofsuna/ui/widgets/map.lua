@@ -1,13 +1,13 @@
 local Class = require("system/class")
 local IconSpec = require("core/specs/icon")
-require(Mod.path .. "widget")
+local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uimap = Class("Uimap", Widgets.Uiwidget)
+Widgets.Uimap = Class("Uimap", UiWidget)
 
 --- Creates a new map widget.
 -- @return Map widget.
 Widgets.Uimap.new = function(clss)
-	local self = Widgets.Uiwidget.new(clss)
+	local self = UiWidget.new(clss)
 	self.hint = "$$B\n$U: Zoom in\n$D: Zoom out\n"
 	self.markers = {}
 	self.timer = 0
@@ -74,7 +74,7 @@ Widgets.Uimap.handle_event = function(self, args)
 		return
 	end
 	-- Other actions.
-	return Widgets.Uiwidget.handle_event(self, args)
+	return UiWidget.handle_event(self, args)
 end
 
 Widgets.Uimap.rebuild_size = function(self)
@@ -83,7 +83,7 @@ end
 
 Widgets.Uimap.rebuild_canvas = function(self)
 	-- Add the base.
-	Widgets.Uiwidget.rebuild_canvas(self)
+	UiWidget.rebuild_canvas(self)
 	-- Rebuild the markers.
 	local player = Client.player_object
 	self:clear_markers()
@@ -101,7 +101,7 @@ Widgets.Uimap.update = function(self, secs)
 		self.timer = 0
 		self.need_repaint = true
 	end
-	Widgets.Uiwidget.update(self, secs)
+	UiWidget.update(self, secs)
 end
 
 Widgets.Uimap.zoom = function(self, dir)

@@ -1,11 +1,9 @@
 local Class = require("system/class")
 local UiEntry = require("ui/widgets/entry")
-require("ui/widgets/scrollfloat")
-require("ui/widgets/scrollinteger")
-local UiToggle = require("ui/widgets/toggle")
-require("ui/widgets/widget")
 local UiScrollFloat = require("ui/widgets/scrollfloat")
 local UiScrollInteger = require("ui/widgets/scrollinteger")
+local UiToggle = require("ui/widgets/toggle")
+local UiWidget = require("ui/widgets/widget")
 
 ------------------------------------------------------------------------------
 
@@ -126,7 +124,7 @@ end
 
 ------------------------------------------------------------------------------
 
-local UiConfigOption = Class("UiConfigOption", Widgets.Uiwidget)
+local UiConfigOption = Class("UiConfigOption", UiWidget)
 
 UiConfigOption.new = function(clss, option, changed)
 	local opt = Client.options.config_keys[option]

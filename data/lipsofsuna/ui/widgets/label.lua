@@ -1,10 +1,10 @@
 local Class = require("system/class")
-require("ui/widgets/widget")
+local UiWidget = require("ui/widgets/widget")
 
-local UiLabel = Class("UiLabel", Widgets.Uiwidget)
+local UiLabel = Class("UiLabel", UiWidget)
 
 UiLabel.new = function(clss, label)
-	local self = Widgets.Uiwidget.new(clss)
+	local self = UiWidget.new(clss)
 	self.hint = "$$B\n$$U\n$$D"
 	self.text = label
 	return self
@@ -15,7 +15,7 @@ end
 
 UiLabel.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiwidget.rebuild_size(self)
+	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.text then
 		local w,h = Program:measure_text(Theme.text_font_1, self.text, size.x - 10)
@@ -26,7 +26,7 @@ end
 
 UiLabel.rebuild_canvas = function(self)
 	-- Add the base.
-	Widgets.Uiwidget.rebuild_canvas(self)
+	UiWidget.rebuild_canvas(self)
 	-- Add the text.
 	self:canvas_text{
 		dest_position = {5,5},

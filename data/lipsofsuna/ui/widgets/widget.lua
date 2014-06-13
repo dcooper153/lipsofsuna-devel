@@ -9,7 +9,7 @@ local ipol_path_x = {-1,-0.5,-0.25,-0.0125,0,0,0}
 local UiWidget = Class("Uiwidget", Widget)
 
 -- FIXME
-Widgets.Uiwidget = UiWidget
+UiWidget = UiWidget
 
 UiWidget.new = function(clss, label)
 	-- Create the widget.

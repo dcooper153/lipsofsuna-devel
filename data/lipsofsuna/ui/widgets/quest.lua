@@ -23,7 +23,7 @@ end
 
 Widgets.Uiquest.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiwidget.rebuild_size(self)
+	local size = Widgets.Uiradio.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.title and self.text then
 		local w1,h1 = Program:measure_text(Theme.text_font_2, self.title, size.x - 10)
@@ -38,7 +38,7 @@ end
 
 Widgets.Uiquest.rebuild_canvas = function(self)
 	-- Add the base.
-	Widgets.Uiwidget.rebuild_canvas(self)
+	Widgets.Uiradio.rebuild_canvas(self)
 	-- Add the background.
 	Theme:draw_button(self, nil,
 		5, 3, self.size.x-10, self.size.y-6,

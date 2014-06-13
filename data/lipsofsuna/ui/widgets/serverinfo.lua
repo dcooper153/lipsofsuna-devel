@@ -1,10 +1,10 @@
 local Class = require("system/class")
-require(Mod.path .. "widget")
+local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uiserverinfo = Class("Uiserverinfo", Widgets.Uiwidget)
+Widgets.Uiserverinfo = Class("Uiserverinfo", UiWidget)
 
 Widgets.Uiserverinfo.new = function(clss, args)
-	local self = Widgets.Uiwidget.new(clss)
+	local self = UiWidget.new(clss)
 	for k,v in pairs(args) do self[k] = v end
 	self.hint = "$A: Select\n$$B\n$$U\n$$D"
 	return self
@@ -18,7 +18,7 @@ end
 
 Widgets.Uiserverinfo.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiwidget.rebuild_size(self)
+	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.desc then
 		local w1,h1 = Program:measure_text(Theme.text_font_2, self.name, 290)
@@ -34,7 +34,7 @@ Widgets.Uiserverinfo.rebuild_canvas = function(self)
 	local w = self.size.x
 	local h = self.size.y
 	-- Add the base.
-	Widgets.Uiwidget.rebuild_canvas(self)
+	UiWidget.rebuild_canvas(self)
 	-- Add the name.
 	if self.name then
 		self:canvas_text{

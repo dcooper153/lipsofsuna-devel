@@ -1,10 +1,10 @@
 local Class = require("system/class")
-require("ui/widgets/widget")
+local UiWidget = require("ui/widgets/widget")
 
-local UiToggle = Class("UiToggle", Widgets.Uiwidget)
+local UiToggle = Class("UiToggle", UiWidget)
 
 UiToggle.new = function(clss, label, changed)
-	local self = Widgets.Uiwidget.new(clss, label)
+	local self = UiWidget.new(clss, label)
 	self.value = false
 	self.changed = changed
 	self.hint = "$A: Toggle\n$$B\n$$U\n$$D"
@@ -23,7 +23,7 @@ end
 
 UiToggle.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiwidget.rebuild_size(self)
+	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the label.
 	local w,h = Theme:measure_button("Yes", Theme.width_widget_1-10)
 	size.x = math.max(size.x, w + 10)
@@ -33,7 +33,7 @@ end
 
 UiToggle.rebuild_canvas = function(self)
 	-- Add the base.
-	Widgets.Uiwidget.rebuild_canvas(self)
+	UiWidget.rebuild_canvas(self)
 	-- Add the button.
 	Theme:draw_button(self,
 		self.value and "Yes" or "No",

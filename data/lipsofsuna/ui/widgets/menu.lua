@@ -23,7 +23,7 @@ local UiMenu = Class("UiMenu", UiWidget)
 -- @param widgets List of widgets. Nil for an empty menu.
 -- @return UiMenu.
 UiMenu.new = function(clss, widgets)
-	local self = Widgets.Uiwidget.new(clss)
+	local self = UiWidget.new(clss)
 	self.hint = "$A: Select\n$$B\n$$U\n$$D"
 	-- Create the popup menu.
 	self.__box = UiVBox()

@@ -28,7 +28,7 @@ Widgets.Uiintrospectfield.new = function(clss, spec, field)
 		end
 	end
 	-- Create the entry custom widget.
-	local self = Widgets.Uiwidget.new(clss, label)
+	local self = UiEntry.new(clss, label)
 	self.help = field.description
 	self.spec = spec
 	self.field = field
@@ -45,7 +45,7 @@ end
 
 Widgets.Uiintrospectfield.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiwidget.rebuild_size(self)
+	local size = UiEntry.rebuild_size(self)
 	size.x = math.max(size.x, 500)
 	-- Resize to fit the label.
 	if self.value then

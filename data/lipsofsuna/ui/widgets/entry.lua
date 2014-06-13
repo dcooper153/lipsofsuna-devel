@@ -1,12 +1,12 @@
 local Class = require("system/class")
 local Keysym = require("system/keysym")
 local String = require("system/string")
-require("ui/widgets/widget")
+local UiWidget = require("ui/widgets/widget")
 
-local UiEntry = Class("UiEntry", Widgets.Uiwidget)
+local UiEntry = Class("UiEntry", UiWidget)
 
 UiEntry.new = function(clss, label, changed)
-	local self = Widgets.Uiwidget.new(clss, label)
+	local self = UiWidget.new(clss, label)
 	self.value = ""
 	self.cursor_pos = 1
 	self.changed = changed
@@ -33,7 +33,7 @@ end
 
 UiEntry.handle_event = function(self, args)
 	if not self.input_mode or (args.type ~= "keypress" and args.type ~= "keyrepeat") then
-		return Widgets.Uiwidget.handle_event(self, args)
+		return UiWidget.handle_event(self, args)
 	end
 	if args.code == Keysym.BACKSPACE then
 		-- Backspace.
@@ -155,7 +155,7 @@ end
 
 UiEntry.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiwidget.rebuild_size(self)
+	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.value then
 		local text = self:get_displayed_text()
@@ -172,7 +172,7 @@ UiEntry.rebuild_canvas = function(self)
 	local w = self.size.x - Theme.width_label_1 - 5
 	local w1 = self:get_text_area_width()
 	local h = self.size.y - 10
-	Widgets.Uiwidget.rebuild_canvas(self)
+	UiWidget.rebuild_canvas(self)
 	-- Add the background.
 	Theme:draw_entry(self,
 		Theme.width_label_1, 5, w, h,
