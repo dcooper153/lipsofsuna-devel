@@ -21,7 +21,7 @@ end
 
 --- Stick-like terrain system.
 -- @type Terrain
-Terrain = Class("Terrain")
+local Terrain = Class("Terrain")
 
 --- Creates a new terrain.
 -- @param clss Terrain class.
