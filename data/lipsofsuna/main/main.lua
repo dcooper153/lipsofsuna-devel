@@ -21,6 +21,7 @@ local Mod = require("main/mod")
 local Parallel = require("system/parallel")
 local Physics = require("system/physics")
 local Settings = require("main/settings")
+local SpecManager = require("main/spec-manager")
 local Timing = require("main/timing")
 local Watchdog = require("system/watchdog")
 
@@ -33,6 +34,7 @@ local Main = Class("Main")
 Main.new = function(clss)
 	local self = Class.new(clss)
 	self.log = Log()
+	self.specs = SpecManager()
 	self.images = ImageManager()
 	self.models = ModelManager()
 	self.timing = Timing()
@@ -55,6 +57,8 @@ end
 --- Loads the mods and their data.
 -- @param self Main.
 Main.load = function(self)
+	-- Load the specs.
+	self.specs:register_all()
 	-- Load the mods.
 	self.mods:load("main")
 	self.mods:load_list("mods.json")

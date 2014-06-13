@@ -128,7 +128,7 @@ Introspect.validate = function(self, data)
 		end
 		-- Validate spec relations.
 		if details.spec then
-			local specclss = Spec.dict_spec[details.spec]
+			local specclss = Main.specs:find_class(details.spec)
 			assert(specclss)
 			if not specclss:find{name = value} then
 				error(value .. " not in " .. details.spec, 0)

@@ -29,7 +29,6 @@ Mod.new = function(clss)
 	self.scripts = {}
 	self.post_scripts = {}
 	self.specs = {}
-	Spec:register_all()
 	return self
 end
 
@@ -72,7 +71,7 @@ Mod.init_all = function(self, settings)
 	-- Create the specs.
 	for k,v in ipairs(self.specs) do
 		if needed(v[1]) then
-			local cls = Spec.dict_spec[v[3]]
+			local cls = Main.specs:find_class(v[3])
 			if not cls then
 				error("loading mod \"" .. v[1] .. "\" failed: " ..
 					"invalid spec type \"" .. v[3] .. "\" in \"" .. v[2] .. "\"")
@@ -120,7 +119,7 @@ Mod.load = function(self, name, optional)
 				return "missing spec type in \"" .. path .. "\""
 			end
 			-- Validate the type.
-			local cls = Spec.dict_spec[type_]
+			local cls = Main.specs:find_class(type_)
 			if not cls then
 				return "invalid spec type \"" .. type_ .. "\" in \"" .. path .. "\""
 			end

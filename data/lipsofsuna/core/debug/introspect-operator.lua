@@ -72,8 +72,7 @@ end
 -- @param self Operator.
 -- @param Spec.
 IntrospectOperator.get_spec = function(self)
-	local spec_clss = Spec.dict_spec[self.__spec_type]
-	return spec_clss:find{name = self.__spec_name}
+	local spec_clss = Main.specs:find_by_name(self.__spec_type, self.__spec_name)
 end
 
 --- Gets the list of introspectable specs.
@@ -84,7 +83,7 @@ end
 -- @param List of specs.
 IntrospectOperator.get_specs = function(self)
 	local lst = {}
-	local spec_clss = Spec.dict_spec[self.__spec_type]
+	local spec_clss = Main.specs:find_class(self.__spec_type)
 	for k,v in pairs(spec_clss.dict_name) do table.insert(lst, v) end
 	table.sort(lst, function(a,b) return a.name < b.name end)
 	return lst

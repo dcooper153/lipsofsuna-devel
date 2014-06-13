@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local Model = require("system/model")
-local ModelSpec = require("core/specs/model")
 
 --- Implements loading and caching of models.
 -- @type ModelManager
@@ -36,7 +35,7 @@ ModelManager.find_by_name = function(self, name)
 	local model = self.models_by_name[name]
 	if not model then
 		-- Load a new model.
-		local spec = ModelSpec:find_by_name(name)
+		local spec = Main.specs:find_by_name("ModelSpec", name)
 		model = Model()
 		model.name = name
 		model.loaded = model:load(spec and spec.model or name, Client and true or false)

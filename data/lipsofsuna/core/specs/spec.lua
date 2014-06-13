@@ -18,7 +18,6 @@ Spec.dict_id = {}
 Spec.dict_cat = {}
 Spec.dict_name = {}
 Spec.dict_file = {}
-Spec.dict_spec = {}
 
 --- Registers a spec class.
 -- @param clss Spec class.
@@ -27,26 +26,7 @@ Spec.dict_spec = {}
 -- @param fields Introspection fields.
 -- @return New spec class.
 Spec.register = function(clss, name, type, fields)
-	local spec = Class(name, clss)
-	spec.type = type
-	spec.dict_id = {}
-	spec.dict_cat = {}
-	spec.dict_name = {}
-	if fields then
-		local Introspect = require("core/introspect/introspect")
-		spec.introspect = Introspect{name = name, fields = fields}
-	end
-	clss.dict_spec[name] = spec
-	return spec
-end
-
---- Registers all the spec types.
--- @param clss Spec class.
-Spec.register_all = function(clss)
-	if not clss.__registered then
-		clss.__registered = true
-		File:require_directory("core/specs", "init")
-	end
+	return Main.specs:register(name, type, fields)
 end
 
 --- Extends a spec with the values in the table.

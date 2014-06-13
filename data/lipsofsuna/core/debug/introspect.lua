@@ -29,7 +29,7 @@ Ui:add_widget{
 	state = "introspect",
 	widget = function()
 		local list = {}
-		for k in pairs(Spec.dict_spec) do
+		for k in pairs(Main.specs:get_class_names()) do
 			table.insert(list, k)
 		end
 		table.sort(list)
