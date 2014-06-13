@@ -13,7 +13,7 @@ local File = require("system/file")
 
 --- TODO:doc
 -- @type Spec
-Spec = Class("Spec")
+local Spec = Class("Spec")
 Spec.dict_id = {}
 Spec.dict_cat = {}
 Spec.dict_name = {}
