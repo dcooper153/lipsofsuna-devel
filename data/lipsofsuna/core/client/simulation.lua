@@ -15,7 +15,7 @@ local Color = require("system/color")
 local Item = require("core/objects/item")
 local Obstacle = require("core/objects/obstacle")
 local Physics = require("system/physics")
-local PhysicsConsts = require("core/server/physics-consts")
+local PhysicsConsts = require("core/physics/consts")
 local Spell = require("core/objects/spell")
 local Staticobject = require("core/objects/static")
 

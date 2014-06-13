@@ -4,7 +4,7 @@ local Item = require("core/objects/item")
 local ModifierSpec = require("core/specs/modifier")
 local Obstacle = require("core/objects/obstacle")
 local Physics = require("system/physics")
-local PhysicsConsts = require("core/server/physics-consts")
+local PhysicsConsts = require("core/physics/consts")
 local Staticobject = require("core/objects/static")
 
 ChatCommand{

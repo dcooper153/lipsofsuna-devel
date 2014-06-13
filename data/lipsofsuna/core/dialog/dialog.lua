@@ -12,7 +12,6 @@ local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Item = require("core/objects/item")
 local Obstacle = require("core/objects/obstacle")
-local Trading = require("core/server/trading") --FIXME
 
 --- Holds the dialog state of an individual NPC.
 -- @type Dialog

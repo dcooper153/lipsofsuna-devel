@@ -6,7 +6,7 @@
 local Bitwise = require("system/bitwise")
 local Item = require("core/objects/item")
 local Physics = require("system/physics")
-local PhysicsConsts = require("core/server/physics-consts")
+local PhysicsConsts = require("core/physics/consts")
 local Simulation = require("core/client/simulation")
 
 local make_flags = function(list)

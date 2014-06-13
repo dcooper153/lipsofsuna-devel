@@ -15,7 +15,7 @@ local Class = require("system/class")
 local Color = require("system/color")
 local Hooks = require("system/hooks")
 local Json = require("system/json")
-local PhysicsConsts = require("core/server/physics-consts")
+local PhysicsConsts = require("core/physics/consts")
 
 local scale255 = function(t)
 	local res = {}

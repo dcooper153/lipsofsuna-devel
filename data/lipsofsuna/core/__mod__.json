@@ -48,6 +48,7 @@
 		["load", "core/messaging"],
 		["load", "core/multiplayer"],
 		["load", "core/objects"],
+		["load", "core/physics"],
 		["load", "core/quest"],
 		["load", "core/server"],
 		["load", "core/shaders"],

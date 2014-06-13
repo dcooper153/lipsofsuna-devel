@@ -12,7 +12,7 @@ local Camera = require("system/camera")
 local Class = require("system/class")
 local MathUtils = require("system/math/utils")
 local Physics = require("system/physics")
-local PhysicsConsts = require("core/server/physics-consts")
+local PhysicsConsts = require("core/physics/consts")
 
 --- First person camera.
 -- @type FirstPersonCamera

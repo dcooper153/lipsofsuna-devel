@@ -1,5 +1,5 @@
 local Client = require("core/client/client")
-local PhysicsConsts = require("core/server/physics-consts")
+local PhysicsConsts = require("core/physics/consts")
 local ThirdPersonCamera = require("core/camera/third/third-person-camera")
 
 Main.main_start_hooks:register(130, function()
