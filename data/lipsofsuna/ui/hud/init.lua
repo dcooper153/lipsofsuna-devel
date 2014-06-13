@@ -1,6 +1,3 @@
-if not Settings then return end
-if Settings.server then return end
-
 local Hudcompass = require("ui/hud/compass")
 local HudCompanion = require("ui/hud/companion")
 local Hudfps = require("ui/hud/fps")

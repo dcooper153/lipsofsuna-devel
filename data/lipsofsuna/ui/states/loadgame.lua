@@ -19,8 +19,8 @@ Ui:add_widget{
 			if file then
 				local name = Operators.single_player:decode_save_filename(file)
 				table.insert(widgets, UiButton(name, function()
-					Settings.file = file
-					Settings.generate = false
+					Main.settings.file = file
+					Main.settings.generate = false
 					Main:start_game("Normal")
 				end))
 			end

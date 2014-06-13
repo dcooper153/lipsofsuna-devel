@@ -30,5 +30,5 @@ Main.messaging:register_message{
 		return {}
 	end,
 	server_to_client_handle = function(self)
-		Main.messaging:client_event("login", Settings.account, Settings.password)
+		Main.messaging:client_event("login", Main.settings.account, Main.settings.password)
 	end}

@@ -3,8 +3,6 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 
-local Simulation = not Settings.server and require("core/client/simulation")
-
 Main.messaging:register_message{
 	name = "create static objects",
 	server_to_client_encode = function(self, objects)
@@ -47,8 +45,9 @@ Main.messaging:register_message{
 	server_to_client_handle = function(self, objects)
 		if not Server.initialized then
 			-- Create the static objects.
+			local Simulation = require("core/client/simulation")
 			for k,v in pairs(objects) do
-				local spec = Staticspec:find{name = v[2]}
+				local spec = Staticspec:find_by_name(v[2])
 				if spec then
 					local o = Simulation:create_object_by_spec(spec, v[1])
 					o:set_position(v[3])

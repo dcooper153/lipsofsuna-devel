@@ -41,8 +41,8 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "join",
 	widget = function() return UiButton("Connect", function()
-			Settings.account = Client.options.join_account
-			Settings.password = Client.options.join_password
+			Main.settings.account = Client.options.join_account
+			Main.settings.password = Client.options.join_password
 			Main.join:join_game(Client.options.join_address, Client.options.join_port)
 		end)
 	end}

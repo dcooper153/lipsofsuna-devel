@@ -48,13 +48,13 @@ Ui:add_widget{
 			if file then
 				local name = Operators.single_player:decode_save_filename(file)
 				table.insert(widgets, UiButton(name, function()
-					Settings.file = file
-					Settings.admin = Client.options.host_admin
-					Settings.generate = Client.options.host_restart
-					Settings.host = "localhost:10101"
-					Settings.join = nil
-					Settings.account = Client.options.host_account
-					Settings.password = Client.options.host_password
+					Main.settings.file = file
+					Main.settings.admin = Client.options.host_admin
+					Main.settings.generate = Client.options.host_restart
+					Main.settings.host = "localhost:10101"
+					Main.settings.join = nil
+					Main.settings.account = Client.options.host_account
+					Main.settings.password = Client.options.host_password
 					Main.host:host_game()
 				end))
 			end

@@ -99,8 +99,8 @@ Server.authenticate_client = function(self, client, login, pass)
 	-- Check if the account has admin rights in the config file.
 	-- Grant admin rights to the first client if started with --admin.
 	local admin = (self.config.admins[login] == true)
-	if Settings.admin or client == -1 then
-		Settings.admin = nil
+	if Main.settings.admin or client == -1 then
+		Main.settings.admin = nil
 		self.config.admins[login] = true
 		admin = true
 	end
