@@ -3,6 +3,8 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 
+local QuestSpec = require("core/specs/quest")
+
 Main.messaging:register_message{
 	name = "update quest marker",
 	server_to_client_encode = function(self, name, marker)
@@ -15,7 +17,7 @@ Main.messaging:register_message{
 	end,
 	server_to_client_handle = function(self, name, marker)
 		-- Find the quest spec.
-		local spec = Questspec:find{name = name}
+		local spec = QuestSpec:find_by_name(name)
 		if not spec then return end
 		-- Find or create the quest.
 		local quest = Operators.quests:get_quest_by_name(name)

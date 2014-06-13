@@ -1,7 +1,9 @@
-Questspec{name = "Erinyes"}
-Questspec{name = "Imaginary Friend"}
-Questspec{name = "Sanctuary"}
-Questspec{name = "Brigands"}
-Questspec{name = "Sword on the Stone"}
-Questspec{name = "Mining Guild"}
-Questspec{name = "Bridge Building"}
+local QuestSpec = require("core/specs/quest")
+
+QuestSpec{name = "Erinyes"}
+QuestSpec{name = "Imaginary Friend"}
+QuestSpec{name = "Sanctuary"}
+QuestSpec{name = "Brigands"}
+QuestSpec{name = "Sword on the Stone"}
+QuestSpec{name = "Mining Guild"}
+QuestSpec{name = "Bridge Building"}

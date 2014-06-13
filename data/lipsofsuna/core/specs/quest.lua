@@ -6,14 +6,14 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.quest
--- @alias Questspec
+-- @alias QuestSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
 --- TODO:doc
--- @type Questspec
-Questspec = Spec:register("Questspec", "quest", {
+-- @type QuestSpec
+local QuestSpec = Spec:register("QuestSpec", "quest", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "status", type = "string", default = "unused", description = "Quest status. (unused/inactive/active/completed)"},
@@ -21,13 +21,13 @@ Questspec = Spec:register("Questspec", "quest", {
 })
 
 --- Creates a new quest specification.
--- @param clss Quest class.
+-- @param clss QuestSpec class.
 -- @param args Arguments.
--- @return New quest spec.
-Questspec.new = function(clss, args)
+-- @return QuestSpec.
+QuestSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
 
-
+return QuestSpec
