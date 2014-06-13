@@ -90,6 +90,7 @@ Options:
   -s  --search STR                Search for a string.
   -sg --search-global STR         Search for a global Lua variable.
   -sp --search-pattern STR        Search for a pattern.
+  -sv --search-variable STR       Search for a full variable name.
 ]])
 end
 
@@ -154,17 +155,62 @@ end
 
 ------------------------------------------------------------------------------
 
-local MatchGlobal = Class("MatchGlobal", Match)
+local MatchVariable = Class("MatchVariable", Match)
 
-MatchGlobal.new = function(clss, path, name, expr)
+MatchVariable.new = function(clss, path, name, expr)
 	local self = Match.new(clss, path, name)
 	self.expression = expr
+	self.language = Utils:get_file_type(name)
+	return self
+end
+
+MatchVariable.match = function(self, line)
+	return self:match_full_name(line, self.expression)
+end
+
+MatchVariable.match_full_name = function(self, line, expr)
+	-- Check that the line contains the variable name.
+	local s1,e1 = string.find(line, self.expression, 1, true)
+	if not s1 then
+		return false
+	end
+	-- Check that the full variable name matches.
+	local n = s1 > 1 and string.sub(line, s1-1, s1-1)
+	if n and string.find("_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", n, 1, true) then
+		return false
+	end
+	local n = string.sub(line, e1+1, e1+1)
+	if n and string.find("_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890", n, 1, true) then
+		return false
+	end
+	-- Check that the line is not in a comment.
+	if self.language == "Lua" then
+		local s2,e2 = string.find(line, "--", 1, true)
+		if s2 and s2 < s1 then
+			return false
+		end
+	elseif self.language == "C" or self.language == "C++" then
+		local s2,e2 = string.find(line, "//", 1, true)
+		if s2 and s2 < s1 then
+			return false
+		end
+	end
+	return true
+end
+
+------------------------------------------------------------------------------
+
+local MatchGlobal = Class("MatchGlobal", MatchVariable)
+
+MatchGlobal.new = function(clss, path, name, expr)
+	local self = MatchVariable.new(clss, path, name, expr)
 	self.expression_local = "local " .. expr .. " = "
 	self.required = (Utils:get_file_type(name) ~= "Lua")
 	return self
 end
 
 MatchGlobal.match = function(self, line)
+	-- Check if the variable is local.
 	if self.required then
 		return false
 	end
@@ -172,15 +218,8 @@ MatchGlobal.match = function(self, line)
 		self.required = true
 		return false
 	end
-	local s1,e1 = string.find(line, self.expression, 1, true)
-	if not s1 then
-		return false
-	end
-	local s2,e2 = string.find(line, "--", 1, true)
-	if s2 and s2 < s1 then
-		return false
-	end
-	return true
+	-- Check that the line contains the full variable name.
+	return self:match_full_name(line, self.expression)
 end
 
 ------------------------------------------------------------------------------
@@ -409,6 +448,11 @@ elseif arg[1] == "-sp" or arg[1] == "--search-pattern" then
 	if #arg ~= 2 and #arg ~= 3 then return Utils:usage() end
 	for path,name in Utils:find_files(arg[3] or ".") do
 		MatchPattern(path, name, arg[2]):parse()
+	end
+elseif arg[1] == "-sv" or arg[1] == "--search-variable" then
+	if #arg ~= 2 and #arg ~= 3 then return Utils:usage() end
+	for path,name in Utils:find_files(arg[3] or ".") do
+		MatchVariable(path, name, arg[2]):parse()
 	end
 elseif arg[1] == "-sw" or arg[1] == "--search-whole" then
 	if #arg ~= 2 and #arg ~= 3 then return Utils:usage() end
