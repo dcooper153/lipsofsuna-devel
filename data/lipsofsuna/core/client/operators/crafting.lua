@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local CraftingRecipeSpec = require("core/specs/crafting-recipe")
 
 Operators.crafting = Class("CraftingOperator")
 Operators.crafting.data = {}
@@ -34,7 +35,7 @@ Operators.crafting.update_craftability = function(self)
 	local object = Client.player_object
 	for k,v in Ui.widgets:get_children() do
 		if v.class_name == "Widgets.Uiinvcraft" then
-			local spec = CraftingRecipeSpec:find{name = v.name}
+			local spec = CraftingRecipeSpec:find_by_name(v.name)
 			v:set_enabled(Main.crafting_utils:can_craft(spec, object, self.data.mode))
 		end
 	end

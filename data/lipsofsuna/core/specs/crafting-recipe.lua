@@ -13,7 +13,7 @@ local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type CraftingRecipeSpec
-CraftingRecipeSpec = Spec:register("CraftingRecipeSpec", "crafting recipe", {
+local CraftingRecipeSpec = Spec:register("CraftingRecipeSpec", "crafting recipe", {
 	{name = "name", type = "string", description = "Name of the crafted item.", details = {spec = "Itemspec"}},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "count", type = "number", default = 1, description = "Number of items crafted per use.", details = {integer = true, min = 1}},
@@ -31,3 +31,5 @@ CraftingRecipeSpec.new = function(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
+
+return CraftingRecipeSpec

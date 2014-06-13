@@ -14,6 +14,8 @@
 
 -- non generating admin items: "weapons", "logs", "health jar", "magic jar"
 
+local CraftingRecipeSpec = require("core/specs/crafting-recipe")
+
 ------------------------------------------------------------------------------
 -- Decorations
 

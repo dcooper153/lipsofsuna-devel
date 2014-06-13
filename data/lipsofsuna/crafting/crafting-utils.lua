@@ -9,6 +9,7 @@
 -- @alias CraftingUtils
 
 local Class = require("system/class")
+local CraftingRecipeSpec = require("core/specs/crafting-recipe")
 local Item = require("lipsofsuna/core/objects/item")
 
 --- Crafting utils.
@@ -56,7 +57,7 @@ end
 -- @return Object or nil.
 CraftingUtils.craft = function(self, user, name, mode)
 	-- Get the specs.
-	local craftspec = CraftingRecipeSpec:find{name = name}
+	local craftspec = CraftingRecipeSpec:find_by_name(name)
 	if not craftspec then return end
 	local itemspec = Itemspec:find{name = name}
 	if not itemspec then return end

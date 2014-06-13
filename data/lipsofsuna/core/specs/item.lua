@@ -10,6 +10,7 @@
 
 local AnimationProfileSpec = require("core/specs/animation-profile")
 local Class = require("system/class")
+local CraftingRecipeSpec = require("core/specs/crafting-recipe")
 local EffectProfileSpec = require("core/specs/effect-profile")
 local Spec = require("core/specs/spec")
 

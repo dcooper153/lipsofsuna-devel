@@ -1,6 +1,7 @@
 local ActorTextureSpec = require("core/specs/actor-texture")
 local AnimationSpec = require("core/specs/animation")
 local AnimationProfileSpec = require("core/specs/animation-profile")
+local CraftingRecipeSpec = require("core/specs/crafting-recipe")
 local FactionSpec = require("core/specs/faction")
 local ModifierSpec = require("core/specs/modifier")
 local MusicSpec = require("core/specs/music")
