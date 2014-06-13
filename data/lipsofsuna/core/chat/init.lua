@@ -8,5 +8,5 @@
 -- @module core.chat.init
 -- @alias ChatInit
 
-require(Mod.path .. "chat-command")
-require(Mod.path .. "commands")
+require("core/chat/chat-command")
+require("core/chat/commands")

@@ -1,3 +1,3 @@
 local File = require("system/file")
 
-File:require_directory(Mod.path, "init")
+File:require_directory("core/misc", "init")

@@ -49,7 +49,6 @@ Main.new = function(clss)
 	self.main_end_hooks = Hooks()
 	self.update_hooks = Hooks()
 	self.__gc_timer = 0
-	_G["Mod"] = self.mods --FIXME: global
 	return self
 end
 

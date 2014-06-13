@@ -1,1 +1,1 @@
-Program:add_path(Mod.path)
+Program:add_path("environment/sky")

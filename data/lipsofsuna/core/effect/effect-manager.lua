@@ -10,11 +10,11 @@
 
 local Class = require("system/class")
 local Client = require("core/client/client")
-local DamageLabelEffect = require(Mod.path .. "damage-label-effect")
-local ParticleEffect = require(Mod.path .. "particle-effect")
+local DamageLabelEffect = require("core/effect/damage-label-effect")
+local ParticleEffect = require("core/effect/particle-effect")
 local Sound = require("system/sound")
-local SoundEffect = require(Mod.path .. "sound-effect")
-local SpeechBubbleEffect = require(Mod.path .. "speech-bubble-effect")
+local SoundEffect = require("core/effect/sound-effect")
+local SpeechBubbleEffect = require("core/effect/speech-bubble-effect")
 
 --- Manages audiovisual effects.
 -- @type EffectManager

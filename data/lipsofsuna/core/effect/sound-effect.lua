@@ -9,7 +9,7 @@
 -- @alias SoundEffect
 
 local Class = require("system/class")
-local EffectObject = require(Mod.path .. "effect-object")
+local EffectObject = require("core/effect/effect-object")
 local SoundSource = require("system/sound-source")
 
 --- Sound effect anchor.
