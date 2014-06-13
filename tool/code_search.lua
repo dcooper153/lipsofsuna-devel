@@ -456,7 +456,10 @@ GraphDeps.solve_module = function(self, path, name)
 		if self.modules[p .. "/"] then return p .. "/" end
 		p = string.match(p, "(.*)/[^/]*$")
 	end
-	return "system/"
+	local m = string.match(c, "system/(.*)$")
+	if m then return "system/" end
+	if #c then return c end
+	return path
 end
 
 GraphDeps.print = function(self)
