@@ -4,6 +4,5 @@ end
 
 ------------------------------------------------------------------------------
 
-Aabb = require("system/math/aabb")
 Vector = require("system/math/vector")
 Quaternion = require("system/math/quaternion")

@@ -8,6 +8,7 @@
 -- @module core.server.util
 -- @alias Utils
 
+local Aabb = require("system/math/aabb")
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Item = require("core/objects/item")
