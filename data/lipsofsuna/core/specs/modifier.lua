@@ -27,7 +27,7 @@ local ModifierSpec = Spec:register("ModifierSpec", "modifier", {
 	{name = "effect", type = "string", description = "Named of the sound effect to play when the modifier is applied.", details = {spec = "Effectspec"}},
 	{name = "effect_fire", type = "string", description = "Named of the sound effect to play when the modifier is fired in a ranged spell.", details = {spec = "Effectspec"}},
 	{name = "effect_target", type = "string", description = "Named of the effect profile field of the actor to play when the modifier is applied."},
-	{name = "icon", type = "string", description = "Icon name.", default = "missing1", details = {spec = "Iconspec"}},
+	{name = "icon", type = "string", description = "Icon name.", default = "missing1", details = {spec = "IconSpec"}},
 	{name = "modifiers", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of modifiers and their strengths.", details = {keys = {spec = "ModifierSpec"}}},
 	{name = "projectile", type = "string", description = "Spell object to use as a projectile.", details = {spec = "Spellspec"}},
 	{name = "radius", type = "number", default = 0, description = "Area of effect radius."},

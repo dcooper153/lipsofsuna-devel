@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local IconSpec = require("core/specs/icon")
 local UiButton = require("ui/widgets/button")
 local UiMenu = require("ui/widgets/menu")
 local UiInvItem = Class("UiInvItem", UiMenu)
@@ -143,7 +144,7 @@ UiInvItem.rebuild_canvas = function(self)
 	UiMenu.rebuild_canvas(self)
 	if not self.item then return end
 	-- Add the icon.
-	local icon = Iconspec:find{name = self.item.icon}
+	local icon = IconSpec:find_by_name(self.item.icon)
 	if icon then
 		self:canvas_image{
 			dest_position = {5,5},

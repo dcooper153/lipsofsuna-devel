@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local IconSpec = require("core/specs/icon")
 require(Mod.path .. "widget")
 
 Widgets.Uimap = Class("Uimap", Widgets.Uiwidget)
@@ -30,7 +31,7 @@ Widgets.Uimap.add_marker = function(self, icon, name, pos, rot)
 	if pix.x < 0 or pix.y < 0 or pix.x >= size.x or pix.y >= size.y then return end
 	-- Create the widget.
 	local tooltip = string.format("%s\nDistance: %d\nDepth: %d", name, loc.length, pos.y - center.y)
-	local widget = Widgets.Uiicon(Iconspec:find{name = icon}, pix, rot, Widgets.Tooltip(tooltip))
+	local widget = Widgets.Uiicon(IconSpec:find_by_name(icon), pix, rot, Widgets.Tooltip(tooltip))
 	-- Pack the widget.
 	self:add_child(widget)
 	table.insert(self.markers, widget)

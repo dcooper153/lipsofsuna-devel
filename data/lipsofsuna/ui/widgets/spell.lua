@@ -10,6 +10,7 @@
 
 local Actionspec = require("core/specs/action")
 local Class = require("system/class")
+local IconSpec = require("core/specs/icon")
 local ModifierSpec = require("core/specs/modifier")
 local UiWidget = require("ui/widgets/widget")
 
@@ -27,7 +28,7 @@ UiSpell.new = function(clss, spec, active)
 	self.mode = spec and spec.type or "modifier"
 	self.active = active
 	self.hint = active and "$A: Select\n$$B\n$$U\n$$D" or "$$B\n$$U\n$$D"
-	self.icon = self.spec and Iconspec:find_by_name(self.spec.icon or "missing")
+	self.icon = self.spec and IconSpec:find_by_name(self.spec.icon or "missing")
 	return self
 end
 

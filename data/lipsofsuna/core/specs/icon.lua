@@ -6,14 +6,14 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.icon
--- @alias Iconspec
+-- @alias IconSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
 --- TODO:doc
--- @type Iconspec
-Iconspec = Spec:register("Iconspec", "icon", {
+-- @type IconSpec
+local IconSpec = Spec:register("IconSpec", "icon", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "image", type = "string", default = "icon1", description = "Source image name."},
@@ -25,10 +25,10 @@ Iconspec = Spec:register("Iconspec", "icon", {
 -- @param clss Iconspec class.
 -- @param args Arguments.
 -- @return New icon specification.
-Iconspec.new = function(clss, args)
+IconSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
 
-
+return IconSpec

@@ -12,6 +12,7 @@ local AnimationProfileSpec = require("core/specs/animation-profile")
 local Class = require("system/class")
 local CraftingRecipeSpec = require("core/specs/crafting-recipe")
 local EffectProfileSpec = require("core/specs/effect-profile")
+local IconSpec = require("core/specs/icon")
 local Spec = require("core/specs/spec")
 
 --- Item speficification.
@@ -50,7 +51,7 @@ Itemspec = Spec:register("Itemspec", "item", {
 	{name = "important", type = "boolean", description = "True to not allow the item to be cleaned up from the map."},
 	{name = "modifiers", type = "dict", dict = {type = "number"}, description = "Dictionary of ways how attacks with the weapon modify the target."},
 	{name = "modifiers_bonus", type = "list", list = {type = "string"}, description = "List of skill-derived attribute names that affect modifiers."},
-	{name = "icon", type = "string", details = {value_in_spec = "Iconspec"}, description = "Icon name."},
+	{name = "icon", type = "string", details = {value_in_spec = "IconSpec"}, description = "Icon name."},
 	{name = "interactive", type = "boolean", default = true, description = "False to make the object not appear interactive."},
 	{name = "inventory_items", type = "dict", dict = {type = "number"}, default = {}, description = "List of inventory items for containers.", details = {keys = {spec = "Itemspec"}, values = {integer = true, min = 1}}},
 	{name = "inventory_size", type = "number", description = "Size of the inventory. Nonzero makes the item a container."},

@@ -11,6 +11,7 @@
 local Button = require("system/widgets/button")
 local Class = require("system/class")
 local Cursor = require("system/widgets/cursor")
+local IconSpec = require("core/specs/icon")
 local Input = require("system/input")
 local InputHandler = require("ui/input-handler")
 local Label = require("system/widgets/label")
@@ -41,7 +42,7 @@ Ui.init = function(self)
 	self.hint = Label()
 	self.label = Label()
 	-- Initialize the cursor.
-	self.cursor = Cursor(Iconspec:find_by_name("cursor1"))
+	self.cursor = Cursor(IconSpec:find_by_name("cursor1"))
 	-- Initialize input.
 	self.input = InputHandler(Client.bindings, self.widgets)
 	self.input.focus_changed = function(w, mouse)

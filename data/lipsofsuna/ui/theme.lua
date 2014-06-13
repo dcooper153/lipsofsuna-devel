@@ -9,6 +9,7 @@
 -- @alias Theme
 
 local Class = require("system/class")
+local IconSpec = require("core/specs/icon")
 
 --- TODO:doc
 -- @type Theme
@@ -137,7 +138,7 @@ Theme.draw_entry = function(self, widget, x, y, w, h, focused, editing)
 end
 
 Theme.draw_icon_scaled = function(self, widget, name, x, y, w, h, color)
-	local icon = Iconspec:find{name = name}
+	local icon = IconSpec:find_by_name(name)
 	if icon then
 		widget:canvas_image{
 			color = color,
