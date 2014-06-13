@@ -15,14 +15,10 @@ local Game = require("core/server/game")
 local Hooks = require("system/hooks")
 local Lighting = require("core/client/lighting")
 local Options = require("core/client/options")
-local Physics = require("system/physics")
 local PlayerState = require("core/client/player-state")
 local Reload = require("system/reload")
 local Simulation = require("core/client/simulation")
-local Skills = require("core/skills/skills")
-local Skillspec = require("core/specs/skill")
 local TerrainSync = require("core/client/terrain-sync")
-local UnlockManager = require("core/unlock/unlock-manager")
 
 --- TODO:doc
 -- @type Client
