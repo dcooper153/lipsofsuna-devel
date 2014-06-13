@@ -8,6 +8,7 @@
 -- @module character.texture_builder
 -- @alias TextureBuilder
 
+local ActorSkinSpec = require("core/specs/actor-skin")
 local ActorTextureSpec = require("core/specs/actor-texture")
 local Class = require("system/class")
 local Color = require("system/color")
@@ -137,7 +138,7 @@ TextureBuilder.__main = function(self, spec)
 	-- Set the base texture.
 	local basename = spec:get_base_texture()
 	if not basename then return end
-	local skinspec = skin_style and Actorskinspec:find_by_name(skin_style)
+	local skinspec = skin_style and ActorSkinSpec:find_by_name(skin_style)
 	local skinname = skinspec and skinspec.textures[1] or basename
 	local base = Main.images:find_by_name_async(skinname, yield)
 	if not base then return end

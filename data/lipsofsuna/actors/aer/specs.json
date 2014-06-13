@@ -101,7 +101,7 @@
 		}
 	},
 	{
-		"type": "Actorskinspec",
+		"type": "ActorSkinSpec",
 		"name": "Aer skin 1",
 		"actors": {"aer": true},
 		"textures": ["skin1"]

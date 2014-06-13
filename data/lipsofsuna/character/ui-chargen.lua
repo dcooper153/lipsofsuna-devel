@@ -1,3 +1,4 @@
+local ActorSkinSpec = require("core/specs/actor-skin")
 local ActorTextureSpec = require("core/specs/actor-texture")
 local ChargenSliderSpec = require("core/specs/chargen-slider")
 local Client = require("core/client/client")
@@ -99,7 +100,7 @@ Ui:add_widget{
 			-- Create the popup widgets.
 			local widgets = {}
 			local race = Client.chargen:get_race()
-			local specs = Actorskinspec:find_by_actor(race)
+			local specs = ActorSkinSpec:find_by_actor(race)
 			for k,v in ipairs(specs) do
 				local active = Client.chargen:get_skin_style() == v.name
 				self:add_item(v.name, active, function(w)

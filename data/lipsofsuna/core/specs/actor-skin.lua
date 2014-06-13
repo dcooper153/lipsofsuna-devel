@@ -13,7 +13,7 @@ local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type Actorskinspec
-Actorskinspec = Spec:register("Actorskinspec", "actor skin", {
+local ActorSkinSpec = Spec:register("ActorSkinSpec", "actor skin", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "actors", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of actor spec names.", details = {keys = {spec = "Actorspec"}}},
@@ -25,7 +25,7 @@ Actorskinspec = Spec:register("Actorskinspec", "actor skin", {
 -- @param clss Actorskinspec class.
 -- @param args Arguments.
 -- @return New actor skin spec.
-Actorskinspec.new = function(clss, args)
+ActorSkinSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	return self
@@ -35,7 +35,7 @@ end
 -- @param self Actorskinspec class.
 -- @param name Actor variant name.
 -- @return List of skins.
-Actorskinspec.find_by_actor = function(self, name)
+ActorSkinSpec.find_by_actor = function(self, name)
 	local res = {}
 	for k,v in pairs(self.dict_name) do
 		if v.actors[name] then table.insert(res, v) end
@@ -44,4 +44,4 @@ Actorskinspec.find_by_actor = function(self, name)
 	return res
 end
 
-
+return ActorSkinSpec
