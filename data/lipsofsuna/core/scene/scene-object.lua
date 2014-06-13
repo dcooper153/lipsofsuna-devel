@@ -5,8 +5,8 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.client_render_object
--- @alias ClientRenderObject
+-- @module core.scene.client_render_object
+-- @alias SceneObject
 
 local Animation = require("system/animation")
 local CensorshipEffect = require("core/effect/censorship-effect")
@@ -14,21 +14,21 @@ local Class = require("system/class")
 local Model = require("system/model")
 local ModelBuilder = require("character/model-builder")
 local ModelEffect = require("core/effect/model-effect")
-local ObjectVisual = require("core/client/object-visual")
+local ObjectVisual = require("core/scene/object-visual")
 local ParticleEffect = require("core/effect/particle-effect")
 local RenderObject = require("system/render-object")
-local RenderUtils = require("core/client/render-utils")
+local RenderUtils = require("core/scene/render-utils")
 local SpeedlineEffect = require("core/effect/speedline-effect")
 local TextureBuilder = require("character/texture-builder")
 
 --- Renderable object.
--- @type ClientRenderObject
-local ClientRenderObject = Class("ClientRenderObject", RenderObject)
+-- @type SceneObject
+local SceneObject = Class("SceneObject", RenderObject)
 
 --- Initializes the render object.
--- @param self Render object.
+-- @param self SceneObject.
 -- @param object Object.
-ClientRenderObject.init = function(self, object)
+SceneObject.init = function(self, object)
 	-- Mark as initialized.
 	if self.initialized then self:clear() end
 	if not object.spec then return end
@@ -36,7 +36,7 @@ ClientRenderObject.init = function(self, object)
 	self.visuals = ObjectVisual(object, self)
 	-- Store the object.
 	self.object = object
-	Client.options:apply_object(object)
+	Main.client.options:apply_object(object)
 	-- Set the render model.
 	if object.spec.models then
 		self:request_model_rebuild()
@@ -63,8 +63,8 @@ ClientRenderObject.init = function(self, object)
 end
 
 --- Clears the render object.
--- @param self Render object.
-ClientRenderObject.clear = function(self)
+-- @param self SceneObject.
+SceneObject.clear = function(self)
 	-- Mark as uninitialized.
 	if not self.initialized then return end
 	self.initialized = nil
@@ -90,13 +90,13 @@ ClientRenderObject.clear = function(self)
 end
 
 --- Plays an animation by name from the spec of the object.
--- @param self Render object.
+-- @param self SceneObject.
 -- @param name Animation name.
 -- @param time Optional start time, or nil.
 -- @param variant Animation variant number, or nil.
 -- @param weapon Weapon being wielded, or nil.
 -- @return Animation arguments.
-ClientRenderObject.add_animation = function(self, name, time, variant, weapon)
+SceneObject.add_animation = function(self, name, time, variant, weapon)
 	-- Check for initialization.
 	if not self.initialized then return end
 	if not self.object.spec.get_animation_arguments then return end
@@ -130,19 +130,19 @@ ClientRenderObject.add_animation = function(self, name, time, variant, weapon)
 end
 
 --- Adds an effect anchor to the object.
--- @param self Render object.
+-- @param self SceneObject.
 -- @param effect Effect anchor.
-ClientRenderObject.add_effect = function(self, effect)
+SceneObject.add_effect = function(self, effect)
 	if not self.initialized then return end
 	table.insert(self.special_effects, effect)
 end
 
 --- Adds a wielded weapon to the model.
--- @param self Render object.
+-- @param self SceneObject.
 -- @param object Wielded item.
 -- @param slot Equipment slot name.
 -- @param node Node where to attach the object.
-ClientRenderObject.add_equipment_anchor = function(self, object, slot, node)
+SceneObject.add_equipment_anchor = function(self, object, slot, node)
 	if not self.initialized then return end
 	-- Add the anchor effect.
 	self.visuals:add_anchor_object(slot .. "_anchor", object, node)
@@ -163,9 +163,9 @@ ClientRenderObject.add_equipment_anchor = function(self, object, slot, node)
 end
 
 --- Adds a speed line effect for the object.
--- @param self Render object.
+-- @param self SceneObject.
 -- @param args Speed line construction arguments.
-ClientRenderObject.add_speedline = function(self, args)
+SceneObject.add_speedline = function(self, args)
 	if not self.initialized then return end
 	-- Stop the old speedline
 	if self.speedline then
@@ -179,31 +179,31 @@ ClientRenderObject.add_speedline = function(self, args)
 end
 
 --- Gets the bounding box of the object.
--- @param self Render object.
+-- @param self SceneObject.
 -- @return Bounding box, or nil.
-ClientRenderObject.get_bounding_box = function(self)
+SceneObject.get_bounding_box = function(self)
 	if not self.initialized then return end
 	if not self.model then return end
 	return self.model.bounding_box
 end
 
 --- Gets the anchor effect for the given object.
--- @param self Render object.
+-- @param self SceneObject.
 -- @param object Wielded item.
 -- @return Effect object, or nil.
-ClientRenderObject.get_equipment_anchor = function(self, object)
+SceneObject.get_equipment_anchor = function(self, object)
 	if not self.initialized then return end
 	return self.visuals:find_by_object(object)
 end
 
 --- Gets the render model of the object.
--- @param self Render object.
+-- @param self SceneObject.
 -- @return Render model, or nil.
-ClientRenderObject.get_model = function(self)
+SceneObject.get_model = function(self)
 	return self.model
 end
 
-ClientRenderObject.handle_inventory_equip = function(self, slot, object)
+SceneObject.handle_inventory_equip = function(self, slot, object)
 	if not self.initialized then return end
 	-- Update models and anchors.
 	local node = self.object.spec:get_node_by_equipment_slot(slot)
@@ -216,7 +216,7 @@ ClientRenderObject.handle_inventory_equip = function(self, slot, object)
 	self:update_censorship()
 end
 
-ClientRenderObject.handle_inventory_unequip = function(self, slot, object)
+SceneObject.handle_inventory_unequip = function(self, slot, object)
 	if not self.initialized then return end
 	-- Update models and anchors.
 	local node = self.object.spec:get_node_by_equipment_slot(slot)
@@ -230,11 +230,11 @@ ClientRenderObject.handle_inventory_unequip = function(self, slot, object)
 end
 
 --- Removes a wielded weapon from the model.
--- @param self Render object.
+-- @param self SceneObject.
 -- @param object Wielded item.
 -- @param slot Equipment slot name.
 -- @param node Node where to attach the object.
-ClientRenderObject.remove_equipment_anchor = function(self, object, slot, node)
+SceneObject.remove_equipment_anchor = function(self, object, slot, node)
 	if not self.initialized then return end
 	-- Remove the anchor effect.
 	self.visuals:unparent_by_slot(slot .. "_anchor")
@@ -246,8 +246,8 @@ ClientRenderObject.remove_equipment_anchor = function(self, object, slot, node)
 end
 
 --- Queues a model rebuild for the actor.
--- @param self Render object.
-ClientRenderObject.request_model_rebuild = function(self)
+-- @param self SceneObject.
+SceneObject.request_model_rebuild = function(self)
 	if not self.initialized then return end
 	if self.object.spec.models then
 		self.model_rebuild_timer = 0.1
@@ -255,9 +255,9 @@ ClientRenderObject.request_model_rebuild = function(self)
 end
 
 --- Updates the state of the render object.
--- @param self Render object.
+-- @param self SceneObject.
 -- @param secs Seconds since the last update.
-ClientRenderObject.update = function(self, secs)
+SceneObject.update = function(self, secs)
 	if not self.initialized then return end
 	-- Handle model and texture rebuilding.
 	--
@@ -312,12 +312,12 @@ ClientRenderObject.update = function(self, secs)
 end
 
 --- Updates the censorship nodes of the object.
--- @param self ClientRenderObject.
-ClientRenderObject.update_censorship = function(self)
+-- @param self SceneObject.
+SceneObject.update_censorship = function(self)
 	if not self.initialized then return end
 	-- Create the censorship node list.
 	local nodes = {}
-	if not Client.options.nudity_enabled then
+	if not Main.client.options.nudity_enabled then
 		-- Add the default censorship nodes.
 		local spec = self.object:get_spec()
 		if spec and spec.censorship_nodes then
@@ -348,8 +348,8 @@ ClientRenderObject.update_censorship = function(self)
 end
 
 --- Updates the body and head scale of the object.
--- @param self Render object.
-ClientRenderObject.update_scale = function(self)
+-- @param self SceneObject.
+SceneObject.update_scale = function(self)
 	if not self.initialized then return end
 	local args = RenderUtils:create_scale_animation(self.object.spec, self.object.body_scale, self.object.head_scale)
 	if args then
@@ -362,18 +362,18 @@ ClientRenderObject.update_scale = function(self)
 end
 
 --- Sets the beheading state of the object.
--- @param self Render object.
+-- @param self SceneObject.
 -- @param value Boolean.
-ClientRenderObject.set_beheaded = function(self, value)
+SceneObject.set_beheaded = function(self, value)
 	if self.beheaded == value then return end
 	self.beheaded = value
 	self:request_model_rebuild()
 end
 
 --- Sets the render model of the object.
--- @param self Render object.
+-- @param self SceneObject.
 -- @param value Render model.
-ClientRenderObject.set_model = function(self, value)
+SceneObject.set_model = function(self, value)
 	if not self.initialized then return end
 	-- Set the render model.
 	local prev_model = self.model
@@ -392,10 +392,10 @@ ClientRenderObject.set_model = function(self, value)
 end
 
 --- Sets the tilt angle of the object.
--- @param self Render object.
+-- @param self SceneObject.
 -- @param nodes Back nodes.
 -- @param value Tilt angle in radians.
-ClientRenderObject.set_tilt = function(self, nodes, value)
+SceneObject.set_tilt = function(self, nodes, value)
 	if not self.initialized then return end
 	if not nodes then return end
 	if not nodes[1] then return end
@@ -410,4 +410,4 @@ ClientRenderObject.set_tilt = function(self, nodes, value)
 		fade_in = 0, fade_out = 0, permanent = true, priority = 1000, replace = true, weight = 1}
 end
 
-return ClientRenderObject
+return SceneObject

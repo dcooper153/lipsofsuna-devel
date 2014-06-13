@@ -5,7 +5,7 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 --
--- @module core.client.movement_prediction
+-- @module core.scene.movement_prediction
 -- @alias MovementPrediction
 
 local Class = require("system/class")

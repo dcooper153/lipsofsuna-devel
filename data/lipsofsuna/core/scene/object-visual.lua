@@ -18,7 +18,7 @@ local ModelBuilder = require("character/model-builder")
 local ModelEffect = require("core/effect/model-effect")
 local ParticleEffect = require("core/effect/particle-effect")
 local RenderObject = require("system/render-object")
-local RenderUtils = require("core/client/render-utils")
+local RenderUtils = require("core/scene/render-utils")
 local SoftbodyEffect = require("core/effect/softbody-effect")
 local SpeedlineEffect = require("core/effect/speedline-effect")
 
@@ -34,7 +34,7 @@ ObjectVisual.new = function(clss, object, render)
 	self.object = object
 	self.render = render
 	self.slots = {}
-	self.__softbody_enabled = Client.options.softbody_enabled
+	self.__softbody_enabled = Main.client.options.softbody_enabled
 	self.__hair_color = {255, 255, 255}
 	return self
 end
@@ -119,7 +119,7 @@ ObjectVisual.add_hair_style = function(self, style)
 				end
 			end
 			local effect
-			if v.type == "softbody" and Client.options.softbody_enabled then
+			if v.type == "softbody" and Main.client.options.softbody_enabled then
 				local params = v.softbody_params or {}
 				effect = SoftbodyEffect(self.render, v.parent_node, model, params)
 			else
@@ -259,12 +259,12 @@ ObjectVisual.update = function(self, secs)
 	   self.__hair_style ~= self.object.hair_style or
 	   a[1] ~= b1 or a[2] ~= b2 or a[3] ~= b3 or
 	   self.__head_scale ~= self.object.head_scale or
-	   self.__softbody_enabled ~= Client.options.softbody_enabled then
+	   self.__softbody_enabled ~= Main.client.options.softbody_enabled then
 		self.__beheaded = self.render.beheaded
 		self.__hair_color = {b1, b2, b3}
 		self.__hair_style = self.object.hair_style
 		self.__head_scale = self.object.head_scale
-		self.__softbody_enabled = Client.options.softbody_enabled
+		self.__softbody_enabled = Main.client.options.softbody_enabled
 		self:unparent_by_slot_prefix("hair_")
 		self:add_hair_style(self.object.hair_style)
 	end

@@ -1,0 +1,4 @@
+{
+	"server": false,
+	"client_scripts": ["main"]
+}

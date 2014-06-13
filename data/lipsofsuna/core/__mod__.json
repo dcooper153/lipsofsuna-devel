@@ -50,6 +50,7 @@
 		["load", "core/objects"],
 		["load", "core/physics"],
 		["load", "core/quest"],
+		["load", "core/scene"],
 		["load", "core/server"],
 		["load", "core/shaders"],
 		["load", "core/shortcut"],
