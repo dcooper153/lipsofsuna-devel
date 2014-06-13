@@ -1,7 +1,7 @@
 local Client = require("core/client/client")
 local Keysym = require("system/keysym")
 
-Client:register_init_hook(500, function()
+Main.main_start_hooks:register(500, function()
 
 	Client.input:register_binding{name = "shortcut_1", mode = "press", key1 = Keysym.NUM1, func = function()
 		Main.shortcuts:activate(1)

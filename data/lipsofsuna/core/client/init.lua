@@ -49,6 +49,13 @@ Main.main_start_hooks:register(10, function(secs)
 	Main.client:init()
 end)
 
+Main.main_start_hooks:register(200, function(secs)
+	Main.client:reset_data()
+	-- Execute the startup command.
+	Main.client.options:apply()
+	Main.client.start_hooks:call()
+end)
+
 Main.main_end_hooks:register(10, function(secs)
 	Main.client:deinit()
 end)

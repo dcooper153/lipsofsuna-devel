@@ -3,12 +3,12 @@ local Eventhandler = require("system/eventhandler")
 local Input = require("core/input/input")
 local Ui = require("ui/ui")
 
-Client:register_init_hook(0, function()
+Main.main_start_hooks:register(110, function()
 	Client.input = Input()
 	Client.bindings = Client.input.bindings --FIXME
 end)
 
-Client:register_init_hook(1000, function()
+Main.main_start_hooks:register(1000, function()
 	Client.input:load()
 end)
 

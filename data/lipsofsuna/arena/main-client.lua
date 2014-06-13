@@ -15,13 +15,14 @@ Main.game_end_hooks:register(0, function(secs)
 	end
 end)
 
-Main.main_start_hooks:register(0, function(secs)
+Main.main_start_hooks:register(130, function(secs)
 	Main.objects.object_created_hooks:register(15, function(object)
 		--FIXME
 		if Main.arena then
 			object.has_server_data = function() return true end
 		end
 	end)
+	Client.camera_manager:register_camera("arena", ArenaCamera())
 end)
 
 Main.update_hooks:register(0, function(secs)
@@ -29,8 +30,4 @@ Main.update_hooks:register(0, function(secs)
 		Main.timing:start_action("arena")
 		Main.arena:update(secs)
 	end
-end)
-
-Client:register_init_hook(26, function()
-	Client.camera_manager:register_camera("arena", ArenaCamera())
 end)

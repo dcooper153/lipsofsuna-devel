@@ -29,7 +29,6 @@ local UnlockManager = require("core/unlock/unlock-manager")
 Client = Class("Client")
 
 -- FIXME
-Client.init_hooks = Hooks()
 Client.play_hooks = Hooks()
 Client.player_hooks = Hooks()
 Client.reset_hooks = Hooks()
@@ -52,18 +51,10 @@ Client.init = function(self)
 	Program:load_graphics()
 	Reload:set_enabled(true)
 	self.lighting = Lighting()
-	-- Call the initialization hooks.
-	self.init_hooks:call()
-	-- Initialize the editor.
-	--self.editor = Editor()
 	-- Initialize data.
-	self:reset_data()
 	self.terrain_sync = TerrainSync()
 	-- Initialize helper threads.
 	self.threads = {}
-	-- Execute the startup command.
-	self.options:apply()
-	self.start_hooks:call()
 end
 
 Client.deinit = function(self)
@@ -112,13 +103,6 @@ Client.reset_data = function(self)
 	self.data.map = {scale = 1}
 	self.data.modifiers = {}
 	self.data.trading = {buy = {}, sell = {}, shop = {}}
-end
-
---- Registers an initialization hook.
--- @param priority Priority.
--- @param hook Function.
-Client.register_init_hook = function(self, priority, hook)
-	self.init_hooks:register(priority, hook)
 end
 
 --- Registers a playing start hook.

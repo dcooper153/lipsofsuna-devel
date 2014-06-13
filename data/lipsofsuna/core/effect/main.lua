@@ -3,7 +3,7 @@ local EffectManager = require("core/effect/effect-manager")
 local Eventhandler = require("system/eventhandler")
 local MusicManager = require("core/effect/music-manager")
 
-Client:register_init_hook(0, function()
+Main.main_start_hooks:register(110, function()
 	Client.effects = EffectManager()
 	Client.music = MusicManager()
 end)

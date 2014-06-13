@@ -35,11 +35,11 @@ Main.update_hooks:register(0, function(secs)
 	end
 end)
 
-Client:register_init_hook(26, function()
+Main.main_start_hooks:register(130, function(secs)
 	Client.camera_manager:register_camera("landscape", LandscapeCamera())
 end)
 
-Client:register_init_hook(510, function()
+Main.main_start_hooks:register(510, function(secs)
 	Client.input:register_binding{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
 		if not Main.landscape then return end
 		local camera = Main.client.camera_manager:find_camera_by_type("landscape")

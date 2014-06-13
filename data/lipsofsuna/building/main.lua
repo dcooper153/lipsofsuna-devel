@@ -34,6 +34,6 @@ Main.update_hooks:register(0, function(secs)
 	end
 end)
 
-Client:register_init_hook(26, function()
+Main.main_start_hooks:register(130, function(secs)
 	Client.camera_manager:register_camera("building", BuildingCamera())
 end)

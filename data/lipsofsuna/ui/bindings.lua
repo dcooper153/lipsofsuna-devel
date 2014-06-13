@@ -2,7 +2,7 @@ local Client = require("core/client/client")
 local Keysym = require("system/keysym")
 local Ui = require("ui/ui")
 
-Client:register_init_hook(500, function()
+Main.main_start_hooks:register(500, function()
 
 	Client.input:register_binding{name = "menu", mode = "press", key1 = Keysym.ESCAPE, func = function()
 		if Ui.root == "play" then

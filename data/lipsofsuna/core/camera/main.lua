@@ -1,10 +1,10 @@
 local CameraManager = require("core/camera/camera-manager")
 local Client = require("core/client/client")
 
-Client:register_init_hook(25, function()
+Main.main_start_hooks:register(120, function()
 	Client.camera_manager = CameraManager()
 end)
-Client:register_init_hook(50, function()
+Main.main_start_hooks:register(150, function()
 	Client.camera_manager:reset()
 end)
 

@@ -21,7 +21,7 @@ Main.game_end_hooks:register(0, function(secs)
 	Client.chargen:reset()
 end)
 
-Client:register_init_hook(26, function()
+Main.main_start_hooks:register(130, function()
 	Client.chargen = Chargen()
 	Client.camera_manager:register_camera("chargen", Client.chargen.camera)
 end)

@@ -2,7 +2,7 @@ local Client = require("core/client/client")
 local PhysicsConsts = require("core/server/physics-consts")
 local ThirdPersonCamera = require("core/camera/third/third-person-camera")
 
-Client:register_init_hook(26, function()
+Main.main_start_hooks:register(130, function()
 	local camera = ThirdPersonCamera()
 	camera:set_collision_mask(PhysicsConsts.MASK_CAMERA)
 	camera:set_far(Client.options.view_distance)

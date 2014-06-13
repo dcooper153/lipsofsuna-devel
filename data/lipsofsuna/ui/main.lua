@@ -2,7 +2,7 @@ local Client = require("core/client/client")
 local Program = require("system/core")
 local Ui = require("ui/ui")
 
-Client:register_init_hook(0, function(secs)
+Main.main_start_hooks:register(110, function()
 	Ui:init()
 end)
 

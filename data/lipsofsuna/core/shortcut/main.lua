@@ -1,7 +1,7 @@
 local Client = require("core/client/client")
 local ShortcutManager = require("core/shortcut/shortcut-manager")
 
-Client:register_init_hook(5, function()
+Main.main_start_hooks:register(110, function()
 	Main.shortcuts = ShortcutManager()
 end)
 
