@@ -6,26 +6,26 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.aiaction
--- @alias Aiactionspec
+-- @alias AiActionSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
 --- TODO:doc
--- @type Aiactionspec
-Aiactionspec = Spec:register("Aiactionspec", "ai action")
+-- @type AiActionSpec
+local AiActionSpec = Spec:register("AiActionSpec", "ai action")
 
 --- Registers an AI action.
--- @param clss Aiactionspec class.
+-- @param clss AiActionSpec class.
 -- @param args Arguments.<ul>
 --   <li>calculate: Function for calculating the likelihood.</li>
 --   <li>categories: List of categories.</li>
 --   <li>name: Action name.</li>
 --   <li>perform: Function for performing the action.</li></ul>
 -- @return New AI action spec.
-Aiactionspec.new = function(clss, args)
+AiActionSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	return self
 end
 
-
+return AiActionSpec

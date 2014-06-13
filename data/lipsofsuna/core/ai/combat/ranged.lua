@@ -1,4 +1,6 @@
-Aiactionspec{
+local AiActionSpec = require("core/specs/aiaction")
+
+AiActionSpec{
 	name = "ranged",
 	categories = {["combat"] = true, ["offensive"] = true},
 	calculate = function(self, args)

@@ -23,7 +23,7 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "base", type = "string", description = "Base actor spec.", details = {spec = "Actorspec"}},
-	{name = "ai_combat_actions", type = "dict", dict = {type = "boolean"}, default = {["block"] = true, ["idle"] = true, ["melee"] = true, ["move backward"] = true, ["move forward"] = true, ["ranged"] = true, ["ranged spell"] = true, ["self spell"] = true, ["strafe"] = true, ["switch weapon"] = true, ["throw"] = true, ["touch spell"] = true}, description = "Dictionary of allowed combat actions", details = {keys = {spec = "Aiactionspec"}}},
+	{name = "ai_combat_actions", type = "dict", dict = {type = "boolean"}, default = {["block"] = true, ["idle"] = true, ["melee"] = true, ["move backward"] = true, ["move forward"] = true, ["ranged"] = true, ["ranged spell"] = true, ["self spell"] = true, ["strafe"] = true, ["switch weapon"] = true, ["throw"] = true, ["touch spell"] = true}, description = "Dictionary of allowed combat actions", details = {keys = {spec = "AiActionSpec"}}},
 	{name = "ai_enable_attack", type = "boolean", default = true, description = "False to prohibit attacking."},
 	{name = "ai_enable_backstep", type = "boolean", default = true, description = "False to prohibit backstep."},
 	{name = "ai_enable_block", type = "boolean", default = true, description = "False to prohibit blocking."},

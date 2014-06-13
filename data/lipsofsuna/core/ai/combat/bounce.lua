@@ -1,4 +1,6 @@
-Aiactionspec{
+local AiActionSpec = require("core/specs/aiaction")
+
+AiActionSpec{
 	name = "bounce",
 	categories = {["combat"] = true, ["defensive"] = true},
 	calculate = function(self)

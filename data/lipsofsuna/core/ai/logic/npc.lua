@@ -9,6 +9,7 @@
 -- @alias NpcAi
 
 local Ai = require("core/ai/logic/ai")
+local AiActionSpec = require("core/specs/aiaction")
 local Class = require("system/class")
 
 --- TODO:doc
@@ -32,12 +33,12 @@ NpcAi.new = function(clss, manager, object)
 	-- Initialize states.
 	self.enabled_states = {}
 	for k,v in pairs(object.spec.ai_enabled_states) do
-		self.enabled_states[k] = Aistatespec:find{name = k}
+		self.enabled_states[k] = Aistatespec:find_by_name(k)
 	end
 	-- Initialize combat actions.
 	self.combat_actions = {}
 	for k,v in pairs(object.spec.ai_combat_actions) do
-		self.combat_actions[k] = Aiactionspec:find{name = k}
+		self.combat_actions[k] = AiActionSpec:find_by_name(k)
 	end
 	return self
 end
