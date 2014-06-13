@@ -1,10 +1,10 @@
 local Class = require("system/class")
-require(Mod.path .. "radio")
+local UiRadio = require("ui/widgets/radio")
 
-Widgets.Uiquest = Class("Uiquest", Widgets.Uiradio)
+local UiQuest = Class("Uiquest", UiRadio)
 
-Widgets.Uiquest.new = function(clss, quest)
-	local self = Widgets.Uiradio.new(clss, nil, "quest")
+UiQuest.new = function(clss, quest)
+	local self = UiRadio.new(clss, nil, "quest")
 	self.quest = quest
 	if quest.status == "completed" then
 		self.title = quest.spec.name .. " (completed)"
@@ -17,13 +17,13 @@ Widgets.Uiquest.new = function(clss, quest)
 	return self
 end
 
-Widgets.Uiquest.changed = function(self)
+UiQuest.changed = function(self)
 	Operators.quests:set_active_quest(self.quest)
 end
 
-Widgets.Uiquest.rebuild_size = function(self)
+UiQuest.rebuild_size = function(self)
 	-- Get the base size.
-	local size = Widgets.Uiradio.rebuild_size(self)
+	local size = UiRadio.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.title and self.text then
 		local w1,h1 = Program:measure_text(Theme.text_font_2, self.title, size.x - 10)
@@ -36,9 +36,9 @@ Widgets.Uiquest.rebuild_size = function(self)
 	return size
 end
 
-Widgets.Uiquest.rebuild_canvas = function(self)
+UiQuest.rebuild_canvas = function(self)
 	-- Add the base.
-	Widgets.Uiradio.rebuild_canvas(self)
+	UiRadio.rebuild_canvas(self)
 	-- Add the background.
 	Theme:draw_button(self, nil,
 		5, 3, self.size.x-10, self.size.y-6,
@@ -61,3 +61,5 @@ Widgets.Uiquest.rebuild_canvas = function(self)
 		text_color = Theme.text_color_1,
 		text_font = Theme.text_font_1}
 end
+
+return UiQuest

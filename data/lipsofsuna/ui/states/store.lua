@@ -1,4 +1,5 @@
 local UiButton = require("ui/widgets/button")
+local UiInvStore = require("ui/widgets/invstore")
 
 Ui:add_state{
 	state = "store",
@@ -18,7 +19,7 @@ Ui:add_widget{
 				text = item.spec.name,
 				count = item:get_count(),
 				icon = item.spec.icon}
-			table.insert(widgets, Widgets.Uiinvstore(Client.data.inventory.id, data, index, slot))
+			table.insert(widgets, UiInvStore(Client.data.inventory.id, data, index, slot))
 		end
 		return widgets
 	end}

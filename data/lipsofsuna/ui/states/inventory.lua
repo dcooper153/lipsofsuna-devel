@@ -1,5 +1,6 @@
 local UiButton = require("ui/widgets/button")
 local UiInvItem = require("ui/widgets/invitem")
+local UiInvMove = require("ui/widgets/invmove")
 local UiScrollInteger = require("ui/widgets/scrollinteger")
 
 Ui:add_state{
@@ -88,7 +89,7 @@ Ui:add_state{
 				text = item.spec.name,
 				count = item.count or 1,
 				icon = item.spec.icon}
-			table.insert(widgets, Widgets.Uiinvmove(object:get_id(), data, index, slot))
+			table.insert(widgets, UiInvMove(object:get_id(), data, index, slot))
 		end
 		return widgets
 	end}

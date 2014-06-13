@@ -1,9 +1,9 @@
 local Class = require("system/class")
 local UiInvItem = require("ui/widgets/invitem")
 
-Widgets.Uitradeslot = Class("Uitradeslot", UiInvItem)
+local UiTradeSlot = Class("Uitradeslot", UiInvItem)
 
-Widgets.Uitradeslot.new = function(clss, item, index, buy)
+UiTradeSlot.new = function(clss, item, index, buy)
 	local self = UiInvItem.new(clss, nil, item, index, item and item.slot)
 	self.buy = buy
 	if item then
@@ -14,7 +14,7 @@ Widgets.Uitradeslot.new = function(clss, item, index, buy)
 	return self
 end
 
-Widgets.Uitradeslot.apply = function(self)
+UiTradeSlot.apply = function(self)
 	if self.item then
 		-- Remove the item.
 		if self.buy then
@@ -36,3 +36,5 @@ Widgets.Uitradeslot.apply = function(self)
 	end
 	Client.effects:play_global("uitransition1")
 end
+
+return UiTradeSlot

@@ -1,22 +1,22 @@
 local Class = require("system/class")
 local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uiserverinfo = Class("Uiserverinfo", UiWidget)
+local UiServerInfo = Class("Uiserverinfo", UiWidget)
 
-Widgets.Uiserverinfo.new = function(clss, args)
+UiServerInfo.new = function(clss, args)
 	local self = UiWidget.new(clss)
 	for k,v in pairs(args) do self[k] = v end
 	self.hint = "$A: Select\n$$B\n$$U\n$$D"
 	return self
 end
 
-Widgets.Uiserverinfo.apply = function(self)
+UiServerInfo.apply = function(self)
 	Client.options.join_address = self.ip
 	Client.options.join_port = self.port
 	Ui:pop_state()
 end
 
-Widgets.Uiserverinfo.rebuild_size = function(self)
+UiServerInfo.rebuild_size = function(self)
 	-- Get the base size.
 	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the label.
@@ -29,7 +29,7 @@ Widgets.Uiserverinfo.rebuild_size = function(self)
 	return size
 end
 
-Widgets.Uiserverinfo.rebuild_canvas = function(self)
+UiServerInfo.rebuild_canvas = function(self)
 	local a = 1
 	local w = self.size.x
 	local h = self.size.y
@@ -66,3 +66,5 @@ Widgets.Uiserverinfo.rebuild_canvas = function(self)
 			text_font = Theme.text_font_1}
 	end
 end
+
+return UiServerInfo

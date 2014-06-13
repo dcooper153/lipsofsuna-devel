@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local UiMenu = require("ui/widgets/menu")
+local UiRadio = require("ui/widgets/radio")
 
 --- Radio menu widget.
 -- @type UiRadioMenu
@@ -42,7 +43,7 @@ end
 -- @param active True if the item is the active one.
 -- @param func Callback function.
 UiRadioMenu.add_item = function(self, label, active, func)
-	local widget = Widgets.Uiradio(label, "menu", function(w)
+	local widget = UiRadio(label, "menu", function(w)
 		if func then func(w) end
 		self:set_menu_opened(false)
 	end)

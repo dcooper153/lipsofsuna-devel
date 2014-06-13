@@ -3,6 +3,7 @@ local UiBackground = require("ui/widgets/background")
 local UiButton = require("ui/widgets/button")
 local UiConfigOption = require("ui/widgets/config-option")
 local UiEntry = require("ui/widgets/entry")
+local UiServerInfo = require("ui/widgets/serverinfo")
 local UiTransition = require("ui/widgets/transition")
 
 Ui:add_state{
@@ -65,7 +66,7 @@ Ui:add_state{
 		-- Create the widgets.
 		local widgets = {}
 		for k,v in pairs(servers) do
-			table.insert(widgets, Widgets.Uiserverinfo(v))
+			table.insert(widgets, UiServerInfo(v))
 		end
 		return widgets
 	end}

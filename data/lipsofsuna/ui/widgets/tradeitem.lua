@@ -1,9 +1,9 @@
 local Class = require("system/class")
 local UiInvItem = require("ui/widgets/invitem")
 
-Widgets.Uitradeitem = Class("Uitradeitem", UiInvItem)
+local UiTradeItem = Class("Uitradeitem", UiInvItem)
 
-Widgets.Uitradeitem.new = function(clss, item, index, buy)
+UiTradeItem.new = function(clss, item, index, buy)
 	local self = UiInvItem.new(clss, nil, item, index, item and item.slot)
 	self.buy = buy
 	if item then
@@ -14,7 +14,7 @@ Widgets.Uitradeitem.new = function(clss, item, index, buy)
 	return self
 end
 
-Widgets.Uitradeitem.apply = function(self)
+UiTradeItem.apply = function(self)
 	if self.buy then
 		Operators.trading:set_buy_item_index(self.index)
 		Operators.trading:add_buy()
@@ -25,3 +25,5 @@ Widgets.Uitradeitem.apply = function(self)
 	Ui:pop_state()
 	Client.effects:play_global("uitransition1")
 end
+
+return UiTradeItem

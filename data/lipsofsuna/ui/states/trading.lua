@@ -1,5 +1,7 @@
 local UiButton = require("ui/widgets/button")
 local UiLabel = require("ui/widgets/label")
+local UiTradeItem = require("ui/widgets/tradeitem")
+local UiTradeSlot = require("ui/widgets/tradeslot")
 
 Ui:add_state{
 	state = "trading",
@@ -15,7 +17,7 @@ Ui:add_widget{
 		local items = Operators.trading:get_buy_items()
 		local widgets = {}
 		for index = 1,5 do
-			table.insert(widgets, Widgets.Uitradeslot(items[index], index, true))
+			table.insert(widgets, UiTradeSlot(items[index], index, true))
 		end
 		return widgets
 	end}
@@ -30,7 +32,7 @@ Ui:add_widget{
 		local items = Operators.trading:get_sell_items()
 		local widgets = {}
 		for index = 1,5 do
-			table.insert(widgets, Widgets.Uitradeslot(items[index], index, false))
+			table.insert(widgets, UiTradeSlot(items[index], index, false))
 		end
 		return widgets
 	end}
@@ -53,7 +55,7 @@ Ui:add_state{
 		local items = Operators.trading:get_shop_items()
 		local widgets = {}
 		for index,item in ipairs(items) do
-			table.insert(widgets, Widgets.Uitradeitem(item, index, true))
+			table.insert(widgets, UiTradeItem(item, index, true))
 		end
 		return widgets
 	end}
@@ -74,7 +76,7 @@ Ui:add_state{
 				count = item.count or 1,
 				icon = item.spec.icon,
 				slot = slot}
-			table.insert(widgets, Widgets.Uitradeitem(data, index, false))
+			table.insert(widgets, UiTradeItem(data, index, false))
 		end
 		return widgets
 	end}

@@ -1,12 +1,14 @@
 local Class = require("system/class")
 local IconSpec = require("core/specs/icon")
+local UiIcon = require("ui/widgets/icon")
+local UiTooltip = require("ui/widgets/tooltip")
 local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uimap = Class("Uimap", UiWidget)
+local UiMap = Class("Uimap", UiWidget)
 
 --- Creates a new map widget.
 -- @return Map widget.
-Widgets.Uimap.new = function(clss)
+UiMap.new = function(clss)
 	local self = UiWidget.new(clss)
 	self.hint = "$$B\n$U: Zoom in\n$D: Zoom out\n"
 	self.markers = {}
@@ -20,7 +22,7 @@ end
 -- @param name Marker name.
 -- @param pos World space position of the marker.
 -- @param rot World space rotation of the marker.
-Widgets.Uimap.add_marker = function(self, icon, name, pos, rot)
+UiMap.add_marker = function(self, icon, name, pos, rot)
 	-- Calculate the relative position.
 	local center = Client.player_object:get_position()
 	local loc = Vector(pos.x, pos.z) - Vector(center.x, center.z)
@@ -31,7 +33,7 @@ Widgets.Uimap.add_marker = function(self, icon, name, pos, rot)
 	if pix.x < 0 or pix.y < 0 or pix.x >= size.x or pix.y >= size.y then return end
 	-- Create the widget.
 	local tooltip = string.format("%s\nDistance: %d\nDepth: %d", name, loc.length, pos.y - center.y)
-	local widget = Widgets.Uiicon(IconSpec:find_by_name(icon), pix, rot, Widgets.Tooltip(tooltip))
+	local widget = UiIcon(IconSpec:find_by_name(icon), pix, rot, UiTooltip(tooltip))
 	-- Pack the widget.
 	self:add_child(widget)
 	table.insert(self.markers, widget)
@@ -39,14 +41,14 @@ end
 
 --- Clear the displayed marker.
 -- @param self Map widget.
-Widgets.Uimap.clear_markers = function(self)
+UiMap.clear_markers = function(self)
 	if self.markers then
 		for k,v in pairs(self.markers) do v:detach() end
 	end
 	self.markers = {}
 end
 
-Widgets.Uimap.handle_event = function(self, args)
+UiMap.handle_event = function(self, args)
 	-- Zoom with keyboard.
 	if args.type ~= "keyrelease" then
 		local a = {}
@@ -77,11 +79,11 @@ Widgets.Uimap.handle_event = function(self, args)
 	return UiWidget.handle_event(self, args)
 end
 
-Widgets.Uimap.rebuild_size = function(self)
+UiMap.rebuild_size = function(self)
 	return Vector(Theme.text_height_1 * 10, Theme.text_height_1 * 10)
 end
 
-Widgets.Uimap.rebuild_canvas = function(self)
+UiMap.rebuild_canvas = function(self)
 	-- Add the base.
 	UiWidget.rebuild_canvas(self)
 	-- Rebuild the markers.
@@ -95,7 +97,7 @@ Widgets.Uimap.rebuild_canvas = function(self)
 	end
 end
 
-Widgets.Uimap.update = function(self, secs)
+UiMap.update = function(self, secs)
 	self.timer = self.timer + secs
 	if self.timer > 0.1 then
 		self.timer = 0
@@ -104,7 +106,7 @@ Widgets.Uimap.update = function(self, secs)
 	UiWidget.update(self, secs)
 end
 
-Widgets.Uimap.zoom = function(self, dir)
+UiMap.zoom = function(self, dir)
 	if dir == "in" then
 		Client.data.map.scale = Client.data.map.scale * 1.5
 	else
@@ -112,3 +114,5 @@ Widgets.Uimap.zoom = function(self, dir)
 	end
 	self.need_repaint = true
 end
+
+return UiMap

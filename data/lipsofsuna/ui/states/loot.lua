@@ -1,3 +1,4 @@
+local UiInvLoot = require("ui/widgets/invloot")
 local UiTransition = require("ui/widgets/transition")
 
 Ui:add_state{
@@ -14,7 +15,7 @@ Ui:add_state{
 				text = item.spec.name,
 				count = item:get_count(),
 				icon = item.spec.icon}
-			table.insert(widgets, Widgets.Uiinvloot(object:get_id(), data, index, slot))
+			table.insert(widgets, UiInvLoot(object:get_id(), data, index, slot))
 		end
 		return widgets
 	end}

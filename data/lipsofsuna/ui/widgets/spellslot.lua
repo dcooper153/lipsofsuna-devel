@@ -1,17 +1,17 @@
 local Class = require("system/class")
-require(Mod.path .. "spell")
+local UiSpell = require("ui/widgets/spell")
 
-Widgets.Uispellslot = Class("Uispellslot", Widgets.Uispell)
+local UiSpellSlot = Class("Uispellslot", UiSpell)
 
-Widgets.Uispellslot.new = function(clss, mode, name, index)
-	local self = Widgets.Uispell.new(clss, mode, name, true)
+UiSpellSlot.new = function(clss, mode, name, index)
+	local self = UiSpell.new(clss, mode, name, true)
 	self.mode = mode
 	self.index = index
 	self.hint = self.spec and "$A: Clear\n$$B\n$$U\n$$D" or "$A: Select\n$$B\n$$U\n$$D"
 	return self
 end
 
-Widgets.Uispellslot.apply = function(self)
+UiSpellSlot.apply = function(self)
 	if self.mode == "type" then
 		-- Choose a new spell type.
 		Ui:push_state("spells/types")
@@ -27,3 +27,5 @@ Widgets.Uispellslot.apply = function(self)
 	end
 	Client.effects:play_global("uitransition1")
 end
+
+return UiSpellSlot

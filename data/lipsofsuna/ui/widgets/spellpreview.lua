@@ -2,9 +2,9 @@ local Class = require("system/class")
 local ModifierSpec = require("core/specs/modifier")
 local UiWidget = require("ui/widgets/widget")
 
-Widgets.Uispellpreview = Class("Uispellpreview", UiWidget)
+local UiSpellPreview = Class("Uispellpreview", UiWidget)
 
-Widgets.Uispellpreview.new = function(clss, index, spell)
+UiSpellPreview.new = function(clss, index, spell)
 	local self = UiWidget.new(clss)
 	self.index = index
 	self.spell = spell
@@ -12,20 +12,20 @@ Widgets.Uispellpreview.new = function(clss, index, spell)
 	return self
 end
 
-Widgets.Uispellpreview.apply = function(self)
+UiSpellPreview.apply = function(self)
 	Operators.spells:set_spell_index(self.index)
 	Ui:push_state("spells/spell")
 	Client.effects:play_global("uitransition1")
 end
 
-Widgets.Uispellpreview.rebuild_size = function(self)
+UiSpellPreview.rebuild_size = function(self)
 	local size = Vector()
 	size.x = Theme.text_height_1 * 1.6 + Theme.width_icon_1 * 5.2 + 10
 	size.y = Theme.width_icon_1 + 10
 	return size
 end
 
-Widgets.Uispellpreview.rebuild_canvas = function(self)
+UiSpellPreview.rebuild_canvas = function(self)
 	local w = self.size.x
 	local h = self.size.y
 	-- Add the base.
@@ -69,3 +69,5 @@ Widgets.Uispellpreview.rebuild_canvas = function(self)
 		end
 	end
 end
+
+return UiSpellPreview

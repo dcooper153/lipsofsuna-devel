@@ -3,10 +3,10 @@ local Introspect = require("core/introspect/introspect")
 local IntrospectOperator = require("core/debug/introspect-operator")
 local UiEntry = require("ui/widgets/entry")
 
-Widgets.Uiintrospectfield = Class("Uiintrospectfield", UiEntry)
-Widgets.Uiintrospectfield.brief_fields = {["boolean"] = true, ["color"] = true, ["number"] = true, ["quaternion"] = true, ["string"] = true, ["vector"] = true}
+local UiIntrospectField = Class("Uiintrospectfield", UiEntry)
+UiIntrospectField.brief_fields = {["boolean"] = true, ["color"] = true, ["number"] = true, ["quaternion"] = true, ["string"] = true, ["vector"] = true}
 
-Widgets.Uiintrospectfield.new = function(clss, spec, field)
+UiIntrospectField.new = function(clss, spec, field)
 	-- Format the label string.
 	local label = field.label or field.name
 	if spec:is_field_set(field.name) then
@@ -37,13 +37,13 @@ Widgets.Uiintrospectfield.new = function(clss, spec, field)
 	return self
 end
 
-Widgets.Uiintrospectfield.apply = function(self)
+UiIntrospectField.apply = function(self)
 	IntrospectOperator:set_field_name(self.field.name)
 	Ui:push_state("introspect/field")
 	Client.effects:play_global("uitransition1")
 end
 
-Widgets.Uiintrospectfield.rebuild_size = function(self)
+UiIntrospectField.rebuild_size = function(self)
 	-- Get the base size.
 	local size = UiEntry.rebuild_size(self)
 	size.x = math.max(size.x, 500)
@@ -55,3 +55,5 @@ Widgets.Uiintrospectfield.rebuild_size = function(self)
 	end
 	return size
 end
+
+return UiIntrospectField

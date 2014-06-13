@@ -1,16 +1,16 @@
 local Class = require("system/class")
 local UiToggle = require("ui/widgets/toggle")
 
-Widgets.Uiradio = Class("Uiradio", UiToggle)
+local UiRadio = Class("Uiradio", UiToggle)
 
-Widgets.Uiradio.new = function(clss, label, group, changed)
+UiRadio.new = function(clss, label, group, changed)
 	local self = UiToggle.new(clss, label, changed)
 	self.radio_group = group
 	self.hint = "$A: Select\n$$B\n$$U\n$$D"
 	return self
 end
 
-Widgets.Uiradio.apply = function(self)
+UiRadio.apply = function(self)
 	-- Reactivation does nothing.
 	if self.value then return end
 	-- Deactivate other toggles in the group.
@@ -29,5 +29,7 @@ Widgets.Uiradio.apply = function(self)
 	Client.effects:play_global("uitoggle1")
 end
 
-Widgets.Uiradio.changed = function(self)
+UiRadio.changed = function(self)
 end
+
+return UiRadio
