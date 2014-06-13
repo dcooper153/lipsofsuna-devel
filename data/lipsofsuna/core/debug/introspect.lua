@@ -2,6 +2,7 @@ local ChatCommand = require("core/chat/chat-command")
 local Introspect = require("core/introspect/introspect")
 local IntrospectOperator = require("core/debug/introspect-operator")
 local Spec = require("core/specs/spec")
+local UiTransition = require("ui/widgets/transition")
 
 ChatCommand{
 	name = "introspect",
@@ -32,7 +33,7 @@ Ui:add_widget{
 		table.sort(list)
 		local widgets = {}
 		for k,v in ipairs(list) do
-			table.insert(widgets, Widgets.Uitransition(v, "introspect/specs",
+			table.insert(widgets, UiTransition(v, "introspect/specs",
 				function() IntrospectOperator:set_spec_type(v) end))
 		end
 		return widgets
@@ -40,7 +41,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "introspect",
-	widget = function() return Widgets.Uitransition("Quit", "quit") end}
+	widget = function() return UiTransition("Quit", "quit") end}
 
 ------------------------------------------------------------------------------
 
@@ -54,7 +55,7 @@ Ui:add_state{
 		local specs = IntrospectOperator:get_specs()
 		local widgets = {}
 		for k,v in ipairs(specs) do
-			widgets[k] = Widgets.Uitransition(v.name, "introspect/spec", function()
+			widgets[k] = UiTransition(v.name, "introspect/spec", function()
 				IntrospectOperator:set_spec_name(v.name)
 			end)
 		end

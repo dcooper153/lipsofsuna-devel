@@ -1,3 +1,5 @@
+local UiTransition = require("ui/widgets/transition")
+
 Ui:add_state{
 	state = "multiplayer",
 	root = "mainmenu",
@@ -8,12 +10,12 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "multiplayer",
-	widget = function() return Widgets.Uitransition("Host", "host/new") end}
+	widget = function() return UiTransition("Host", "host/new") end}
 
 Ui:add_widget{
 	state = "multiplayer",
-	widget = function() return Widgets.Uitransition("Load", "host/load") end}
+	widget = function() return UiTransition("Load", "host/load") end}
 
 Ui:add_widget{
 	state = "multiplayer",
-	widget = function() return Widgets.Uitransition("Join", "join") end}
+	widget = function() return UiTransition("Join", "join") end}

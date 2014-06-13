@@ -1,3 +1,5 @@
+local UiTransition = require("ui/widgets/transition")
+
 Ui:add_state{
 	state = "loot",
 	label = "Loot",
@@ -20,5 +22,5 @@ Ui:add_state{
 Ui:add_widget{
 	state = "loot",
 	widget = function()
-		return Widgets.Uitransition("Store", "store")
+		return UiTransition("Store", "store")
 	end}

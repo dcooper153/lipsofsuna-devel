@@ -1,7 +1,7 @@
 local Class = require("system/class")
 local UiMenu = require("ui/widgets/menu")
-
 local UiInvItem = Class("UiInvItem", UiMenu)
+local UiTransition = require("ui/widgets/transition")
 
 UiInvItem.new = function(clss, id, item, index, slot)
 	local self = UiMenu.new(clss)
@@ -87,18 +87,18 @@ UiInvItem.apply = function(self)
 			-- Don't show the widget if the count isn't at least two.
 			if count < 2 then return end
 			-- Create the widget.
-			return Widgets.Uitransition("Drop stack", "inventory/drop",
+			return UiTransition("Drop stack", "inventory/drop",
 				function() parent:set_menu_opened(false) end)
 		end,
 		function()
 			-- Don't show the widget if the count isn't at least two.
 			if count < 2 then return end
 			-- Create the widget.
-			return Widgets.Uitransition("Split stack", "inventory/split",
+			return UiTransition("Split stack", "inventory/split",
 				function() parent:set_menu_opened(false) end)
 		end,
 		function()
-			return Widgets.Uitransition("Move", "inventory/move",
+			return UiTransition("Move", "inventory/move",
 				function() parent:set_menu_opened(false) end)
 		end
 	}

@@ -1,4 +1,5 @@
 local Lobby = require("system/lobby")
+local UiTransition = require("ui/widgets/transition")
 
 Ui:add_state{
 	state = "join",
@@ -10,7 +11,7 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "join",
-	widget = function() return Widgets.Uitransition("Server list", "join/servers") end}
+	widget = function() return UiTransition("Server list", "join/servers") end}
 
 Ui:add_widget{
 	state = "join",

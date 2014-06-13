@@ -4,6 +4,7 @@ local Client = require("core/client/client")
 local HairStyleSpec = require("core/specs/hair-style")
 local UiRadioMenu = require("ui/widgets/radio-menu")
 local UiScrollFloat = require("ui/widgets/scrollfloat")
+local UiTransition = require("ui/widgets/transition")
 
 local chargen_input = function(args)
 	return Client.chargen:input(args)
@@ -55,19 +56,19 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "chargen",
-	widget = function() return Widgets.Uitransition("Body", "chargen/body") end}
+	widget = function() return UiTransition("Body", "chargen/body") end}
 
 Ui:add_widget{
 	state = "chargen",
-	widget = function() return Widgets.Uitransition("Head", "chargen/head") end}
+	widget = function() return UiTransition("Head", "chargen/head") end}
 
 Ui:add_widget{
 	state = "chargen",
-	widget = function() return Widgets.Uitransition("Face", "chargen/face") end}
+	widget = function() return UiTransition("Face", "chargen/face") end}
 
 Ui:add_widget{
 	state = "chargen",
-	widget = function() return Widgets.Uitransition("Misc", "chargen/misc") end}
+	widget = function() return UiTransition("Misc", "chargen/misc") end}
 
 Ui:add_widget{
 	state = "chargen",
@@ -80,7 +81,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "chargen",
-	widget = function() return Widgets.Uitransition("Quit", "quit") end}
+	widget = function() return UiTransition("Quit", "quit") end}
 
 ------------------------------------------------------------------------------
 

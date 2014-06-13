@@ -1,3 +1,5 @@
+local UiTransition = require("ui/widgets/transition")
+
 Ui:add_state{
 	state = "editor",
 	root = "editor",
@@ -30,11 +32,11 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "editor/menu",
-	widget = function() return Widgets.Uitransition("Load", "editor/load") end}
+	widget = function() return UiTransition("Load", "editor/load") end}
 
 Ui:add_widget{
 	state = "editor/menu",
-	widget = function() return Widgets.Uitransition("Add", "editor/add") end}
+	widget = function() return UiTransition("Add", "editor/add") end}
 
 Ui:add_widget{
 	state = "editor/menu",
@@ -55,11 +57,11 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "editor/menu",
-	widget = function() return Widgets.Uitransition("Introspect", "introspect") end}
+	widget = function() return UiTransition("Introspect", "introspect") end}
 
 Ui:add_widget{
 	state = "editor/menu",
-	widget = function() return Widgets.Uitransition("Quit", "quit") end}
+	widget = function() return UiTransition("Quit", "quit") end}
 
 ------------------------------------------------------------------------------
 
@@ -94,23 +96,23 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "editor/add",
-	widget = function() return Widgets.Uitransition("Items", "editor/items") end}
+	widget = function() return UiTransition("Items", "editor/items") end}
 
 Ui:add_widget{
 	state = "editor/add",
-	widget = function() return Widgets.Uitransition("Obstacles", "editor/obstacles") end}
+	widget = function() return UiTransition("Obstacles", "editor/obstacles") end}
 
 Ui:add_widget{
 	state = "editor/add",
-	widget = function() return Widgets.Uitransition("Static objects", "editor/statics") end}
+	widget = function() return UiTransition("Static objects", "editor/statics") end}
 
 Ui:add_widget{
 	state = "editor/add",
-	widget = function() return Widgets.Uitransition("Actors", "editor/actors") end}
+	widget = function() return UiTransition("Actors", "editor/actors") end}
 
 Ui:add_widget{
 	state = "editor/add",
-	widget = function() return Widgets.Uitransition("Tiles", "editor/tiles") end}
+	widget = function() return UiTransition("Tiles", "editor/tiles") end}
 
 ------------------------------------------------------------------------------
 

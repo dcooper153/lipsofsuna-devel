@@ -1,9 +1,9 @@
 local Class = require("system/class")
-require(Mod.path .. "button")
+require("ui/widgets/button")
 
-Widgets.Uitransition = Class("Uitransition", Widgets.Uibutton)
+local UiTransition = Class("UiTransition", Widgets.Uibutton)
 
-Widgets.Uitransition.new = function(clss, label, state, changed)
+UiTransition.new = function(clss, label, state, changed)
 	local self = Widgets.Uibutton.new(clss, label)
 	self.hint = "$A: Enter\n$$B\n$$U\n$$D"
 	self.target_state = state
@@ -11,11 +11,13 @@ Widgets.Uitransition.new = function(clss, label, state, changed)
 	return self
 end
 
-Widgets.Uitransition.apply = function(self)
+UiTransition.apply = function(self)
 	self:changed()
 	Ui:push_state(self.target_state)
 	Client.effects:play_global("uitransition1")
 end
 
-Widgets.Uitransition.changed = function(self)
+UiTransition.changed = function(self)
 end
+
+return UiTransition

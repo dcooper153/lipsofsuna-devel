@@ -1,3 +1,5 @@
+local UiTransition = require("ui/widgets/transition")
+
 Ui:add_state{
 	state = "mainmenu",
 	root = "mainmenu",
@@ -12,23 +14,23 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "mainmenu",
-	widget = function() return Widgets.Uitransition("New game", "newgame") end}
+	widget = function() return UiTransition("New game", "newgame") end}
 
 Ui:add_widget{
 	state = "mainmenu",
-	widget = function() return Widgets.Uitransition("Load game", "loadgame") end}
+	widget = function() return UiTransition("Load game", "loadgame") end}
 
 Ui:add_widget{
 	state = "mainmenu",
-	widget = function() return Widgets.Uitransition("Multiplayer", "multiplayer") end}
+	widget = function() return UiTransition("Multiplayer", "multiplayer") end}
 
 Ui:add_widget{
 	state = "mainmenu",
-	widget = function() return Widgets.Uitransition("Controls", "controls") end}
+	widget = function() return UiTransition("Controls", "controls") end}
 
 Ui:add_widget{
 	state = "mainmenu",
-	widget = function() return Widgets.Uitransition("Options", "options") end}
+	widget = function() return UiTransition("Options", "options") end}
 
 Ui:add_widget{
 	state = "mainmenu",
