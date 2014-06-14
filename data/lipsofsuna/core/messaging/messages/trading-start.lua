@@ -29,7 +29,7 @@ Main.messaging:register_message{
 		Client.data.trading = {buy = {}, sell = {}, shop = {}}
 		-- Add the shop items.
 		for k,v in ipairs(items) do
-			local spec = Itemspec:find{name = v}
+			local spec = Main.specs:find_by_name("Itemspec", v)
 			local item = {spec = spec, count = 1}
 			Client.data.trading.shop[k] = item
 		end

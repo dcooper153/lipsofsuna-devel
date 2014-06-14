@@ -307,7 +307,7 @@ end
 -- @param self Chargen.
 -- @return Table.
 Chargen.get_build_data = function(self)
-	local spec = Actorspec:find{name = self.char.race .. "-player"}
+	local spec = Main.specs:find_by_name("Actorspec", self.char.race .. "-player")
 	return {
 		beheaded = false,
 		body_scale = self.char.height,

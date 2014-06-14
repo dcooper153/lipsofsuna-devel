@@ -133,7 +133,7 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			-- Set the quest type.
 			var_type = "kill actor"
 			-- Get the list of possible target actors.
-			local list = Actorspec:find{category = "scapegoat"}
+			local list = Main.specs:find_by_category("Actorspec", "scapegoat")
 			if not list then return end
 			-- Randomize the order of target actors.
 			local actors = {}
@@ -426,7 +426,7 @@ Dialog.execute = function(self)
 		end,
 		["give player item"] = function(vm, c)
 			vm[1].pos = vm[1].pos + 1
-			local s = Itemspec:find{name = c[2]}
+			local s = Main.specs:find_by_name("Itemspec", c[2])
 			if not s then return end
 			local o = Item(self.user.manager)
 			o:set_spec(s)
@@ -543,17 +543,6 @@ Dialog.execute = function(self)
 				end
 				object.marker = Main.markers:create(name, object:get_id(), object:get_position())
 				object.marker:unlock()
-			end
-			vm[1].pos = vm[1].pos + 1
-		end,
-		["spawn pattern"] = function(vm, c)
-			local pat = Patternspec:find{name = c[2]}
-			if pat then
-				local pos = select_spawn_position(c):copy():multiply(Voxel.tile_scale):subtract(pat.size * 0.5):round()
-				if c.erase_tiles then
-					Voxel:fill_region{point = pos, size = pat.size}
-				end
-				Voxel:place_pattern{name = c[2], point = pos, rotation = c.rotation}
 			end
 			vm[1].pos = vm[1].pos + 1
 		end,

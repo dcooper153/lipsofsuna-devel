@@ -56,7 +56,7 @@ end
 Skillspec.find_direct_requirements = function(self)
 	local reqs = {}
 	for index,name in pairs(self.requires) do
-		local spec = Skillspec:find{name = name}
+		local spec = Main.specs:find_by_name("Skillspec", name)
 		if spec and not reqs[name] then
 			reqs[name] = spec
 		end
@@ -103,7 +103,7 @@ Skillspec.find_indirect_requirements = function(self)
 	local recurse
 	recurse = function(spec)
 		for index,name in pairs(spec.requires) do
-			local spec = Skillspec:find{name = name}
+			local spec = Main.specs:find_by_name("Skillspec", name)
 			if spec and not reqs[name] then
 				reqs[name] = spec
 				recurse(spec)

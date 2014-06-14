@@ -235,10 +235,10 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local spec1 = Actorspec:find{name = matches[1]}
-		local spec2 = Itemspec:find{name = matches[1]}
-		local spec3 = Obstaclespec:find{name = matches[1]}
-		local spec4 = Staticspec:find{name = matches[1]}
+		local spec1 = Main.specs:find_by_name("Actorspec", matches[1])
+		local spec2 = Main.specs:find_by_name("Itemspec", matches[1])
+		local spec3 = Main.specs:find_by_name("Obstaclespec", matches[1])
+		local spec4 = Main.specs:find_by_name("Staticspec", matches[1])
 		if spec1 then
 			local o = Actor(player.manager)
 			o:set_spec(spec1)
@@ -271,7 +271,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local spec = Actorspec:find{name = matches[1]}
+		local spec = Main.specs:find_by_name("Actorspec", matches[1])
 		if not spec then return end
 		local o = Actor(player.manager)
 		o:set_spec(spec)
@@ -287,7 +287,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local spec = Itemspec:find{name = matches[1]}
+		local spec = Main.specs:find_by_name("Itemspec", matches[1])
 		if not spec then return end
 		local o = Item(player.manager)
 		o:set_spec(spec)
@@ -303,7 +303,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local spec = Obstaclespec:find{name = matches[1]}
+		local spec = Main.specs:find_by_name("Obstaclespec", matches[1])
 		if not spec then return end
 		local o = Obstacle(player.manager)
 		o:set_spec(spec)

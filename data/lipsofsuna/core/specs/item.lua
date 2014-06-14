@@ -90,7 +90,7 @@ Itemspec.get_animation = function(self, name, profile)
 	local try = function(self, p, a)
 		local pname = self.animations[p]
 		if not pname then return end
-		local profile = AnimationProfileSpec:find{name = pname}
+		local profile = Main.specs:find_by_name("AnimationProfileSpec", pname)
 		if not profile then return end
 		return profile:get_animation(a)
 	end
@@ -106,7 +106,7 @@ Itemspec.get_animation_equipped = function(self, name, profile)
 	local try = function(self, p, a)
 		local pname = self.animations_equipped[p]
 		if not pname then return end
-		local profile = AnimationProfileSpec:find{name = pname}
+		local profile = Main.specs:find_by_name("AnimationProfileSpec", pname)
 		if not profile then return end
 		return profile:get_animation(a)
 	end
@@ -199,7 +199,7 @@ Itemspec.get_special_effects = function(self)
 	if not self.special_effects then return end
 	local res = {}
 	for k,v in pairs(self.special_effects) do
-		local eff = Effectspec:find{name = v}
+		local eff = Main.specs:find_by_name("Effectspec", v)
 		if eff then
 			table.insert(res, eff)
 		end

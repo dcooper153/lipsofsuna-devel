@@ -59,7 +59,7 @@ CraftingUtils.craft = function(self, user, name, mode)
 	-- Get the specs.
 	local craftspec = CraftingRecipeSpec:find_by_name(name)
 	if not craftspec then return end
-	local itemspec = Itemspec:find{name = name}
+	local itemspec = Main.specs:find_by_name("Itemspec", name)
 	if not itemspec then return end
 	-- Check for requirements.
 	--

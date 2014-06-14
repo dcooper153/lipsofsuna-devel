@@ -57,7 +57,7 @@ Obstaclespec.get_constraints = function(self)
 	if not self.constraints then return end
 	local res = {}
 	for k,v in pairs(self.constraints) do
-		local con = Constraintspec:find{name = v}
+		local con = Main.specs:find_by_name("Constraintspec", v)
 		if con then
 			table.insert(res, con)
 		end
@@ -89,7 +89,7 @@ Obstaclespec.get_special_effects = function(self)
 	if not self.special_effects then return end
 	local res = {}
 	for k,v in pairs(self.special_effects) do
-		local eff = Effectspec:find{name = v}
+		local eff = Main.specs:find_by_name("Effectspec", v)
 		if eff then
 			table.insert(res, eff)
 		end

@@ -242,7 +242,7 @@ end
 -- @param self Item.
 -- @param value Itemspec.
 Item.set_spec = function(self, value)
-	local spec = type(value) == "string" and Itemspec:find{name = value} or value
+	local spec = type(value) == "string" and Main.specs:find_by_name("Itemspec", value) or value
 	if not spec then return end
 	SimulationObject.set_spec(self, spec)
 	-- Configure physics.

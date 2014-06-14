@@ -521,7 +521,7 @@ Main.messaging:register_message{
 		-- Equipment.
 		if args.equipment then
 			for k,v in ipairs(args.equipment) do
-				local spec = Itemspec:find{name = v[3]}
+				local spec = Main.specs:find_by_name("Itemspec", v[3])
 				if spec then
 					local item = Item(o.manager)
 					item:set_spec(spec)

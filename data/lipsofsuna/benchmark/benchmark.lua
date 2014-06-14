@@ -30,7 +30,7 @@ Benchmark.new = function(clss)
 	-- Create the objects.
 	self.objects = setmetatable({}, {__mode = "kv"})
 	local anims = {"idle", "walk", "strafe left"}
-	local spec = Actorspec:find{name = "benchmark test actor"}
+	local spec = Main.specs:find_by_name("Actorspec", "benchmark test actor")
 	for i = 1,20 do
 		local o = Simulation:create_object_by_spec(spec)
 		local a = i/20*2*math.pi
@@ -42,7 +42,7 @@ Benchmark.new = function(clss)
 		self.object = o
 	end
 	-- Create a static object.
-	local spec = Staticspec:find{name = "statictree1"}
+	local spec = Main.specs:find_by_name("Staticspec", "statictree1")
 	local o = Simulation:create_object_by_spec(spec)
 	o:set_position(Vector(500,500,497))
 	o:set_visible(true)

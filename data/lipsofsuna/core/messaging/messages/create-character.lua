@@ -96,7 +96,7 @@ Main.messaging:register_message{
 		local player = Server:get_player_by_client(client)
 		if player then return end
 		-- Get the actor spec of the character.
-		local spec = Actorspec:find{name = char.race .. "-player"}
+		local spec = Main.specs:find_by_name("Actorspec", char.race .. "-player")
 		if not spec then return end
 		-- Create the character.
 		local player = Player(Main.objects)

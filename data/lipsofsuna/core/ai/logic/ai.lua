@@ -122,7 +122,7 @@ Ai.calculate_ranged_tilt = function(self)
 	-- Get the ammo type.
 	local weapon = self.object:get_weapon()
 	if not weapon or not weapon.spec.ammo_type then return Quaternion() end
-	local spec = Itemspec:find{name = weapon.spec.ammo_type}
+	local spec = Main.specs:find_by_name("Itemspec", weapon.spec.ammo_type)
 	if not spec then return Quaternion() end
 	-- Calculate distance to the target.
 	local diff = self.target:get_position() + self.target.physics:get_center_offset() - self.object:get_position() - self.object.spec.aim_ray_center

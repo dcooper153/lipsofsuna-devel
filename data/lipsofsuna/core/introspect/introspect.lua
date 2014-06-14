@@ -128,9 +128,10 @@ Introspect.validate = function(self, data)
 		end
 		-- Validate spec relations.
 		if details.spec then
-			local specclss = Main.specs:find_class(details.spec)
-			assert(specclss)
-			if not specclss:find{name = value} then
+			if not Main.specs:find_class(details.spec) then
+				error("invalid spec class " .. details.spec, 0)
+			end
+			if not Main.specs:find_by_name(details.spec, value) then
 				error(value .. " not in " .. details.spec, 0)
 			end
 		end

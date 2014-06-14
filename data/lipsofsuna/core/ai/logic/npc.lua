@@ -316,7 +316,7 @@ NpcAi.update = function(self, secs)
 	self.action_timer = self.action_timer - tick
 	-- Let the current state manipulate the position and other attributes
 	-- of the character and trigger state dependent actions such as attacking.
-	local state = Aistatespec:find{name = self.state}
+	local state = Main.specs:find_by_name("Aistatespec", self.state)
 	if state then state.update(self, tick) end
 	-- Only consider state changes every couple of seconds.
 	if self.ai_timer < self.object.spec.ai_update_delay then return end

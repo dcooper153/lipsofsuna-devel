@@ -34,7 +34,7 @@ Trading.accept = function(self, player)
 	-- Give the bought items.
 	for k,v in pairs(player.trading.buy) do
 		local name = player.trading.shop[v[1]]
-		local spec = Itemspec:find{name = name}
+		local spec = Main.specs:find_by_name("Itemspec", name)
 		local item = Item(player.manager)
 		item:set_spec(spec)
 		item:set_count(v[2])
@@ -79,7 +79,7 @@ Trading.deal = function(self, player)
 	for k,v in pairs(player.trading.buy) do
 		local name = player.trading.shop[v[1]]
 		if name then
-			local spec = Itemspec:find{name = name}
+			local spec = Main.specs:find_by_name("Itemspec", name)
 			buy = buy + v[2] * spec:get_trading_value()
 		else
 			player.trading.shop[v[1]] = nil

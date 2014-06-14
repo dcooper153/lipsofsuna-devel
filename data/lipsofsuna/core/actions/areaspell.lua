@@ -13,8 +13,8 @@ Actionspec{
 			-- Area spells may have different durations so a combination of them
 			-- cannot generally be represented as one object.
 			for k,v in pairs(feat.effects) do
-				local effect = ModifierSpec:find{name = v[1]}
-				local spec = effect and Spellspec:find{name = effect.projectile}
+				local effect = Main.specs:find_by_name("ModifierSpec", v[1])
+				local spec = effect and Main.specs:find_by_name("Spellspec", effect.projectile)
 				if effect and spec then
 					local sub = Feat("area spell", {{v[1], v[2]}})
 					local spell = AreaSpell(args.user.manager, {

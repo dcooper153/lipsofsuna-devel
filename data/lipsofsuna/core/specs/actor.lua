@@ -215,7 +215,7 @@ Actorspec.get_animation = function(self, name, profile)
 	local try = function(self, p, a)
 		local pname = self.animations[p]
 		if not pname then return end
-		local profile = AnimationProfileSpec:find{name = pname}
+		local profile = Main.specs:find_by_name("AnimationProfileSpec", pname)
 		if not profile then return end
 		return profile:get_animation(a)
 	end
@@ -276,8 +276,7 @@ end
 -- @return Personality spec, or nil.
 Actorspec.get_personality = function(self)
 	if not self.personality then return end
-	if not Personalityspec then return end
-	return Personalityspec:find{name = self.personality}
+	return Main.specs:find_by_name("Personalityspec", self.personality)
 end
 
 --- Gets a random eye color for the actor.
@@ -377,7 +376,7 @@ Actorspec.get_special_effects = function(self)
 	if not self.special_effects then return end
 	local res = {}
 	for k,v in pairs(self.special_effects) do
-		local eff = Effectspec:find{name = v}
+		local eff = Main.specs:find_by_name("Effectspec", v)
 		if eff then
 			table.insert(res, eff)
 		end

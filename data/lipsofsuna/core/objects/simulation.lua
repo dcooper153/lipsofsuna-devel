@@ -291,7 +291,7 @@ end
 SimulationObject.get_animation_profile = function(self)
 	if self.animation_profile then return self.animation_profile end
 	if self.spec.preset then
-		local preset = Actorpresetspec:find{name = self.spec.preset}
+		local preset = Main.specs:find_by_name("Actorpresetspec", self.spec.preset)
 		if preset.animation_profile then return preset.animation_profile end
 	end
 	return "default"
@@ -443,7 +443,7 @@ SimulationObject.teleport = function(self, args)
 		if not marker or not marker.position then return end
 		self:set_position(marker.position + Vector(0, 2, -1))
 	elseif args.region then
-		local reg = Patternspec:find{name = args.region}
+		local reg = Main.specs:find_by_name("Patternspec", args.region)
 		if not reg then return end
 		self:set_position(reg:get_spawn_point_world())
 	elseif args.position then
