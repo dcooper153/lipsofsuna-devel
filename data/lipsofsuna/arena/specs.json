@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "arena player",
 		"base": "aer-player",
 		"preset": "Female 3",
@@ -18,14 +18,14 @@
 		}
 	},
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "arena button",
 		"model": "chest1",
 		"dialog": "arena button",
 		"usages": {"examine": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "arena chest",
 		"model": "chest1",
 		"effects":

@@ -33,7 +33,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "chest",
 		"categories": {"container": true, "generate": true},
 		"animations":
@@ -57,7 +57,7 @@
 		"usages": {"loot": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "treasure chest",
 		"categories": {"container": true},
 		"animations":

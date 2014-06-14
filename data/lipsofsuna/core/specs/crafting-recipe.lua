@@ -14,11 +14,11 @@ local Spec = require("core/specs/spec")
 --- TODO:doc
 -- @type CraftingRecipeSpec
 local CraftingRecipeSpec = Spec:register("CraftingRecipeSpec", "crafting recipe", {
-	{name = "name", type = "string", description = "Name of the crafted item.", details = {spec = "Itemspec"}},
+	{name = "name", type = "string", description = "Name of the crafted item.", details = {spec = "ItemSpec"}},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "count", type = "number", default = 1, description = "Number of items crafted per use.", details = {integer = true, min = 1}},
-	{name = "effect", type = "string", description = "Name of the effect to play when the item is crafted.", details = {spec = "Effectspec"}},
-	{name = "materials", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of crafting materials.", details = {keys = {spec = "Itemspec"}, values = {integer = true, min = 1}}},
+	{name = "effect", type = "string", description = "Name of the effect to play when the item is crafted.", details = {spec = "EffectSpec"}},
+	{name = "materials", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of crafting materials.", details = {keys = {spec = "ItemSpec"}, values = {integer = true, min = 1}}},
 	{name = "modes", type = "dict", dict = {type = "boolean"}, default = {["default"] = true}, description = "Crafting modes that can be used for crafting the item."}
 })
 

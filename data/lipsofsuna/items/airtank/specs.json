@@ -7,7 +7,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "air tank",
 		"model": "airtank1",
 		"mass": 15,

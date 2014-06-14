@@ -1,13 +1,13 @@
 [
 	{
-		"type": "Skillspec",
+		"type": "SkillSpec",
 		"name": "Circle cut",
 		"combat": true,
 		"action": "circle cut",
 		"description": "Jump attack."
 	},
 	{
-		"type": "Skillspec",
+		"type": "SkillSpec",
 		"name": "Stun smash",
 		"combat": true,
 		"action": "stun smash",

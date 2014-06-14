@@ -9,7 +9,7 @@
 		}
 	},
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "slime",
 		"categories":
 		{
@@ -65,7 +65,7 @@
 		}
 	},
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "plague slime",
 		"categories": {"plague": true},
 		"ai_combat_actions":

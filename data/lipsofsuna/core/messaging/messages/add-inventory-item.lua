@@ -21,7 +21,7 @@ Main.messaging:register_message{
 		if not object then return end
 		-- Add to the inventory.
 		if not object:has_server_data() then
-			local spec = Main.specs:find_by_name("Itemspec", name)
+			local spec = Main.specs:find_by_name("ItemSpec", name)
 			if not spec then return end
 			local item = Item(object.manager)
 			item:set_spec(spec)

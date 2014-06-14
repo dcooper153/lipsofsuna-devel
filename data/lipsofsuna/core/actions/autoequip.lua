@@ -1,5 +1,7 @@
+local ActionSpec = require("core/specs/action")
+
 -- Automatically equips an item.
-Actionspec{name = "autoequip", type = "item", func = function(item, user)
+ActionSpec{name = "autoequip", type = "item", func = function(item, user)
 	if not item.spec.equipment_slot then return end
 	-- Find the object whose inventory contains the item.
 	local owner = Main.objects:find_by_id(item.parent)

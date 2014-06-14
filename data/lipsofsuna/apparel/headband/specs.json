@@ -9,7 +9,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "kitty headband",
 		"model": "headband1",
 		"armor_class": 0.02,

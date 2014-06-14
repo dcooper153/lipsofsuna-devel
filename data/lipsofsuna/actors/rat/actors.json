@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "small rat",
 		"ai_enable_strafe": false,
 		"ai_enable_block": false,
@@ -41,7 +41,7 @@
 		"speed_walk": 4
 	},
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "rat",
 		"base": "small rat",
 		"ai_enable_strafe": false,
@@ -79,7 +79,7 @@
 		"speed_walk": 4
 	},
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "plague rat",
 		"base": "small rat",
 		"ai_enable_strafe": false,

@@ -1,4 +1,6 @@
-Actionspec{
+local ActionSpec = require("core/specs/action")
+
+ActionSpec{
 	name = "craft spells",
 	label = "Craft spells",
 	start = function(action, item)

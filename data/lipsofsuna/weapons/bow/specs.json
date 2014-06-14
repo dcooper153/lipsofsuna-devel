@@ -18,7 +18,7 @@
 		}
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "firearrow1",
 		"node": "#root",
 		"light": true,
@@ -43,7 +43,7 @@
 		"modes": {"wood": true, "default": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "arrow",
 		"categories": {"arrow": true},
 		"modifiers": {"physical damage": 1},
@@ -63,7 +63,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "fire arrow",
 		"categories": {"arrow": true},
 		"modifiers": {"physical damage": 5},
@@ -83,7 +83,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "explosive arrow",
 		"categories": {"arrow": true, "explosive": true},
 		"modifiers": {"physical damage": 5},
@@ -103,7 +103,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wooden bow",
 		"categories": {"ranged": true, "weapon": true},
 		"actions": {"right": "ranged", "left": "cancel ranged"},
@@ -131,7 +131,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "fire bow",
 		"categories": {"ranged": true, "weapon": true},
 		"actions": {"right": "ranged", "left": "cancel ranged"},
@@ -159,7 +159,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "explosive bow",
 		"categories": {"ranged": true, "weapon": true},
 		"actions": {"right": "ranged", "left": "cancel ranged"},

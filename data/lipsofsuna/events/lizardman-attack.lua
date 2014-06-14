@@ -1,3 +1,5 @@
+local GlobalEventSpec = require("core/specs/globalevent")
+
 local count_monsters = function(sector, objects)
 	do return 0 end --FIXME
 	if not Server.generator:is_overworld_sector_by_id(sector) then return 0 end
@@ -10,7 +12,7 @@ local count_monsters = function(sector, objects)
 	return math.max(0, monsters)
 end
 
-Globaleventspec{
+GlobalEventSpec{
 	name = "lizardman attack",
 	duration = 200,
 	sector_created = function(self, event, sector, loaded, objects)

@@ -7,7 +7,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "barrel",
 		"model": "barrel1",
 		"icon": "potion3",

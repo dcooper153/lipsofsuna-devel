@@ -144,7 +144,7 @@ end
 -- @param clss Spec class.
 -- @param args Arguments.<ul>
 --   <li>category: Category name or nil.</li></ul>
--- @return Obstaclespec or nil.
+-- @return ObstacleSpec or nil.
 Spec.random = function(clss, args)
 	if args and args.name then
 		return clss.dict_name[args.name]

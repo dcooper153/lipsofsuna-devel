@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "alchemy table",
 		"categories":
 		{
@@ -17,7 +17,7 @@
 		}
 	},
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "workbench",
 		"categories":
 		{

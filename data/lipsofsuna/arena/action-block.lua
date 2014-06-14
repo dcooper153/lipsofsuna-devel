@@ -1,4 +1,6 @@
-Actionspec{
+local ActionSpec = require("core/specs/action")
+
+ActionSpec{
 	name = "block",
 	start = function(action)
 		-- Prevent during cooldown or other actions.
@@ -24,13 +26,13 @@ Actionspec{
 		return true
 	end}
 
-Actionspec{
+ActionSpec{
 	name = "block weapon",
 	start = function(action)
 		action.object:action("block")
 	end}
 
-Actionspec{
+ActionSpec{
 	name = "block shield",
 	start = function(action)
 		action.object:action("block")

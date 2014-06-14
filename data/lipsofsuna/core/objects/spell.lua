@@ -92,7 +92,7 @@ end
 
 --- Sets the spec of the object.
 -- @param self Actor.
--- @param value Spellspec.
+-- @param value SpellSpec.
 Spell.set_spec = function(self, value)
 	if self.spec == value then return end
 	SimulationObject.set_spec(self, value)

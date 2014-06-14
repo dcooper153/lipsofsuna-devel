@@ -1,4 +1,6 @@
-Aistatespec{
+local AiStateSpec = require("core/specs/aistate")
+
+AiStateSpec{
 	name = "wait",
 	calculate = function(self)
 		-- Check if the allowed for the actor.

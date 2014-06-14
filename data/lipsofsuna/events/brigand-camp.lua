@@ -1,6 +1,7 @@
+local GlobalEventSpec = require("core/specs/globalevent")
 local MapUtils = require("core/server/map-utils")
 
-Globaleventspec{
+GlobalEventSpec{
 	name = "brigand camp",
 	update = function(self, event, secs)
 		-- Update the timer.

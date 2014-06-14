@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "crafting player",
 		"base": "aer-player",
 		"preset": "Female 1",
@@ -14,7 +14,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "crafting chest",
 		"model": "chest1",
 		"inventory_size": 10,

@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "crossbow1",
 		"sound": "weaponcrossbow1"
 	},
@@ -30,7 +30,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "adamantium crossbow",
 		"categories": {"ranged": true, "weapon": true},
 		"actions": {"right": "ranged", "left": "cancel ranged"},
@@ -59,7 +59,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "aquanite crossbow",
 		"categories": {"ranged": true, "weapon": true},
 		"actions": {"right": "ranged", "left": "cancel ranged"},
@@ -88,7 +88,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "crimson crossbow",
 		"categories": {"ranged": true, "weapon": true},
 		"actions": {"right": "ranged", "left": "cancel ranged"},
@@ -117,7 +117,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "iron crossbow",
 		"categories": {"ranged": true, "weapon": true},
 		"actions": {"right": "ranged", "left": "cancel ranged"},
@@ -146,7 +146,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wooden crossbow",
 		"categories": {"ranged": true, "weapon": true},
 		"actions": {"right": "ranged", "left": "cancel ranged"},

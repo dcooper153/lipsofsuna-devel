@@ -158,7 +158,7 @@ Item.randomize = function(self)
 	-- Create static loot.
 	if self.inventory:get_size() > 0 then
 		for k,v in pairs(spec.inventory_items) do
-			local ispec = Main.specs:find_by_name("Itemspec", k)
+			local ispec = Main.specs:find_by_name("ItemSpec", k)
 			if ispec then
 				local item = Item(self.manager)
 				item:set_spec(ispec)
@@ -181,7 +181,7 @@ Item.randomize = function(self)
 		for i = 1,num_item do
 			local cat = spec.loot_categories[math.random(1, num_cat)]
 			local item = Item(self.manager)
-			item:set_spec(Main.specs:find_random_by_category("Itemspec", cat))
+			item:set_spec(Main.specs:find_random_by_category("ItemSpec", cat))
 			self.inventory:merge_object(item)
 		end
 	end
@@ -240,9 +240,9 @@ end
 
 --- Sets the itemspec of the object.
 -- @param self Item.
--- @param value Itemspec.
+-- @param value ItemSpec.
 Item.set_spec = function(self, value)
-	local spec = type(value) == "string" and Main.specs:find_by_name("Itemspec", value) or value
+	local spec = type(value) == "string" and Main.specs:find_by_name("ItemSpec", value) or value
 	if not spec then return end
 	SimulationObject.set_spec(self, spec)
 	-- Configure physics.

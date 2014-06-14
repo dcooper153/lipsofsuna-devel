@@ -7,7 +7,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "adamantium sword",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -32,7 +32,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "aquanite sword",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -59,7 +59,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "crimson sword",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -86,7 +86,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "iron sword",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -114,7 +114,7 @@
 		"modes": {"metal": true, "default": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "stone sword",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -141,7 +141,7 @@
 		"modes": {"wood": true, "default": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wooden sword",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},

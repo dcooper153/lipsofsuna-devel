@@ -98,9 +98,9 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			-- Choose the wanted item.
 			local spec
 			if difficulty == "hard" then
-				spec = Main.specs:find_random("Itemspec")
+				spec = Main.specs:find_random("ItemSpec")
 			else
-				spec = Main.specs:find_random_by_category("Itemspec", "material")
+				spec = Main.specs:find_random_by_category("ItemSpec", "material")
 			end
 			var_item = spec.name
 			-- Choose a random excuse.
@@ -133,7 +133,7 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			-- Set the quest type.
 			var_type = "kill actor"
 			-- Get the list of possible target actors.
-			local list = Main.specs:find_by_category("Actorspec", "scapegoat")
+			local list = Main.specs:find_by_category("ActorSpec", "scapegoat")
 			if not list then return end
 			-- Randomize the order of target actors.
 			local actors = {}
@@ -426,7 +426,7 @@ Dialog.execute = function(self)
 		end,
 		["give player item"] = function(vm, c)
 			vm[1].pos = vm[1].pos + 1
-			local s = Main.specs:find_by_name("Itemspec", c[2])
+			local s = Main.specs:find_by_name("ItemSpec", c[2])
 			if not s then return end
 			local o = Item(self.user.manager)
 			o:set_spec(s)
@@ -506,9 +506,9 @@ Dialog.execute = function(self)
 		end,
 		["spawn object"] = function(vm, c)
 			-- Spawn the object.
-			local spec1 = Main.specs:find_by_name("Actorspec", c[2])
-			local spec2 = Main.specs:find_by_name("Itemspec", c[2])
-			local spec3 = Main.specs:find_by_name("Obstaclespec", c[2])
+			local spec1 = Main.specs:find_by_name("ActorSpec", c[2])
+			local spec2 = Main.specs:find_by_name("ItemSpec", c[2])
+			local spec3 = Main.specs:find_by_name("ObstacleSpec", c[2])
 			local object
 			if spec1 then
 				object = Actor(self.object.manager)

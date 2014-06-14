@@ -96,7 +96,7 @@ EnchantState.init = function(self)
 	end
 	-- Select the default action.
 	if not self.__action then
-		for k,v in ipairs(Main.specs:find_by_category("Actionspec", "enchantment")) do
+		for k,v in ipairs(Main.specs:find_by_category("ActionSpec", "enchantment")) do
 			self.__action = v
 			break
 		end
@@ -114,7 +114,7 @@ end
 
 --- Sets the current action.
 -- @param self EnchantState.
--- @param value Actionspec.
+-- @param value ActionSpec.
 EnchantState.set_action = function(self, value)
 	self.__action = value
 	self.__modifiers = {}
@@ -136,7 +136,7 @@ EnchantState.get_actions = function(self)
 	-- Create the action selector.
 	local actions = {}
 	local index = 1
-	for k,v in ipairs(Main.specs:find_by_category("Actionspec", "enchantment")) do
+	for k,v in ipairs(Main.specs:find_by_category("ActionSpec", "enchantment")) do
 		if Client.data.unlocks:get("action", v.name) then
 			table.insert(actions, {v.name, function() self:set_action(v) end})
 			if self.__action == v then

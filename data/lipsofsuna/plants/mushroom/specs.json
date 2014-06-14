@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "mushroom",
 		"model": "mushroom-000",
 		"icon": "mushroom1",
@@ -10,7 +10,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "mushroom",
 		"model": "mushroom-000",
 		"categories": {"small-plant": true, "reagent": true},

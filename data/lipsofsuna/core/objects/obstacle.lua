@@ -108,7 +108,7 @@ end
 -- @param self Object to kill.
 Obstacle.die = function(self)
 	for k,v in ipairs(self.spec.destroy_items) do
-		local spec = Main.specs:find_by_name("Itemspec", v.name)
+		local spec = Main.specs:find_by_name("ItemSpec", v.name)
 		if spec then
 			local p = self:transform_local_to_global(v.position or Vector())
 			local r = self:get_rotation():copy():concat(v.rotation or Quaternion())
@@ -143,7 +143,7 @@ Obstacle.set_visible = function(self, value)
 end
 
 Obstacle.set_spec = function(self, value)
-	local spec = type(value) == "string" and Main.specs:find_by_name("Obstaclespec", value) or value
+	local spec = type(value) == "string" and Main.specs:find_by_name("ObstacleSpec", value) or value
 	if not spec then return end
 	SimulationObject.set_spec(self, spec)
 	-- Configure physics.

@@ -1,4 +1,6 @@
-Aistatespec{
+local AiStateSpec = require("core/specs/aistate")
+
+AiStateSpec{
 	name = "search",
 	calculate = function(self)
 		if self.state ~= "combat" then return end

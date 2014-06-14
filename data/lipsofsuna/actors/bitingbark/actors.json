@@ -9,7 +9,7 @@
 		}
 	},
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "bitingbark",
 		"ai_enable_strafe": false,
 		"ai_enable_block": false,

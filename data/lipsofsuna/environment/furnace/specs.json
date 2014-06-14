@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "furnace",
 		"model": "furnace1",
 		"categories":

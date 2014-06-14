@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "watermelon",
 		"model": "watermelon2",
 		"categories": {"small-plant": true, "reagent": true},
@@ -11,7 +11,7 @@
 		"usages": {"harvest": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "watermelon",
 		"categories": {"food": true},
 		"icon": "mushroom1",

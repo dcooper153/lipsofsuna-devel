@@ -9,7 +9,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "lizard boots",
 		"categories":
 		{
@@ -38,7 +38,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "lizard dress",
 		"categories":
 		{
@@ -68,7 +68,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "lizard gloves",
 		"categories":
 		{

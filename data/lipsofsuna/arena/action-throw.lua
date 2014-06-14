@@ -1,7 +1,8 @@
+local ActionSpec = require("core/specs/action")
 local BoomerangController = require("arena/boomerang-controller")
 local ProjectileController = require("arena/projectile-controller")
 
-Actionspec{
+ActionSpec{
 	name = "throw",
 	categories = { ["throw"] = true },
 	start = function(action)

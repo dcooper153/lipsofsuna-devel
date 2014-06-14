@@ -72,7 +72,7 @@ end
 -- configured to grant bonuses for having certain skills.
 --
 -- @param self Damage.
--- @param spec Itemspec.
+-- @param spec ItemSpec.
 -- @param skills Attacker's skills. Nil if not available.
 Damage.add_itemspec_modifiers = function(self, spec, skills)
 	if not spec then return end

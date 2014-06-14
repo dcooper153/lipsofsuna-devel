@@ -12,7 +12,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "adamantium hatchet",
 		"categories": {"hatchet": true, "melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -37,7 +37,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "aquanite hatchet",
 		"categories": {"hatchet": true, "melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -64,7 +64,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "crimson hatchet",
 		"categories": {"hatchet": true, "melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -91,7 +91,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "iron hatchet",
 		"categories": {"hatchet": true, "melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -118,7 +118,7 @@
 		"modes": {"metal": true, "default": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "stone hatchet",
 		"categories": {"hatchet": true, "melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -145,7 +145,7 @@
 		"modes": {"wood": true, "default": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wooden hatchet",
 		"categories": {"hatchet": true, "melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},

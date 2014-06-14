@@ -1,4 +1,6 @@
-Actionspec{
+local ActionSpec = require("core/specs/action")
+
+ActionSpec{
 	name = "jump stop",
 	label = "Jump stop",
 	start = function(action)

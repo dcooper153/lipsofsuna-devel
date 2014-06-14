@@ -1,8 +1,9 @@
+local AiStateSpec = require("core/specs/aistate")
 local Vector = require("system/math/vector")
 
 local __vec1 = Vector()
 
-Aistatespec{
+AiStateSpec{
 	name = "wander",
 	calculate = function(self)
 		-- Start wandering after waiting for a while.

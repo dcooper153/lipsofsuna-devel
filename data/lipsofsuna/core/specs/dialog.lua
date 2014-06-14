@@ -6,32 +6,32 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.dialog
--- @alias Dialogspec
+-- @alias DialogSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
 --- TODO:doc
--- @type Dialogspec
-Dialogspec = Spec:register("Dialogspec", "dialog", {
+-- @type DialogSpec
+local DialogSpec = Spec:register("DialogSpec", "dialog", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "commands", type = "dialog tree", default = {}, description = "Dialog commands"}
 })
 
 --- Creates a new dialog specification.
--- @param clss Dialogspec class.
+-- @param clss DialogSpec class.
 -- @param args Arguments.
 -- @return New dialog specification.
-Dialogspec.new = function(clss, args)
+DialogSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
 
 --- Validates the dialog.
--- @param self Dialogspec.
-Dialogspec.validate = function(self)
+-- @param self DialogSpec.
+DialogSpec.validate = function(self)
 	local validate_arguments
 	local validate_branch
 	local validate_command
@@ -246,7 +246,7 @@ Dialogspec.validate = function(self)
 		end
 	end
 	xpcall(
-		function() validate_branch(self.commands, 1, "Dialogspec") end,
+		function() validate_branch(self.commands, 1, "DialogSpec") end,
 		function(err)
 			print(string.format("ERROR: in dialog \"%s\": %s", self.name,
 				string.match(err, ".*:[0-9]*: (.*)")))
@@ -254,11 +254,11 @@ Dialogspec.validate = function(self)
 end
 
 --- Validates all registered dialogs.
--- @param self Dialogspec class.
-Dialogspec.validate_all = function(self)
+-- @param self DialogSpec class.
+DialogSpec.validate_all = function(self)
 	for k,v in pairs(self.dict_id) do
 		v:validate()
 	end
 end
 
-
+return DialogSpec

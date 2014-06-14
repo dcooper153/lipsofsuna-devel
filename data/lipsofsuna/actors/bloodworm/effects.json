@@ -1,20 +1,20 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "bloodworm bite",
 		"sound": "slimemonster-attack2",
 		"sound_pitch_min": 0.8,
 		"sound_pitch_max": 1.2
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "bloodworm damage",
 		"sound": "slimemonster-damage1",
 		"sound_pitch_min": 0.8,
 		"sound_pitch_max": 1.2
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "bloodworm damage death",
 		"sound": "slimemonster-damage2",
 		"sound_pitch_min": 0.8,

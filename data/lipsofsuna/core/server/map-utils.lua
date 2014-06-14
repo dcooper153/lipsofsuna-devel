@@ -16,7 +16,7 @@ MapUtils = Class("MapUtils")
 -- @param difficulty Maximum difficulty of the actor. Nil for no preference.
 MapUtils.place_actor_by_category = function(clss, category, point, rotation, difficulty)
 	-- Find the actors in the category.
-	local cat = Main.specs:find_by_category("Actorspec", category)
+	local cat = Main.specs:find_by_category("ActorSpec", category)
 	if not cat then return end
 	-- Choose the actor.
 	local num = 0
@@ -49,7 +49,7 @@ end
 -- @param rotation Rotation around Y axis. Nil for default.
 MapUtils.place_actor_by_name = function(clss, name, point, rotation)
 	-- Choose the actor.
-	local spec = Main.specs:find_by_name("Actorspec", name)
+	local spec = Main.specs:find_by_name("ActorSpec", name)
 	if not spec then return end
 	-- Spawn the actor.
 	local obj = Actor(Main.objects)
@@ -69,7 +69,7 @@ end
 -- @param point Position vector, in tiles.
 -- @param rotation Rotation around Y axis. Nil for default.
 MapUtils.place_item_by_category = function(clss, category, point, rotation)
-	local spec = Main.specs:find_random_by_category("Itemspec", category)
+	local spec = Main.specs:find_random_by_category("ItemSpec", category)
 	if not spec then return end
 	local obj = Item(Main.objects)
 	obj:set_spec(spec)

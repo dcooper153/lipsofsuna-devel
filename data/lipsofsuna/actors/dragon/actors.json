@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "dragon",
 		"model": "dragon1",
 		"ai_enable_strafe": false,

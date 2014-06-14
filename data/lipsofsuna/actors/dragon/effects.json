@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "dragonbreath1",
 		"node": "head",
 		"particle": "firebreath1",

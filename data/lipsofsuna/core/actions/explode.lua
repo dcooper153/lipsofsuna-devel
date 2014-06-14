@@ -1,6 +1,8 @@
+local ActionSpec = require("core/specs/action")
+
 -- Self-destruction.
 -- The actor explodes after the animation has played.
-Actionspec{
+ActionSpec{
 	name = "explode",
 	categories = { ["melee"] = true },
 	start = function(action)

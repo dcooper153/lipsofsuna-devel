@@ -26,7 +26,7 @@ BlackHazeModifier.start = function(modifier, value)
 		return true
 	end
 	-- Choose a random plague monster.
-	local s = Main.specs:find_random_by_category("Actorspec", "plague")
+	local s = Main.specs:find_random_by_category("ActorSpec", "plague")
 	if not s then return end
 	-- Spawn the monster.
 	local p = modifier.point + Vector(

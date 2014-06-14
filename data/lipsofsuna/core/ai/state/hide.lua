@@ -1,4 +1,6 @@
-Aistatespec{
+local AiStateSpec = require("core/specs/aistate")
+
+AiStateSpec{
 	name = "hide",
 	calculate = function(self)
 		-- Hide after fleeing.

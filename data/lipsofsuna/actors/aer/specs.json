@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "aer",
 		"actions":
 		{
@@ -89,7 +89,7 @@
 		"timing_pickup": 0.2
 	},
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "aer-player",
 		"base": "aer",
 		"ai_enabled": false,

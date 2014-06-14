@@ -1,20 +1,20 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "rat attack 1",
 		"sound": "rat-attack1",
 		"sound_pitch_min": 0.8,
 		"sound_pitch_max": 1.2
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "rat damage 1",
 		"sound": "rat-pain1",
 		"sound_pitch_min": 0.8,
 		"sound_pitch_max": 1.2
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "rat death 1",
 		"sound": "rat-death1",
 		"sound_pitch_min": 0.8,

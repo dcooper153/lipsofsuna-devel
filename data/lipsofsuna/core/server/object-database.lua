@@ -158,12 +158,12 @@ end
 ObjectDatabase.load_object = function(self, id, type_, spec, dead)
 	-- Get the spec.
 	local objspec
-	if type_ == "actor" then objspec = Main.specs:find_by_name("Actorspec", spec)
-	elseif type_ == "companion" then objspec = Main.specs:find_by_name("Actorspec", spec)
-	elseif type_ == "item" then objspec = Main.specs:find_by_name("Itemspec", spec)
-	elseif type_ == "obstacle" then objspec = Main.specs:find_by_name("Obstaclespec", spec)
-	elseif type_ == "player" then objspec = Main.specs:find_by_name("Actorspec", spec)
-	elseif type_ == "static" then objspec = Main.specs:find_by_name("Staticspec", spec)
+	if type_ == "actor" then objspec = Main.specs:find_by_name("ActorSpec", spec)
+	elseif type_ == "companion" then objspec = Main.specs:find_by_name("ActorSpec", spec)
+	elseif type_ == "item" then objspec = Main.specs:find_by_name("ItemSpec", spec)
+	elseif type_ == "obstacle" then objspec = Main.specs:find_by_name("ObstacleSpec", spec)
+	elseif type_ == "player" then objspec = Main.specs:find_by_name("ActorSpec", spec)
+	elseif type_ == "static" then objspec = Main.specs:find_by_name("StaticSpec", spec)
 	else
 		error(string.format("invalid object type %q", type_))
 	end

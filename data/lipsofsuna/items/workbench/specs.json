@@ -13,7 +13,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "workbench",
 		"categories":
 		{

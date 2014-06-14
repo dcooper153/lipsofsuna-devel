@@ -7,7 +7,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "iron spear",
 		"actions": {"right": "attack", "left": "block weapon"},
 		"categories": {"melee": true, "weapon": true},

@@ -6,18 +6,18 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.skill
--- @alias Skillspec
+-- @alias SkillSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
 --- Specifies a skill.
--- @type Skillspec
-local Skillspec = Spec:register("Skillspec", "skill", {
+-- @type SkillSpec
+local SkillSpec = Spec:register("SkillSpec", "skill", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "assign", type = "function"},
-	{name = "action", type = "string", description = "Action for combat arts.", details = {spec = "Actionspec"}},
+	{name = "action", type = "string", description = "Action for combat arts.", details = {spec = "ActionSpec"}},
 	{name = "combat", type = "boolean", default = false, description = "Set to true for combat arts."},
 	{name = "description", type = "string", description = "Description string."},
 	{name = "icon", type = "string", description = "Icon name."},
@@ -25,19 +25,19 @@ local Skillspec = Spec:register("Skillspec", "skill", {
 })
 
 --- Registers a skill specifification.
--- @param clss Skillspec class.
+-- @param clss SkillSpec class.
 -- @param args Arguments.
 -- @return New skill spec.
-Skillspec.new = function(clss, args)
+SkillSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
 
 --- Finds all skills that are directly dependent on this one.
--- @param self Skillspec.
+-- @param self SkillSpec.
 -- @return Array of specs.
-Skillspec.find_directly_dependent = function(self)
+SkillSpec.find_directly_dependent = function(self)
 	local deps = {}
 	for name,spec in pairs(self.dict_name) do
 		for index,requires in pairs(spec.requires) do
@@ -51,12 +51,12 @@ Skillspec.find_directly_dependent = function(self)
 end
 
 --- Finds all skills on which this one depends directly.
--- @param self Skillspec.
+-- @param self SkillSpec.
 -- @return Table of specs.
-Skillspec.find_direct_requirements = function(self)
+SkillSpec.find_direct_requirements = function(self)
 	local reqs = {}
 	for index,name in pairs(self.requires) do
-		local spec = Main.specs:find_by_name("Skillspec", name)
+		local spec = Main.specs:find_by_name("SkillSpec", name)
 		if spec and not reqs[name] then
 			reqs[name] = spec
 		end
@@ -65,9 +65,9 @@ Skillspec.find_direct_requirements = function(self)
 end
 
 --- Finds all skills that are directly or indirectly dependent on this one.
--- @param self Skillspec.
+-- @param self SkillSpec.
 -- @return Table of specs.
-Skillspec.find_indirectly_dependent = function(self)
+SkillSpec.find_indirectly_dependent = function(self)
 	-- Set this spec as a dependency.
 	local more = true
 	local deps = {[self.name] = self}
@@ -96,14 +96,14 @@ Skillspec.find_indirectly_dependent = function(self)
 end
 
 --- Finds all skills on which this one depends directly or indirectly.
--- @param self Skillspec.
+-- @param self SkillSpec.
 -- @return Table of specs.
-Skillspec.find_indirect_requirements = function(self)
+SkillSpec.find_indirect_requirements = function(self)
 	local reqs = {}
 	local recurse
 	recurse = function(spec)
 		for index,name in pairs(spec.requires) do
-			local spec = Main.specs:find_by_name("Skillspec", name)
+			local spec = Main.specs:find_by_name("SkillSpec", name)
 			if spec and not reqs[name] then
 				reqs[name] = spec
 				recurse(spec)
@@ -114,4 +114,4 @@ Skillspec.find_indirect_requirements = function(self)
 	return reqs
 end
 
-return Skillspec
+return SkillSpec

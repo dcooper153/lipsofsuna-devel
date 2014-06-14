@@ -1,11 +1,11 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "aerhurt1",
 		"sound": "thud-000"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "jump1",
 		"sound": "hop-000"
 	},

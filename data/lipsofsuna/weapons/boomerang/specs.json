@@ -29,7 +29,7 @@
 		"modes": {"wood": true, "default": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "boomerang",
 		"categories": {"boomerang": true, "throwable": true, "weapon": true},
 		"actions": {"right": "throw", "left": "block weapon"},

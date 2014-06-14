@@ -25,7 +25,7 @@ GlobalEventManager.new = function(clss)
 	self.timer = 0
 	-- Create the events.
 	self.events = {}
-	for k,v in pairs(Globaleventspec.dict_name) do
+	for k,v in pairs(GlobalEventSpec.dict_name) do
 		self.events[k] = {name = k, spec = v}
 	end
 	-- Start the initial events.

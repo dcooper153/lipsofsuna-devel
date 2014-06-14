@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "stone imp",
 		"categories":
 		{
@@ -55,7 +55,7 @@
 		}
 	},
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "fire imp",
 		"categories":
 		{

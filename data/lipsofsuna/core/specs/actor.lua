@@ -6,7 +6,7 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.actor
--- @alias Actorspec
+-- @alias ActorSpec
 
 local ActorTextureSpec = require("core/specs/actor-texture")
 local AnimationProfileSpec = require("core/specs/animation-profile")
@@ -18,11 +18,11 @@ local HairStyleSpec = require("core/specs/hair-style")
 local Spec = require("core/specs/spec")
 
 --- Actor specification.
--- @type Actorspec
-local Actorspec = Spec:register("Actorspec", "actor", {
+-- @type ActorSpec
+local ActorSpec = Spec:register("ActorSpec", "actor", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-	{name = "base", type = "string", description = "Base actor spec.", details = {spec = "Actorspec"}},
+	{name = "base", type = "string", description = "Base actor spec.", details = {spec = "ActorSpec"}},
 	{name = "ai_combat_actions", type = "dict", dict = {type = "boolean"}, default = {["block"] = true, ["idle"] = true, ["melee"] = true, ["move backward"] = true, ["move forward"] = true, ["ranged"] = true, ["ranged spell"] = true, ["self spell"] = true, ["strafe"] = true, ["switch weapon"] = true, ["throw"] = true, ["touch spell"] = true}, description = "Dictionary of allowed combat actions", details = {keys = {spec = "AiActionSpec"}}},
 	{name = "ai_enable_attack", type = "boolean", default = true, description = "False to prohibit attacking."},
 	{name = "ai_enable_backstep", type = "boolean", default = true, description = "False to prohibit backstep."},
@@ -35,7 +35,7 @@ local Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "ai_enable_walk", type = "boolean", default = true, description = "False to prohibit walking."},
 	{name = "ai_enable_weapon_switch", type = "boolean", default = true, description = "False to prohibit weapon switching."},
 	{name = "ai_enabled", type = "boolean", default = true, description = "False to disable AI for the actor."},
-	{name = "ai_enabled_states", type = "dict", dict = {type = "boolean"}, default = {["chat"] = true, ["combat"] = true, ["flee"] = true, ["follow"] = true, ["hide"] = true, ["none"] = true, ["search"] = true, ["wait"] = true, ["wander"] = true}, description = "Dictionary of allowed combat actions", details = {keys = {spec = "Aistatespec"}}},
+	{name = "ai_enabled_states", type = "dict", dict = {type = "boolean"}, default = {["chat"] = true, ["combat"] = true, ["flee"] = true, ["follow"] = true, ["hide"] = true, ["none"] = true, ["search"] = true, ["wait"] = true, ["wander"] = true}, description = "Dictionary of allowed combat actions", details = {keys = {spec = "AiStateSpec"}}},
 	{name = "ai_offense_factor", type = "number", default = 0.75, description = "How much the actor prefers offense over defense, in the range of [0,1]."},
 	{name = "ai_search_time", type = "number", default = 20, description = "Time in seconds how long the AI will search for hidden foes."},
 	{name = "ai_type", type = "string", description = "Name of the AI type to use."},
@@ -45,7 +45,7 @@ local Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "aim_ray_center", type = "vector", default = Vector(0,1), description = "Center vector of the aim ray."},
 	{name = "aim_ray_end", type = "number", default = 5, description = "Aim ray end distance."},
 	{name = "aim_ray_start", type = "number", default = 0.1, description = "Aim ray start distance."},
-	{name = "actions", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of actions the actor is able to perform.", details = {values = {spec = "Actionspec"}}},
+	{name = "actions", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of actions the actor is able to perform.", details = {values = {spec = "ActionSpec"}}},
 	{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation profiles.", details = {values = {spec = "AnimationProfileSpec"}}},
 	{name = "blocking_armor", type = "number", default = 0.5, description = "How much armor class blocking offsers."},
 	{name = "blocking_cooldown", type = "number", default = 0.4, description = "Time in seconds how long it takes to leave the blocking stance."},
@@ -59,7 +59,7 @@ local Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "damage_from_magma", type = "number", default = 6, description = "Points of damage from magma per second."},
 	{name = "damage_from_water", type = "number", default = 0, description = "Points of damage from water per second."},
 	{name = "dead", type = "boolean", description = "True if the actor should spawn as dead."},
-	{name = "dialog", type = "string", description = "Dialog name.", details = {spec = "Dialogspec"}},
+	{name = "dialog", type = "string", description = "Dialog name.", details = {spec = "DialogSpec"}},
 	{name = "difficulty", type = "number", default = 0, description = "The approximate difficulty of the actor in the range of [0,1]."},
 	{name = "effects", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of effect profiles.", details = {values = {spec = "EffectProfileSpec"}}},
 	{name = "enable_decapitation", type = "boolean", default = true, description = "False to not allow the actor to be decapitated."},
@@ -81,8 +81,8 @@ local Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "head_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of head styles."},
 	{name = "important", type = "boolean", description = "True to not allow the actor to be cleaned up from the map."},
 	{name = "interactive", type = "boolean", default = true, description = "False to make the object not appear interactive."},
-	{name = "inventory_items", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of inventory items to give when the actor is spawned.", details = {keys = {spec = "Itemspec"}, values = {integer = true, min = 1}}},
-	{name = "inventory_items_death", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of inventory items to give when the actor is killed.", details = {keys = {spec = "Itemspec"}, values = {integer = true, min = 1}}},
+	{name = "inventory_items", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of inventory items to give when the actor is spawned.", details = {keys = {spec = "ItemSpec"}, values = {integer = true, min = 1}}},
+	{name = "inventory_items_death", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of inventory items to give when the actor is killed.", details = {keys = {spec = "ItemSpec"}, values = {integer = true, min = 1}}},
 	{name = "inventory_size", type = "number", default = 0, description = "Number of inventory slots the actor has."},
 	{name = "jump_force", type = "number", default = 8, description = "Mass-independent jump force of the actor."},
 	{name = "loot_categories", type = "list", list = {type = "string"}, description = "List of item categories this actor can have as random loot."},
@@ -94,17 +94,17 @@ local Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "model_partitions", type = "dict", dict = {type = "string"}, description = "Dictionary of model partitions."},
 	{name = "models", type = "dict", dict = {type = "string"}, description = "Dictionary or model names."},
 	{name = "mouth_style", type = "string", description = "Mouth style."},
-	{name = "personality", type = "string", description = "Name of the personality type.", details = {spec = "Personalityspec"}},
-	{name = "preset", type = "string", description = "Name of the actor preset to use.", details = {spec = "Actorpresetspec"}},
+	{name = "personality", type = "string", description = "Name of the personality type.", details = {spec = "PersonalitySpec"}},
+	{name = "preset", type = "string", description = "Name of the actor preset to use.", details = {spec = "ActorPresetSpec"}},
 	{name = "reagentless_spells", type = "boolean", description = "True to allow the actor to cast spells without reagents."},
 	{name = "skill_regen", type = "number", default = 0.5, description = "Skill regeneration speed in units per second."},
 	{name = "skill_quota", type = "number", default = 200, description = "Number of skill points the actor can distribute over skills."},
-	{name = "skills", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of skills.", details = {keys = {spec = "Skillspec"}}},
+	{name = "skills", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of skills.", details = {keys = {spec = "SkillSpec"}}},
 	{name = "skin_color", type = "color", description = "Skin color."},
 	{name = "skin_material", type = "string", description = "Skin material name."},
 	{name = "skin_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of skin styles."},
 	{name = "skin_textures", type = "list", list = {type = "string"}, description = "List of skin textures."},
-	{name = "special_effects", type = "list", list = {type = "string", details = {value = {spec = "Effectspec"}}}, default = {}, description = "List of special effects to render."},
+	{name = "special_effects", type = "list", list = {type = "string", details = {value = {spec = "EffectSpec"}}}, default = {}, description = "List of special effects to render."},
 	{name = "speed_run", type = "number", default = 6, description = "Running speed in meters per second."},
 	{name = "speed_walk", type = "number", default = 3, description = "Walking speed in meters per second."},
 	{name = "swim_force", type = "number", default = 3.5, description = "Mass-independent upward swim force of the actor."},
@@ -131,13 +131,13 @@ local Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "water_friction", type = "number", default = 0.8, description = "How much being in water slows the actor down."},
 	{name = "water_gravity", type = "vector", default = Vector(0,-1), description = "The gravity of the actor in water."}
 })
-Actorspec.introspect.base = function(spec) return Main.specs:find_by_name("Actorspec", spec.base) end
+ActorSpec.introspect.base = function(spec) return Main.specs:find_by_name("ActorSpec", spec.base) end
 
 --- Registers a new actor spec.
--- @param clss Actorspec class.
+-- @param clss ActorSpec class.
 -- @param args Arguments.
 -- @return New actor spec.
-Actorspec.new = function(clss, args)
+ActorSpec.new = function(clss, args)
 	-- Copy arguments from the base spec.
 	-- The arguments used to initialize each spec have been stored to the
 	-- args field of the instance so that they can be easily copied to the
@@ -164,7 +164,7 @@ end
 -- @param self Actor spec.
 -- @param object Object.
 -- @return True if an enemy.
-Actorspec.check_enemy = function(self, object)
+ActorSpec.check_enemy = function(self, object)
 	if object.spec.type ~= "actor" then return end
 	for name1 in pairs(self.factions) do
 		local spec1 = Main.specs:find_by_name("FactionSpec", name1)
@@ -179,8 +179,8 @@ Actorspec.check_enemy = function(self, object)
 end
 
 --- Precalculate combat abilities for AI.
--- @param self Actorspec.
-Actorspec.calculate_abilities = function(self)
+-- @param self ActorSpec.
+ActorSpec.calculate_abilities = function(self)
 	self.can_melee = false
 	self.can_ranged = false
 	self.can_throw = false
@@ -188,7 +188,7 @@ Actorspec.calculate_abilities = function(self)
 	self.can_cast_self = false
 	self.can_cast_touch = false
 	for k,v in pairs(self.actions) do
-		local action = Main.specs:find_by_name("Actionspec", v)
+		local action = Main.specs:find_by_name("ActionSpec", v)
 		if not action then
 			print(string.format("WARNING: missing action %q while initializing actor %q", v, self.name))
 		else
@@ -211,7 +211,7 @@ end
 -- @param name Animation name.
 -- @param profile Animation profile mapping, or nil for "default".
 -- @return Animation spec, or nil.
-Actorspec.get_animation = function(self, name, profile)
+ActorSpec.get_animation = function(self, name, profile)
 	local try = function(self, p, a)
 		local pname = self.animations[p]
 		if not pname then return end
@@ -228,7 +228,7 @@ end
 -- @param profile Animation profile mapping, or nil for "default".
 -- @param variant Variant number, or nil.
 -- @return Table of animation playback arguments.
-Actorspec.get_animation_arguments = function(self, name, profile, variant)
+ActorSpec.get_animation_arguments = function(self, name, profile, variant)
 	local args = {animation = name, fade_in = 0.3, fade_out = 0.3, time = time}
 	local anim = self:get_animation(name, profile)
 	if anim then
@@ -238,9 +238,9 @@ Actorspec.get_animation_arguments = function(self, name, profile, variant)
 end
 
 --- Gets the base diffuse texture of the actor.
--- @param self Actorspec.
+-- @param self ActorSpec.
 -- @return String if found. Nil otherwise.
-Actorspec.get_base_texture = function(self)
+ActorSpec.get_base_texture = function(self)
 	return self.skin_textures and self.skin_textures[1]
 end
 
@@ -249,7 +249,7 @@ end
 -- @param name Effect name.
 -- @param profile Effect profile name. Nil for "default".
 -- @return Effect spec, or nil.
-Actorspec.get_effect = function(self, name, profile)
+ActorSpec.get_effect = function(self, name, profile)
 	local try = function(self, p, e)
 		local pname = self.effects[p]
 		if not pname then return end
@@ -264,7 +264,7 @@ end
 -- @param self Actor spec.
 -- @param slot Equipment slot name.
 -- @return Node name, or nil.
-Actorspec.get_node_by_equipment_slot = function(self, slot)
+ActorSpec.get_node_by_equipment_slot = function(self, slot)
 	if not self.equipment_slots then return end
 	local node = self.equipment_slots[slot]
 	if node == "" then return end
@@ -274,15 +274,15 @@ end
 --- Gets the personality of the actor.
 -- @param self Actor spec.
 -- @return Personality spec, or nil.
-Actorspec.get_personality = function(self)
+ActorSpec.get_personality = function(self)
 	if not self.personality then return end
-	return Main.specs:find_by_name("Personalityspec", self.personality)
+	return Main.specs:find_by_name("PersonalitySpec", self.personality)
 end
 
 --- Gets a random eye color for the actor.
 -- @param self Actor spec.
 -- @return Color table, or nil.
-Actorspec.get_random_eye_color = function(self)
+ActorSpec.get_random_eye_color = function(self)
 	if not self.eye_style then return end
 	local color = self.eye_color
 	if not color then
@@ -298,7 +298,7 @@ end
 --- Gets a random hair color for the actor.
 -- @param self Actor spec.
 -- @return Color table, or nil.
-Actorspec.get_random_hair_color = function(self)
+ActorSpec.get_random_hair_color = function(self)
 	if not self.hair_style then return end
 	local color = self.hair_color
 	if not color then
@@ -313,7 +313,7 @@ end
 --- Gets a random hair style for the actor.
 -- @param self Actor spec.
 -- @return Style string, or nil.
-Actorspec.get_random_hair_style = function(self)
+ActorSpec.get_random_hair_style = function(self)
 	local style = self.hair_style
 	if not style then return end
 	if style == "random" then
@@ -335,7 +335,7 @@ end
 --- Gets a random head style for the actor.
 -- @param self Actor spec.
 -- @return Head style name, or nil.
-Actorspec.get_random_head = function(self)
+ActorSpec.get_random_head = function(self)
 	local style = self.head_style
 	if not style then return end
 	if style == "random" then
@@ -355,7 +355,7 @@ end
 -- @param self Actor spec.
 -- @param name Style class name.
 -- @return Style name, or nil.
-Actorspec.get_random_texture_style = function(self, name)
+ActorSpec.get_random_texture_style = function(self, name)
 	local style = self[name .. "_style"]
 	if not style then return end
 	if style == "random" then
@@ -372,11 +372,11 @@ end
 --- Finds the special effects of the actor.
 -- @param self Actor spec.
 -- @return List of effect specs, or nil.
-Actorspec.get_special_effects = function(self)
+ActorSpec.get_special_effects = function(self)
 	if not self.special_effects then return end
 	local res = {}
 	for k,v in pairs(self.special_effects) do
-		local eff = Main.specs:find_by_name("Effectspec", v)
+		local eff = Main.specs:find_by_name("EffectSpec", v)
 		if eff then
 			table.insert(res, eff)
 		end
@@ -388,7 +388,7 @@ end
 --- Sets the factions of the actor.
 -- @param self Actor spec.
 -- @param args List of factions.
-Actorspec.set_factions = function(self, args)
+ActorSpec.set_factions = function(self, args)
 	if args then
 		self.factions = {}
 		for k,v in pairs(args) do
@@ -397,4 +397,4 @@ Actorspec.set_factions = function(self, args)
 	end
 end
 
-return Actorspec
+return ActorSpec

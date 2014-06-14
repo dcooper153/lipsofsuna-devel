@@ -1,7 +1,8 @@
+local ActionSpec = require("core/specs/action")
 local Damage = require("arena/damage")
 local Physics = require("system/physics")
 
-Actionspec{
+ActionSpec{
 	name = "touch spell",
 	categories =
 	{

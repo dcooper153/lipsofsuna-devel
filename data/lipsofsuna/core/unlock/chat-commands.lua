@@ -7,7 +7,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local spec = Main.specs:find_by_name("Actionspec", matches[1])
+		local spec = Main.specs:find_by_name("ActionSpec", matches[1])
 		if spec then
 			Main.unlocks:unlock("action", matches[1])
 		else
@@ -57,7 +57,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local spec = Main.specs:find_by_name("Skillspec", matches[1])
+		local spec = Main.specs:find_by_name("SkillSpec", matches[1])
 		if spec then
 			Main.unlocks:unlock("skill", matches[1])
 		else

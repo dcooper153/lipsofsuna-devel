@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "log",
 		"model": "log1",
 		"icon": "log1",
@@ -29,7 +29,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "tree",
 		"model": "tree1",
 		"categories":
@@ -57,7 +57,7 @@
 		}
 	},
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "rust sprig tree",
 		"model": "tree2",
 		"categories":

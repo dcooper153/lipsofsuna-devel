@@ -31,7 +31,7 @@ end
 -- @param dir Activation direction. Nil for non-combat skills.
 Skills.add = function(self, name, dir)
 	-- Find the skill.
-	local skill = Main.specs:find_by_name("Skillspec", name)
+	local skill = Main.specs:find_by_name("SkillSpec", name)
 	if not skill then return end
 	-- Add the skill.
 	self.skills[name] = dir or ""
@@ -48,7 +48,7 @@ end
 -- @param dir Activation direction. Nil for non-combat skills.
 Skills.add_without_requirements = function(self, name, dir)
 	-- Find the skill.
-	local skill = Main.specs:find_by_name("Skillspec", name)
+	local skill = Main.specs:find_by_name("SkillSpec", name)
 	if not skill then return end
 	-- Add the skill.
 	self.skills[name] = dir or ""
@@ -71,7 +71,7 @@ Skills.calculate_attributes = function(self)
 		spell_damage = 1,
 		view_distance = 32}
 	for k,v in pairs(self.skills) do
-		local skill = Main.specs:find_by_name("Skillspec", k)
+		local skill = Main.specs:find_by_name("SkillSpec", k)
 		if skill and skill.assign then skill.assign(attr) end
 	end
 	return attr
@@ -97,7 +97,7 @@ end
 -- that affect the damage of the weapon are listed in the spec of the item.
 --
 -- @param self Skills.
--- @param spec Itemspec.
+-- @param spec ItemSpec.
 -- @return Number.
 Skills.calculate_damage_multiplier_for_itemspec = function(self, spec)
 	if not spec.modifiers_bonus then return 1 end
@@ -141,13 +141,13 @@ end
 
 --- Gets the combat art for the given directional key.
 -- @param self Skills.
--- @return Actionspec if found. Nil otherwise.
+-- @return ActionSpec if found. Nil otherwise.
 Skills.get_combat_art = function(self, dir)
 	for k,v in pairs(self.skills) do
 		if v == dir then
-			local s = Main.specs:find_by_name("Skillspec", k)
+			local s = Main.specs:find_by_name("SkillSpec", k)
 			if s and s.combat and s.action then
-				local a = Main.specs:find_by_name("Actionspec", s.action)
+				local a = Main.specs:find_by_name("ActionSpec", s.action)
 				if a then return a end
 			end
 		end
@@ -174,7 +174,7 @@ end
 -- @return Table of strings.
 Skills.get_statuses = function(self)
 	local skills = {}
-	for name,skill in pairs(Main.specs:get_spec_names("Skillspec")) do
+	for name,skill in pairs(Main.specs:get_spec_names("SkillSpec")) do
 		if self.skills[name] then
 			skills[name] = "active"
 		elseif self:is_activable(name) then
@@ -201,7 +201,7 @@ end
 -- @param name Skill name.
 -- @return True if the requirements are met.
 Skills.is_activable = function(self, name)
-	local skill = Main.specs:find_by_name("Skillspec", name)
+	local skill = Main.specs:find_by_name("SkillSpec", name)
 	if not skill then return end
 	for index,name in pairs(skill.requires) do
 		if not self.skills[name] then return end
@@ -223,7 +223,7 @@ end
 -- @param name Skill name.
 Skills.remove = function(self, name)
 	-- Find the skill.
-	local skill = Main.specs:find_by_name("Skillspec", name)
+	local skill = Main.specs:find_by_name("SkillSpec", name)
 	if not skill then return end
 	-- Remove the skill.
 	self.skills[name] = nil
@@ -242,7 +242,7 @@ Skills.remove_invalid = function(self)
 	while more do
 		more = false
 		for name in pairs(self.skills) do
-			local skill = Main.specs:find_by_name("Skillspec", name)
+			local skill = Main.specs:find_by_name("SkillSpec", name)
 			if skill then
 				-- Remove if the requirements are not met.
 				local deps = skill:find_direct_requirements()

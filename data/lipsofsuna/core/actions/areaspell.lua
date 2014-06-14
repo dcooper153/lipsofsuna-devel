@@ -1,8 +1,9 @@
+local ActionSpec = require("core/specs/action")
 local AreaSpell = require("core/objects/areaspell")
 local Coroutine = require("system/coroutine")
 local Feat = FIXME
 
-Actionspec{
+ActionSpec{
 	name = "area spell",
 	func = function(feat, info, args)
 		Coroutine(function(t)
@@ -13,7 +14,7 @@ Actionspec{
 			-- cannot generally be represented as one object.
 			for k,v in pairs(feat.effects) do
 				local effect = Main.specs:find_by_name("ModifierSpec", v[1])
-				local spec = effect and Main.specs:find_by_name("Spellspec", effect.projectile)
+				local spec = effect and Main.specs:find_by_name("SpellSpec", effect.projectile)
 				if effect and spec then
 					local sub = Feat("area spell", {{v[1], v[2]}})
 					local spell = AreaSpell(args.user.manager, {

@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "revolver1",
 		"sound": "weaponmusket1"
 	},
@@ -38,7 +38,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "adamantium revolver",
 		"categories": {"ranged": true, "weapon": true},
 		"actions": {"right": "ranged", "left": "cancel ranged"},
@@ -66,7 +66,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "aquanite revolver",
 		"categories": {"ranged": true, "weapon": true},
 		"actions": {"right": "ranged", "left": "cancel ranged"},
@@ -94,7 +94,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "crimson revolver",
 		"categories": {"ranged": true, "weapon": true},
 		"actions": {"right": "ranged", "left": "cancel ranged"},
@@ -122,7 +122,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "iron revolver",
 		"categories": {"ranged": true, "weapon": true},
 		"actions": {"right": "ranged", "left": "cancel ranged"},

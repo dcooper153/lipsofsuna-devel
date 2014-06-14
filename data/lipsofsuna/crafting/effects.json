@@ -1,46 +1,46 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "craftmetal1",
 		"sound": "craftmetal1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "craftalchemy1",
 		"sound": "craftpotion1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "craftfood1",
 		"sound": "craftpotion1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "craftpotion1",
 		"sound": "craftpotion1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "craftsewing1",
 		"sound": "craftsewing1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "craftwood1",
 		"sound": "craftwood1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "harvest1",
 		"sound": "scissor1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "enchant",
 		"sound": "enchant1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "disenchant",
 		"sound": "disenchant1"
 	}

@@ -6,26 +6,26 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.aistate
--- @alias Aistatespec
+-- @alias AiStateSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
 --- TODO:doc
--- @type Aistatespec
-Aistatespec = Spec:register("Aistatespec", "ai state")
+-- @type AiStateSpec
+local AiStateSpec = Spec:register("AiStateSpec", "ai state")
 
 --- Registers an AI state.
--- @param clss Aistatespec class.
+-- @param clss AiStateSpec class.
 -- @param args Arguments.<ul>
 --   <li>calculate: Function for calculating the likelihood.</li>
 --   <li>categories: List of categories.</li>
 --   <li>name: State name.</li>
 --   <li>update: Function for updating the AI during the state.</li></ul>
 -- @return New AI state spec.
-Aistatespec.new = function(clss, args)
+AiStateSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	return self
 end
 
-
+return AiStateSpec

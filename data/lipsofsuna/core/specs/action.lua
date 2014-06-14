@@ -6,14 +6,14 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.action
--- @alias Actionspec
+-- @alias ActionSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
 --- TODO:doc
--- @type Actionspec
-Actionspec = Spec:register("Actionspec", "action", {
+-- @type ActionSpec
+local ActionSpec = Spec:register("ActionSpec", "action", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "func", type = "ignore"},
@@ -21,16 +21,15 @@ Actionspec = Spec:register("Actionspec", "action", {
 })
 
 --- Creates a new action specification.
--- @param clss Actionspec class.
+-- @param clss ActionSpec class.
 -- @param args Arguments.<ul>
 --   <li>categories: List of categories to which the action belongs.</li>
 --   <li>func: Function to handle the action.</li>
 --   <li>name: Name of the action type.</li></ul>
 -- @return New action specification.
-Actionspec.new = function(clss, args)
+ActionSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	return self
 end
 
-return Actionspec
-
+return ActionSpec

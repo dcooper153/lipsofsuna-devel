@@ -12,7 +12,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "aquanite grenade",
 		"categories": {"explosive": true, "throwable": true, "weapon": true},
 		"actions": {"right": "throw"},
@@ -37,7 +37,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "crimson grenade",
 		"categories": {"explosive": true, "throwable": true, "weapon": true},
 		"actions": {"right": "throw"},

@@ -1,34 +1,34 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "bind item shortcut",
 		"sound": "shortcut-bind1",
 		"sound_positional": false,
 		"sound_volume": 0.3
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "clear item shortcut",
 		"sound": "shortcut-clear1",
 		"sound_positional": false,
 		"sound_volume": 0.3
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "shortcut error",
 		"sound": "shortcut-error1",
 		"sound_positional": false,
 		"sound_volume": 0.3
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "shortcut equip",
 		"sound": "shortcut-equip1",
 		"sound_positional": false,
 		"sound_volume": 0.15
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "shortcut unequip",
 		"sound": "shortcut-unequip1",
 		"sound_positional": false,

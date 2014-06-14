@@ -1,30 +1,30 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "uimove1",
 		"sound": "toggle1",
 		"sound_volume": 0.3
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "uislider1",
 		"sound": "slider1",
 		"sound_volume": 0.3
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "uitoggle1",
 		"sound": "toggle1",
 		"sound_volume": 0.5
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "uitoggle2",
 		"sound": "toggle2",
 		"sound_volume": 0.5
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "uitransition1",
 		"sound": "transition1",
 		"sound_volume": 0.3

@@ -9,7 +9,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "fedora",
 		"model": "fedora1",
 		"icon": "leatherarmor1",

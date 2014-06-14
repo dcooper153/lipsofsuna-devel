@@ -1,11 +1,11 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "portal1",
 		"sound": "portal1"
 	},
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "portal of lips",
 		"model": "portal1",
 		"categories": {"portal": true, "special": true},
@@ -14,7 +14,7 @@
 		"usages": {"teleport": true}
 	},
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "portal of midguard",
 		"model": "portal1",
 		"categories": {"portal": true, "special": true},

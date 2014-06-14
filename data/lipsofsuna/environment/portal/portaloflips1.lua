@@ -1,4 +1,6 @@
-Patternspec{
+local PatternSpec = require("core/specs/pattern")
+
+PatternSpec{
 	name = "portaloflips1",
 	size = Vector(8,8,8),
 	position = Vector(700,960,700),

@@ -83,7 +83,7 @@ ModelBuilder.build_with_merger = function(clss, merger, args, hash)
 	local equipment = {}
 	if args.equipment then
 		for slot,name in pairs(args.equipment) do
-			local spec = Main.specs:find_by_name("Itemspec", name)
+			local spec = Main.specs:find_by_name("ItemSpec", name)
 			if spec then
 				table.insert(equipment, spec)
 			end

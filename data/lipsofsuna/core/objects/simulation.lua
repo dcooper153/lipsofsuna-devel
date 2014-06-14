@@ -54,7 +54,7 @@ end
 -- @return Action if created an effect-over-time one. Nil otherwise.
 SimulationObject.action = function(self, name, ...)
 	-- Find the action spec.
-	local spec = Main.specs:find_by_name("Actionspec", name)
+	local spec = Main.specs:find_by_name("ActionSpec", name)
 	if not spec then return end
 	if not spec.start then return end
 	-- Start the action.
@@ -289,7 +289,7 @@ end
 SimulationObject.get_animation_profile = function(self)
 	if self.animation_profile then return self.animation_profile end
 	if self.spec.preset then
-		local preset = Main.specs:find_by_name("Actorpresetspec", self.spec.preset)
+		local preset = Main.specs:find_by_name("ActorPresetSpec", self.spec.preset)
 		if preset.animation_profile then return preset.animation_profile end
 	end
 	return "default"
@@ -441,7 +441,7 @@ SimulationObject.teleport = function(self, args)
 		if not marker or not marker.position then return end
 		self:set_position(marker.position + Vector(0, 2, -1))
 	elseif args.region then
-		local reg = Main.specs:find_by_name("Patternspec", args.region)
+		local reg = Main.specs:find_by_name("PatternSpec", args.region)
 		if not reg then return end
 		self:set_position(reg:get_spawn_point_world())
 	elseif args.position then

@@ -13,7 +13,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "iron greaves",
 		"model": "legplate1",
 		"icon": "metalboot1",
@@ -47,7 +47,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "iron gauntlets",
 		"model": "armplate1",
 		"icon": "metalglove1",
@@ -81,7 +81,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "iron breastplate",
 		"model": "upperplate1",
 		"icon": "metalarmor1",
@@ -114,7 +114,7 @@
 		"mass": 25
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "iron skirt",
 		"model": "lowerplate1",
 		"icon": "metalarmor1",

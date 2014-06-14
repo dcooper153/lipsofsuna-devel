@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "anvil",
 		"categories":
 		{

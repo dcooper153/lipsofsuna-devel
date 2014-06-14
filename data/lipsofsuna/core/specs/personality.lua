@@ -6,14 +6,14 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.personality
--- @alias Personalityspec
+-- @alias PersonalitySpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
 --- TODO:doc
--- @type Personalityspec
-Personalityspec = Spec:register("Personalityspec", "personality", {
+-- @type PersonalitySpec
+local PersonalitySpec = Spec:register("PersonalitySpec", "personality", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "phrases_angered", type = "list", list = {type = "string"}, description = "List of angered phrases."},
@@ -22,10 +22,10 @@ Personalityspec = Spec:register("Personalityspec", "personality", {
 })
 
 --- Registers an actor personality.
--- @param clss Personalityspec class.
+-- @param clss PersonalitySpec class.
 -- @param args Arguments.
 -- @return New personality spec.
-Personalityspec.new = function(clss, args)
+PersonalitySpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	return self
@@ -34,7 +34,7 @@ end
 --- Gets a random phrase for the given situation.
 -- @param self Personality spec.
 -- @param type Phrase type: "angered"/"combat"/"death".
-Personalityspec.get_phrase = function(self, type)
+PersonalitySpec.get_phrase = function(self, type)
 	local rnd = function(tbl)
 		if not tbl then return end
 		local len = #tbl
@@ -44,4 +44,4 @@ Personalityspec.get_phrase = function(self, type)
 	return rnd(self["phrases_" .. type])
 end
 
-
+return PersonalitySpec

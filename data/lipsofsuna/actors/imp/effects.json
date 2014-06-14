@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "impflame1",
 		"light": true,
 		"light_diffuse": [1,0.5,0.25,1],

@@ -6,7 +6,7 @@
 		"materials": {"granite stone": 3}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "jar",
 		"model": "jar1",
 		"icon": "potion3",

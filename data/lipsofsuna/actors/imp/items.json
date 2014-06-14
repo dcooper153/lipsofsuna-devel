@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "impstone",
 		"categories":
 		{
@@ -26,7 +26,7 @@
 		"stacking": false
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "firestone",
 		"categories":
 		{

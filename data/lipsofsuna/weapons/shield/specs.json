@@ -15,7 +15,7 @@
 		"modes": {"metal": true, "wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "round shield",
 		"actions": {"left": "block shield"},
 		"animations_equipped": {"default": "default shield equipped"},
@@ -38,7 +38,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wooden shield",
 		"actions": {"left": "block shield"},
 		"animations_equipped": {"default": "default shield equipped"},

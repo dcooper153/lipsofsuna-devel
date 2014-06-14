@@ -1,4 +1,6 @@
-Dialogspec{
+local DialogSpec = require("core/specs/dialog")
+
+DialogSpec{
 	name = "portal of lips",
 	commands = {
 		{"branch", cond = "portal of lips activated",

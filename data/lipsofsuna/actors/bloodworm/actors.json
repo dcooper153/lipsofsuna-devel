@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "bloodworm",
 		"ai_enable_strafe": false,
 		"ai_enable_block": false,

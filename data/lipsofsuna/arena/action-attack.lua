@@ -1,4 +1,6 @@
-Actionspec{
+local ActionSpec = require("core/specs/action")
+
+ActionSpec{
 	name = "attack",
 	categories =
 	{
@@ -12,7 +14,7 @@ Actionspec{
 			if action.object.cooldown then return end
 			local chained = Main.combat_utils:get_combat_action_for_actor(action.object, "right")
 			if not chained or chained.name == "attack" then
-				chained = Main.specs:find_by_name("Actionspec", "melee")
+				chained = Main.specs:find_by_name("ActionSpec", "melee")
 				if not chained then return end
 			end
 			action.object:action(chained.name)
@@ -40,7 +42,7 @@ Actionspec{
 				return
 			end
 			-- Find the finish action.
-			local finish = Main.specs:find_by_name("Actionspec", "melee")
+			local finish = Main.specs:find_by_name("ActionSpec", "melee")
 			if not finish then return end
 			-- Start the charge animation.
 			local move = Main.combat_utils:get_melee_move_of_actor(action.object)

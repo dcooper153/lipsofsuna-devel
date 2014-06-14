@@ -1,4 +1,6 @@
-Aistatespec{
+local AiStateSpec = require("core/specs/aistate")
+
+AiStateSpec{
 	name = "combat",
 	calculate = function(self)
 		-- Check for enemies.

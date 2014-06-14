@@ -1,12 +1,12 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "staffflame1",
 		"node": "#flame",
 		"particle": "torchfx1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "staffflame2",
 		"node": "#flame2",
 		"particle": "torchfx1"
@@ -27,7 +27,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wooden staff",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -54,7 +54,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "luminous staff",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},

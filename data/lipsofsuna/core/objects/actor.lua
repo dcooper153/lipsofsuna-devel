@@ -491,7 +491,7 @@ Actor.die = function(self)
 	end
 	-- Spawn death drop items.
 	for k,v in pairs(self.spec.inventory_items_death) do
-		local s = Main.specs:find_by_name("Itemspec", k)
+		local s = Main.specs:find_by_name("ItemSpec", k)
 		if s then
 			local o = Item(self.manager)
 			o:set_spec(s)
@@ -593,7 +593,7 @@ Actor.randomize = function(self)
 	self.stats:set_value("willpower", self.stats:get_maximum("willpower"))
 	-- Populate the inventory.
 	for k,v in pairs(spec.inventory_items) do
-		local itemspec = Main.specs:find_by_name("Itemspec", k)
+		local itemspec = Main.specs:find_by_name("ItemSpec", k)
 		if itemspec then
 			if itemspec.stacking then
 				local item = Item(self.manager)
@@ -623,7 +623,7 @@ Actor.randomize = function(self)
 		end
 		for i = 1,num_item do
 			local cat = spec.loot_categories[math.random(1, num_cat)]
-			local itemspec = Main.specs:find_random_by_category("Itemspec", cat)
+			local itemspec = Main.specs:find_random_by_category("ItemSpec", cat)
 			if itemspec then
 				local item = Item(self.manager)
 				item:set_spec(itemspec)
@@ -1074,9 +1074,9 @@ end
 
 --- Sets the actor spec of the object.
 -- @param self Actor.
--- @param v Actorspec.
+-- @param v ActorSpec.
 Actor.set_spec = function(self, v)
-	local spec = type(v) == "string" and Main.specs:find_by_name("Actorspec", v) or v
+	local spec = type(v) == "string" and Main.specs:find_by_name("ActorSpec", v) or v
 	if self.spec == spec then return end
 	SimulationObject.set_spec(self, spec)
 	-- Configure physics.

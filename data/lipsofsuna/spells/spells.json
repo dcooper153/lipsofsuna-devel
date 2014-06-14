@@ -1,24 +1,24 @@
 [
 	{
-		"type": "Spellspec",
+		"type": "SpellSpec",
 		"name": "fireball1",
 		"model": "fireball1",
 		"particle": "fireball1"
 	},
 	{
-		"type": "Spellspec",
+		"type": "SpellSpec",
 		"name": "firebreath1",
 		"particle": "firebreath1"
 	},
 	{
-		"type": "Spellspec",
+		"type": "SpellSpec",
 		"name": "firewall1",
 		"model": "firewall1",
 		"particle": "firewall1",
 		"effect": "firewall burning"
 	},
 	{
-		"type": "Spellspec",
+		"type": "SpellSpec",
 		"name": "magicmissile1",
 		"model": "fireball1",
 		"particle": "fireball1"

@@ -32,7 +32,7 @@ NpcAi.new = function(clss, manager, object)
 	-- Initialize states.
 	self.enabled_states = {}
 	for k,v in pairs(object.spec.ai_enabled_states) do
-		self.enabled_states[k] = Main.specs:find_by_name("Aistatespec", k)
+		self.enabled_states[k] = Main.specs:find_by_name("AiStateSpec", k)
 	end
 	-- Initialize combat actions.
 	self.combat_actions = {}
@@ -262,7 +262,7 @@ NpcAi.set_state = function(self, args)
 	if s == prev then return end
 	-- Leave the previous state.
 	if prev then
-		local state = Main.specs:find_by_name("Aistatespec", prev)
+		local state = Main.specs:find_by_name("AiStateSpec", prev)
 		if state and state.leave then
 			state.leave(self)
 		end
@@ -279,7 +279,7 @@ NpcAi.set_state = function(self, args)
 	self.object.running = (self.state == "combat")
 	self.object:calculate_speed()
 	-- Enter the new state.
-	local state = Main.specs:find_by_name("Aistatespec", s)
+	local state = Main.specs:find_by_name("AiStateSpec", s)
 	if state and state.enter then
 		state.enter(self, prev)
 	end
@@ -315,7 +315,7 @@ NpcAi.update = function(self, secs)
 	self.action_timer = self.action_timer - tick
 	-- Let the current state manipulate the position and other attributes
 	-- of the character and trigger state dependent actions such as attacking.
-	local state = Main.specs:find_by_name("Aistatespec", self.state)
+	local state = Main.specs:find_by_name("AiStateSpec", self.state)
 	if state then state.update(self, tick) end
 	-- Only consider state changes every couple of seconds.
 	if self.ai_timer < self.object.spec.ai_update_delay then return end

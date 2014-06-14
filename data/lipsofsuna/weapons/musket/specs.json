@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "musket1",
 		"sound": "weaponmusket1"
 	},
@@ -13,7 +13,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "bullet",
         "categories": {"bullet": true},
 		"modifiers": {"physical damage": 1},
@@ -47,7 +47,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "adamantium musket",
 		"categories":
 		{
@@ -103,7 +103,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "aquanite musket",
 		"categories":
 		{
@@ -164,7 +164,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "crimson musket",
 		"categories":
 		{
@@ -225,7 +225,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "iron musket",
 		"categories":
 		{

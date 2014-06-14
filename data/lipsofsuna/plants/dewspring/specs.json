@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "dewspring",
 		"model": "dewspring1",
 		"categories": {"small-plant": true, "reagent": true},
@@ -11,7 +11,7 @@
 		"usages": {"harvest": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "dewspring leaf",
 		"model": "dewspringleaf1",
 		"icon": "mushroom1",

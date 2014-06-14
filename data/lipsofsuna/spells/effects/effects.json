@@ -1,20 +1,20 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "FIXME",
 		"particle": "spell1",
 		"particle_life": 5,
 		"sound": "spellberserk1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "berserk1",
 		"particle": "spell1",
 		"particle_life": 5,
 		"sound": "spellberserk1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "burning spell",
 		"particle": "fire-damage1",
 		"particle_life": 5,
@@ -25,7 +25,7 @@
 		"sound_volume": 0.5
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "burning spell cast",
 		"sound": "fireball1",
 		"sound_pitch_min": 2,
@@ -33,7 +33,7 @@
 		"sound_volume": 0.3
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "cold damage",
 		"particle": "cold-damage1",
 		"particle_life": 1,
@@ -43,42 +43,42 @@
 		"sound_volume": 0.5
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "cold damage cast",
 		"sound": "cold-spell-cast1",
 		"sound_volume": 0.2
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "conjuration spell",
 		"particle": "summon1",
 		"particle_life": 5
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "conjuration spell cast",
 		"sound": "spellberserk1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "debug1",
 		"particle": "debug1",
 		"particle_life": 5
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "dig spell",
 		"sound": "dig-spell1",
 		"sound_rolloff": 0.2
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "dig spell cast",
 		"sound": "dig-spell-cast1",
 		"sound_rolloff": 0.5
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "explosion1",
 		"particle": "explosion1",
 		"particle_life": 5,
@@ -87,7 +87,7 @@
 		"sound_rolloff": 0.2
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "fire damage",
 		"particle": "fire-damage1",
 		"particle_life": 5,
@@ -96,7 +96,7 @@
 		"sound_volume": 0.5
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "fire damage cast",
 		"sound": "fireball1",
 		"sound_pitch_min": 2,
@@ -104,18 +104,18 @@
 		"sound_volume": 0.3
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "firewall spell",
 		"sound": "fire-000"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "firewall spell cast",
 		"sound": "fireball1",
 		"sound_volume": 0.3
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "firewall burning",
 		"particle": "firewall1",
 		"sound": "firewall-burning1",
@@ -125,18 +125,18 @@
 		"sound_volume": 0.3
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "disease1",
 		"sound": "diseasecontact1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "fireball1",
 		"sound": "fireball1",
 		"sound_volume": 0.3
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "light1",
 		"particle": "spell2",
 		"particle_life": 5,
@@ -144,35 +144,35 @@
 		"sound": "spelllight1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "heal1",
 		"particle": "heal1",
 		"particle_life": 5,
 		"sound": "spellhealing1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "sanctuary1",
 		"particle": "sanctuary1",
 		"particle_life": 5,
 		"sound": "spellsanctuary1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "selfdestruct1",
 		"particle": "particle1",
 		"particle_life": 5,
 		"sound": "selfdestructcountdown1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "wilderness 1",
 		"particle": "particle1",
 		"particle_life": 5,
 		"sound": "wilderness1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "wilderness growth 1",
 		"particle": "particle1",
 		"particle_life": 5,

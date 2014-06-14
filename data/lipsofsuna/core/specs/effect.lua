@@ -6,14 +6,14 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.effect
--- @alias Effectspec
+-- @alias EffectSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
 --- Audiovisual effect specification.
--- @type Effectspec
-Effectspec = Spec:register("Effectspec", "effect", {
+-- @type EffectSpec
+local EffectSpec = Spec:register("EffectSpec", "effect", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "light", type = "boolean", description = "True to enable light source creation."},
@@ -39,23 +39,23 @@ Effectspec = Spec:register("Effectspec", "effect", {
 })
 
 --- Registers a new effect spec.
--- @param clss Effectspec class.
+-- @param clss EffectSpec class.
 -- @param args Arguments.
 -- @return New effect spec.
-Effectspec.new = function(clss, args)
+EffectSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
 
 --- Gets the pitch of the sound.
--- @param self Effectspec.
+-- @param self EffectSpec.
 -- @return Pitch multiplier.
-Effectspec.get_sound_pitch = function(self)
+EffectSpec.get_sound_pitch = function(self)
 	local min = self.sound_pitch_min
 	local max = self.sound_pitch_max
 	if min >= max then return min end
 	return min + (max - min) * math.random()
 end
 
-return Effectspec
+return EffectSpec

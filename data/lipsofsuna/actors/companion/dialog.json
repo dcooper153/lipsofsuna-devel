@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Dialogspec",
+		"type": "DialogSpec",
 		"name": "companion",
 		"commands":
 		[

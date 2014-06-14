@@ -1,4 +1,6 @@
-Aistatespec{
+local AiStateSpec = require("core/specs/aistate")
+
+AiStateSpec{
 	name = "bounce",
 	calculate = function(self)
 		for k,v in pairs(self.enemies) do return end

@@ -15,7 +15,7 @@ local Spec = require("core/specs/spec")
 -- @type EffectProfileSpec
 local EffectProfileSpec = Spec:register("EffectProfileSpec", "effect profile", {
 	{name = "name", type = "string", description = "Name of the spec."},
-	{name = "effects", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of effect specs.", details = {values = {spec = "Effectspec"}}},
+	{name = "effects", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of effect specs.", details = {values = {spec = "EffectSpec"}}},
 	{name = "inherit", type = "list", list = {type = "string", details = {value = {spec = "EffectProfileSpec"}}}, default = {}, description = "List of inherited profiles."}
 })
 
@@ -37,7 +37,7 @@ EffectProfileSpec.get_effect = function(self, name)
 	-- Try primary effects.
 	local ename = self.effects[name]
 	if ename then
-		return Main.specs:find_by_name("Effectspec", ename)
+		return Main.specs:find_by_name("EffectSpec", ename)
 	end
 	-- Try inherited effect.
 	for k,v in pairs(self.inherit) do

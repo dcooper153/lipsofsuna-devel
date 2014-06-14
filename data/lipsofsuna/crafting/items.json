@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "flax",
 		"model": "book-000",
 		"mass": 1,
@@ -11,7 +11,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "hide",
 		"model": "book-000",
 		"icon": "hide1",
@@ -23,7 +23,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wheat",
 		"model": "book-000",
 		"mass": 1,

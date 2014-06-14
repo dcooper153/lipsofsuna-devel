@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "building player",
 		"base": "aer-player",
 		"inventory_items":

@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "candleflame1",
 		"light": true,
 		"light_diffuse": [1,1,1,1],
@@ -16,7 +16,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wooden lantern",
 		"animations_equipped": {"default": "default torch equipped"},
 		"description": "A wooden lantern commonly used as a ligth source",

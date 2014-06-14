@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "companion",
 		"base": "aer",
 		"ai_type": "companion",

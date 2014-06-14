@@ -8,7 +8,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "security robot arm",
 		"model": "musket1",
 		"icon": "musket1",
@@ -30,7 +30,7 @@
 		"mass": 15
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "security turret barrel",
 		"model": "musket1",
 		"icon": "musket1",

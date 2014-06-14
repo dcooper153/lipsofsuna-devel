@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "behead1",
 		"particle": "decapitate1",
 		"particle_life": 5,
@@ -8,14 +8,14 @@
 		"sound": "squish-000"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "growl1",
 		"sound": "growl-000",
 		"sound_pitch_min": 0.9,
 		"sound_pitch_max": 1.1
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "impact1",
 		"particle": "impact1",
 		"particle_life": 5,
@@ -24,7 +24,7 @@
 		"sound_pitch_max": 1.1
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "flesh impact 1",
 		"particle": "blood1",
 		"particle_life": 5,
@@ -33,7 +33,7 @@
 		"sound_pitch_max": 1.1
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "slime impact 1",
 		"particle": "impact1",
 		"particle_life": 5,
@@ -42,7 +42,7 @@
 		"sound_pitch_max": 1.1
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "slime impact 2",
 		"particle": "impact1",
 		"particle_life": 5,
@@ -51,7 +51,7 @@
 		"sound_pitch_max": 1.1
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "metal impact 1",
 		"particle": "impact1",
 		"particle_life": 5,
@@ -60,7 +60,7 @@
 		"sound_pitch_max": 1.1
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "stone impact 1",
 		"particle": "impact1",
 		"particle_life": 5,
@@ -69,7 +69,7 @@
 		"sound_pitch_max": 1.1
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "wood impact 1",
 		"particle": "impact1",
 		"particle_life": 5,
@@ -78,12 +78,12 @@
 		"sound_pitch_max": 1.1
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "swing1",
 		"sound": "swing-000"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "wield1",
 		"sound": "wield-000"
 	},

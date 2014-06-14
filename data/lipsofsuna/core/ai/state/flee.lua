@@ -1,4 +1,6 @@
-Aistatespec{
+local AiStateSpec = require("core/specs/aistate")
+
+AiStateSpec{
 	name = "flee",
 	calculate = function(self)
 		local h = self.object.stats:get_value("health")

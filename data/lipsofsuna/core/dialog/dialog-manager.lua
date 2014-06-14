@@ -63,7 +63,7 @@ DialogManager.execute_custom = function(self, object, user, name)
 	-- Only allow one dialog at a time.
 	if self.dialogs_by_object[object] then return true end
 	-- Find the dialog spec.
-	local spec = Main.specs:find_by_name("Dialogspec", name)
+	local spec = Main.specs:find_by_name("DialogSpec", name)
 	if not spec then return end
 	-- Create the dialog.
 	local dialog = Dialog(object, user or object, spec)

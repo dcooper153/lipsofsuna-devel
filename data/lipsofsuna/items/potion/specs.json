@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "drink potion 1",
 		"sound": "potiondrink1"
 	},
@@ -20,7 +20,7 @@
 		"modes": {"alchemy": true, "metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "empty bottle",
 		"model": "emptypotion1",
 		"categories": {"misc": true},
@@ -37,7 +37,7 @@
 		"modes": {"alchemy": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "cure disease potion",
 		"model": "potion1",
 		"mass": 2,
@@ -59,7 +59,7 @@
 		"modes": {"alchemy": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "health potion",
 		"model": "potion3",
 		"mass": 2,
@@ -82,7 +82,7 @@
 		"modes": {"alchemy": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "mana potion",
 		"model": "potion7",
 		"mass": 2,
@@ -105,7 +105,7 @@
 		"modes": {"alchemy": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "poison potion",
 		"model": "potion2",
 		"mass": 2,

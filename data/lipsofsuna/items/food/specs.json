@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "apple",
 		"categories": {"food": true, "material": true},
 		"mass": 1,
@@ -16,7 +16,7 @@
 		"modes": {"alchemy": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "bread",
 		"categories": {"food": true},
 		"mass": 1,
@@ -32,7 +32,7 @@
 		"modes": {"alchemy": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "cooked meat",
 		"categories": {"food": true},
 		"mass": 1,
@@ -41,7 +41,7 @@
 		"usages": {"eat": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "egg",
 		"categories": {"food": true},
 		"mass": 1,
@@ -58,7 +58,7 @@
 		"modes": {"alchemy": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "long bread",
 		"categories": {"food": true},
 		"mass": 1,
@@ -67,7 +67,7 @@
 		"usages": {"eat": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "berry",
 		"categories": {"food": true, "material": true},
 		"mass": 1,
@@ -83,7 +83,7 @@
 		"modes": {"alchemy": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "cheese",
 		"categories": {"food": true, "material": true},
 		"mass": 1,
@@ -92,7 +92,7 @@
 		"usages": {"eat": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "fruit",
 		"categories": {"food": true, "material": true},
 		"mass": 1,
@@ -101,7 +101,7 @@
 		"usages": {"eat": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "orange",
 		"categories": {"food": true, "material": true},
 		"mass": 1,
@@ -110,7 +110,7 @@
 		"usages": {"eat": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "raw meat",
 		"categories": {"food": true},
 		"mass": 1,
@@ -126,7 +126,7 @@
 		"modes": {"alchemy": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "small cooked meat",
 		"categories": {"food": true},
 		"mass": 1,
@@ -135,7 +135,7 @@
 		"usages": {"eat": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "small raw meat",
 		"categories": {"food": true},
 		"mass": 1,
@@ -151,7 +151,7 @@
 		"modes": {"alchemy": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "rice bowl",
 		"categories": {"food": true},
 		"mass": 1,

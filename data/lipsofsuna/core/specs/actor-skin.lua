@@ -16,7 +16,7 @@ local Spec = require("core/specs/spec")
 local ActorSkinSpec = Spec:register("ActorSkinSpec", "actor skin", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-	{name = "actors", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of actor spec names.", details = {keys = {spec = "Actorspec"}}},
+	{name = "actors", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of actor spec names.", details = {keys = {spec = "ActorSpec"}}},
 	{name = "material", type = "string", default = "animskin1", description = "Material name."},
 	{name = "textures", type = "list", list = {type = "string"}, description = "List of texture names."}
 })

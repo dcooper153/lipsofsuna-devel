@@ -267,7 +267,7 @@ Player.set_spawn_point = function(self, name)
 	if not name or name == "Home" then
 		home = self.account and self.account.spawn_point
 	else
-		local r = Main.specs:find_by_name("Patternspec", spawnpoint)
+		local r = Main.specs:find_by_name("PatternSpec", spawnpoint)
 		if r and not r.spawn_point then r = nil end
 		if r then home = r:get_spawn_point_world() end
 	end

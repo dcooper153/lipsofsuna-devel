@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Actorspec",
+		"type": "ActorSpec",
 		"name": "benchmark test actor",
 		"ai_type": "camper",
 		"base": "aer",

@@ -1,4 +1,6 @@
-Aistatespec{
+local AiStateSpec = require("core/specs/aistate")
+
+AiStateSpec{
 	name = "chat",
 	calculate = function(self)
 		-- Check for an active dialog.

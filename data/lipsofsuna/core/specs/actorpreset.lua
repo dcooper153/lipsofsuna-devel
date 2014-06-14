@@ -6,15 +6,15 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.actorpreset
--- @alias Actorpresetspec
+-- @alias ActorPresetSpec
 
 local Class = require("system/class")
 local ChargenSliderSpec = require("core/specs/chargen-slider")
 local Spec = require("core/specs/spec")
 
 --- TODO:doc
--- @type Actorpresetspec
-Actorpresetspec = Spec:register("Actorpresetspec", "actor preset", {
+-- @type ActorPresetSpec
+local ActorPresetSpec = Spec:register("ActorPresetSpec", "actor preset", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "animation_profile", type = "string", description = "Default animation profile."},
@@ -35,19 +35,19 @@ Actorpresetspec = Spec:register("Actorpresetspec", "actor preset", {
 })
 
 --- Registers an actor preset.
--- @param clss Actorpresetspec class.
+-- @param clss ActorPresetSpec class.
 -- @param args Arguments.
 -- @return New actor preset spec.
-Actorpresetspec.new = function(clss, args)
+ActorPresetSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
 
 --- Gets the spec data in the form suitable for actor creation.
--- @param self Actorpresetspec.
+-- @param self ActorPresetSpec.
 -- @return Table.
-Actorpresetspec.get_actor = function(self)
+ActorPresetSpec.get_actor = function(self)
 	local copy = function(t)
 		local res = {}
 		for k,v in pairs(t) do res[k] = v end
@@ -87,9 +87,9 @@ Actorpresetspec.get_actor = function(self)
 end
 
 --- Gets the spec data in the form suitable for character creation.
--- @param self Actorpresetspec.
+-- @param self ActorPresetSpec.
 -- @return Table.
-Actorpresetspec.get_chargen = function(self)
+ActorPresetSpec.get_chargen = function(self)
 	return {
 		animation_profile = self.animation_profile,
 		body = self:get_chargen_body(),
@@ -108,9 +108,9 @@ Actorpresetspec.get_chargen = function(self)
 end
 
 --- Gets the body in the list form suitable for character creation.
--- @param self Actorpresetspec.
+-- @param self ActorPresetSpec.
 -- @return List of numbers.
-Actorpresetspec.get_chargen_body = function(self)
+ActorPresetSpec.get_chargen_body = function(self)
 	local list = {}
 	local count = 0
 	for k,v in ipairs(Main.specs:find_by_category("ChargenSliderSpec", "body")) do
@@ -126,9 +126,9 @@ Actorpresetspec.get_chargen_body = function(self)
 end
 
 --- Gets the face in the list form suitable for character creation.
--- @param self Actorpresetspec.
+-- @param self ActorPresetSpec.
 -- @return List of numbers.
-Actorpresetspec.get_chargen_face = function(self)
+ActorPresetSpec.get_chargen_face = function(self)
 	local list = {}
 	local count = 0
 	for k,v in ipairs(Main.specs:find_by_category("ChargenSliderSpec", "face")) do
@@ -143,4 +143,4 @@ Actorpresetspec.get_chargen_face = function(self)
 	return list
 end
 
-return Actorpresetspec
+return ActorPresetSpec

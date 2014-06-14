@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "obelisk",
 		"model": "obelisk1",
 		"categories":
@@ -16,13 +16,13 @@
 		}
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "obelisk visit 1",
 		"sound": "obelisk-visit1",
 		"sound_volume": 0.8
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "obelisk visit 2",
 		"sound": "obelisk-visit2",
 		"sound_volume": 1

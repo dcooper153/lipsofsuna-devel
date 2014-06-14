@@ -133,7 +133,7 @@ class Specs(object):
 				if texture:
 					self.textures[texture] = True
 			# Sound effects.
-			if spec['type'] == 'Effectspec':
+			if spec['type'] == 'EffectSpec':
 				sound = spec.get('sound')
 				if sound:
 					self.sounds[sound] = True

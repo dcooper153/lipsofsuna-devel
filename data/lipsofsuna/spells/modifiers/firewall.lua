@@ -18,7 +18,7 @@ FirewallModifier.start = function(modifier, value)
 		local w = ctr + dir * i * Main.terrain.grid_size
 		local p = Utils:find_empty_ground(w)
 		if p then
-			local spec = Main.specs:find_by_name("Spellspec", "firewall1")
+			local spec = Main.specs:find_by_name("SpellSpec", "firewall1")
 			local spell = AreaSpell(modifier.owner.manager)
 			local modifiers = {["burning"] = 3}
 			spell:set_spec(spec)

@@ -31,7 +31,7 @@ Main.messaging:register_message{
 		if player.dead then return end
 		-- Validate the input.
 		for k,v in pairs(enabled) do
-			local skill = Main.specs:find_by_name("Skillspec", k)
+			local skill = Main.specs:find_by_name("SkillSpec", k)
 			if not skill or not Main.unlocks:get("skill", k) then
 				enabled[k] = nil
 			end

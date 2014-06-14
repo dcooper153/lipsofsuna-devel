@@ -6,14 +6,14 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.constraint
--- @alias Constraintspec
+-- @alias ConstraintSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
 --- TODO:doc
--- @type Constraintspec
-Constraintspec = Spec:register("Constraintspec", "constraint", {
+-- @type ConstraintSpec
+local ConstraintSpec = Spec:register("ConstraintSpec", "constraint", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "axis", type = "vector", description = "Axis of rotation for hinges."},
@@ -22,13 +22,13 @@ Constraintspec = Spec:register("Constraintspec", "constraint", {
 })
 
 --- Registers a new constraint spec.
--- @param clss Constraintspec class.
+-- @param clss ConstraintSpec class.
 -- @param args Arguments.
 -- @return New constraint spec.
-Constraintspec.new = function(clss, args)
+ConstraintSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
 
-
+return ConstraintSpec

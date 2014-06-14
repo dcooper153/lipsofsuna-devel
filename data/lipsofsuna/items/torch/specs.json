@@ -1,11 +1,11 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "torch lit 1",
 		"sound": "torchlit1"
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "torchflame1",
 		"light": true,
 		"light_diffuse": [1,1,1,1],
@@ -45,7 +45,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "torch",
 		"animations_equipped":
 		{

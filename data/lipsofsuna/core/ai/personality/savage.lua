@@ -1,4 +1,6 @@
-Personalityspec{
+local PersonalitySpec = require("core/specs/personality")
+
+PersonalitySpec{
 	name = "savage",
 	phrases_angered = {
 		"There you are!",

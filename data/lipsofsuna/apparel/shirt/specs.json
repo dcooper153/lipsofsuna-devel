@@ -9,7 +9,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "shirt",
 		"model": "leggings1",
 		"icon": "leatherarmor1",

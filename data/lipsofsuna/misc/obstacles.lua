@@ -1,7 +1,10 @@
+local EffectSpec = require("core/specs/effect")
+local ObstacleSpec = require("core/specs/obstacle")
+
 ------------------------------------------------------------------------------
 -- Quest obstacles
 
-Obstaclespec{
+ObstacleSpec{
 	name = "wanted poster",
 	model = "wantedposter1",
 	categories = {["special"] = true},
@@ -10,14 +13,14 @@ Obstaclespec{
 ------------------------------------------------------------------------------
 -- Map objects
 
-Effectspec{
+EffectSpec{
 	name = "lamppostlight1",
 	light = true,
 	light_diffuse = {1,0.7,0.6,1},
 	light_equation = {0.1,0.1,0.01},
 	node = "#root"}
 
-Obstaclespec{
+ObstacleSpec{
 	name = "wooden fence",
 	model = "fence1",
 	categories = {["prop"] = true},
@@ -31,7 +34,7 @@ Obstaclespec{
 	health = 50,
 	interactive = false}
 
-Obstaclespec{
+ObstacleSpec{
 	name = "lamppost 1",
 	model = "lamppost01",
 	categories = {["prop"] = true},

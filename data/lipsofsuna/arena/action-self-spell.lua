@@ -1,9 +1,10 @@
+local ActionSpec = require("core/specs/action")
 local Damage = require("arena/damage")
 
 -- Spell on self.
 -- At the specific time into the attack animation, the effects of the
 -- feat are applied to the attacker herself.
-Actionspec{
+ActionSpec{
 	name = "self spell",
 	categories =
 	{

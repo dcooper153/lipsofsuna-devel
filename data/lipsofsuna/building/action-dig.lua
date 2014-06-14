@@ -1,6 +1,7 @@
+local ActionSpec = require("core/specs/action")
 local Physics = require("system/physics")
 
-Actionspec{
+ActionSpec{
 	name = "dig",
 	start = function(action, move)
 		if action.object.cooldown then return end

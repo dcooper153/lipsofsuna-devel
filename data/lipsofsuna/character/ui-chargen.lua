@@ -147,7 +147,7 @@ Ui:add_widget{
 		return UiRadioMenu("Head style", function(self)
 			-- Find and sort the head styles.
 			local race = Client.chargen:get_race()
-			local spec = Main.specs:find_by_name("Actorspec", race)
+			local spec = Main.specs:find_by_name("ActorSpec", race)
 			if not spec.head_styles then return end
 			local lst = {}
 			for k,v in pairs(spec.head_styles) do
@@ -359,7 +359,7 @@ Ui:add_widget{
 		return UiRadioMenu("Animation profile", function(self)
 			-- Find and sort the profiles.
 			local race = Client.chargen:get_race()
-			local spec = Main.specs:find_by_name("Actorspec", race)
+			local spec = Main.specs:find_by_name("ActorSpec", race)
 			if not spec.animations then return end
 			local lst = {}
 			for k,v in pairs(spec.animations) do

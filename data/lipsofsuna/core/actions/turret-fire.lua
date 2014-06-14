@@ -1,6 +1,7 @@
+local ActionSpec = require("core/specs/action")
 local ProjectileController = require("arena/projectile-controller")
 
-Actionspec{
+ActionSpec{
 	name = "turret fire",
 	categories = { ["ranged"] = true },
 	start = function(action)

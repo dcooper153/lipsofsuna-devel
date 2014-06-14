@@ -6,18 +6,18 @@
 -- License, or (at your option) any later version.
 --
 -- @module core.specs.pattern
--- @alias Patternspec
+-- @alias PatternSpec
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
 
 --- TODO:doc
--- @type Patternspec
-Patternspec = Spec:register("Patternspec", "pattern", {
+-- @type PatternSpec
+local PatternSpec = Spec:register("Patternspec", "pattern", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "size", type = "vector", default = Vector(4,4,4), decription = "Pattern size in tiles."},
-	{name = "distance_pattern", type = "string", decription = "Position reference pattern.", details = {spec = "Patternspec"}},
+	{name = "distance_pattern", type = "string", decription = "Position reference pattern.", details = {spec = "PatternSpec"}},
 	{name = "distance_min", type = "number", default = 11, decription = "Minimum distance to the reference pattern."},
 	{name = "distance_max", type = "number", default = 51, decription = "Maximum distance to the reference pattern."},
 	{name = "overworld", type = "boolean", default = false, decription = "True to allow generation in the overworld."},
@@ -32,19 +32,19 @@ Patternspec = Spec:register("Patternspec", "pattern", {
 })
 
 --- Creates a new pattern specification.
--- @param clss Patternspec class.
+-- @param clss PatternSpec class.
 -- @param args Arguments.
 -- @return New pattern spec.
-Patternspec.new = function(clss, args)
+PatternSpec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	return self
 end
 
 --- Finds patterns that have a spawn point.
--- @param self Patternspec class.
+-- @param self PatternSpec class.
 -- @return Table of patterns.
-Patternspec.find_spawn_points = function(self)
+PatternSpec.find_spawn_points = function(self)
 	local list = {}
 	for k,v in pairs(self.dict_id) do
 		if v.spawn_point then
@@ -55,15 +55,15 @@ Patternspec.find_spawn_points = function(self)
 end
 
 --- Writes the pattern to a string.
--- @param self Patternspec.
+-- @param self PatternSpec.
 -- @return String.
-Patternspec.write = function(self)
+PatternSpec.write = function(self)
 	return self.introspect:write_str(self)
 end
 
-Patternspec.get_spawn_point_world = function(self)
+PatternSpec.get_spawn_point_world = function(self)
 	if not self.spawn_point then return end
 	return (self.position + self.spawn_point) * Voxel.tile_size
 end
 
-
+return PatternSpec

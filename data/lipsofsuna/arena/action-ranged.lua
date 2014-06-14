@@ -1,7 +1,8 @@
+local ActionSpec = require("core/specs/action")
 local Damage = require("arena/damage")
 local ProjectileController = require("arena/projectile-controller")
 
-Actionspec{
+ActionSpec{
 	name = "ranged",
 	categories = { ["ranged"] = true },
 	start = function(action, move)

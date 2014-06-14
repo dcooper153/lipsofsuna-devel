@@ -133,7 +133,7 @@ UnlockManager.unlock_random = function(self)
 	-- All skill types that have a description are assumed to be used by
 	-- players. Such a skill can be unlocked if it hasn't been unlocked
 	-- already but all its requirements have been unlocked.
-	for k,v in pairs(Main.specs:get_spec_names("Skillspec")) do
+	for k,v in pairs(Main.specs:get_spec_names("SkillSpec")) do
 		if v.description and not self:get("skill", k) then
 			local deps = v:find_direct_requirements()
 			local pass = true

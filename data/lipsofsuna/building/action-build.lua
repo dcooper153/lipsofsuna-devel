@@ -1,6 +1,7 @@
+local ActionSpec = require("core/specs/action")
 local Physics = require("system/physics")
 
-Actionspec{
+ActionSpec{
 	name = "build",
 	categories = { ["build"] = true },
 	start = function(action, move)

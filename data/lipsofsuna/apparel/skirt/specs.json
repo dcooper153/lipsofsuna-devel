@@ -9,7 +9,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "skirt",
 		"model": "book-000",
 		"icon": "leatherarmor1",

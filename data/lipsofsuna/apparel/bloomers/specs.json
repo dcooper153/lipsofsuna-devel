@@ -12,7 +12,7 @@
 		"materials": {"hide": 1}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "bloomers",
 		"model": "bloomers1",
 		"icon": "leatherarmor1",
@@ -35,7 +35,7 @@
 		"mass": 5
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "bloomers top",
 		"model": "bloomerstop1",
 		"icon": "leatherarmor1",

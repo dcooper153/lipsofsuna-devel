@@ -6,7 +6,7 @@
 		"materials": {"hide": 4}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "leather pants",
 		"model": "book-000",
 		"icon": "leatherarmor1",

@@ -7,7 +7,7 @@
 		"modes": {"wood": true, "default": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wooden club",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},

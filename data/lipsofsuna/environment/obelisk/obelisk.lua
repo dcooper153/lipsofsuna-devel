@@ -1,4 +1,6 @@
-Dialogspec{name = "obelisk", commands = {
+local DialogSpec = require("core/specs/dialog")
+
+DialogSpec{name = "obelisk", commands = {
 	{"branch", check = {{"var", "examined"}},
 		{"effect", "obelisk visit 2"},
 		{"info", "As you examine the already familiar obelisk, you are reminded of your past discoveries."},

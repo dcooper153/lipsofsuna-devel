@@ -90,7 +90,7 @@ end
 -- @param name Effect spec name.
 EffectManager.play_global = function(self, name)
 	-- Find the effect.
-	local effect = Main.specs:find_by_name("Effectspec", name)
+	local effect = Main.specs:find_by_name("EffectSpec", name)
 	if not effect then return end
 	-- Create the effect object.
 	if effect.sound then
@@ -113,7 +113,7 @@ end
 
 EffectManager.play_object = function(self, name, object, node)
 	-- Find the effect.
-	local effect = Main.specs:find_by_name("Effectspec", name)
+	local effect = Main.specs:find_by_name("EffectSpec", name)
 	if not effect then return end
 	-- Find the node.
 	local p
@@ -149,7 +149,7 @@ end
 
 EffectManager.play_world = function(self, name, position)
 	-- Find the effect.
-	local effect = Main.specs:find_by_name("Effectspec", name)
+	local effect = Main.specs:find_by_name("EffectSpec", name)
 	if not effect then return end
 	-- Create the effect object.
 	if effect.particle then

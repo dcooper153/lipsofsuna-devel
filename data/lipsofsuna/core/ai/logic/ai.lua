@@ -122,7 +122,7 @@ Ai.calculate_ranged_tilt = function(self)
 	-- Get the ammo type.
 	local weapon = self.object:get_weapon()
 	if not weapon or not weapon.spec.ammo_type then return Quaternion() end
-	local spec = Main.specs:find_by_name("Itemspec", weapon.spec.ammo_type)
+	local spec = Main.specs:find_by_name("ItemSpec", weapon.spec.ammo_type)
 	if not spec then return Quaternion() end
 	-- Calculate distance to the target.
 	local diff = self.target:get_position() + self.target.physics:get_center_offset() - self.object:get_position() - self.object.spec.aim_ray_center
@@ -243,7 +243,7 @@ Ai.find_best_action = function(self, args)
 	local process_spec = function(spec)
 		if not spec.actions then return end
 		for k,name in pairs(spec.actions) do
-			local aspec = Main.specs:find_by_name("Actionspec", name)
+			local aspec = Main.specs:find_by_name("ActionSpec", name)
 			if aspec and aspec.categories[args.category] and not actions[aspec] then
 				local score = process_action(aspec)
 				if score then

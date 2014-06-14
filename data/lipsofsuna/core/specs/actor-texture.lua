@@ -16,7 +16,7 @@ local Spec = require("core/specs/spec")
 local ActorTextureSpec = Spec:register("ActorTextureSpec", "actor skin", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-	{name = "actors", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of actor spec names.", details = {keys = {spec = "Actorspec"}}},
+	{name = "actors", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of actor spec names.", details = {keys = {spec = "ActorSpec"}}},
 	{name = "blit_dst", type = "list", list = {type = "number"}, description = "Blit destination point in pixels"},
 	{name = "blit_mode", type = "string", description = "Blit mode name."},
 	{name = "blit_texture", type = "string", description = "Texture name."},

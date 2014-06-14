@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "spell table",
 		"categories":
 		{
@@ -17,7 +17,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "spellbook of fireball",
 		"icon": "scroll1",
 		"model": "book-000",
@@ -33,7 +33,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "spellbook of healing",
 		"icon": "scroll1",
 		"model": "book-000",
@@ -49,7 +49,7 @@
 		}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "spellbook of poison",
 		"icon": "scroll1",
 		"model": "book-000",

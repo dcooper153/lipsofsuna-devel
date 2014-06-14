@@ -1,4 +1,6 @@
-Dialogspec{
+local DialogSpec = require("core/specs/dialog")
+
+DialogSpec{
 	name = "portal of midguard",
 	commands = {
 		{"branch", cond = "portal of midguard activated",

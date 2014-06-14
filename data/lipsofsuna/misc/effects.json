@@ -1,12 +1,12 @@
 [
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "quest1",
 		"sound": "quest1",
 		"sound_positional": false
 	},
 	{
-		"type": "Effectspec",
+		"type": "EffectSpec",
 		"name": "step1",
 		"sound": "stepdirt_2",
 		"sound_volume": 0.6

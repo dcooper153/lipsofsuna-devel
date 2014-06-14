@@ -55,7 +55,7 @@
 	},
 
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "adamantium",
 		"categories": {"material": true},
 		"actions": {"right": "build"},
@@ -69,7 +69,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "aquanite ore",
 		"categories": {"material": true},
 		"actions": {"right": "build"},
@@ -83,7 +83,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "crimson ore",
 		"categories": {"material": true},
 		"actions": {"right": "build"},
@@ -97,7 +97,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "ferrostone",
 		"categories": {"build": true, "material": true},
 		"actions": {"right": "build"},
@@ -111,7 +111,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "granite stone",
 		"categories": {"build": true, "material": true},
 		"actions": {"right": "build"},
@@ -127,7 +127,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "sand chunk",
 		"categories": {"build": true, "material": true},
 		"actions": {"right": "build"},
@@ -143,7 +143,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "soil chunk",
 		"categories": {"build": true, "material": true},
 		"actions": {"right": "build"},

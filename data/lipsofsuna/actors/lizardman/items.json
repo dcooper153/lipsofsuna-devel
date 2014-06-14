@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "lizard scale",
 		"icon": "bone1",
 		"model": "book-000",

@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "adamantium ingot",
 		"categories":
 		{
@@ -13,7 +13,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "aquanite ingot",
 		"categories":
 		{
@@ -26,7 +26,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "crimson ingot",
 		"categories":
 		{
@@ -39,7 +39,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "glass ingot",
 		"categories":
 		{
@@ -52,7 +52,7 @@
 		"stacking": true
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "iron ingot",
 		"categories":
 		{

@@ -16,7 +16,7 @@ local Action = Class("Action")
 
 --- Creates a new action.
 -- @param clss Action class.
--- @param spec Actionspec.
+-- @param spec ActionSpec.
 -- @param object Object.
 -- @return New action.
 Action.new = function(clss, spec, object)

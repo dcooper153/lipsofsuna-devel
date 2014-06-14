@@ -12,7 +12,7 @@
 		"materials": {"hide": 3}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "dress",
 		"model": "chinadress1",
 		"icon": "cloth1",
@@ -35,7 +35,7 @@
 		"mass": 1
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "sexy dress",
 		"model": "chinadress1",
 		"icon": "cloth1",

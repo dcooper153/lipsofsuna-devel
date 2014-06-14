@@ -1,6 +1,6 @@
 [
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "ruby",
 		"icon": "gem1",
 		"model": "gem-000",

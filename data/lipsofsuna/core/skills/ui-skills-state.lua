@@ -15,7 +15,7 @@ Ui:add_state{
 		for name,status in pairs(status) do
 			local unlocked = Client.data.unlocks:get("skill", name)
 			if unlocked and status ~= "incompatible" then
-				local spec = Main.specs:find_by_name("Skillspec", name)
+				local spec = Main.specs:find_by_name("SkillSpec", name)
 				local active = (status == "active")
 				local activable = (status == "activable")
 				table.insert(skills, {name, spec, active or activable, active})

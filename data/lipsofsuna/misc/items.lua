@@ -15,6 +15,7 @@
 -- non generating admin items: "weapons", "logs", "health jar", "magic jar"
 
 local CraftingRecipeSpec = require("core/specs/crafting-recipe")
+local ItemSpec = require("core/specs/item")
 
 ------------------------------------------------------------------------------
 -- Decorations
@@ -25,7 +26,7 @@ CraftingRecipeSpec{
 	materials = {["log"] = 7},
 	modes = {["wood"] = true}}
 
-Itemspec{
+ItemSpec{
 	name = "broken wooden fence",
 	model = "fence1",
 	icon = "chest1", -- FIXME

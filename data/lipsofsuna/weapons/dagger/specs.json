@@ -7,7 +7,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "adamantium dagger",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -27,7 +27,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "aquanite dagger",
 		"model": "dagger1",
 		"categories": {"melee": true, "weapon": true},
@@ -49,7 +49,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "crimson dagger",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -71,7 +71,7 @@
 		"modes": {"metal": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "iron dagger",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -93,7 +93,7 @@
 		"modes": {"metal": true, "default": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "stone dagger",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},
@@ -115,7 +115,7 @@
 		"modes": {"wood": true, "default": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wooden dagger",
 		"categories": {"melee": true, "weapon": true},
 		"actions": {"right": "attack", "left": "block weapon"},

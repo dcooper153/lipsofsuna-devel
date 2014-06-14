@@ -6,7 +6,7 @@
 		"materials": {"hide": 4}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "leather leggings",
 		"model": "leggings1",
 		"icon": "leatherarmor1",

@@ -7,7 +7,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "bookcase",
 		"model": "bookcase1",
 		"icon": "chest1",
@@ -30,7 +30,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "chair",
 		"icon": "chest1",
 		"model": "chair1",
@@ -40,7 +40,7 @@
 		"stacking": false
 	},
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "shelf",
 		"categories": {"furniture": true},
 		"collision_mask": 65535,
@@ -57,7 +57,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wood bench",
 		"model": "bench1",
 		"icon": "chest1",
@@ -74,7 +74,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wood chair",
 		"model": "chair2",
 		"icon": "chest1",
@@ -91,7 +91,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "wood table",
 		"model": "table1",
 		"icon": "chest1",

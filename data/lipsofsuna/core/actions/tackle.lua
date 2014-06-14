@@ -1,6 +1,7 @@
+local ActionSpec = require("core/specs/action")
 local Damage = require("arena/damage")
 
-Actionspec{
+ActionSpec{
 	name = "tackle",
 	categories = { ["melee"] = true },
 	start = function(action, move)

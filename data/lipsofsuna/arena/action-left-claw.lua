@@ -1,7 +1,8 @@
+local ActionSpec = require("core/specs/action")
 local Damage = require("arena/damage")
 local Physics = require("system/physics")
 
-Actionspec{
+ActionSpec{
 	name = "left claw",
 	categories = { ["melee"] = true },
 	start = function(action)

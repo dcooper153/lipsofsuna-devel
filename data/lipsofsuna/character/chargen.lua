@@ -46,7 +46,7 @@ Chargen.init = function(self, standalone)
 	self.data.active = true
 	-- Create the object.
 	self.data.object = Actor(Main.objects)
-	self.data.object:set_spec(Main.specs:find_by_name("Actorspec", "aer-player"))
+	self.data.object:set_spec(Main.specs:find_by_name("ActorSpec", "aer-player"))
 	self.data.object:set_position(Vector(1, 1, 1))
 	self.data.object:randomize()
 	self.data.object:set_visible(true)
@@ -178,7 +178,7 @@ end
 Chargen.save = function(self)
 	-- Set the simple fields.
 	local preset = {
-		type = "Actorpresetspec",
+		type = "ActorPresetSpec",
 		animation_profile = self.char.animation_profile,
 		body = {},
 		eye_color = self.char.eye_color,
@@ -220,7 +220,7 @@ Chargen.update = function(self, secs)
 	-- Build models and textures.
 	if self.data.update_needed then
 		self.data.update_needed = nil
-		local spec = Main.specs:find_by_name("Actorspec", self.char.race .. "-player")
+		local spec = Main.specs:find_by_name("ActorSpec", self.char.race .. "-player")
 		local data = self:get_build_data()
 		self.data.object:set_spec(spec)
 		self.data.object.physics:set_collision_group(PhysicsConsts.GROUP_PLAYERS)
@@ -306,7 +306,7 @@ end
 -- @param self Chargen.
 -- @return Table.
 Chargen.get_build_data = function(self)
-	local spec = Main.specs:find_by_name("Actorspec", self.char.race .. "-player")
+	local spec = Main.specs:find_by_name("ActorSpec", self.char.race .. "-player")
 	return {
 		beheaded = false,
 		body_scale = self.char.height,
@@ -540,7 +540,7 @@ end
 -- @return Indexed list of presets.
 Chargen.get_presets = function(self)
 	local presets = {}
-	for k,v in pairs(Actorpresetspec.dict_name) do
+	for k,v in pairs(ActorPresetSpec.dict_name) do
 		if v.playable then
 			table.insert(presets, v)
 		end

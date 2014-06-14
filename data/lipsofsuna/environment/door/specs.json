@@ -7,7 +7,7 @@
 		"modes": {"wood": true}
 	},
 	{
-		"type": "Itemspec",
+		"type": "ItemSpec",
 		"name": "broken door",
 		"model": "door1",
 		"icon": "chest1",
@@ -17,13 +17,13 @@
 		"stacking": false
 	},
 	{
-		"type": "Constraintspec",
+		"type": "ConstraintSpec",
 		"name": "doorhinge1",
 		"constraint": "hinge",
 		"offset": [0,1.333,0]
 	},
 	{
-		"type": "Obstaclespec",
+		"type": "ObstacleSpec",
 		"name": "wooden door",
 		"model": "door1",
 		"categories": {"prop": true},

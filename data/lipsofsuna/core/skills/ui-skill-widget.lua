@@ -18,7 +18,7 @@ local UiSkillWidget = Class("UiSkillWidget", UiMenu)
 
 --- Creates a new skill widget.
 -- @param clss UiSkillWidget class.
--- @param skill Skillspec.
+-- @param skill SkillSpec.
 -- @param active True if the requirements are met. False otherwise.
 -- @param value True if enabled by the user. False otherwise.
 -- @return UiSkillWidget.
