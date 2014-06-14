@@ -73,7 +73,7 @@ Crafting.update = function(self, secs)
 	-- Initialize the player.
 	if not self.player then
 		self.player = Player(Main.objects)
-		self.player:set_spec(Actorspec:find_by_name("crafting player"))
+		self.player:set_spec(Main.specs:find_by_name("Actorspec", "crafting player"))
 		self.player:randomize()
 		self.player.get_admin = function() return true end --FIXME
 		self.player:set_position(Vector(500,101,500))
@@ -86,27 +86,27 @@ Crafting.update = function(self, secs)
 		self.player:calculate_animation()
 
 		local alchemy = Obstacle(Main.objects)
-		alchemy:set_spec(Obstaclespec:find_by_name("alchemy table"))
+		alchemy:set_spec(Main.specs:find_by_name("Obstaclespec", "alchemy table"))
 		alchemy:set_position(Vector(495,100.1,500))
 		alchemy:set_visible(true)
 
 		local anvil = Obstacle(Main.objects)
-		anvil:set_spec(Obstaclespec:find_by_name("anvil"))
+		anvil:set_spec(Main.specs:find_by_name("Obstaclespec", "anvil"))
 		anvil:set_position(Vector(500,100.1,495))
 		anvil:set_visible(true)
 
 		local spelltable = Obstacle(Main.objects)
-		spelltable:set_spec(Obstaclespec:find_by_name("spell table"))
+		spelltable:set_spec(Main.specs:find_by_name("Obstaclespec", "spell table"))
 		spelltable:set_position(Vector(500,100.1,505))
 		spelltable:set_visible(true)
 
 		local workbench = Obstacle(Main.objects)
-		workbench:set_spec(Obstaclespec:find_by_name("workbench"))
+		workbench:set_spec(Main.specs:find_by_name("Obstaclespec", "workbench"))
 		workbench:set_position(Vector(505,100.1,500))
 		workbench:set_visible(true)
 
 		local chest = Item(Main.objects)
-		chest:set_spec(Itemspec:find_by_name("crafting chest"))
+		chest:set_spec(Main.specs:find_by_name("Itemspec", "crafting chest"))
 		chest:set_position(Vector(505,105.1,510))
 		chest:set_visible(true)
 		chest:randomize()

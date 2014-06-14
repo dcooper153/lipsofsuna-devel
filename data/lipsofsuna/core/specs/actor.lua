@@ -131,7 +131,7 @@ Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "water_friction", type = "number", default = 0.8, description = "How much being in water slows the actor down."},
 	{name = "water_gravity", type = "vector", default = Vector(0,-1), description = "The gravity of the actor in water."}
 })
-Actorspec.introspect.base = function(spec) return Actorspec:find_by_name(spec.base) end
+Actorspec.introspect.base = function(spec) return Main.specs:find_by_name("Actorspec", spec.base) end
 
 --- Registers a new actor spec.
 -- @param clss Actorspec class.
@@ -188,7 +188,7 @@ Actorspec.calculate_abilities = function(self)
 	self.can_cast_self = false
 	self.can_cast_touch = false
 	for k,v in pairs(self.actions) do
-		local action = Actionspec:find_by_name(v)
+		local action = Main.specs:find_by_name("Actionspec", v)
 		if not action then
 			print(string.format("WARNING: missing action %q while initializing actor %q", v, self.name))
 		else

@@ -2,7 +2,7 @@ local BuildingUtils = require("building/building-utils")
 local ModifierSpec = require("core/specs/modifier")
 
 -- Dig terrain.
-local DigModifier = ModifierSpec:find_by_name("dig")
+local DigModifier = Main.specs:find_by_name("ModifierSpec", "dig")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

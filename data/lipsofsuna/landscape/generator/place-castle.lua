@@ -107,7 +107,7 @@ PlaceCastle.generate = function(self, chunk, params)
 	-- TODO
 	local w = chunk.manager.chunk_size
 	local t = chunk.manager.terrain
-	local ms = TerrainMaterialSpec:find_by_name("brick")
+	local ms = Main.specs:find_by_name("TerrainMaterialSpec", "brick")
 	local m = ms and ms.id
 	local chk = TerrainChunk(w)
 	-- Create the floor.

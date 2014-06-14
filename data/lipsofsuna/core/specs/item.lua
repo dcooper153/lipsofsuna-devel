@@ -236,7 +236,7 @@ Itemspec.get_trading_value = function(self)
 			self.value = value
 			local awg = 0
 			for k,v in pairs(req) do
-				local spec = Itemspec:find_by_name(v)
+				local spec = Main.specs:find_by_name("Itemspec", v)
 				if spec then awg = awg + spec:get_trading_value() end
 			end
 			awg = awg / #req
@@ -254,7 +254,7 @@ end
 Itemspec.get_use_actions = function(self)
 	local res = {}
 	for k,v in pairs(self.usages) do
-		local a = Actionspec:find_by_name(k)
+		local a = Main.specs:find_by_name("Actionspec", k)
 		if a then table.insert(res, a) end
 	end
 	return res

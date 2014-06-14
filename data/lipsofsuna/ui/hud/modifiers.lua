@@ -41,7 +41,7 @@ Hudmodifiers.add = function(self, name, time)
 		icon.time = time
 	else
 		local id = #self.dict_id + 1
-		local effect = ModifierSpec:find_by_name(name)
+		local effect = Main.specs:find_by_name("ModifierSpec", name)
 		local icon_name = effect and effect.icon or "missing1"
 		local icon_table = {id = id, icon = icon_name, name = name, time = time}
 		self.dict_id[id] = icon_table

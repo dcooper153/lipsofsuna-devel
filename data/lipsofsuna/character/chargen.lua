@@ -47,7 +47,7 @@ Chargen.init = function(self, standalone)
 	self.data.active = true
 	-- Create the object.
 	self.data.object = Actor(Main.objects)
-	self.data.object:set_spec(Actorspec:find_by_name("aer-player"))
+	self.data.object:set_spec(Main.specs:find_by_name("Actorspec", "aer-player"))
 	self.data.object:set_position(Vector(1, 1, 1))
 	self.data.object:randomize()
 	self.data.object:set_visible(true)
@@ -221,7 +221,7 @@ Chargen.update = function(self, secs)
 	-- Build models and textures.
 	if self.data.update_needed then
 		self.data.update_needed = nil
-		local spec = Actorspec:find_by_name(self.char.race .. "-player")
+		local spec = Main.specs:find_by_name("Actorspec", self.char.race .. "-player")
 		local data = self:get_build_data()
 		self.data.object:set_spec(spec)
 		self.data.object.physics:set_collision_group(PhysicsConsts.GROUP_PLAYERS)

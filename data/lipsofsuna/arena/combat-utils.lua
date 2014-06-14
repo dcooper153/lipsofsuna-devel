@@ -78,7 +78,7 @@ CombatUtils.apply_damage_to_terrain = function(self, caster, tile, damage, point
 	end
 	-- Apply the damage.
 	for name,value in pairs(damage.modifiers) do
-		local spec = ModifierSpec:find_by_name(name)
+		local spec = Main.specs:find_by_name("ModifierSpec", name)
 		if spec then
 			local modifier = Modifier(spec, nil, caster, point)
 			modifier:start_terrain(value)
@@ -139,7 +139,7 @@ end
 CombatUtils.count_modifier_stats = function(self, modifiers)
 	local required = {}
 	for k,v in pairs(modifiers) do
-		local spec = ModifierSpec:find_by_name(k)
+		local spec = Main.specs:find_by_name("ModifierSpec", k)
 		if spec then
 			spec:get_required_stats(required)
 		end
@@ -248,7 +248,7 @@ CombatUtils.get_combat_action_for_actor = function(self, actor, hand)
 	-- Check for actor actions.
 	local name = actor.spec.actions[hand]
 	if not name then return end
-	return Actionspec:find_by_name(name)
+	return Main.specs:find_by_name("Actionspec", name)
 end
 
 --- Gets the spell modifiers for the item.
@@ -272,7 +272,7 @@ CombatUtils.get_spell_modifiers_for_item = function(self, item)
 	local found
 	local modifiers = {}
 	for k,v in pairs(names) do
-		local spec = ModifierSpec:find_by_name(k)
+		local spec = Main.specs:find_by_name("ModifierSpec", k)
 		if spec then
 			modifiers[k] = v
 			found = true
@@ -292,13 +292,13 @@ CombatUtils.get_weapon_action_for_actor = function(self, actor, hand)
 	if not weapon then return end
 	-- Check for enchanted actions.
 	if weapon.spell_action then
-		local spec = Actionspec:find_by_name(weapon.spell_action)
+		local spec = Main.specs:find_by_name("Actionspec", weapon.spell_action)
 		if spec then return spec end
 	end
 	-- Check for weapon actions.
 	local name = weapon.spec.actions[hand]
 	if not name then return end
-	return Actionspec:find_by_name(name)
+	return Main.specs:find_by_name("Actionspec", name)
 end
 
 --- Calculates the armor class of the item.

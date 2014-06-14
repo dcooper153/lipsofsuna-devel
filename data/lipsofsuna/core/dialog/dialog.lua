@@ -506,9 +506,9 @@ Dialog.execute = function(self)
 		end,
 		["spawn object"] = function(vm, c)
 			-- Spawn the object.
-			local spec1 = Actorspec:find_by_name(c[2])
-			local spec2 = Itemspec:find_by_name(c[2])
-			local spec3 = Obstaclespec:find_by_name(c[2])
+			local spec1 = Main.specs:find_by_name("Actorspec", c[2])
+			local spec2 = Main.specs:find_by_name("Itemspec", c[2])
+			local spec3 = Main.specs:find_by_name("Obstaclespec", c[2])
 			local object
 			if spec1 then
 				object = Actor(self.object.manager)

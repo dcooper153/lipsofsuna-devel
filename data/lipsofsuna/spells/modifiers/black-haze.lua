@@ -3,7 +3,7 @@ local Modifier = require("core/server/modifier")
 local ModifierSpec = require("core/specs/modifier")
 
 -- Summon plagued beasts.
-local BlackHazeModifier = ModifierSpec:find_by_name("black haze")
+local BlackHazeModifier = Main.specs:find_by_name("ModifierSpec", "black haze")
 
 --- Gets the attribute modifications of the modifier.
 -- @param modifier Modifier.

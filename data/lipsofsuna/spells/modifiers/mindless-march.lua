@@ -1,6 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local MindlessMarchModifier = ModifierSpec:find_by_name("mindless march")
+local MindlessMarchModifier = Main.specs:find_by_name("ModifierSpec", "mindless march")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

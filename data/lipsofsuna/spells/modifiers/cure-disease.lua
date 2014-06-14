@@ -1,6 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local CureDiseaseModifier = ModifierSpec:find_by_name("cure disease")
+local CureDiseaseModifier = Main.specs:find_by_name("ModifierSpec", "cure disease")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

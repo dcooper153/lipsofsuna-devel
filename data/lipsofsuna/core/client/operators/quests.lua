@@ -177,7 +177,7 @@ end
 Operators.quests.get_quests = function(self)
 	local quests = {}
 	for name,quest in pairs(self.data.quests) do
-		local spec = QuestSpec:find_by_name(name)
+		local spec = Main.specs:find_by_name("QuestSpec", name)
 		table.insert(quests, {spec, quest})
 	end
 	table.sort(quests, function(a, b) return a[1].name < b[1].name end)

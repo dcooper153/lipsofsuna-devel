@@ -243,7 +243,7 @@ Ai.find_best_action = function(self, args)
 	local process_spec = function(spec)
 		if not spec.actions then return end
 		for k,name in pairs(spec.actions) do
-			local aspec = Actionspec:find_by_name(name)
+			local aspec = Main.specs:find_by_name("Actionspec", name)
 			if aspec and aspec.categories[args.category] and not actions[aspec] then
 				local score = process_action(aspec)
 				if score then

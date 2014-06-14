@@ -19,7 +19,7 @@ Actionspec{
 		-- Replace the potion with an empty bottle.
 		item:subtract(1)
 		local item1 = Item(action.object.manager)
-		item1:set_spec(Itemspec:find_by_name("empty bottle"))
+		item1:set_spec(Main.specs:find_by_name("Itemspec", "empty bottle"))
 		action.object.inventory:merge_or_drop_object(item1)
 		-- Log the action.
 		if Server.events then

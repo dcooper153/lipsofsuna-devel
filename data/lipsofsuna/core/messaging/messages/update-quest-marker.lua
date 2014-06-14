@@ -17,7 +17,7 @@ Main.messaging:register_message{
 	end,
 	server_to_client_handle = function(self, name, marker)
 		-- Find the quest spec.
-		local spec = QuestSpec:find_by_name(name)
+		local spec = Main.specs:find_by_name("QuestSpec", name)
 		if not spec then return end
 		-- Find or create the quest.
 		local quest = Operators.quests:get_quest_by_name(name)

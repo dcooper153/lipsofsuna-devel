@@ -1,6 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local HomeModifier = ModifierSpec:find_by_name("home")
+local HomeModifier = Main.specs:find_by_name("ModifierSpec", "home")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

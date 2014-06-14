@@ -1,6 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local RestoreHealthModifier = ModifierSpec:find_by_name("restore health")
+local RestoreHealthModifier = Main.specs:find_by_name("ModifierSpec", "restore health")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

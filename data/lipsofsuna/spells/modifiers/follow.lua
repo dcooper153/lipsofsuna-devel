@@ -1,6 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local FollowModifier = ModifierSpec:find_by_name("follow")
+local FollowModifier = Main.specs:find_by_name("ModifierSpec", "follow")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

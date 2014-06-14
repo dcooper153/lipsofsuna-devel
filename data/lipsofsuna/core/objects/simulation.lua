@@ -56,7 +56,7 @@ end
 -- @return Action if created an effect-over-time one. Nil otherwise.
 SimulationObject.action = function(self, name, ...)
 	-- Find the action spec.
-	local spec = Actionspec:find_by_name(name)
+	local spec = Main.specs:find_by_name("Actionspec", name)
 	if not spec then return end
 	if not spec.start then return end
 	-- Start the action.

@@ -1,6 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local BurningModifier = ModifierSpec:find_by_name("burning")
+local BurningModifier = Main.specs:find_by_name("ModifierSpec", "burning")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

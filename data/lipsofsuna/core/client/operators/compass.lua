@@ -6,7 +6,7 @@ local QuestSpec = require("core/specs/quest")
 Client.get_active_marker = function(self)
 	if not self.data.quest.shown then return end
 	if not self.player_object then return end
-	local quest = QuestSpec:find_by_name(self.data.quest.shown)
+	local quest = Main.specs:find_by_name("QuestSpec", self.data.quest.shown)
 	if not quest or not quest.marker then return end
 	return Main.markers:find_by_name(quest.marker)
 end

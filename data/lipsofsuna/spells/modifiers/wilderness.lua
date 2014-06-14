@@ -3,7 +3,7 @@ local Obstacle = require("core/objects/obstacle")
 local TerrainMaterialSpec = require("core/specs/terrain-material")
 
 -- Spawn trees and plants.
-local WildernessModifier = ModifierSpec:find_by_name("wilderness")
+local WildernessModifier = Main.specs:find_by_name("ModifierSpec", "wilderness")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

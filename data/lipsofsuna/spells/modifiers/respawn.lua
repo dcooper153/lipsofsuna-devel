@@ -1,7 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 local Vector = require("system/math/vector")
 
-local RespawnModifier = ModifierSpec:find_by_name("respawn")
+local RespawnModifier = Main.specs:find_by_name("ModifierSpec", "respawn")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

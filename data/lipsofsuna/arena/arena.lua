@@ -68,7 +68,7 @@ Arena.update = function(self, secs)
 	-- Initialize the player.
 	if not self.player then
 		self.player = Player(Main.objects)
-		self.player:set_spec(Actorspec:find_by_name("arena player"))
+		self.player:set_spec(Main.specs:find_by_name("Actorspec", "arena player"))
 		self.player:randomize()
 		self.player.get_admin = function() return true end --FIXME
 		self.player:set_position(Vector(500,101,500))
@@ -81,23 +81,23 @@ Arena.update = function(self, secs)
 		self.player:calculate_animation()
 
 		self.button = Obstacle(Main.objects)
-		self.button:set_spec(Obstaclespec:find_by_name("arena button"))
+		self.button:set_spec(Main.specs:find_by_name("Obstaclespec", "arena button"))
 		self.button:set_position(Vector(505,100.5,500))
 		self.button:set_visible(true)
 
 		local chest = Item(Main.objects)
-		chest:set_spec(Itemspec:find_by_name("arena chest"))
+		chest:set_spec(Main.specs:find_by_name("Itemspec", "arena chest"))
 		chest:set_position(Vector(500,105.1,505))
 		chest:randomize()
 		chest:set_visible(true)
 
 		local spelltable = Obstacle(Main.objects)
-		spelltable:set_spec(Obstaclespec:find_by_name("spell table"))
+		spelltable:set_spec(Main.specs:find_by_name("Obstaclespec", "spell table"))
 		spelltable:set_position(Vector(500,100.1,495))
 		spelltable:set_visible(true)
 
 		local scholar = Actor(Main.objects)
-		scholar:set_spec(Actorspec:find_by_name("scholar"))
+		scholar:set_spec(Main.specs:find_by_name("Actorspec", "scholar"))
 		scholar:set_position(Vector(495,100.1,500))
 		scholar:randomize()
 		scholar:set_visible(true)

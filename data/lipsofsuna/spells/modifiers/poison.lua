@@ -1,6 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local PoisonModifier = ModifierSpec:find_by_name("poison")
+local PoisonModifier = Main.specs:find_by_name("ModifierSpec", "poison")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

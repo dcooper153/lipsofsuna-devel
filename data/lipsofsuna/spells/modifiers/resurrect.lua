@@ -1,6 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local ResurrectModifier = ModifierSpec:find_by_name("resurrect")
+local ResurrectModifier = Main.specs:find_by_name("ModifierSpec", "resurrect")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

@@ -1,6 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local BurdeningModifier = ModifierSpec:find_by_name("burdening")
+local BurdeningModifier = Main.specs:find_by_name("ModifierSpec", "burdening")
 
 --- Restarts the modifier with a new value.
 -- @param modifier Modifier.

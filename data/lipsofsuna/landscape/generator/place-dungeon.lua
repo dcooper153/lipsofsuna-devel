@@ -244,7 +244,7 @@ end
 PlaceDungeon.generate_entrance = function(self, chunk, params)
 	local w = chunk.manager.chunk_size
 	local t = chunk.manager.terrain
-	local ms = TerrainMaterialSpec:find_by_name("brick")
+	local ms = Main.specs:find_by_name("TerrainMaterialSpec", "brick")
 	local m = ms and ms.id
 	local y = params[2]
 	local h = params[3]
@@ -293,7 +293,7 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 	local conn_zm = Bitwise:bchk(mask, 0x04)
 	local conn_zp = Bitwise:bchk(mask, 0x08)
 	local wp = {x = math.floor(chunk.x / w), z = math.floor(chunk.z / w)}
-	local brick = TerrainMaterialSpec:find_by_name("brick")
+	local brick = Main.specs:find_by_name("TerrainMaterialSpec", "brick")
 	brick = brick and brick.id
 	yield()
 	local corridor = function(x1, z1, x2, z2, b00, b10, b01, b11, t00, t10, t01, t11)
@@ -395,7 +395,7 @@ end
 PlaceDungeon.generate_room = function(self, chunk, params)
 	local w = chunk.manager.chunk_size
 	local t = chunk.manager.terrain
-	local ms = TerrainMaterialSpec:find_by_name("brick")
+	local ms = Main.specs:find_by_name("TerrainMaterialSpec", "brick")
 	local m = ms and ms.id
 	local y = params[2]
 	local h = params[3]

@@ -149,7 +149,7 @@ Ui:add_widget{
 		return UiRadioMenu("Head style", function(self)
 			-- Find and sort the head styles.
 			local race = Client.chargen:get_race()
-			local spec = Actorspec:find_by_name(race)
+			local spec = Main.specs:find_by_name("Actorspec", race)
 			if not spec.head_styles then return end
 			local lst = {}
 			for k,v in pairs(spec.head_styles) do

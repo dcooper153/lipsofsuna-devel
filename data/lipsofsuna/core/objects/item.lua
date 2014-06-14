@@ -158,7 +158,7 @@ Item.randomize = function(self)
 	-- Create static loot.
 	if self.inventory:get_size() > 0 then
 		for k,v in pairs(spec.inventory_items) do
-			local ispec = Itemspec:find_by_name(k)
+			local ispec = Main.specs:find_by_name("Itemspec", k)
 			if ispec then
 				local item = Item(self.manager)
 				item:set_spec(ispec)

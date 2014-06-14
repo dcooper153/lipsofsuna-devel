@@ -1,6 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local StunModifier = ModifierSpec:find_by_name("stun")
+local StunModifier = Main.specs:find_by_name("ModifierSpec", "stun")
 
 --- Restarts the modifier with a new value.
 -- @param modifier Modifier.

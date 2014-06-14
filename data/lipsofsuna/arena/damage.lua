@@ -216,7 +216,7 @@ end
 Damage.get_firing_effects = function(self)
 	local res = {}
 	for name,value in pairs(self.modifiers) do
-		local effect = ModifierSpec:find_by_name(name)
+		local effect = Main.specs:find_by_name("ModifierSpec", name)
 		if effect and effect.effect_fire then
 			res[effect.effect_fire] = true
 		end
@@ -231,7 +231,7 @@ end
 Damage.get_impact_effects = function(self, target)
 	local res = {}
 	for name,value in pairs(self.modifiers) do
-		local modifier = ModifierSpec:find_by_name(name)
+		local modifier = Main.specs:find_by_name("ModifierSpec", name)
 		if modifier then
 			-- Try actor specific effects.
 			local effect

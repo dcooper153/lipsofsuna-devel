@@ -24,7 +24,7 @@ Actionspec{
 		local weapon = action.object:get_weapon()
 		if not weapon then return end
 		if not weapon.spec.construct_tile then return end
-		local material = TerrainMaterialSpec:find_by_name(weapon.spec.construct_tile)
+		local material = Main.specs:find_by_name("TerrainMaterialSpec", weapon.spec.construct_tile)
 		if not material then return end
 		-- Perform the ray cast.
 		local src,dst = Main.combat_utils:get_attack_ray_for_actor(action.object)

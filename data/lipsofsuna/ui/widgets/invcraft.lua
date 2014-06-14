@@ -4,7 +4,7 @@ local UiInvItem = require("ui/widgets/invitem")
 local UiInvCraft = Class("UiInvCraft", UiInvItem)
 
 UiInvCraft.new = function(clss, id, name)
-	local spec = Itemspec:find_by_name(name)
+	local spec = Main.specs:find_by_name("Itemspec", name)
 	local self = UiInvItem.new(clss, id, {text = name, icon = spec.icon})
 	self.name = name
 	self.hint = "$A: Craft\n$$B\n$$U\n$$D"

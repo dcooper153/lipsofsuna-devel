@@ -1,7 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 
 -- Increase or decrease health.
-local PhysicalDamageModifier = ModifierSpec:find_by_name("physical damage")
+local PhysicalDamageModifier = Main.specs:find_by_name("ModifierSpec", "physical damage")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

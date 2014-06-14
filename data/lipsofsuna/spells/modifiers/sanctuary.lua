@@ -1,7 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 
 -- Increase sanctuary duration.
-local SanctuaryModifier = ModifierSpec:find_by_name("sanctuary")
+local SanctuaryModifier = Main.specs:find_by_name("ModifierSpec", "sanctuary")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

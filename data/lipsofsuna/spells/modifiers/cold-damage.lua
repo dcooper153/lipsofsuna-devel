@@ -1,7 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 
 -- Decrease health.
-local ColdDamageModifier = ModifierSpec:find_by_name("cold damage")
+local ColdDamageModifier = Main.specs:find_by_name("ModifierSpec", "cold damage")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

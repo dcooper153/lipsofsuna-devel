@@ -1,7 +1,7 @@
 local ModifierSpec = require("core/specs/modifier")
 
 -- Teleport to Lips.
-local TravelModifier = ModifierSpec:find_by_name("travel")
+local TravelModifier = Main.specs:find_by_name("ModifierSpec", "travel")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

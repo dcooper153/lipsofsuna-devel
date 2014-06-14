@@ -437,11 +437,11 @@ Main.messaging:register_message{
 		-- Spec.
 		local spec
 		if args.type == "item" then
-			spec = Itemspec:find_by_name(args.spec)
+			spec = Main.specs:find_by_name("Itemspec", args.spec)
 		elseif args.type == "obstacle" then
-			spec = Obstaclespec:find_by_name(args.spec)
+			spec = Main.specs:find_by_name("Obstaclespec", args.spec)
 		elseif args.type == "actor" then
-			spec = Actorspec:find_by_name(args.spec)
+			spec = Main.specs:find_by_name("Actorspec", args.spec)
 		elseif args.type == "spell" then
 			spec = Spellspec:find_by_name(args.spec)
 		end

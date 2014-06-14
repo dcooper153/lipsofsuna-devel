@@ -81,7 +81,7 @@ end
 -- @param point Impact point. Nil for default.
 -- @return Modifier if effect-over-time. Nil otherwise.
 Obstacle.add_modifier = function(self, name, strength, caster, point)
-	local spec = ModifierSpec:find_by_name(name)
+	local spec = Main.specs:find_by_name("ModifierSpec", name)
 	if not spec then return end
 	local m = Modifier(spec, self, caster or self, point or self:get_position())
 	m:start(strength)
@@ -109,7 +109,7 @@ end
 -- @param self Object to kill.
 Obstacle.die = function(self)
 	for k,v in ipairs(self.spec.destroy_items) do
-		local spec = Itemspec:find_by_name(v.name)
+		local spec = Main.specs:find_by_name("Itemspec", v.name)
 		if spec then
 			local p = self:transform_local_to_global(v.position or Vector())
 			local r = self:get_rotation():copy():concat(v.rotation or Quaternion())

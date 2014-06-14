@@ -37,7 +37,7 @@ EffectProfileSpec.get_effect = function(self, name)
 	-- Try primary effects.
 	local ename = self.effects[name]
 	if ename then
-		return Effectspec:find_by_name(ename)
+		return Main.specs:find_by_name("Effectspec", ename)
 	end
 	-- Try inherited effect.
 	for k,v in pairs(self.inherit) do

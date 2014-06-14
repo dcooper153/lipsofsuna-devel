@@ -221,7 +221,7 @@ Actor.add_modifier = function(self, name, strength, caster, point)
 		if not ret then return end
 		return old
 	else
-		local spec = ModifierSpec:find_by_name(name)
+		local spec = Main.specs:find_by_name("ModifierSpec", name)
 		if not spec then return end
 		local m = Modifier(spec, self, caster or self, point or self:get_position())
 		if not m:start(strength) then return end

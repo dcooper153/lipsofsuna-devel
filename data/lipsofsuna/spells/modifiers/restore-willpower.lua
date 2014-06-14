@@ -1,6 +1,6 @@
 local ModifierSpec = require("core/specs/modifier")
 
-local RestoreWillpowerModifier = ModifierSpec:find_by_name("restore willpower")
+local RestoreWillpowerModifier = Main.specs:find_by_name("ModifierSpec", "restore willpower")
 
 --- Applies the modifier.
 -- @param modifier Modifier.

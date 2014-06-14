@@ -42,7 +42,7 @@ end
 Staticspec.get_use_actions = function(self)
 	local res = {}
 	for k,v in pairs(self.usages) do
-		local a = Actionspec:find_by_name(k)
+		local a = Main.specs:find_by_name("Actionspec", k)
 		if a then table.insert(res, a) end
 	end
 	return res
