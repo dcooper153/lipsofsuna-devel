@@ -51,7 +51,7 @@ BuildingUtils.destroy_terrain_sphere = function(self, attacker, point, radius)
 	-- TODO: Should use material specs.
 		--[[
 		if not n and math.random() < 0.01 then
-			local spec = Actorspec:random{category = "mining"}
+			local spec = Main.specs:find_random_by_category("Actorspec", "mining")
 			if spec then
 				local offset = (point + Vector(0.5,0.1,0.5)) * Voxel.tile_size
 				local object = Actor()

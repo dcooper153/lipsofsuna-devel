@@ -625,7 +625,7 @@ Actor.randomize = function(self)
 		end
 		for i = 1,num_item do
 			local cat = spec.loot_categories[math.random(1, num_cat)]
-			local itemspec = Itemspec:random{category = cat}
+			local itemspec = Main.specs:find_random_by_category("Itemspec", cat)
 			if itemspec then
 				local item = Item(self.manager)
 				item:set_spec(itemspec)

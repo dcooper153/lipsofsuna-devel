@@ -98,9 +98,9 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			-- Choose the wanted item.
 			local spec
 			if difficulty == "hard" then
-				spec = Itemspec:random()
+				spec = Main.specs:find_random("Itemspec")
 			else
-				spec = Itemspec:random{category = "material"}
+				spec = Main.specs:find_random_by_category("Itemspec", "material")
 			end
 			var_item = spec.name
 			-- Choose a random excuse.

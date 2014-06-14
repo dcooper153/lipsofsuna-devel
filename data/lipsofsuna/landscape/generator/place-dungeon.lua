@@ -374,7 +374,7 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 	if connections == 1 then
 		local p = Vector(chunk.x + 6.5, 0.0, chunk.z + 6.5)
 		p:multiply(chunk.manager.grid_size):add_xyz(0, y, 0)
-		local obj = MapUtils:place_item{point = p, name = "treasure chest", rotation = math.random() * math.pi * 2}
+		local obj = MapUtils:place_item_by_name("treasure chest", p, math.random() * math.pi * 2)
 		obj:set_important(true)
 		yield()
 	end
@@ -382,7 +382,7 @@ PlaceDungeon.generate_corridor = function(self, chunk, params)
 	if connections >= 2 and math.random() < 0.5 then
 		local p = Vector(chunk.x + 6.5, 0.0, chunk.z + 6.5)
 		p:multiply(chunk.manager.grid_size):add_xyz(0, y, 0)
-		local obj = MapUtils:place_actor{point = p, category = "enemy", rotation = math.random() * math.pi * 2}
+		local obj = MapUtils:place_actor_by_category("enemy", p, math.random() * math.pi * 2)
 		obj:set_important(true)
 		yield()
 	end
@@ -438,14 +438,14 @@ PlaceDungeon.generate_room = function(self, chunk, params)
 		p:multiply(chunk.manager.grid_size)
 		p:add_xyz(0, civ_y, 0)
 		-- Choose and create the obstacle.
-		MapUtils:place_obstacle{point = p, category = "civilization", rotation = math.random() * math.pi * 2}
+		MapUtils:place_obstacle_by_category("civilization", p, math.random() * math.pi * 2)
 		yield()
 	end
 	-- Generate extra monsters.
 	if math.random() < 0.5 then
 		local p = Vector(chunk.x + math.random(1, w-2), 0.0, chunk.z + math.random(1, w-2))
 		p:multiply(chunk.manager.grid_size):add_xyz(0, y, 0)
-		local obj = MapUtils:place_actor{point = p, category = "enemy", rotation = math.random() * math.pi * 2}
+		local obj = MapUtils:place_actor_by_category("enemy", p, math.random() * math.pi * 2)
 		obj:set_important(true)
 		yield()
 	end

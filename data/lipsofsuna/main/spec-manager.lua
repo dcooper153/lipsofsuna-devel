@@ -89,6 +89,29 @@ SpecManager.find_class = function(self, clss)
 	return self.__classes[clss]
 end
 
+--- Returns a random spec.
+-- @param self SpecManager.
+-- @param clss Class name.
+-- @return Spec if found. Nil otheriwse.
+SpecManager.find_random = function(self, clss)
+	local specs = self.__classes[clss]
+	if not specs then return end
+	return specs.dict_id[math.random(#specs.dict_id)]
+end
+
+--- Returns a random spec.
+-- @param self SpecManager.
+-- @param clss Class name.
+-- @param category Category name.
+-- @return Spec if found. Nil otheriwse.
+SpecManager.find_random_by_category = function(self, clss, category)
+	local specs = self.__classes[clss]
+	if not specs then return end
+	local cat = specs.dict_cat[category]
+	if not cat then return end
+	return cat[math.random(#cat)]
+end
+
 --- Registers a spec class.
 -- @param self SpecManager.
 -- @param name Spec name.

@@ -11,13 +11,13 @@ Globaleventspec{
 		local spawn = Server.events:find_actor_spawn_point()
 		if not spawn then return end
 		-- Spawn the brigands.
-		MapUtils:place_actor{point = spawn:copy(), name = "brigandmale"}
+		MapUtils:place_actor_by_name("brigandmale", spawn:copy())
 		local count = math.random(3,6)
 		for i = 1,count do
 			local p = Utils:find_spawn_point(spawn:copy():add_xyz(
 				5 * math.random(), 5 * math.random(), 5 * math.random()))
 			if p then
-				MapUtils:place_actor{point = p, name = "brigandmale"}
+				MapUtils:place_actor_by_name("brigandmale", p)
 			end
 		end
 	end}

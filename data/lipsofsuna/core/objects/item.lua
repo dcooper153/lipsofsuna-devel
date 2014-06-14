@@ -181,7 +181,7 @@ Item.randomize = function(self)
 		for i = 1,num_item do
 			local cat = spec.loot_categories[math.random(1, num_cat)]
 			local item = Item(self.manager)
-			item:set_spec(Itemspec:random{category = cat})
+			item:set_spec(Main.specs:find_random_by_category("Itemspec", cat))
 			self.inventory:merge_object(item)
 		end
 	end

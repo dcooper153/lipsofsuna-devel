@@ -69,7 +69,7 @@ PlaceDefault.generate_objects = function(self, chunk, surface)
 		p:multiply(chunk.manager.grid_size)
 		p:add_xyz(0, civ_y, 0)
 		-- Choose and create the obstacle.
-		MapUtils:place_obstacle{point = p, category = "civilization", rotation = math.random() * math.pi * 2}
+		MapUtils:place_obstacle_by_category("civilization", p, math.random() * math.pi * 2)
 		yield()
 	end
 end
@@ -97,9 +97,9 @@ PlaceDefault.generate_plants = function(self, chunk, surface)
 				local f = Noise:plasma_noise_2d(seeds[5] + 0.005 * cx, seeds[6] + 0.005 * cz, 2)
 				-- Choose and create the obstacle.
 				if r > f * 0.01 then
-					MapUtils:place_obstacle{point = p, category = "tree", rotation = math.random() * math.pi * 2}
+					MapUtils:place_obstacle_by_category("tree", p, math.random() * math.pi * 2)
 				else
-					MapUtils:place_obstacle{point = p, category = "small-plant", rotation = math.random() * math.pi * 2}
+					MapUtils:place_obstacle_by_category("small-plant", p, math.random() * math.pi * 2)
 				end
 			end
 		end
@@ -138,9 +138,9 @@ PlaceDefault.generate_terrain = function(self, chunk, surface, chk)
 				local y0,y1,y2,y3 = a00 + b00 + c00, a10 + b10 + c10, a01 + b01 + c01, a11 + b11 + c11
 				local mat
 				if math.random() < 0.75 then
-					mat = TerrainMaterialSpec:random{category = "common ore"}
+					mat = Main.specs:find_random_by_category("TerrainMaterialSpec", "common ore")
 				else
-					mat = TerrainMaterialSpec:random{category = "rare ore"}
+					mat = Main.specs:find_random_by_category("TerrainMaterialSpec", "rare ore")
 				end
 				chk:add_stick_corners(x, z, y0 - ore, y1 - ore, y2 - ore, y3 - ore, y0, y1, y2, y3, mat.id)
 			end

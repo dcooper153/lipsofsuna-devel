@@ -154,7 +154,7 @@ PlaceCastle.generate = function(self, chunk, params)
 	-- TODO: Plan what NPCs to place in which sector.
 	local p = Vector(chunk.x + math.random(1, w-2), 0.0, chunk.z + math.random(1, w-2))
 	p:multiply(chunk.manager.grid_size):add_xyz(0, params[2], 0)
-	local obj = MapUtils:place_actor{point = p, category = "castle", rotation = math.random() * math.pi * 2}
+	local obj = MapUtils:place_actor_by_category("castle", p, math.random() * math.pi * 2)
 	if obj then
 		obj:set_important(true)
 	end

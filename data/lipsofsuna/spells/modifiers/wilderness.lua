@@ -39,7 +39,7 @@ WildernessModifier.start = function(modifier, value)
 			local p = hits[k]
 			if p then
 				hits[k] = nil
-				local obstspec = Obstaclespec:random{category = "wilderness"}
+				local obstspec = Main.specs:find_random_by_category("Obstaclespec", "wilderness")
 				if obstspec then
 					if Utils:check_room(p, obstspec.model) then
 						local o = Obstacle(modifier.owner.manager)

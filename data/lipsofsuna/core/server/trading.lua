@@ -103,7 +103,7 @@ Trading.start = function(self, player, merchant)
 	-- TODO: Should depend on the merchant.
 	local count = 20
 	for i = 1,count do
-		local s = Itemspec:random()
+		local s = Main.specs:find_random("Itemspec")
 		table.insert(player.trading.shop, s.name)
 	end
 	-- Send the trading start packet.

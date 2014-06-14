@@ -19,7 +19,7 @@ Globaleventspec{
 		local spawns = Utils:find_spawn_points_in_sector(sector, count, true)
 		for k,v in pairs(spawns) do
 			v:multiply(Voxel.tile_scale)
-			MapUtils:place_actor{point = v, name = "lizardman"}
+			MapUtils:place_actor_by_name("lizardman", v)
 		end
 	end,
 	started = function(self, event)
