@@ -1,5 +1,3 @@
-local ModifierSpec = require("core/specs/modifier")
-
 local CurseModifier = Main.specs:find_by_name("ModifierSpec", "curse")
 
 --- Gets the attribute modifications of the modifier.

@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local Item = require("core/objects/item")
-local TerrainMaterialSpec = require("core/specs/terrain-material")
 
 --- Building utils.
 -- @type BuildingUtils

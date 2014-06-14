@@ -1,5 +1,3 @@
-local ModifierSpec = require("core/specs/modifier")
-
 local BurningModifier = Main.specs:find_by_name("ModifierSpec", "burning")
 
 --- Applies the modifier.

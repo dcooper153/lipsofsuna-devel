@@ -3,8 +3,6 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 
-local QuestSpec = require("core/specs/quest")
-
 Main.messaging:register_message{
 	name = "update quest marker",
 	server_to_client_encode = function(self, name, marker)

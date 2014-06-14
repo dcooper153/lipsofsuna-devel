@@ -11,7 +11,6 @@
 local Class = require("system/class")
 local File = require("system/file")
 local Json = require("system/json")
-local Spec = require("core/specs/spec")
 
 --- Mod loading.
 -- @type Mod

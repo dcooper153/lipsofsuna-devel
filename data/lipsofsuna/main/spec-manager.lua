@@ -143,9 +143,12 @@ end
 
 --- Gets the dictionary of spec names.
 -- @param self SpecManager.
+-- @param clss Spec class name.
 -- @return Dictionary whose keys correspond to spec names.
-SpecManager.get_spec_names = function(self)
-	return self.__classes
+SpecManager.get_spec_names = function(self, clss)
+	local specs = self.__classes[clss]
+	if not specs then return {} end
+	return specs.dict_name
 end
 
 return SpecManager

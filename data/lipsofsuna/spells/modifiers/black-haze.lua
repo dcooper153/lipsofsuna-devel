@@ -1,6 +1,5 @@
 local Actor = require("core/objects/actor")
 local Modifier = require("core/server/modifier")
-local ModifierSpec = require("core/specs/modifier")
 
 -- Summon plagued beasts.
 local BlackHazeModifier = Main.specs:find_by_name("ModifierSpec", "black haze")

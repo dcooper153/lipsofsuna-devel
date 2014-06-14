@@ -1,5 +1,4 @@
 local Class = require("system/class")
-local ModifierSpec = require("core/specs/modifier")
 local UiWidget = require("ui/widgets/widget")
 
 local UiSpellPreview = Class("Uispellpreview", UiWidget)

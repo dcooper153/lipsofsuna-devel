@@ -13,7 +13,6 @@ local Class = require("system/class")
 local PlaceDefault = require("landscape/generator/place-default")
 local Noise = require("system/noise")
 local TerrainChunk = require("system/terrain-chunk")
-local TerrainMaterialSpec = require("core/specs/terrain-material")
 
 local yield = coroutine.yield
 

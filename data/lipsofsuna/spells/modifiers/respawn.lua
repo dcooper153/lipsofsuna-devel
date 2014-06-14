@@ -1,4 +1,3 @@
-local ModifierSpec = require("core/specs/modifier")
 local Vector = require("system/math/vector")
 
 local RespawnModifier = Main.specs:find_by_name("ModifierSpec", "respawn")

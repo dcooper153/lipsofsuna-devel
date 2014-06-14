@@ -1,8 +1,6 @@
 local ActorSkinSpec = require("core/specs/actor-skin")
 local ActorTextureSpec = require("core/specs/actor-texture")
-local ChargenSliderSpec = require("core/specs/chargen-slider")
 local Client = require("core/client/client")
-local HairStyleSpec = require("core/specs/hair-style")
 local UiButton = require("ui/widgets/button")
 local UiEntry = require("ui/widgets/entry")
 local UiRadioMenu = require("ui/widgets/radio-menu")
@@ -174,7 +172,7 @@ Ui:add_widget{
 		return UiRadioMenu("Hair style", function(self)
 			-- Find and sort the hair styles.
 			local lst = {}
-			for k,v in pairs(HairStyleSpec.dict_name) do
+			for k,v in pairs(Main.specs:get_spec_names("HairStyleSpec")) do
 				table.insert(lst, {k, k})
 			end
 			table.sort(lst, function(a,b) return a[1] < b[1] end)

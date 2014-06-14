@@ -1,5 +1,4 @@
 local Class = require("system/class")
-local IconSpec = require("core/specs/icon")
 local UiIcon = require("ui/widgets/icon")
 local UiTooltip = require("ui/widgets/tooltip")
 local UiWidget = require("ui/widgets/widget")

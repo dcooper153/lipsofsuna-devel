@@ -1,7 +1,6 @@
 local AreaSpell = require("core/objects/areaspell")
 local Coroutine = require("system/coroutine")
 local Feat = FIXME
-local ModifierSpec = require("core/specs/modifier")
 
 Actionspec{
 	name = "area spell",

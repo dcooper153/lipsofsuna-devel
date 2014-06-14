@@ -8,10 +8,7 @@
 -- @module ui.widgets.spell
 -- @alias UiSpell
 
-local Actionspec = require("core/specs/action")
 local Class = require("system/class")
-local IconSpec = require("core/specs/icon")
-local ModifierSpec = require("core/specs/modifier")
 local UiWidget = require("ui/widgets/widget")
 
 --- Spell widget.

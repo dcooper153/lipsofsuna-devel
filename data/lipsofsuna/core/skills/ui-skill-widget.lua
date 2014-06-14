@@ -9,7 +9,6 @@
 -- @alias UiSkillWidget
 
 local Class = require("system/class")
-local Skillspec = require("core/specs/skill")
 local UiMenu = require("ui/widgets/menu")
 local UiWidget = require("ui/widgets/widget")
 

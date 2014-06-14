@@ -1,5 +1,4 @@
 local Actor = require("core/objects/actor")
-local ModifierSpec = require("core/specs/modifier")
 
 local FireElementalModifier = Main.specs:find_by_name("ModifierSpec", "fire elemental")
 

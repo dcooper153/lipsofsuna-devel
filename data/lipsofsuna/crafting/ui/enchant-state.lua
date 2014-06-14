@@ -9,7 +9,6 @@
 -- @alias EnchantState
 
 local Class = require("system/class")
-local ModifierSpec = require("core/specs/modifier")
 
 --- Enchantment state.
 -- @type EnchantState

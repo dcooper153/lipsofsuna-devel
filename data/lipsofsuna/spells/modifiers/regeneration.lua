@@ -1,5 +1,3 @@
-local ModifierSpec = require("core/specs/modifier")
-
 -- Increase sanctuary duration.
 local RegenerationModifier = Main.specs:find_by_name("ModifierSpec", "regeneration")
 

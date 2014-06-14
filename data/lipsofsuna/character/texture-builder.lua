@@ -8,11 +8,8 @@
 -- @module character.texture_builder
 -- @alias TextureBuilder
 
-local ActorSkinSpec = require("core/specs/actor-skin")
-local ActorTextureSpec = require("core/specs/actor-texture")
 local Class = require("system/class")
 local Color = require("system/color")
-local HairStyleSpec = require("core/specs/hair-style")
 local Image = require("system/image")
 local ImageMerger = require("system/image-merger")
 local Serialize = require("system/serialize")

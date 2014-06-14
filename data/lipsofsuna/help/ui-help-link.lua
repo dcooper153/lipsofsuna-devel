@@ -9,7 +9,6 @@
 -- @alias UiHelpLink
 
 local Class = require("system/class")
-local HelpSpec = require("core/specs/help")
 local UiHelpText = require("help/ui-help-text")
 local UiMenu = require("ui/widgets/menu")
 

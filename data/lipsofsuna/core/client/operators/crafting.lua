@@ -1,5 +1,4 @@
 local Class = require("system/class")
-local CraftingRecipeSpec = require("core/specs/crafting-recipe")
 
 Operators.crafting = Class("CraftingOperator")
 Operators.crafting.data = {}

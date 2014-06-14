@@ -1,5 +1,3 @@
-local ModifierSpec = require("core/specs/modifier")
-
 local BlessModifier = Main.specs:find_by_name("ModifierSpec", "bless")
 
 --- Gets the attribute modifications of the modifier.

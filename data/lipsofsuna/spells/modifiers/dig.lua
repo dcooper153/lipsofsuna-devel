@@ -1,5 +1,4 @@
 local BuildingUtils = require("building/building-utils")
-local ModifierSpec = require("core/specs/modifier")
 
 -- Dig terrain.
 local DigModifier = Main.specs:find_by_name("ModifierSpec", "dig")

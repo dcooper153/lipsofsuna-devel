@@ -1,5 +1,3 @@
-local ModifierSpec = require("core/specs/modifier")
-
 local BurdeningModifier = Main.specs:find_by_name("ModifierSpec", "burdening")
 
 --- Restarts the modifier with a new value.

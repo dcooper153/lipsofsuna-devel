@@ -1,5 +1,4 @@
 local Class = require("system/class")
-local QuestSpec = require("core/specs/quest")
 
 Operators.quests = Class("QuestsOperator")
 Operators.quests.data = {}

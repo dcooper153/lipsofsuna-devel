@@ -1,5 +1,3 @@
-local ModifierSpec = require("core/specs/modifier")
-
 -- Increase or decrease health.
 local PhysicalDamageModifier = Main.specs:find_by_name("ModifierSpec", "physical damage")
 

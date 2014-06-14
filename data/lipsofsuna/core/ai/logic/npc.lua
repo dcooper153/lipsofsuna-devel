@@ -9,7 +9,6 @@
 -- @alias NpcAi
 
 local Ai = require("core/ai/logic/ai")
-local AiActionSpec = require("core/specs/aiaction")
 local Class = require("system/class")
 
 --- TODO:doc

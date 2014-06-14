@@ -1,7 +1,6 @@
 local ChatCommand = require("core/chat/chat-command")
 local Introspect = require("core/introspect/introspect")
 local IntrospectOperator = require("core/debug/introspect-operator")
-local Spec = require("core/specs/spec")
 local UiIntrospectField = require("ui/widgets/introspect-field")
 local UiLabel = require("ui/widgets/label")
 local UiTransition = require("ui/widgets/transition")

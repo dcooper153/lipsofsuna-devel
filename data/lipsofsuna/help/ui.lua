@@ -1,4 +1,3 @@
-local HelpSpec = require("core/specs/help")
 local UiLabel = require("ui/widgets/label")
 local UiHelpLink = require("help/ui-help-link")
 local UiHelpText = require("help/ui-help-text")

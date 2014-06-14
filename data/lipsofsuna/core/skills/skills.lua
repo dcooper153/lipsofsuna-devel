@@ -9,7 +9,6 @@
 -- @alias Skills
 
 local Class = require("system/class")
-local Skillspec = require("core/specs/skill")
 
 --- Create and synchronize skills.
 -- @type Skills
@@ -175,7 +174,7 @@ end
 -- @return Table of strings.
 Skills.get_statuses = function(self)
 	local skills = {}
-	for name,skill in pairs(Skillspec.dict_name) do
+	for name,skill in pairs(Main.specs:get_spec_names("Skillspec")) do
 		if self.skills[name] then
 			skills[name] = "active"
 		elseif self:is_activable(name) then

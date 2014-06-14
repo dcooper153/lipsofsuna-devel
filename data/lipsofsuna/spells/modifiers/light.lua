@@ -1,5 +1,3 @@
-local ModifierSpec = require("core/specs/modifier")
-
 -- Increase light duration.
 local LightModifier = Main.specs:find_by_name("ModifierSpec", "light")
 

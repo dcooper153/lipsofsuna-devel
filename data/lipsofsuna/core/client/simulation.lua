@@ -9,7 +9,6 @@
 -- @alias Simulation
 
 local Actor = require("core/objects/actor")
-local Actorpresetspec = require("core/specs/actorpreset")
 local Class = require("system/class")
 local Color = require("system/color")
 local Item = require("core/objects/item")

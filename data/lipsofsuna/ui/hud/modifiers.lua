@@ -9,7 +9,6 @@
 -- @alias Hudmodifiers
 
 local Class = require("system/class")
-local ModifierSpec = require("core/specs/modifier")
 local Widget = require("system/widget")
 
 --- HUD status modifier list widget.

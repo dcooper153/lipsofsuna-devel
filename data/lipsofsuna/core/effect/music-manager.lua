@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local Client = require("core/client/client")
-local MusicSpec = require("core/specs/music")
 local Sound = require("system/sound")
 
 --- Manages music playback.

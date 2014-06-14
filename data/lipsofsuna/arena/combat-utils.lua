@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local Modifier = require("core/server/modifier")
-local ModifierSpec = require("core/specs/modifier")
 
 --- Combat utils.
 -- @type CombatUtils

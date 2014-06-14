@@ -1,5 +1,3 @@
-local ModifierSpec = require("core/specs/modifier")
-
 local ResurrectModifier = Main.specs:find_by_name("ModifierSpec", "resurrect")
 
 --- Applies the modifier.

@@ -9,7 +9,6 @@
 -- @alias IntrospectOperator
 
 local Class = require("system/class")
-local Spec = require("core/specs/spec")
 
 --- Manages the state of the introspection UI.
 -- @type IntrospectOperator

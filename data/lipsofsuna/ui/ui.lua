@@ -11,7 +11,6 @@
 local Button = require("system/widgets/button")
 local Class = require("system/class")
 local Cursor = require("system/widgets/cursor")
-local IconSpec = require("core/specs/icon")
 local Input = require("system/input")
 local InputHandler = require("ui/input-handler")
 local Label = require("system/widgets/label")

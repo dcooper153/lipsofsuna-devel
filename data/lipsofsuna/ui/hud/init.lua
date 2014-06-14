@@ -5,7 +5,6 @@ local Hudlog = require("ui/hud/log")
 local Hudmodifiers = require("ui/hud/modifiers")
 local Hudnotification = require("ui/hud/notification")
 local Hudtarget = require("ui/hud/target")
-local IconSpec = require("core/specs/icon")
 local UiIcon = require("ui/widgets/icon")
 local UiStat = require("ui/widgets/stat")
 

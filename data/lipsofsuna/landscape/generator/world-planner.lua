@@ -16,7 +16,6 @@ local PlaceCastle = require("landscape/generator/place-castle")
 local PlaceDefault = require("landscape/generator/place-default")
 local PlaceDungeon = require("landscape/generator/place-dungeon")
 local SurfaceGenerator = require("landscape/generator/surface-generator")
-local TerrainMaterialSpec = require("core/specs/terrain-material")
 local Vector = require("system/math/vector")
 
 --- Procedural world layout planner.

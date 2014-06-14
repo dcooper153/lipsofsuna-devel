@@ -11,7 +11,6 @@
 local ChargenSliderSpec = require("core/specs/chargen-slider")
 local Class = require("system/class")
 local Color = require("system/color")
-local HairStyleSpec = require("core/specs/hair-style")
 local Model = require("system/model")
 local ModelMerger = require("system/model-merger")
 local Serialize = require("system/serialize")

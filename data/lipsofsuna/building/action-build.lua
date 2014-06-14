@@ -1,5 +1,4 @@
 local Physics = require("system/physics")
-local TerrainMaterialSpec = require("core/specs/terrain-material")
 
 Actionspec{
 	name = "build",

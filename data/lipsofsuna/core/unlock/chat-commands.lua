@@ -1,7 +1,4 @@
-local ActionSpec = require("core/specs/action")
 local ChatCommand = require("core/chat/chat-command")
-local ModifierSpec = require("core/specs/modifier")
-local Skillspec = require("core/specs/skill")
 
 ChatCommand{
 	name = "unlock_action",

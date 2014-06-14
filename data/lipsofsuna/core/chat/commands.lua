@@ -1,7 +1,6 @@
 local Actor = require("core/objects/actor")
 local Debug = require( "system/debug")
 local Item = require("core/objects/item")
-local ModifierSpec = require("core/specs/modifier")
 local Obstacle = require("core/objects/obstacle")
 local Physics = require("system/physics")
 local PhysicsConsts = require("core/physics/consts")

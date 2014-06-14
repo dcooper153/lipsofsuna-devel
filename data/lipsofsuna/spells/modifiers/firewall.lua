@@ -1,5 +1,4 @@
 local AreaSpell = require("core/objects/areaspell")
-local ModifierSpec = require("core/specs/modifier")
 
 local FirewallModifier = Main.specs:find_by_name("ModifierSpec", "firewall")
 

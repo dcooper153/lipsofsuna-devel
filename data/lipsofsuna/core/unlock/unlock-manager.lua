@@ -8,10 +8,7 @@
 -- @module core.unlock.unlock_manager
 -- @alias UnlockManager
 
-local ActionSpec = require("core/specs/action")
 local Class = require("system/class")
-local ModifierSpec = require("core/specs/modifier")
-local Skillspec = require("core/specs/skill")
 
 --- Manages unlocks.
 -- @type UnlockManager
@@ -136,7 +133,7 @@ UnlockManager.unlock_random = function(self)
 	-- All skill types that have a description are assumed to be used by
 	-- players. Such a skill can be unlocked if it hasn't been unlocked
 	-- already but all its requirements have been unlocked.
-	for k,v in pairs(Skillspec.dict_name) do
+	for k,v in pairs(Main.specs:get_spec_names("Skillspec")) do
 		if v.description and not self:get("skill", k) then
 			local deps = v:find_direct_requirements()
 			local pass = true
@@ -154,7 +151,7 @@ UnlockManager.unlock_random = function(self)
 	-- Find the unlockable actions.
 	-- All spell types that have a description are assumed to be used by
 	-- players. Out of those, we choose ones not yet unlocked.
-	for k,v in pairs(ActionSpec.dict_name) do
+	for k,v in pairs(Main.specs:get_spec_names("ActionSpec")) do
 		if v.description and not self:get("action", k) then
 			table.insert(choices, {"action", k})
 		end
@@ -163,7 +160,7 @@ UnlockManager.unlock_random = function(self)
 	-- All modifiers that have a description are assumed to be used by
 	-- players. Out of those, we choose ones that are not yet unlocked but
 	-- have at least one of the allowed actions unlocked.
-	for k,v in pairs(ModifierSpec.dict_name) do
+	for k,v in pairs(Main.specs:get_spec_names("ModifierSpec")) do
 		if v.description and not self:get("modifier", k) then
 			local pass = false
 			for name in pairs(v.actions) do

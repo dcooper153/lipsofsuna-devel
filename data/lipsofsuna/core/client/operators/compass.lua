@@ -1,5 +1,3 @@
-local QuestSpec = require("core/specs/quest")
-
 --- Gets the currently shown map marker.
 -- @param self Client.
 -- @return Marker or nil.

@@ -1,5 +1,3 @@
-local ModifierSpec = require("core/specs/modifier")
-
 -- Increase berserk duration.
 local BerserkModifier = Main.specs:find_by_name("ModifierSpec", "berserk")
 

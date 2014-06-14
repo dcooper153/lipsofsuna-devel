@@ -1,5 +1,4 @@
 local EnchantState = require("crafting/ui/enchant-state")
-local ModifierSpec = require("core/specs/modifier")
 local UiButton = require("ui/widgets/button")
 local UiLabel = require("ui/widgets/label")
 local UiSelector = require("ui/widgets/selector")

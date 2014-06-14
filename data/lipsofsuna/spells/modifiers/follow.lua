@@ -1,5 +1,3 @@
-local ModifierSpec = require("core/specs/modifier")
-
 local FollowModifier = Main.specs:find_by_name("ModifierSpec", "follow")
 
 --- Applies the modifier.

@@ -1,5 +1,3 @@
-local ModifierSpec = require("core/specs/modifier")
-
 local MindlessMarchModifier = Main.specs:find_by_name("ModifierSpec", "mindless march")
 
 --- Applies the modifier.

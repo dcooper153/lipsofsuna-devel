@@ -3,7 +3,6 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 
-local Skillspec = require("core/specs/skill")
 local UiSkillWidget = require("core/skills/ui-skill-widget")
 
 Ui:add_state{

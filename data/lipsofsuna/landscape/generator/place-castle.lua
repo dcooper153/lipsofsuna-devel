@@ -11,7 +11,6 @@
 local Class = require("system/class")
 local PlaceGenerator = require("landscape/generator/place-generator")
 local TerrainChunk = require("system/terrain-chunk")
-local TerrainMaterialSpec = require("core/specs/terrain-material")
 
 local yield = coroutine.yield
 

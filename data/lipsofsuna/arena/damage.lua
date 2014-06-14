@@ -9,7 +9,6 @@
 -- @alias Damage
 
 local Class = require("system/class")
-local ModifierSpec = require("core/specs/modifier")
 
 --- Damage calculator.
 -- @type Damage

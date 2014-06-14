@@ -3,8 +3,6 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 
-local Skillspec = require("core/specs/skill")
-
 Main.messaging:register_message{
 	name = "update skills",
 	client_to_server_encode = function(self, enabled)

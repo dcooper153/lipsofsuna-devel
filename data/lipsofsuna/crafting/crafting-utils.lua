@@ -9,7 +9,6 @@
 -- @alias CraftingUtils
 
 local Class = require("system/class")
-local CraftingRecipeSpec = require("core/specs/crafting-recipe")
 local Item = require("core/objects/item")
 
 --- Crafting utils.
@@ -119,7 +118,7 @@ end
 -- @return Table of item names.
 CraftingUtils.get_craftable = function(self, user, mode)
 	local items = {}
-	for name,spec in pairs(CraftingRecipeSpec.dict_name) do
+	for name,spec in pairs(Main.specs:get_spec_names("CraftingRecipeSpec")) do
 		if self:can_craft(spec, user, mode) then
 			table.insert(items, name)
 		end
@@ -133,7 +132,7 @@ end
 -- @return Table of item names.
 CraftingUtils.get_requiring_items = function(self, spec)
 	local items = {}
-	for k,v in pairs(CraftingRecipeSpec.dict_name) do
+	for k,v in pairs(Main.specs:get_spec_names("CraftingRecipeSpec")) do
 		if v.materials[spec.name] then
 			table.insert(items, k)
 		end

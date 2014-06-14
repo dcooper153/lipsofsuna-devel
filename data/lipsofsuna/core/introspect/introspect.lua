@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local File = require("system/file")
-local Spec = require("core/specs/spec")
 
 --- Introspection and validation for specs and other custom types.
 -- @type Introspect
