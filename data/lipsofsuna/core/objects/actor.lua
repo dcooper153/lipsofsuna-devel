@@ -8,12 +8,10 @@
 -- @module core.objects.actor
 -- @alias Actor
 
-local ActorPresetSpec = require("core/specs/actorpreset")
 local Class = require("system/class")
 local Coroutine = require("system/coroutine")
 local Item = require("core/objects/item")
 local Modifier = require("core/server/modifier")
-local ModifierSpec = require("core/specs/modifier")
 local ObjectSerializer = require("core/objects/object-serializer")
 local Physics = require("system/physics")
 local Quaternion = require("system/math/quaternion")

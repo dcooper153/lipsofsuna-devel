@@ -19,7 +19,7 @@ local Spec = require("core/specs/spec")
 
 --- Actor specification.
 -- @type Actorspec
-Actorspec = Spec:register("Actorspec", "actor", {
+local Actorspec = Spec:register("Actorspec", "actor", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "base", type = "string", description = "Base actor spec.", details = {spec = "Actorspec"}},

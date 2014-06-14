@@ -9,11 +9,9 @@
 -- @alias Player
 
 local Actor = require("core/objects/actor")
-local ActorSpec = require("core/specs/actor")
 local Class = require("system/class")
 local Companion = require("core/objects/companion")
 local Modifier = require("core/server/modifier")
-local ModifierSpec = require("core/specs/modifier")
 local Packet = require("system/packet")
 local PlayerVision = require("core/objects/player-vision")
 

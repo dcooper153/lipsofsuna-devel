@@ -11,7 +11,6 @@
 local Class = require("system/class")
 local Item = require("core/objects/item")
 local Modifier = require("core/server/modifier")
-local ModifierSpec = require("core/specs/modifier")
 local ObjectSerializer = require("core/objects/object-serializer")
 local SimulationObject = require("core/objects/simulation")
 

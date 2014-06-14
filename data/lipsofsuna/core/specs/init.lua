@@ -1,3 +1,4 @@
+local Actorspec = require("core/specs/actor")
 local ActorTextureSpec = require("core/specs/actor-texture")
 local AnimationSpec = require("core/specs/animation")
 local AnimationProfileSpec = require("core/specs/animation-profile")

@@ -9,8 +9,6 @@
 -- @alias SimulationObject
 
 local Action = require("core/actions/action")
-local Actionspec = require("core/specs/action")
-local Actorpresetspec = require("core/specs/actorpreset")
 local Class = require("system/class")
 local Inventory = require("core/server/inventory")
 local Object = require("system/object")
