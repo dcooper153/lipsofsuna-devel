@@ -33,12 +33,12 @@ NpcAi.new = function(clss, manager, object)
 	-- Initialize states.
 	self.enabled_states = {}
 	for k,v in pairs(object.spec.ai_enabled_states) do
-		self.enabled_states[k] = Aistatespec:find_by_name(k)
+		self.enabled_states[k] = Main.specs:find_by_name("Aistatespec", k)
 	end
 	-- Initialize combat actions.
 	self.combat_actions = {}
 	for k,v in pairs(object.spec.ai_combat_actions) do
-		self.combat_actions[k] = AiActionSpec:find_by_name(k)
+		self.combat_actions[k] = Main.specs:find_by_name("AiActionSpec", k)
 	end
 	return self
 end
@@ -263,7 +263,7 @@ NpcAi.set_state = function(self, args)
 	if s == prev then return end
 	-- Leave the previous state.
 	if prev then
-		local state = Aistatespec:find_by_name(prev)
+		local state = Main.specs:find_by_name("Aistatespec", prev)
 		if state and state.leave then
 			state.leave(self)
 		end
@@ -280,7 +280,7 @@ NpcAi.set_state = function(self, args)
 	self.object.running = (self.state == "combat")
 	self.object:calculate_speed()
 	-- Enter the new state.
-	local state = Aistatespec:find_by_name(s)
+	local state = Main.specs:find_by_name("Aistatespec", s)
 	if state and state.enter then
 		state.enter(self, prev)
 	end

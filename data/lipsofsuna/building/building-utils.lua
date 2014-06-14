@@ -93,7 +93,7 @@ end
 -- @param radius Radius in world units.
 BuildingUtils.__create_terrain_mining_items = function(self, attacker, materials)
 	for k,v in pairs(materials) do
-		local mat = TerrainMaterialSpec:find_by_id(k)
+		local mat = Main.specs:find_by_id("TerrainMaterialSpec", k)
 		if mat and mat.mining_item and v >= 0.1 then
 			local spec = Main.specs:find_by_name("Itemspec", mat.mining_item)
 			local item = Item(Main.objects)
@@ -117,7 +117,7 @@ BuildingUtils.__play_terrain_destruction_effect = function(self, point, material
 		end
 	end
 	if best_k then
-		local mat = TerrainMaterialSpec:find_by_id(best_k)
+		local mat = Main.specs:find_by_id("TerrainMaterialSpec", best_k)
 		if mat and mat.effect_collapse then
 			effect = mat.effect_collapse
 		end

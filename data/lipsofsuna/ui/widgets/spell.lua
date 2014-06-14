@@ -28,7 +28,7 @@ UiSpell.new = function(clss, spec, active)
 	self.mode = spec and spec.type or "modifier"
 	self.active = active
 	self.hint = active and "$A: Select\n$$B\n$$U\n$$D" or "$$B\n$$U\n$$D"
-	self.icon = self.spec and IconSpec:find_by_name(self.spec.icon or "missing")
+	self.icon = self.spec and Main.specs:find_by_name("IconSpec", self.spec.icon or "missing")
 	return self
 end
 

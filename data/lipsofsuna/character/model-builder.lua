@@ -195,7 +195,7 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 	end
 	-- Face customization.
 	if args.face_sliders then--and string.match(name, ".*head.*" then
-		for k,spec in ipairs(ChargenSliderSpec:find_by_category("face")) do
+		for k,spec in ipairs(Main.specs:find_by_category("ChargenSliderSpec", "face")) do
 			local field = args[spec.field_name]
 			if field then
 				add(spec, field[spec.field_index])
@@ -204,7 +204,7 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 	end
 	-- Body customization.
 	if args.body_sliders then
-		for k,spec in ipairs(ChargenSliderSpec:find_by_category("body")) do
+		for k,spec in ipairs(Main.specs:find_by_category("ChargenSliderSpec", "body")) do
 			local field = args[spec.field_name]
 			if field then
 				add(spec, field[spec.field_index])

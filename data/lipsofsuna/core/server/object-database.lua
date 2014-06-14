@@ -163,7 +163,7 @@ ObjectDatabase.load_object = function(self, id, type_, spec, dead)
 	elseif type_ == "item" then objspec = Main.specs:find_by_name("Itemspec", spec)
 	elseif type_ == "obstacle" then objspec = Main.specs:find_by_name("Obstaclespec", spec)
 	elseif type_ == "player" then objspec = Main.specs:find_by_name("Actorspec", spec)
-	elseif type_ == "static" then objspec = Staticspec:find_by_name(spec)
+	elseif type_ == "static" then objspec = Main.specs:find_by_name("Staticspec", spec)
 	else
 		error(string.format("invalid object type %q", type_))
 	end

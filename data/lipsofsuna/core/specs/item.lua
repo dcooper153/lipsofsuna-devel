@@ -153,7 +153,7 @@ Itemspec.get_effect = function(self, name, profile)
 	local try = function(self, p, e)
 		local pname = self.effects[p]
 		if not pname then return end
-		local profile = EffectProfileSpec:find_by_name(pname)
+		local profile = Main.specs:find_by_name("EffectProfileSpec", pname)
 		if not profile then return end
 		return profile:get_effect(e)
 	end
@@ -229,7 +229,7 @@ Itemspec.get_trading_value = function(self)
 			value = value + 100
 		end
 	end
-	local craft = CraftingRecipeSpec:find_by_name(self.name)
+	local craft = Main.specs:find_by_name("CraftingRecipeSpec", self.name)
 	if craft then
 		local req = Main.crafting_utils:get_requiring_items(craft)
 		if #req > 0 then

@@ -163,7 +163,7 @@ Player.update_server = function(self, secs)
 	-- Update the state of the companion.
 	if not self.companion then
 		-- FIXME: Appearance should be customizable.
-		local spec = ActorSpec:find_by_name("companion")
+		local spec = Main.specs:find_by_name("ActorSpec", "companion")
 		if spec then
 			self.companion = Companion(self.manager)
 			self.companion:set_owner(self)

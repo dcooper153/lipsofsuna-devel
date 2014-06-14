@@ -97,7 +97,7 @@ EnchantState.init = function(self)
 	end
 	-- Select the default action.
 	if not self.__action then
-		for k,v in ipairs(Actionspec:find_by_category("enchantment")) do
+		for k,v in ipairs(Main.specs:find_by_category("Actionspec", "enchantment")) do
 			self.__action = v
 			break
 		end
@@ -137,7 +137,7 @@ EnchantState.get_actions = function(self)
 	-- Create the action selector.
 	local actions = {}
 	local index = 1
-	for k,v in ipairs(Actionspec:find_by_category("enchantment")) do
+	for k,v in ipairs(Main.specs:find_by_category("Actionspec", "enchantment")) do
 		if Client.data.unlocks:get("action", v.name) then
 			table.insert(actions, {v.name, function() self:set_action(v) end})
 			if self.__action == v then
@@ -169,7 +169,7 @@ EnchantState.get_modifiers_available = function(self)
 	if #self.__modifiers >= 3 then return end
 	-- Get the modifiers.
 	local modifiers = {}
-	for k,v in ipairs(ModifierSpec:find_by_category("spell")) do
+	for k,v in ipairs(Main.specs:find_by_category("ModifierSpec", "spell")) do
 		if Client.data.unlocks:get("modifier", v.name) then
 			if v.actions[self.__action.name] then
 				table.insert(modifiers, {v.name, function() self:add_modifier(v) end})

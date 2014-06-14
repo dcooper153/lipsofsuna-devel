@@ -113,7 +113,7 @@ end
 Actorpresetspec.get_chargen_body = function(self)
 	local list = {}
 	local count = 0
-	for k,v in ipairs(ChargenSliderSpec:find_by_category("body")) do
+	for k,v in ipairs(Main.specs:find_by_category("ChargenSliderSpec", "body")) do
 		count = math.max(count, v.field_index)
 		list[v.field_index] = self.body[v.name] or v.default
 	end
@@ -131,7 +131,7 @@ end
 Actorpresetspec.get_chargen_face = function(self)
 	local list = {}
 	local count = 0
-	for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
+	for k,v in ipairs(Main.specs:find_by_category("ChargenSliderSpec", "face")) do
 		count = math.max(count, v.field_index)
 		list[v.field_index] = self.face[v.name] or v.default
 	end

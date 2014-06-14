@@ -81,7 +81,7 @@ end
 ObjectVisual.add_hair_style = function(self, style)
 	-- Get the hair style spec.
 	if not style then return end
-	local spec = HairStyleSpec:find_by_name(style)
+	local spec = Main.specs:find_by_name("HairStyleSpec", style)
 	if not spec then return end
 	-- Get the list of anchors.
 	local class = self.object.spec.equipment_class or self.object.spec.name

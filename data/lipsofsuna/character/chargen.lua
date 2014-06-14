@@ -87,7 +87,7 @@ Chargen.reset = function(self)
 		spawn_point = "Home"}
 	-- Initialize the body sliders.
 	local max_body = 0
-	for k,v in ipairs(ChargenSliderSpec:find_by_category("body")) do
+	for k,v in ipairs(Main.specs:find_by_category("ChargenSliderSpec", "body")) do
 		self.char.body[v.field_index] = v.default
 		max_body = math.max(max_body, v.field_index)
 	end
@@ -98,7 +98,7 @@ Chargen.reset = function(self)
 	end
 	-- Initialize the face sliders.
 	local max_face = 0
-	for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
+	for k,v in ipairs(Main.specs:find_by_category("ChargenSliderSpec", "face")) do
 		self.char.face[v.field_index] = v.default
 		max_face = math.max(max_face, v.field_index)
 	end
@@ -191,14 +191,14 @@ Chargen.save = function(self)
 		skin_color = self.char.skin_color,
 		skin_style = self.char.skin_style}
 	-- Set the body slider states.
-	for k,v in ipairs(ChargenSliderSpec:find_by_category("body")) do
+	for k,v in ipairs(Main.specs:find_by_category("ChargenSliderSpec", "body")) do
 		local val = self.char.body[v.field_index]
 		if val then
 			preset.body[v.name] = val
 		end
 	end
 	-- Set the face slider states.
-	for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
+	for k,v in ipairs(Main.specs:find_by_category("ChargenSliderSpec", "face")) do
 		local val = self.char.face[v.field_index]
 		if val then
 			preset.face[v.name] = val

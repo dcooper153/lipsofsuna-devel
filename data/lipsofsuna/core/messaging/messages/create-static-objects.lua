@@ -47,7 +47,7 @@ Main.messaging:register_message{
 			-- Create the static objects.
 			local Simulation = require("core/client/simulation")
 			for k,v in pairs(objects) do
-				local spec = Staticspec:find_by_name(v[2])
+				local spec = Main.specs:find_by_name("Staticspec", v[2])
 				if spec then
 					local o = Simulation:create_object_by_spec(spec, v[1])
 					o:set_position(v[3])

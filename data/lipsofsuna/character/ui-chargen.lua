@@ -116,7 +116,7 @@ Ui:add_widget{
 	widget = function()
 		-- Create the body proportion sliders.
 		local widgets = {}
-		for k,v in ipairs(ChargenSliderSpec:find_by_category("body")) do
+		for k,v in ipairs(Main.specs:find_by_category("ChargenSliderSpec", "body")) do
 			local value = Client.chargen:get_body(v.field_index) or 0
 			local widget = UiScrollFloat(v.name, 0, 1, value, function(w)
 				Client.chargen:set_body(k, w.value)
@@ -337,7 +337,7 @@ Ui:add_widget{
 	widget = function()
 		-- Create the face shape sliders.
 		local widgets = {}
-		for k,v in ipairs(ChargenSliderSpec:find_by_category("face")) do
+		for k,v in ipairs(Main.specs:find_by_category("ChargenSliderSpec", "face")) do
 			local value = Client.chargen:get_face(v.field_index) or 0
 			local widget = UiScrollFloat(v.name, 0, 1, value, function(w)
 				Client.chargen:set_face(k, w.value)

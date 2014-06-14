@@ -35,7 +35,7 @@ Operators.crafting.update_craftability = function(self)
 	local object = Client.player_object
 	for k,v in Ui.widgets:get_children() do
 		if v.class_name == "UiInvCraft" then
-			local spec = CraftingRecipeSpec:find_by_name(v.name)
+			local spec = Main.specs:find_by_name("CraftingRecipeSpec", v.name)
 			v:set_enabled(Main.crafting_utils:can_craft(spec, object, self.data.mode))
 		end
 	end

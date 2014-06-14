@@ -33,7 +33,7 @@ UiMap.add_marker = function(self, icon, name, pos, rot)
 	if pix.x < 0 or pix.y < 0 or pix.x >= size.x or pix.y >= size.y then return end
 	-- Create the widget.
 	local tooltip = string.format("%s\nDistance: %d\nDepth: %d", name, loc.length, pos.y - center.y)
-	local widget = UiIcon(IconSpec:find_by_name(icon), pix, rot, UiTooltip(tooltip))
+	local widget = UiIcon(Main.specs:find_by_name("IconSpec", icon), pix, rot, UiTooltip(tooltip))
 	-- Pack the widget.
 	self:add_child(widget)
 	table.insert(self.markers, widget)

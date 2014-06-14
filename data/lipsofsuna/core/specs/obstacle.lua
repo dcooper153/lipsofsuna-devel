@@ -75,7 +75,7 @@ Obstaclespec.get_effect = function(self, name, profile)
 	local try = function(self, p, e)
 		local pname = self.effects[p]
 		if not pname then return end
-		local profile = EffectProfileSpec:find_by_name(pname)
+		local profile = Main.specs:find_by_name("EffectProfileSpec", pname)
 		if not profile then return end
 		return profile:get_effect(e)
 	end

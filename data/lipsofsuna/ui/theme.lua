@@ -139,7 +139,7 @@ Theme.draw_entry = function(self, widget, x, y, w, h, focused, editing)
 end
 
 Theme.draw_icon_scaled = function(self, widget, name, x, y, w, h, color)
-	local icon = IconSpec:find_by_name(name)
+	local icon = Main.specs:find_by_name("IconSpec", name)
 	if icon then
 		widget:canvas_image{
 			color = color,

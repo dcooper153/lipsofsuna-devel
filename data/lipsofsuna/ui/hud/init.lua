@@ -38,7 +38,7 @@ Ui:add_hud{
 	id = "crosshair",
 	active = function() return Ui.root == "play" end,
 	init = function()
-		local self = UiIcon(IconSpec:find_by_name("crosshair1"))
+		local self = UiIcon(Main.specs:find_by_name("IconSpec", "crosshair1"))
 		self.update = function(self, secs)
 			local mode = Program:get_video_mode()
 			local padx = mode[1] - self.icon.size[1]

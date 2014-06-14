@@ -144,7 +144,7 @@ UiInvItem.rebuild_canvas = function(self)
 	UiMenu.rebuild_canvas(self)
 	if not self.item then return end
 	-- Add the icon.
-	local icon = IconSpec:find_by_name(self.item.icon)
+	local icon = Main.specs:find_by_name("IconSpec", self.item.icon)
 	if icon then
 		self:canvas_image{
 			dest_position = {5,5},

@@ -13,7 +13,7 @@ MapUtils = Class("MapUtils")
 -- @param args Arguments.<ul>
 --   <li>category: Actorspec category.</li>
 --   <li>class: Forces all objects to use the given class.</li>
---   <li>diffuculty: Maximum difficulty of the actor.</li>
+--   <li>difficulty: Maximum difficulty of the actor.</li>
 --   <li>name: Actorspec name.</li>
 --   <li>point: Position vector, in tiles.</li>
 --   <li>rotation: Rotation around Y axis.</li></ul>
@@ -24,7 +24,7 @@ MapUtils.place_actor = function(clss, args)
 	-- maximum difficulty of the actor.
 	local spec
 	if args.category and args.difficulty then
-		local cat = Actorspec:find(args)
+		local cat = Main.specs:find_by_category("Actorspec", args.category)
 		if not cat then return end
 		local num = 0
 		local opt = {}

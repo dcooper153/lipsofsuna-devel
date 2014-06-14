@@ -8,7 +8,7 @@ Ui:add_state{
 	label = "Help",
 	init = function()
 		-- Find the help text.
-		local help = HelpSpec:find_by_name(Client.data.help.page)
+		local help = Main.specs:find_by_name("HelpSpec", Client.data.help.page)
 		if not help then return end
 		-- Create the widgets.
 		local widgets = {UiLabel(help.title)}

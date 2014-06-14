@@ -575,7 +575,7 @@ Actor.randomize = function(self)
 	local spec = self:get_spec()
 	-- Set the appearance.
 	if spec.preset then
-		local preset = ActorPresetSpec:find_by_name(spec.preset)
+		local preset = Main.specs:find_by_name("ActorPresetSpec", spec.preset)
 		if preset then
 			for k,v in pairs(preset:get_actor()) do
 				self[k] = v

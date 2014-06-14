@@ -167,7 +167,7 @@ end
 Actorspec.check_enemy = function(self, object)
 	if object.spec.type ~= "actor" then return end
 	for name1 in pairs(self.factions) do
-		local spec1 = FactionSpec:find_by_name(name1)
+		local spec1 = Main.specs:find_by_name("FactionSpec", name1)
 		if spec1 then
 			for name2 in pairs(object.spec.factions) do
 				if spec1.enemies[name2] then
@@ -253,7 +253,7 @@ Actorspec.get_effect = function(self, name, profile)
 	local try = function(self, p, e)
 		local pname = self.effects[p]
 		if not pname then return end
-		local profile = EffectProfileSpec:find_by_name(pname)
+		local profile = Main.specs:find_by_name("EffectProfileSpec", pname)
 		if not profile then return end
 		return profile:get_effect(e)
 	end
@@ -392,7 +392,7 @@ Actorspec.set_factions = function(self, args)
 	if args then
 		self.factions = {}
 		for k,v in pairs(args) do
-			self.factions[v] = FactionSpec:find_by_name(v)
+			self.factions[v] = Main.specs:find_by_name("FactionSpec", v)
 		end
 	end
 end

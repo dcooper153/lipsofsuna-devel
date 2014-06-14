@@ -32,7 +32,7 @@ Actionspec{
 			return
 		end
 		-- Fire the spell.
-		local spec = Spellspec:find_by_name("fireball1") --FIXME
+		local spec = Main.specs:find_by_name("Spellspec", "fireball1") --FIXME
 		if not spec then return end
 		local spell = Spell(action.object.manager)
 		spell:set_spec(spec)

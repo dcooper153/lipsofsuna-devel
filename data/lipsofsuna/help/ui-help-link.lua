@@ -34,7 +34,7 @@ end
 -- @param self UiMenu.
 UiHelpLink.apply = function(self)
 	-- Find the help text.
-	local help = HelpSpec:find_by_name(self.link)
+	local help = Main.specs:find_by_name("HelpSpec", self.link)
 	if not help then return end
 	-- Create the widgets.
 	local widgets = {}

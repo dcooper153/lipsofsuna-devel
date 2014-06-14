@@ -47,7 +47,7 @@ Simulation.create_object_by_spec = function(self, spec, id)
 	o:set_spec(spec)
 	-- Apply presets.
 	if spec.preset then
-		local preset = Actorpresetspec:find_by_name(spec.preset)
+		local preset = Main.specs:find_by_name("ActorPresetSpec", spec.preset)
 		if preset then
 			preset = preset:get_chargen()
 			local copy_table = function(t)

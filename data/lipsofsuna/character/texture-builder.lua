@@ -107,7 +107,7 @@ TextureBuilder.__main = function(self, spec)
 	yield()
 	-- Find the haircut spec.
 	if hair_style and hair_style ~= "" then
-		local spec1 = HairStyleSpec:find_by_name(hair_style)
+		local spec1 = Main.specs:find_by_name("HairStyleSpec", hair_style)
 		if spec1 then
 			table.insert(specs, spec1)
 		end
@@ -138,7 +138,7 @@ TextureBuilder.__main = function(self, spec)
 	-- Set the base texture.
 	local basename = spec:get_base_texture()
 	if not basename then return end
-	local skinspec = skin_style and ActorSkinSpec:find_by_name(skin_style)
+	local skinspec = skin_style and Main.specs:find_by_name("ActorSkinSpec", skin_style)
 	local skinname = skinspec and skinspec.textures[1] or basename
 	local base = Main.images:find_by_name_async(skinname, yield)
 	if not base then return end
@@ -177,7 +177,7 @@ end
 -- @param colors Color dictionary.
 TextureBuilder.__merge_colored = function(self, name, colors)
 	if not name then return end
-	local spec = ActorTextureSpec:find_by_name(name)
+	local spec = Main.specs:find_by_name("ActorTextureSpec", name)
 	if not spec then return end
 	if not spec.blit_texture then return end
 	local blit = Main.images:find_by_name_async(spec.blit_texture, yield)

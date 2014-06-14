@@ -45,7 +45,7 @@ MusicManager.cycle_track = function(self, force)
 	local mode = self.__combat_timer and "combat" or self.__music_mode
 	if not mode then return end
 	-- Find the tracks.
-	local tracks = MusicSpec:find_by_category(mode)
+	local tracks = Main.specs:find_by_category("MusicSpec", mode)
 	if not tracks then return end
 	if #tracks == 0 then return end
 	-- Choose a random track.

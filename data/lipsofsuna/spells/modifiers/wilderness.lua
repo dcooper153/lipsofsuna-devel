@@ -25,7 +25,7 @@ WildernessModifier.start = function(modifier, value)
 			if ground then
 				local gx,gz = Main.terrain:get_grid_xz_by_point(ground.x, ground.z)
 				local y,h,mat = Main.terrain.terrain:get_stick(gx, gz, ground.y - 0.01)
-				local matspec = TerrainMaterialSpec:find_by_id(mat)
+				local matspec = Main.specs:find_by_id("TerrainMaterialSpec", mat)
 				if matspec and (matspec.name == "soil" or matspec.name == "grass") then
 					table.insert(hits, ground)
 				end

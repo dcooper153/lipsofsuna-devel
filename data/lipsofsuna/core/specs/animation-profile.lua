@@ -38,7 +38,7 @@ AnimationProfileSpec.get_animation = function(self, name)
 	-- Try primary animations.
 	local aname = self.animations[name]
 	if aname then
-		return AnimationSpec:find_by_name(aname)
+		return Main.specs:find_by_name("AnimationSpec", aname)
 	end
 	-- Try inherited animations.
 	for k,v in pairs(self.inherit) do

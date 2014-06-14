@@ -443,7 +443,7 @@ Main.messaging:register_message{
 		elseif args.type == "actor" then
 			spec = Main.specs:find_by_name("Actorspec", args.spec)
 		elseif args.type == "spell" then
-			spec = Spellspec:find_by_name(args.spec)
+			spec = Main.specs:find_by_name("Spellspec", args.spec)
 		end
 		local o = Simulation:create_object_by_spec(spec, args.id)
 		-- Self.

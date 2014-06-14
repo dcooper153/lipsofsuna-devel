@@ -42,7 +42,7 @@ Ui.init = function(self)
 	self.hint = Label()
 	self.label = Label()
 	-- Initialize the cursor.
-	self.cursor = Cursor(IconSpec:find_by_name("cursor1"))
+	self.cursor = Cursor(Main.specs:find_by_name("IconSpec", "cursor1"))
 	-- Initialize input.
 	self.input = InputHandler(Client.bindings, self.widgets)
 	self.input.focus_changed = function(w, mouse)
