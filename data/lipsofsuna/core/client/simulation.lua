@@ -8,15 +8,10 @@
 -- @module core.client.simulation
 -- @alias Simulation
 
-local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Color = require("system/color")
-local Item = require("core/objects/item")
-local Obstacle = require("core/objects/obstacle")
 local Physics = require("system/physics")
 local PhysicsConsts = require("core/physics/consts")
-local Spell = require("core/objects/spell")
-local Staticobject = require("core/objects/static")
 
 --- TODO:doc
 -- @type Simulation

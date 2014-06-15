@@ -1,5 +1,3 @@
-local Obstacle = require("core/objects/obstacle")
-
 -- Spawn trees and plants.
 local WildernessModifier = Main.specs:find_by_name("ModifierSpec", "wilderness")
 
@@ -40,9 +38,9 @@ WildernessModifier.start = function(modifier, value)
 				local obstspec = Main.specs:find_random_by_category("ObstacleSpec", "wilderness")
 				if obstspec then
 					if Utils:check_room(p, obstspec.model) then
-						local o = Obstacle(modifier.owner.manager)
-						o:set_position(p)
+						local o = modifier.owner.manager:create_object("Obstacle")
 						o:set_spec(obstspec)
+						o:set_position(p)
 						o:set_visible(true)
 						Main.vision:world_effect(p, "wilderness growth 1")
 					end

@@ -8,10 +8,7 @@
 -- @module core.dialog.dialog
 -- @alias Dialog
 
-local Actor = require("core/objects/actor")
 local Class = require("system/class")
-local Item = require("core/objects/item")
-local Obstacle = require("core/objects/obstacle")
 local Quaternion = require("system/math/quaternion")
 
 --- Holds the dialog state of an individual NPC.
@@ -427,10 +424,8 @@ Dialog.execute = function(self)
 		end,
 		["give player item"] = function(vm, c)
 			vm[1].pos = vm[1].pos + 1
-			local s = Main.specs:find_by_name("ItemSpec", c[2])
-			if not s then return end
-			local o = Item(self.user.manager)
-			o:set_spec(s)
+			local o = self.user.manager:create_object_by_spec("Item", c[2])
+			if not o then return end
 			o:set_count(c.count)
 			if self.user.inventory:merge_or_drop_object(o) then
 				self.user:send_message("Received " .. c[2])

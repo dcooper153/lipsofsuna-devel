@@ -8,12 +8,7 @@
 -- @module core.server.object_database
 -- @alias ObjectDatabase
 
-local Actor = require("core/objects/actor")
 local Class = require("system/class")
-local Item = require("core/objects/item")
-local Obstacle = require("core/objects/obstacle")
-local Player = require("core/objects/player")
-local Staticobject = require("core/objects/static")
 
 --- TODO:doc
 -- @type ObjectDatabase

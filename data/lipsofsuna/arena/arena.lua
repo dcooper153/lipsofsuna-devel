@@ -8,15 +8,11 @@
 -- @module arena.arena
 -- @alias Arena
 
-local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Game = require("core/server/game")
 local Hooks = require("system/hooks")
-local Item = require("core/objects/item")
 local Physics = require("system/physics")
 local PhysicsConsts = require("core/physics/consts")
-local Obstacle = require("core/objects/obstacle")
-local Player = require("core/objects/player")
 local ServerUtils = require("core/server/util") --FIXME
 local TerrainManager = require("core/terrain/terrain-manager")
 local Vector = require("system/math/vector")

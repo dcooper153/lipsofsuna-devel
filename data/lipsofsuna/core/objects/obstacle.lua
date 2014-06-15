@@ -64,8 +64,8 @@ end
 -- @return New object.
 Obstacle.clone = function(self)
 	-- TODO: Clone dialog variables?
-	local o = Obstacle(self.manager)
-	o:set_spec(self.spec)
+	local o = self.manager:create_object("Obstacle")
+	o:set_spec(self:get_spec())
 	o:set_position(self:get_position())
 	o:set_rotation(self:get_rotation())
 	o.health = self.health

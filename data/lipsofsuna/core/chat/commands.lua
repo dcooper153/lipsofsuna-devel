@@ -1,10 +1,6 @@
-local Actor = require("core/objects/actor")
 local Debug = require( "system/debug")
-local Item = require("core/objects/item")
-local Obstacle = require("core/objects/obstacle")
 local Physics = require("system/physics")
 local PhysicsConsts = require("core/physics/consts")
-local Staticobject = require("core/objects/static")
 
 Main.chat:register_command{
 	name = "behead",
@@ -265,10 +261,8 @@ Main.chat:register_command{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local spec = Main.specs:find_by_name("ItemSpec", matches[1])
-		if not spec then return end
-		local o = Item(player.manager)
-		o:set_spec(spec)
+		local o = player.manager:create_object_by_spec("Item", matches[1])
+		if not o then return end
 		o:set_position(player:get_position())
 		o:randomize()
 		o:set_visible(true)
@@ -281,10 +275,8 @@ Main.chat:register_command{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local spec = Main.specs:find_by_name("ObstacleSpec", matches[1])
-		if not spec then return end
-		local o = Obstacle(player.manager)
-		o:set_spec(spec)
+		local o = player.manager:create_object_by_spec("Obstacle", matches[1])
+		if not o then return end
 		o:set_position(player:get_position())
 		o:set_visible(true)
 	end}
