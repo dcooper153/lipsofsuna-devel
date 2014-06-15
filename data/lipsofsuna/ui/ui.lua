@@ -603,6 +603,9 @@ end
 -- @param self Ui class.
 Ui.show_state_attach = function(self)
 	local root = self.background or self.window
+	if root.reshaped then
+		root:reshaped()
+	end
 	-- Attach the speech bubble widgets.
 	for k,v in pairs(self.bubbles) do
 		root:add_child(v)
@@ -656,8 +659,14 @@ Ui.update = function(self, secs)
 		self.size.x = mode[1]
 		self.size.y = mode[2]
 		self.window:set_request(mode[1], mode[2])
+		if self.window.reshaped then
+			self.window:reshaped()
+		end
 		if self.background then
 			self.background:set_request(mode[1], mode[2])
+			if self.background.reshaped then
+				self.background:reshaped()
+			end
 		end
 		self:update_help()
 		self.need_relayout = true
@@ -665,6 +674,7 @@ Ui.update = function(self, secs)
 	-- Update the cursor.
 	if not self:get_pointer_grab() then
 		self.cursor:update()
+		self.cursor:reshaped()
 	end
 	-- Call the update functions of the state.
 	local s = self.states[self:get_state()]

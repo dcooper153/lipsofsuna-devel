@@ -28,7 +28,6 @@ Widget.new = function(clss)
 	local self = Class.new(clss)
 	self.handle = Los.widget_new()
 	self.__children = {}
-	__userdata_lookup[self.handle] = self
 	return self
 end
 
@@ -38,6 +37,7 @@ end
 Widget.add_child = function(self, widget)
 	Los.widget_add_child(self.handle, widget.handle)
 	self.__children[widget] = widget
+	widget.__parent = self
 end
 
 --- Calculates and sets the size request of the widget.
@@ -117,6 +117,7 @@ Widget.detach = function(self)
 	end
 	-- Remove from the internal parent.
 	Los.widget_detach(self.handle)
+	self.__parent = nil
 end
 
 --- Pops up the widget.
@@ -221,7 +222,7 @@ end
 Widget.get_parent = function(self)
 	local handle = Los.widget_get_parent(self.handle)
 	if not handle then return end
-	return __userdata_lookup[handle] -- TODO: eliminate by caching the parent in scripts
+	return self.__parent
 end
 
 --- Gets the size request of the widget.
@@ -290,15 +291,6 @@ end
 -- @param v Number.
 Widget.set_y = function(self, v)
 	Los.widget_set_y(self.handle, v)
-end
-
--- Userdata don't have members but the engine needs to be able to call the
--- reshape functions of widgets. This is done with a global variable.
-__widget_reshape = function(handle)
-	local w = __userdata_lookup[handle]
-	if w and w.reshaped then
-		w:reshaped()
-	end
 end
 
 return Widget

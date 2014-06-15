@@ -26,7 +26,4 @@ Class.new = function(clss, name, base)
 	end
 end
 
--- FIXME
-__userdata_lookup = setmetatable({}, {__mode = "kv"})
-
 return Class

@@ -35,13 +35,13 @@ Cursor.update = function(self)
 		self.tooltip = nil
 	end
 	if self.widget then return end
-	if self:get_floating() then
+--[[	if self:get_floating() then
 		local w = Widgets:find_handler_widget("tooltip")
 		if w and w.tooltip then
 			self.tooltip = w.tooltip
 			w.tooltip:popup(c + Vector(5,5))
 		end
-	end
+	end]]
 end
 
 Cursor.reshaped = function(self)
