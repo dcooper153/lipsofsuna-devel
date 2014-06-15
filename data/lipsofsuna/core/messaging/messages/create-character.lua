@@ -3,8 +3,6 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 
-local Player = require("core/objects/player")
-
 Main.messaging:register_message{
 	name = "create character",
 	client_to_server_encode = function(self, char)
@@ -95,12 +93,9 @@ Main.messaging:register_message{
 		-- Make sure not created already.
 		local player = Server:get_player_by_client(client)
 		if player then return end
-		-- Get the actor spec of the character.
-		local spec = Main.specs:find_by_name("ActorSpec", char.race .. "-player")
-		if not spec then return end
 		-- Create the character.
-		local player = Player(Main.objects)
-		player:set_spec(spec)
+		local player = Main.objects:create_object_by_spec("Player", char.race .. "-player")
+		if not player then return end
 		player:randomize()
 		player.account = account
 		player.animation_profile = char.animation_profile

@@ -57,7 +57,7 @@ end
 -- @param self Object.
 -- @return New object.
 Staticobject.clone = function(self)
-	local o = Staticobject(self.manager)
+	local o = self.manager:create_object("Static")
 	o:set_spec(self:get_spec())
 	o:set_position(self:get_position())
 	o:set_rotation(self:get_rotation())

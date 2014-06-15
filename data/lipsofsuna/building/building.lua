@@ -13,7 +13,6 @@ local Game = require("core/server/game")
 local Hooks = require("system/hooks")
 local Physics = require("system/physics")
 local PhysicsConsts = require("core/physics/consts")
-local Player = require("core/objects/player")
 local ServerUtils = require("core/server/util") --FIXME
 local TerrainManager = require("core/terrain/terrain-manager")
 local Vector = require("system/math/vector")
@@ -69,8 +68,7 @@ end
 Building.update = function(self, secs)
 	-- Initialize the player.
 	if not self.player then
-		self.player = Player(Main.objects)
-		self.player:set_spec(Main.specs:find_by_name("ActorSpec", "building player"))
+		self.player = Main.objects:create_object_by_spec("Player", "building player")
 		self.player:randomize()
 		self.player.get_admin = function() return true end --FIXME
 		self.player:set_position(Vector(500,101,500))

@@ -1,9 +1,5 @@
-local Actor = require("core/objects/actor")
 local Class = require("system/class")
-local Item = require("core/objects/item")
-local Obstacle = require("core/objects/obstacle")
 local Quaternion = require("system/math/quaternion")
-local Staticobject = require("core/objects/static")
 
 --- Various helpers for populating the map.
 -- @type MapUtils
@@ -66,10 +62,8 @@ end
 -- @param point Position vector, in tiles.
 -- @param rotation Rotation around Y axis. Nil for default.
 MapUtils.place_item_by_category = function(clss, category, point, rotation)
-	local spec = Main.specs:find_random_by_category("ItemSpec", category)
-	if not spec then return end
-	local obj = Item(Main.objects)
-	obj:set_spec(spec)
+	local obj = Main.objects:create_object_by_spec_category("Item", category)
+	if not obj then return end
 	if obj.randomize then
 		obj:randomize()
 	end
@@ -85,10 +79,8 @@ end
 -- @param point Position vector, in tiles.
 -- @param rotation Rotation around Y axis. Nil for default.
 MapUtils.place_item_by_name = function(clss, name, point, rotation)
-	local spec = Main.specs:find_by_name(name)
-	if not spec then return end
-	local obj = Item(Main.objects)
-	obj:set_spec(spec)
+	local obj = Main.objects:create_object_by_spec("Item", name)
+	if not obj then return end
 	if obj.randomize then
 		obj:randomize()
 	end
@@ -104,10 +96,8 @@ end
 -- @param point Position vector, in tiles.
 -- @param rotation Rotation around Y axis. Nil for default.
 MapUtils.place_obstacle_by_category = function(clss, category, point, rotation)
-	local spec = Main.specs:find_random_by_category(category)
-	if not spec then return end
-	local obj = Obstacle(Main.objects)
-	obj:set_spec(spec)
+	local obj = Main.objects:create_object_by_spec_category("Obstacle", category)
+	if not obj then return end
 	obj:set_position(point)
 	if rotation then obj:set_rotation(Quaternion:new_from_euler(rotation * 2 * math.pi, 0, 0)) end
 	obj:set_visible(true)
@@ -120,10 +110,8 @@ end
 -- @param point Position vector, in tiles.
 -- @param rotation Rotation around Y axis. Nil for default.
 MapUtils.place_obstacle_by_name = function(clss, name, point, rotation)
-	local spec = Main.specs:find_by_name(name)
-	if not spec then return end
-	local obj = Staticobject(Main.objects)
-	obj:set_spec(spec)
+	local obj = Main.objects:create_object_by_spec("Obstacle", name)
+	if not obj then return end
 	obj:set_position(point)
 	if rotation then obj:set_rotation(Quaternion:new_from_euler(rotation * 2 * math.pi, 0, 0)) end
 	obj:set_visible(true)
@@ -136,10 +124,8 @@ end
 -- @param point Position vector, in tiles.
 -- @param rotation Rotation around Y axis. Nil for default.
 MapUtils.place_static_by_category = function(clss, category, point, rotation)
-	local spec = Main.specs:find_random_by_category(category)
-	if not spec then return end
-	local obj = Staticobject(Main.objects)
-	obj:set_spec(spec)
+	local obj = Main.objects:create_object_by_spec_category("Static", category)
+	if not obj then return end
 	obj:set_position(point)
 	if rotation then obj:set_rotation(Quaternion:new_from_euler(rotation * 2 * math.pi, 0, 0)) end
 	obj:set_visible(true)
@@ -152,10 +138,8 @@ end
 -- @param point Position vector, in tiles.
 -- @param rotation Rotation around Y axis. Nil for default.
 MapUtils.place_static_by_name = function(clss, name, point, rotation)
-	local spec = Main.specs:find_by_name(name)
-	if not spec then return end
-	local obj = Staticobject(Main.objects)
-	obj:set_spec(spec)
+	local obj = Main.objects:create_object_by_spec("Static", name)
+	if not obj then return end
 	obj:set_position(point)
 	if rotation then obj:set_rotation(Quaternion:new_from_euler(rotation * 2 * math.pi, 0, 0)) end
 	obj:set_visible(true)
