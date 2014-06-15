@@ -37,7 +37,7 @@ MapUtils.place_actor_by_category = function(clss, category, point, rotation, dif
 		obj:randomize()
 	end
 	obj:set_position(point)
-	if rotation then obj:set_rotation(Quaternion{euler = {rotation * 2 * math.pi, 0, 0}}) end
+	if rotation then obj:set_rotation(Quaternion:new_from_euler(rotation * 2 * math.pi, 0, 0)) end
 	obj:set_visible(true)
 	return obj
 end
@@ -58,7 +58,7 @@ MapUtils.place_actor_by_name = function(clss, name, point, rotation)
 		obj:randomize()
 	end
 	obj:set_position(point)
-	if rotation then obj:set_rotation(Quaternion{euler = {rotation * 2 * math.pi, 0, 0}}) end
+	if rotation then obj:set_rotation(Quaternion:new_from_euler(rotation * 2 * math.pi, 0, 0)) end
 	obj:set_visible(true)
 	return obj
 end
@@ -77,7 +77,7 @@ MapUtils.place_item_by_category = function(clss, category, point, rotation)
 		obj:randomize()
 	end
 	obj:set_position(args.point)
-	if rotation then obj:set_rotation(Quaternion{euler = {rotation * 2 * math.pi, 0, 0}}) end
+	if rotation then obj:set_rotation(Quaternion:new_from_euler(rotation * 2 * math.pi, 0, 0)) end
 	obj:set_visible(true)
 	return obj
 end
@@ -96,7 +96,7 @@ MapUtils.place_item_by_name = function(clss, name, point, rotation)
 		obj:randomize()
 	end
 	obj:set_position(point)
-	if rotation then obj:set_rotation(Quaternion{euler = {rotation * 2 * math.pi, 0, 0}}) end
+	if rotation then obj:set_rotation(Quaternion:new_from_euler(rotation * 2 * math.pi, 0, 0)) end
 	obj:set_visible(true)
 	return obj
 end
@@ -112,7 +112,7 @@ MapUtils.place_obstacle_by_category = function(clss, category, point, rotation)
 	local obj = Obstacle(Main.objects)
 	obj:set_spec(spec)
 	obj:set_position(point)
-	if rotation then obj:set_rotation(Quaternion{euler = {rotation * 2 * math.pi, 0, 0}}) end
+	if rotation then obj:set_rotation(Quaternion:new_from_euler(rotation * 2 * math.pi, 0, 0)) end
 	obj:set_visible(true)
 	return obj
 end
@@ -128,7 +128,7 @@ MapUtils.place_obstacle_by_name = function(clss, name, point, rotation)
 	local obj = Staticobject(Main.objects)
 	obj:set_spec(spec)
 	obj:set_position(point)
-	if rotation then obj:set_rotation(Quaternion{euler = {rotation * 2 * math.pi, 0, 0}}) end
+	if rotation then obj:set_rotation(Quaternion:new_from_euler(rotation * 2 * math.pi, 0, 0)) end
 	obj:set_visible(true)
 	return obj
 end
@@ -144,7 +144,7 @@ MapUtils.place_static_by_category = function(clss, category, point, rotation)
 	local obj = Staticobject(Main.objects)
 	obj:set_spec(spec)
 	obj:set_position(point)
-	if rotation then obj:set_rotation(Quaternion{euler = {rotation * 2 * math.pi, 0, 0}}) end
+	if rotation then obj:set_rotation(Quaternion:new_from_euler(rotation * 2 * math.pi, 0, 0)) end
 	obj:set_visible(true)
 	return obj
 end
@@ -160,7 +160,7 @@ MapUtils.place_static_by_name = function(clss, name, point, rotation)
 	local obj = Staticobject(Main.objects)
 	obj:set_spec(spec)
 	obj:set_position(point)
-	if rotation then obj:set_rotation(Quaternion{euler = {rotation * 2 * math.pi, 0, 0}}) end
+	if rotation then obj:set_rotation(Quaternion:new_from_euler(rotation * 2 * math.pi, 0, 0)) end
 	obj:set_visible(true)
 	return obj
 end

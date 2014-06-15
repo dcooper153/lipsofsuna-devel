@@ -8,7 +8,7 @@ Main.messaging:register_message{
 	client_to_server_encode = function(self, turn, tilt)
 		local o = Client.player_object
 		if not o then return end
-		o:set_rotation(Quaternion{euler = {turn, 0, 0}})
+		o:set_rotation(Quaternion:new_from_euler(turn, 0, 0))
 		o:set_tilt_angle(tilt)
 		if not o.synced_turn_state or math.abs(o.synced_turn_state - turn) > math.pi/180 or
 		   not o.synced_tilt_state or math.abs(o.synced_tilt_state - tilt) > math.pi/180 then
@@ -29,6 +29,6 @@ Main.messaging:register_message{
 		tilt = math.min(player.spec.tilt_limit, tilt)
 		tilt = math.max(-player.spec.tilt_limit, tilt)
 		player:set_tilt_angle(tilt)
-		player:set_rotation(Quaternion{euler = {turn, 0, 0}})
+		player:set_rotation(Quaternion:new_from_euler(turn, 0, 0))
 		Main.vision:object_event(player, "object-motion")
 	end}

@@ -98,7 +98,7 @@ Ai.calculate_melee_tilt = function(self)
 	local angle = math.atan2(diff.y, dist)
 	local limit = self.object.spec.tilt_limit
 	angle = math.min(math.max(angle, -limit), limit)
-	return Quaternion{euler = {0,0,angle}}
+	return Quaternion:new_from_euler(0,0,angle)
 end
 
 --- Calculates the tilt value for ranged spell attacks.
@@ -124,7 +124,7 @@ Ai.calculate_ranged_tilt = function(self)
 	local speed = 20
 	local solve = function(angle)
 		local a = spec.gravity_projectile
-		local v = Quaternion{euler = {0,0,angle}} * Vector(0, 0, -speed)
+		local v = Quaternion:new_from_euler(0,0,angle) * Vector(0, 0, -speed)
 		local t_hit = dist / Vector(v.x,0,v.z).length
 		local y_hit = v.y * t_hit + 0.5 * a.y * t_hit^2
 		return y_hit
@@ -138,7 +138,7 @@ Ai.calculate_ranged_tilt = function(self)
 			best_error = e
 		end
 	end
-	return Quaternion{euler = {0,0,best}}
+	return Quaternion:new_from_euler(0,0,best)
 end
 
 -- Calculates the combat ratings of a weapon.

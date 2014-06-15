@@ -41,7 +41,7 @@ FirstPersonCamera.get_picking_ray = function(self)
 	-- Calculate the rotation.
 	local euler = self.object:get_rotation().euler
 	euler[3] = self.object:get_tilt_angle() - self.tilt_state
-	local rot = Quaternion{euler = euler}
+	local rot = Quaternion:new_from_euler(euler)
 	-- Project the ray.
 	local ctr = self.object:transform_local_to_global(spec.aim_ray_center)
 	return ctr,Vector(0, 0, -5):transform(rot, ctr)
@@ -51,7 +51,7 @@ FirstPersonCamera.get_transform = function(self)
 	-- Calculate the rotation.
 	local turn = self.turn_state + self.object:get_turn_angle()
 	local tilt = self.tilt_state + self.object:get_tilt_angle()
-	local rot = Quaternion{euler = {turn, 0, tilt}}
+	local rot = Quaternion:new_from_euler(turn, 0, tilt)
 	-- Find the camera offset.
 	local spec = self.object.spec
 	local rel = spec.camera_center or Vector(0, 2, 0)

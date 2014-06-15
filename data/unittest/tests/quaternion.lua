@@ -14,7 +14,7 @@ Unittest:add(1, "system", "quaternion", function()
 	assert(q3.y == -1)
 	assert(q3.length == 1)
 	-- Euler presentation.
-	local q4 = Quaternion{euler = {0,0,1.5}}
+	local q4 = Quaternion:new_from_euler(0,0,1.5)
 	assert(q4.euler[1] == 0)
 	assert(q4.euler[2] == 0)
 	assert(q4.euler[3] == 1.5)

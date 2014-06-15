@@ -146,7 +146,6 @@ end
 --   <li>angle: Angle of rotation in radians.</li>
 --   <li>axis: Axis of rotation.</li>
 --   <li>dir: Look direction vector.</li>
---   <li>euler: Euler angles.</li>
 --   <li>up: Up direction vector.</li>
 -- </ul>
 --
@@ -159,9 +158,7 @@ end
 Quaternion.new = function(clss, x, y, z, w)
 	local h
 	if type(x) == "table" then
-		if x.euler then
-			h = Los.quaternion_new_euler(x.euler)
-		elseif x.axis then
+		if x.axis then
 			h = Los.quaternion_new{axis = x.axis.handle, angle = x.angle}
 		else
 			h = Los.quaternion_new{dir = x.dir.handle, up = x.up.handle}
@@ -199,8 +196,13 @@ end
 -- @param z Third angle.
 -- @return New quaternion.
 Quaternion.new_from_euler = function(clss, x, y, z)
-	local h = Los.quaternion_new_euler{x, y, z}
-	return Quaternion:new_from_handle(h)
+	if type(x) == "table" then
+		local h = Los.quaternion_new_euler(x)
+		return Quaternion:new_from_handle(h)
+	else
+		local h = Los.quaternion_new_euler{x, y, z}
+		return Quaternion:new_from_handle(h)
+	end
 end
 
 --- Creates a new quaternion from an internal handle.

@@ -225,7 +225,7 @@ CombatUtils.get_attack_ray_for_actor = function(self, actor, ray_start, ray_end,
 	local ray2 = Vector(0, 0, -(ray_end or actor.spec.aim_ray_end))
 	if rel then ray2 = ray2 + rel * (ray_end or actor.spec.aim_ray_end) end
 	if actor.tilt then
-		local rot = Quaternion{euler = actor.tilt.euler}
+		local rot = Quaternion:new_from_euler(actor.tilt.euler)
 		local src = actor:transform_local_to_global(ctr + rot * ray1)
 		local dst = actor:transform_local_to_global(ctr + rot * ray2)
 		return src, dst
