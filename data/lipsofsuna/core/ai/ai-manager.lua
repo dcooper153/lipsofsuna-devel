@@ -18,6 +18,7 @@ local AiManager = Class("AiManager")
 -- @return AiManager.
 AiManager.new = function(clss)
 	local self = Class.new(clss)
+	self.__classes = {}
 	self.logics = setmetatable({}, {__mode = "k"})
 	return self
 end
@@ -34,6 +35,21 @@ end
 -- @param ai AI.
 AiManager.remove = function(self, ai)
 	self.logics[ai] = nil
+end
+
+--- Finds an AI logic class.
+-- @param self AiManager.
+-- @param type Logic type.
+-- @return Logic class on success. Nil otherwise.
+AiManager.find_class_by_type = function(self, type)
+	return self.__classes[type]
+end
+
+--- Registers an AI logic class.
+-- @param self AiManager.
+-- @param logic Logic class.
+AiManager.register_class = function(self, logic)
+	self.__classes[logic.type] = logic
 end
 
 --- Updates the AI of all the objects.

@@ -14,8 +14,7 @@ local Physics = require("system/physics")
 
 --- Artificial intelligence.
 -- @type Ai
-Ai = Class("Ai")
-Ai.dict_name = {}
+local Ai = Class("Ai")
 
 --- Creates a new actor AI.<br/>
 --
@@ -37,13 +36,6 @@ Ai.new = function(clss, manager, object)
 	self:calculate_combat_ratings()
 	self.object:set_movement(0)
 	return self
-end
-
---- Registers an AI subclass.
--- @param clss AI class.
--- @param ai Subclass.
-Ai.register = function(clss, ai)
-	clss.dict_name[ai.type] = ai
 end
 
 --- Adds an enemy to the list of enemies.

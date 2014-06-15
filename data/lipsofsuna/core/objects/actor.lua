@@ -1112,7 +1112,7 @@ Actor.set_spec = function(self, v)
 		end
 		-- Create the AI.
 		if not spec.dead and spec.ai_enabled then
-			ai_class = Ai.dict_name[spec.ai_type or "npc"]
+			ai_class = Main.ai:find_class_by_type(spec.ai_type or "npc")
 			self.ai = ai_class and ai_class(Main.ai, self)
 		end
 	end

@@ -1,7 +1,6 @@
-local Ai = require("core/ai/logic/ai")
-local AiManager = require("core/ai/ai-manager")
-
-Ai:register(require("core/ai/logic/anchored"))
-Ai:register(require("core/ai/logic/npc"))
-Ai:register(require("core/ai/logic/camper"))
-Ai:register(require("core/ai/logic/companion"))
+Main.main_start_hooks:register(1, function()
+	Main.ai:register_class(require("core/ai/logic/anchored"))
+	Main.ai:register_class(require("core/ai/logic/npc"))
+	Main.ai:register_class(require("core/ai/logic/camper"))
+	Main.ai:register_class(require("core/ai/logic/companion"))
+end)
