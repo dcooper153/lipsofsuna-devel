@@ -137,16 +137,7 @@ local quaternion_tostring = function(self)
 	return Los.quaternion_tostring(self.handle)
 end
 
---- Creates a new quaternion.<br>
---
--- If a table is passed as the first argument, the following additional
--- constuction arguments can be used:<br/>
---
--- <ul>
---   <li>dir: Look direction vector.</li>
---   <li>up: Up direction vector.</li>
--- </ul>
---
+--- Creates a new quaternion.
 -- @param clss Quaternion class.
 -- @param x Optional X value, default is 0.
 -- @param y Optional Y value, default is 0.
@@ -154,12 +145,7 @@ end
 -- @param w Optional W value, default is 1.
 -- @return New quaternion.
 Quaternion.new = function(clss, x, y, z, w)
-	local h
-	if type(x) == "table" then
-		h = Los.quaternion_new{dir = x.dir.handle, up = x.up.handle}
-	else
-		h = Los.quaternion_new(x, y, z, w)
-	end
+	local h = Los.quaternion_new(x, y, z, w)
 	return Quaternion:new_from_handle(h)
 end
 
