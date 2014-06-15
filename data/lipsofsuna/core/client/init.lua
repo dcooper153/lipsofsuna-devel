@@ -1,10 +1,13 @@
 -- Initialize the default video mode.
 local Options = require("core/client/options")
 local options = Options()
+
 __initial_videomode = {options.window_width, options.window_height, options.fullscreen, options.vsync, options.multisamples}
 __initial_pointer_grab = false
-
 require "system/graphics"
+__initial_pointer_grab = nil
+__initial_videomode = nil
+
 require "system/model-editing"
 
 Program:set_window_title("Lips of Suna")
