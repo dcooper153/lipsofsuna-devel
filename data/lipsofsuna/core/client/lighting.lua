@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Light = require("system/light")
+local Quaternion = require("system/math/quaternion")
 local Render = require("system/render")
 
 --- TODO:doc

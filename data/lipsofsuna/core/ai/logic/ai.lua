@@ -11,6 +11,7 @@
 local Class = require("system/class")
 local Action = require("core/actions/action")
 local Physics = require("system/physics")
+local Quaternion = require("system/math/quaternion")
 local Time = require("system/time")
 
 --- Artificial intelligence.

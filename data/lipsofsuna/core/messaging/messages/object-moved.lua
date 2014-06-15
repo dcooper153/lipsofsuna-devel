@@ -3,6 +3,8 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 
+local Quaternion = require("system/math/quaternion")
+
 Main.messaging:register_message{
 	name = "object moved",
 	server_to_client_encode = function(self, id, position, rotation, tilt, velocity)

@@ -7,6 +7,7 @@ local Bitwise = require("system/bitwise")
 local Item = require("core/objects/item")
 local Physics = require("system/physics")
 local PhysicsConsts = require("core/physics/consts")
+local Quaternion = require("system/math/quaternion")
 local Simulation = require("core/client/simulation")
 local Time = require("system/time")
 

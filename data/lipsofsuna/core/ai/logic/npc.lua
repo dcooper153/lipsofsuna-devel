@@ -10,6 +10,7 @@
 
 local Ai = require("core/ai/logic/ai")
 local Class = require("system/class")
+local Quaternion = require("system/math/quaternion")
 
 --- TODO:doc
 -- @type NpcAi

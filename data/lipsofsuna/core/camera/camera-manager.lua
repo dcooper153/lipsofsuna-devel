@@ -12,6 +12,7 @@ local Class = require("system/class")
 local Client = require("core/client/client")
 local Graphics = require("system/graphics")
 local Program = require("system/core")
+local Quaternion = require("system/math/quaternion")
 local Simulation = require("core/client/simulation")
 
 --- In-game camera management.

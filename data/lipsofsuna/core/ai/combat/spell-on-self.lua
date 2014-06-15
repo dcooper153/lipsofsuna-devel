@@ -1,4 +1,5 @@
 local AiActionSpec = require("core/specs/aiaction")
+local Quaternion = require("system/math/quaternion")
 
 AiActionSpec{
 	name = "self spell",

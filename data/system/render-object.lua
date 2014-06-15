@@ -10,6 +10,7 @@
 
 local Animation = require("system/animation")
 local Class = require("system/class")
+local Quaternion = require("system/math/quaternion")
 
 if not Los.program_load_extension("graphics") then
 	error("loading extension `graphics' failed")

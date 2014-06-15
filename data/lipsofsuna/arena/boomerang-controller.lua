@@ -9,6 +9,7 @@
 -- @alias BoomerangController
 
 local Class = require("system/class")
+local Quaternion = require("system/math/quaternion")
 
 --- Provides boomerange movement to objects.
 -- @type BoomerangController

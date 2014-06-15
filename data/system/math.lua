@@ -5,4 +5,3 @@ end
 ------------------------------------------------------------------------------
 
 Vector = require("system/math/vector")
-Quaternion = require("system/math/quaternion")

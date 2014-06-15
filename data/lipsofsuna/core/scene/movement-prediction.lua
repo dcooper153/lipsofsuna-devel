@@ -9,6 +9,7 @@
 -- @alias MovementPrediction
 
 local Class = require("system/class")
+local Quaternion = require("system/math/quaternion")
 
 --- TODO:doc
 -- @type MovementPrediction

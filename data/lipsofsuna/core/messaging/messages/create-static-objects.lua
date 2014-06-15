@@ -3,6 +3,8 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 
+local Quaternion = require("system/math/quaternion")
+
 Main.messaging:register_message{
 	name = "create static objects",
 	server_to_client_encode = function(self, objects)

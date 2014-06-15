@@ -14,6 +14,7 @@ local Inventory = require("core/server/inventory")
 local Object = require("system/object")
 local Model = require("system/model")
 local PhysicsObject = require("system/physics-object")
+local Quaternion = require("system/math/quaternion")
 local Time = require("system/time")
 local Timer = require("system/timer")
 

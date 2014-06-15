@@ -9,6 +9,7 @@
 -- @alias Camera
 
 local Class = require("system/class")
+local Quaternion = require("system/math/quaternion")
 
 if not Los.program_load_extension("camera") then
 	error("loading extension `camera' failed")

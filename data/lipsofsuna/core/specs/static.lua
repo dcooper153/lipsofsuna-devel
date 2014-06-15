@@ -9,6 +9,7 @@
 -- @alias StaticSpec
 
 local Class = require("system/class")
+local Quaternion = require("system/math/quaternion")
 local Spec = require("core/specs/spec")
 
 --- TODO:doc
