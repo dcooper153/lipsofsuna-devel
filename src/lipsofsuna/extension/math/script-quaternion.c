@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2013 Lips of Suna development team.
+ * Copyright© 2007-2014 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,38 +26,47 @@
 
 static void Quaternion_new (LIScrArgs* args)
 {
-	float angle;
-	LIMatVector axis;
-	LIMatVector dir;
-	LIMatVector up;
 	LIMatQuaternion quat = { 0.0f, 0.0f, 0.0f, 1.0f };
 
-	if (liscr_args_gets_vector (args, "axis", &axis) &&
-	    liscr_args_gets_float (args, "angle", &angle))
-	{
-		quat = limat_quaternion_rotation (angle, axis);
-	}
-	else if (liscr_args_gets_vector (args, "dir", &dir) &&
-	         liscr_args_gets_vector (args, "up", &up))
-	{
-		quat = limat_quaternion_look (dir, up);
-		quat = limat_quaternion_conjugate (quat);
-	}
-	else
-	{
-		if (!liscr_args_gets_float (args, "x", &quat.x))
-			liscr_args_geti_float (args, 0, &quat.x);
-		if (!liscr_args_gets_float (args, "y", &quat.y))
-			liscr_args_geti_float (args, 1, &quat.y);
-		if (!liscr_args_gets_float (args, "z", &quat.z))
-			liscr_args_geti_float (args, 2, &quat.z);
-		if (!liscr_args_gets_float (args, "w", &quat.w))
-			liscr_args_geti_float (args, 3, &quat.w);
-	}
+	liscr_args_geti_float (args, 0, &quat.x);
+	liscr_args_geti_float (args, 1, &quat.y);
+	liscr_args_geti_float (args, 2, &quat.z);
+	liscr_args_geti_float (args, 3, &quat.w);
 	liscr_args_seti_quaternion (args, &quat);
 }
 
-static void Quaternion_new_euler (LIScrArgs* args)
+static void Quaternion_new_from_axis (LIScrArgs* args)
+{
+	float angle = 0.0f;
+	LIMatVector axis = { 0.0f, 1.0f, 0.0f };
+	LIMatQuaternion quat;
+
+	liscr_args_geti_float (args, 0, &axis.x);
+	liscr_args_geti_float (args, 1, &axis.y);
+	liscr_args_geti_float (args, 2, &axis.z);
+	liscr_args_geti_float (args, 3, &angle);
+	quat = limat_quaternion_rotation (angle, axis);
+	liscr_args_seti_quaternion (args, &quat);
+}
+
+static void Quaternion_new_from_dir (LIScrArgs* args)
+{
+	LIMatVector dir = { 0.0f, 0.0f, -1.0f };
+	LIMatVector up = { 0.0f, 1.0f, 0.0f };
+	LIMatQuaternion quat;
+
+	liscr_args_geti_float (args, 0, &dir.x);
+	liscr_args_geti_float (args, 1, &dir.y);
+	liscr_args_geti_float (args, 2, &dir.z);
+	liscr_args_geti_float (args, 3, &up.x);
+	liscr_args_geti_float (args, 4, &up.y);
+	liscr_args_geti_float (args, 5, &up.z);
+	quat = limat_quaternion_look (dir, up);
+	quat = limat_quaternion_conjugate (quat);
+	liscr_args_seti_quaternion (args, &quat);
+}
+
+static void Quaternion_new_from_euler (LIScrArgs* args)
 {
 	float euler[3] = { 0.0f, 0.0f, 0.0f };
 	LIMatQuaternion quat;
@@ -71,15 +80,18 @@ static void Quaternion_new_euler (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &quat);
 }
 
-static void Quaternion_new_vectors (LIScrArgs* args)
+static void Quaternion_new_from_vectors (LIScrArgs* args)
 {
 	LIMatQuaternion quat;
-	LIMatVector v1;
-	LIMatVector v2;
+	LIMatVector v1 = { 0.0f, 0.0f, 0.0f };
+	LIMatVector v2 = { 0.0f, 0.0f, 0.0f };
 
-	if (!liscr_args_geti_vector (args, 0, &v1) ||
-	    !liscr_args_geti_vector (args, 1, &v2))
-		return;
+	liscr_args_geti_float (args, 0, &v1.x);
+	liscr_args_geti_float (args, 1, &v1.y);
+	liscr_args_geti_float (args, 2, &v1.z);
+	liscr_args_geti_float (args, 3, &v2.x);
+	liscr_args_geti_float (args, 4, &v2.y);
+	liscr_args_geti_float (args, 5, &v2.z);
 	quat = limat_quaternion_init_vectors (v1, v2);
 	quat = limat_quaternion_validate (quat);
 	quat = limat_quaternion_normalize (quat);
@@ -278,8 +290,10 @@ void liext_script_quaternion (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new", Quaternion_new);
-	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new_euler", Quaternion_new_euler);
-	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new_vectors", Quaternion_new_vectors);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new_from_axis", Quaternion_new_from_axis);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new_from_dir", Quaternion_new_from_dir);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new_from_euler", Quaternion_new_from_euler);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new_from_vectors", Quaternion_new_from_vectors);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_add", Quaternion_add);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_concat", Quaternion_concat);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_multiply", Quaternion_multiply);

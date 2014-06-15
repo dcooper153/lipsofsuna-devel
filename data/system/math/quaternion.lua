@@ -157,8 +157,7 @@ end
 -- @param angle Angle.
 -- @return New quaternion.
 Quaternion.new_from_axis = function(clss, x, y, z, angle)
-	local axis = Vector(x,y,z)
-	local h = Los.quaternion_new{axis = axis.handle, angle = angle}
+	local h = Los.quaternion_new_from_axis(x, y, z, angle)
 	return Quaternion:new_from_handle(h)
 end
 
@@ -172,9 +171,7 @@ end
 -- @param uz Up vector.
 -- @return New quaternion.
 Quaternion.new_from_dir = function(clss, dx, dy, dz, ux, uy, uz)
-	local dir = Vector(dx, dy, dz)
-	local up = Vector(ux, uy, uz)
-	local h = Los.quaternion_new{dir = dir.handle, up = up.handle}
+	local h = Los.quaternion_new_from_dir(dx, dy, dz, ux, uy, uz)
 	return Quaternion:new_from_handle(h)
 end
 
@@ -186,10 +183,10 @@ end
 -- @return New quaternion.
 Quaternion.new_from_euler = function(clss, x, y, z)
 	if type(x) == "table" then
-		local h = Los.quaternion_new_euler(x)
+		local h = Los.quaternion_new_from_euler(x[1], x[2], x[3])
 		return Quaternion:new_from_handle(h)
 	else
-		local h = Los.quaternion_new_euler{x, y, z}
+		local h = Los.quaternion_new_from_euler(x, y, z)
 		return Quaternion:new_from_handle(h)
 	end
 end
@@ -212,13 +209,16 @@ end
 
 --- Creates a quaternion that rotates from the source point to the destination.
 -- @param clss Quaternion class.
--- @param src Vector.
--- @param dst Vector.
+-- @param sx Source vector.
+-- @param sy Source vector.
+-- @param sz Source vector.
+-- @param dx Destination vector.
+-- @param dy Destination vector.
+-- @param dz Destination vector.
 -- @return New quaternion.
-Quaternion.new_vectors = function(clss, src, dst)
-	local self = Class.new(clss)
-	self.handle = Los.quaternion_new_vectors(src.handle, dst.handle)
-	return self
+Quaternion.new_from_vectors = function(clss, sx, sy, sz, dx, dy, sz)
+	local h = Los.quaternion_new_from_vectors(sx, sy, sz, dx, dy, sz)
+	return Quaternion:new_from_handle(h)
 end
 
 --- Returns a copy of the quaternion.
