@@ -6,7 +6,7 @@ local Staticobject = require("core/objects/static")
 
 --- Various helpers for populating the map.
 -- @type MapUtils
-MapUtils = Class("MapUtils")
+local MapUtils = Class("MapUtils")
 
 --- Places a monster to the map.
 -- @param clss MapUtils class.

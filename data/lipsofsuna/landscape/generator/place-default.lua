@@ -9,6 +9,7 @@
 -- @alias PlaceDefault
 
 local Class = require("system/class")
+local MapUtils = require("core/utils/map")
 local Noise = require("system/noise")
 local PlaceGenerator = require("landscape/generator/place-generator")
 local TerrainChunk = require("system/terrain-chunk")

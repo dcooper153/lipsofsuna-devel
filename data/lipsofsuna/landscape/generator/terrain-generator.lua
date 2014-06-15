@@ -9,7 +9,7 @@
 -- @alias TerrainGenerator
 
 local Class = require("system/class")
-local MapUtils = require("core/server/map-utils")
+local MapUtils = require("core/utils/map")
 local Vector = require("system/math/vector")
 local WorldPlanner = require("landscape/generator/world-planner")
 

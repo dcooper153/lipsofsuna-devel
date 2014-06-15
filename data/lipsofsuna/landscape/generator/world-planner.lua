@@ -10,7 +10,7 @@
 
 local Class = require("system/class")
 local DiamondSquare = require("landscape/generator/diamond-square")
-local MapUtils = require("core/server/map-utils")
+local MapUtils = require("core/utils/map")
 local Noise = require("system/noise")
 local PlaceCastle = require("landscape/generator/place-castle")
 local PlaceDefault = require("landscape/generator/place-default")

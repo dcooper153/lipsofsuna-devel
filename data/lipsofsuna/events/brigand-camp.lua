@@ -1,5 +1,5 @@
 local GlobalEventSpec = require("core/specs/globalevent")
-local MapUtils = require("core/server/map-utils")
+local MapUtils = require("core/utils/map")
 
 GlobalEventSpec{
 	name = "brigand camp",

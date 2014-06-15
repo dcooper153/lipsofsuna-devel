@@ -1,4 +1,5 @@
 local GlobalEventSpec = require("core/specs/globalevent")
+local MapUtils = require("core/utils/map")
 
 local count_monsters = function(sector, objects)
 	do return 0 end --FIXME

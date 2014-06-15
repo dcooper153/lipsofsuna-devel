@@ -58,6 +58,7 @@
 		["load", "core/specs"],
 		["load", "core/terrain"],
 		["load", "core/unlock"],
+		["load", "core/utils"],
 		["load", "core/vision"],
 		["load", "core/misc"],
 		["load", "core/debug"]

@@ -11,6 +11,7 @@
 local Bitwise = require("system/bitwise")
 local Class = require("system/class")
 local PlaceDefault = require("landscape/generator/place-default")
+local MapUtils = require("core/utils/map")
 local Noise = require("system/noise")
 local TerrainChunk = require("system/terrain-chunk")
 
