@@ -10,7 +10,6 @@
 
 local Class = require("system/class")
 local Coroutine = require("system/coroutine")
-local Item = require("core/objects/item")
 local Modifier = require("core/combat/modifier")
 local ObjectSerializer = require("core/objects/object-serializer")
 local Physics = require("system/physics")
@@ -492,10 +491,8 @@ Actor.die = function(self)
 	end
 	-- Spawn death drop items.
 	for k,v in pairs(self.spec.inventory_items_death) do
-		local s = Main.specs:find_by_name("ItemSpec", k)
-		if s then
-			local o = Item(self.manager)
-			o:set_spec(s)
+		local o = self.manager:create_object_by_spec("Item", k)
+		if o then
 			o:set_count(v)
 			self.inventory:merge_or_drop_object(o)
 		end
@@ -597,13 +594,13 @@ Actor.randomize = function(self)
 		local itemspec = Main.specs:find_by_name("ItemSpec", k)
 		if itemspec then
 			if itemspec.stacking then
-				local item = Item(self.manager)
+				local item = self.manager:create_object("Item")
 				item:set_spec(itemspec)
 				item:set_count(v)
 				self.inventory:merge_object(item)
 			else
 				for i = 1,v do
-					local item = Item(self.manager)
+					local item = self.manager:create_object("Item")
 					item:set_spec(itemspec)
 					self.inventory:merge_object(item)
 				end
@@ -626,7 +623,7 @@ Actor.randomize = function(self)
 			local cat = spec.loot_categories[math.random(1, num_cat)]
 			local itemspec = Main.specs:find_random_by_category("ItemSpec", cat)
 			if itemspec then
-				local item = Item(self.manager)
+				local item = self.manager:create_object("Item")
 				item:set_spec(itemspec)
 				self.inventory:merge_object(item)
 			end

@@ -3,8 +3,6 @@
 -- published by the Free Software Foundation, either version 3 of the
 -- License, or (at your option) any later version.
 
-local Item = require("core/objects/item")
-
 Main.messaging:register_message{
 	name = "add inventory item",
 	server_to_client_encode = function(self, id, index, name, count)
@@ -21,12 +19,11 @@ Main.messaging:register_message{
 		if not object then return end
 		-- Add to the inventory.
 		if not object:has_server_data() then
-			local spec = Main.specs:find_by_name("ItemSpec", name)
-			if not spec then return end
-			local item = Item(object.manager)
-			item:set_spec(spec)
-			item:set_count(count)
-			object.inventory:set_object(index, item)
+			local item = object.manager:create_object_by_spec("Item", name)
+			if item then
+				item:set_count(count)
+				object.inventory:set_object(index, item)
+			end
 		end
 		-- Update the user interface.
 		if Ui:get_state() == "crafting" and object == Client.player_object then

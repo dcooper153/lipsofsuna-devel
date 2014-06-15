@@ -4,7 +4,6 @@
 -- License, or (at your option) any later version.
 
 local Bitwise = require("system/bitwise")
-local Item = require("core/objects/item")
 local Physics = require("system/physics")
 local PhysicsConsts = require("core/physics/consts")
 local Quaternion = require("system/math/quaternion")
@@ -523,10 +522,8 @@ Main.messaging:register_message{
 		-- Equipment.
 		if args.equipment then
 			for k,v in ipairs(args.equipment) do
-				local spec = Main.specs:find_by_name("ItemSpec", v[3])
-				if spec then
-					local item = Item(o.manager)
-					item:set_spec(spec)
+				local item = o.manager:create_object_by_spec("Item", v[3])
+				if item then
 					item:set_count(v[4])
 					o.inventory:set_object(v[1], item)
 					o.inventory:equip_index(v[1], v[2])

@@ -9,7 +9,6 @@
 -- @alias CraftingUtils
 
 local Class = require("system/class")
-local Item = require("core/objects/item")
 
 --- Crafting utils.
 -- @type CraftingUtils
@@ -76,7 +75,7 @@ CraftingUtils.craft = function(self, user, name, mode)
 	-- Play the crafting effect.
 	Main.vision:object_effect(user, craftspec.effect)
 	-- Create item.
-	local item = Item(user.manager)
+	local item = user.manager:create_object("Item")
 	item:set_spec(itemspec)
 	item:set_count(craftspec.count)
 	return item

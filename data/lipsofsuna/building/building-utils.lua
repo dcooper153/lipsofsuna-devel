@@ -9,7 +9,6 @@
 -- @alias BuildingUtils
 
 local Class = require("system/class")
-local Item = require("core/objects/item")
 
 --- Building utils.
 -- @type BuildingUtils
@@ -92,9 +91,8 @@ BuildingUtils.__create_terrain_mining_items = function(self, attacker, materials
 	for k,v in pairs(materials) do
 		local mat = Main.specs:find_by_id("TerrainMaterialSpec", k)
 		if mat and mat.mining_item and v >= 0.1 then
-			local spec = Main.specs:find_by_name("ItemSpec", mat.mining_item)
-			local item = Item(Main.objects)
-			item:set_spec(spec)
+			local item = Main.objects:create_object_by_spec("Item", mat.mining_item)
+			if not item then return end
 			item:set_count(math.floor(v / 10) * 10 + 0.1)
 			attacker.inventory:merge_or_drop_object(item)
 		end

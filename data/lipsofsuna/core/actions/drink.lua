@@ -1,6 +1,5 @@
 local ActionSpec = require("core/specs/action")
 local Damage = require("core/combat/damage")
-local Item = require("core/objects/item")
 
 ActionSpec{
 	name = "drink",
@@ -19,9 +18,10 @@ ActionSpec{
 		Main.combat_utils:apply_damage_to_actor(action.object, action.object, damage)
 		-- Replace the potion with an empty bottle.
 		item:subtract(1)
-		local item1 = Item(action.object.manager)
-		item1:set_spec(Main.specs:find_by_name("ItemSpec", "empty bottle"))
-		action.object.inventory:merge_or_drop_object(item1)
+		local item1 = action.object.manager:create_object_by_spec("Item", "empty bottle")
+		if item1 then
+			action.object.inventory:merge_or_drop_object(item1)
+		end
 		-- Log the action.
 		if Server.events then
 			Server.events:notify_action("eat", action.object)

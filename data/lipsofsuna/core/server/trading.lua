@@ -9,7 +9,6 @@
 -- @alias Trading
 
 local Class = require("system/class")
-local Item = require("core/objects/item")
 
 --- TODO:doc
 -- @type Trading
@@ -34,11 +33,11 @@ Trading.accept = function(self, player)
 	-- Give the bought items.
 	for k,v in pairs(player.trading.buy) do
 		local name = player.trading.shop[v[1]]
-		local spec = Main.specs:find_by_name("ItemSpec", name)
-		local item = Item(player.manager)
-		item:set_spec(spec)
-		item:set_count(v[2])
-		player.inventory:merge_or_drop_object(item)
+		local item = player.manager:create_object_by_spec("Item", name)
+		if item then
+			item:set_count(v[2])
+			player.inventory:merge_or_drop_object(item)
+		end
 	end
 	-- Close the trading screen.
 	player.trading = nil

@@ -9,9 +9,7 @@
 -- @alias Utils
 
 local Aabb = require("system/math/aabb")
-local Actor = require("core/objects/actor")
 local Class = require("system/class")
-local Item = require("core/objects/item")
 local Vector = require("system/math/vector")
 
 -- FIXME: These need to be cleaned up.

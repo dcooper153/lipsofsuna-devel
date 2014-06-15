@@ -9,7 +9,6 @@
 -- @alias Obstacle
 
 local Class = require("system/class")
-local Item = require("core/objects/item")
 local Modifier = require("core/combat/modifier")
 local ObjectSerializer = require("core/objects/object-serializer")
 local Quaternion = require("system/math/quaternion")
@@ -109,12 +108,10 @@ end
 -- @param self Object to kill.
 Obstacle.die = function(self)
 	for k,v in ipairs(self.spec.destroy_items) do
-		local spec = Main.specs:find_by_name("ItemSpec", v.name)
-		if spec then
+		local item = self.manager:create_object_by_spec("Item", v.name)
+		if item then
 			local p = self:transform_local_to_global(v.position or Vector())
 			local r = self:get_rotation():copy():concat(v.rotation or Quaternion())
-			local item = Item(self.manager)
-			item:set_spec(spec)
 			item:set_position(p)
 			item:set_rotation(r)
 			item:randomize()

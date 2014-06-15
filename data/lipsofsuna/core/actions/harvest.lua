@@ -1,5 +1,4 @@
 local ActionSpec = require("core/specs/action")
-local Item = require("core/objects/item")
 
 ActionSpec{
 	name = "harvest",
@@ -12,10 +11,11 @@ ActionSpec{
 		-- Play the harvesting effect.
 		Main.vision:world_effect(object:get_position(), object.spec.harvest_effect)
 		-- Choose a random item from the list.
-		local item = Item(action.object.manager)
-		item:set_spec(Main.specs:find_by_name("ItemSpec", mats[math.random(1, #mats)]))
-		action.object.inventory:merge_or_drop_object(item)
-		action.object:send_message("Harvested " .. item.spec.name .. ".")
+		local item = action.object.manager:create_object_by_spec("Item", mats[math.random(1, #mats)])
+		if item then
+			action.object.inventory:merge_or_drop_object(item)
+			action.object:send_message("Harvested " .. item.spec.name .. ".")
+		end
 		-- Apply the harvesting behavior.
 		if object.spec.harvest_behavior == "destroy" then
 			object:die()
