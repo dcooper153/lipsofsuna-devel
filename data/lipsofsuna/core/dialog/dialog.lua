@@ -150,7 +150,7 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			for k,spec in ipairs(actors) do
 				if not Main.quests:get_dialog_flag("scapegoat_alive_" .. spec.name) then
 					var_actor = spec.name
-					actor = Actor(self.object.manager)
+					actor = self.object.manager:create_object("Actor")
 					actor:set_spec(spec)
 					actor:set_position(Utils:find_random_overworld_point())
 					actor:randomize()
@@ -507,21 +507,11 @@ Dialog.execute = function(self)
 		end,
 		["spawn object"] = function(vm, c)
 			-- Spawn the object.
-			local spec1 = Main.specs:find_by_name("ActorSpec", c[2])
-			local spec2 = Main.specs:find_by_name("ItemSpec", c[2])
-			local spec3 = Main.specs:find_by_name("ObstacleSpec", c[2])
-			local object
-			if spec1 then
-				object = Actor(self.object.manager)
-				object:set_spec(spec1)
+			local object = self.object.manager:create_object_by_spec("Actor", c[2]) or
+			               self.object.manager:create_object_by_spec("Item", c[2]) or
+			               self.object.manager:create_object_by_spec("Obstacle", c[2])
+			if object and object.randomize then
 				object:randomize()
-			elseif spec2 then
-				object = Item(self.object.manager)
-				object:set_spec(spec2)
-				object:randomize()
-			elseif spec3 then
-				object = Obstacle(self.object.manager)
-				object:set_spec(spec3)
 			end
 			-- Set the position.
 			if object then

@@ -32,6 +32,23 @@ ObjectManager.new = function(clss, chunk_size, grid_size)
 	self.object_update_hooks = Hooks()
 	-- Initialize the sector manager.
 	self.chunks = ObjectChunkManager(self, chunk_size, grid_size)
+	-- TODO: These should be registered elsewhere.
+	self.__classes = {
+		Actor = require("core/objects/actor"),
+		AreaSpell = require("core/objects/areaspell"),
+		Item = require("core/objects/item"),
+		MissileSpell = require("core/objects/missilespell"),
+		Obstacle = require("core/objects/obstacle"),
+		Player = require("core/objects/player"),
+		Static = require("core/objects/static")}
+	self.__specs = {
+		Actor = "ActorSpec",
+		AreaSpell = "SpellSpec",
+		Item = "ItemSpec",
+		MissileSpell = "SpellSpec",
+		Obstacle = "ObstacleSpec",
+		Player = "ActorSpec",
+		Static = "StaticSpec"}
 	return self
 end
 
@@ -40,6 +57,46 @@ end
 -- @param object Object.
 ObjectManager.add = function(self, object)
 	self.objects_by_id[object:get_id()] = object
+end
+
+--- Creates a new object.
+-- @param self ObjectManager.
+-- @param clss Object class name.
+-- @param id Object ID. Nil for automatic.
+-- @return Object.
+ObjectManager.create_object = function(self, clss, id)
+	local c = self.__classes[clss]
+	return c(self, id)
+end
+
+--- Creates a new object.
+-- @param self ObjectManager.
+-- @param clss Object class name.
+-- @param spec Spec name.
+-- @param id Object ID. Nil for automatic.
+-- @return Object on success. Nil otherwise.
+ObjectManager.create_object_by_spec = function(self, clss, spec, id)
+	local s = Main.specs:find_by_name(self.__specs[clss], spec)
+	if not s then return end
+	local c = self.__classes[clss]
+	local o = c(self, id)
+	o:set_spec(s)
+	return o
+end
+
+--- Creates a new object.
+-- @param self ObjectManager.
+-- @param clss Object class name.
+-- @param cat Spec category.
+-- @param id Object ID. Nil for automatic.
+-- @return Object on success. Nil otherwise.
+ObjectManager.create_object_by_spec_category = function(self, clss, cat, id)
+	local s = Main.specs:find_by_category(self.__specs[clss], cat)
+	if not s then return end
+	local c = self.__classes[clss]
+	local o = c(self, id)
+	o:set_spec(s)
+	return o
 end
 
 --- Finds an object by its ID.

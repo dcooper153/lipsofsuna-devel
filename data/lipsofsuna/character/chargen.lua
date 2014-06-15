@@ -45,8 +45,7 @@ Chargen.init = function(self, standalone)
 	self.data.standalone = standalone
 	self.data.active = true
 	-- Create the object.
-	self.data.object = Actor(Main.objects)
-	self.data.object:set_spec(Main.specs:find_by_name("ActorSpec", "aer-player"))
+	self.data.object = Main.objects:create_object_by_spec("Actor", "aer-player")
 	self.data.object:set_position(Vector(1, 1, 1))
 	self.data.object:randomize()
 	self.data.object:set_visible(true)

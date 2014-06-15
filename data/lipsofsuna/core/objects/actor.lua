@@ -169,7 +169,7 @@ end
 -- @return New object.
 Actor.clone = function(self)
 	-- TODO: Copy dialog variables?
-	local o = Actor(self.manager)
+	local o = self.manager:create_object("Actor")
 	o:set_spec(self:get_spec())
 	o:set_beheaded(self:get_beheaded())
 	o:set_dead(self.dead)

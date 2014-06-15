@@ -156,34 +156,25 @@ end
 -- @param dead One for dead, zero for alive.
 -- @return Object.
 ObjectDatabase.load_object = function(self, id, type_, spec, dead)
-	-- Get the spec.
-	local objspec
-	if type_ == "actor" then objspec = Main.specs:find_by_name("ActorSpec", spec)
-	elseif type_ == "companion" then objspec = Main.specs:find_by_name("ActorSpec", spec)
-	elseif type_ == "item" then objspec = Main.specs:find_by_name("ItemSpec", spec)
-	elseif type_ == "obstacle" then objspec = Main.specs:find_by_name("ObstacleSpec", spec)
-	elseif type_ == "player" then objspec = Main.specs:find_by_name("ActorSpec", spec)
-	elseif type_ == "static" then objspec = Main.specs:find_by_name("StaticSpec", spec)
+	-- Get the object class.
+	local objclss
+	if type_ == "actor" then objclss = "Actor"
+	elseif type_ == "companion" then objclss = "Companion"
+	elseif type_ == "item" then objclss = "Item"
+	elseif type_ == "obstacle" then objclss = "Obstacle"
+	elseif type_ == "player" then objclss = "Player"
+	elseif type_ == "static" then objclss = "Static"
 	else
 		error(string.format("invalid object type %q", type_))
 	end
-	if not objspec then
+	-- Create the object.
+	local object = Main.objects:create_object_by_spec(objclss, spec, id)
+	if not object then
 		print("WARNING: missing spec \"" .. spec .. "\"")
 		return
 	end
-	-- Create the object.
-	local object
-	if type_ == "actor" then object = Actor(Main.objects, id)
-	elseif type_ == "companion" then object = Companion(Main.objects, id)
-	elseif type_ == "item" then object = Item(Main.objects, id)
-	elseif type_ == "obstacle" then object = Obstacle(Main.objects, id)
-	elseif type_ == "player" then object = Player(Main.objects, id)
-	elseif type_ == "static" then object = Staticobject(Main.objects, id) end
-	assert(object)
-	-- Set the mandatory fields.
-	object:set_spec(objspec)
+	-- Set the fields.
 	if object.set_dead then object:set_dead(dead == 1) end
-	-- Read the additional fields.
 	if object.serializer then
 		local create = function(a,b,c,d) return self:load_object(a,b,c,d) end
 		object.serializer:read(object, self.db, create)

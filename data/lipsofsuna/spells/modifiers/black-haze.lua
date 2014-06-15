@@ -25,16 +25,10 @@ BlackHazeModifier.start = function(modifier, value)
 		modifier.health_damage = 1
 		return true
 	end
-	-- Choose a random plague monster.
-	local s = Main.specs:find_random_by_category("ActorSpec", "plague")
-	if not s then return end
 	-- Spawn the monster.
-	local p = modifier.point + Vector(
-		-1 + 2 * math.random(),
-		0,
-		-1 + 2 * math.random())
-	local o = Actor(modifier.owner.manager)
-	o:set_spec(s)
+	local o = modifier.owner.manager:create_object_by_spec_category("Actor", "plague")
+	if not o then return end
+	local p = modifier.point + Vector(-1 + 2 * math.random(), 0, -1 + 2 * math.random())
 	o:set_position(p)
 	o:randomize()
 	o:set_visible(true)

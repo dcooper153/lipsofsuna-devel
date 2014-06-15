@@ -234,33 +234,14 @@ Main.chat:register_command{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local spec1 = Main.specs:find_by_name("ActorSpec", matches[1])
-		local spec2 = Main.specs:find_by_name("ItemSpec", matches[1])
-		local spec3 = Main.specs:find_by_name("ObstacleSpec", matches[1])
-		local spec4 = Main.specs:find_by_name("StaticSpec", matches[1])
-		if spec1 then
-			local o = Actor(player.manager)
-			o:set_spec(spec1)
-			o:set_position(player:get_position())
-			o:randomize()
-			o:set_visible(true)
-		elseif spec2 then
-			local o = Item(player.manager)
-			o:set_spec(spec2)
-			o:set_position(player:get_position())
-			o:randomize()
-			o:set_visible(true)
-		elseif spec3 then
-			local o = Obstacle(player.manager)
-			o:set_spec(spec3)
-			o:set_position(player:get_position())
-			o:set_visible(true)
-		elseif spec4 then
-			local o = Staticobject(player.manager)
-			o:set_spec(spec4)
-			o:set_position(player:get_position())
-			o:set_visible(true)
-		end
+		local o = Main.objects:create_object_by_spec("Actor", matches[1]) or
+		          Main.objects:create_object_by_spec("Item", matches[1]) or
+		          Main.objects:create_object_by_spec("Obstacle", matches[1]) or
+		          Main.objects:create_object_by_spec("Static", matches[1])
+		if not o then return end
+		o:set_position(player:get_position())
+		if o.randomize then o:randomize() end
+		o:set_visible(true)
 	end}
 
 Main.chat:register_command{
@@ -270,10 +251,8 @@ Main.chat:register_command{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		local spec = Main.specs:find_by_name("ActorSpec", matches[1])
-		if not spec then return end
-		local o = Actor(player.manager)
-		o:set_spec(spec)
+		local o = player.manager:create_object_by_spec("Actor", matches[1])
+		if not o then return end
 		o:set_position(player:get_position())
 		o:randomize()
 		o:set_visible(true)

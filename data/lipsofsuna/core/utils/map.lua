@@ -32,7 +32,7 @@ MapUtils.place_actor_by_category = function(clss, category, point, rotation, dif
 	if num == 0 then return end
 	local spec = opt[math.random(1, num)]
 	-- Spawn the actor.
-	local obj = Actor(Main.objects)
+	local obj = Main.objects:create_object("Actor")
 	obj:set_spec(spec)
 	if obj.randomize then
 		obj:randomize()
@@ -49,12 +49,8 @@ end
 -- @param point Position vector, in tiles.
 -- @param rotation Rotation around Y axis. Nil for default.
 MapUtils.place_actor_by_name = function(clss, name, point, rotation)
-	-- Choose the actor.
-	local spec = Main.specs:find_by_name("ActorSpec", name)
-	if not spec then return end
-	-- Spawn the actor.
-	local obj = Actor(Main.objects)
-	obj:set_spec(spec)
+	local obj = Main.objects:create_object_by_spec("Actor", name)
+	if not obj then return end
 	if obj.randomize then
 		obj:randomize()
 	end
