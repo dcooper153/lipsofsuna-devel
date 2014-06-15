@@ -11,6 +11,7 @@
 local Class = require("system/class")
 local Action = require("core/actions/action")
 local Physics = require("system/physics")
+local Time = require("system/time")
 
 --- Artificial intelligence.
 -- @type Ai
@@ -44,9 +45,9 @@ end
 Ai.add_enemy = function(self, object)
 	local enemy = self.enemies[object]
 	if enemy then
-		enemy[2] = Program:get_time() + 30
+		enemy[2] = Time:get_secs() + 30
 	else
-		self.enemies[object] = {object, Program:get_time() + 30}
+		self.enemies[object] = {object, Time:get_secs() + 30}
 	end
 end
 
@@ -264,7 +265,7 @@ end
 Ai.scan_enemies = function(self)
 	-- Clear old enemies.
 	local old = self.enemies
-	local time = Program:get_time()
+	local time = Time:get_secs()
 	self.enemies = {}
 	-- Find new enemies.
 	local objs = Main.objects:find_by_point(self.object:get_position(), 15)

@@ -9,6 +9,7 @@
 -- @alias Damage
 
 local Class = require("system/class")
+local Time = require("system/time")
 
 --- Damage calculator.
 -- @type Damage
@@ -164,7 +165,7 @@ Damage.apply_defender_armor = function(self, object)
 	local armor = Main.combat_utils:get_actor_armor_class(object)
 	if object.blocking then
 		local delay = object.spec.blocking_delay
-		local elapsed = Program:get_time() - object.blocking
+		local elapsed = Time:get_secs() - object.blocking
 		local frac = math.min(1, elapsed / delay)
 		armor = armor + frac * object.spec.blocking_armor
 	end

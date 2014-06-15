@@ -18,6 +18,7 @@ local Quaternion = require("system/math/quaternion")
 local SimulationObject = require("core/objects/simulation")
 local Skills = require("core/skills/skills")
 local Stats = require("core/server/stats")
+local Time = require("system/time")
 local Timer = require("system/timer")
 local Vector = require("system/math/vector")
 
@@ -851,7 +852,7 @@ end
 
 Actor.get_attack_charge = function(self)
 	if not self.attack_charge then return 0 end
-	return math.min(1, (Program:get_time() - self.attack_charge) / 2)
+	return math.min(1, (Time:get_secs() - self.attack_charge) / 2)
 end
 
 --- Returns true if the actor is behaded.
@@ -893,7 +894,7 @@ Actor.set_block = function(self, value)
 	if value and self.blocking then return end
 	if not value and not self.blocking then return end
 	if value then
-		self.blocking = Program:get_time()
+		self.blocking = Time:get_secs()
 		self:animate("block start")
 	else
 		self.blocking = nil

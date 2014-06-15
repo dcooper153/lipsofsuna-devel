@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Modifier = require("core/server/modifier")
+local Time = require("system/time")
 
 --- Combat utils.
 -- @type CombatUtils
@@ -59,7 +60,7 @@ CombatUtils.apply_damage_to_actor = function(self, caster, target, damage, point
 	end
 	-- Stagger the attacker.
 	if damage.blocking then
-		if Program:get_time() - target.blocking > target.spec.blocking_delay then
+		if Time:get_secs() - target.blocking > target.spec.blocking_delay then
 			caster.cooldown = (caster.cooldown or 0) + 1
 			caster:animate("stagger")
 		end

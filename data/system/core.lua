@@ -190,13 +190,6 @@ Program.get_tick = function(self)
 	return Los.program_get_tick()
 end
 
---- Gets the number of seconds the program has been running.
--- @param self Program class.
--- @return Number.
-Program.get_time = function(self)
-	return Los.program_get_time()
-end
-
 --- Gets the version string of the engine.
 -- @param self Program class.
 -- @return String.

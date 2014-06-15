@@ -11,6 +11,7 @@
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Coroutine = require("system/coroutine")
+local Time = require("system/time")
 
 --- TODO:doc
 -- @type GlobalEventManager
@@ -138,7 +139,7 @@ GlobalEventManager.notify_action = function(self, action, player)
 	-- Handle the action.
 	if action == "dialog" then
 		-- Keep 10 last dialog actions in memory.
-		local t = Program:get_time()
+		local t = Time:get_secs()
 		local n = #s.dialog
 		if n == 0 then
 			s.dialog[1] = t
@@ -148,7 +149,7 @@ GlobalEventManager.notify_action = function(self, action, player)
 		end
 	elseif action == "eat" or action == "drink" then
 		-- Keep 10 last eating actions in memory.
-		local t = Program:get_time()
+		local t = Time:get_secs()
 		local n = #s.eaten
 		if n == 0 then
 			s.eaten[1] = t
@@ -161,7 +162,7 @@ GlobalEventManager.notify_action = function(self, action, player)
 		--
 		-- Since this action is based on sector loading, and that tends
 		-- to occur in clusters, only one event per 5 seconds is recorded.
-		local t = Program:get_time()
+		local t = Time:get_secs()
 		local n = #s.explored
 		if n == 0 then
 			s.explored[1] = t
@@ -218,7 +219,7 @@ GlobalEventManager.start_event = function(self, name)
 	-- Start the new event.
 	local event = self.events[name]
 	if not event then return end
-	event.start_time = Program:get_time()
+	event.start_time = Time:get_secs()
 	event.spec:started(event)
 	-- Log the event.
 	Main.log:format("Started global event %q", name)
@@ -248,7 +249,7 @@ GlobalEventManager.update = function(self, secs)
 	if self.timer < 1 then return end
 	self.timer = self.timer - 1
 	-- Update running events.
-	local now = Program:get_time()
+	local now = Time:get_secs()
 	for k,v in pairs(self.events) do
 		if v.start_time and v.spec.duration and v.spec.duration < now - v.start_time then
 			self:stop_event(k)

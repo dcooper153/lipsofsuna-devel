@@ -9,6 +9,7 @@
 -- @alias ModelManager
 
 local Class = require("system/class")
+local Time = require("system/time")
 
 --- Implements trivial timing and profiling.
 -- @type ModelManager
@@ -35,7 +36,7 @@ end
 -- @param self Timing.
 -- @param name Action name.
 Timing.start_action = function(self, name)
-	local time = Program:get_time()
+	local time = Time:get_secs()
 	-- End the previous action.
 	if self.__action_start then
 		local name = self.__action_name
@@ -57,7 +58,7 @@ end
 -- @param self Timing.
 Timing.start_frame = function(self)
 	-- Calculate the previous frame duration.
-	local time = Program:get_time()
+	local time = Time:get_secs()
 	if self.__frame_start then
 		self.frame_time = time - self.__frame_start
 	end

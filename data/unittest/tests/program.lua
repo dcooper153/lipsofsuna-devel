@@ -1,5 +1,6 @@
 Unittest:add(1, "system", "program", function()
 	local Program = require("system/core")
+	local Time = require("system/time")
 	-- Built-in tests.
 	Los.program_unittest()
 	-- Getters and setters.
@@ -7,7 +8,7 @@ Unittest:add(1, "system", "program", function()
 	assert(type(Program:get_quit()) == "boolean")
 	assert(type(Program:get_sleep()) == "number")
 	assert(type(Program:get_tick()) == "number")
-	assert(type(Program:get_time()) == "number")
+	assert(type(Time:get_secs()) == "number")
 	Program:set_quit(true)
 	assert(Program:get_quit())
 	-- Message passing disabled for non-threads.

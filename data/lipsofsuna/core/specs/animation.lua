@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Spec = require("core/specs/spec")
+local Time = require("system/time")
 
 local bone_chain_mapping = {
 	LOWER = {"IK", "pelvis", "pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "leg1.R", "leg2.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6",

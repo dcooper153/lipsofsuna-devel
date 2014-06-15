@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Eventhandler = require("system/eventhandler")
+local Time = require("system/time")
 
 --- TODO:doc
 -- @type Timer
@@ -51,7 +52,7 @@ end
 -- @param self Timer.
 Timer.enable = function(self)
 	Timer.dict_timer[self] = self.owner or true
-	self.updated = Program:get_time()
+	self.updated = Time:get_secs()
 end
 
 Timer.get_enabled = function(self, v)
@@ -64,7 +65,7 @@ end
 
 -- Register event handler.
 Eventhandler{type = "tick", func = function(self, args)
-	local t = Program:get_time()
+	local t = Time:get_secs()
 	-- Remove timers.
 	for k in pairs(Timer.dict_delete) do
 		Timer.dict_timer[k] = nil

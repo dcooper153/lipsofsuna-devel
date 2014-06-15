@@ -14,6 +14,7 @@ local CraftingRecipeSpec = require("core/specs/crafting-recipe")
 local EffectProfileSpec = require("core/specs/effect-profile")
 local IconSpec = require("core/specs/icon")
 local Spec = require("core/specs/spec")
+local Time = require("system/time")
 
 --- Item speficification.
 -- @type ItemSpec

@@ -11,6 +11,7 @@
 local Class = require("system/class")
 local Program = require("system/core")
 local ObjectChunkLoader = require("core/objects/object-chunk-loader")
+local Time = require("system/time")
 
 --- Stores information on an object chunk.
 -- @type ObjectChunk
@@ -26,7 +27,7 @@ ObjectChunk.new = function(clss, manager, x, z)
 	self.x = x
 	self.z = z
 	self.id = manager:get_chunk_id_by_xz(x, z)
-	self.time = Program:get_time()
+	self.time = Time:get_secs()
 	-- Create a sector loader.
 	if Server.initialized then
 		self.loader = ObjectChunkLoader(manager, self.id, x, z)
@@ -64,7 +65,7 @@ end
 -- @param self ObjectChunk.
 -- @param secs Seconds since the last update.
 ObjectChunk.update = function(self, secs)
-	local t = Program:get_time()
+	local t = Time:get_secs()
 	-- Unload unused chunks.
 	if self.manager.unload_time and t - self.time > self.manager.unload_time then
 		self:save()

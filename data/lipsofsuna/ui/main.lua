@@ -1,6 +1,7 @@
 local Client = require("core/client/client")
 local Graphics = require("system/graphics")
 local Program = require("system/core")
+local Time = require("system/time")
 local Ui = require("ui/ui")
 
 Main.main_start_hooks:register(110, function()
@@ -10,7 +11,7 @@ end)
 Client:register_update_hook(5, function(secs)
 	Main.timing:start_action("ui")
 	-- Emit key repeat events.
-	local t = Program:get_time()
+	local t = Time:get_secs()
 	for k,v in pairs(Client.input.pressed) do
 		if t - v.time > 0.05 then
 			v.type = "keyrepeat"

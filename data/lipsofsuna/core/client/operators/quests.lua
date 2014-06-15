@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Time = require("system/time")
 
 Operators.quests = Class("QuestsOperator")
 Operators.quests.data = {}
@@ -9,7 +10,7 @@ Operators.quests.data = {}
 --
 -- @param self Operator.
 Operators.quests.reset = function(self)
-	self.data = {sound_timer = Program:get_time(), quests = {}}
+	self.data = {sound_timer = Time:get_secs(), quests = {}}
 end
 
 --- Adds a new quest.<br/>
@@ -134,7 +135,7 @@ end
 -- @param status New status.
 -- @param text Quest text.
 Operators.quests.set_quest_status = function(self, quest, status, text)
-	local t = Program:get_time()
+	local t = Time:get_secs()
 	local joining = Operators.play:is_startup_period()
 	local silent = joining or (t - self.data.sound_timer < 2)
 	-- Update the status.

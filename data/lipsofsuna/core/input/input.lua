@@ -13,6 +13,7 @@ local Class = require("system/class")
 local ControlsSerializer = require("core/input/controls-serializer")
 local Hooks = require("system/hooks")
 local Keycode = require("system/keycode")
+local Time = require("system/time")
 
 --- Input binding management.
 -- @type Input
@@ -53,7 +54,7 @@ Input.event = function(self, args)
 	end
 	-- Maintain key states.
 	if args.type == "keypress" then
-		args.time = Program:get_time() + 0.25
+		args.time = Time:get_secs() + 0.25
 		self.mods = args.mods
 		self.pressed[args.code] = args
 	elseif args.type == "keyrelease" then

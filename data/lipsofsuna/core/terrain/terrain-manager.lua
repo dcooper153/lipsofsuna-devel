@@ -16,6 +16,7 @@ local Program = require("system/core")
 local Terrain = require("system/terrain")
 local TerrainChunk = require("core/terrain/terrain-chunk")
 local TerrainMaterialSpec = require("core/specs/terrain-material")
+local Time = require("system/time")
 
 --- Manages terrain chunks.
 -- @type TerrainManager
@@ -68,7 +69,7 @@ end
 TerrainManager.refresh_chunks_by_point = function(self, point, radius)
 	local xc,zc = self:get_chunk_xz_by_point(point.x, point.z)
 	local x0,z0,x1,z1 = self:get_chunk_xz_range_by_point(point, radius)
-	local t = Program:get_time()
+	local t = Time:get_secs()
 	for z = z0,z1,self.chunk_size do
 		for x = x0,x1,self.chunk_size do
 			-- Load the chunk.
@@ -92,7 +93,7 @@ end
 -- @param radius Radius in world units.
 TerrainManager.refresh_models_by_point = function(self, point, radius)
 	local x0,z0,x1,z1 = self:get_chunk_xz_range_by_point(point, radius)
-	local t = Program:get_time()
+	local t = Time:get_secs()
 	for z = z0,z1,self.chunk_size do
 		for x = x0,x1,self.chunk_size do
 			local id = self:get_chunk_id_by_xz(x, z)

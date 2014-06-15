@@ -16,6 +16,7 @@ local EffectProfileSpec = require("core/specs/effect-profile")
 local FactionSpec = require("core/specs/faction")
 local HairStyleSpec = require("core/specs/hair-style")
 local Spec = require("core/specs/spec")
+local Time = require("system/time")
 
 --- Actor specification.
 -- @type ActorSpec

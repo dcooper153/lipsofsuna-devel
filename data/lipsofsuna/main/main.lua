@@ -23,6 +23,7 @@ local Parallel = require("system/parallel")
 local Physics = require("system/physics")
 local Settings = require("main/settings")
 local SpecManager = require("main/spec-manager")
+local Time = require("system/time")
 local Timing = require("main/timing")
 local Watchdog = require("system/watchdog")
 
@@ -166,9 +167,9 @@ Main.enable_manual_gc = function(self)
 	collectgarbage("setstepmul", 10)
 	-- Perform full garbage collection.
 	local memory0 = collectgarbage("count")
-	local time0 = Program:get_time()
+	local time0 = Time:get_secs()
 	collectgarbage()
-	local time1 = Program:get_time()
+	local time1 = Time:get_secs()
 	local memory1 = collectgarbage("count")
 	-- Estimate the garbage collection rate.
 	self.__need_memory = memory1

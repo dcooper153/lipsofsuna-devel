@@ -14,6 +14,7 @@ local Inventory = require("core/server/inventory")
 local Object = require("system/object")
 local Model = require("system/model")
 local PhysicsObject = require("system/physics-object")
+local Time = require("system/time")
 local Timer = require("system/timer")
 
 --- The base class for game objects.
@@ -130,7 +131,7 @@ SimulationObject.animate = function(self, name, force_temporary)
 			if not self.animations then self.animations = {} end
 			local prev = self.animations[anim.channel]
 			if prev and prev[1] == name then return end
-			self.animations[anim.channel] = {name, Program:get_time()}
+			self.animations[anim.channel] = {name, Time:get_secs()}
 		elseif self.animations then
 			self.animations[anim.channel] = nil
 		end

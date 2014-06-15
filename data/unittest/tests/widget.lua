@@ -1,6 +1,6 @@
 Unittest:add(2, "system", "widget", function()
 	local Class = require("system/class")
-	local Program require("system/graphics")
+	local Program = require("system/graphics")
 	local Widget = require("system/widget")
 	-- Initialization.
 	local w = Widget()

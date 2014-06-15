@@ -1,5 +1,6 @@
 local GlobalEventSpec = require("core/specs/globalevent")
 local MapUtils = require("core/utils/map")
+local Time = require("system/time")
 
 local count_monsters = function(sector, objects)
 	do return 0 end --FIXME
@@ -43,7 +44,7 @@ GlobalEventSpec{
 			if #status.explored < 5 then return end
 			if #status.eaten < 3 then return end
 			if status.eaten[3] < status.explored[1]  then return end
-			local t = Program:get_time()
+			local t = Time:get_secs()
 			if t - status.explored[2] < 30 then return end
 			if t - status.eaten[3] > 200 then return end
 			return true

@@ -8,6 +8,7 @@ local Item = require("core/objects/item")
 local Physics = require("system/physics")
 local PhysicsConsts = require("core/physics/consts")
 local Simulation = require("core/client/simulation")
+local Time = require("system/time")
 
 local make_flags = function(list)
 	local res = {}
@@ -138,7 +139,7 @@ Main.messaging:register_message{
 			local tmp = {}
 			for k,v in pairs(o.animations) do
 				if v[1] then
-					table.insert(tmp, {v[1], Program:get_time() - v[2]})
+					table.insert(tmp, {v[1], Time:get_secs() - v[2]})
 				end
 			end
 			if #tmp > 0 then
@@ -406,7 +407,7 @@ Main.messaging:register_message{
 			if o.animations then
 				for k,v in pairs(o.animations) do
 					if v[1] then
-						o.render:add_animation(v[1], Program:get_time() - v[2])
+						o.render:add_animation(v[1], Time:get_secs() - v[2])
 					end
 				end
 			end

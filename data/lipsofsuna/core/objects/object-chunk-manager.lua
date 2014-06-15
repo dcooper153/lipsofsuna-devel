@@ -13,6 +13,7 @@ local ChunkManager = require("system/chunk-manager")
 local ObjectChunk = require("core/objects/object-chunk")
 local ObjectChunkLoader = require("core/objects/object-chunk-loader")
 local Program = require("system/core")
+local Time = require("system/time")
 
 --- Implements partitioning and swapping of map objects.
 -- @type ObjectChunkManager
@@ -44,7 +45,7 @@ ObjectChunkManager.refresh = function(self, point, radius)
 			if not chunk then
 				self:load_chunk(x, z)
 			else
-				chunk.time = Program:get_time()
+				chunk.time = Time:get_secs()
 			end
 		end
 	end
@@ -79,7 +80,7 @@ end
 ObjectChunkManager.get_sector_idle = function(self, id)
 	local chunk = self.chunks[sector]
 	if not chunk then return end
-	return Program:get_time() - chunk.time
+	return Time:get_secs() - chunk.time
 end
 
 return ObjectChunkManager

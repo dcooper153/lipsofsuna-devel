@@ -12,6 +12,7 @@ local Class = require("system/class")
 local Packet = require("system/packet")
 local Program = require("system/core")
 local TerrainChunkLoader = require("core/terrain/terrain-chunk-loader")
+local Time = require("system/time")
 local Vector = require("system/math/vector")
 
 --- Stores information on a terrain chunk.
@@ -28,7 +29,7 @@ TerrainChunk.new = function(clss, manager, x, z)
 	self.x = x
 	self.z = z
 	self.id = manager:get_chunk_id_by_xz(x, z)
-	self.time = Program:get_time()
+	self.time = Time:get_secs()
 	self.loader = TerrainChunkLoader(manager, self.id, x, z)
 	return self
 end
@@ -123,7 +124,7 @@ end
 -- @param self TerrainChunk.
 -- @param secs Seconds since the last update.
 TerrainChunk.update = function(self, secs)
-	local t = Program:get_time()
+	local t = Time:get_secs()
 	-- Unload unused chunks.
 	if self.manager.unload_time and t - self.time > self.manager.unload_time then
 		self:save()

@@ -25,6 +25,7 @@ Unittest:add(1, "system", "physics object: collision", function()
 	local Physics = require("system/physics")
 	local PhysicsObject = require("system/physics-object")
 	local Program = require("system/core")
+	local Time = require("system/time")
 	local Vector = require("system/math/vector")
 	-- Create the collision shape.
 	local model = Model()
@@ -49,7 +50,7 @@ Unittest:add(1, "system", "physics object: collision", function()
 	-- Simulation.
 	Physics:set_enable_simulation(true)
 	Program:discard_events()
-	local start = Program:get_time()
+	local start = Time:get_secs()
 	local curr = start
 	local prev = start - 0.01
 	while curr < start + 0.2 do
@@ -60,7 +61,7 @@ Unittest:add(1, "system", "physics object: collision", function()
 			e = Program:pop_event()
 		end
 		prev = curr
-		curr = Program:get_time()
+		curr = Time:get_secs()
 	end
 	Physics:set_enable_simulation(false)
 end)
@@ -70,6 +71,7 @@ Unittest:add(1, "system", "physics object: motion", function()
 	local Physics = require("system/physics")
 	local PhysicsObject = require("system/physics-object")
 	local Program = require("system/core")
+	local Time = require("system/time")
 	local Vector = require("system/math/vector")
 	-- Create the object.
 	local o = PhysicsObject()
@@ -83,7 +85,7 @@ Unittest:add(1, "system", "physics object: motion", function()
 	-- Simulation.
 	Physics:set_enable_simulation(true)
 	Program:discard_events()
-	local start = Program:get_time()
+	local start = Time:get_secs()
 	local curr = start
 	local prev = start - 0.01
 	while curr < start + 0.2 do
@@ -101,7 +103,7 @@ Unittest:add(1, "system", "physics object: motion", function()
 			e = Program:pop_event()
 		end
 		prev = curr
-		curr = Program:get_time()
+		curr = Time:get_secs()
 	end
 	assert(o:get_position().x == 1000)
 	assert(o:get_position().y < 1100)
