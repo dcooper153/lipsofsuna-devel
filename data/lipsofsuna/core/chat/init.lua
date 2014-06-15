@@ -1,4 +1,4 @@
---- TODO:doc
+--- Chat module initialization.
 --
 -- Lips of Suna is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Lesser General Public License as
@@ -8,5 +8,7 @@
 -- @module core.chat.init
 -- @alias ChatInit
 
-require("core/chat/chat-command")
+local ChatManager = require("core/chat/chat-manager")
+
+Main.chat = ChatManager()
 require("core/chat/commands")

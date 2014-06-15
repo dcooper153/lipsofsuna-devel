@@ -6,7 +6,7 @@ local Physics = require("system/physics")
 local PhysicsConsts = require("core/physics/consts")
 local Staticobject = require("core/objects/static")
 
-ChatCommand{
+Main.chat:register_command{
 	name = "behead",
 	description = "Beheading or unbehead yourself.",
 	pattern = "^/behead$",
@@ -16,7 +16,7 @@ ChatCommand{
 		player:set_beheaded(not player:get_beheaded())
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "client_restart",
 	description = "Restart the client.",
 	pattern = "^/client_restart$",
@@ -26,7 +26,7 @@ ChatCommand{
 		Program:set_quit(true)
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "client_stats",
 	description = "Show client stats.",
 	pattern = "^/client_stats$",
@@ -36,7 +36,7 @@ ChatCommand{
 		Ui:set_state("admin/client-stats")
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "debug_dump",
 	description = "Dump debug information.",
 	pattern = "^/debug_dump$",
@@ -45,7 +45,7 @@ ChatCommand{
 		Program:debug_dump()
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "debug_dump_class",
 	description = "Dump debug information on a specific class.",
 	pattern = "^/debug_dump_class (.*)$",
@@ -54,7 +54,7 @@ ChatCommand{
 		Debug:dump_paths_by_class_instance(matches[1])
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "decay_objects",
 	description = "Causes unimporant objects to decay immediately.",
 	pattern = "^/decay_objects$",
@@ -64,7 +64,7 @@ ChatCommand{
 		Server.object_database:decay_world_now()
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "god",
 	description = "Toggle the god mode.",
 	pattern = "^/god$",
@@ -80,7 +80,7 @@ ChatCommand{
 		end
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "grant_admin",
 	description = "Grant admin privileges to a given account.",
 	pattern = "^/grant_admin ([a-zA-Z0-9]*)$",
@@ -100,7 +100,7 @@ ChatCommand{
 		end
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "lua",
 	description = "Execute a Lua command.",
 	pattern = "^/lua (.*)$",
@@ -117,7 +117,7 @@ ChatCommand{
 		end
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "noclip",
 	description = "Toggle the no clip mode.",
 	pattern = "^/noclip$",
@@ -143,7 +143,7 @@ ChatCommand{
 		end
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "position",
 	description = "Show the coordinates of the player.",
 	pattern = "^/position$",
@@ -157,7 +157,7 @@ ChatCommand{
 		print(str)
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "prof",
 	description = "Shows profiling data.",
 	pattern = "^/prof$",
@@ -166,7 +166,7 @@ ChatCommand{
 		Ui:set_state("admin/profiling")
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "prof_reset",
 	description = "Resets profiling data.",
 	pattern = "^/prof_reset$",
@@ -176,7 +176,7 @@ ChatCommand{
 		Client:append_log("Profiling reset")
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "revoke_admin",
 	description = "Revoke admin privileges from the given account.",
 	pattern = "^/revoke_admin ([a-zA-Z0-9]*)$",
@@ -196,7 +196,7 @@ ChatCommand{
 		end
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "save",
 	description = "Saves the game state to the database.",
 	pattern = "^/save$",
@@ -206,7 +206,7 @@ ChatCommand{
 		Main.game:save()
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "shutdown",
 	description = "Saves the game state and shuts down the server.",
 	pattern = "^/shutdown$",
@@ -217,7 +217,7 @@ ChatCommand{
 		Program:shutdown()
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "server_stats",
 	description = "Show server stats.",
 	pattern = "^/server_stats$",
@@ -227,7 +227,7 @@ ChatCommand{
 		Main.messaging:client_event("server stats")
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "spawn",
 	description = "Spawn an object of any type.",
 	pattern = "^/spawn (.*)$",
@@ -263,7 +263,7 @@ ChatCommand{
 		end
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "spawn_actor",
 	description = "Spawn an actor",
 	pattern = "^/spawn_actor (.*)$",
@@ -279,7 +279,7 @@ ChatCommand{
 		o:set_visible(true)
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "spawn_item",
 	description = "Spawn an item.",
 	pattern = "^/spawn_item (.*)$",
@@ -295,7 +295,7 @@ ChatCommand{
 		o:set_visible(true)
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "spawn_obstacle",
 	description = "Spawn an obstacle.",
 	pattern = "^/spawn_obstacle (.*)$",
@@ -310,7 +310,7 @@ ChatCommand{
 		o:set_visible(true)
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "start_global_event",
 	description = "Start a global event.",
 	pattern = "^/start_global_event (.*)$",
@@ -320,7 +320,7 @@ ChatCommand{
 		Server.events:start_event(matches[1])
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "stop_global_event",
 	description = "Stop a global event.",
 	pattern = "^/stop_global_event (.*)$",
@@ -330,7 +330,7 @@ ChatCommand{
 		Server.events:stop_event(matches[1])
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "resurrect",
 	description = "Resurrect yourself.",
 	pattern = "^/resurrect$",
@@ -340,7 +340,7 @@ ChatCommand{
 		player:action("resurrect")
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "sucide",
 	description = "Make your character commit a suicide.",
 	pattern = "^/suicide$",
@@ -350,7 +350,7 @@ ChatCommand{
 		player:die()
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "teleport",
 	description = "Teleport to a map marker.",
 	pattern = "^/teleport (.*)$",
@@ -364,7 +364,7 @@ ChatCommand{
 		end
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "unlock_marker",
 	description = "Unlock a map marker.",
 	pattern = "^/unlock_marker (.*)$",
@@ -380,7 +380,7 @@ ChatCommand{
 	end}
 
 -- Invalid commands.
-ChatCommand{
+Main.chat:register_command{
 	pattern = "^(/[^ ]*).*",
 	fallback = true,
 	handler = "server",
@@ -390,7 +390,7 @@ ChatCommand{
 	end}
 
 -- Normal chat.
-ChatCommand{
+Main.chat:register_command{
 	pattern = ".*",
 	fallback = true,
 	handler = "client",
@@ -399,7 +399,7 @@ ChatCommand{
 	func = function(player, matches)
 		Main.messaging:client_event("player chat", matches[1])
 	end}
-ChatCommand{
+Main.chat:register_command{
 	pattern = ".*",
 	fallback = true,
 	handler = "server",

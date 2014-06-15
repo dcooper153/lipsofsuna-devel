@@ -1,4 +1,3 @@
-local ChatCommand = require("core/chat/chat-command")
 local Quaternion = require("system/math/quaternion")
 local UiScrollFloat = require("ui/widgets/scrollfloat")
 
@@ -18,7 +17,7 @@ end
 
 ------------------------------------------------------------------------------
 
-ChatCommand{
+Main.chat:register_command{
 	name = "anchor_editor",
 	description = "Edit the anchor of the wielded object.",
 	pattern = "^/anchor_editor$",

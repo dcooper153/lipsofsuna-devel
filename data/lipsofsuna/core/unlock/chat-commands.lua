@@ -1,6 +1,4 @@
-local ChatCommand = require("core/chat/chat-command")
-
-ChatCommand{
+Main.chat:register_command{
 	name = "unlock_action",
 	description = "Unlock an action.",
 	pattern = "^/unlock_action (.*)$",
@@ -15,7 +13,7 @@ ChatCommand{
 		end
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "unlock_all",
 	description = "Unlock all skills, spell types or spell effects.",
 	pattern = "^/unlock_all$",
@@ -25,7 +23,7 @@ ChatCommand{
 		Main.unlocks:unlock_all()
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "unlock_random",
 	description = "Unlock a random skill, spell type or spell effect.",
 	pattern = "^/unlock_random$",
@@ -35,7 +33,7 @@ ChatCommand{
 		Main.unlocks:unlock_random()
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "unlock_modifier",
 	description = "Unlock a modifier.",
 	pattern = "^/unlock_modifier (.*)$",
@@ -50,7 +48,7 @@ ChatCommand{
 		end
 	end}
 
-ChatCommand{
+Main.chat:register_command{
 	name = "unlock_skill",
 	description = "Unlock a skill.",
 	pattern = "^/unlock_skill (.*)$",
