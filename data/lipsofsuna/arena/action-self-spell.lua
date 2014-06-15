@@ -1,5 +1,5 @@
 local ActionSpec = require("core/specs/action")
-local Damage = require("arena/damage")
+local Damage = require("core/combat/damage")
 
 -- Spell on self.
 -- At the specific time into the attack animation, the effects of the

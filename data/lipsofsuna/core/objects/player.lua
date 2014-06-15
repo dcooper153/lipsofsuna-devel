@@ -11,7 +11,7 @@
 local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Companion = require("core/objects/companion")
-local Modifier = require("core/server/modifier")
+local Modifier = require("core/combat/modifier")
 local Packet = require("system/packet")
 local PlayerVision = require("core/objects/player-vision")
 

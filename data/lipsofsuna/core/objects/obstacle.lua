@@ -10,7 +10,7 @@
 
 local Class = require("system/class")
 local Item = require("core/objects/item")
-local Modifier = require("core/server/modifier")
+local Modifier = require("core/combat/modifier")
 local ObjectSerializer = require("core/objects/object-serializer")
 local Quaternion = require("system/math/quaternion")
 local SimulationObject = require("core/objects/simulation")

@@ -18,5 +18,5 @@
 			"long": "--generate"
 		}
 	],
-	"scripts": ["main", "game", "modifier", "server", "util"]
+	"scripts": ["main", "game", "server", "util"]
 }

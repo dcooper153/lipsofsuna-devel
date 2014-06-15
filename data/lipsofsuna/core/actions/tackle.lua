@@ -1,5 +1,5 @@
 local ActionSpec = require("core/specs/action")
-local Damage = require("arena/damage")
+local Damage = require("core/combat/damage")
 
 ActionSpec{
 	name = "tackle",

@@ -9,7 +9,7 @@
 -- @alias AreaSpell
 
 local Class = require("system/class")
-local Damage = require("arena/damage")
+local Damage = require("core/combat/damage")
 local Spell = require("core/objects/spell")
 
 --- Area spell object.

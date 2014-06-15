@@ -9,7 +9,7 @@
 -- @alias Spell
 
 local Class = require("system/class")
-local Damage = require("arena/damage") --FIXME
+local Damage = require("core/combat/damage") --FIXME
 local SimulationObject = require("core/objects/simulation")
 
 --- Base class for spell objects.
