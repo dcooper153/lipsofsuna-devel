@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local UiRadio = require("ui/widgets/radio")
 
 local UiQuest = Class("Uiquest", UiRadio)
@@ -26,8 +27,8 @@ UiQuest.rebuild_size = function(self)
 	local size = UiRadio.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.title and self.text then
-		local w1,h1 = Program:measure_text(Theme.text_font_2, self.title, size.x - 10)
-		local w2,h2 = Program:measure_text(Theme.text_font_1, self.text, size.x - 10)
+		local w1,h1 = Graphics:measure_text(Theme.text_font_2, self.title, size.x - 10)
+		local w2,h2 = Graphics:measure_text(Theme.text_font_1, self.text, size.x - 10)
 		if h1 and h2 then
 			size.y = math.max(size.y, h1 + h2 + 20)
 			self.title_height = h1 + 3

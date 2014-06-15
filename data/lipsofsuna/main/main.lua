@@ -13,6 +13,7 @@ local Class = require("system/class")
 local Eventhandler = require("system/eventhandler")
 local Hooks = require("system/hooks")
 local GameModeManager = require("main/game-mode-manager")
+local Graphics = require("system/graphics")
 local ImageManager = require("main/image-manager")
 local Log = require("main/log")
 local Messaging = require("main/messaging")
@@ -96,7 +97,7 @@ Main.main = function(self)
 		-- Update animations.
 		if self.client then
 			self.timing:start_action("animations")
-			Program:update_scene_animations(tick)
+			Graphics:update_scene_animations(tick)
 		end
 		-- Update the program state.
 		self.timing:start_action("program")
@@ -127,7 +128,7 @@ Main.main = function(self)
 		-- Update the scene.
 		if self.client then
 			self.timing:start_action("scene")
-			Program:update_scene(tick)
+			Graphics:update_scene(tick)
 		end
 		-- Update physics and render.
 		self.timing:start_action("parallel")

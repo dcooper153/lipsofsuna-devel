@@ -9,6 +9,7 @@
 -- @alias UiSpell
 
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local UiWidget = require("ui/widgets/widget")
 
 --- Spell widget.
@@ -36,8 +37,8 @@ UiSpell.rebuild_size = function(self)
 	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the description.
 	if self.spec then
-		local w1,h1 = Program:measure_text(Theme.text_font_2, self:get_pretty_name(), size.x-5-Theme.width_icon_1)
-		local w2,h2 = Program:measure_text(Theme.text_font_1, self.spec.description, size.x-5-Theme.width_icon_1)
+		local w1,h1 = Graphics:measure_text(Theme.text_font_2, self:get_pretty_name(), size.x-5-Theme.width_icon_1)
+		local w2,h2 = Graphics:measure_text(Theme.text_font_1, self.spec.description, size.x-5-Theme.width_icon_1)
 		local h = (h1 or 0) + (h2 or 0)
 		size.y = math.max(size.y, h + 10)
 		size.y = math.max(size.y, Theme.width_icon_1+10)

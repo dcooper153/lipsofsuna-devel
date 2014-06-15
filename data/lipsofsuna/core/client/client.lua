@@ -12,6 +12,7 @@ local Class = require("system/class")
 local ControlState = require("core/client/control-state")
 local File = require("system/file")
 local Game = require("core/server/game")
+local Graphics = require("system/graphics")
 local Hooks = require("system/hooks")
 local Lighting = require("core/client/lighting")
 local Options = require("core/client/options")
@@ -44,7 +45,7 @@ Client.init = function(self)
 	-- Initialize options.
 	self.options = Options()
 	-- Initialize graphics.
-	Program:load_graphics()
+	Graphics:load_graphics()
 	Reload:set_enabled(true)
 	self.lighting = Lighting()
 	-- Initialize data.

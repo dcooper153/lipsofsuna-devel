@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local Keysym = require("system/keysym")
 local String = require("system/string")
 local UiWidget = require("ui/widgets/widget")
@@ -112,7 +113,7 @@ end
 UiEntry.move_cursor_down = function(self)
 	-- Layout the text.
 	local text = self:get_displayed_text()
-	local layout = Program:layout_text(Theme.text_font_1, text, self:get_text_area_width())
+	local layout = Graphics:layout_text(Theme.text_font_1, text, self:get_text_area_width())
 	if not layout then return end
 	-- Find the closest glyph below the cursor.
 	local best
@@ -135,7 +136,7 @@ end
 UiEntry.move_cursor_up = function(self)
 	-- Layout the text.
 	local text = self:get_displayed_text()
-	local layout = Program:layout_text(Theme.text_font_1, text, self:get_text_area_width())
+	local layout = Graphics:layout_text(Theme.text_font_1, text, self:get_text_area_width())
 	if not layout then return end
 	-- Find the closest glyph above the cursor.
 	local best
@@ -159,7 +160,7 @@ UiEntry.rebuild_size = function(self)
 	-- Resize to fit the label.
 	if self.value then
 		local text = self:get_displayed_text()
-		local w,h = Program:measure_text(Theme.text_font_1, text, self:get_text_area_width(size))
+		local w,h = Graphics:measure_text(Theme.text_font_1, text, self:get_text_area_width(size))
 		if h then size.y = math.max(size.y, h + 10) end
 	end
 	return size
@@ -204,7 +205,7 @@ end
 -- @return X,Y.
 UiEntry.get_cursor_position = function(self)
 	local text = self:get_displayed_text()
-	local layout = Program:layout_text(Theme.text_font_1, text, self:get_text_area_width())
+	local layout = Graphics:layout_text(Theme.text_font_1, text, self:get_text_area_width())
 	if not layout then return 0,0 end
 	local cx,cy
 	local cp = 3*self.cursor_pos-2

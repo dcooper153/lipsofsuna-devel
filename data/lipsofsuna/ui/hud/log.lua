@@ -9,6 +9,7 @@
 -- @alias Hudlog
 
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local Widget = require("system/widget")
 
 --- HUD message log widget.
@@ -32,7 +33,7 @@ Hudlog.reshaped = function(self)
 	local h = self:get_height()
 	local y = 200
 	for k,v in ipairs(self.lines) do
-		local tw,th = Program:measure_text(Theme.text_font_1, v[1], w)
+		local tw,th = Graphics:measure_text(Theme.text_font_1, v[1], w)
 		y = y - th
 		Theme:draw_scene_text(self, v[1], 0, y, w, th, v[3], {0.5,0})
 	end
@@ -43,7 +44,7 @@ Hudlog.update = function(self, secs)
 	local changed = self.need_relayout
 	self.need_relayout = true
 	-- Update the screen offset.
-	local mode = Program:get_video_mode()
+	local mode = Graphics:get_video_mode()
 	if self:get_width() ~= mode[1] or self:get_offset().y ~= mode[2] - 200 then
 		self:set_offset(Vector(5, mode[2] - Theme.text_height_1 * 3 - 200))
 		self:set_request(mode[1], 200)

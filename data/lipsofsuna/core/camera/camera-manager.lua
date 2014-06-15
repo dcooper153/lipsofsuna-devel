@@ -10,6 +10,7 @@
 
 local Class = require("system/class")
 local Client = require("core/client/client")
+local Graphics = require("system/graphics")
 local Program = require("system/core")
 local Simulation = require("core/client/simulation")
 
@@ -113,11 +114,11 @@ CameraManager.update = function(self, secs)
 	end
 	-- Update the viewport.
 	--Program:set_multisamples(Client.options.multisamples)
-	Program:set_camera_far(self.camera:get_far())
-	Program:set_camera_near(self.camera:get_near())
-	Program:set_camera_position(self.camera:get_position())
-	Program:set_camera_rotation(self.camera:get_rotation())
-	local mode = Program:get_video_mode()
+	Graphics:set_camera_far(self.camera:get_far())
+	Graphics:set_camera_near(self.camera:get_near())
+	Graphics:set_camera_position(self.camera:get_position())
+	Graphics:set_camera_rotation(self.camera:get_rotation())
+	local mode = Graphics:get_video_mode()
 	local viewport = {0, 0, mode[1], mode[2]}
 	self.camera:set_viewport(viewport)
 	Client.lighting:set_dungeon_mode(false)

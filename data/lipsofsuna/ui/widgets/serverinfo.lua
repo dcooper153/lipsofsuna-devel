@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local UiWidget = require("ui/widgets/widget")
 
 local UiServerInfo = Class("Uiserverinfo", UiWidget)
@@ -21,8 +22,8 @@ UiServerInfo.rebuild_size = function(self)
 	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.desc then
-		local w1,h1 = Program:measure_text(Theme.text_font_2, self.name, 290)
-		local w2,h2 = Program:measure_text(Theme.text_font_1, self.desc, 290)
+		local w1,h1 = Graphics:measure_text(Theme.text_font_2, self.name, 290)
+		local w2,h2 = Graphics:measure_text(Theme.text_font_1, self.desc, 290)
 		if h1 and h2 then size.y = math.max(size.y, h1 + h2 + 30) end
 		self.title_height = h1
 	end

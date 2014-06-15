@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local Label = require("system/widgets/label")
 local Widget = require("system/widget")
 
@@ -12,7 +13,7 @@ UiTooltip.new = function(clss, text)
 end
 
 UiTooltip.popup = function(self, point)
-	local mode = Program:get_video_mode()
+	local mode = Graphics:get_video_mode()
 	self:set_floating(true)
 	if point.x > mode[1] - self:get_width() then
 		self:set_x(mode[1] - self:get_width())

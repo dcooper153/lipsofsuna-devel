@@ -1,16 +1,13 @@
--- Initialize the default video mode.
+local Graphics = require("system/graphics")
 local Options = require("core/client/options")
-local options = Options()
 
-__initial_videomode = {options.window_width, options.window_height, options.fullscreen, options.vsync, options.multisamples}
-__initial_pointer_grab = false
-require "system/graphics"
-__initial_pointer_grab = nil
-__initial_videomode = nil
+-- Initialize the default video mode.
+local options = Options()
+Graphics:create_window(options.window_width, options.window_height, options.fullscreen, options.vsync, options.multisamples, false)
 
 require "system/model-editing"
 
-Program:set_window_title("Lips of Suna")
+Graphics:set_window_title("Lips of Suna")
 
 require("core/client/bindings")
 local Client = require("core/client/client")

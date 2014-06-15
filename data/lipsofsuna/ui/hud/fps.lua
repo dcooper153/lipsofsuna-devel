@@ -9,6 +9,7 @@
 -- @alias Hudfps
 
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local Vector = require("system/math/vector")
 local Widget = require("system/widget")
 
@@ -31,7 +32,7 @@ Hudfps.reshaped = function(self)
 end
 
 Hudfps.update = function(self, secs)
-	local mode = Program:get_video_mode()
+	local mode = Graphics:get_video_mode()
 	local text = "FPS: " .. tostring(math.floor(Program:get_fps() + 0.5))
 	self:set_offset(__vec1:set_xyz(mode[1] - Theme.text_height_1 * 4.5, mode[2] - Theme.text_height_1 - 5))
 	self.font = Theme.text_font_1

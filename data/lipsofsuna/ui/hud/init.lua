@@ -1,3 +1,4 @@
+local Graphics = require("system/graphics")
 local Hudcompass = require("ui/hud/compass")
 local HudCompanion = require("ui/hud/companion")
 local Hudfps = require("ui/hud/fps")
@@ -39,7 +40,7 @@ Ui:add_hud{
 	init = function()
 		local self = UiIcon(Main.specs:find_by_name("IconSpec", "crosshair1"))
 		self.update = function(self, secs)
-			local mode = Program:get_video_mode()
+			local mode = Graphics:get_video_mode()
 			local padx = mode[1] - self.icon.size[1]
 			local pady = mode[2] - self.icon.size[2]
 			self:set_offset(Vector(padx / 2, pady / 2))

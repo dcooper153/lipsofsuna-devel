@@ -9,6 +9,7 @@
 -- @alias UiDialogText
 
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local UiWidget = require("ui/widgets/widget")
 
 --- Text widget for NPC dialogs.
@@ -35,8 +36,8 @@ UiDialogText.rebuild_size = function(self)
 	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.text and self.char then
-		local w1,h1 = Program:measure_text(Theme.text_font_1, self.char, size.x - 25)
-		local w2,h2 = Program:measure_text(Theme.text_font_1, self.text, size.x - 10)
+		local w1,h1 = Graphics:measure_text(Theme.text_font_1, self.char, size.x - 25)
+		local w2,h2 = Graphics:measure_text(Theme.text_font_1, self.text, size.x - 10)
 		if h1 and h2 then size.y = math.max(size.y, h1 + h2 + 15) end
 		self.title_width = w1
 		self.title_height = math.max(20, (h1 or 0) + 5)

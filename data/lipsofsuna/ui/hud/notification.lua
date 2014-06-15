@@ -9,6 +9,7 @@
 -- @alias Hudnotification
 
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local Widget = require("system/widget")
 
 --- HUD notification widget.
@@ -48,7 +49,7 @@ Hudnotification.update = function(self, secs)
 	if not self:get_visible() then return end
 	if self.__text and self.timer < 5 then
 		-- Show.
-		local mode = Program:get_video_mode()
+		local mode = Graphics:get_video_mode()
 		local off = 1
 		if self.timer < 0.5 then off = 2 * self.timer end
 		if self.timer > 4.5 then off = 2 * (5 - self.timer) end

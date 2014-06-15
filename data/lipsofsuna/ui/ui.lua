@@ -11,6 +11,7 @@
 local Button = require("system/widgets/button")
 local Class = require("system/class")
 local Cursor = require("system/widgets/cursor")
+local Graphics = require("system/graphics")
 local Input = require("system/input")
 local InputHandler = require("ui/input-handler")
 local Label = require("system/widgets/label")
@@ -564,7 +565,7 @@ Ui.show_state = function(self, state, focus)
 		end
 	end
 	-- Set the state name text.
-	local mode = Program:get_video_mode()
+	local mode = Graphics:get_video_mode()
 	self:update_help()
 	-- Toggle HUD widgets.
 	for index,hud in pairs(self.huds) do
@@ -653,7 +654,7 @@ end
 -- @param secs Seconds since the last update.
 Ui.update = function(self, secs)
 	-- Update the window size.
-	local mode = Program:get_video_mode()
+	local mode = Graphics:get_video_mode()
 	self.was_resized = (mode[1] ~= self.size.x or mode[2] ~= self.size.y)
 	if self.was_resized then
 		self.size.x = mode[1]
@@ -772,7 +773,7 @@ Ui.update_help = function(self)
 		hint = hint .. "\n\n" .. help
 	end
 	-- Update the help text.
-	local mode = Program:get_video_mode()
+	local mode = Graphics:get_video_mode()
 	self.label:set_request(Theme.help_text_width, nil)
 	self.label:set_font(Theme.text_font_2)
 	self.label:set_text(state and state.label or "")

@@ -1,3 +1,4 @@
+local Graphics = require("system/graphics")
 local Render = require("system/render")
 local Sound = require("system/sound")
 local UiBackground = require("ui/widgets/background")
@@ -18,9 +19,9 @@ Ui:add_widget{
 	widget = function()
 		return UiRadioMenu("Video mode", function(self)
 			-- Get the sorted list of video modes.
-			local mode = Program:get_video_mode()
+			local mode = Graphics:get_video_mode()
 			local modes = {}
-			for k,v in ipairs(Program:get_video_modes()) do
+			for k,v in ipairs(Graphics:get_video_modes()) do
 				if v[2] >= 480 then
 					local name = string.format("%sx%s", v[1], v[2])
 					table.insert(modes, {name, v[1], v[2], true})
@@ -35,13 +36,13 @@ Ui:add_widget{
 			-- Create the windowed mode button.
 			self:clear()
 			self:add_item("Windowed", not mode[3], function(w)
-				local s = Program:get_video_mode()
-				Program:set_video_mode(s[1], s[2], false, Client.options.vsync)
+				local s = Graphics:get_video_mode()
+				Graphics:set_video_mode(s[1], s[2], false, Client.options.vsync)
 			end)
 			-- Create the fullscreen mode buttons.
 			for k,v in ipairs(modes) do
 				self:add_item(v[1], mode[3] and v[2] == mode[1] and v[3] == mode[2], function(w)
-					Program:set_video_mode(v[2], v[3], v[4], Client.options.vsync)
+					Graphics:set_video_mode(v[2], v[3], v[4], Client.options.vsync)
 				end)
 			end
 		end)

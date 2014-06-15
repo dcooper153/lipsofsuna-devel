@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local UiWidget = require("ui/widgets/widget")
 
 local UiLabel = Class("UiLabel", UiWidget)
@@ -18,7 +19,7 @@ UiLabel.rebuild_size = function(self)
 	local size = UiWidget.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.text then
-		local w,h = Program:measure_text(Theme.text_font_1, self.text, size.x - 10)
+		local w,h = Graphics:measure_text(Theme.text_font_1, self.text, size.x - 10)
 		if h then size.y = math.max(size.y, h + 10) end
 	end
 	return size

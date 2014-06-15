@@ -1,4 +1,5 @@
 local Client = require("core/client/client")
+local Graphics = require("system/graphics")
 local Program = require("system/core")
 local Ui = require("ui/ui")
 
@@ -22,7 +23,7 @@ Client:register_update_hook(5, function(secs)
 	Ui:update(secs)
 	-- Update the window size.
 	if Ui.was_resized then
-		local v = Program:get_video_mode()
+		local v = Graphics:get_video_mode()
 		Client.options.window_width = v[1]
 		Client.options.window_height = v[2]
 		Client.options.fullscreen = v[3]

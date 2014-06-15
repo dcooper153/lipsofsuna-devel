@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local UiButton = require("ui/widgets/button")
 local UiMenu = require("ui/widgets/menu")
 local UiInvItem = Class("UiInvItem", UiMenu)
@@ -130,7 +131,7 @@ UiInvItem.rebuild_size = function(self)
 	-- Resize to fit the description.
 	local name = self:get_pretty_name()
 	if name then
-		local w,h = Program:measure_text(Theme.text_font_1, name, size.x - 40)
+		local w,h = Graphics:measure_text(Theme.text_font_1, name, size.x - 40)
 		if h then size.y = math.max(size.y, h + 10) end
 	end
 	return size

@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local Interpolation = require("system/math/interpolation")
 local Widget = require("system/widget")
 
@@ -83,7 +84,7 @@ UiWidget.rebuild_size = function(self)
 	local size = Vector(Theme.width_widget_1, Theme.height_widget_1)
 	-- Resize to fit the label.
 	if self.label then
-		local w,h = Program:measure_text(Theme.text_font_1, self.label, Theme.width_label_1-5)
+		local w,h = Graphics:measure_text(Theme.text_font_1, self.label, Theme.width_label_1-5)
 		if h then size.y = math.max(size.y, h) end
 	end
 	-- Resize to fit the child.

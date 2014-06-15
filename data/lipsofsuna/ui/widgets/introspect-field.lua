@@ -1,4 +1,5 @@
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local Introspect = require("core/introspect/introspect")
 local IntrospectOperator = require("core/debug/introspect-operator")
 local UiEntry = require("ui/widgets/entry")
@@ -50,7 +51,7 @@ UiIntrospectField.rebuild_size = function(self)
 	-- Resize to fit the label.
 	if self.value then
 		local text = self:get_displayed_text()
-		local w,h = Program:measure_text(Theme.text_font_1, text, self:get_text_area_width(size))
+		local w,h = Graphics:measure_text(Theme.text_font_1, text, self:get_text_area_width(size))
 		if h then size.y = math.max(size.y, h + 10) end
 	end
 	return size

@@ -1,4 +1,5 @@
 local Client = require("core/client/client")
+local Graphics = require("system/graphics")
 local Keysym = require("system/keysym")
 
 Main.main_start_hooks:register(500, function()
@@ -98,7 +99,7 @@ Main.main_start_hooks:register(500, function()
 	end}
 
 	Client.input:register_binding{name = "screenshot", mode = "press", key1 = Keysym.PRINT, func = function()
-		local n = Program:capture_screen()
+		local n = Graphics:capture_screen()
 		Client:append_log("Screenshot: " .. n)
 		Main.effect_manager:play_global("uitransition1")
 	end}

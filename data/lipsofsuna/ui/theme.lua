@@ -9,6 +9,7 @@
 -- @alias Theme
 
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local Widgets = require("system/widgets")
 
 --- TODO:doc
@@ -226,7 +227,7 @@ Theme.draw_slider = function(self, widget, value, x, y, w, h, focused, editing)
 end
 
 Theme.measure_button = function(self, w, text)
-	local w1,h1 = Program:measure_text(self.text_font_1, text, w)
+	local w1,h1 = Graphics:measure_text(self.text_font_1, text, w)
 	return w1 or 0,h1 or 0
 end
 

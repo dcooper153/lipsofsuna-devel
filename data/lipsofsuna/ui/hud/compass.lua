@@ -9,6 +9,7 @@
 -- @alias Hudcompass
 
 local Class = require("system/class")
+local Graphics = require("system/graphics")
 local Widget = require("system/widget")
 
 --- HUD compass widget.
@@ -41,7 +42,7 @@ end
 Hudcompass.reshaped = function(self)
 	local w = self:get_width()
 	local h = self:get_height()
-	local mode = Program:get_video_mode()
+	local mode = Graphics:get_video_mode()
 	self:set_offset(Vector(0, mode[2] - 80))
 	self:canvas_clear()
 	-- Add the background.
