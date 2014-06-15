@@ -45,6 +45,7 @@
 		["load", "core/dialog"],
 		["load", "core/effect"],
 		["load", "core/input"],
+		["load", "core/inventory"],
 		["load", "core/marker"],
 		["load", "core/messaging"],
 		["load", "core/multiplayer"],

@@ -10,7 +10,7 @@
 
 local Action = require("core/actions/action")
 local Class = require("system/class")
-local Inventory = require("core/server/inventory")
+local Inventory = require("core/inventory/inventory")
 local Object = require("system/object")
 local Model = require("system/model")
 local PhysicsObject = require("system/physics-object")
