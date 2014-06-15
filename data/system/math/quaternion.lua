@@ -143,8 +143,6 @@ end
 -- constuction arguments can be used:<br/>
 --
 -- <ul>
---   <li>angle: Angle of rotation in radians.</li>
---   <li>axis: Axis of rotation.</li>
 --   <li>dir: Look direction vector.</li>
 --   <li>up: Up direction vector.</li>
 -- </ul>
@@ -158,11 +156,7 @@ end
 Quaternion.new = function(clss, x, y, z, w)
 	local h
 	if type(x) == "table" then
-		if x.axis then
-			h = Los.quaternion_new{axis = x.axis.handle, angle = x.angle}
-		else
-			h = Los.quaternion_new{dir = x.dir.handle, up = x.up.handle}
-		end
+		h = Los.quaternion_new{dir = x.dir.handle, up = x.up.handle}
 	else
 		h = Los.quaternion_new(x, y, z, w)
 	end
@@ -171,20 +165,29 @@ end
 
 --- Creates a new quaternion from an axis and angle.
 -- @param clss Quaternion class.
--- @param axis Axis.
+-- @param x Axis.
+-- @param y Axis.
+-- @param z Axis.
 -- @param angle Angle.
 -- @return New quaternion.
-Quaternion.new_from_axis = function(clss, axis, angle)
+Quaternion.new_from_axis = function(clss, x, y, z, angle)
+	local axis = Vector(x,y,z)
 	local h = Los.quaternion_new{axis = axis.handle, angle = angle}
 	return Quaternion:new_from_handle(h)
 end
 
 --- Creates a new quaternion from direction and up vectors.
 -- @param clss Quaternion class.
--- @param dir Direction vector.
--- @param up Up vector.
+-- @param dx Direction vector.
+-- @param dy Direction vector.
+-- @param dz Direction vector.
+-- @param ux Up vector.
+-- @param uy Up vector.
+-- @param uz Up vector.
 -- @return New quaternion.
-Quaternion.new_from_dir = function(clss, dir, up)
+Quaternion.new_from_dir = function(clss, dx, dy, dz, ux, uy, uz)
+	local dir = Vector(dx, dy, dz)
+	local up = Vector(ux, uy, uz)
 	local h = Los.quaternion_new{dir = dir.handle, up = up.handle}
 	return Quaternion:new_from_handle(h)
 end

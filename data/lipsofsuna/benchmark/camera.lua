@@ -36,7 +36,8 @@ BenchmarkCamera.update = function(self, secs)
 		Client.camera_manager:set_camera_mode("benchmark")
 		local camctr = Vector(505,500,500)
 		local campos = camctr + Main.benchmark.translation
-		local camrot = Quaternion{dir = camctr - campos, up = Vector(0,1,0)}
+		local dir = camctr - campos
+		local camrot = Quaternion:new_from_dir(dir.x,dir.y,dir.z, 0,1,0)
 		self:set_target_position(campos)
 		self:set_target_rotation(camrot)
 		Camera.update(self, secs)

@@ -98,7 +98,7 @@ NpcAi.choose_combat_action = function(self)
 	end
 	-- Check if we could strafe left.
 	if spec.ai_enable_strafe and math.random() > spec.ai_offense_factor then
-		local dirl = Quaternion{axis = Vector(0,1), angle = 0.5 * math.pi} * dir
+		local dirl = Quaternion:new_from_axis(0,1,0, 0.5 * math.pi) * dir
 		local dstl = (ctr + dirl):floor()
 		-- FIXME: Stick terrain
 		local l1 = 0--Voxel:get_tile(dstl)
@@ -114,7 +114,7 @@ NpcAi.choose_combat_action = function(self)
 	end
 	-- Check if we could strafe right.
 	if spec.ai_enable_strafe and math.random() > spec.ai_offense_factor then
-		local dirr = Quaternion{axis = Vector(0,1), angle = -0.5 * math.pi} * dir
+		local dirr = Quaternion:new_from_axis(0,1,0, -0.5 * math.pi) * dir
 		local dstr = (ctr + dirr):floor()
 		-- FIXME: Stick terrain
 		local r1 = 0--Voxel:get_tile(dstr)
@@ -206,7 +206,7 @@ NpcAi.choose_wander_target = function(self)
 		end
 	end]]
 	-- Fallback to a random direction.
-	local rot = Quaternion{axis = Vector(0,1,0), angle = math.random() * 6.28}
+	local rot = Quaternion:new_from_axis(0,1,0, math.random() * 6.28)
 	self.target = self.object:get_position() + rot * Vector(0, 0, 10)
 end
 

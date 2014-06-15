@@ -526,7 +526,7 @@ Dialog.execute = function(self)
 			if object then
 				object:set_position(select_spawn_position(c))
 				if type(c.rotation) == "number" then
-					object:set_rotation(Quaternion{axis = Vector(0,1), angle = c.rotation / math.pi * 180})
+					object:set_rotation(Quaternion:new_from_axis(0,1,0, c.rotation / math.pi * 180))
 				elseif type(c.rotation) == "table" then
 					object:set_rotation(c.rotation)
 				end

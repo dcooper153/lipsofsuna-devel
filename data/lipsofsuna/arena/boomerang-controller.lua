@@ -32,7 +32,7 @@ BoomerangController.attach = function(self)
 	local src,dst = Main.combat_utils:get_attack_ray_for_actor(self.attacker)
 	self.projectile:detach()
 	self.projectile:set_position(src + self.attacker:get_rotation() * Vector(0,0,-1))
-	self.projectile:set_rotation(Quaternion{axis = Vector(0,0,1), angle = -0.5 * math.pi})
+	self.projectile:set_rotation(Quaternion:new_from_axis(0,0,1, -0.5 * math.pi))
 	self.projectile:set_velocity(dst:subtract(src):normalize():multiply(10))
 	self.projectile:set_visible(true)
 	-- Enable contact events.

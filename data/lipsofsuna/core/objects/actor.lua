@@ -1053,8 +1053,7 @@ end
 -- @return Quaternion.
 Actor.get_rotation_to_point = function(self, point)
 	local dir = __vec1:set(point):subtract(self:get_position()):normalize()
-	dir.y = 0
-	return Quaternion{dir = dir, up = __vec2:set_xyz(0, 1, 0)}
+	return Quaternion:new_from_dir(dir.x, 0, dir.z, 0, 1, 0)
 end
 
 --- Gets the running state of the actor.

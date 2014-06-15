@@ -400,7 +400,7 @@ SceneObject.set_tilt = function(self, nodes, value)
 	if not nodes then return end
 	if not nodes[1] then return end
 	-- Calculate the bone rotation.
-	local rot = Quaternion{axis = Vector(1,0,0), angle = -value / #nodes}
+	local rot = Quaternion:new_from_axis(1,0,0, -value / #nodes)
 	-- Create the tilting channel.
 	local anim = Animation("tilt")
 	for k,v in pairs(nodes) do
