@@ -12,7 +12,7 @@ local Class = require("system/class")
 
 --- Message handler.
 -- @type Message
-Message = Class("Message")
+local Message = Class("Message")
 
 --- Creates a new message.
 -- @param id Message ID.
@@ -27,5 +27,3 @@ Message.new = function(clss, id, args)
 end
 
 return Message
-
-
