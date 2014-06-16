@@ -95,7 +95,7 @@ ObjectManager.create_object_by_spec_category = function(self, clss, cat, id)
 	if not s then return end
 	local c = self.__classes[clss]
 	local o = c(self, id)
-	o:set_spec(s)
+	o:set_spec(s[math.random(#s)])
 	return o
 end
 

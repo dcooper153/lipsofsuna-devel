@@ -13,7 +13,7 @@ local Spec = require("core/specs/spec")
 
 --- TODO:doc
 -- @type GlobalEventSpec
-local GlobalEventSpec = Spec:register("Globaleventspec", "global event", {
+local GlobalEventSpec = Spec:register("GlobalEventSpec", "global event", {
 	{name = "name", type = "string", description = "Name of the spec."},
 	{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 	{name = "duration", type = "number", description = "Duration of the event, in seconds."},

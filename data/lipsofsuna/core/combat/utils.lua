@@ -9,6 +9,7 @@
 -- @alias CombatUtils
 
 local Class = require("system/class")
+local Damage = require("core/combat/damage")
 local Modifier = require("core/combat/modifier")
 local Quaternion = require("system/math/quaternion")
 local Time = require("system/time")

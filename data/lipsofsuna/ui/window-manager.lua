@@ -10,7 +10,9 @@
 
 local Class = require("system/class")
 local Client = require("core/client/client")
+local Graphics = require("system/graphics")
 local Program = require("system/core")
+local Time = require("system/time")
 
 --- Manages the windows of the user interface.
 -- @type WindowManager
@@ -50,7 +52,7 @@ end
 -- @param secs Seconds since the last update.
 WindowManager.update = function(self, secs)
 	-- Update the window size.
-	local mode = Program:get_video_mode()
+	local mode = Graphics:get_video_mode()
 	local resized = (mode[1] ~= self.__width or mode[2] ~= self.__height)
 	if resized then
 		self.__width = mode[1]
@@ -60,7 +62,7 @@ WindowManager.update = function(self, secs)
 		end
 	end
 	-- Emit key repeat events.
-	local t = Program:get_time()
+	local t = Time:get_secs()
 	for k,v in pairs(Client.input.pressed) do
 		if t - v.time > 0.05 then
 			v.type = "keyrepeat"
@@ -75,7 +77,7 @@ WindowManager.update = function(self, secs)
 	end
 	-- Update video mode options.
 	if resized then
-		local v = Program:get_video_mode()
+		local v = Graphics:get_video_mode()
 		Client.options.window_width = v[1]
 		Client.options.window_height = v[2]
 		Client.options.fullscreen = v[3]
