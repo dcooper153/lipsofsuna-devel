@@ -1,5 +1,4 @@
 local ActionSpec = require("core/specs/action")
-local AreaSpell = require("core/objects/areaspell")
 local Coroutine = require("system/coroutine")
 local Feat = FIXME
 
@@ -14,13 +13,15 @@ ActionSpec{
 			-- cannot generally be represented as one object.
 			for k,v in pairs(feat.effects) do
 				local effect = Main.specs:find_by_name("ModifierSpec", v[1])
-				local spec = effect and Main.specs:find_by_name("SpellSpec", effect.projectile)
-				if effect and spec then
+				local spell = effect and args.user.manager:create_object_by_spec("AreaSpell", effect.projectile)
+				if spell then
 					local sub = Feat("area spell", {{v[1], v[2]}})
-					local spell = AreaSpell(args.user.manager, {
-						duration = effect.duration, radius = effect.radius,
-						feat = sub, owner = args.user, position = args.user:get_position(),
-						realized = true, spec = spec})
+					spell.duration = effect.duration
+					spell.radius = effect.radius
+					spell.feat = sub
+					spell.owner = args.user
+					spell:set_position(args.user:get_position())
+					spell:set_visible(true)
 				end
 			end
 		end)

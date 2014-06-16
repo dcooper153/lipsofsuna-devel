@@ -13,7 +13,6 @@ local Network = require("system/network")
 local Region = require("landscape/generator/region")
 local Sector = require("system/sector")
 local SectorGenerator = require("landscape/generator/sector-generator")
-local Staticobject = require("core/objects/static")
 
 --- Landscape generator.
 -- @type Generator

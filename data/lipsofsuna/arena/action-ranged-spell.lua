@@ -1,6 +1,5 @@
 local ActionSpec = require("core/specs/action")
 local Damage = require("core/combat/damage")
-local Spell = require("core/objects/spell")
 
 ActionSpec{
 	name = "ranged spell",
@@ -33,10 +32,8 @@ ActionSpec{
 			return
 		end
 		-- Fire the spell.
-		local spec = Main.specs:find_by_name("SpellSpec", "fireball1") --FIXME
-		if not spec then return end
-		local spell = Spell(action.object.manager)
-		spell:set_spec(spec)
+		local spell = action.object.manager:create_object_by_spec("Spell", "fireball1") --FIXME
+		if not spell then return end
 		spell:set_modifiers(modifiers)
 		spell:set_owner(action.object)
 		spell:fire()

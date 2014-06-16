@@ -1,5 +1,3 @@
-local AreaSpell = require("core/objects/areaspell")
-
 local FirewallModifier = Main.specs:find_by_name("ModifierSpec", "firewall")
 
 --- Applies the modifier.
@@ -18,16 +16,16 @@ FirewallModifier.start = function(modifier, value)
 		local w = ctr + dir * i * Main.terrain.grid_size
 		local p = Utils:find_empty_ground(w)
 		if p then
-			local spec = Main.specs:find_by_name("SpellSpec", "firewall1")
-			local spell = AreaSpell(modifier.owner.manager)
-			local modifiers = {["burning"] = 3}
-			spell:set_spec(spec)
-			spell:set_modifiers(modifiers)
-			spell:set_owner(modifier.owner)
-			spell.duration = 15
-			spell.radius = 1.3
-			spell:set_position(w)
-			spell:set_visible(true)
+			local spell = modifier.owner.manager:create_object_by_spec("AreaSpell", "firewall1")
+			if spell then
+				local modifiers = {["burning"] = 3}
+				spell:set_modifiers(modifiers)
+				spell:set_owner(modifier.owner)
+				spell.duration = 15
+				spell.radius = 1.3
+				spell:set_position(w)
+				spell:set_visible(true)
+			end
 		end
 	end
 end

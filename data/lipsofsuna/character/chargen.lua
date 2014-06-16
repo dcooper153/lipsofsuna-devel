@@ -8,7 +8,6 @@
 -- @module character.chargen
 -- @alias Chargen
 
-local Actor = require("core/objects/actor")
 local ChargenCamera = require("character/camera")
 local Class = require("system/class")
 local Color = require("system/color")
@@ -539,7 +538,7 @@ end
 -- @return Indexed list of presets.
 Chargen.get_presets = function(self)
 	local presets = {}
-	for k,v in pairs(ActorPresetSpec.dict_name) do
+	for k,v in pairs(Main.specs:get_spec_names("ActorPresetSpec")) do
 		if v.playable then
 			table.insert(presets, v)
 		end

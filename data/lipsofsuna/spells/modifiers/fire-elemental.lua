@@ -1,5 +1,3 @@
-local Actor = require("core/objects/actor")
-
 local FireElementalModifier = Main.specs:find_by_name("ModifierSpec", "fire elemental")
 
 --- Applies the modifier.

@@ -8,7 +8,6 @@
 -- @module core.server.global_event_manager
 -- @alias GlobalEventManager
 
-local Actor = require("core/objects/actor")
 local Class = require("system/class")
 local Coroutine = require("system/coroutine")
 local Time = require("system/time")
@@ -53,7 +52,7 @@ GlobalEventManager.find_actor_spawn_point = function(self)
 	local objects = Main.objects:find_by_point(ppos, radius)
 	local monsters = 0
 	for id,object in pairs(objects) do
-		if object.class == Actor then
+		if object.class_name == "Actor" then
 			if math.abs(object:get_position().y - ppos.y) < 10 then
 				monsters = monsters + 1
 				if monsters > 4 then return end

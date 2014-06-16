@@ -1,4 +1,3 @@
-local Actor = require("core/objects/actor")
 local Modifier = require("core/combat/modifier")
 
 -- Summon plagued beasts.
