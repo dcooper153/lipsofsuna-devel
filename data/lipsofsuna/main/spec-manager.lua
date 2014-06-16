@@ -25,29 +25,6 @@ SpecManager.new = function(clss)
 	return self
 end
 
---- Finds a spec.
--- @param self SpecManager.
--- @param clss Class name.
--- @param args Arguments.<ul>
---   <li>category: Category name.</li>
---   <li>name: Spec name.</li>
---   <li>id: Spec ID.</li></ul>
--- @return Spec or nil if searching by name or ID. Table or nil otherwise.
-SpecManager.find = function(self, clss, args)
-	if not args then return end
-	local specs = self.__classes[clss]
-	if not specs then return end
-	if args.category then
-		return specs.dict_cat[args.category]
-	end
-	if args.name then
-		return specs.dict_name[args.name]
-	end
-	if args.id then
-		return specs.dict_id[args.id]
-	end
-end
-
 --- Finds specs by category.
 -- @param self SpecManager.
 -- @param clss Class name.

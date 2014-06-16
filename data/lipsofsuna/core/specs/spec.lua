@@ -14,10 +14,6 @@ local File = require("system/file")
 --- TODO:doc
 -- @type Spec
 local Spec = Class("Spec")
-Spec.dict_id = {}
-Spec.dict_cat = {}
-Spec.dict_name = {}
-Spec.dict_file = {}
 
 --- Registers a spec class.
 -- @param clss Spec class.
@@ -27,38 +23,6 @@ Spec.dict_file = {}
 -- @return New spec class.
 Spec.register = function(clss, name, type, fields)
 	return Main.specs:register(name, type, fields)
-end
-
---- Extends a spec with the values in the table.
--- @param clss Spec class.
--- @param args Arguments.<ul>
---   <li>name: Spec name.</li></ul>
-Spec.extend = function(clss, args)
-	local spec = clss:find(args)
-	if not spec then return end
-	for k,v in pairs(args) do
-		if k ~= "name" then spec[k] = v end
-	end
-end
-
---- Finds a spec.
--- @param clss Spec class.
--- @param args Arguments.<ul>
---   <li>category: Category name.</li>
---   <li>name: Spec name.</li>
---   <li>id: Spec ID.</li></ul>
--- @return Spec or nil if searching by name or ID. Table or nil otherwise.
-Spec.find = function(clss, args)
-	if not args then return end
-	if args.category then
-		return clss.dict_cat[args.category]
-	end
-	if args.name then
-		return clss.dict_name[args.name]
-	end
-	if args.id then
-		return clss.dict_id[args.id]
-	end
 end
 
 --- Finds specs by category.

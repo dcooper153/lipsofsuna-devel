@@ -1,9 +1,8 @@
 {
 	"resources": ["."],
-	"specs": ["effects"],
+	"specs": ["effects", "items"],
 	"scripts":
 	[
-		"items",
 		"obstacles",
 		"quests"
 	]

@@ -1,0 +1,28 @@
+[
+	{
+		"type": "CraftingRecipeSpec",
+		"name": "broken wooden fence",
+		"effect": "craftwood1",
+		"materials":
+		{
+			"log": 7
+		},
+		"modes":
+		{
+			"wood": true
+		}
+	},
+	{
+		"type": "ItemSpec",
+		"name": "broken wooden fence",
+		"categories":
+		{
+			"furniture": true
+		},
+		"model": "fence1",
+		"icon": "chest1",
+		"mass": 10,
+		"health": 50,
+		"stacking": false
+	}
+]
