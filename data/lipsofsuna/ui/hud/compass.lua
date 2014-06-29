@@ -10,25 +10,34 @@
 
 local Class = require("system/class")
 local Graphics = require("system/graphics")
-local Widget = require("system/widget")
+local UiWindow = require("ui/windows/ui-window")
 
 --- HUD compass widget.
 -- @type Hudcompass
-local Hudcompass = Class("Hudcompass", Widget)
+local Hudcompass = Class("Hudcompass", UiWindow)
 
 --- Creates a new compass widget.
 -- @param clss Compass class.
 -- @return Compass widget.
 Hudcompass.new = function(clss)
-	local self = Widget.new(clss)
+	local self = UiWindow.new(clss)
 	self.timer = 0
 	return self
+end
+
+--- Called when the screen size changes.
+-- @param self Hudcompass.
+-- @param width Screen width.
+-- @param height Screen height.
+Hudcompass.screen_resized = function(self, w, h)
+	self:set_position(0, h - 80)
 end
 
 --- Updates the compass.
 -- @param self Compass widget.
 -- @param secs Seconds since the last update.
 Hudcompass.update = function(self, secs)
+	self:set_visible(Ui.root == "play")
 	self.timer = self.timer + secs
 	if self.timer < 0.03 then return end
 	self.timer = 0
@@ -40,10 +49,6 @@ Hudcompass.update = function(self, secs)
 end
 
 Hudcompass.reshaped = function(self)
-	local w = self:get_width()
-	local h = self:get_height()
-	local mode = Graphics:get_video_mode()
-	self:set_offset(Vector(0, mode[2] - 80))
 	self:canvas_clear()
 	-- Add the background.
 	self:canvas_image{
@@ -56,7 +61,7 @@ Hudcompass.reshaped = function(self)
 		source_tiling = {0,74,0,0,74,0}}
 	-- Add the quest marker.
 	if self.quest_direction then
-		local frac = 0.6 + 0.4 * math.min(1,self.quest_distance/(50*Voxel.tile_size))
+		local frac = 0.6 + 0.4 * math.min(1,self.quest_distance/50)
 		self:canvas_image{
 			dest_position = {32,44-33*frac},
 			dest_size = {12,50},

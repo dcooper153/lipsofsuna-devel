@@ -27,6 +27,10 @@ Hudfps.reshaped = function(self)
 	Theme:draw_scene_text(self, self.text, 0, 0, w, h, 1, {0, 0.5})
 end
 
+--- Called when the screen size changes.
+-- @param self Hudfps.
+-- @param width Screen width.
+-- @param height Screen height.
 Hudfps.screen_resized = function(self, w, h)
 	self:set_position(w - Theme.text_height_1 * 4.5, h - Theme.text_height_1 - 5)
 end

@@ -25,16 +25,6 @@ Ui:add_hud{
 	init = function() return Hudlog() end}
 
 Ui:add_hud{
-	id = "compass",
-	active = function() return Ui.root == "play" end,
-	init = function() return Hudcompass() end}
-
-Ui:add_hud{
-	id = "companion",
-	active = function() return Ui.root == "play" end,
-	init = function() return HudCompanion() end}
-
-Ui:add_hud{
 	id = "crosshair",
 	active = function() return Ui.root == "play" end,
 	init = function()
@@ -49,6 +39,7 @@ Ui:add_hud{
 	end}
 
 Main.main_start_hooks:register(1002, function(secs)
+	Main.windows:add_window(Hudcompass())
 	Main.windows:add_window(Hudfps())
 end)
 
