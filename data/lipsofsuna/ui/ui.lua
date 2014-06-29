@@ -29,7 +29,6 @@ Ui.states = {}
 --- Initializes the user interface state system.
 -- @param self Ui class.
 Ui.init = function(self)
-	Theme:init()
 	self.history = {}
 	self.size = Vector()
 	self.stack = {}

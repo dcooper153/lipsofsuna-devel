@@ -48,10 +48,9 @@ Ui:add_hud{
 		return self
 	end}
 
-Ui:add_hud{
-	id = "fps",
-	active = function() return true end,
-	init = function() return Hudfps() end}
+Main.main_start_hooks:register(1002, function(secs)
+	Main.windows:add_window(Hudfps())
+end)
 
 Ui:add_hud{
 	id = "modifier",

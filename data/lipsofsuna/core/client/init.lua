@@ -1,17 +1,17 @@
 local Graphics = require("system/graphics")
 local Options = require("core/client/options")
 
--- Initialize the default video mode.
-local options = Options()
-Graphics:create_window(options.window_width, options.window_height, options.fullscreen, options.vsync, options.multisamples, false)
-
 require "system/model-editing"
-
-Graphics:set_window_title("Lips of Suna")
-
 require("core/client/bindings")
 local Client = require("core/client/client")
 local Network = require("system/network")
+
+-- Initialize the default video mode.
+Main.main_start_hooks:register(1000, function(secs)
+	local options = Options()
+	Graphics:create_window(options.window_width, options.window_height, options.fullscreen, options.vsync, options.multisamples, false)
+	Graphics:set_window_title("Lips of Suna")
+end)
 
 Main.game_modes:register("Normal", function()
 	Client:start_single_player()

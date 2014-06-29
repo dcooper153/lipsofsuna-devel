@@ -13,6 +13,8 @@ local Client = require("core/client/client")
 local Graphics = require("system/graphics")
 local Program = require("system/core")
 local Time = require("system/time")
+local Vector = require("system/math/vector")
+local Widget = require("system/widget")
 
 --- Manages the windows of the user interface.
 -- @type WindowManager
@@ -24,14 +26,25 @@ local WindowManager = Class("WindowManager")
 WindowManager.new = function(clss)
 	local self = Class.new(clss)
 	self.__windows = {}
+	self.__base = Widget()
+	self.__base:set_floating(true)
+	self.__base:set_fullscreen(true)
+	local mode = Graphics:get_video_mode()
+	self.__width = mode[1]
+	self.__height = mode[2]
 	return self
 end
 
 --- Adds a window.
 -- @param self WindowManager.
 -- @param window Window.
-WindowManager.add_window = function(self, window)
+-- @param hack FIXME.
+WindowManager.add_window = function(self, window, hack)
 	self.__windows[window] = true
+	if not hack then
+		self.__base:add_child(window)
+	end
+	window:screen_resized(self.__width, self.__height)
 end
 
 --- Handles an input event.
@@ -57,6 +70,8 @@ WindowManager.update = function(self, secs)
 	if resized then
 		self.__width = mode[1]
 		self.__height = mode[2]
+		self.__base:set_request(mode[1], mode[2])
+		self.__base:set_offset(Vector(0, 0))
 		for k,v in pairs(self.__windows) do
 			k:screen_resized(mode[1], mode[2])
 		end

@@ -2,9 +2,10 @@ local Client = require("core/client/client")
 local Ui = require("ui/ui")
 local WindowManager = require("ui/window-manager")
 
-Main.main_start_hooks:register(0, function(secs)
+Main.main_start_hooks:register(1001, function(secs)
+	Theme:init()
 	Main.windows = WindowManager()
-	Main.windows:add_window(Ui) -- FIXME: Hack
+	Main.windows:add_window(Ui, true) -- FIXME: Hack
 end)
 
 Main.update_hooks:register(0, function(secs)
