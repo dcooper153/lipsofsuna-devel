@@ -41,6 +41,7 @@ Ui:add_hud{
 Main.main_start_hooks:register(1002, function(secs)
 	Main.windows:add_window(Hudcompass())
 	Main.windows:add_window(Hudfps())
+	Main.windows:add_window(HudCompanion())
 end)
 
 Ui:add_hud{

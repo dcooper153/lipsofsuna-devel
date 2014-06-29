@@ -9,14 +9,14 @@
 -- @alias HudCompanion
 
 local Class = require("system/class")
-local Widget = require("system/widget")
+local UiWindow = require("ui/windows/ui-window")
 
 --- Companion HUD widget.
 -- @type HudCompanion
-local HudCompanion = Class("HudCompanion", Widget)
+local HudCompanion = Class("HudCompanion", UiWindow)
 
 HudCompanion.new = function(clss)
-	local self = Widget.new(clss)
+	local self = UiWindow.new(clss)
 	self:set_offset(Vector())
 	return self
 end
@@ -62,6 +62,7 @@ HudCompanion.reshaped = function(self)
 end
 
 HudCompanion.update = function(self, secs)
+	self:set_visible(Ui.root == "play")
 	local dialog = self:get_dialog()
 	local text = dialog and dialog.message or nil
 	if text ~= self.__text then
