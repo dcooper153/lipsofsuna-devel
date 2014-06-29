@@ -13,8 +13,8 @@ local Client = require("core/client/client")
 local Graphics = require("system/graphics")
 local Program = require("system/core")
 local Time = require("system/time")
+local UiBackground = require("ui/widgets/background")
 local Vector = require("system/math/vector")
-local Widget = require("system/widget")
 
 --- Manages the windows of the user interface.
 -- @type WindowManager
@@ -26,7 +26,7 @@ local WindowManager = Class("WindowManager")
 WindowManager.new = function(clss)
 	local self = Class.new(clss)
 	self.__windows = {}
-	self.__base = Widget()
+	self.__base = UiBackground()
 	self.__base:set_floating(true)
 	self.__base:set_fullscreen(true)
 	local mode = Graphics:get_video_mode()
@@ -99,6 +99,13 @@ WindowManager.update = function(self, secs)
 		Client.options.vsync = v[4]
 		Client.options:save()
 	end
+end
+
+--- Sets the background image.
+-- @param self WindowManager.
+-- @param image Image name. Nil to disable the background.
+WindowManager.set_background = function(self, image)
+	self.__base:set_image(image)
 end
 
 return WindowManager

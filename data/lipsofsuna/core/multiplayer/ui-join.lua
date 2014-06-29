@@ -1,5 +1,4 @@
 local Lobby = require("system/lobby")
-local UiBackground = require("ui/widgets/background")
 local UiButton = require("ui/widgets/button")
 local UiConfigOption = require("ui/widgets/config-option")
 local UiEntry = require("ui/widgets/entry")
@@ -11,7 +10,7 @@ Ui:add_state{
 	root = "mainmenu",
 	label = "Join",
 	background = function()
-		return UiBackground("mainmenu1")
+		return "mainmenu1"
 	end}
 
 Ui:add_widget{
@@ -54,7 +53,7 @@ Ui:add_state{
 	root = "mainmenu",
 	label = "Select server",
 	background = function()
-		return UiBackground("mainmenu1")
+		return "mainmenu1"
 	end,
 	init = function()
 		-- Download the server list.

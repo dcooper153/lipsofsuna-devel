@@ -36,4 +36,9 @@ UiBackground.reshaped = function(self)
 	end
 end
 
+UiBackground.set_image = function(self, image)
+	self.image = image
+	self:reshaped()
+end
+
 return UiBackground

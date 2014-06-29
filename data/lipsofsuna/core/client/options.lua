@@ -168,7 +168,9 @@ Options.apply = function(self)
 	end
 	-- Set the UI theme.
 	if Theme:set_theme(self.ui_size) then
-		Ui:restart_state()
+		if Main.windows then
+			Ui:restart_state()
+		end
 	end
 	-- Update the render properties of objects.
 	for k,v in pairs(Main.objects.objects_by_id) do

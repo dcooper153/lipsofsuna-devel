@@ -75,11 +75,7 @@ end
 -- @param widget Widget.
 Ui.add_speech_bubble = function(self, widget)
 	-- Add to the canvas.
-	if self.background then
-		self.background:add_child(widget)
-	else
-		self.window:add_child(widget)
-	end
+	self.window:add_child(widget)
 	-- Add to the list.
 	table.insert(self.bubbles, widget)
 end
@@ -194,7 +190,7 @@ Ui.add_temporary = function(self, x, y, widget)
 	-- Add to the widget list.
 	self.widgets:add_child(widget)
 	-- Add to the view.
-	local root = self.background or self.window
+	local root = self.window
 	root:add_child(widget)
 end
 
@@ -513,10 +509,7 @@ Ui.show_state = function(self, state, focus)
 	-- Detach the widgets.
 	self:show_state_detach()
 	-- Remove the old background.
-	if self.background then
-		self.background:detach()
-		self.background = nil
-	end
+	Main.windows:set_background()
 	-- Find the state.
 	if not state then return end
 	local state_ = self.states[state]
@@ -527,13 +520,11 @@ Ui.show_state = function(self, state, focus)
 	end
 	-- Create the background.
 	if state_.background then
-		local ret,widget = xpcall(state_.background, function(err)
+		local ret,image = xpcall(state_.background, function(err)
 			print(debug.traceback("ERROR: " .. err))
 		end)
-		if widget then
-			widget:set_request(self.window:get_width(), self.window:get_height())
-			self.window:add_child(widget)
-			self.background = widget
+		if image then
+			Main.windows:set_background(image)
 		end
 	end
 	-- Call the initializers.
@@ -602,7 +593,7 @@ end
 --- Internal function that adds all widgets to the window in the right order.
 -- @param self Ui class.
 Ui.show_state_attach = function(self)
-	local root = self.background or self.window
+	local root = self.window
 	if root.reshaped then
 		root:reshaped()
 	end
@@ -652,9 +643,6 @@ Ui.screen_resized = function(self, width, height)
 	self.size.x = width
 	self.size.y = height
 	self.window:set_request(width, height)
-	if self.background then
-		self.background:set_request(width, height)
-	end
 	self:update_help()
 	self.need_relayout = true
 end
