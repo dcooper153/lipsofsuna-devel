@@ -1,5 +1,6 @@
 local ActionSpec = require("core/specs/action")
 local Physics = require("system/physics")
+local Damage = require("core/combat/damage")
 
 ActionSpec{
 	name = "dig",
