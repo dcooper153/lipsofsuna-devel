@@ -418,13 +418,18 @@ static int private_lua_require (
 		return 1;
 	lua_pop (lua, 3);
 
+	/*Because loading files can be recursive, we must make a temporary duplicate of the path, otherwise its allocation may be recycled before we're done with it.*/
+	path = lisys_string_dup(path);
+
 	/* Load the file. */
 	/* This will push the result to the stack upon success. */
 	/* TODO: Also support additions in the home directory. */
 	if (!private_lua_require_load (lua, program->paths->module_data, path) &&
 	    !private_lua_require_load (lua, program->paths->global_data, path))
 	{
-		luaL_error (lua, "failed to open module \"%s\"", path);
+		lua_pushfstring(lua, "failed to open module \"%s\"", path);
+		lisys_free((void *)path);
+		lua_error(lua);
 		return 0;
 	}
 
@@ -445,6 +450,7 @@ static int private_lua_require (
 		lua_pushboolean (lua, 1);
 	}
 
+	lisys_free((void *)path);
 	return 1;
 }
 
