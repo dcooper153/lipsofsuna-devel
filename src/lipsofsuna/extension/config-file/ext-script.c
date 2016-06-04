@@ -46,7 +46,15 @@ static LIExtConfigFile* private_new_config (
 		return NULL;
 
 	/* Resolve the full path. */
-	self->path = lipth_paths_create_file (module->program->paths, name, 1);
+	const char *path = lipth_paths_create_file (module->program->paths, name, 1);
+	if (path == NULL)
+	{
+		lisys_error_report ();
+		lisys_free (self);
+		return NULL;
+	}
+	/*Make a copy of the path, to prevent the path table from freeing it.*/
+	self->path = lisys_string_dup(path);
 	if (self->path == NULL)
 	{
 		lisys_error_report ();
