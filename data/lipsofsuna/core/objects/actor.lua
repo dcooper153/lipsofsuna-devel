@@ -271,36 +271,25 @@ Actor.calculate_speed = function(self)
 	end
 end
 
---- Checks if the actor could climb over a low wall.
+--- Checks if the actor could climb over terrain.
 -- @param self Actor.
--- @return True if could climb.
-Actor.can_climb_low = function(self)
-	-- FIXME: Stick terrain
-	do return end
+-- @return Height above the actor at which the new surface is, or nil if not possible.
+Actor.can_climb = function(self)
 	if self:get_movement() < 0 then return end
-	local ctr = self:get_position():copy():multiply(Voxel.tile_scale):add_xyz(0,0.5,0)
+	local ctr = self:get_position():copy()
 	local dir = self:get_rotation() * Vector(0,0,-1)
-	local dst = (ctr + dir):floor()
-	local f1 = Voxel:get_tile(dst)
-	local f2 = Voxel:get_tile(dst + Vector(0,1,0))
-	local f3 = Voxel:get_tile(dst + Vector(0,2,0))
-	return f1 ~= 0 and f2 == 0 and f3 == 0
-end
-
---- Checks if the actor could climb over a high wall.
--- @param self Actor.
--- @return True if could climb.
-Actor.can_climb_high = function(self)
-	-- FIXME: Stick terrain
-	do return end
-	if self:get_movement() < 0 then return end
-	local ctr = self:get_position():copy():multiply(Voxel.tile_scale):add_xyz(0,0.5,0)
-	local dir = self:get_rotation() * Vector(0,0,-1)
-	local dst = (ctr + dir):floor()
-	local f1 = Voxel:get_tile(dst + Vector(0,1,0))
-	local f2 = Voxel:get_tile(dst + Vector(0,2,0))
-	local f3 = Voxel:get_tile(dst + Vector(0,3,0))
-	return f1 ~= 0 and f2 == 0 and f3 == 0
+	local dst = (ctr + dir)
+	local yempty
+	--check higher positions first.
+	yempty = Main.terrain.terrain:find_nearest_empty_stick(dst.x, dst.z, dst.y + 2, 2) - dst.y
+	if yempty >= 3 then
+		--Position is too high, try again lower.
+		yempty = Main.terrain.terrain:find_nearest_empty_stick(dst.x, dst.z, dst.y + 1, 2) - dst.y
+	end
+	if yempty > 0 and yempty < 3 then
+		return yempty
+	end
+	return nil
 end
 
 --- Checks if the given object is an enemy of the actor.
@@ -322,71 +311,50 @@ Actor.check_enemy = function(self, object)
 end
 
 Actor.climb = function(self)
-	-- FIXME: Stick terrain
-	do return end
 	if self.blocking then return end
 	if self.climbing then return end
-	local align_object = function()
-		local ctr = self:get_position() * Voxel.tile_scale
-		ctr:add_xyz(0,0.5,0):floor()
-		ctr:add_xyz(0.5,0.1,0.5):multiply(Voxel.tile_size)
-		self:set_position(ctr)
-	end
-	if self:can_climb_high() then
-		align_object(self)
+	local climbheight = self:can_climb()
+	if climbheight then
 		self.jumping = nil
 		self.climbing = true
-		self:animate("climb high")
+		local timerise, timeslide
+		local heightrise, heightslide
+		if climbheight > 1.5 then
+			self:animate("climb high")
+			timerise = 0.8
+			timeslide = 1.5
+			heightrise = 0.8
+		else
+			self:animate("climb low")
+			timerise = 0.2
+			timeslide = 0.5
+			heightrise = 0.8
+		end
+		heightslide = 1 - heightrise
 		Coroutine(function()
 			-- Rise.
 			local t = 0
-			local p = self:get_position():copy()
+			local startpos = self:get_position():copy()
+			local p = startpos:copy()
 			local r = self:get_rotation():copy()
 			local z = Vector()
 			repeat
 				local d = coroutine.yield()
 				t = t + d
-				self:set_position(p + Vector(0,2*t,0))
+				self:set_position(p + Vector(0, climbheight * heightrise * t / timerise,0))
 				self:set_velocity(z)
-			until t > 0.8 * Voxel.tile_size
+			until t > timerise
 			-- Slide.
-			t = 0
-			p = self:get_position():copy()
+			t = t - timerise
+			p = p + Vector(0, climbheight * heightrise,0)
 			repeat
 				local d = coroutine.yield()
 				t = t + d
-				self:set_position(p + r * Vector(0,0.3,-0.8) * t)
+				self:set_position(p + Vector(0, climbheight * heightslide * t / timeslide, 0) + r * Vector(0,0,-1) * (t / timeslide))
 				self:set_velocity(z)
-			until t > 1.5
+			until t >= timeslide
 			self.climbing = nil
-		end)
-	elseif self:can_climb_low() then
-		align_object(self)
-		self.jumping = nil
-		self.climbing = true
-		self:animate("climb low")
-		Coroutine(function()
-			-- Rise.
-			local t = 0
-			local p = self:get_position():copy()
-			local r = self:get_rotation():copy()
-			local z = Vector()
-			repeat
-				local d = coroutine.yield()
-				t = t + d
-				self:set_position(p + Vector(0,4*t,0))
-				self:set_velocity(z)
-			until t > 0.2 * Voxel.tile_size
-			-- Slide.
-			t = 0
-			p = self:get_position():copy()
-			repeat
-				local d = coroutine.yield()
-				t = t + d
-				self:set_position(p + r * Vector(0,0.3,-1) * 2 * t)
-				self:set_velocity(z)
-			until t > 0.7
-			self.climbing = nil
+			self:set_position(startpos + Vector(0, climbheight,0) + r * Vector(0,0,-1))
 		end)
 	end
 end
