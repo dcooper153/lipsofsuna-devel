@@ -185,11 +185,34 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 				table.insert(morph, value * 2 - 1)
 			end
 		else
-			-- TODO
-			val = val * num
-			local key = math.min(math.floor(val) + 1, num)
-			table.insert(morph, spec.sliders[key])
-			table.insert(morph, val - key)
+			--Multi-stage shape key, which will blend between two keys depending where the value is.
+			--Empty strings, nil and false are considered to be the default shape.
+			local val = value * (num - 1)
+			local key = math.floor(val) + 1
+			if key >= num then
+				--Slider is at or past the last stage.
+				if spec.shape_keys[num] ~= "" and spec.shape_keys[num] then
+					table.insert(morph, spec.shape_keys[num])
+					table.insert(morph, 2 + val - num)
+				end
+			elseif key < 1 then
+				--Slider is before the first stage.
+				if spec.shape_keys[1] ~= "" and spec.shape_keys[1] then
+					table.insert(morph, spec.shape_keys[1])
+					table.insert(morph, 1 - val)
+				end
+			else
+				--Slider is betweeen two stages, so interpolate between them.
+				local weight = val - (key - 1)
+				if spec.shape_keys[key] ~= "" and spec.shape_keys[key] then
+					table.insert(morph, spec.shape_keys[key])
+					table.insert(morph, 1 - weight)
+				end
+				if spec.shape_keys[key + 1] ~= "" and spec.shape_keys[key + 1] then
+					table.insert(morph, spec.shape_keys[key + 1])
+					table.insert(morph, weight)
+				end
+			end
 		end
 	end
 	-- Face customization.
