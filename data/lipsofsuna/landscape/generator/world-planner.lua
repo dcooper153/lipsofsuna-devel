@@ -13,6 +13,7 @@ local DiamondSquare = require("landscape/generator/diamond-square")
 local MapUtils = require("core/utils/map")
 local Noise = require("system/noise")
 local PlaceCastle = require("landscape/generator/place-castle")
+local PlaceTower = require("landscape/generator/place-tower")
 local PlaceDefault = require("landscape/generator/place-default")
 local PlaceDungeon = require("landscape/generator/place-dungeon")
 local SurfaceGenerator = require("landscape/generator/surface-generator")
@@ -39,6 +40,7 @@ WorldPlanner.new = function(clss, terrain, generator)
 	self.__place_types =
 	{
 		["castle"] = PlaceCastle(self.__generator, self),
+		["tower"] = PlaceTower(self.__generator, self),
 		["default"] = PlaceDefault(self.__generator, self),
 		["dungeon"] = PlaceDungeon(self.__generator, self)
 	}
@@ -47,7 +49,8 @@ WorldPlanner.new = function(clss, terrain, generator)
 		[1] = "castle",
 		[2] = "dungeon",
 		[3] = "dungeon",
-		[4] = "dungeon"
+		[4] = "dungeon",
+		[5] = "tower"
 	}
 	return self
 end
