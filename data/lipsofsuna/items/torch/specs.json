@@ -8,8 +8,8 @@
 		"type": "EffectSpec",
 		"name": "torchflame1",
 		"light": true,
-		"light_diffuse": [1,1,1,1],
-		"light_equation": [2,0.1,0.1],
+		"light_diffuse": [1,0.9375,0.75,1],
+		"light_equation": [1,0,0.125],
 		"node": "#flame",
 		"particle": "torchfx1"
 	},

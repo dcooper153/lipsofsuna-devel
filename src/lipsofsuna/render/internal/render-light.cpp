@@ -27,7 +27,7 @@
 #include "render.hpp"
 #include "render-light.hpp"
 
-#define LIGHT_RANGE_MAX 32.0f
+#define LIGHT_RANGE_MAX 10240.0f
 
 static void private_update_type (
 	LIRenLight* self);

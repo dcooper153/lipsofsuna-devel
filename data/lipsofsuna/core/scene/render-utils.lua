@@ -89,7 +89,7 @@ RenderUtils.create_special_effects = function(self, parent, spec)
 					parent = parent,
 					parent_node = v.node,
 					position_mode = "node"}
-				table.insert(result, fx)
+				table.insert(result, effect)
 			end
 			if v.particle then
 				local effect = ParticleEffect{
