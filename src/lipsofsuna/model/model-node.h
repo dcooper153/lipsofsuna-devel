@@ -116,6 +116,11 @@ LIAPICALL (void, limdl_node_get_rest_transform, (
 	const LIMdlNode* self,
 	LIMatTransform*  value));
 
+LIAPICALL (void, limdl_node_get_full_rest_transform, (
+	const LIMdlNode* self,
+	float*           scale,
+	LIMatTransform*  value));
+
 LIAPICALL (void, limdl_node_get_world_transform, (
 	const LIMdlNode* self,
 	float*           scale,

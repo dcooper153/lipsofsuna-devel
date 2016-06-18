@@ -457,6 +457,21 @@ void limdl_node_get_rest_transform (
 }
 
 /**
+ * \brief Gets the full rest transformation.
+ * \param self Node.
+ * \param scale Return location for the scale factor.
+ * \param value Return location for the transformation.
+ */
+void limdl_node_get_full_rest_transform (
+	const LIMdlNode* self,
+	float*           scale,
+	LIMatTransform*  value)
+{
+	*scale = self->rest_transform.global_scale;
+	*value = self->rest_transform.global;
+}
+
+/**
  * \brief Gets the world space pose transformation.
  * \param self Node.
  * \param scale Return location for the scale factor.

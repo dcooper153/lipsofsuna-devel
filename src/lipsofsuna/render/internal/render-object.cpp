@@ -239,13 +239,34 @@ int LIRenObject::find_node (
 	LISysScopedLock lock (mutex_pose_attachment);
 
 	/* Search from the skeleton. */
-	if (pose_skeleton != NULL)
+	if (pose_skeleton != NULL) {
 		node = limdl_pose_skeleton_find_node (pose_skeleton, name);
-	if (node == NULL)
+		if(node != NULL) {
+			/* Get the transformation. */
+			limdl_node_get_world_transform (node, &scale, &transform);
+		}
+	} else {
+		/*Our skeleton isn't animated, so we need to search the unposed bones.*/
+		for (size_t i = 0 ; i < attachments.size () ; i++) {
+			if (attachments[i]->get_replacer () == NULL) {
+				LIRenModelData* m = attachments[i]->get_model ();
+				if (m != NULL) {
+					node = limdl_nodes_find_node(&(m->rest_pose_skeleton->nodes), name);
+					if(node != NULL) {
+						break;
+					}
+				}
+			}
+		}
+		if(node != NULL) {
+			/* Get the transformation. */
+			limdl_node_get_full_rest_transform(node, &scale, &transform);
+		}
+	}
+	if (node == NULL) {
 		return 0;
+	}
 
-	/* Get the transformation. */
-	limdl_node_get_world_transform (node, &scale, &transform);
 	if (world)
 		transform = limat_transform_multiply (this->transform, transform);
 	*result = transform;

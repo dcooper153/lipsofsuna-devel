@@ -35,7 +35,7 @@ ModelEffect.new = function(clss, args)
 end
 
 ModelEffect.add_special_effects = function(self, list)
-	if not self.specia_effects then
+	if not self.special_effects then
 		self.special_effects = {}
 	end
 	for k,v in pairs(list) do
