@@ -100,7 +100,10 @@ ImageManager.update = function(self, secs)
 	-- Update the asynchronous image loaders.
 	for name,loader in pairs(self.loaders_by_name) do
 		if loader:get_done() then
-			self.images_by_name[name] = loader:get_image()
+			local image = loader:get_image()
+			--Set the cache time here to make sure the image has a strong reference and doesn't get prematurely unloaded by the garbage collector.
+			self.seconds_by_image[image] = 100
+			self.images_by_name[name] = image
 			self.loaders_by_name[name] = nil
 		end
 	end
