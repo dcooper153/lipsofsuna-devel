@@ -74,6 +74,19 @@ Image.blit = function(self, image)
 	Los.image_blit(self.handle, image.handle)
 end
 
+--- Blits an image.
+-- @param self Image.
+-- @param image Image.
+-- @param dx Destination X.
+-- @param dy Destination Y.
+-- @param sw Destination width.
+-- @param sh Destination height.
+-- @param sx Source X.
+-- @param sy Source Y.
+Image.blit_rect = function(self, image, dx, dy, dw, dh, sx, sy)
+	Los.image_blit_rect(self.handle, image.handle, dx, dy, dw, dh, sx, sy)
+end
+
 --- Blits an HSV altered image over this one.
 -- @param self Image.
 -- @param image Image.

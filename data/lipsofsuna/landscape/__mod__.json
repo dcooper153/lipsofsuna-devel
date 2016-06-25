@@ -12,6 +12,7 @@
 	[
 		["load", "landscape/generator"]
 	],
+	"resources": ["terrain/"],
 	"server": false,
 	"scripts": ["main", "ui"],
 	"specs":

@@ -19,10 +19,11 @@ local TerrainMaterialSpec = Spec:register("TerrainMaterialSpec", "terrain materi
 	{name = "effect_build", type = "string", description = "Building effect.", details = {spec = "EffectSpec"}},
 	{name = "effect_collapse", type = "string", description = "Collapsing effect.", details = {spec = "EffectSpec"}},
 	{name = "mining_item", type = "string", description = "Item name obtained by mining.", details = {spec = "ItemSpec"}},
-	{name = "top_texture", type = "number", description = "Texture number of the top surface"},
-	{name = "bottom_texture", type = "number", description = "Texture number of the bottom surface"},
-	{name = "side_texture", type = "number", description = "Texture number of the side surfaces"},
-	{name = "decoration_texture", type = "number", description = "Texture number of the decoration"},
+	{name = "texture", type = "string", description = "Default texture for all faces."},
+	{name = "texture_top", type = "string", description = "Texture name for the top surface"},
+	{name = "texture_bottom", type = "string", description = "Texture name for the bottom surface"},
+	{name = "texture_side", type = "string", description = "Texture name for the side surfaces"},
+	{name = "texture_decoration", type = "string", description = "Texture name of the decoration"},
 	{name = "decoration_type", type = "number", description = "Decoration type"},
 	{name = "stick_type", type = "number", description = "Stick type"}
 })

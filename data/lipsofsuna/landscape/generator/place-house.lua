@@ -104,7 +104,7 @@ end
 -- @param chunk TerrainChunk.
 -- @param params Place parameters as set by plan().
 PlaceHouse.generate = function(self, chunk, params)
-	print "house"
+	--print "house"
 	local w = chunk.manager.chunk_size
 	local t = chunk.manager.terrain
 	local wallspec = Main.specs:find_by_name("TerrainMaterialSpec", "brick")

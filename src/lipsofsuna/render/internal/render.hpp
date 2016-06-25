@@ -132,6 +132,12 @@ public:
 	void get_stats (
 		LIRenStats* result) const;
 
+	void update_texture (
+		const char* name,
+		int width,
+		int height,
+		const void* pixels);
+
 	void set_title (
 		const char* value);
 

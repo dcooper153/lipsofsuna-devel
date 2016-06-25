@@ -123,6 +123,37 @@ static void Image_blit (LIScrArgs* args)
 	}
 }
 
+static void Image_blit_rect (LIScrArgs* args)
+{
+	LIImgImage* self;
+	LIImgImage* image;
+	LIScrData* data;
+	LIMatRectInt dst_rect;
+	LIMatRectInt src_rect;
+
+	/* Get arguments. */
+	self = args->self;
+	if (!liscr_args_geti_data (args, 0, LIEXT_SCRIPT_IMAGE, &data))
+		return;
+	image = liscr_data_get_data (data);
+	if (!liscr_args_geti_int (args, 1, &dst_rect.x))
+		return;
+	if (!liscr_args_geti_int (args, 2, &dst_rect.y))
+		return;
+	if (!liscr_args_geti_int (args, 3, &dst_rect.width))
+		return;
+	if (!liscr_args_geti_int (args, 4, &dst_rect.height))
+		return;
+	if (!liscr_args_geti_int (args, 5, &src_rect.x))
+		return;
+	if (!liscr_args_geti_int (args, 6, &src_rect.y))
+		return;
+	src_rect.width = dst_rect.width;
+	src_rect.height = dst_rect.height;
+
+	liimg_image_blit (self, image, &dst_rect, &src_rect);
+}
+
 static void Image_blit_hsv_add (LIScrArgs* args)
 {
 	float hue_add;
@@ -275,6 +306,7 @@ void liext_script_image (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_IMAGE, "image_new_empty", Image_new_empty);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_add_hsv", Image_add_hsv);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_blit", Image_blit);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_blit_rect", Image_blit_rect);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_blit_hsv_add", Image_blit_hsv_add);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_copy", Image_copy);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_fill", Image_fill);

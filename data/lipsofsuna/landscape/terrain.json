@@ -3,43 +3,33 @@
 		"type": "TerrainMaterialSpec",
 		"name": "soil",
 		"mining_item": "soil chunk",
-		"top_texture": 0,
-		"bottom_texture": 0,
-		"side_texture": 0
+		"texture": "soil",
 	},
 	{
 		"type": "TerrainMaterialSpec",
 		"name": "grass",
 		"mining_item": "soil chunk",
-		"top_texture": 1,
-		"bottom_texture": 1,
-		"side_texture": 1,
-		"decoration_texture": 3,
+		"texture": "grass-ground",
+		"texture_decoration": "grass-blades",
 		"decoration_type": 1
 	},
 	{
 		"type": "TerrainMaterialSpec",
 		"name": "granite",
 		"mining_item": "granite stone",
-		"top_texture": 2,
-		"bottom_texture": 2,
-		"side_texture": 2
+		"texture": "granite",
 	},
 	{
 		"type": "TerrainMaterialSpec",
 		"name": "plank",
 		"mining_item": "log",
-		"top_texture": 4,
-		"bottom_texture": 4,
-		"side_texture": 4
+		"texture": "wood-planks",
 	},
 	{
 		"type": "TerrainMaterialSpec",
 		"name": "sand",
 		"mining_item": "sand chunk",
-		"top_texture": 13,
-		"bottom_texture": 13,
-		"side_texture": 13
+		"texture": "sand",
 	},
 	{
 		"type": "TerrainMaterialSpec",
@@ -49,9 +39,7 @@
 			"common ore": true
 		},
 		"mining_item": "ferrostone",
-		"top_texture": 15,
-		"bottom_texture": 15,
-		"side_texture": 15
+		"texture": "ferrostone",
 	},
 	{
 		"type": "TerrainMaterialSpec",
@@ -61,9 +49,7 @@
 			"rare ore": true
 		},
 		"mining_item": "aquanite ore",
-		"top_texture": 7,
-		"bottom_texture": 7,
-		"side_texture": 7
+		"texture": "aqua",
 	},
 	{
 		"type": "TerrainMaterialSpec",
@@ -73,9 +59,7 @@
 			"rare ore": true
 		},
 		"mining_item": "crimson ore",
-		"top_texture": 12,
-		"bottom_texture": 12,
-		"side_texture": 12
+		"texture": "crimson",
 	},
 	{
 		"type": "TerrainMaterialSpec",
@@ -85,16 +69,18 @@
 			"rare ore": true
 		},
 		"mining_item": "adamantium",
-		"top_texture": 7,
-		"bottom_texture": 7,
-		"side_texture": 7
+		"texture": "adamantium",
 	},
 	{
 		"type": "TerrainMaterialSpec",
 		"name": "brick",
 		"mining_item": "granite stone",
-		"top_texture": 8,
-		"bottom_texture": 8,
-		"side_texture": 8
+		"texture": "bricks-grey",
+	},
+	{
+		"type": "TerrainMaterialSpec",
+		"name": "steel-plate",
+		"mining_item": "iron ingot",
+		"texture": "steel-plate",
 	}
 ]

@@ -24,6 +24,7 @@
 
 #include <lipsofsuna/render.h>
 #include "ext-module.h"
+#include "../image/module.h"
 
 static void Render_add_compositor (LIScrArgs* args)
 {
@@ -181,6 +182,23 @@ static void Render_get_stats (LIScrArgs* args)
 	liscr_args_sets_int (args, "texture_memory", stats.texture_memory);
 }
 
+static void Render_update_texture (LIScrArgs* args)
+{
+	LIExtModule* module;
+	const char* name;
+	LIScrData* value;
+	LIImgImage* image;
+
+	if (!liscr_args_geti_string (args, 0, &name)) {
+		return;
+	}
+	if (!liscr_args_geti_data (args, 1, LIEXT_SCRIPT_IMAGE, &value)) {
+		return;
+	}
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
+	image = liscr_data_get_data (value);
+	liren_render_update_texture(module->render, name, image->width, image->height, image->pixels);
+}
 /*****************************************************************************/
 
 void liext_script_render (
@@ -198,6 +216,7 @@ void liext_script_render (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_scene_ambient", Render_set_scene_ambient);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_skybox", Render_set_skybox);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_get_stats", Render_get_stats);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_update_texture", Render_update_texture);
 }
 
 /** @} */

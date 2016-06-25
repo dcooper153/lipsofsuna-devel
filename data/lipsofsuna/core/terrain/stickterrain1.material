@@ -8,6 +8,7 @@ pass stickterrain1/lighting
 	{
 		texture stickterrain1.png 2d
 		tex_address_mode clamp
+		filtering none
 	}
 	texture_unit
 	{
@@ -49,6 +50,7 @@ material stickterrain1
 			{
 				texture stickterrain1.png 2d
 				tex_address_mode clamp
+				filtering none
 			}
 			vertex_program_ref depthstickterrain1/vert
 			{
@@ -109,6 +111,7 @@ material stickterraintwoside1
 			{
 				texture stickterrain1.png 2d
 				tex_address_mode clamp
+				filtering none
 			}
 			vertex_program_ref depthstickterrain1/vert
 			{

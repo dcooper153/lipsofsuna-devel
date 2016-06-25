@@ -17,6 +17,8 @@ local Terrain = require("system/terrain")
 local TerrainChunk = require("core/terrain/terrain-chunk")
 local TerrainMaterialSpec = require("core/specs/terrain-material")
 local Time = require("system/time")
+local Image = require("system/image")
+local Render = require("system/render")
 
 --- Manages terrain chunks.
 -- @type TerrainManager
@@ -40,11 +42,17 @@ TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, 
 	self.__view_distance = 48
 	self.__load_priorities = {}
 	self.terrain = Terrain(chunk_size, grid_size)
+	self.image_size = 1024
+	self.image_tile_size = 128
+	self.image = Image(self.image_size, self.image_size)
+	self.image:fill(255, 255, 255, 0)
+	self.image_tile_count = self.image_size / self.image_tile_size
+	self.image_tile_total = self.image_tile_count * self.image_tile_count
+	self.material_tile_next = 0
+	self.material_tile_by_name = {}
 	-- Initialize the materials.
 	for k,v in pairs(TerrainMaterialSpec.dict_id) do
-		self.terrain:set_material_decoration_type(k, v.decoration_type)
-		self.terrain:set_material_stick_type(k, v.stick_type)
-		self.terrain:set_material_textures(k, v.top_texture, v.bottom_texture, v.side_texture, v.decoration_texture)
+		self:add_terrain_material(k, v)
 	end
 	-- Initialize physics.
 	self.physics = PhysicsTerrain(self.terrain)
@@ -60,6 +68,45 @@ TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, 
 			(id INTEGER PRIMARY KEY,data BLOB);]]);
 	end
 	return self
+end
+
+TerrainManager.add_terrain_material_texture = function(self, name)
+	local tile = self.material_tile_by_name[name]
+	if tile then
+		return tile
+	end
+	tile = self.material_tile_next
+	self.material_tile_by_name[name] = tile
+	self.material_tile_next = self.material_tile_next + 1
+
+	--print("Terrain texture '" .. name .. "' to tile " .. tile)
+
+	local img = Image(name .. ".png")
+	local tx = tile % self.image_tile_count
+	local ty = math.floor(tile / self.image_tile_count)
+	local x = self.image_tile_size * tx
+	local y = self.image_tile_size * ty
+	if img then
+		self.image:blit_rect(img, x, y, img:get_width(), img:get_height(), 0, 0)
+	else
+		print ("No image found for:" .. name)
+	end
+	return tile
+end
+
+TerrainManager.add_terrain_material = function(self, k, v)
+	--print("TerrainManager: ", k, v)
+	self.terrain:set_material_decoration_type(k, v.decoration_type)
+	self.terrain:set_material_stick_type(k, v.stick_type)
+	local t_all = v.texture and self:add_terrain_material_texture(v.texture)
+	local t_top = t_all
+	local t_side = t_all
+	local t_bottom = t_all
+	--todo: Sanity check all faces are set.
+	--todo: Sanity check the case of t_all being set but all other faces have different faces (i.e. t_all is redundant).
+	local t_decoration = v.texture_decoration and self:add_terrain_material_texture(v.texture_decoration)
+	self.terrain:set_material_textures(k, t_top, t_bottom, t_side, t_decoration)
+	Render:update_texture("stickterrain1.png", self.image)
 end
 
 --- Increases the timestamp of the chunks inside the given sphere.

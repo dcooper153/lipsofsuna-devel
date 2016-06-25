@@ -345,6 +345,16 @@ void liren_render_get_stats (
 	self->get_stats (result);
 }
 
+void liren_render_update_texture (
+	LIRenRender* self,
+	const char* name,
+	int width,
+	int height,
+	const void* pixels)
+{
+	self->update_texture(name, width, height, pixels);
+}
+
 void liren_render_set_title (
 	LIRenRender* self,
 	const char*  value)

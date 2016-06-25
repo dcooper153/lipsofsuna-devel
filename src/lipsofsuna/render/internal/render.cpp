@@ -584,6 +584,17 @@ void LIRenRender::get_stats (
 	}
 }
 
+void LIRenRender::update_texture (
+	const char* name,
+	int width,
+	int height,
+	const void* pixels)
+{
+	Ogre::Image img;
+	img.loadDynamicImage ((Ogre::uchar*) pixels, width, height, 1, Ogre::PF_A8B8G8R8);
+	texture_manager->loadImage(name, LIREN_RESOURCES_PERMANENT, img, Ogre::TEX_TYPE_2D, 0);
+}
+
 void LIRenRender::set_title (
 	const char* value)
 {

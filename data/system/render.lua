@@ -12,7 +12,7 @@ local Class = require("system/class")
 local Vector = require("system/math/vector")
 
 if not Los.program_load_extension("graphics") then
-	error("loading extension `render' failed")
+	error("loading extension `graphics' failed")
 end
 
 if not Los.program_load_extension("render") then
@@ -91,6 +91,12 @@ end
 
 Render.get_stats = function(self)
 	return Los.render_get_stats()
+end
+
+Render.update_texture = function(self, name, image)
+	if image then
+		Los.render_update_texture(name, image.handle)
+	end
 end
 
 return Render

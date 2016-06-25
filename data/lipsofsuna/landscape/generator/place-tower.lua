@@ -170,6 +170,8 @@ PlaceTower.generate = function(self, chunk, params)
 	local stairmat = stairspec and stairspec.id
 	local floorspec = Main.specs:find_by_name("TerrainMaterialSpec", "plank")
 	local floormat = floorspec and floorspec.id
+	local steelspec = Main.specs:find_by_name("TerrainMaterialSpec", "steel-plate")
+	local steelmat = steelspec and steelspec.id
 	
 	local chk = TerrainChunk(w)
 
@@ -238,22 +240,22 @@ PlaceTower.generate = function(self, chunk, params)
 
 	-- Create the east wall.
 	for z = 0,w-1 do
-		chk:add_stick(0, z, base, h - base + 1 + (z % 2), wallmat)
+		chk:add_stick(0, z, base, h - base + 1 + (z % 2), (z > 1 and z < 10) and wallmat or steelmat)
 	end
 	yield()
 	-- Create the west wall.
 	for z = 0,w-1 do
-		chk:add_stick(w-1, z, base, h - base + 1 + (z % 2), wallmat)
+		chk:add_stick(w-1, z, base, h - base + 1 + (z % 2), (z > 1 and z < 10) and wallmat or steelmat)
 	end
 	yield()
 	-- Create the south wall.
 	for x = 0,w-1 do
-		chk:add_stick(x, 0, base, h - base + 1 + (x % 2), wallmat)
+		chk:add_stick(x, 0, base, h - base + 1 + (x % 2), (x > 1 and x < 10) and wallmat or steelmat)
 	end
 	yield()
 	-- Create the north wall.
 	for x = 0,w-1 do
-		chk:add_stick(x, w-1, base, h - base + 1 + (x % 2), wallmat)
+		chk:add_stick(x, w-1, base, h - base + 1 + (x % 2), (x > 1 and x < 10) and wallmat or steelmat)
 	end
 	
 	--create door in north wall

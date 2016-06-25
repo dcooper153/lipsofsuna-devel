@@ -994,6 +994,73 @@
 		{
 			"files":
 			[
+				"data/lipsofsuna/landscape/terrain/adamantium.png",
+				"data/lipsofsuna/landscape/terrain/crimson.png",
+				"data/lipsofsuna/landscape/terrain/grass-blades.png",
+				"data/lipsofsuna/landscape/terrain/soil.png",
+				"data/lipsofsuna/landscape/terrain/aqua.png",
+				"data/lipsofsuna/landscape/terrain/ferrostone.png",
+				"data/lipsofsuna/landscape/terrain/grass-ground.png",
+				"data/lipsofsuna/landscape/terrain/granite.png",
+				"data/lipsofsuna/landscape/terrain/sand.png",
+			],
+			"authors":
+			[
+				"Ari Mustonen"
+			],
+			"licenses":
+			[
+				"CC0"
+			]
+		},
+		{
+			"files":
+			[
+				"data/lipsofsuna/landscape/terrain/wood-planks.png",
+			],
+			"authors":
+			[
+				"Lanea Zimmerman (AKA Sharm)"
+			],
+			"licenses":
+			[
+				"Creative Commons BY 3.0"
+			],
+			"source": "http://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles"
+		},
+		{
+			"files":
+			[
+				"data/lipsofsuna/landscape/terrain/bricks-grey.png",
+			],
+			"authors":
+			[
+				"Evert"
+			],
+			"licenses":
+			[
+				"Creative Commons BY 3.0"
+			],
+			"source": "http://opengameart.org/content/lpc-castle"
+		},
+		{
+			"files":
+			[
+				"data/lipsofsuna/landscape/terrain/steel-plate.png",
+			],
+			"authors":
+			[
+				"Xenodora"
+			],
+			"licenses":
+			[
+				"CC0"
+			],
+			"source": "http://opengameart.org/content/lpc-style-wood-bridges-and-steel-flooring"
+		},
+		{
+			"files":
+			[
 				"data/lipsofsuna/apparel/platearmor/aerbreastplate1.png",
 				"data/lipsofsuna/apparel/platearmor/aerarmplate1.lmdl",
 				"data/lipsofsuna/apparel/platearmor/aerlegplate1.lmdl",
