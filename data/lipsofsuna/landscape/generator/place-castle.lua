@@ -6,7 +6,7 @@
 -- License, or (at your option) any later version.
 --
 -- @module landscape.generator.place_castle
--- @type PlaceCastle
+-- @alias PlaceCastle
 
 local Class = require("system/class")
 local MapUtils = require("core/utils/map")
