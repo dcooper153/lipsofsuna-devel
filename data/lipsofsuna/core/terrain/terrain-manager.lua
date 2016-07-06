@@ -19,6 +19,7 @@ local TerrainMaterialSpec = require("core/specs/terrain-material")
 local Time = require("system/time")
 local Image = require("system/image")
 local Render = require("system/render")
+local Texture = require("system/texture")
 
 --- Manages terrain chunks.
 -- @type TerrainManager
@@ -42,6 +43,7 @@ TerrainManager.new = function(clss, chunk_size, grid_size, database, unloading, 
 	self.__view_distance = 48
 	self.__load_priorities = {}
 	self.terrain = Terrain(chunk_size, grid_size)
+	self.texture = Texture("stickterrain1")
 	self.image_size = 1024
 	self.image_tile_size = 128
 	self.image = Image(self.image_size, self.image_size)
@@ -106,7 +108,7 @@ TerrainManager.add_terrain_material = function(self, k, v)
 	--todo: Sanity check the case of t_all being set but all other faces have different faces (i.e. t_all is redundant).
 	local t_decoration = v.texture_decoration and self:add_terrain_material_texture(v.texture_decoration)
 	self.terrain:set_material_textures(k, t_top, t_bottom, t_side, t_decoration)
-	Render:update_texture("stickterrain1.png", self.image)
+	self.texture:set_image(self.image)
 end
 
 --- Increases the timestamp of the chunks inside the given sphere.
@@ -199,6 +201,8 @@ TerrainManager.update = function(self, secs)
 		if chunk and not chunk.loader then
 			if chunk.object or chunk.time_model then
 				chunk:create_render_object()
+				--todo: Remove this once the terrain texture atlas can be updated as needed.
+				self.texture:set_image(self.image)
 			end
 		end
 	end

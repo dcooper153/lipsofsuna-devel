@@ -23,6 +23,7 @@
 
 #define LIEXT_SCRIPT_LIGHT "Light"
 #define LIEXT_SCRIPT_RENDER "Render"
+#define LIEXT_SCRIPT_TEXTURE "Texture"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
@@ -57,5 +58,7 @@ void liext_script_light (
 
 void liext_script_render (
 	LIScrScript* self);
+
+LIAPICALL (void, liext_script_texture, (LIScrScript* self));
 
 #endif
