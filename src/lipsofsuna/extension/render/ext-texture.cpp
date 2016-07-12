@@ -17,9 +17,14 @@ static void Texture_free(LIExtTexture* self)
 {
 	/*Release the texture pointer.*/
 	self->texture.setNull();
-	/*And call the destructor on the texture pointer object.*/
-	self->texture.~TexturePtr();
-	lisys_free(self->name);
+	/*Release name.*/
+	if(self->name != NULL) {
+		lisys_free(self->name);
+		self->name = NULL;
+	}
+	/*Call the destructor on the object.*/
+	self->~_LIExtTexture();
+	/*And finally free the memory.*/
 	lisys_free(self);
 }
 
@@ -41,26 +46,23 @@ static void Texture_new(LIScrArgs* args)
 	if (self == NULL) {
 		return;
 	}
+	/* Construct the struct, so the TexturePtr class is initialised.*/
+	new(self) _LIExtTexture();
 	self->module = module;
 
 	/*Copy the name.*/
 	self->name = lisys_string_dup(name);
 	if(!self->name) {
-		lisys_free(self);
+		Texture_free(self);
 		return;
 	}
 
 	/*Find or allocate the texture.*/
-	/*Construct the texture pointer object*/
-	new(&self->texture) Ogre::TexturePtr();
 	self->texture = module->render->texture_manager->getByName(name);
 	if(self->texture.isNull()) {
 		self->texture = module->render->texture_manager->create(name, LIREN_RESOURCES_PERMANENT, true);
 		if(self->texture.isNull()) {
-			/*Call the destructor on the texture pointer object.*/
-			self->texture.~TexturePtr();
-			lisys_free(self->name);
-			lisys_free(self);
+			Texture_free(self);
 			return;
 		}
 	}
@@ -68,12 +70,8 @@ static void Texture_new(LIScrArgs* args)
 	/* Allocate userdata. */
 	data = (LIScrData *)liscr_data_new (args->script, args->lua, self, LIEXT_SCRIPT_TEXTURE, (LIScrGCFunc)Texture_free);
 	if (data == NULL) {
-		/*Release the texture pointer.*/
-		self->texture.setNull();
-		/*Call the destructor on the texture pointer object.*/
-		self->texture.~TexturePtr();
-		lisys_free(self->name);
-		lisys_free(self);
+		Texture_free(self);
+		return;
 	}
 
 	liscr_args_seti_stack (args);
@@ -91,8 +89,11 @@ static void Texture_set_image(LIScrArgs* args)
 	image = (LIImgImage *)liscr_data_get_data (value);
 	Ogre::Image img;
 	img.loadDynamicImage ((Ogre::uchar*) image->pixels, image->width, image->height, 1, Ogre::PF_A8B8G8R8);
-	//self->texture->loadImage(img);
-	self->module->render->texture_manager->loadImage(self->name, LIREN_RESOURCES_PERMANENT, img, Ogre::TEX_TYPE_2D, 0);
+	/*Unload the old image, otherwise it will not update the texture if an image has already been loaded.*/
+	self->texture->unload();
+	/*And load in the new one.*/
+	self->texture->loadImage(img);
+	//self->module->render->texture_manager->loadImage(self->name, LIREN_RESOURCES_PERMANENT, img, Ogre::TEX_TYPE_2D, 0);
 }
 
 void liext_script_texture (
