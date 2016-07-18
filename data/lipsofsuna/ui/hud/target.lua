@@ -9,7 +9,6 @@
 -- @alias Hudtarget
 
 local Class = require("system/class")
-local Graphics = require("system/graphics")
 local Widget = require("system/widget")
 
 --- HUD target action display widget.
@@ -48,8 +47,7 @@ Hudtarget.update = function(self, secs)
 		self.text = string.format("%s %s", key, obj.spec.name)
 	end
 	-- Update the position.
-	local mode = Graphics:get_video_mode()
-	local padx = mode[1] - self:get_width()
+	local padx = Ui.size.x - self:get_width()
 	self:set_offset(Vector(padx / 2, Theme.width_icon_1 + Theme.text_height_1 * 2.5))
 	-- Show the widget.
 	self:reshaped()

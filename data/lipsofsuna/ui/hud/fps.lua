@@ -9,7 +9,6 @@
 -- @alias Hudfps
 
 local Class = require("system/class")
-local Graphics = require("system/graphics")
 local UiWindow = require("ui/windows/ui-window")
 
 --- HUD FPS counter widget.
@@ -36,7 +35,6 @@ Hudfps.screen_resized = function(self, w, h)
 end
 
 Hudfps.update = function(self, secs)
-	local mode = Graphics:get_video_mode()
 	local text = "FPS: " .. tostring(math.floor(Program:get_fps() + 0.5))
 	self.font = Theme.text_font_1
 	self.text = text

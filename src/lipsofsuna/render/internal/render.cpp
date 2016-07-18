@@ -60,8 +60,6 @@ int LIRenRender::init (
 	LIRenVideomode* mode)
 {
 	char* log1;
-	Ogre::Real w;
-	Ogre::Real h;
 	Ogre::String data1 (paths->module_data);
 
 	/* Initialize the private data. */
@@ -103,15 +101,10 @@ int LIRenRender::init (
 	scene_manager->setShadowTextureSize (1024);
 	scene_root = scene_manager->getRootSceneNode ();
 
-	/* Initialize the camera. */
-	camera = scene_manager->createCamera ("Camera");
-	camera->setNearClipDistance (1);
-	camera->setFarClipDistance (75);
-	viewport = render_window->addViewport (camera);
-	viewport->setBackgroundColour (Ogre::ColourValue (0.0f, 0.0f, 0.0f));
-	w = Ogre::Real (viewport->getActualWidth ());
-	h = Ogre::Real (viewport->getActualHeight ());
-	camera->setAspectRatio (w / h);
+	/* Initialize the camera and viewport. */
+	float view_rect[4] = {0, 0.0f, 1.0f, 1.0f};
+	float camera_pos[3] = {0.0, 0, 0};
+	add_viewport("Camera", view_rect, camera_pos);
 
 	/* Initialize the user interface. */
 	overlay_mgr = new LIRenOverlayManager (this);
@@ -164,8 +157,13 @@ void LIRenRender::deinit ()
 void LIRenRender::add_compositor (
 	const char* name)
 {
-	Ogre::CompositorManager::getSingleton ().addCompositor (viewport, name);
-	Ogre::CompositorManager::getSingleton ().setCompositorEnabled (viewport, name, true);
+	for(size_t i = 0; i < viewports.size(); i++) {
+		if(Ogre::CompositorManager::getSingleton ().addCompositor (viewports[i].viewport, name)) {
+			Ogre::CompositorManager::getSingleton ().setCompositorEnabled (viewports[i].viewport, name, true);
+		} else {
+			printf("Could not add compositor %s to view %s.\n", name, viewports[i].name.c_str());
+		}
+	}
 }
 
 /**
@@ -175,8 +173,74 @@ void LIRenRender::add_compositor (
 void LIRenRender::remove_compositor (
 	const char* name)
 {
-	Ogre::CompositorManager::getSingleton ().removeCompositor (viewport, name);
+	for(size_t i = 0; i < viewports.size(); i++) {
+		Ogre::CompositorManager::getSingleton ().removeCompositor (viewports[i].viewport, name);
+	}
 }
+
+/**
+ * \brief Add a viewport, or updates a viewport if it already exists.
+ * \param name The name of the viewport to remove.
+ * \param view_rect An array of 4 floats with the left, top, width, and height of the viewport.
+ * \param camera_pos An array of 3 floats with the unrotated x, y, and z position of the camera relative to the viewer.
+ */
+void LIRenRender::add_viewport (
+	const char* name,
+	float view_rect[4],
+	float camera_pos[3])
+{
+	for(size_t i = 0; i < viewports.size(); i++) {
+		if(viewports[i].name == name) {
+			viewports[i].viewport->setDimensions(view_rect[0], view_rect[1], view_rect[2], view_rect[3]);
+			viewports[i].position = Ogre::Vector3(camera_pos[0], camera_pos[1], camera_pos[2]);
+			return;
+		}
+	}
+	int zorder = 0;
+	if(viewports.size() > 0) {
+		zorder = viewports.back().zorder + 1;
+	}
+	Ogre::Camera* camera = scene_manager->createCamera(name);
+	LIRenViewport view = {
+		name,
+		camera,
+		Ogre::Vector3(camera_pos[0], camera_pos[1], camera_pos[2]),
+		render_window->addViewport(camera, zorder, view_rect[0], view_rect[1], view_rect[2], view_rect[3]),
+		zorder};
+	viewports.push_back(view);
+}
+
+/**
+ * \brief Remove a single named viewport.
+ * \param name The name of the viewport to remove.
+ */
+void LIRenRender::remove_viewport (
+	const char* name)
+{
+	for(size_t i = 0; i < viewports.size(); i++) {
+		if(viewports[i].name == name) {
+			render_window->removeViewport(viewports[i].zorder);
+			scene_manager->destroyCamera(viewports[i].camera);
+			viewports.erase(viewports.begin() + i);
+			break;
+		}
+	}
+}
+
+/**
+ * \brief Removes all viewports.
+ */
+void LIRenRender::remove_all_viewports ()
+{
+	for(size_t i = 0; i < viewports.size(); i++) {
+		render_window->removeViewport(viewports[i].zorder);
+		scene_manager->destroyCamera(viewports[i].camera);
+	}
+	viewports.clear();
+}
+
+
+
 
 /**
  * \brief Registers an object.
@@ -352,8 +416,9 @@ void LIRenRender::project (
 	const LIMatVector* world,
 	LIMatVector*       screen)
 {
-	Ogre::Matrix4 proj = camera->getProjectionMatrix ();
-	Ogre::Matrix4 view = camera->getViewMatrix ();
+	//todo: properly handle the case of when there is more than 1 view port.
+	Ogre::Matrix4 proj = viewports[0].camera->getProjectionMatrix();
+	Ogre::Matrix4 view = viewports[0].camera->getViewMatrix();
 	Ogre::Vector3 w (world->x, world->y, world->z);
 	Ogre::Vector3 s = proj * view * w;
 	screen->x = (0.5f + 0.5f * s.x) * mode.width;
@@ -416,9 +481,11 @@ int LIRenRender::update (
 	update_mode ();
 
 	/* Update the aspect ratio of the camera. */
-	Ogre::Real w (viewport->getActualWidth ());
-	Ogre::Real h (viewport->getActualHeight ());
-	camera->setAspectRatio (w / h);
+	for(size_t i = 0; i < viewports.size(); i++) {
+		Ogre::Real w = viewports[i].viewport->getActualWidth ();
+		Ogre::Real h = viewports[i].viewport->getActualHeight ();
+		viewports[i].camera->setAspectRatio (w / h);
+	}
 
 	/* Free unused resources. */
 	/* Ogre internals seem to be sloppy with using resource pointers. At
@@ -486,7 +553,9 @@ void LIRenRender::set_anisotropy (
 void LIRenRender::set_camera_far (
 	float value)
 {
-	camera->setFarClipDistance (value);
+	for(size_t i = 0; i < viewports.size(); i++) {
+		viewports[i].camera->setFarClipDistance (value);
+	}
 }
 
 /**
@@ -496,7 +565,9 @@ void LIRenRender::set_camera_far (
 void LIRenRender::set_camera_near (
 	float value)
 {
-	camera->setNearClipDistance (value);
+	for(size_t i = 0; i < viewports.size(); i++) {
+		viewports[i].camera->setNearClipDistance (value);
+	}
 }
 
 /**
@@ -506,8 +577,12 @@ void LIRenRender::set_camera_near (
 void LIRenRender::set_camera_transform (
 	const LIMatTransform* value)
 {
-	camera->setPosition (value->position.x, value->position.y, value->position.z);
-	camera->setOrientation (Ogre::Quaternion (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z));
+	Ogre::Vector3 pos(value->position.x, value->position.y, value->position.z);
+	Ogre::Quaternion rot(value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z);
+	for(size_t i = 0; i < viewports.size(); i++) {
+		viewports[i].camera->setPosition (pos + rot * viewports[i].position);
+		viewports[i].camera->setOrientation(rot);
+	}
 }
 
 /**
@@ -517,7 +592,9 @@ void LIRenRender::set_camera_transform (
 void LIRenRender::set_material_scheme (
 	const char* value)
 {
-	viewport->setMaterialScheme (value);
+	for(size_t i = 0; i < viewports.size(); i++) {
+		viewports[i].viewport->setMaterialScheme (value);
+	}
 }
 
 /**
@@ -554,8 +631,9 @@ void LIRenRender::set_skybox (
 void LIRenRender::get_stats (
 	LIRenStats* result) const
 {
-	result->batch_count = viewport->_getNumRenderedBatches ();
-	result->face_count = viewport->_getNumRenderedFaces ();
+	//todo: Handle the case of more than 1 view port.
+	result->batch_count = viewports[0].viewport->_getNumRenderedBatches ();
+	result->face_count = viewports[0].viewport->_getNumRenderedFaces ();
 	result->material_count = count_resources (Ogre::MaterialManager::getSingleton ());
 	result->material_count_loaded = count_resources_loaded (Ogre::MaterialManager::getSingleton ());
 	result->mesh_count = count_resources (Ogre::MeshManager::getSingleton ());

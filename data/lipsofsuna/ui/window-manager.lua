@@ -32,6 +32,8 @@ WindowManager.new = function(clss)
 	local mode = Graphics:get_video_mode()
 	self.__width = mode[1]
 	self.__height = mode[2]
+	self.__real_width = mode[1]
+	self.__real_height = mode[2]
 	return self
 end
 
@@ -66,14 +68,24 @@ end
 WindowManager.update = function(self, secs)
 	-- Update the window size.
 	local mode = Graphics:get_video_mode()
-	local resized = (mode[1] ~= self.__width or mode[2] ~= self.__height)
+	local w, h
+	if Client.options.vr_enabled then
+		w = math.floor(mode[1] / 2.0)
+		h = mode[2]
+	else
+		w = mode[1]
+		h = mode[2]
+	end
+	local resized = (w ~= self.__width or h ~= self.__height)
 	if resized then
-		self.__width = mode[1]
-		self.__height = mode[2]
-		self.__base:set_request(mode[1], mode[2])
+		self.__real_width = mode[1]
+		self.__real_height = mode[2]
+		self.__width = w
+		self.__height = h
+		self.__base:set_request(w, h)
 		self.__base:set_offset(Vector(0, 0))
 		for k,v in pairs(self.__windows) do
-			k:screen_resized(mode[1], mode[2])
+			k:screen_resized(w, h)
 		end
 	end
 	-- Emit key repeat events.

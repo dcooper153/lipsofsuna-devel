@@ -48,9 +48,12 @@ Options.config_keys = {
 	ui_animations = {"User interface animations", "bool"},
 	ui_size = {"User interface size", "int", 1, 3},
 	view_distance = {"View distance", "float", 10, 1000000},
+	vr_enabled = {"VR enable", "bool"},
+	vr_ipd = {"IPD (mm)", "int", 50, 80},
 	vsync = {"Vertical sync", "bool"},
 	window_height = {"Window height", "int", 32, 65536},
 	window_width = {"Window width", "int", 32, 65536}}
+
 
 --- Creates the options.
 -- @param clss Options class.
@@ -91,6 +94,8 @@ Options.new = function(clss)
 	self.ui_animations = true
 	self.ui_size = 2
 	self.view_distance = 200
+	self.vr_enabled = false
+	self.vr_ipd = 63
 	-- Read values from the configuration file.
 	self.config = ConfigFile{name = "options.cfg"}
 	for k,t in pairs(clss.config_keys) do
@@ -146,14 +151,24 @@ end
 Options.apply = function(self)
 	-- Set the anisotropic filter.
 	local Render = require("system/render")
+	local Viewport = require("system/viewport")
+
 	Render:set_anisotrophy(self.anisotropic_filter)
 	-- Set the shader scheme.
 	-- TODO: Change this now since quality 2 is not used.
+	Viewport:remove_all()
+	if self.vr_enabled then
+		Viewport:add("CameraL", 0.0, 0, 0.5, 1, -self.vr_ipd / 2000.0, 0, 0)
+		Viewport:add("CameraR", 0.5, 0, 0.5, 1,  self.vr_ipd / 2000.0, 0, 0)
+	else
+		Viewport:add("Camera", 0, 0, 1, 1, 0, 0, 0)
+	end
 	Render:remove_compositor("compositor/default")
 	Render:remove_compositor("compositor/outlines")
 	Render:remove_compositor("compositor/particles")
 	Render:remove_compositor("bloom1")
-	if self.shader_quality > 1 then
+	Render:remove_compositor("hdmwarp")
+	if self.shader_quality > 2 then
 		Render:set_material_scheme("none")
 		Render:add_compositor("compositor/default")
 		if self.outlines_enabled then
@@ -163,6 +178,11 @@ Options.apply = function(self)
 		if self.bloom_enabled then
 		   Render:add_compositor("bloom1")
 		end
+		if self.vr_enabled then
+			Render:add_compositor("hmdwarp")
+		end
+	elseif self.shader_quality == 2 then
+		Render:set_material_scheme("none")
 	else
 		Render:set_material_scheme("fixed")
 	end

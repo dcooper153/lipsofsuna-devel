@@ -1,5 +1,4 @@
 local Class = require("system/class")
-local Graphics = require("system/graphics")
 local UiWidget = require("ui/widgets/widget")
 
 local UiStat = Class("UiStat", UiWidget)
@@ -74,9 +73,8 @@ UiStat.update = function(self, secs)
 	self.timer = self.timer - secs
 	-- Update the offset and visibility.
 	if stat and self.timer > 0 then
-		local mode = Graphics:get_video_mode()
-		local pad = mode[1] - self.size.x
-		self:set_offset(Vector(pad / 2, mode[2] - self.index * Theme.text_height_1 * 1.2))
+		local pad = Ui.size.x - self.size.x
+		self:set_offset(Vector(pad / 2, Ui.size.y - self.index * Theme.text_height_1 * 1.2))
 		self:set_visible(true)
 	else
 		self.timer = 0

@@ -44,10 +44,9 @@ Hudlog.update = function(self, secs)
 	local changed = self.need_relayout
 	self.need_relayout = true
 	-- Update the screen offset.
-	local mode = Graphics:get_video_mode()
-	if self:get_width() ~= mode[1] or self:get_offset().y ~= mode[2] - 200 then
-		self:set_offset(Vector(5, mode[2] - Theme.text_height_1 * 3 - 200))
-		self:set_request(mode[1], 200)
+	if self:get_width() ~= Ui.size.x or self:get_offset().y ~= Ui.size.y - 200 then
+		self:set_offset(Vector(5, Ui.size.y - Theme.text_height_1 * 3 - 200))
+		self:set_request(Ui.size.x, 200)
 		changed = true
 	end
 	-- Fade out messages.

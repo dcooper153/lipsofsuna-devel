@@ -555,7 +555,6 @@ Ui.show_state = function(self, state, focus)
 		end
 	end
 	-- Set the state name text.
-	local mode = Graphics:get_video_mode()
 	self:update_help()
 	-- Toggle HUD widgets.
 	for index,hud in pairs(self.huds) do
@@ -645,6 +644,7 @@ Ui.screen_resized = function(self, width, height)
 	self.window:set_request(width, height)
 	self:update_help()
 	self.need_relayout = true
+	Client.options:apply()
 end
 
 --- Updates the user interface system.
@@ -752,18 +752,17 @@ Ui.update_help = function(self)
 		hint = hint .. "\n\n" .. help
 	end
 	-- Update the help text.
-	local mode = Graphics:get_video_mode()
 	self.label:set_request(Theme.help_text_width, nil)
 	self.label:set_font(Theme.text_font_2)
 	self.label:set_text(state and state.label or "")
-	self.label:set_offset(Vector(mode[1] - Theme.help_text_width, 0))
+	self.label:set_offset(Vector(self.size.x - Theme.help_text_width, 0))
 	self.hint:set_request(Theme.help_text_width, nil)
 	self.hint:set_font(Theme.text_font_1)
 	self.hint:set_text(hint)
 	if self.label:get_text() ~= "" then
-		self.hint:set_offset(Vector(mode[1] - Theme.help_text_width, Theme.help_title_height))
+		self.hint:set_offset(Vector(self.size.x - Theme.help_text_width, Theme.help_title_height))
 	else
-		self.hint:set_offset(Vector(mode[1] - Theme.help_text_width, 0))
+		self.hint:set_offset(Vector(self.size.x - Theme.help_text_width, 0))
 	end
 end
 

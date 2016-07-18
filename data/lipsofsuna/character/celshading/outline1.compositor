@@ -29,11 +29,12 @@ compositor compositor/outlines
 {
 	technique
 	{
-		texture depth target_width target_height PF_FLOAT32_R pooled chain_scope
-		texture outlines target_width target_height PF_R8G8B8 pooled chain_scope
+		texture depth target_width target_height PF_FLOAT32_R chain_scope
+		texture outlines target_width target_height PF_R8G8B8 chain_scope
 		target depth
 		{
 			input none
+			shadows off
 			pass clear
 			{
 			}

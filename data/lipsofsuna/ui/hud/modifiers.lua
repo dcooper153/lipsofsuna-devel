@@ -9,7 +9,6 @@
 -- @alias Hudmodifiers
 
 local Class = require("system/class")
-local Graphics = require("system/graphics")
 local Widget = require("system/widget")
 
 --- HUD status modifier list widget.
@@ -88,8 +87,7 @@ Hudmodifiers.update = function(self, secs)
 	if len == 0 then
 		self:set_visible(false)
 	else
-		local mode = Graphics:get_video_mode()
-		local width = mode[1] - len * Theme.width_icon_1
+		local width = Ui.size.x - len * Theme.width_icon_1
 		self:set_offset(Vector(width / 2, 5))
 		self:set_visible(true)
 		for k,v in pairs(self.dict_id) do

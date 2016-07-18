@@ -438,13 +438,17 @@ void LIRenObject::update (
 	/* Frustum culling cannot necessarily eliminate all desirable objects if the
 	   view distance is very low. Because of that, we allow the user to specify
 	   the render distance for the object. */
-	if (render_distance > 0)
+	if (render_distance > 0 && visible)
 	{
-		float dist2 = node->getSquaredViewDepth (render->camera);
-		if (dist2 > render_distance * render_distance)
-			node->setVisible (false);
-		else
-			node->setVisible (visible);
+		bool vis = false;
+		for(size_t i = 0; i < render->viewports.size(); i++) {
+			float dist2 = node->getSquaredViewDepth (render->viewports[i].camera);
+			if (dist2 <= render_distance * render_distance) {
+				vis = true;
+				break;
+			}
+		}
+		node->setVisible (vis);
 	}
 	else
 		node->setVisible (visible);

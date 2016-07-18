@@ -1,0 +1,15 @@
+fragment_program hmdwarp/frag glsl {
+	source hmdwarp.frag
+	default_params {
+		param_named HmdWarpParam float4 1, 0.22, 0.24, 0
+		param_named_auto ViewPortSize viewport_size
+		param_named_auto ViewPortOffset texel_offsets
+		param_named Prescale float2 2 2
+		param_named Postscale float2 0.25 0.25
+	}
+}
+
+vertex_program hmdwarp/vert glsl {
+	source hmdwarp.vert
+}
+

@@ -1,0 +1,18 @@
+material hmdwarp {
+	technique {
+		pass {
+			depth_check off
+
+			vertex_program_ref hmdwarp/vert {
+			}
+			fragment_program_ref hmdwarp/frag {
+			}
+			texture_unit tx {
+				tex_coord_set 0
+				tex_address_mode border
+				tex_border_colour 0 0 0
+				filtering linear linear linear
+			}
+		}
+	}
+}

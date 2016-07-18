@@ -42,6 +42,15 @@ class LIRenObject;
 class LIRenOverlayManager;
 class LIRenResourceLoadingListener;
 
+typedef struct _LIRenViewport LIRenViewport;
+struct _LIRenViewport {
+	Ogre::String name; //<The name of the view port.
+	Ogre::Camera* camera; //<The camera used for this viewport.
+	Ogre::Vector3 position; //<The position of the camera, relative to the unrotated viewer.
+	Ogre::Viewport* viewport; //<The viewport itself.
+	int zorder;
+};
+
 class LIRenRender
 {
 public:
@@ -55,6 +64,16 @@ public:
 
 	void remove_compositor (
 		const char* name);
+
+	void add_viewport (
+		const char* name,
+		float view_rect[4],
+		float camera_pos[3]);
+
+	void remove_viewport (
+		const char* name);
+
+	void remove_all_viewports ();
 
 	void add_object (
 		LIRenObject* object);
@@ -187,7 +206,7 @@ public:
 
 	float unload_timer;
 	Ogre::Root* root;
-	Ogre::Camera* camera;
+	std::vector<LIRenViewport> viewports; //<Array of viewports and associated names and cameras.
 	Ogre::MaterialManager* material_manager;
 	LIRenOverlayManager* overlay_mgr;
 	Ogre::RenderWindow* render_window;
@@ -195,7 +214,6 @@ public:
 	Ogre::SceneManager* scene_manager;
 	Ogre::SceneNode* scene_root;
 	Ogre::TextureManager* texture_manager;
-	Ogre::Viewport* viewport;
 	Ogre::LogManager* log;
 	LIRenMaterialUtils* material_utils;
 	LIRenResourceLoadingListener* resource_loading_listener;

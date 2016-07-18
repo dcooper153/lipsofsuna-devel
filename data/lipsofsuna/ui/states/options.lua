@@ -53,6 +53,10 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "options",
+	widget = function() return UiStateMenu("VR (experimental)", "options/vr") end}
+
+Ui:add_widget{
+	state = "options",
 	widget = function() return UiStateMenu("Sound", "options/sound") end}
 
 Ui:add_widget{
@@ -140,6 +144,22 @@ Ui:add_widget{
 		return UiConfigOption("nudity_enabled", function()
 			Client.options:apply()
 		end)
+	end}
+
+------------------------------------------------------------------------------
+
+Ui:add_widget{
+	state = "options/vr",
+	widget = function()
+		return UiConfigOption("vr_enabled",
+			function() Client.options:apply() end)
+	end}
+
+Ui:add_widget{
+	state = "options/vr",
+	widget = function()
+		return UiConfigOption("vr_ipd",
+			function() Client.options:apply() end)
 	end}
 
 ------------------------------------------------------------------------------
