@@ -127,4 +127,10 @@ Main.main_start_hooks:register(500, function()
 		Main.effect_manager:play_global("uitransition1")
 	end}
 
+	Client.input:register_binding{name = "console", mode = "press", key1 = Keysym.BACKQUOTE, func = function()
+		if not Client.player_object then return end
+		Ui:set_state("console")
+		Main.effect_manager:play_global("uitransition1")
+	end}
+
 end)

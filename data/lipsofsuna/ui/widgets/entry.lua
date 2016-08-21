@@ -1,8 +1,10 @@
 local Class = require("system/class")
 local Graphics = require("system/graphics")
 local Keysym = require("system/keysym")
+local Keymods = require("system/keymods")
 local String = require("system/string")
 local UiWidget = require("ui/widgets/widget")
+local Clipboard = require("system/clipboard")
 
 local UiEntry = Class("UiEntry", UiWidget)
 
@@ -13,6 +15,9 @@ UiEntry.new = function(clss, label, changed)
 	self.changed = changed
 	self.hint = "$A: Edit\n$$B\n$$U\n$$D"
 	self.need_reshape = true
+	self.history_enabled = false
+	self.history = {}
+	self.history_index = 1
 	return self
 end
 
@@ -92,20 +97,86 @@ UiEntry.handle_event = function(self, args)
 		self:move_cursor_down()
 		self.need_repaint = true
 	elseif args.text then
-		-- Typing.
-		local w = String.utf8_to_wchar(self.value or "")
-		local p = self.cursor_pos
-		local i = String.utf8_to_wchar(args.text)
-		for k,v in ipairs(i) do
-			table.insert(w, p, v)
-			p = p + 1
+		if ((math.floor(args.mods / Keymods.LALT) % 2) + (math.floor(args.mods / Keymods.RALT) % 2)) > 0 then
+			if self.history_enabled and (args.text == 'p' or args.text == 'P') then
+				self:history_select(self.history_index - 1)
+			elseif self.history_enabled and (args.text == 'n' or args.text == 'N') then
+				self:history_select(self.history_index + 1)
+			end
+		elseif args.text == '\x16' then --ctrl v
+			self:insert_text(Clipboard.get())
+		elseif args.text == '\x03' then --ctrl c
+			Clipboard.set(self.value)
+		else
+			self:insert_text(args.text)
 		end
-		self.value = String.wchar_to_utf8(w)
-		self.cursor_pos = p
-		self.need_reshape = true
-		self.need_repaint = true
-		self:changed()
 	end
+end
+
+--- Enables or disables history.
+-- @param en Disables history if false, enables history otherwise.
+UiEntry.history_enable = function(self, en)
+	if en == nil then
+		self.history_enabled = true
+	else
+		self.history_enabled = en and true or false
+	end
+end
+
+--- Adds a text string to the history list.
+-- @param text The text string to append to the end of the history list.
+UiEntry.history_add = function(self, text)
+	--Don't store if the last one was the same as this.
+	if #self.history > 0 and self.history[#self.history] == text then
+		return
+	end
+	--todo: limit length of history
+	--todo: remove duplicates?
+	self.history[#self.history + 1] = text
+	self.history_index = #self.history + 1
+end
+
+--- Sets the text of the widget to the history element at the given index, or blank if past the end of the history.
+--@param index The index of the history element to use.
+UiEntry.history_select = function(self, index)
+	self.history_index = index
+	if self.history_index > #self.history + 1 then
+		self.history_index = #self.history + 1
+	end
+	if self.history_index < 1 then
+		self.history_index = 1
+	end
+	if self.history_index > #self.history then
+		self.value = ""
+	else
+		self.value = self.history[self.history_index]
+	end
+	--todo: set cursor position to the end
+	self.cursor_pos = 1
+	self.need_reshape = true
+	self.need_repaint = true
+	self:changed()
+end
+
+--- Inserts text into the entry widget.
+-- @param text The text to insert.
+-- @param pos The position to insert to, defaults to cursor_pos.
+-- @param move Move cursor_pos after insert, defaults to false if pos supplied or true otherwise.
+UiEntry.insert_text = function(self, text, pos, move)
+	local w = String.utf8_to_wchar(self.value or "")
+	local p = pos or self.cursor_pos
+	local i = String.utf8_to_wchar(text)
+	for k,v in ipairs(i) do
+		table.insert(w, p, v)
+		p = p + 1
+	end
+	self.value = String.wchar_to_utf8(w)
+	if move or not pos then
+		self.cursor_pos = p
+	end
+	self.need_reshape = true
+	self.need_repaint = true
+	self:changed()
 end
 
 --- Moves the cursor down one line.

@@ -29,6 +29,7 @@ extern LIMaiExtensionInfo liext_animation_info;
 extern LIMaiExtensionInfo liext_array_info;
 extern LIMaiExtensionInfo liext_billboard_info;
 extern LIMaiExtensionInfo liext_camera_info;
+extern LIMaiExtensionInfo liext_clipboard_info;
 extern LIMaiExtensionInfo liext_config_file_info;
 extern LIMaiExtensionInfo liext_database_info;
 extern LIMaiExtensionInfo liext_file_info;
@@ -118,6 +119,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "time", &liext_time_info },
 		{ "vision", &liext_vision_info },
 		{ "watchdog", &liext_watchdog_info },
+		{ "clipboard", &liext_clipboard_info },
 #ifndef LI_DISABLE_GRAPHICS
 		{ "billboard", &liext_billboard_info },
 		{ "camera", &liext_camera_info },
