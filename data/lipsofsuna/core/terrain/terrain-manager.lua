@@ -156,19 +156,21 @@ end
 
 --- Saves all active chunks to the database.
 -- @param self TerrainManager.
+-- @param db The database to save to, will fall back to internal database if nil.
 -- @param erase True to completely erase the old map.
-TerrainManager.save_all = function(self, erase)
-	if not self.database then return end
-	self.database:query([[BEGIN TRANSACTION;]])
+TerrainManager.save_all = function(self, db, erase)
+	local database = db or self.database
+	if not database then return end
+	database:query([[BEGIN TRANSACTION;]])
 	-- Erase old world from the database.
 	if erase then
-		self.database:query([[DELETE FROM terrain_chunks;]])
+		database:query([[DELETE FROM terrain_chunks;]])
 	end
 	-- Write each chunk.
 	for id,chunk in pairs(self.chunks) do
 		chunk:save()
 	end
-	self.database:query([[END TRANSACTION;]])
+	database:query([[END TRANSACTION;]])
 end
 
 --- Updates the state of the chunks.
@@ -201,8 +203,6 @@ TerrainManager.update = function(self, secs)
 		if chunk and not chunk.loader then
 			if chunk.object or chunk.time_model then
 				chunk:create_render_object()
-				--todo: Remove this once the terrain texture atlas can be updated as needed.
-				self.texture:set_image(self.image)
 			end
 		end
 	end
