@@ -249,7 +249,7 @@ static void private_calculate_control (
 	if ((target_speed < 0.0f || current_speed < target_speed) &&
 	    (target_speed > 0.0f || current_speed > target_speed))
 	{
-		accel_factor = limat_smoothstep (target_speed, 1.0f, target_speed);
+		accel_factor = limat_smoothstep(current_speed, 0, target_speed);
 		accel_factor = limat_mix (6.0f, 2.0f, accel_factor);
 		*acceleration_result += *direction * target_speed * accel_factor;
 	}
