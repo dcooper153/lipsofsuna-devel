@@ -546,7 +546,7 @@ static bool private_contact_processed (
 		momentum0 = limat_vector_multiply (momentum0, liphy_object_get_mass (object0));
 	}
 	else
-		momentum1 = limat_vector_init (0.0f, 0.0f, 0.0f);
+		momentum0 = limat_vector_init (0.0f, 0.0f, 0.0f);
 	if (object1 != NULL)
 	{
 		liphy_object_get_velocity (object1, &momentum1);
