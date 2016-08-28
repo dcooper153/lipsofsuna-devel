@@ -55,6 +55,7 @@ extern LIMaiExtensionInfo liext_parallel_info;
 extern LIMaiExtensionInfo liext_particle_info;
 extern LIMaiExtensionInfo liext_password_info;
 extern LIMaiExtensionInfo liext_physics_info;
+extern LIMaiExtensionInfo liext_physics_debug_info;
 extern LIMaiExtensionInfo liext_physics_terrain_info;
 extern LIMaiExtensionInfo liext_reload_info;
 extern LIMaiExtensionInfo liext_render_info;
@@ -127,6 +128,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "heightmap-render", &liext_heightmap_render_info },
 		{ "input", &liext_input_info },
 		{ "particle", &liext_particle_info },
+		{ "physics-debug", &liext_physics_debug_info },
 		{ "render", &liext_render_info },
 		{ "render-object", &liext_object_render_info },
 		{ "render-model", &liext_render_model_info },

@@ -132,8 +132,19 @@ Main.main = function(self)
 			Graphics:update_scene(tick)
 		end
 		-- Update physics and render.
+		--if Client.player_object then
+		--	print("before:", Client.player_object.physics:get_position())
+		--end
+		if self.physics_debug_enable and self.physics_debug then
+			self.timing:start_action("phy-debug")
+			self.physics_debug:draw()
+		end
 		self.timing:start_action("parallel")
 		Parallel:update_physics_and_render(tick)
+		--if Client.player_object then
+		--	print("after:", Client.player_object.physics:get_position())
+		--end
+		self.timing:start_action("wrap")
 	end
 	self.main_end_hooks:call()
 end
