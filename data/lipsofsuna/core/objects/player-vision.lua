@@ -174,7 +174,7 @@ PlayerVision.__callback = function(self, args)
 			local v = s:get_skill(args.name)
 			if not v then return end
 			if v.prot == "public" or player == o then
-				Main.messaging:server_event("object stat", client, o:get_id(), args.name, args.value, args.maximum, math.ceil(args.value - args.value_prev + 0.5))
+				Main.messaging:server_event("object stat", client, o:get_id(), args.name, args.value, args.maximum, math.floor(args.value - args.value_prev + 0.5))
 			end
 		end,
 		["object-equip"] = function(args)
