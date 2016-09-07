@@ -744,18 +744,23 @@ int liext_terrain_column_build_model (
 			/* Bottom face. */
 			if (stick_prev != NULL && stick_prev->material == 0)
 			{
-				limdl_vertex_init (quad + 0, &bot[0][0].coord, &bot[0][0].normal, s * (offset->x + bot[0][0].coord.x), s * (offset->z + bot[0][0].coord.z));
-				limdl_vertex_init (quad + 1, &bot[1][0].coord, &bot[1][0].normal, s * (offset->x + bot[1][0].coord.x), s * (offset->z + bot[1][0].coord.z));
-				limdl_vertex_init (quad + 2, &bot[1][1].coord, &bot[1][1].normal, s * (offset->x + bot[1][1].coord.x), s * (offset->z + bot[1][1].coord.z));
-				limdl_vertex_init (quad + 3, &bot[0][1].coord, &bot[0][1].normal, s * (offset->x + bot[0][1].coord.x), s * (offset->z + bot[0][1].coord.z));
-				quad[0].color[0] = material->texture_bottom;
-				quad[1].color[0] = material->texture_bottom;
-				quad[2].color[0] = material->texture_bottom;
-				quad[3].color[0] = material->texture_bottom;
-				quad[0].color[1] = 255 * (int)(1.0f - bot[0][0].splatting);
-				quad[1].color[1] = 255 * (int)(1.0f - bot[1][0].splatting);
-				quad[2].color[1] = 255 * (int)(1.0f - bot[1][1].splatting);
-				quad[3].color[1] = 255 * (int)(1.0f - bot[0][1].splatting);
+				/*Choose corners to best match the underlying convex hull model used for physics.*/
+				size_t q0 = (bot[0][0].coord.y + bot[1][1].coord.y <= bot[1][0].coord.y + bot[0][1].coord.y) ? 0 : 1;
+				size_t q1 = q0 + 1;
+				size_t q2 = q0 + 2;
+				size_t q3 = (q0 + 3) & 0x3;
+				limdl_vertex_init (quad + q0, &bot[0][0].coord, &bot[0][0].normal, s * (offset->x + bot[0][0].coord.x), s * (offset->z + bot[0][0].coord.z));
+				limdl_vertex_init (quad + q1, &bot[1][0].coord, &bot[1][0].normal, s * (offset->x + bot[1][0].coord.x), s * (offset->z + bot[1][0].coord.z));
+				limdl_vertex_init (quad + q2, &bot[1][1].coord, &bot[1][1].normal, s * (offset->x + bot[1][1].coord.x), s * (offset->z + bot[1][1].coord.z));
+				limdl_vertex_init (quad + q3, &bot[0][1].coord, &bot[0][1].normal, s * (offset->x + bot[0][1].coord.x), s * (offset->z + bot[0][1].coord.z));
+				quad[q0].color[0] = material->texture_bottom;
+				quad[q1].color[0] = material->texture_bottom;
+				quad[q2].color[0] = material->texture_bottom;
+				quad[q3].color[0] = material->texture_bottom;
+				quad[q0].color[1] = 255 * (int)(1.0f - bot[0][0].splatting);
+				quad[q1].color[1] = 255 * (int)(1.0f - bot[1][0].splatting);
+				quad[q2].color[1] = 255 * (int)(1.0f - bot[1][1].splatting);
+				quad[q3].color[1] = 255 * (int)(1.0f - bot[0][1].splatting);
 				private_insert_quad (builder, 0, quad);
 			}
 
@@ -763,18 +768,23 @@ int liext_terrain_column_build_model (
 			if (stick->next == NULL || stick->next->material == 0)
 			{
 				/* Face. */
-				limdl_vertex_init (quad + 0, &top[0][0].coord, &top[0][0].normal, s * (offset->x + top[0][0].coord.x), s * (offset->z + top[0][0].coord.z));
-				limdl_vertex_init (quad + 1, &top[0][1].coord, &top[0][1].normal, s * (offset->x + top[0][1].coord.x), s * (offset->z + top[0][1].coord.z));
-				limdl_vertex_init (quad + 2, &top[1][1].coord, &top[1][1].normal, s * (offset->x + top[1][1].coord.x), s * (offset->z + top[1][1].coord.z));
-				limdl_vertex_init (quad + 3, &top[1][0].coord, &top[1][0].normal, s * (offset->x + top[1][0].coord.x), s * (offset->z + top[1][0].coord.z));
-				quad[0].color[0] = material->texture_top;
-				quad[1].color[0] = material->texture_top;
-				quad[2].color[0] = material->texture_top;
-				quad[3].color[0] = material->texture_top;
-				quad[0].color[1] = 255 * (int)(1.0f - stick->vertices[0][0].splatting);
-				quad[1].color[1] = 255 * (int)(1.0f - stick->vertices[0][1].splatting);
-				quad[2].color[1] = 255 * (int)(1.0f - stick->vertices[1][1].splatting);
-				quad[3].color[1] = 255 * (int)(1.0f - stick->vertices[1][0].splatting);
+				/*Choose corners to best match the underlying convex hull model used for physics.*/
+				size_t q0 = (top[0][0].coord.y + top[1][1].coord.y >= top[1][0].coord.y + top[0][1].coord.y) ? 0 : 1;
+				size_t q1 = q0 + 1;
+				size_t q2 = q0 + 2;
+				size_t q3 = (q0 + 3) & 0x3;
+				limdl_vertex_init (quad + q0, &top[0][0].coord, &top[0][0].normal, s * (offset->x + top[0][0].coord.x), s * (offset->z + top[0][0].coord.z));
+				limdl_vertex_init (quad + q1, &top[0][1].coord, &top[0][1].normal, s * (offset->x + top[0][1].coord.x), s * (offset->z + top[0][1].coord.z));
+				limdl_vertex_init (quad + q2, &top[1][1].coord, &top[1][1].normal, s * (offset->x + top[1][1].coord.x), s * (offset->z + top[1][1].coord.z));
+				limdl_vertex_init (quad + q3, &top[1][0].coord, &top[1][0].normal, s * (offset->x + top[1][0].coord.x), s * (offset->z + top[1][0].coord.z));
+				quad[q0].color[0] = material->texture_top;
+				quad[q1].color[0] = material->texture_top;
+				quad[q2].color[0] = material->texture_top;
+				quad[q3].color[0] = material->texture_top;
+				quad[q0].color[1] = 255 * (int)(1.0f - stick->vertices[0][0].splatting);
+				quad[q1].color[1] = 255 * (int)(1.0f - stick->vertices[0][1].splatting);
+				quad[q2].color[1] = 255 * (int)(1.0f - stick->vertices[1][1].splatting);
+				quad[q3].color[1] = 255 * (int)(1.0f - stick->vertices[1][0].splatting);
 				private_insert_quad (builder, 0, quad);
 
 				/* Grass. */
