@@ -102,19 +102,25 @@ class LIMesh:
 			bimg = uvtexture.data[face.index].image
 		# Select the texture coordinate mode.
 		uvmode = 'UV'
+		uvmapping = 'FLAT'
 		if uvtexture and uvlayer:
 			if bmat and len(bmat.texture_slots):
 				if bmat.texture_slots[0] and bmat.texture_slots[0].texture_coords == 'ORCO':
 					uvmode = 'ORCO'
+				if bmat.texture_slots[0] and bmat.texture_slots[0].mapping != 'FLAT':
+					uvmapping = bmat.texture_slots[0].mapping
 		else:
 			uvmode = 'ORCO'
+			uvmapping = 'SPHERE'
 		# Generate the texture coordinates.
-		if uvmode == 'UV':
+		if uvmapping == 'FLAT':
 			uvs = self.generate_texcoord_uv(face, verts, uvlayer)
 		else:
+			if uvmapping != 'SPHERE' or uvmode != 'ORCO':
+				print("Warning: UV mode and mapping combination not properly handled, treating as SPHERE ORCO. Mapping: %s , Mode: %s" % (uvmapping, uvmode))
 			uvs = self.generate_texcoord_orco_sphere(face, verts)
 		# Emit material.
-		key = (bmat and idx or -1, bimg and bimg.name or '')
+		key = ((bmat is None) and -1 or idx, bimg and bimg.name or '')
 		if key not in self.matdict:
 			mat = LIMaterial(len(self.matlist), bmat, bimg)
 			self.matdict[key] = mat
