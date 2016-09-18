@@ -18,6 +18,8 @@
 /**
  * \addtogroup LIExt Extension
  * @{
+ * \addtogroup LIObj Object
+ * @{
  * \addtogroup LIObjObject Object
  * @{
  */
@@ -77,5 +79,6 @@ void liobj_sector_free (
 	lisys_free (self);
 }
 
+/** @} */
 /** @} */
 /** @} */

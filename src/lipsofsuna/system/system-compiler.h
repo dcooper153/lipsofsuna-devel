@@ -18,6 +18,12 @@
 #ifndef __SYSTEM_COMPILER_H__
 #define __SYSTEM_COMPILER_H__
 
+/**
+ * \addtogroup LISys System
+ * @{
+ * \addtogroup LISysCompiler Compiler
+ * @{
+ */
 #ifdef WIN32
  #ifdef __cplusplus
   #define LIAPIEXPORT(ret, name, args) extern "C" __declspec(dllexport) ret name args
@@ -35,23 +41,51 @@
   #define LIAPIIMPORT(ret, name, args) ret name args
  #endif
 #endif
+
+/**
+ * \brief Declares a C function.
+ * \param ret The return expression of the function.
+ * \param name The name of the function.
+ * \param args
+ */
 #ifdef DLL_EXPORT
  #define LIAPICALL(ret, name, args) LIAPIIMPORT(ret, name, args)
 #else
  #define LIAPICALL(ret, name, args) LIAPIEXPORT(ret, name, args)
 #endif
 
+/**
+ * \brief Declares a GCC style attribute.
+ * For compilers not supporting this, it will be an empty macro.
+ * \param attr The attribute to declare.
+ */
 #if __GNUC__ >= 4
-#define LISYS_ATTR_CONST __attribute__((const))
-#define LISYS_ATTR_FORMAT(i, j) __attribute__((format (printf, i, j)))
-#define LISYS_ATTR_NORETURN __attribute__((noreturn))
-#define LISYS_ATTR_SENTINEL __attribute__((sentinel))
+#define LISYS_ATTR(attr) __attribute__(attr)
 #else
-#define LISYS_ATTR_CONST
-#define LISYS_ATTR_FORMAT(i, j)
-#define LISYS_ATTR_NORETURN
-#define LISYS_ATTR_SENTINEL
+#define LISYS_ATTR(attr)
 #endif
+
+/**
+ * \brief Declare a function as having the const attribute.
+ */
+#define LISYS_ATTR_CONST LISYS_ATTR((const))
+/**
+ * \brief Declare a function as having printf style formatting.
+ * \param i The index of the parameter with the format string (1 based).
+ * \param j The index of the first vararg parameter (1 based).
+ */
+#define LISYS_ATTR_FORMAT(i, j) LISYS_ATTR((format (printf, i, j)))
+/**
+ * \brief Declare a function as never returning.
+ */
+#define LISYS_ATTR_NORETURN LISYS_ATTR((noreturn))
+/**
+ * \brief Declare a function as the sentinel attribute.
+ */
+#define LISYS_ATTR_SENTINEL LISYS_ATTR((sentinel))
+
+/** @} */
+/** @} */
 
 #endif
 

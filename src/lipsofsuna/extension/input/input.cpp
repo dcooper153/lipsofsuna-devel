@@ -18,6 +18,8 @@
 /**
  * \addtogroup LIExt Extension
  * @{
+ * \addtogroup LIInp Input
+ * @{
  * \addtogroup LIInpInput Input
  * @{
  */
@@ -206,5 +208,6 @@ static int private_tick (
 	return 1;
 }
 
+/** @} */
 /** @} */
 /** @} */

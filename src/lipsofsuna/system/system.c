@@ -40,6 +40,15 @@
 #include "system-error.h"
 #include "system-path.h"
 
+/**
+ * \brief Prints a message to stderr, before terminating by abort().
+ * This function is called when \ref lisys_assert fails.
+ * \param asrt The string of the expression that failed.
+ * \param file The filename where the failed \ref lisys_assert was.
+ * \param line The line number the failed \ref lisys_assert was.
+ * \param func The function containing the failed \ref lisys_assert.
+ * \sa lisys_assert
+ */
 void lisys_assert_fail (
 	const char* asrt,
 	const char* file,

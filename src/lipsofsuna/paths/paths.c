@@ -40,6 +40,7 @@ static int private_create_save_path (
  * \param path Package root directory or NULL for auto-detect.
  * \param name Module name.
  * \return Paths or NULL.
+ * \public \memberof _LIPthPaths
  */
 LIPthPaths* lipth_paths_new (
 	const char* path,
@@ -178,6 +179,8 @@ LIPthPaths* lipth_paths_new (
 			self->global_exts = lisys_string_dup (LIEXTSDIR);
 			private_validate_dir (&self->global_exts);
 		}
+#else
+		private_validate_dir (&self->global_exts);
 #endif
 	}
 
@@ -199,6 +202,7 @@ LIPthPaths* lipth_paths_new (
  * \brief Frees the paths object.
  *
  * \param self Paths object.
+ * \public \memberof _LIPthPaths
  */
 void lipth_paths_free (
 	LIPthPaths* self)
@@ -236,6 +240,7 @@ void lipth_paths_free (
  * \brief Adds a data directory lookup path.
  * \param self Paths.
  * \param path Module root relative path.
+ * \public \memberof _LIPthPaths
  */
 int lipth_paths_add_path (
 	LIPthPaths* self,
@@ -272,6 +277,7 @@ int lipth_paths_add_path (
  * \brief Adds a data directory lookup path.
  * \param self Paths.
  * \param path Absolute path.
+ * \public \memberof _LIPthPaths
  */
 int lipth_paths_add_path_abs (
 	LIPthPaths* self,
@@ -340,11 +346,12 @@ int lipth_paths_add_path_abs (
 }
 
 /**
- * \brief Creates a new file in the override directory.
+ * \brief Makes a full path to a file in either the configuration directory (config is non-zero), or the save data directory (config is zero).
  * \param self Paths.
- * \param name Filename.
+ * \param name The filename to append to the base path.
  * \param config One for a config file, zero for a data file.
  * \return path Absolute path or NULL.
+ * \public \memberof _LIPthPaths
  */
 const char* lipth_paths_create_file (
 	LIPthPaths* self,
@@ -380,6 +387,7 @@ const char* lipth_paths_create_file (
  * \param self Paths.
  * \param name File name.
  * \return path Absolute path or NULL.
+ * \public \memberof _LIPthPaths
  */
 const char* lipth_paths_find_file (
 	LIPthPaths* self,
@@ -394,6 +402,7 @@ const char* lipth_paths_find_file (
  * \param path Path relative to the data directory root.
  * \param config Nonzero for a config file, zero for a data file.
  * \return Absolute path or NULL.
+ * \public \memberof _LIPthPaths
  */
 char* lipth_paths_find_path (
 	const LIPthPaths* self,
@@ -425,6 +434,7 @@ char* lipth_paths_find_path (
 /**
  * \brief Gets the game root directory.
  * \return Path or NULL.
+ * \relates _LIPthPaths
  */
 char* lipth_paths_get_root ()
 {

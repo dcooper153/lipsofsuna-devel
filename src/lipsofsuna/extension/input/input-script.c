@@ -18,6 +18,8 @@
 /**
  * \addtogroup LIExt Extension
  * @{
+ * \addtogroup LIInp Input
+ * @{
  * \addtogroup LIInpInput Input
  * @{
  */
@@ -77,5 +79,6 @@ void liinp_script_input (
 	liscr_script_insert_cfunc (self, LIINP_SCRIPT_INPUT, "input_set_pointer_grab", Input_set_pointer_grab);
 }
 
+/** @} */
 /** @} */
 /** @} */

@@ -22,14 +22,18 @@
 
 #define LIMAI_EXTENSION_VERSION 0xFFFFFFFF
 
+/**
+ * \brief A structure for holding the information related to an extension.
+ * This is used by the extension system to load and initialise extensions as they're needed.
+ */
 typedef struct _LIMaiExtensionInfo LIMaiExtensionInfo;
 struct _LIMaiExtensionInfo
 {
-	unsigned int version;
-	const char* name;
-	void* init;
-	void* free;
-	void* memstat;
+	unsigned int version; /**< The version of the extension system this extension was designed to work with.*/
+	const char* name; /**< A string with the name of this extension.*/
+	void* init; /**< A function pointer that's called to initialise this extension.*/
+	void* free; /**< A function pointer that's called to release a previously initialised extension.*/
+	void* memstat; /**< A function pointer to gather statistic's about the extension's memory usage.*/
 };
 
 typedef struct _LIMaiExtension LIMaiExtension;

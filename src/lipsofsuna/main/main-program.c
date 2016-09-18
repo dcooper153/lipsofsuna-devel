@@ -53,6 +53,7 @@ static int private_tick (
  * \param name Module name.
  * \param args Module arguments or NULL.
  * \return New program or NULL.
+ * \public \memberof _LIMaiProgram
  */
 LIMaiProgram* limai_program_new (
 	const char* path,
@@ -86,6 +87,7 @@ LIMaiProgram* limai_program_new (
  * \brief Frees the program.
  *
  * \param self Program.
+ * \public \memberof _LIMaiProgram
  */
 void limai_program_free (
 	LIMaiProgram* self)
@@ -174,6 +176,7 @@ void limai_program_free (
  * \param self Program.
  * \param type Event type.
  * \param ... List of name,type,value triplets terminated by NULL.
+ * \public \memberof _LIMaiProgram
  */
 void limai_program_event (
 	LIMaiProgram* self,
@@ -192,6 +195,7 @@ void limai_program_event (
  * \param self Program.
  * \param type Event type.
  * \param args Variable argument list.
+ * \public \memberof _LIMaiProgram
  */
 void limai_program_eventva (
 	LIMaiProgram* self,
@@ -211,6 +215,7 @@ void limai_program_eventva (
  * \param self Program.
  * \param file Filename.
  * \return Nonzero on success.
+ * \public \memberof _LIMaiProgram
  */
 int limai_program_execute_script (
 	LIMaiProgram* self,
@@ -231,6 +236,7 @@ int limai_program_execute_script (
  * \param self Program.
  * \param code Code string.
  * \return Nonzero on success.
+ * \public \memberof _LIMaiProgram
  */
 int limai_program_execute_string (
 	LIMaiProgram* self,
@@ -252,6 +258,7 @@ int limai_program_execute_string (
  * \param self Program.
  * \param name Component name.
  * \return Component or NULL.
+ * \public \memberof _LIMaiProgram
  */
 void* limai_program_find_component (
 	LIMaiProgram* self,
@@ -266,6 +273,7 @@ void* limai_program_find_component (
  * \param self Program.
  * \param name Extension name.
  * \return Extension or NULL.
+ * \public \memberof _LIMaiProgram
  */
 LIMaiExtension* limai_program_find_extension (
 	LIMaiProgram* self,
@@ -287,6 +295,7 @@ LIMaiExtension* limai_program_find_extension (
  * \param self Program.
  * \param name Extensions name.
  * \return Nonzero on success.
+ * \public \memberof _LIMaiProgram
  */
 int limai_program_insert_extension (
 	LIMaiProgram* self,
@@ -418,6 +427,7 @@ int limai_program_insert_extension (
  * \param name Component name.
  * \param value Component.
  * \return Nonzero on success.
+ * \public \memberof _LIMaiProgram
  */
 int limai_program_insert_component (
 	LIMaiProgram* self,
@@ -431,6 +441,7 @@ int limai_program_insert_component (
  * \brief Pops an event from the event queue.
  * \param self Program.
  * \return Event, or NULL.
+ * \public \memberof _LIMaiProgram
  */
 LIMaiEvent* limai_program_pop_event (
 	LIMaiProgram* self)
@@ -459,6 +470,7 @@ LIMaiEvent* limai_program_pop_event (
  * \param self Program.
  * \param queue Message queue.
  * \return Message, or NULL.
+ * \public \memberof _LIMaiProgram
  */
 LIMaiMessage* limai_program_pop_message (
 	LIMaiProgram* self,
@@ -489,6 +501,7 @@ LIMaiMessage* limai_program_pop_message (
  * physics update or other critical loops.
  * 
  * \param self Program.
+ * \public \memberof _LIMaiProgram
  */
 void limai_program_pump_events (
 	LIMaiProgram* self)
@@ -535,6 +548,7 @@ void limai_program_pump_events (
  * \brief Pushes an event to the event queue.
  * \param self Program.
  * \param event Event.
+ * \public \memberof _LIMaiProgram
  */
 void limai_program_push_event (
 	LIMaiProgram* self,
@@ -566,6 +580,7 @@ void limai_program_push_event (
  * \param name Message name.
  * \param data Message data to be soft copied.
  * \return Nonzero on success.
+ * \public \memberof _LIMaiProgram
  */
 int limai_program_push_message (
 	LIMaiProgram* self,
@@ -603,6 +618,7 @@ int limai_program_push_message (
  *
  * \param self Program.
  * \param name Component name.
+ * \public \memberof _LIMaiProgram
  */
 void limai_program_remove_component (
 	LIMaiProgram* self,
@@ -616,6 +632,7 @@ void limai_program_remove_component (
  *
  * \note Thread safe.
  * \param self Program.
+ * \public \memberof _LIMaiProgram
  */
 void limai_program_shutdown (
 	LIMaiProgram* self)
@@ -626,6 +643,7 @@ void limai_program_shutdown (
 /**
  * \brief Executes unit tests for the whole engine.
  * \param self Program.
+ * \public \memberof _LIMaiProgram
  */
 void limai_program_unittest (
 	LIMaiProgram* self)
@@ -637,6 +655,7 @@ void limai_program_unittest (
  * \brief Updates the program state.
  * \param self Program.
  * \return Nonzero if the program is still running.
+ * \public \memberof _LIMaiProgram
  */
 int limai_program_update (
 	LIMaiProgram* self)
@@ -675,6 +694,7 @@ int limai_program_update (
  *
  * \param self Program.
  * \return Time in seconds.
+ * \public \memberof _LIMaiProgram
  */
 double limai_program_get_time (
 	const LIMaiProgram* self)

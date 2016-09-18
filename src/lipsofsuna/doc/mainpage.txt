@@ -1,0 +1,78 @@
+/*! \mainpage
+
+Lips of Suna
+============
+
+This is the code documentation for the Lips of Suna engine. This is primarily concerned with the C/C++ backend of the engine. For documentation on the Lua code extensions consult the Lua Docs for <a href="../system/index.html" target="_blank">`system`</a>. For documentation on the code for game Lips of Suna, consult the Lua Docs for <a href="../lipsofsuna/index.html" target="_blank">`lipsofsuna`</a>.
+
+Programming Language
+--------------------
+
+The Lips of Suna engine is writen in a mixture of C and C++, with C predominately used for older code, but C++ is used for newer code and libraries using C++.
+
+Naming Conventions
+------------------
+
+Structs and classes have the following naming convention:
+
+    LIModClassOrStruct
+
+Where:
+ - "LI" is the project prefix for Lips of Suna.
+ - "Mod" is a 3 letter abbreviation for the module or category this struct or class belongs to.
+ - "ClassOrStruct" is a mixed case name for the struct or class.
+
+C functions are all in lower case have the following formats:
+
+    limod_function_name
+    limod_c_class_function_name
+
+Where:
+ - "li" is the project prefix for Lips of Suna
+ - "mod" is the 3 letter abbreviation for the module or category
+
+
+Abbr. |    Module  | Description
+:---: | :--------: | :-------------------------------------------------
+ Alg  | \ref LIAlg | Covers algorithms like random number genration and path findind, and also covers advance data structures like dictionaries.
+ Arc  | \ref LIArc | x
+ Cal  | \ref LICal | x
+ Ext  | \ref LIExt | Extension is a broad category primarily consiting of sub-modules that implement script extensions.
+ Inp  | \ref LIInp | x
+ Mai  | \ref LIMai | x
+ Mdl  | \ref LIMdl | x
+ Mat  | \ref LIMat | Mathematical primatives and structures, and functions necessary for manipulating them.
+ Obj  | \ref LIObj | x
+ Phy  | \ref LIPhy | x
+ Pth  | \ref LIPth | x
+ Ren  | \ref LIRen | The render module is a broad module that implements most of the details of drawing stuff to the screen.
+ Scr  | \ref LIScr | The script module contains helper and wrapper functions that interface the Lua's script engine with the module interface.
+ Snd  | \ref LISnd | x
+ Sys  | \ref LISys | Functions and structures that are primarily related low level system details such as memory management, string, threads, and file I/O.
+ Wdg  | \ref LIWdg | x
+
+
+Files
+-----
+
+Extension | Notes
+:-------: | :--------------------------------------------------
+ .cpp     | Regular C++ files.
+ .c       | Regular C files.
+ .hpp     | C++ header files. These files can only be included from C++ files.
+ .h       | C header files. These files can be included from both C and C++ files. To ensure compatibility between C and C++ functions should be declared with \ref LIAPICALL .
+
+Object Oriented C
+-----------------
+
+A C class is defined a structure with the struct tag `_LIModClassName`, and a typedef alias `LIModClassName`.
+Member functions are prefixed with `limod_class_name_` in front of `memember_function` name to produce a name that looks like this:  `limod_class_name_member_function`.
+ - `LIModClassName *limod_class_name_new()` allocates a new instance of LIModClassName and initialises it. This is akin to using a new with a C++ constructor.
+ - `void limod_class_name_free(LIModClassName *self)` destructs the instance of LIModClassName before releasing the allocated memory. This is akin to using delete with a C++ destructor.
+
+Lua Extensions
+--------------
+
+\ref page_lua_extensions
+
+*/

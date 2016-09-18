@@ -30,7 +30,7 @@ Clipboard.get = function()
 	return Los.clipboard_get()
 end
 
---- Set a text string a clipboard.
+--- Set the clipboard with a text string.
 -- @param text The text to set into the clipboard.
 Clipboard.set = function(text)
 	Los.clipboard_set(text)

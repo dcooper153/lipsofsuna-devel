@@ -18,6 +18,8 @@
 /**
  * \addtogroup LIExt Extension
  * @{
+ * \addtogroup LIObj Object
+ * @{
  * \addtogroup LIObjObject Object
  * @{
  */
@@ -198,5 +200,6 @@ void liext_script_object (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_static", Object_set_static);
 }
 
+/** @} */
 /** @} */
 /** @} */

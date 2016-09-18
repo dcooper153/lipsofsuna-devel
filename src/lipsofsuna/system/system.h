@@ -34,11 +34,26 @@
 #define LISYS_EXTENSION_EXE ""
 #endif
 
+/**
+ * \addtogroup LISys System
+ * @{
+ * \addtogroup LISysSystem System
+ * @{
+ */
+/**
+ * \brief Tests if a supplied expression is true, and will abort if false.
+ * This is a macro implementing the equivalent of standard C's assert().
+ * Like assert() this will do nothing when compiled NDEBUG set.
+ * \param exp The expression to test
+ * \sa lisys_assert_fail
+ */
 #ifdef NDEBUG
 #define lisys_assert(exp) ((void) 0)
 #else
 #define lisys_assert(exp) ((exp)? (void) 0 : lisys_assert_fail (#exp, __FILE__, __LINE__, __func__))
 #endif
+/** @} */
+/** @} */
 
 /* Workaround for libflac providing its own assert.h that doesn't have assert(). */
 #ifdef __cplusplus

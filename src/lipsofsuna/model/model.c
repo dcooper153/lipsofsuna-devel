@@ -989,6 +989,7 @@ float* limdl_model_get_buffer_bon_wgt (
 /**
  * \brief Gets the index buffer data for the given LOD level.
  * \param self Model.
+ * \param level The level of detail.
  * \return Vertex buffer data on success. NULL otherwise.
  */
 uint16_t* limdl_model_get_buffer_idx (

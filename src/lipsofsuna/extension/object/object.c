@@ -18,6 +18,8 @@
 /**
  * \addtogroup LIEng Engine
  * @{
+ * \addtogroup LIObj Object
+ * @{
  * \addtogroup LIObjObject Object
  * @{
  */
@@ -241,5 +243,6 @@ int liobj_object_set_transform (
 	return 1;
 }
 
+/** @} */
 /** @} */
 /** @} */

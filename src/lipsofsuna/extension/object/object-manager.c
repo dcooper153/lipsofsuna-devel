@@ -18,6 +18,8 @@
 /**
  * \addtogroup LIExt Extension
  * @{
+ * \addtogroup LIObj Object
+ * @{
  * \addtogroup LIObjObject Object
  * @{
  */
@@ -120,5 +122,6 @@ void liobj_manager_get_memstat (
 /* TODO: memstat */
 }
 
+/** @} */
 /** @} */
 /** @} */

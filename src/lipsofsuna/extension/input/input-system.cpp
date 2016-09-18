@@ -18,6 +18,8 @@
 /**
  * \addtogroup LIExt Extension
  * @{
+ * \addtogroup LIInp Input
+ * @{
  * \addtogroup LIInpInput Input
  * @{
  */
@@ -254,5 +256,6 @@ int LIInpSystem::translate_mouse_button (OIS::MouseButtonID id)
 		break;
 */
 
+/** @} */
 /** @} */
 /** @} */

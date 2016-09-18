@@ -1,0 +1,127 @@
+/** \page page_lua_extensions Lua Extensions
+
+A Lua extension is a module that's loaded by the Lua program that either exposes features of the engine or implements features that are too slow in Lua.
+
+To implement an extension, a \ref _LIMaiExtensionInfo has to be defined. This is composed of version id \ref _LIMaiExtensionInfo::version , an extension name \ref _LIMaiExtensionInfo::name, and function pointers creating \ref _LIMaiExtensionInfo::init , releasing \ref _LIMaiExtensionInfo::free , and reporting memory stats \ref _LIMaiExtensionInfo::memstat .
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+void *liext_custom_addon_new (LIMaiProgram* program);
+void liext_custom_addon_free (void *self);
+void liext_custom_addon_get_memstat (void *self, LIMaiMemstat* stat);
+
+LIMaiExtensionInfo liext_model_merge_info =
+{
+	LIMAI_EXTENSION_VERSION, "CustomAddon",
+	liext_custom_addon_new,
+	liext_custom_addon_free,
+	liext_custom_addon_get_memstat
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The init/new function does two things. First it allocates an object to store information needed by the extension (typically the pointer to the passed \ref LIMaiProgram program). Secondly registers C-Lua functions with the program's script. It returns a pointer to the new object, or NULL if it fails.
+
+The free function is passed the object pointer returned by the init/new function, performs any special clean up (if required) before finally releasing it.
+
+The memstat function is meant to gather memory statistics, but it is a stub function in many extensions.
+
+Registering C-Lua Functions
+---------------------------
+
+C Lua extensions are registered with \ref liscr_script_insert_cfunc and \ref liscr_script_insert_mfunc . 
+
+\ref liscr_script_insert_mfunc is used for registering member functions. These functions are expected to be called like the member function of a Lua object, with the first parameter being passed being `self`. When the registered function is called from Lua, the script object will automatically extract the `self` object before passing it to
+
+\ref liscr_script_insert_cfunc is used for registering 'class' functions. These functions are either not member functions of an object, or special member functions like `new`. As such no `self` parameter is expected to be passed.
+
+In both case calling structure is the same, 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#define LIEXT_SCRIPT_CUSTOM_ADDON "CustomAddon"
+void liext_script_custom_addon(LIScrScript* self) {
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_CUSTOM_ADDON, "custom_addon_new", CustomAddon_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CUSTOM_ADDON, "custom_addon_member_function", CustomAddon_member_function);
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+C-Lua Functions
+---------------
+
+For the examples we use a simple C object LIExtCustomAddon, 
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+typedef struct _LIExtCustomAddon LIExtCustomAddon;
+struct _LIExtCustomAddon {
+	LIExtModule* module;
+};
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+static void CustomAddon_new(LIScrArgs* args) {
+	LIExtCustomAddon *self;
+	LIScrData *data;
+
+	/*Allocate storage for self.*/
+	self = (LIExtCustomAddon *)lisys_calloc (1, sizeof (LIExtCustomAddon));
+	if(self == NULL) {
+		
+		return;
+	}
+
+	/*Store the module for this extension. This is often useful.*/
+	module = (LIExtModule *)liscr_script_get_userdata (args->script, LIEXT_SCRIPT_CUSTOM_ADDON);
+
+
+	/* ... Other initialisation goes here. ... */
+
+	/*Allocate userdata.*/
+	data = (LIScrData *)liscr_data_new (args->script, args->lua, self, LIEXT_SCRIPT_CUSTOM_ADDON, (LIScrGCFunc)CustomAddon_free);
+	if(data == NULL) {
+		/*Failed to create Lua user data for this object. Release the object and abort.*/
+		CustomAddon_free(self);
+	}
+	/*Finalise Lua stack and return.*/
+	liscr_args_seti_stack (args);
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+static void CustomAddon_free(LIExtCustomAddon* self) {
+
+	/* ... Special clean up goes here. ... */
+
+	/*Release the object.*/
+	lisys_free(self);
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+Built In Extensions
+-------------------
+
+To add an extension to the engine itself, an entry must be added inside the array `info` in the function \ref limai_extension_get_builtin of the file `lipsofsuna/main/main-extension.c` . The entry will look like `{ "custom-addon", &liext_custom_addon_info }` , with the string being lower case. This string is what's used when trying to load an extension. 
+
+If the extension depends on graphics being present, it should go inside the \#`ifndef LI_DISABLE_GRAPHICS` block. 
+
+The existance of the extension info should be declared with `extern LIMaiExtensionInfo liext_custom_addon_info;`  with the other declarations before the function.
+
+
+Built In Extension File Location
+--------------------------------
+
+Files for a built in extension should be placed in `src/lipsofsuna/extension/<exension-name>`.
+
+Updating `wscript` For Built In Extnesions
+----------------------------------------
+
+To make the build process aware of these new files, `wscript` in the root of the Lips of Suna source must be updated. For extensions depending upon graphics, `<extension-name>` should be added to `EXTS_DIRS_GFX`. For other extensions `<extension-name>` is added to `EXTS_DIRS`. The build process will then automatically scan these directories and add all .c and .cpp files to the build process.
+
+
+.dll/.so Extensions
+-------------------
+
+???
+
+
+*/

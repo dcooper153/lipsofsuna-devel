@@ -182,8 +182,8 @@ void liext_number_array_2d_get_gradient (
 /**
  * \brief Samples the gradient at the given index.
  * \param self Array.
- * \param x X coordinate.
- * \param y Y coordinate.
+ * \param fx X coordinate.
+ * \param fy Y coordinate.
  * \param result_x Return location for the horizontal gradient.
  * \param result_y Return location for the vertical gradient.
  */

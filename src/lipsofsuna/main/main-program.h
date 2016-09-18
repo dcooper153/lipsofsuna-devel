@@ -26,8 +26,18 @@
 #include "main-extension.h"
 #include "main-message.h"
 
+/**
+ * \addtogroup LIMai Main
+ * @{
+ * \addtogroup LIMaiProgram Program
+ * @{
+ */
+
 #define LIMAI_PROGRAM_FPS_TICKS 32
 
+/**
+ * \brief This is a structure for holding the program that's executed by the engine.
+ */
 typedef struct _LIMaiProgram LIMaiProgram;
 struct _LIMaiProgram
 {
@@ -38,25 +48,28 @@ struct _LIMaiProgram
 	float tick;
 	float ticks[LIMAI_PROGRAM_FPS_TICKS];
 	char* args;
-	char* launch_name;
-	char* launch_args;
+	char* launch_name; /**< When this program has finished executing, it will launch a new program with this name, or exit if NULL. */
+	char* launch_args; /**< If launch_name is non-NULL, it will pass these arguments when launching the program launch_name. */
 	LISysTimeval start;
 	LISysTimeval curr_tick;
 	LISysTimeval prev_tick;
 	LIAlgRandom random;
-	LIAlgStrdic* components;
+	LIAlgStrdic* components; /**< A string indexed dictionary with pointers to the component objects instantiated for this program. */
 	LICalCallbacks* callbacks;
 	LICalHandle calls[1];
-	LIMaiExtension* extensions;
+	LIMaiExtension* extensions; /**< A pointer to a linked list of extension objects instatiated for this program. */
 	LIMaiEvent* events_first;
 	LIMaiEvent* events_last;
 	LIMaiMessage* messages[LIMAI_MESSAGE_QUEUE_MAX];
 	LIMaiProgram* parent;
 	LIMdlManager* models;
 	LIPthPaths* paths;
-	LIScrScript* script;
+	LIScrScript* script; /**< The Lua script engine for this program. */
 	LISysMutex* message_mutex;
 };
+
+/** @} */
+/** @} */
 
 LIAPICALL (LIMaiProgram*, limai_program_new, (
 	const char* path,
